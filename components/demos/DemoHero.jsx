@@ -2,9 +2,9 @@ export default function DemoHero() {
   return (
     <div className="demo-hero">
       <span className="eyebrow">
-        <span className="dot"></span>Portal de Serviços
+        <span className="dot" aria-hidden="true"></span>Portal de Serviços
       </span>
-      <h4>A Secretaria de Economia está mais perto de você.</h4>
+      <div className="title">A Secretaria de Economia está mais perto de você.</div>
       <p>
         Formulários, informações, requerimentos, calculadoras e guias da SEMEC
         Porto Velho.

@@ -11,11 +11,11 @@ export default function DemoCard({
     <div className={"demo-card" + (soon ? " soon" : "")}>
       <div className={"tag" + (green ? " green" : "")}>{tag}</div>
       {badge && <div className="badge">{badge}</div>}
-      <h5>{title}</h5>
+      <div className="title">{title}</div>
       <p>{description}</p>
       <div className="foot">
         <span className="go">{go}</span>
-        {!soon && <span className="arrow">→</span>}
+        {!soon && <span className="arrow" aria-hidden="true">→</span>}
       </div>
     </div>
   );

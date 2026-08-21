@@ -74,11 +74,11 @@ export default function OverviewPage() {
         {secoes.map((s) => (
           <Link key={s.href} href={s.href} className="demo-card" style={{ textDecoration: "none", color: "inherit" }}>
             <div className="tag">{s.tag}</div>
-            <h5>{s.title}</h5>
+            <div className="title">{s.title}</div>
             <p>{s.desc}</p>
             <div className="foot">
               <span className="go">Acessar</span>
-              <span className="arrow">→</span>
+              <span className="arrow" aria-hidden="true">→</span>
             </div>
           </Link>
         ))}
