@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { navigation } from "@/lib/navigation";
+import ThemeToggle from "./ThemeToggle";
 
 const allItems = () =>
   navigation.flatMap((item) =>
@@ -64,6 +65,7 @@ export default function Header({ open, onToggle }) {
           </div>
         )}
       </div>
+      <ThemeToggle />
       <button
         className="menu-btn"
         onClick={onToggle}

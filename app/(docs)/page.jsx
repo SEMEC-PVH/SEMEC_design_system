@@ -1,54 +1,64 @@
-import Link from "next/link";
 import Card from "@/components/ui/Card";
+import SectionCard from "@/components/ui/SectionCard";
+import {
+  ArtTipografia,
+  ArtCores,
+  ArtLayout,
+  ArtRaios,
+  ArtComponentes,
+  ArtAnimacoes,
+  ArtAcessibilidade,
+  ArtAntiPadroes,
+} from "@/components/ui/sectionArt";
 
 export const metadata = { title: "Visão geral" };
 
 const secoes = [
   {
     href: "/fundamentos/tipografia",
-    tag: "Fundamentos",
+    art: <ArtTipografia />,
     title: "Tipografia",
     desc: "Famílias e escala renderizada dos títulos, corpo e microtexto.",
   },
   {
     href: "/fundamentos/cores",
-    tag: "Fundamentos",
+    art: <ArtCores />,
     title: "Cores",
     desc: "Paletas pv-blue, pv-green, pv-yellow, neutros e papéis semânticos.",
   },
   {
     href: "/fundamentos/layout",
-    tag: "Fundamentos",
+    art: <ArtLayout />,
     title: "Layout",
     desc: "Container, grid de cards e regras de espaçamento.",
   },
   {
     href: "/fundamentos/raios-sombras",
-    tag: "Fundamentos",
+    art: <ArtRaios />,
     title: "Raios, bordas e sombras",
     desc: "Escala de raios e família de sombras institucional.",
   },
   {
     href: "/componentes",
-    tag: "Componentes",
+    art: <ArtComponentes />,
     title: "Componentes",
     desc: "Header, Hero, Barra de controles, ServiceCard, Botões e Footer.",
   },
   {
     href: "/regras/animacoes",
-    tag: "Regras",
+    art: <ArtAnimacoes />,
     title: "Animações",
     desc: "Easing padrão, movimento e prefers-reduced-motion.",
   },
   {
     href: "/regras/acessibilidade",
-    tag: "Regras",
+    art: <ArtAcessibilidade />,
     title: "Acessibilidade",
     desc: "Foco visível, contraste e semântica de landmarks.",
   },
   {
     href: "/regras/anti-padroes",
-    tag: "Regras",
+    art: <ArtAntiPadroes />,
     title: "Anti-padrões",
     desc: "O que não fazer ao construir interfaces SEMEC.",
   },
@@ -70,17 +80,15 @@ export default function OverviewPage() {
       </Card>
 
       <h2>Seções</h2>
-      <div className="demo-cards">
+      <div className="section-cards">
         {secoes.map((s) => (
-          <Link key={s.href} href={s.href} className="demo-card" style={{ textDecoration: "none", color: "inherit" }}>
-            <div className="tag">{s.tag}</div>
-            <h5>{s.title}</h5>
-            <p>{s.desc}</p>
-            <div className="foot">
-              <span className="go">Acessar</span>
-              <span className="arrow">→</span>
-            </div>
-          </Link>
+          <SectionCard
+            key={s.href}
+            href={s.href}
+            art={s.art}
+            title={s.title}
+            desc={s.desc}
+          />
         ))}
       </div>
     </>

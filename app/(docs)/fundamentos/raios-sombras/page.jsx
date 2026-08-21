@@ -28,11 +28,11 @@ export default function RaiosSombrasPage() {
         <div className="shape-grid">
           <Shape
             caption="Card repouso"
-            style={{ boxShadow: "0 1px 3px rgba(15,35,56,0.04)", border: "none" }}
+            style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.12)", border: "none" }}
           />
           <Shape
             caption="Card hover"
-            style={{ boxShadow: "0 14px 34px -12px rgba(15,35,56,0.22)", border: "none" }}
+            style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.16)", border: "none" }}
           />
           <Shape
             caption="Elevado"
@@ -40,9 +40,10 @@ export default function RaiosSombrasPage() {
           />
         </div>
         <p className="note">
-          Regra: sombras usam sempre a família{" "}
-          <code>rgba(15,35,56,…)</code> (azul institucional escuro), nunca preto
-          puro.
+          Cards (ServiceCard) usam a família de sombra neutra da Uber{" "}
+          <code>rgba(0,0,0,…)</code> (whisper-soft). Demais superfícies
+          continuam na família <code>rgba(15,35,56,…)</code> (azul institucional
+          escuro).
         </p>
       </Card>
     </>

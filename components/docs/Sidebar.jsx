@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { navigation } from "@/lib/navigation";
+import { safeGet, safeSet } from "@/lib/storage";
 
 const isActive = (pathname, href) => {
   const [path, hash] = href.split("#");
@@ -19,8 +20,7 @@ export default function Sidebar({ open, onClose }) {
     const saved = {};
     navigation.forEach((item) => {
       if (item.items) {
-        saved[item.key] =
-          localStorage.getItem("ds-group-" + item.key) === "0";
+        saved[item.key] = safeGet("ds-group-" + item.key) === "0";
       }
     });
     setCollapsed(saved);
@@ -33,7 +33,7 @@ export default function Sidebar({ open, onClose }) {
   const toggleGroup = (key) => {
     const next = { ...collapsed, [key]: !collapsed[key] };
     setCollapsed(next);
-    localStorage.setItem("ds-group-" + key, next[key] ? "0" : "1");
+    safeSet("ds-group-" + key, next[key] ? "0" : "1");
   };
 
   return (
