@@ -1,4 +1,4 @@
-import { Poppins, Press_Start_2P, JetBrains_Mono } from "next/font/google";
+import { Poppins, Press_Start_2P, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -15,7 +15,7 @@ const pressStart = Press_Start_2P({
   display: "swap",
 });
 
-const mono = JetBrains_Mono({
+const mono = IBM_Plex_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-mono",

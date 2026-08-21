@@ -34,6 +34,7 @@
   --fg: #14233a;
   --ps-body: #cfcecd;
   --ps-accent: #211e1e;
+  --black: #000000;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -44,7 +45,7 @@
 }
 
 body {
-  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-family: var(--font-mono), "IBM Plex Mono", ui-monospace, monospace;
   background: var(--bg);
   color: var(--fg);
   line-height: 1.6;
@@ -94,7 +95,7 @@ a {
 }
 .site-header .brand .name .dig {
   color: var(--pv-green-600);
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono), "IBM Plex Mono", ui-monospace, monospace;
   letter-spacing: -0.13em;
 }
 
@@ -188,8 +189,6 @@ a {
 .layout {
   display: flex;
   align-items: flex-start;
-  max-width: 1280px;
-  margin: 0 auto;
 }
 
 .sidebar {
@@ -329,7 +328,7 @@ h1 {
 h2 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--pv-blue-900);
+  color: var(--black);
   margin: 3rem 0 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--ps-accent);
@@ -383,7 +382,7 @@ code {
   border-radius: 0.3rem;
   padding: 0.05rem 0.35rem;
   font-size: 0.78em;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono), "IBM Plex Mono", ui-monospace, monospace;
 }
 
 ul,
@@ -521,7 +520,7 @@ li {
 }
 .demo-header .name .dig {
   color: var(--pv-green-600);
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono), "IBM Plex Mono", ui-monospace, monospace;
   letter-spacing: -0.13em;
 }
 .demo-header nav {
