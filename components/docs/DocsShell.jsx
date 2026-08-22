@@ -10,6 +10,9 @@ export default function DocsShell({ children }) {
 
   return (
     <>
+      <a className="skip-link" href="#topo">
+        Pular para o conteúdo
+      </a>
       <Header open={open} onToggle={() => setOpen((v) => !v)} />
       <div className="layout">
         <Sidebar open={open} onClose={onClose} />

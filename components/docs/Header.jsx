@@ -3,14 +3,20 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { navigation } from "@/lib/navigation";
+import { searchIndex } from "@/lib/searchIndex";
 import ThemeToggle from "./ThemeToggle";
 
 const allItems = () =>
   navigation.flatMap((item) =>
     item.items
       ? item.items.map((s) => ({ label: s.label, href: s.href, group: item.label }))
-      : [{ label: item.label, href: item.href, group: "Início" }]
+      : [{ label: item.label, href: item.href, group: "Introdução" }]
   );
+
+const groupOf = (href) => {
+  const found = allItems().find((r) => r.href === href);
+  return found ? found.group : "Seções";
+};
 
 export default function Header({ open, onToggle }) {
   const [query, setQuery] = useState("");
@@ -19,12 +25,23 @@ export default function Header({ open, onToggle }) {
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
-    return allItems()
-      .filter(
-        (r) =>
-          r.label.toLowerCase().includes(q) || r.href.toLowerCase().includes(q)
-      )
-      .slice(0, 8);
+    const seen = new Set();
+    const out = [];
+    for (const r of allItems()) {
+      if (r.label.toLowerCase().includes(q) || r.href.toLowerCase().includes(q)) {
+        if (seen.has(r.href)) continue;
+        seen.add(r.href);
+        out.push(r);
+      }
+    }
+    for (const idx of searchIndex) {
+      if (idx.term.toLowerCase().includes(q)) {
+        if (seen.has(idx.href)) continue;
+        seen.add(idx.href);
+        out.push({ label: idx.term, href: idx.href, group: groupOf(idx.href) });
+      }
+    }
+    return out.slice(0, 8);
   }, [query]);
 
   useEffect(() => {
@@ -45,10 +62,10 @@ export default function Header({ open, onToggle }) {
       <div className="header-search" ref={wrapRef}>
         <input
           type="search"
-          placeholder="Buscar no guia…"
+          placeholder="Buscar seções…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          aria-label="Buscar no guia"
+          aria-label="Buscar seções"
         />
         {query.trim() && (
           <div className="results">

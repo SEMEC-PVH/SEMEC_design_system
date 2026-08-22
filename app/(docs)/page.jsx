@@ -11,7 +11,7 @@ import {
   ArtAntiPadroes,
 } from "@/components/ui/sectionArt";
 
-export const metadata = { title: "Visão geral" };
+export const metadata = { title: "Introdução" };
 
 const secoes = [
   {
