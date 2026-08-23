@@ -41,13 +41,17 @@ export default function Sidebar({ open, onClose }) {
       {navigation.map((item) =>
         item.items ? (
           <div key={item.key}>
-            <div
+            <button
+              type="button"
               className={"side-title" + (collapsed[item.key] ? "" : " open")}
               onClick={() => toggleGroup(item.key)}
+              aria-expanded={!collapsed[item.key]}
+              aria-controls={"group-" + item.key}
             >
-              {item.label} <span className="caret">▶</span>
-            </div>
+              {item.label} <span className="caret" aria-hidden="true">▶</span>
+            </button>
             <div
+              id={"group-" + item.key}
               className={
                 "side-group" + (collapsed[item.key] ? " collapsed" : "")
               }
