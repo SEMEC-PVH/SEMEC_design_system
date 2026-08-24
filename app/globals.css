@@ -100,6 +100,58 @@ a {
   top: 8px;
 }
 
+/* ---- Cookie banner ---- */
+.cookie-banner {
+  background: var(--pv-blue-950);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1rem 1.5rem;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+}
+.cookie-banner-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  color: #fff;
+}
+.cookie-banner-content p {
+  margin: 0 0 0.3rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+.cookie-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.cookie-banner-actions button {
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.cookie-banner-actions button:first-child {
+  background: var(--pv-green-500);
+  color: var(--pv-blue-950);
+}
+.cookie-banner-actions button:last-child {
+  background: transparent;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+.cookie-banner-view {
+  color: #fff;
+  text-decoration: underline;
+  font-size: 0.78rem;
+  margin-left: 0.5rem;
+}
+
 /* ---- Header simples ---- */
 .site-header {
   position: sticky;
