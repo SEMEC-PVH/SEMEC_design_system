@@ -14,7 +14,7 @@ export default function AcessibilidadePage() {
         <ul>
           <li>
             <strong>Foco visível:</strong>{" "}
-            <code>focus-visible:ring-2 focus-visible:ring-pv-green-500</code>
+            <code>focus-visible:ring-2 focus-visible:ring-pv-green-800</code>
           </li>
           <li>
             <strong>Labels:</strong> <code>aria-label</code> em botões de ícone,{" "}

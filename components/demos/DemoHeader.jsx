@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid -- preview estático, links são placeholders */
 export default function DemoHeader() {
   return (
     <div className="demo-header">

@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid -- preview estático, links são placeholders */
 const social = [
   { glyph: "f", label: "SEMEC Digital no Facebook" },
   { glyph: "◎", label: "SEMEC Digital no Instagram" },

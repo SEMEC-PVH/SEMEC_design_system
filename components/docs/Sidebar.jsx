@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { navigation } from "@/lib/navigation";
 import { safeGet, safeSet } from "@/lib/storage";
 
@@ -14,22 +14,47 @@ const isActive = (pathname, href) => {
 
 const MOBILE_QUERY = "(max-width: 900px)";
 
+let collapsedCache = null;
+const listeners = new Set();
+const subscribe = (cb) => {
+  listeners.add(cb);
+  return () => listeners.delete(cb);
+};
+
+const readCollapsed = () => {
+  if (collapsedCache === null) {
+    collapsedCache = {};
+    if (typeof window !== "undefined") {
+      navigation.forEach((item) => {
+        if (item.items) {
+          collapsedCache[item.key] = safeGet("ds-group-" + item.key) === "0";
+        }
+      });
+    }
+  }
+  return collapsedCache;
+};
+
+const EMPTY_COLLAPSED = {};
+const serverCollapsed = () => EMPTY_COLLAPSED;
+
+function updateCollapsed(key, value) {
+  const next = { ...collapsedCache, [key]: value };
+  collapsedCache = next;
+  safeSet("ds-group-" + key, next[key] ? "0" : "1");
+  listeners.forEach((l) => l());
+}
+
 export default function Sidebar({ open, onClose }) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState({});
+  const collapsed = useSyncExternalStore(
+    subscribe,
+    readCollapsed,
+    serverCollapsed
+  );
   // Começa em `false` para que o primeiro render (servidor e cliente) nunca
   // marque a sidebar como inerte — o valor real chega no efeito abaixo.
   const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const saved = {};
-    navigation.forEach((item) => {
-      if (item.items) {
-        saved[item.key] = safeGet("ds-group-" + item.key) === "0";
-      }
-    });
-    setCollapsed(saved);
-  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
@@ -45,9 +70,7 @@ export default function Sidebar({ open, onClose }) {
   }, [pathname, onClose]);
 
   const toggleGroup = (key) => {
-    const next = { ...collapsed, [key]: !collapsed[key] };
-    setCollapsed(next);
-    safeSet("ds-group-" + key, next[key] ? "0" : "1");
+    updateCollapsed(key, !collapsedCache[key]);
   };
 
   // Fora da tela em mobile: retira do foco e do leitor de tela.

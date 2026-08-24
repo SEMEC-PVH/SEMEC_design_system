@@ -44,7 +44,7 @@ export default function TermosDeUsoPage() {
       <Card>
         <h3>Isenção de responsabilidade</h3>
         <p>
-          O conteúdo é disponibilizado "como está", com caráter informativo.
+          O conteúdo é disponibilizado &ldquo;como está&rdquo;, com caráter informativo.
           A SEMEC não se responsabiliza por decisões tomadas com base nas
           informações aqui apresentadas.
         </p>

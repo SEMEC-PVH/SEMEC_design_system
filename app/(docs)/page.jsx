@@ -72,7 +72,7 @@ export default function OverviewPage() {
 
       <Card>
         <h3>Como usar</h3>
-        <p style={{ fontSize: "0.85rem", color: "var(--pv-gray-500)" }}>
+        <p style={{ fontSize: "0.85rem", color: "var(--pv-gray-600)" }}>
           O sistema de design define as bases das interfaces de usuário em todo
           o ecossistema de produtos e serviços da SEMEC. Ele reúne todas as
           experiências da SEMEC sob uma estrutura única e unificada.

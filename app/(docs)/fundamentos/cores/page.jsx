@@ -102,7 +102,7 @@ export default function CoresPage() {
               <td>Fundo de página</td>
               <td>
                 <code>--background</code>{" "}
-                <span style={{ color: "var(--pv-gray-500)" }}>(#f4f6f9)</span>
+                <span style={{ color: "var(--pv-gray-600)" }}>(#f4f6f9)</span>
               </td>
             </tr>
             <tr>

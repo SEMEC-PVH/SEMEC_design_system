@@ -1,31 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { safeGet, safeSet } from "@/lib/storage";
+import { useSyncExternalStore } from "react";
+import { safeSet } from "@/lib/storage";
 
-function currentTheme() {
-  const root = document.documentElement;
-  return root.dataset.theme === "dark" ? "dark" : "light";
+const listeners = new Set();
+const subscribe = (cb) => {
+  listeners.add(cb);
+  return () => listeners.delete(cb);
+};
+
+const isDark = () =>
+  typeof document !== "undefined" &&
+  document.documentElement.dataset.theme === "dark";
+
+const serverIsDark = () => false;
+
+function applyTheme(next) {
+  document.documentElement.dataset.theme = next ? "dark" : "light";
+  safeSet("theme", next ? "dark" : "light");
+  listeners.forEach((l) => l());
 }
 
 export default function ThemeToggle() {
-  const [dark, setDark] = useState(false);
-
-  useEffect(() => {
-    setDark(currentTheme() === "dark");
-  }, []);
-
-  const toggle = () => {
-    const next = !dark;
-    setDark(next);
-    document.documentElement.dataset.theme = next ? "dark" : "light";
-    safeSet("theme", next ? "dark" : "light");
-  };
+  const dark = useSyncExternalStore(subscribe, isDark, serverIsDark);
 
   return (
     <button
       className="theme-toggle"
-      onClick={toggle}
+      onClick={() => applyTheme(!dark)}
       aria-label={dark ? "Ativar modo claro" : "Ativar modo escuro"}
       title={dark ? "Modo claro" : "Modo escuro"}
     >

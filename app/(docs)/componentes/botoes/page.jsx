@@ -14,10 +14,10 @@ export default function BotoesPage() {
       <Card>
         <h3>Preview</h3>
         <Buttons />
-        <p style={{ fontSize: "0.8rem", color: "var(--pv-gray-500)", marginTop: "0.75rem" }}>
+        <p style={{ fontSize: "0.8rem", color: "var(--pv-gray-600)", marginTop: "0.75rem" }}>
           Primário <code>bg-pv-blue-900 hover:bg-pv-blue-800</code> · destaque{" "}
           <code>bg-pv-green-600</code> · sempre{" "}
-          <code>focus-visible:ring-2 focus-visible:ring-pv-green-500</code>.
+          <code>focus-visible:ring-2 focus-visible:ring-pv-green-800</code>.
         </p>
       </Card>
     </>
