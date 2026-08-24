@@ -1,8 +1,27 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="site-footer">
-      <span className="site-footer-brand">SEMEC Digital</span>
-      <span>Design System · guia visual de referência</span>
+    <span className="site-footer-brand">DEVSEMEC</span>
+      <div className="site-footer-left">
+        <span className="site-footer-copy">
+          © 2026. Prefeitura de Porto Velho.
+        </span>
+        <nav className="site-footer-links" aria-label="Links do rodapé">
+          <a href="mailto:contato@semec.gov.br">Contato</a>
+          <a
+            href="https://www.portovelho.ro.gov.br/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Prefeitura de Porto Velho
+          </a>
+          <Link href="/cookies">Preferências de cookies</Link>
+          <Link href="/termos-de-uso">Termos de uso do site</Link>
+        </nav>
+      </div>
+
     </footer>
   );
 }

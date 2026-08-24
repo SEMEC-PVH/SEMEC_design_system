@@ -117,7 +117,7 @@ export default function Header({ open, onToggle }) {
   return (
     <header className="site-header">
       <div className="brand">
-        <span className="brand-pixel">DEVSEMEC</span>
+        <span className="brand-title">SEMEC | Design System</span>
       </div>
       <div className="header-search" ref={wrapRef}>
         <input
