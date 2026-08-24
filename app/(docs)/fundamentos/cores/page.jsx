@@ -22,6 +22,7 @@ const green = [
   ["pv-green-500", "#86c95b"],
   ["pv-green-600", "#70b643"],
   ["pv-green-700", "#5a9636"],
+  ["pv-green-800", "#3a6420"],
 ];
 
 const yellow = [
@@ -33,7 +34,9 @@ const yellow = [
 const gray = [
   ["pv-gray-100", "#f5f5f5"],
   ["pv-gray-200", "#e5e7eb"],
+  ["pv-gray-400", "#78849a"],
   ["pv-gray-500", "#6b7280"],
+  ["pv-gray-600", "#4b5563"],
   ["pv-gray-700", "#374151"],
 ];
 
@@ -42,6 +45,7 @@ const sistema = [
   ["Fundo página", "#f4f6f9"],
   ["Texto principal", "#14233a"],
   ["Superfície", "#ffffff"],
+  ["--focus-ring", "#223f99"],
 ];
 
 const Swatches = ({ tokens }) => (

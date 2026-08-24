@@ -1,16 +1,22 @@
-import { Poppins, Press_Start_2P, IBM_Plex_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+const poppins = localFont({
+  src: [
+    { path: "./fonts/Poppins-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/Poppins-500.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/Poppins-600.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/Poppins-700.woff2", weight: "700", style: "normal" },
+    { path: "./fonts/Poppins-800.woff2", weight: "800", style: "normal" },
+  ],
   variable: "--font-poppins",
   display: "swap",
 });
 
-const pressStart = Press_Start_2P({
-  subsets: ["latin"],
-  weight: "400",
+const pressStart = localFont({
+  src: [
+    { path: "./fonts/PressStart2P-400.woff2", weight: "400", style: "normal" },
+  ],
   variable: "--font-press-start",
   display: "swap",
 });

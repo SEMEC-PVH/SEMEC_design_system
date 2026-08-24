@@ -64,7 +64,7 @@ export default function ComponentesPage() {
                 <td>{c.desc}</td>
                 <td style={{ textAlign: "right" }}>
                   <Link href={c.href} aria-label={`Abrir página de ${c.title}`}>
-                    →
+                    <span aria-hidden="true">→</span>
                   </Link>
                 </td>
               </tr>

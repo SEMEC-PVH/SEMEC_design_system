@@ -29,15 +29,6 @@ export default function TipografiaPage() {
               </td>
               <td>Corpo, títulos, labels, links, botões.</td>
             </tr>
-            <tr>
-              <td>
-                <strong>Poppins Bold</strong>
-              </td>
-              <td>
-                <code>--font-poppins--bold</code>
-              </td>
-              <td>Títulos e chamamentos.</td>
-            </tr>
           </tbody>
         </table>
       </Card>

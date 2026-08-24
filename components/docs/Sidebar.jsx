@@ -12,9 +12,14 @@ const isActive = (pathname, href) => {
   return pathname === href || pathname.startsWith(href + "/");
 };
 
+const MOBILE_QUERY = "(max-width: 900px)";
+
 export default function Sidebar({ open, onClose }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState({});
+  // Começa em `false` para que o primeiro render (servidor e cliente) nunca
+  // marque a sidebar como inerte — o valor real chega no efeito abaixo.
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const saved = {};
@@ -27,6 +32,15 @@ export default function Sidebar({ open, onClose }) {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mql = window.matchMedia(MOBILE_QUERY);
+    const sync = (e) => setIsMobile(e.matches);
+    sync(mql);
+    mql.addEventListener("change", sync);
+    return () => mql.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
     onClose();
   }, [pathname, onClose]);
 
@@ -35,6 +49,10 @@ export default function Sidebar({ open, onClose }) {
     setCollapsed(next);
     safeSet("ds-group-" + key, next[key] ? "0" : "1");
   };
+
+  // Fora da tela em mobile: retira do foco e do leitor de tela.
+  // No desktop a sidebar está sempre visível, então nunca fica inerte.
+  const inert = isMobile && !open;
 
   return (
     <aside className={"sidebar" + (open ? " open" : "")} id="sidebar">
@@ -56,30 +74,11 @@ export default function Sidebar({ open, onClose }) {
                 "side-group" + (collapsed[item.key] ? " collapsed" : "")
               }
             >
-              {item.items.map((sub) => (
-                <Link
-                  key={sub.href + sub.label}
-                  href={sub.href}
-                  className={
-                    (sub.sub ? "sub " : "") +
-                    (isActive(pathname, sub.href) ? "active" : "")
-                  }
-                >
-                  {sub.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={isActive(pathname, item.href) ? "active" : ""}
-          >
-            {item.label}
-          </Link>
-        )
-      )}
+              {item.label}
+            </Link>
+          )
+        )}
+      </nav>
     </aside>
   );
 }

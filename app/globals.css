@@ -22,12 +22,18 @@
   --pv-green-500: #86c95b;
   --pv-green-600: #70b643;
   --pv-green-700: #5a9636;
+  /* Verde para TEXTO e para fundo com texto branco (WCAG AA) */
+  --pv-green-800: #3a6420;
   --pv-yellow-400: #f6d56e;
   --pv-yellow-500: #f2c94c;
   --pv-yellow-600: #d9ad2e;
   --pv-gray-100: #f5f5f5;
   --pv-gray-200: #e5e7eb;
+  /* Borda de campo de formulário — 3:1 mínimo (WCAG 1.4.11) */
+  --pv-gray-400: #78849a;
   --pv-gray-500: #6b7280;
+  /* Texto secundário sobre o fundo de página (--bg) */
+  --pv-gray-600: #4b5563;
   --pv-gray-700: #374151;
   --hero: #223f99;
   --bg: #f4f6f9;
@@ -196,15 +202,15 @@ a {
   font-family: inherit;
   font-size: 0.8rem;
   color: var(--fg);
-  outline: none;
 }
 .header-search input::placeholder {
   color: var(--text-muted);
 }
 .header-search input:focus {
-  border-color: var(--pv-green-500);
-  background: var(--surface);
-  box-shadow: 0 0 0 2px rgba(112, 182, 67, 0.2);
+  border-color: var(--focus-ring);
+  background: #fff;
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 .header-search .results {
   position: absolute;
@@ -304,6 +310,15 @@ a {
 }
 .sidebar .side-title.open .caret {
   transform: rotate(90deg);
+}
+/* Versão em <button> — mesmo visual, semântica acessível */
+button.side-title {
+  background: none;
+  border: none;
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 .sidebar .side-group {
   overflow: hidden;
@@ -633,7 +648,7 @@ li {
   text-decoration: none;
 }
 .demo-header nav a:hover {
-  color: var(--pv-green-600);
+  color: var(--pv-green-800);
 }
 .demo-header .cta {
   background: var(--pv-blue-900);
@@ -668,7 +683,8 @@ li {
   border-radius: 50%;
   background: var(--pv-yellow-500);
 }
-.demo-hero h4 {
+.demo-hero h4,
+.demo-hero .title {
   font-size: 1.6rem;
   font-weight: 700;
   line-height: 1.1;
@@ -738,7 +754,7 @@ li {
   bottom: 0;
   height: 2px;
   border-radius: 2px;
-  background: var(--pv-green-600);
+  background: var(--pv-green-800);
 }
 .demo-tabs .count {
   background: var(--pv-gray-100);
@@ -751,7 +767,7 @@ li {
 }
 .demo-tabs button.active .count {
   background: var(--pv-green-50);
-  color: var(--pv-green-700);
+  color: var(--pv-green-800);
 }
 .demo-search {
   padding: 1rem 1.25rem;
@@ -761,18 +777,18 @@ li {
 }
 .demo-search input {
   width: 100%;
-  border: 1px solid var(--pv-gray-200);
+  border: 1px solid var(--pv-gray-400);
   background: var(--pv-gray-100);
   border-radius: 0.75rem;
   padding: 0.75rem 2.5rem;
   font-family: inherit;
   font-size: 0.85rem;
-  outline: none;
 }
 .demo-search input:focus {
-  border-color: var(--pv-green-500);
+  border-color: var(--focus-ring);
   background: #fff;
-  box-shadow: 0 0 0 2px rgba(112, 182, 67, 0.2);
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 .demo-search .icon {
   position: absolute;
@@ -789,7 +805,7 @@ li {
   padding: 0.75rem 1.25rem 1.25rem;
 }
 .demo-chips .chip {
-  border: none;
+  border: 1px solid var(--pv-gray-400);
   font-family: inherit;
   font-size: 0.72rem;
   font-weight: 600;
@@ -849,7 +865,8 @@ li {
   font-weight: 700;
   text-transform: uppercase;
 }
-.demo-card h5 {
+.demo-card h5,
+.demo-card .title {
   margin-top: 0.9rem;
   font-size: 1.05rem;
   font-weight: 700;
@@ -873,14 +890,14 @@ li {
 .demo-card .foot .go {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--pv-green-700);
+  color: var(--pv-green-800);
 }
 .demo-card .foot .arrow {
   width: 32px;
   height: 32px;
   border-radius: 50%;
   background: var(--pv-green-50);
-  color: var(--pv-green-700);
+  color: var(--pv-green-800);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -888,7 +905,7 @@ li {
   transition: background 0.2s, color 0.2s;
 }
 .demo-card:hover .foot .arrow {
-  background: var(--pv-green-600);
+  background: var(--pv-green-800);
   color: #fff;
 }
 .demo-card.soon {
@@ -989,11 +1006,11 @@ li {
   background: var(--pv-blue-800);
 }
 .btn.green {
-  background: var(--pv-green-600);
+  background: var(--pv-green-800);
   color: #fff;
 }
 .btn.green:hover {
-  background: var(--pv-green-700);
+  background: #2f5a1b;
 }
 .btn.link {
   background: none;
@@ -1001,7 +1018,7 @@ li {
   padding: 0.25rem 0.5rem;
 }
 .btn.link:hover {
-  color: var(--pv-green-600);
+  color: var(--pv-green-800);
 }
 
 /* Footer simulado */
@@ -1012,7 +1029,8 @@ li {
   padding: 1.5rem;
   margin-top: 0.75rem;
 }
-.demo-footer h6 {
+.demo-footer h6,
+.demo-footer .title {
   font-size: 0.85rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
@@ -1075,13 +1093,14 @@ footer {
   padding-bottom: 2rem;
 }
 
-/* ---- Reduced motion ---- */
+/* ---- Movimento reduzido ---- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
