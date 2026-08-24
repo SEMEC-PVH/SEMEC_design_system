@@ -3,6 +3,7 @@
 import { useCallback, useState } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
+import CookieBanner from "./CookieBanner";
 
 export default function DocsShell({ children }) {
   const [open, setOpen] = useState(false);
@@ -13,6 +14,7 @@ export default function DocsShell({ children }) {
       <a className="skip-link" href="#topo">
         Pular para o conteúdo
       </a>
+      <CookieBanner />
       <Header open={open} onToggle={() => setOpen((v) => !v)} />
       <div className="layout">
         <Sidebar open={open} onClose={onClose} />
