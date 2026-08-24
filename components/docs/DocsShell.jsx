@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import CookieBanner from "./CookieBanner";
+import Footer from "./Footer";
 
 export default function DocsShell({ children }) {
   const [open, setOpen] = useState(false);
@@ -22,9 +23,7 @@ export default function DocsShell({ children }) {
           <div className="container">{children}</div>
         </main>
       </div>
-      <footer>
-        Design System — SEMEC Digital · guia visual de referência
-      </footer>
+      <Footer />
     </>
   );
 }
