@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { navigation } from "@/lib/navigation";
+import { safeGet, safeSet } from "@/lib/storage";
 
 const isActive = (pathname, href) => {
   const [path, hash] = href.split("#");
@@ -24,8 +25,7 @@ export default function Sidebar({ open, onClose }) {
     const saved = {};
     navigation.forEach((item) => {
       if (item.items) {
-        saved[item.key] =
-          localStorage.getItem("ds-group-" + item.key) === "0";
+        saved[item.key] = safeGet("ds-group-" + item.key) === "0";
       }
     });
     setCollapsed(saved);
@@ -47,7 +47,7 @@ export default function Sidebar({ open, onClose }) {
   const toggleGroup = (key) => {
     const next = { ...collapsed, [key]: !collapsed[key] };
     setCollapsed(next);
-    localStorage.setItem("ds-group-" + key, next[key] ? "0" : "1");
+    safeSet("ds-group-" + key, next[key] ? "0" : "1");
   };
 
   // Fora da tela em mobile: retira do foco e do leitor de tela.
@@ -55,52 +55,24 @@ export default function Sidebar({ open, onClose }) {
   const inert = isMobile && !open;
 
   return (
-    <aside
-      className={"sidebar" + (open ? " open" : "")}
-      id="sidebar"
-      inert={inert}
-    >
-      <nav aria-label="Seções do guia">
-        {navigation.map((item) =>
-          item.items ? (
-            <div key={item.key}>
-              <button
-                type="button"
-                className={"side-title" + (collapsed[item.key] ? "" : " open")}
-                onClick={() => toggleGroup(item.key)}
-                aria-expanded={!collapsed[item.key]}
-                aria-controls={"side-group-" + item.key}
-              >
-                {item.label}{" "}
-                <span className="caret" aria-hidden="true">
-                  ▶
-                </span>
-              </button>
-              <div
-                id={"side-group-" + item.key}
-                className={
-                  "side-group" + (collapsed[item.key] ? " collapsed" : "")
-                }
-              >
-                {item.items.map((sub) => (
-                  <Link
-                    key={sub.href + sub.label}
-                    href={sub.href}
-                    className={
-                      (sub.sub ? "sub " : "") +
-                      (isActive(pathname, sub.href) ? "active" : "")
-                    }
-                  >
-                    {sub.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={isActive(pathname, item.href) ? "active" : ""}
+    <aside className={"sidebar" + (open ? " open" : "")} id="sidebar">
+      {navigation.map((item) =>
+        item.items ? (
+          <div key={item.key}>
+            <button
+              type="button"
+              className={"side-title" + (collapsed[item.key] ? "" : " open")}
+              onClick={() => toggleGroup(item.key)}
+              aria-expanded={!collapsed[item.key]}
+              aria-controls={"group-" + item.key}
+            >
+              {item.label} <span className="caret" aria-hidden="true">▶</span>
+            </button>
+            <div
+              id={"group-" + item.key}
+              className={
+                "side-group" + (collapsed[item.key] ? " collapsed" : "")
+              }
             >
               {item.label}
             </Link>
