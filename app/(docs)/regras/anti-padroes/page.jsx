@@ -17,8 +17,9 @@ export default function AntiPadroesPage() {
             Não usar hex solto de cor — sempre token <code>pv-*</code>.
           </li>
           <li>
-            Não criar sombra com preto puro — usar a família{" "}
-            <code>rgba(15,35,56,…)</code>.
+            Não criar sombra própria fora dos padrões — cards usam{" "}
+            <code>rgba(0,0,0,…)</code> whisper-soft; demais superfícies usam a
+            família <code>rgba(15,35,56,…)</code>.
           </li>
           <li>
             Não inventar raio novo — usar os valores da seção de raios.

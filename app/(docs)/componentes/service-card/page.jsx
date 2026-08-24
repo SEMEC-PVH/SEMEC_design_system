@@ -36,12 +36,13 @@ export default function ServiceCardPage() {
           />
         </div>
         <p style={{ fontSize: "0.8rem", color: "var(--pv-gray-500)", marginTop: "0.75rem" }}>
-          Card: <code>rounded-2xl border border-slate-200/80 bg-white p-6</code>{" "}
-          · hover <code>-translate-y-1</code> + sombra · selo{" "}
+          Card: <code>bg-white rounded-2xl p-6</code> sem borda, sombra{" "}
+          <code>0 4px 16px rgba(0,0,0,0.12)</code> · hover whisper{" "}
+          <code>0 8px 24px rgba(0,0,0,0.16)</code> · selo{" "}
           <code>bg-pv-yellow-500 text-pv-blue-950</code> · seta{" "}
           <code>bg-pv-green-50</code> → hover{" "}
           <code>bg-pv-green-600 text-white</code> · &quot;Em breve&quot;{" "}
-          <code>border-dashed</code>.
+          <code>bg-#efefef</code>.
         </p>
       </Card>
     </>
