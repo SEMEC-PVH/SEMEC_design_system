@@ -1362,19 +1362,30 @@ footer {
    Dispara em `:hover` e em `:focus-visible`. O card é um link — quem
    navega por teclado tem de ver o mesmo que quem usa mouse.
 
-   Todo tempo e toda curva vêm dos tokens de movimento. A página inicial
-   passa a ser demonstração viva de `--duration-*` e `--easing-standard`.
+   SOBRE O TEMPO. Os três tokens de duração servem a retorno de interface,
+   onde a resposta tem de ser imediata. Esta arte é ilustração, e pede um
+   ritmo mais lento para o olho acompanhar o que está sendo dito. Por isso
+   os tempos daqui são *derivados* do token, com `calc()`, em vez de
+   inventados — se `--duration-slow` mudar, tudo aqui acompanha. É o mesmo
+   raciocínio do traço de 3px destes desenhos contra os 2px do sistema de
+   ícones: outra camada, outra régua, mesma origem.
    ---------------------------------------------------------------------- */
+
+.section-card-art {
+  --art-duracao: calc(var(--duration-slow) * 1.5); /* 600ms */
+  --art-escalonamento: calc(var(--duration-slow) * 0.35); /* 140ms */
+}
 
 /* `fill-box` faz a origem da transformação ser o próprio elemento, e não
    o sistema de coordenadas do SVG inteiro — sem isso, `center` aponta
-   para o meio do viewBox e tudo gira em torno do lugar errado. */
+   para o meio do viewBox e tudo gira em torno do lugar errado.
+
+   Só `transform` entra aqui: é a única propriedade que o compositor
+   resolve sem repintar. As que repintam ficam restritas a quem as usa. */
 .section-card-art [class*="art__"] {
   transform-box: fill-box;
   transform-origin: center;
-  transition: transform var(--duration-base) var(--easing-standard),
-    rx var(--duration-base) var(--easing-standard),
-    stroke-dashoffset var(--duration-slow) var(--easing-standard);
+  transition: transform var(--art-duracao) var(--easing-standard);
 }
 
 /* ---- Tipografia: a serifa da base se alarga ---- */
@@ -1398,10 +1409,15 @@ footer {
   transform: translateY(-3px);
 }
 .section-card:is(:hover, :focus-visible) .art__bloco--b {
-  transition-delay: 60ms;
+  transition-delay: var(--art-escalonamento);
 }
 
-/* ---- Raios: o raio de borda cresce, demonstrando o próprio token ---- */
+/* ---- Raios: o raio de borda cresce, demonstrando o próprio token ----
+   `rx` é propriedade geométrica: repinta, não compõe. Fica só nos dois
+   retângulos que a usam, em vez de pesar em todos os catorze elementos. */
+.section-card-art .art__raio {
+  transition: rx var(--art-duracao) var(--easing-standard);
+}
 .section-card:is(:hover, :focus-visible) .art__raio--externo {
   rx: 16;
 }
@@ -1417,38 +1433,54 @@ footer {
 /* ---- Animações: as setas avançam em sequência ---- */
 .section-card:is(:hover, :focus-visible) .art__seta {
   transform: translateX(4px);
-  transition-duration: var(--duration-fast);
 }
 .section-card:is(:hover, :focus-visible) .art__seta--2 {
-  transition-delay: 70ms;
+  transition-delay: var(--art-escalonamento);
 }
 .section-card:is(:hover, :focus-visible) .art__seta--3 {
-  transition-delay: 140ms;
+  transition-delay: calc(var(--art-escalonamento) * 2);
 }
 
-/* ---- Acessibilidade: a pupila percorre e volta ---- */
+/* ---- Acessibilidade: a pupila olha para um lado, para o outro, e volta
+   Começa e termina no centro, para não haver salto na entrada nem na
+   saída. As demoras em 35% e 70% são o que faz o movimento ler como
+   *olhar* em vez de deslizar: sem a pausa nos extremos, o olho parece
+   apenas escorregar de um lado ao outro. */
 .section-card:is(:hover, :focus-visible) .art__pupila {
-  animation: art-olhar var(--duration-slow) var(--easing-standard) 2 alternate;
+  animation: art-olhar calc(var(--art-duracao) * 2) var(--easing-standard);
 }
 
 @keyframes art-olhar {
-  from {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
     transform: translateX(-5px);
   }
-  to {
+  35% {
+    transform: translateX(-5px);
+  }
+  55% {
     transform: translateX(5px);
+  }
+  70% {
+    transform: translateX(5px);
+  }
+  100% {
+    transform: translateX(0);
   }
 }
 
 /* ---- Anti-padrões: o corte se desenha ----
    `pathLength="1"` normaliza o comprimento do traço, então 1 é o caminho
-   inteiro qualquer que seja a geometria. */
+   inteiro qualquer que seja a geometria. Em repouso o corte fica inteiro:
+   quem pediu menos movimento continua vendo o símbolo completo. */
 .section-card-art .art__corte {
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
 }
 .section-card:is(:hover, :focus-visible) .art__corte {
-  animation: art-cortar var(--duration-slow) var(--easing-standard);
+  animation: art-cortar calc(var(--art-duracao) * 1.5) var(--easing-standard);
 }
 
 @keyframes art-cortar {
