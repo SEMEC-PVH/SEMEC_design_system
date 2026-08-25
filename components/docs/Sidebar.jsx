@@ -3,14 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { navigation } from "@/lib/navigation";
+import { navigation, navState } from "@/lib/navigation";
 import { safeGet, safeSet } from "@/lib/storage";
-
-const isActive = (pathname, href) => {
-  const [path, hash] = href.split("#");
-  if (hash) return pathname === path;
-  return pathname === href || pathname.startsWith(href + "/");
-};
 
 const MOBILE_QUERY = "(max-width: 900px)";
 
@@ -105,25 +99,34 @@ export default function Sidebar({ open, onClose }) {
                   "side-group" + (collapsed[item.key] ? " collapsed" : "")
                 }
               >
-                {item.items.map((sub) => (
-                  <Link
-                    key={sub.href + sub.label}
-                    href={sub.href}
-                    className={
-                      (sub.sub ? "sub " : "") +
-                      (isActive(pathname, sub.href) ? "active" : "")
-                    }
-                  >
-                    {sub.label}
-                  </Link>
-                ))}
+                {item.items.map((sub) => {
+                  const estado = navState(pathname, sub.href);
+                  return (
+                    <Link
+                      key={sub.href + sub.label}
+                      href={sub.href}
+                      className={
+                        (sub.sub ? "sub " : "") + (estado ? "active" : "")
+                      }
+                      // Só a página aberta se anuncia como atual. A
+                      // categoria que a contém fica destacada, mas
+                      // anunciá-la também diria que há duas páginas atuais.
+                      aria-current={estado === "current" ? "page" : undefined}
+                    >
+                      {sub.label}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           ) : (
             <Link
               key={item.href}
               href={item.href}
-              className={isActive(pathname, item.href) ? "active" : ""}
+              className={navState(pathname, item.href) ? "active" : ""}
+              aria-current={
+                navState(pathname, item.href) === "current" ? "page" : undefined
+              }
             >
               {item.label}
             </Link>
