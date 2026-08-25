@@ -1,3 +1,5 @@
+@import "./tokens.css";
+
 *,
 *::before,
 *::after {
@@ -6,63 +8,47 @@
   padding: 0;
 }
 
+/* ==========================================================================
+   Compatibilidade com os nomes antigos
+   --------------------------------------------------------------------------
+   Os primitivos e a camada semântica moram agora em `tokens.css`. Os nomes
+   abaixo são os que o CSS deste arquivo já usava; viraram apelidos da
+   camada semântica, com valor idêntico ao que tinham. Nada mudou de
+   aparência — mudou de onde o valor vem.
+
+   Em código novo, use o token semântico (`--color-surface-base`), não o
+   apelido (`--bg`). Os apelidos saem quando o último uso sair.
+   ========================================================================== */
 :root {
-  --pv-blue-50: #eef4fa;
-  --pv-blue-100: #dbe6f1;
-  --pv-blue-200: #bbcee2;
-  --pv-blue-300: #9bb5d3;
-  --pv-blue-400: #7a9dc4;
-  --pv-blue-500: #5a84b5;
-  --pv-blue-600: #3a6ca6;
-  --pv-blue-700: #2f5a8a;
-  --pv-blue-800: #26476f;
-  --pv-blue-900: #1e3a5f;
-  --pv-blue-950: #0f2238;
-  --pv-green-50: #eef7e6;
-  --pv-green-500: #86c95b;
-  --pv-green-600: #70b643;
-  --pv-green-700: #5a9636;
-  /* Verde para TEXTO e para fundo com texto branco (WCAG AA) */
-  --pv-green-800: #3a6420;
-  --pv-yellow-400: #f6d56e;
-  --pv-yellow-500: #f2c94c;
-  --pv-yellow-600: #d9ad2e;
-  --pv-gray-100: #f5f5f5;
-  --pv-gray-200: #e5e7eb;
-  /* Borda de campo de formulário — 3:1 mínimo (WCAG 1.4.11) */
-  --pv-gray-400: #78849a;
-  --pv-gray-500: #6b7280;
-  /* Texto secundário sobre o fundo de página (--bg) */
-  --pv-gray-600: #4b5563;
-  --pv-gray-700: #374151;
-  --hero: #223f99;
-  --bg: #f4f6f9;
-  --fg: #14233a;
-  --ps-body: #cfcecd;
+  --bg:          var(--color-surface-base);
+  --fg:          var(--color-text-primary);
+  --surface:     var(--color-surface-raised);
+  --surface-alt: var(--color-surface-sunken);
+  --border:      var(--color-border-default);
+  --text-muted:  var(--color-text-muted);
+  --focus-ring:  var(--color-focus-ring);
+  --tint:        var(--pv-blue-50);
+  --text-strong: var(--pv-black);
+  --black:       var(--pv-black);
+  --hero:        var(--pv-blue-hero);
+
+  /* Sem papel semântico definido. Usados só na página de apresentação;
+     entram na camada semântica quando alguém disser o que representam. */
+  --ps-body:   #cfcecd;
   --ps-accent: #211e1e;
-  --black: #000000;
-  --surface: #ffffff;
-  --surface-alt: #f5f5f5;
-  --border: #e5e7eb;
-  --tint: #eef4fa;
-  --text-strong: #000000;
-  --text-muted: #4b5563;
-  --focus-ring: #223f99;
+
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  --bg: #111111;
-  --fg: #e2e8f0;
-  --ps-body: #f1ecec;
-  --ps-accent: #b3b0b0;
-  --surface: #1a1a1a;
-  --surface-alt: #222222;
-  --border: #2a2a2a;
-  --tint: #242424;
+  /* Os apelidos acima seguem sozinhos os tokens semânticos, que `tokens.css`
+     já troca no tema escuro. Aqui ficam apenas os que não têm equivalente. */
+  --tint:        #242424;
   --text-strong: #f1f5f9;
-  --text-muted: #9ca3af;
-  --focus-ring: #7ab3ff;
+
+  --ps-body:   #f1ecec;
+  --ps-accent: #b3b0b0;
+
   color-scheme: dark;
 }
 
