@@ -6,6 +6,7 @@ export default function FiltrosPage() {
   return (
     <PatternPage
       title="Filtros"
+      component="Painel de filtros"
       subtitle="Restrição dos dados exibidos por critérios selecionados pelo usuário."
       sections={[
         {

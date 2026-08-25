@@ -6,6 +6,7 @@ export default function EtapasDePreenchimentoPage() {
   return (
     <PatternPage
       title="Etapas de preenchimento"
+      component="Formulário em etapas"
       subtitle="Divisão de formulários longos em passos sequenciais para reduzir fricção."
       sections={[
         {

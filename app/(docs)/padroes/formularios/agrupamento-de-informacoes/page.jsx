@@ -6,6 +6,7 @@ export default function AgrupamentoDeInformacoesPage() {
   return (
     <PatternPage
       title="Agrupamento de informações"
+      component="Agrupamento de seções"
       subtitle="Organização lógica dos campos em seções para facilitar o preenchimento."
       sections={[
         {

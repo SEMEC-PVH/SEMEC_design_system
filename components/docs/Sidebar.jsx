@@ -8,6 +8,38 @@ import { safeGet, safeSet } from "@/lib/storage";
 
 const MOBILE_QUERY = "(max-width: 900px)";
 
+const GROUP_PREFIX = "group:";
+const NESTED_PREFIX = "nested:";
+const groupCacheKey = (key) => GROUP_PREFIX + key;
+const nestedCacheKey = (key, href) => NESTED_PREFIX + key + href;
+const nestedStorageKey = (key, href) => "ds-nested-" + key + href;
+const groupId = (key, href) =>
+  "side-subgroup-" + key + href.replace(/[^a-z0-9]/gi, "-");
+
+const buildSections = (items) => {
+  const sections = [];
+  let current = null;
+  for (const it of items) {
+    if (!it.sub) {
+      current = { item: it, children: [] };
+      sections.push(current);
+    } else if (current) {
+      current.children.push(it);
+    } else {
+      sections.push({ item: it, children: [] });
+    }
+  }
+  return sections;
+};
+
+// true se o grupo contém a rota ativa (item direto ou dentro de um subgrupo).
+const groupHasActive = (pathname, item) =>
+  buildSections(item.items).some(
+    (s) =>
+      navState(pathname, s.item.href) ||
+      s.children.some((c) => navState(pathname, c.href))
+  );
+
 let collapsedCache = null;
 const listeners = new Set();
 const subscribe = (cb) => {
@@ -20,9 +52,15 @@ const readCollapsed = () => {
     collapsedCache = {};
     if (typeof window !== "undefined") {
       navigation.forEach((item) => {
-        if (item.items) {
-          collapsedCache[item.key] = safeGet("ds-group-" + item.key) === "0";
-        }
+        if (!item.items) return;
+        collapsedCache[groupCacheKey(item.key)] =
+          safeGet("ds-group-" + item.key) === "0";
+        buildSections(item.items).forEach((s) => {
+          if (s.children.length > 0) {
+            collapsedCache[nestedCacheKey(item.key, s.item.href)] =
+              safeGet(nestedStorageKey(item.key, s.item.href)) === "0";
+          }
+        });
       });
     }
   }
@@ -32,10 +70,27 @@ const readCollapsed = () => {
 const EMPTY_COLLAPSED = {};
 const serverCollapsed = () => EMPTY_COLLAPSED;
 
-function updateCollapsed(key, value) {
-  const next = { ...collapsedCache, [key]: value };
+function Caret() {
+  return (
+    <span className="caret" aria-hidden="true">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 -960 960 960"
+        width="24"
+        height="24"
+        fill="currentColor"
+        focusable="false"
+      >
+        <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
+      </svg>
+    </span>
+  );
+}
+
+function updateCollapsed(storageKey, cacheKey, value) {
+  const next = { ...collapsedCache, [cacheKey]: value };
   collapsedCache = next;
-  safeSet("ds-group-" + key, next[key] ? "0" : "1");
+  safeSet(storageKey, next[cacheKey] ? "0" : "1");
   listeners.forEach((l) => l());
 }
 
@@ -64,8 +119,92 @@ export default function Sidebar({ open, onClose }) {
   }, [pathname, onClose]);
 
   const toggleGroup = (key) => {
-    updateCollapsed(key, !collapsedCache[key]);
+    updateCollapsed(
+      "ds-group-" + key,
+      groupCacheKey(key),
+      !collapsedCache[groupCacheKey(key)]
+    );
   };
+
+  const toggleNested = (groupKey, href) => {
+    updateCollapsed(
+      nestedStorageKey(groupKey, href),
+      nestedCacheKey(groupKey, href),
+      !collapsedCache[nestedCacheKey(groupKey, href)]
+    );
+  };
+
+  // Rota ativa dentro do grupo: exibe o grupo expandido (sem gravar no storage).
+  const collapsedGroup = (item) =>
+    !!collapsed[groupCacheKey(item.key)] && !groupHasActive(pathname, item);
+
+  const renderSections = (item) =>
+    buildSections(item.items).map((section) => {
+      if (section.children.length === 0) {
+        const estado = navState(pathname, section.item.href);
+        return (
+          <Link
+            key={section.item.href + section.item.label}
+            href={section.item.href}
+            className={
+              (section.item.sub ? "sub " : "") + (estado ? "active" : "")
+            }
+            // Só a página aberta se anuncia como atual. A categoria que a
+            // contém fica destacada, mas anunciá-la também diria ao leitor
+            // de tela que há duas páginas atuais.
+            aria-current={estado === "current" ? "page" : undefined}
+          >
+            {section.item.label}
+          </Link>
+        );
+      }
+      const storedCollapsed = !!collapsed[
+        nestedCacheKey(item.key, section.item.href)
+      ];
+      const hasActiveChild = section.children.some((c) =>
+        navState(pathname, c.href)
+      );
+      // Rota ativa dentro da categoria: exibe expandida (sem gravar).
+      const collapsedNested = storedCollapsed && !hasActiveChild;
+      const gid = groupId(item.key, section.item.href);
+      // Categoria com filhos vira botão de recolher, não link — então a
+      // própria página da categoria sai da barra. Sem isto, estar em
+      // `/padroes/navegacao` não produz nenhuma indicação de lugar.
+      const categoriaAtual = navState(pathname, section.item.href) === "current";
+      return (
+        <div key={section.item.href}>
+          <button
+            type="button"
+            className={"side-subtitle" + (collapsedNested ? "" : " open")}
+            onClick={() => toggleNested(item.key, section.item.href)}
+            aria-expanded={!collapsedNested}
+            aria-controls={gid}
+            aria-current={categoriaAtual ? "page" : undefined}
+          >
+            {section.item.label}{" "}
+            <Caret />
+          </button>
+          <div
+            id={gid}
+            className={"side-subgroup" + (collapsedNested ? " collapsed" : "")}
+          >
+            {section.children.map((sub) => {
+              const estado = navState(pathname, sub.href);
+              return (
+                <Link
+                  key={sub.href + sub.label}
+                  href={sub.href}
+                  className={"sub " + (estado ? "active" : "")}
+                  aria-current={estado === "current" ? "page" : undefined}
+                >
+                  {sub.label}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      );
+    });
 
   // Fora da tela em mobile: retira do foco e do leitor de tela.
   // No desktop a sidebar está sempre visível, então nunca fica inerte.
@@ -83,40 +222,21 @@ export default function Sidebar({ open, onClose }) {
             <div key={item.key}>
               <button
                 type="button"
-                className={"side-title" + (collapsed[item.key] ? "" : " open")}
+                className={"side-title" + (collapsedGroup(item) ? "" : " open")}
                 onClick={() => toggleGroup(item.key)}
-                aria-expanded={!collapsed[item.key]}
+                aria-expanded={!collapsedGroup(item)}
                 aria-controls={"side-group-" + item.key}
               >
                 {item.label}{" "}
-                <span className="caret" aria-hidden="true">
-                  ▶
-                </span>
+                <Caret />
               </button>
               <div
                 id={"side-group-" + item.key}
                 className={
-                  "side-group" + (collapsed[item.key] ? " collapsed" : "")
+                  "side-group" + (collapsedGroup(item) ? " collapsed" : "")
                 }
               >
-                {item.items.map((sub) => {
-                  const estado = navState(pathname, sub.href);
-                  return (
-                    <Link
-                      key={sub.href + sub.label}
-                      href={sub.href}
-                      className={
-                        (sub.sub ? "sub " : "") + (estado ? "active" : "")
-                      }
-                      // Só a página aberta se anuncia como atual. A
-                      // categoria que a contém fica destacada, mas
-                      // anunciá-la também diria que há duas páginas atuais.
-                      aria-current={estado === "current" ? "page" : undefined}
-                    >
-                      {sub.label}
-                    </Link>
-                  );
-                })}
+                {renderSections(item)}
               </div>
             </div>
           ) : (

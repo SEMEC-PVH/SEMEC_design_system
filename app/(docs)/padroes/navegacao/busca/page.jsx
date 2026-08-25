@@ -6,6 +6,7 @@ export default function BuscaPage() {
   return (
     <PatternPage
       title="Busca"
+      component="Campo de busca"
       subtitle="Mecanismo para localizar conteúdo por palavra-chave, complementar à navegação."
       sections={[
         {

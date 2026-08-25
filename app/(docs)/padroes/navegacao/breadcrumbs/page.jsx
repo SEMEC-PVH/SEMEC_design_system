@@ -6,6 +6,7 @@ export default function BreadcrumbsPage() {
   return (
     <PatternPage
       title="Breadcrumbs"
+      component="Breadcrumbs"
       subtitle="Trilha que mostra a posição do usuário na hierarquia e permite voltar a níveis superiores."
       sections={[
         {

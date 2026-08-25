@@ -6,6 +6,7 @@ export default function IndisponibilidadePage() {
   return (
     <PatternPage
       title="Indisponibilidade"
+      component="Tela de indisponibilidade"
       subtitle="Comunicação de serviços ou funcionalidades temporariamente fora do ar."
       sections={[
         {

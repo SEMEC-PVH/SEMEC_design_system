@@ -6,6 +6,7 @@ export default function ConfirmacaoPage() {
   return (
     <PatternPage
       title="Confirmação"
+      component="Diálogo de confirmação"
       subtitle="Pedido de confirmação antes de ações importantes ou difíceis de reverter."
       sections={[
         {

@@ -6,6 +6,7 @@ export default function EstadosSemResultadosPage() {
   return (
     <PatternPage
       title="Estados sem resultados"
+      component="Estado vazio"
       subtitle="Como apresentar listas, buscas e filtros que não retornam dados."
       sections={[
         {

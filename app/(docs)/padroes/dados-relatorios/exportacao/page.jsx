@@ -6,6 +6,7 @@ export default function ExportacaoPage() {
   return (
     <PatternPage
       title="Exportação"
+      component="Menu de exportação"
       subtitle="Geração de arquivos (CSV, XLSX, PDF) a partir dos dados exibidos."
       sections={[
         {

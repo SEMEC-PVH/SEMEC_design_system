@@ -6,6 +6,7 @@ export default function GraficosPage() {
   return (
     <PatternPage
       title="Gráficos"
+      component="Gráficos"
       subtitle="Visualização de tendências, distribuições e comparações de dados."
       sections={[
         {

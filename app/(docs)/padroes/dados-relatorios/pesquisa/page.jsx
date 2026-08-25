@@ -6,6 +6,7 @@ export default function PesquisaPage() {
   return (
     <PatternPage
       title="Pesquisa"
+      component="Campo de pesquisa"
       subtitle="Localização de registros específicos por texto dentro de um conjunto de dados."
       sections={[
         {

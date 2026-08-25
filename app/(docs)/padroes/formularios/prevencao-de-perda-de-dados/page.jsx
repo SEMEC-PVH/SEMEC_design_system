@@ -6,6 +6,7 @@ export default function PrevencaoDePerdaDeDadosPage() {
   return (
     <PatternPage
       title="Prevenção de perda de dados"
+      component="Aviso de perda de dados"
       subtitle="Proteção do que o usuário digitou contra saídas acidentais ou erros."
       sections={[
         {

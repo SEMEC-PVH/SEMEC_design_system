@@ -6,6 +6,7 @@ export default function ErroPage() {
   return (
     <PatternPage
       title="Erro"
+      component="Banner de erro"
       subtitle="Comunicação de falhas do sistema ou de ações do usuário."
       sections={[
         {

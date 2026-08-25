@@ -67,9 +67,11 @@ export default function DocsShell({ children }) {
             )}
             {children}
           </div>
+          <div className="container">
+            <Footer />
+          </div>
         </main>
       </div>
-      <Footer />
     </>
   );
 }

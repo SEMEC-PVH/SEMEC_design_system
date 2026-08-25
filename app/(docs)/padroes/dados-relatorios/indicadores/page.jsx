@@ -6,6 +6,7 @@ export default function IndicadoresPage() {
   return (
     <PatternPage
       title="Indicadores"
+      component="Cartões de indicadores"
       subtitle="Números-chave que resumem o estado dos dados em um relance."
       sections={[
         {

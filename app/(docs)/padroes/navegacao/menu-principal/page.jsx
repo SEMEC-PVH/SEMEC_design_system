@@ -6,6 +6,7 @@ export default function MenuPrincipalPage() {
   return (
     <PatternPage
       title="Menu principal"
+      component="Menu principal"
       subtitle="Navegação primária de topo que dá acesso às seções de maior nível da interface."
       sections={[
         {

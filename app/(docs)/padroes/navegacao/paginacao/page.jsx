@@ -6,6 +6,7 @@ export default function PaginacaoPage() {
   return (
     <PatternPage
       title="Paginação"
+      component="Paginação"
       subtitle="Divisão de listas longas em páginas numeradas para facilitar a navegação."
       sections={[
         {

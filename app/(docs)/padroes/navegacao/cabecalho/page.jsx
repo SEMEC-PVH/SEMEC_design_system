@@ -6,6 +6,7 @@ export default function CabecalhoPage() {
   return (
     <PatternPage
       title="Cabeçalho"
+      component="Cabeçalho"
       subtitle="Topo da página com marca, navegação principal e ações contextuais."
       sections={[
         {

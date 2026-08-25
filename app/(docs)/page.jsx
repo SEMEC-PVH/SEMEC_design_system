@@ -68,16 +68,28 @@ export default function OverviewPage() {
   return (
     <>
       <h1>SEMEC design system</h1>
-      <p className="subtitle">Guia visual de referência · extraído da página inicial</p>
+      <p className="subtitle">Guia de referência visual SEMEC</p>
 
-      <Card>
-        <h3>Como usar</h3>
-        <p style={{ fontSize: "0.85rem", color: "var(--pv-gray-600)" }}>
-          O sistema de design define as bases das interfaces de usuário em todo
-          o ecossistema de produtos e serviços da SEMEC. Ele reúne todas as
-          experiências da SEMEC sob uma estrutura única e unificada.
+
+        <h3>O que é um Design System</h3>
+        <p style={{ fontSize: "0.95rem", color: "var(--pv-gray-600)" }}>
+          Um Design System é um conjunto de diretrizes, componentes
+          reutilizáveis, padrões e outros recursos que ajudam designers e
+          desenvolvedores a criar experiências digitais e aplicativos
+          consistentes. O SEMEC Design System (SDS) oferece uma arquitetura nova
+          e rica, componentes reutilizáveis e padrões web modernos que auxiliam
+          no design e na construção de aplicativos alinhados à experiência institucional da PMPV.
         </p>
-      </Card>
+        <p style={{ fontSize: "0.95rem", color: "var(--pv-gray-600)", marginTop: "0.75rem" }}>
+          O SDS inclui recursos para criar interfaces de usuário consistentes
+          com os princípios de design, a linguagem visual e as melhores práticas
+          do Salesforce. Em vez de perder tempo ajustando pixels, os
+          desenvolvedores podem concentrar-se na lógica da aplicação, enquanto
+          os designers focam na experiência do usuário, nas interações e nos
+          fluxos. Esse sistema garante que a criação em todas as aplicações web
+          da PMPV seja consistente, acessível e eficiente.
+        </p>
+
 
       <h2>Seções</h2>
       <div className="section-cards">

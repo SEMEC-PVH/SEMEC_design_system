@@ -6,6 +6,7 @@ export default function ProcessamentoPage() {
   return (
     <PatternPage
       title="Processamento"
+      component="Estado de processamento"
       subtitle="Estado de operações que rodam em segundo plano, sem bloquear o usuário."
       sections={[
         {

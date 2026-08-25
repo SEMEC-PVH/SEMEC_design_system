@@ -6,6 +6,7 @@ export default function ProgressoPage() {
   return (
     <PatternPage
       title="Progresso"
+      component="Barra de progresso"
       subtitle="Indicação do andamento de tarefas longas, com percentual ou etapas."
       sections={[
         {

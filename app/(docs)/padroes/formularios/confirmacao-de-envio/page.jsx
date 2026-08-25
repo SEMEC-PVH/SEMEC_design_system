@@ -6,6 +6,7 @@ export default function ConfirmacaoDeEnvioPage() {
   return (
     <PatternPage
       title="Confirmação de envio"
+      component="Confirmação de envio"
       subtitle="Feedback claro após o envio bem-sucedido de um formulário."
       sections={[
         {
