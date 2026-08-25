@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Card from "@/components/ui/Card";
 
 export const metadata = { title: "Componentes · Visão geral" };
 
@@ -45,8 +44,7 @@ export default function ComponentesPage() {
         regras de uso.
       </p>
 
-      <Card>
-        <h3>Índice de componentes</h3>
+      <h3>Índice de componentes</h3>
         <table>
           <tbody>
             <tr>
@@ -71,7 +69,6 @@ export default function ComponentesPage() {
             ))}
           </tbody>
         </table>
-      </Card>
     </>
   );
 }

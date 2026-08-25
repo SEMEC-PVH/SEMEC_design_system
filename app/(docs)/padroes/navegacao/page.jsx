@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Card from "@/components/ui/Card";
 
 export const metadata = { title: "Padrões · Navegação" };
 
@@ -24,8 +23,7 @@ export default function NavegacaoPage() {
         interface.
       </p>
 
-      <Card>
-        <h3>Índice de padrões</h3>
+      <h3>Índice de padrões</h3>
         <table>
           <tbody>
             <tr>
@@ -50,7 +48,6 @@ export default function NavegacaoPage() {
             ))}
           </tbody>
         </table>
-      </Card>
     </>
   );
 }
