@@ -1050,11 +1050,14 @@ li {
   flex-direction: column;
   text-decoration: none;
   color: inherit;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition: box-shadow var(--duration-base) var(--easing-standard),
+    border-color var(--duration-base) var(--easing-standard),
+    transform var(--duration-base) var(--easing-standard);
 }
-.section-card:hover {
+.section-card:is(:hover, :focus-visible) {
   border-color: var(--pv-gray-500);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 .section-card-art {
   display: flex;
@@ -1349,6 +1352,112 @@ footer {
   line-height: var(--leading-sm);
   font-weight: var(--font-medium);
   color: var(--color-feedback-danger);
+}
+
+/* ---- Animação da arte dos cards de seção ------------------------------
+   Cada card anima a parte do desenho que carrega o seu conceito. Nenhum
+   ícone depende do movimento para ser legível: a animação acrescenta,
+   não informa.
+
+   Dispara em `:hover` e em `:focus-visible`. O card é um link — quem
+   navega por teclado tem de ver o mesmo que quem usa mouse.
+
+   Todo tempo e toda curva vêm dos tokens de movimento. A página inicial
+   passa a ser demonstração viva de `--duration-*` e `--easing-standard`.
+   ---------------------------------------------------------------------- */
+
+/* `fill-box` faz a origem da transformação ser o próprio elemento, e não
+   o sistema de coordenadas do SVG inteiro — sem isso, `center` aponta
+   para o meio do viewBox e tudo gira em torno do lugar errado. */
+.section-card-art [class*="art__"] {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform var(--duration-base) var(--easing-standard),
+    rx var(--duration-base) var(--easing-standard),
+    stroke-dashoffset var(--duration-slow) var(--easing-standard);
+}
+
+/* ---- Tipografia: a serifa da base se alarga ---- */
+.section-card:is(:hover, :focus-visible) .art__serifa {
+  transform: scaleX(1.3);
+}
+
+/* ---- Cores: os três círculos se afastam ---- */
+.section-card:is(:hover, :focus-visible) .art__cor--esq {
+  transform: translate(-4px, 2px);
+}
+.section-card:is(:hover, :focus-visible) .art__cor--topo {
+  transform: translateY(-4px);
+}
+.section-card:is(:hover, :focus-visible) .art__cor--dir {
+  transform: translate(4px, 2px);
+}
+
+/* ---- Layout: as colunas assentam, uma depois da outra ---- */
+.section-card:is(:hover, :focus-visible) .art__bloco {
+  transform: translateY(-3px);
+}
+.section-card:is(:hover, :focus-visible) .art__bloco--b {
+  transition-delay: 60ms;
+}
+
+/* ---- Raios: o raio de borda cresce, demonstrando o próprio token ---- */
+.section-card:is(:hover, :focus-visible) .art__raio--externo {
+  rx: 16;
+}
+.section-card:is(:hover, :focus-visible) .art__raio--interno {
+  rx: 11;
+}
+
+/* ---- Componentes: o controle responde ---- */
+.section-card:is(:hover, :focus-visible) .art__ponto {
+  transform: scale(1.6);
+}
+
+/* ---- Animações: as setas avançam em sequência ---- */
+.section-card:is(:hover, :focus-visible) .art__seta {
+  transform: translateX(4px);
+  transition-duration: var(--duration-fast);
+}
+.section-card:is(:hover, :focus-visible) .art__seta--2 {
+  transition-delay: 70ms;
+}
+.section-card:is(:hover, :focus-visible) .art__seta--3 {
+  transition-delay: 140ms;
+}
+
+/* ---- Acessibilidade: a pupila percorre e volta ---- */
+.section-card:is(:hover, :focus-visible) .art__pupila {
+  animation: art-olhar var(--duration-slow) var(--easing-standard) 2 alternate;
+}
+
+@keyframes art-olhar {
+  from {
+    transform: translateX(-5px);
+  }
+  to {
+    transform: translateX(5px);
+  }
+}
+
+/* ---- Anti-padrões: o corte se desenha ----
+   `pathLength="1"` normaliza o comprimento do traço, então 1 é o caminho
+   inteiro qualquer que seja a geometria. */
+.section-card-art .art__corte {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.section-card:is(:hover, :focus-visible) .art__corte {
+  animation: art-cortar var(--duration-slow) var(--easing-standard);
+}
+
+@keyframes art-cortar {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 /* ---- Movimento reduzido ---- */
