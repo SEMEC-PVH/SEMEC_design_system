@@ -6,6 +6,7 @@ export default function SelecaoDeRegistrosPage() {
   return (
     <PatternPage
       title="Seleção de registros"
+      component="Seleção de registros"
       subtitle="Marcação de itens de uma lista para aplicar ações em conjunto."
       sections={[
         {

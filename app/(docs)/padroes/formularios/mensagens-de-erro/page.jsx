@@ -6,6 +6,7 @@ export default function MensagensDeErroPage() {
   return (
     <PatternPage
       title="Mensagens de erro"
+      component="Mensagens de erro"
       subtitle="Como comunicar o que deu errado e como o usuário pode corrigir."
       sections={[
         {

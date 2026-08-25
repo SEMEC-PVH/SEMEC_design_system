@@ -6,6 +6,7 @@ export default function NavegacaoLateralPage() {
   return (
     <PatternPage
       title="Navegação lateral"
+      component="Navegação lateral"
       subtitle="Menu em coluna que organiza as seções de um contexto, típico de áreas administrativas e documentação."
       sections={[
         {

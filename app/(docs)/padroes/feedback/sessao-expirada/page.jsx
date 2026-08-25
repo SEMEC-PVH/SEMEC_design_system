@@ -6,6 +6,7 @@ export default function SessaoExpiradaPage() {
   return (
     <PatternPage
       title="Sessão expirada"
+      component="Tela de sessão expirada"
       subtitle="Tratamento de sessões que terminam por inatividade ou tempo limite."
       sections={[
         {

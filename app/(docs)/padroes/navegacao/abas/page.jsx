@@ -6,6 +6,7 @@ export default function AbasPage() {
   return (
     <PatternPage
       title="Abas"
+      component="Abas"
       subtitle="Alternância entre visões de um mesmo contexto sem trocar de página."
       sections={[
         {

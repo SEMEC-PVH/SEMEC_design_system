@@ -6,6 +6,7 @@ export default function MascarasPage() {
   return (
     <PatternPage
       title="Máscaras"
+      component="Campos com máscara"
       subtitle="Formatação automática da entrada para padrões conhecidos (CPF, telefone, datas, CEP)."
       sections={[
         {

@@ -6,6 +6,7 @@ export default function RodapePage() {
   return (
     <PatternPage
       title="Rodapé"
+      component="Rodapé"
       subtitle="Área inferior com informações institucionais, links complementares e contato."
       sections={[
         {

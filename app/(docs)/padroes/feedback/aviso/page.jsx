@@ -6,6 +6,7 @@ export default function AvisoPage() {
   return (
     <PatternPage
       title="Aviso"
+      component="Banner de aviso"
       subtitle="Alertas sobre situações que exigem atenção, mas não são erros."
       sections={[
         {

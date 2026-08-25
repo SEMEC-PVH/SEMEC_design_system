@@ -6,6 +6,7 @@ export default function IndicacaoLocalizacaoPage() {
   return (
     <PatternPage
       title="Indicação da localização atual"
+      component="Indicação de localização atual"
       subtitle="Como o usuário sabe onde está dentro da estrutura da interface."
       sections={[
         {

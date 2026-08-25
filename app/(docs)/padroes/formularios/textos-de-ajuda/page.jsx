@@ -6,6 +6,7 @@ export default function TextosDeAjudaPage() {
   return (
     <PatternPage
       title="Textos de ajuda"
+      component="Textos de ajuda"
       subtitle="Orientação contextual sobre o que preencher em cada campo."
       sections={[
         {

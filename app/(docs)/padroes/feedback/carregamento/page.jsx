@@ -6,6 +6,7 @@ export default function CarregamentoPage() {
   return (
     <PatternPage
       title="Carregamento"
+      component="Spinner de carregamento"
       subtitle="Indicação de que o sistema está processando uma solicitação do usuário."
       sections={[
         {

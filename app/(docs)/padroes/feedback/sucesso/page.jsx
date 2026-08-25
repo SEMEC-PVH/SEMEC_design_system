@@ -6,6 +6,7 @@ export default function SucessoPage() {
   return (
     <PatternPage
       title="Sucesso"
+      component="Banner de sucesso"
       subtitle="Confirmação de que uma ação do usuário foi concluída com êxito."
       sections={[
         {

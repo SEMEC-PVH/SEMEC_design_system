@@ -6,6 +6,7 @@ export default function CamposObrigatoriosPage() {
   return (
     <PatternPage
       title="Campos obrigatórios"
+      component="Indicação de campos obrigatórios"
       subtitle="Como indicar, de forma clara e consistente, quais campos precisam ser preenchidos."
       sections={[
         {

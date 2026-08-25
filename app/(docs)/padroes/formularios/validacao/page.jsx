@@ -6,6 +6,7 @@ export default function ValidacaoPage() {
   return (
     <PatternPage
       title="Validação"
+      component="Validação de campos"
       subtitle="Verificação dos dados no momento certo para evitar erros e retrabalho."
       sections={[
         {

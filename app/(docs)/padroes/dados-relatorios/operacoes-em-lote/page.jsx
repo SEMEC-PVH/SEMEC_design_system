@@ -6,6 +6,7 @@ export default function OperacoesEmLotePage() {
   return (
     <PatternPage
       title="Operações em lote"
+      component="Barra de ações em lote"
       subtitle="Ações aplicadas a vários registros selecionados de uma só vez."
       sections={[
         {

@@ -6,6 +6,7 @@ export default function TabelasPage() {
   return (
     <PatternPage
       title="Tabelas"
+      component="Tabela de dados"
       subtitle="Exibição estruturada de dados em linhas e colunas para leitura e comparação."
       sections={[
         {

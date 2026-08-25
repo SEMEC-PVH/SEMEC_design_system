@@ -1,5 +1,12 @@
 import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 const poppins = localFont({
   src: [
@@ -40,7 +47,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="pt-BR"
-      className={`${poppins.variable} ${pressStart.variable} ${mono.variable}`}
+      className={`${inter.variable} ${poppins.variable} ${pressStart.variable} ${mono.variable}`}
       suppressHydrationWarning
     >
       <body>

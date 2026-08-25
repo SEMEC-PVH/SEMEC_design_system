@@ -6,6 +6,7 @@ export default function OrdenacaoPage() {
   return (
     <PatternPage
       title="Ordenação"
+      component="Colunas ordenáveis"
       subtitle="Reorganização dos dados por uma coluna, em ordem crescente ou decrescente."
       sections={[
         {
