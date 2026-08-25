@@ -58,8 +58,8 @@ export function ArtRaios() {
   return (
     <svg width="56" height="56" {...base}>
       {/* o próprio raio de borda cresce — o desenho demonstra o token */}
-      <rect className="art__raio art__raio--externo" x="10" y="10" width="44" height="44" rx="8" />
-      <rect className="art__raio art__raio--interno" x="21" y="21" width="22" height="22" rx="6" />
+      <rect className="art__raio art__raio--externo" x="10" y="10" width="44" height="44" />
+      <rect className="art__raio art__raio--interno" x="21" y="21" width="22" height="22" />
       <circle cx="32" cy="32" r="3" />
     </svg>
   );

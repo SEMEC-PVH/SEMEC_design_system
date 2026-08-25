@@ -1566,7 +1566,11 @@ footer {
    `rx` é propriedade geométrica: repinta, não compõe. Fica só nos dois
    retângulos que a usam, em vez de pesar em todos os catorze elementos. */
 .section-card-art .art__raio {
+  rx: 8;
   transition: rx var(--art-duracao) var(--easing-standard);
+}
+.section-card-art .art__raio--interno {
+  rx: 6;
 }
 .section-card:is(:hover, :focus-visible) .art__raio--externo {
   rx: 16;
