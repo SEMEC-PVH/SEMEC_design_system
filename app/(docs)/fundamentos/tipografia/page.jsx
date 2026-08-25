@@ -1,4 +1,3 @@
-import Card from "@/components/ui/Card";
 import TypeRow from "@/components/ui/TypeRow";
 
 export const metadata = { title: "Tipografia" };
@@ -11,30 +10,28 @@ export default function TipografiaPage() {
         Famílias, pesos e a escala renderizada do design system.
       </p>
 
-      <Card>
-        <h3>Famílias</h3>
-        <table>
-          <tbody>
-            <tr>
-              <th>Família</th>
-              <th>Token</th>
-              <th>Uso</th>
-            </tr>
-            <tr>
-              <td>
-                <strong>Poppins</strong>
-              </td>
-              <td>
-                <code>--font-poppins</code>
-              </td>
-              <td>Corpo, títulos, labels, links, botões.</td>
-            </tr>
-          </tbody>
-        </table>
-      </Card>
+      <h3>Famílias</h3>
+      <table>
+        <tbody>
+          <tr>
+            <th>Família</th>
+            <th>Token</th>
+            <th>Uso</th>
+          </tr>
+          <tr>
+            <td>
+              <strong>Poppins</strong>
+            </td>
+            <td>
+              <code>--font-poppins</code>
+            </td>
+            <td>Corpo, títulos, labels, links, botões.</td>
+          </tr>
+        </tbody>
+      </table>
 
-      <Card>
-        <h3>Escala renderizada</h3>
+      <h3>Escala renderizada</h3>
+      <div className="preview">
         <TypeRow label="Título herói">
           <span style={{ fontSize: "2.25rem", fontWeight: 700, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
             A Secretaria está mais perto
@@ -112,7 +109,7 @@ export default function TipografiaPage() {
             © 2026 SEMEC
           </span>
         </TypeRow>
-      </Card>
+      </div>
     </>
   );
 }

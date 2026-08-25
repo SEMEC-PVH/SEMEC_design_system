@@ -1,4 +1,3 @@
-import Card from "@/components/ui/Card";
 import DemoCard from "@/components/demos/DemoCard";
 
 export const metadata = { title: "Layout" };
@@ -11,13 +10,13 @@ export default function LayoutPage() {
         Container, grid e regras de espaçamento da página.
       </p>
 
-      <Card>
-        <h3>Container &amp; Grid</h3>
-        <p style={{ fontSize: "0.85rem", color: "var(--pv-gray-500)", marginBottom: "0.75rem" }}>
-          Container <code>max-w-6xl</code> (72rem) · padding <code>px-4</code> ·{" "}
-          centralizado <code>mx-auto</code>. Grid de cards:{" "}
-          <code>grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3</code>.
-        </p>
+      <h3>Container &amp; Grid</h3>
+      <p style={{ fontSize: "0.85rem", color: "var(--pv-gray-500)", marginBottom: "0.75rem" }}>
+        Container <code>max-w-6xl</code> (72rem) · padding <code>px-4</code> ·{" "}
+        centralizado <code>mx-auto</code>. Grid de cards:{" "}
+        <code>grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3</code>.
+      </p>
+      <div className="preview">
         <div className="demo-cards">
           <DemoCard
             tag="IPTU"
@@ -36,7 +35,7 @@ export default function LayoutPage() {
             description="Espaço interno de card: p-6."
           />
         </div>
-      </Card>
+      </div>
     </>
   );
 }

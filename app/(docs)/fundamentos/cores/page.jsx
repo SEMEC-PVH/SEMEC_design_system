@@ -1,4 +1,3 @@
-import Card from "@/components/ui/Card";
 import Swatch from "@/components/ui/Swatch";
 
 export const metadata = { title: "Cores" };
@@ -65,91 +64,89 @@ export default function CoresPage() {
         copiar o hex.
       </p>
 
-      <Card>
-        <h3 id="cor-blue">pv-blue — Azul institucional (primário)</h3>
+      <h3 id="cor-blue">pv-blue — Azul institucional (primário)</h3>
+      <div className="preview">
         <Swatches tokens={blue} />
-      </Card>
+      </div>
 
-      <Card>
-        <h3 id="cor-green">pv-green — Verde ação (secundário)</h3>
+      <h3 id="cor-green">pv-green — Verde ação (secundário)</h3>
+      <div className="preview">
         <Swatches tokens={green} />
-      </Card>
+      </div>
 
-      <Card>
-        <h3 id="cor-yellow">pv-yellow — Amarelo destaque (acento)</h3>
+      <h3 id="cor-yellow">pv-yellow — Amarelo destaque (acento)</h3>
+      <div className="preview">
         <Swatches tokens={yellow} />
-      </Card>
+      </div>
 
-      <Card>
-        <h3 id="cor-gray">pv-gray — Cinza neutro</h3>
+      <h3 id="cor-gray">pv-gray — Cinza neutro</h3>
+      <div className="preview">
         <Swatches tokens={gray} />
-      </Card>
+      </div>
 
-      <Card>
-        <h3 id="cor-sistema">Cores de sistema</h3>
+      <h3 id="cor-sistema">Cores de sistema</h3>
+      <div className="preview">
         <Swatches tokens={sistema} />
-      </Card>
+      </div>
 
-      <Card>
-        <h3 id="cor-semantica">Papéis semânticos</h3>
-        <table>
-          <tbody>
-            <tr>
-              <th>Papel</th>
-              <th>Token / Cor</th>
-            </tr>
-            <tr>
-              <td>Fundo de página</td>
-              <td>
-                <code>--background</code>{" "}
-                <span style={{ color: "var(--pv-gray-600)" }}>(#f4f6f9)</span>
-              </td>
-            </tr>
-            <tr>
-              <td>Superfície (card)</td>
-              <td>
-                <code>bg-white</code>
-              </td>
-            </tr>
-            <tr>
-              <td>Texto primário</td>
-              <td>
-                <code>--foreground</code> / <code>text-pv-blue-900</code>
-              </td>
-            </tr>
-            <tr>
-              <td>Texto secundário</td>
-              <td>
-                <code>text-pv-gray-500</code> / <code>text-slate-600</code>
-              </td>
-            </tr>
-            <tr>
-              <td>Ação principal</td>
-              <td>
-                <code>bg-pv-blue-900</code> (hover <code>bg-pv-blue-800</code>)
-              </td>
-            </tr>
-            <tr>
-              <td>Ação de destaque</td>
-              <td>
-                <code>bg-pv-green-600</code> / <code>text-pv-green-700</code>
-              </td>
-            </tr>
-            <tr>
-              <td>Destaque/novidade</td>
-              <td>
-                <code>bg-pv-yellow-500</code> + <code>text-pv-blue-950</code>
-              </td>
-            </tr>
-            <tr>
-              <td>Erro/destrutivo</td>
-              <td>
-                não definido na home — usar <code>red-*</code> com moderação
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </Card>
+      <h3 id="cor-semantica">Papéis semânticos</h3>
+      <table>
+        <tbody>
+          <tr>
+            <th>Papel</th>
+            <th>Token / Cor</th>
+          </tr>
+          <tr>
+            <td>Fundo de página</td>
+            <td>
+              <code>--background</code>{" "}
+              <span style={{ color: "var(--pv-gray-600)" }}>(#f4f6f9)</span>
+            </td>
+          </tr>
+          <tr>
+            <td>Superfície (card)</td>
+            <td>
+              <code>bg-white</code>
+            </td>
+          </tr>
+          <tr>
+            <td>Texto primário</td>
+            <td>
+              <code>--foreground</code> / <code>text-pv-blue-900</code>
+            </td>
+          </tr>
+          <tr>
+            <td>Texto secundário</td>
+            <td>
+              <code>text-pv-gray-500</code> / <code>text-slate-600</code>
+            </td>
+          </tr>
+          <tr>
+            <td>Ação principal</td>
+            <td>
+              <code>bg-pv-blue-900</code> (hover <code>bg-pv-blue-800</code>)
+            </td>
+          </tr>
+          <tr>
+            <td>Ação de destaque</td>
+            <td>
+              <code>bg-pv-green-600</code> / <code>text-pv-green-700</code>
+            </td>
+          </tr>
+          <tr>
+            <td>Destaque/novidade</td>
+            <td>
+              <code>bg-pv-yellow-500</code> + <code>text-pv-blue-950</code>
+            </td>
+          </tr>
+          <tr>
+            <td>Erro/destrutivo</td>
+            <td>
+              não definido na home — usar <code>red-*</code> com moderação
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </>
   );
 }

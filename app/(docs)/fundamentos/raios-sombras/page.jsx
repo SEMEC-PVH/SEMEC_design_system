@@ -1,4 +1,3 @@
-import Card from "@/components/ui/Card";
 import Shape from "@/components/ui/Shape";
 
 export const metadata = { title: "Raios, bordas e sombras" };
@@ -11,8 +10,8 @@ export default function RaiosSombrasPage() {
         Escala de raios e a família de sombras institucional.
       </p>
 
-      <Card>
-        <h3>Raios</h3>
+      <h3>Raios</h3>
+      <div className="preview">
         <div className="shape-grid">
           <Shape caption="rounded-sm · 0.25rem" style={{ borderRadius: "0.25rem" }} />
           <Shape caption="rounded-md · 0.375rem" style={{ borderRadius: "0.375rem" }} />
@@ -21,10 +20,10 @@ export default function RaiosSombrasPage() {
           <Shape caption="rounded-2xl · 1rem" style={{ borderRadius: "1rem" }} />
           <Shape caption="rounded-full" style={{ borderRadius: "9999px" }} />
         </div>
-      </Card>
+      </div>
 
-      <Card>
-        <h3>Sombras</h3>
+      <h3>Sombras</h3>
+      <div className="preview">
         <div className="shape-grid">
           <Shape
             caption="Card repouso"
@@ -39,13 +38,13 @@ export default function RaiosSombrasPage() {
             style={{ boxShadow: "0 10px 30px -10px rgba(15,35,56,0.15)", border: "none" }}
           />
         </div>
-        <p className="note">
-          Cards (ServiceCard) usam a família de sombra neutra da Uber{" "}
-          <code>rgba(0,0,0,…)</code> (whisper-soft). Demais superfícies
-          continuam na família <code>rgba(15,35,56,…)</code> (azul institucional
-          escuro).
-        </p>
-      </Card>
+      </div>
+      <p className="note">
+        Cards (ServiceCard) usam a família de sombra neutra da Uber{" "}
+        <code>rgba(0,0,0,…)</code> (whisper-soft). Demais superfícies
+        continuam na família <code>rgba(15,35,56,…)</code> (azul institucional
+        escuro).
+      </p>
     </>
   );
 }
