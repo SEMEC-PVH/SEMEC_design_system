@@ -1,0 +1,293 @@
+/* =========================================================================
+   Design System SEMEC — Camada de tokens
+   =========================================================================
+
+   Duas camadas, na ordem em que devem ser usadas:
+
+   L0 — PRIMITIVOS (`--pv-*`)
+        Valores brutos. Invariantes de tema. Nunca use um primitivo
+        diretamente em componente: ele não carrega intenção.
+
+   L1 — SEMÂNTICOS (`--color-*`, `--space-*`, `--text-*`, `--radius-*`,
+        `--elevation-*`, `--duration-*`, `--control-*`)
+        A camada do dia a dia. Diz o papel, não a cor.
+
+   O tema escuro troca apenas L1. Os primitivos não mudam — é o que
+   permite trocar a paleta institucional sem reescrever componente.
+   Ver ADR-003 (tokens em três níveis) e ADR-012 (tema por atributo).
+
+   -------------------------------------------------------------------------
+   PENDÊNCIAS REGISTRADAS NESTE ARQUIVO
+
+   QA-01  O azul institucional não está decidido. `--pv-blue-*` é a escala
+          em uso no portal; `--pv-blue-hero` é um quarto azul que convive
+          com ela. Este arquivo NÃO resolve a questão: preserva os dois e
+          marca o conflito.
+   QA-03  Tipografia não decidida. Aqui há apenas tamanho, entrelinha e
+          peso — nenhuma família. A família continua em `globals.css`.
+   QA-07  Não existia vermelho na paleta. A escala `--pv-red-*` abaixo é
+          PROVISÓRIA, escolhida por contraste, não por identidade.
+
+   -------------------------------------------------------------------------
+   DESVIOS DELIBERADOS DA `especificacao-alvo.md`
+
+   Três mapeamentos da spec não cumprem o contraste que ela própria exige,
+   e em todos os três o CSS do portal já usava um valor melhor. Este
+   arquivo segue o portal:
+
+   | Token                 | Spec      | Aqui      | Motivo                        |
+   |-----------------------|-----------|-----------|-------------------------------|
+   | `color-border-strong` | gray-300  | gray-400  | 1,47:1 -> 3,77:1 (WCAG 1.4.11)|
+   | `color-text-muted`    | gray-500  | gray-600  | 4,47:1 -> 6,98:1              |
+   | `color-focus-ring`    | blue-400  | blue-hero | 2,82:1 -> 9,38:1              |
+
+   A spec já registra os dois primeiros como "inconsistência conhecida".
+   O terceiro é achado novo. Todos precisam de correção na spec.
+   ========================================================================= */
+
+:root {
+  /* =======================================================================
+     L0 — PRIMITIVOS
+     ======================================================================= */
+
+  /* ---- Azul — escala primária ------------------------------------------ */
+  --pv-blue-50:  #eef4fa;
+  --pv-blue-100: #dbe6f1;
+  --pv-blue-200: #bbcee2;
+  --pv-blue-300: #9bb5d3;
+  --pv-blue-400: #7a9dc4;
+  --pv-blue-500: #5a84b5;
+  --pv-blue-600: #3a6ca6;
+  --pv-blue-700: #2f5a8a;
+  --pv-blue-800: #26476f;
+  --pv-blue-900: #1e3a5f;
+  --pv-blue-950: #0f2238;
+
+  /* QA-01: quarto azul em circulação. Usado hoje no hero e no anel de foco.
+     Não deriva da escala acima. Fica registrado até a questão ser decidida. */
+  --pv-blue-hero: #223f99;
+
+  /* ---- Verde — escala de apoio ----------------------------------------- */
+  --pv-green-50:  #eef7e6;
+  --pv-green-500: #86c95b;
+  --pv-green-600: #70b643;
+  --pv-green-700: #5a9636;
+  --pv-green-800: #3a6420;  /* texto, e fundo com texto branco (WCAG AA) */
+
+  /* ---- Amarelo — escala de destaque ------------------------------------ */
+  --pv-yellow-400: #f6d56e;
+  --pv-yellow-500: #f2c94c;
+  --pv-yellow-600: #d9ad2e;
+  /* PROVISÓRIO: nenhum amarelo existente serve de texto de alerta.
+     #8a5a00 -> 5,48:1 sobre o fundo de página. Revisar junto da QA-01. */
+  --pv-yellow-800: #8a5a00;
+
+  /* ---- Vermelho — QA-07, escala provisória ------------------------------
+     Não havia vermelho no sistema, o que impedia qualquer estado de erro.
+     Valores escolhidos por contraste; a identidade decide depois.          */
+  --pv-red-50:  #fef2f2;
+  --pv-red-100: #fee2e2;
+  --pv-red-200: #fecaca;
+  --pv-red-300: #fca5a5;
+  --pv-red-400: #f87171;
+  --pv-red-500: #ef4444;
+  --pv-red-600: #dc2626;
+  --pv-red-700: #b91c1c;  /* 5,98:1 sobre o fundo de página; 6,47:1 com texto branco */
+  --pv-red-800: #991b1b;
+  --pv-red-900: #7f1d1d;
+  --pv-red-950: #450a0a;
+
+  /* ---- Neutros ---------------------------------------------------------- */
+  --pv-gray-50:  #f4f6f9;  /* fundo de página em uso no portal */
+  --pv-gray-100: #f5f5f5;
+  --pv-gray-200: #e5e7eb;
+  --pv-gray-300: #d1d5db;  /* decorativo apenas — 1,47:1, não serve de borda de campo */
+  --pv-gray-400: #78849a;  /* borda de campo — 3,77:1 (WCAG 1.4.11) */
+  --pv-gray-500: #6b7280;
+  --pv-gray-600: #4b5563;  /* texto secundário — 6,98:1 sobre o fundo de página */
+  --pv-gray-700: #374151;
+  --pv-gray-800: #1f2937;
+  --pv-gray-900: #14233a;  /* texto principal em uso no portal */
+  --pv-gray-950: #0b1220;
+
+  --pv-white: #ffffff;
+  --pv-black: #000000;
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Cor (tema claro)
+     ======================================================================= */
+
+  /* ---- Marca ------------------------------------------------------------ */
+  --color-brand-primary:   var(--pv-blue-600);
+  --color-brand-secondary: var(--pv-green-600);
+  --color-brand-accent:    var(--pv-yellow-500);
+
+  /* ---- Ação ------------------------------------------------------------- */
+  --color-action-primary:        var(--pv-blue-600);
+  --color-action-primary-hover:  var(--pv-blue-700);
+  --color-action-primary-active: var(--pv-blue-800);
+
+  /* ---- Superfície ------------------------------------------------------- */
+  --color-surface-base:   var(--pv-gray-50);
+  --color-surface-raised: var(--pv-white);
+  --color-surface-sunken: var(--pv-gray-100);
+
+  /* ---- Texto ------------------------------------------------------------ */
+  --color-text-primary:   var(--pv-gray-900);
+  --color-text-secondary: var(--pv-gray-700);
+  --color-text-muted:     var(--pv-gray-600);  /* desvio: spec diz gray-500 (4,47:1) */
+  --color-text-on-brand:  var(--pv-white);
+
+  /* ---- Borda ------------------------------------------------------------ */
+  --color-border-default: var(--pv-gray-200);
+  --color-border-strong:  var(--pv-gray-400);  /* desvio: spec diz gray-300 (1,47:1) */
+
+  /* ---- Foco -------------------------------------------------------------
+     Desvio: a spec aponta blue-400, que dá 2,82:1 e não cumpre o mínimo de
+     3:1 para indicador. O portal já usava este valor, com 9,38:1.          */
+  --color-focus-ring: var(--pv-blue-hero);
+
+  /* ---- Retorno ao usuário ----------------------------------------------- */
+  --color-feedback-success: var(--pv-green-800);
+  --color-feedback-warning: var(--pv-yellow-800);
+  --color-feedback-danger:  var(--pv-red-700);
+  --color-feedback-info:    var(--pv-blue-600);
+
+  /* Fundos suaves, para faixa de alerta e realce de linha */
+  --color-feedback-success-surface: var(--pv-green-50);
+  --color-feedback-warning-surface: #fdf6e3;
+  --color-feedback-danger-surface:  var(--pv-red-50);
+  --color-feedback-info-surface:    var(--pv-blue-50);
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Espaçamento
+     Escala de 8px com meio-degrau. Nove valores, nenhum a mais.
+     ======================================================================= */
+  --space-0:  0;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Tipografia
+     Só tamanho, entrelinha e peso. A família depende da QA-03.
+     ======================================================================= */
+  --text-display: 40px;  --leading-display: 1.1;
+  --text-3xl:     32px;  --leading-3xl:     1.2;
+  --text-2xl:     24px;  --leading-2xl:     1.25;
+  --text-xl:      20px;  --leading-xl:      1.3;
+  --text-lg:      18px;  --leading-lg:      1.4;
+  --text-base:    16px;  --leading-base:    1.5;
+  --text-sm:      14px;  --leading-sm:      1.5;
+  --text-xs:      12px;  --leading-xs:      1.4;
+
+  --font-regular:  400;
+  --font-medium:   500;
+  --font-semibold: 600;
+  --font-bold:     700;
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Forma
+     ======================================================================= */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   16px;
+  --radius-full: 9999px;
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Elevação
+     A sombra usa o azul-escuro do sistema, nunca preto puro, nunca cor.
+     ======================================================================= */
+  --elevation-0: none;
+  --elevation-1: 0 1px 2px rgba(20, 35, 58, .08);
+  --elevation-2: 0 4px 12px rgba(20, 35, 58, .10);
+  --elevation-3: 0 12px 32px rgba(20, 35, 58, .14);
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Movimento
+     Toda animação respeita `prefers-reduced-motion` — a regra já está
+     aplicada no fim de `globals.css`.
+     ======================================================================= */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --easing-standard: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Densidade
+     Fundamento que a especificação ainda não cobre. Sistema administrativo
+     com tabela longa é inutilizável na altura de linha de portal público.
+     O modo compacto é ativado por `data-density="compact"` em qualquer
+     ancestral, no mesmo modelo do tema (ADR-012).
+
+     As alturas de controle vêm da tabela de tamanhos do Button na spec.
+     O alvo de toque de 44px vale no modo confortável; o modo compacto
+     pressupõe ponteiro, em tabela densa.
+     ======================================================================= */
+  --control-height-sm: 32px;
+  --control-height-md: 44px;
+  --control-height-lg: 52px;
+
+  --density-padding-x:  var(--space-4);
+  --density-padding-y:  var(--space-3);
+  --density-row-height: 48px;
+  --density-font-size:  var(--text-base);
+}
+
+/* ==========================================================================
+   Modo compacto
+   ========================================================================== */
+[data-density="compact"] {
+  --control-height-sm: 24px;
+  --control-height-md: 32px;
+  --control-height-lg: 40px;
+
+  --density-padding-x:  var(--space-3);
+  --density-padding-y:  var(--space-1);
+  --density-row-height: 36px;
+  --density-font-size:  var(--text-sm);
+}
+
+/* ==========================================================================
+   Tema escuro — troca apenas a camada semântica
+   ========================================================================== */
+[data-theme="dark"] {
+  --color-surface-base:   #111111;
+  --color-surface-raised: #1a1a1a;
+  --color-surface-sunken: #222222;
+
+  --color-text-primary:   #e2e8f0;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted:     #9ca3af;
+  --color-text-on-brand:  var(--pv-white);
+
+  --color-border-default: #2a2a2a;
+  --color-border-strong:  #3f4756;
+
+  --color-focus-ring: #7ab3ff;
+
+  /* Sobre fundo escuro é o valor claro da escala que enxerga */
+  --color-action-primary:        var(--pv-blue-400);
+  --color-action-primary-hover:  var(--pv-blue-300);
+  --color-action-primary-active: var(--pv-blue-200);
+
+  --color-feedback-success: var(--pv-green-500);
+  --color-feedback-warning: var(--pv-yellow-400);
+  --color-feedback-danger:  var(--pv-red-400);
+  --color-feedback-info:    var(--pv-blue-400);
+
+  --color-feedback-success-surface: #16261a;
+  --color-feedback-warning-surface: #2a2113;
+  --color-feedback-danger-surface:  #2a1414;
+  --color-feedback-info-surface:    #14203a;
+
+  /* A sombra precisa de mais peso para existir sobre fundo escuro */
+  --elevation-1: 0 1px 2px rgba(0, 0, 0, .40);
+  --elevation-2: 0 4px 12px rgba(0, 0, 0, .48);
+  --elevation-3: 0 12px 32px rgba(0, 0, 0, .56);
+}
