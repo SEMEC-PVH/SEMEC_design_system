@@ -1,3 +1,5 @@
+@import "./tokens.css";
+
 *,
 *::before,
 *::after {
@@ -6,50 +8,40 @@
   padding: 0;
 }
 
+/* ==========================================================================
+   Compatibilidade com os nomes antigos
+   --------------------------------------------------------------------------
+   Os primitivos e a camada semântica moram agora em `tokens.css`. Os nomes
+   abaixo são os que o CSS deste arquivo já usava; viraram apelidos da
+   camada semântica, com valor idêntico ao que tinham. Nada mudou de
+   aparência — mudou de onde o valor vem.
+
+   Em código novo, use o token semântico (`--color-surface-base`), não o
+   apelido (`--bg`). Os apelidos saem quando o último uso sair.
+   ========================================================================== */
 :root {
-  --pv-blue-50: #eef4fa;
-  --pv-blue-100: #dbe6f1;
-  --pv-blue-200: #bbcee2;
-  --pv-blue-300: #9bb5d3;
-  --pv-blue-400: #7a9dc4;
-  --pv-blue-500: #5a84b5;
-  --pv-blue-600: #3a6ca6;
-  --pv-blue-700: #2f5a8a;
-  --pv-blue-800: #26476f;
-  --pv-blue-900: #1e3a5f;
-  --pv-blue-950: #0f2238;
-  --pv-green-50: #eef7e6;
-  --pv-green-500: #86c95b;
-  --pv-green-600: #70b643;
-  --pv-green-700: #5a9636;
-  /* Verde para TEXTO e para fundo com texto branco (WCAG AA) */
-  --pv-green-800: #3a6420;
-  --pv-yellow-400: #f6d56e;
-  --pv-yellow-500: #f2c94c;
-  --pv-yellow-600: #d9ad2e;
-  --pv-gray-100: #f5f5f5;
-  --pv-gray-200: #e5e7eb;
-  /* Borda de campo de formulário — 3:1 mínimo (WCAG 1.4.11) */
-  --pv-gray-400: #78849a;
-  --pv-gray-500: #6b7280;
-  /* Texto secundário sobre o fundo de página (--bg) */
-  --pv-gray-600: #4b5563;
-  --pv-gray-700: #374151;
-  --hero: #223f99;
-  --bg: #ffffff;
-  --fg: #14233a;
-  --ps-body: #cfcecd;
+  --bg:          var(--color-surface-base);
+  --fg:          var(--color-text-primary);
+  --surface:     var(--color-surface-raised);
+  --surface-alt: var(--color-surface-sunken);
+  --border:      var(--color-border-default);
+  --text-muted:  var(--color-text-muted);
+  --focus-ring:  var(--color-focus-ring);
+  --tint:        var(--pv-blue-50);
+  --text-strong: var(--pv-black);
+  --black:       var(--pv-black);
+  --hero:        var(--pv-blue-hero);
+
+  /* Sem papel semântico definido. Usados só na página de apresentação;
+     entram na camada semântica quando alguém disser o que representam. */
+  --ps-body:   #cfcecd;
   --ps-accent: #211e1e;
-  --black: #000000;
-  --surface: #ffffff;
-  --surface-alt: #f5f5f5;
-  --border: #e5e7eb;
-  --tint: #eef4fa;
-  --text-strong: #000000;
-  --text-muted: #4b5563;
-  --focus-ring: #223f99;
+
+  /* Destaque e estado ativo da navegação lateral (ver Sidebar.jsx) */
   --nav-accent: #223f99;
   --nav-active-bg: #eef4fa;
+
+  /* Escala tipográfica utilitária */
   --font-size-2xs: 0.625rem; /* 10px */
   --font-size-xs: 0.75rem; /* 12px */
   --font-size-sm: 0.875rem; /* 14px */
@@ -58,23 +50,22 @@
   --font-size-lg: 1.25rem; /* 20px */
   --font-size-xl: 1.5rem; /* 24px */
   --font-size-2xl: 2rem; /* 32px */
+
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  --bg: #111111;
-  --fg: #e2e8f0;
-  --ps-body: #f1ecec;
-  --ps-accent: #b3b0b0;
-  --surface: #1a1a1a;
-  --surface-alt: #222222;
-  --border: #2a2a2a;
-  --tint: #242424;
+  /* Os apelidos acima seguem sozinhos os tokens semânticos, que `tokens.css`
+     já troca no tema escuro. Aqui ficam apenas os que não têm equivalente. */
+  --tint:        #242424;
   --text-strong: #f1f5f9;
-  --text-muted: #9ca3af;
-  --focus-ring: #7ab3ff;
+
+  --ps-body:   #f1ecec;
+  --ps-accent: #b3b0b0;
+
   --nav-accent: #7ab3ff;
   --nav-active-bg: #0f2238;
+
   color-scheme: dark;
 }
 
@@ -1208,11 +1199,14 @@ li {
   flex-direction: column;
   text-decoration: none;
   color: inherit;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition: box-shadow var(--duration-base) var(--easing-standard),
+    border-color var(--duration-base) var(--easing-standard),
+    transform var(--duration-base) var(--easing-standard);
 }
-.section-card:hover {
+.section-card:is(:hover, :focus-visible) {
   border-color: var(--pv-gray-500);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 .section-card-art {
   display: flex;
@@ -1401,6 +1395,251 @@ footer {
   text-shadow: 2px 2px 0 var(--ps-accent);
   letter-spacing: 0.02em;
   margin-right: auto;
+}
+
+/* ---- ErrorSummary ----------------------------------------------------
+   Primeiro componente escrito inteiramente sobre a camada semântica de
+   `tokens.css`. Nenhum hex, nenhum valor solto: se a paleta institucional
+   mudar (QA-01) ou o vermelho for decidido (QA-07), este bloco acompanha
+   sem ser tocado.
+   ---------------------------------------------------------------------- */
+.ds-error-summary {
+  border: 2px solid var(--color-feedback-danger);
+  border-left-width: var(--space-1);
+  border-radius: var(--radius-md);
+  background: var(--color-feedback-danger-surface);
+  padding: var(--space-4) var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+/* O resumo recebe foco por script, e o anel precisa aparecer para quem
+   navega por teclado. Não é `:focus` puro: o clique do mouse não deve
+   desenhar anel. */
+.ds-error-summary:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: var(--space-1);
+}
+
+.ds-error-summary__title {
+  font-size: var(--text-xl);
+  line-height: var(--leading-xl);
+  font-weight: var(--font-semibold);
+  color: var(--color-feedback-danger);
+  margin-bottom: var(--space-3);
+}
+
+.ds-error-summary__list {
+  margin: 0;
+  padding-left: var(--space-6);
+  font-size: var(--text-base);
+  line-height: var(--leading-base);
+}
+
+.ds-error-summary__list li + li {
+  margin-top: var(--space-2);
+}
+
+/* O sublinhado é o que sinaliza "isto é um link" sem depender de cor —
+   exigência da própria página de mensagens de erro acessíveis. */
+.ds-error-summary__list a {
+  color: var(--color-feedback-danger);
+  font-weight: var(--font-medium);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.ds-error-summary__list a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.ds-error-summary__list a:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: var(--space-1);
+  border-radius: var(--radius-sm);
+}
+
+/* ---- Campo de formulário em erro (apoio à demonstração) ---- */
+.ds-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.ds-field label {
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+}
+
+.ds-field input {
+  min-height: var(--control-height-md);
+  padding: 0 var(--density-padding-x);
+  font: inherit;
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  transition: border-color var(--duration-fast) var(--easing-standard);
+}
+
+.ds-field input:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: var(--space-1);
+}
+
+/* Erro nunca é sinalizado só por cor: a borda engrossa e a mensagem
+   aparece em texto, abaixo do campo. */
+.ds-field[data-invalid="true"] input {
+  border-color: var(--color-feedback-danger);
+  border-width: 2px;
+}
+
+.ds-field__error {
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-feedback-danger);
+}
+
+/* ---- Animação da arte dos cards de seção ------------------------------
+   Cada card anima a parte do desenho que carrega o seu conceito. Nenhum
+   ícone depende do movimento para ser legível: a animação acrescenta,
+   não informa.
+
+   Dispara em `:hover` e em `:focus-visible`. O card é um link — quem
+   navega por teclado tem de ver o mesmo que quem usa mouse.
+
+   SOBRE O TEMPO. Os três tokens de duração servem a retorno de interface,
+   onde a resposta tem de ser imediata. Esta arte é ilustração, e pede um
+   ritmo mais lento para o olho acompanhar o que está sendo dito. Por isso
+   os tempos daqui são *derivados* do token, com `calc()`, em vez de
+   inventados — se `--duration-slow` mudar, tudo aqui acompanha. É o mesmo
+   raciocínio do traço de 3px destes desenhos contra os 2px do sistema de
+   ícones: outra camada, outra régua, mesma origem.
+   ---------------------------------------------------------------------- */
+
+.section-card-art {
+  --art-duracao: calc(var(--duration-slow) * 1.5); /* 600ms */
+  --art-escalonamento: calc(var(--duration-slow) * 0.35); /* 140ms */
+}
+
+/* `fill-box` faz a origem da transformação ser o próprio elemento, e não
+   o sistema de coordenadas do SVG inteiro — sem isso, `center` aponta
+   para o meio do viewBox e tudo gira em torno do lugar errado.
+
+   Só `transform` entra aqui: é a única propriedade que o compositor
+   resolve sem repintar. As que repintam ficam restritas a quem as usa. */
+.section-card-art [class*="art__"] {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform var(--art-duracao) var(--easing-standard);
+}
+
+/* ---- Tipografia: a serifa da base se alarga ---- */
+.section-card:is(:hover, :focus-visible) .art__serifa {
+  transform: scaleX(1.3);
+}
+
+/* ---- Cores: os três círculos se afastam ---- */
+.section-card:is(:hover, :focus-visible) .art__cor--esq {
+  transform: translate(-4px, 2px);
+}
+.section-card:is(:hover, :focus-visible) .art__cor--topo {
+  transform: translateY(-4px);
+}
+.section-card:is(:hover, :focus-visible) .art__cor--dir {
+  transform: translate(4px, 2px);
+}
+
+/* ---- Layout: as colunas assentam, uma depois da outra ---- */
+.section-card:is(:hover, :focus-visible) .art__bloco {
+  transform: translateY(-3px);
+}
+.section-card:is(:hover, :focus-visible) .art__bloco--b {
+  transition-delay: var(--art-escalonamento);
+}
+
+/* ---- Raios: o raio de borda cresce, demonstrando o próprio token ----
+   `rx` é propriedade geométrica: repinta, não compõe. Fica só nos dois
+   retângulos que a usam, em vez de pesar em todos os catorze elementos. */
+.section-card-art .art__raio {
+  transition: rx var(--art-duracao) var(--easing-standard);
+}
+.section-card:is(:hover, :focus-visible) .art__raio--externo {
+  rx: 16;
+}
+.section-card:is(:hover, :focus-visible) .art__raio--interno {
+  rx: 11;
+}
+
+/* ---- Componentes: o controle responde ---- */
+.section-card:is(:hover, :focus-visible) .art__ponto {
+  transform: scale(1.6);
+}
+
+/* ---- Animações: as setas avançam em sequência ---- */
+.section-card:is(:hover, :focus-visible) .art__seta {
+  transform: translateX(4px);
+}
+.section-card:is(:hover, :focus-visible) .art__seta--2 {
+  transition-delay: var(--art-escalonamento);
+}
+.section-card:is(:hover, :focus-visible) .art__seta--3 {
+  transition-delay: calc(var(--art-escalonamento) * 2);
+}
+
+/* ---- Acessibilidade: a pupila olha para um lado, para o outro, e volta
+   Começa e termina no centro, para não haver salto na entrada nem na
+   saída. As demoras em 35% e 70% são o que faz o movimento ler como
+   *olhar* em vez de deslizar: sem a pausa nos extremos, o olho parece
+   apenas escorregar de um lado ao outro. */
+.section-card:is(:hover, :focus-visible) .art__pupila {
+  animation: art-olhar calc(var(--art-duracao) * 2) var(--easing-standard);
+}
+
+@keyframes art-olhar {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-5px);
+  }
+  35% {
+    transform: translateX(-5px);
+  }
+  55% {
+    transform: translateX(5px);
+  }
+  70% {
+    transform: translateX(5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* ---- Anti-padrões: o corte se desenha ----
+   `pathLength="1"` normaliza o comprimento do traço, então 1 é o caminho
+   inteiro qualquer que seja a geometria. Em repouso o corte fica inteiro:
+   quem pediu menos movimento continua vendo o símbolo completo. */
+.section-card-art .art__corte {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.section-card:is(:hover, :focus-visible) .art__corte {
+  animation: art-cortar calc(var(--art-duracao) * 1.5) var(--easing-standard);
+}
+
+@keyframes art-cortar {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 /* ---- Movimento reduzido ---- */
