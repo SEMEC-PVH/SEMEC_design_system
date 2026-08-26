@@ -10,13 +10,18 @@ export default function LayoutPage() {
         Container, grid e regras de espaçamento da página.
       </p>
 
-      <h3>Container &amp; Grid</h3>
-      <p style={{ fontSize: "0.85rem", color: "var(--pv-gray-500)", marginBottom: "0.75rem" }}>
-        Container <code>max-w-6xl</code> (72rem) · padding <code>px-4</code> ·{" "}
-        centralizado <code>mx-auto</code>. Grid de cards:{" "}
-        <code>grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3</code>.
-      </p>
-      <div className="preview">
+      <Card>
+        <h3>Container &amp; Grid</h3>
+        <p style={{ fontSize: "0.85rem", color: "var(--pv-gray-500)", marginBottom: "0.75rem" }}>
+          Container <code>max-w-6xl</code> (72rem) · padding <code>px-4</code> ·{" "}
+          centralizado <code>mx-auto</code>. Grid de cards:{" "}
+          <code>grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3</code>.
+        </p>
+        <p className="note">
+          O limite de <code>72rem</code> vale para as interfaces construídas
+          com o sistema (portal). Este guia de documentação usa largura fluida
+          para leitura e não segue esse limite.
+        </p>
         <div className="demo-cards">
           <DemoCard
             tag="IPTU"

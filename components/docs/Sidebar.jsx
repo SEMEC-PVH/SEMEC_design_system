@@ -6,10 +6,22 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { navigation } from "@/lib/navigation";
 import { safeGet, safeSet } from "@/lib/storage";
 
-const isActive = (pathname, href) => {
+// Normaliza o pathname que o Next entrega com trailing slash (trailingSlash:
+// true) para comparar com os hrefs do navigation, que não o têm.
+const stripTrailingSlash = (p) => (p.length > 1 ? p.replace(/\/+$/, "") : p);
+
+// Links com hash (ex.: /fundamentos/cores#cor-blue) só ficam ativos quando o
+// hash da URL atual coincide com o do link. Itens folha ativam apenas por
+// igualdade exata; `hasChildren` libera o prefixo (item é ancestral de uma
+// seção com subitens).
+const isActive = (pathname, href, currentHash = "", hasChildren = false) => {
   const [path, hash] = href.split("#");
-  if (hash) return pathname === path;
-  return pathname === href || pathname.startsWith(href + "/");
+  const cleanPath = stripTrailingSlash(pathname);
+  if (hash) return stripTrailingSlash(path) === cleanPath && currentHash === hash;
+  const cleanHref = stripTrailingSlash(href);
+  if (hasChildren)
+    return cleanPath === cleanHref || cleanPath.startsWith(cleanHref + "/");
+  return cleanPath === cleanHref;
 };
 
 const MOBILE_QUERY = "(max-width: 900px)";
@@ -39,11 +51,11 @@ const buildSections = (items) => {
 };
 
 // true se o grupo contém a rota ativa (item direto ou dentro de um subgrupo).
-const groupHasActive = (pathname, item) =>
+const groupHasActive = (pathname, item, currentHash = "") =>
   buildSections(item.items).some(
     (s) =>
-      isActive(pathname, s.item.href) ||
-      s.children.some((c) => isActive(pathname, c.href))
+      isActive(pathname, s.item.href, currentHash, s.children.length > 0) ||
+      s.children.some((c) => isActive(pathname, c.href, currentHash))
   );
 
 let collapsedCache = null;
@@ -76,6 +88,24 @@ const readCollapsed = () => {
 const EMPTY_COLLAPSED = {};
 const serverCollapsed = () => EMPTY_COLLAPSED;
 
+// Hash atual da URL, observado via `hashchange` (o `usePathname` não o expõe).
+let currentHash = "";
+let hashLoaded = false;
+const hashListeners = new Set();
+const subscribeHash = (cb) => {
+  hashListeners.add(cb);
+  return () => hashListeners.delete(cb);
+};
+const readHash = () => {
+  if (!hashLoaded && typeof window !== "undefined") {
+    hashLoaded = true;
+    currentHash = window.location.hash.replace(/^#/, "");
+  }
+  return currentHash;
+};
+const serverHash = () => "";
+const useHash = () => useSyncExternalStore(subscribeHash, readHash, serverHash);
+
 function Caret() {
   return (
     <span className="caret" aria-hidden="true">
@@ -102,6 +132,7 @@ function updateCollapsed(storageKey, cacheKey, value) {
 
 export default function Sidebar({ open, onClose }) {
   const pathname = usePathname();
+  const hash = useHash();
   const collapsed = useSyncExternalStore(
     subscribe,
     readCollapsed,
@@ -121,8 +152,41 @@ export default function Sidebar({ open, onClose }) {
   }, []);
 
   useEffect(() => {
+    const onHash = () => {
+      currentHash = window.location.hash.replace(/^#/, "");
+      hashListeners.forEach((l) => l());
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  useEffect(() => {
     onClose();
   }, [pathname, onClose]);
+
+  // Ao navegar para dentro de um grupo/subgrupo colapsado, expande-o — a rota
+  // atual nunca fica oculta, mas o colapso manual continua valendo até a rota
+  // sair da categoria (ou o usuário voltar a colapsar nesta página).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    navigation.forEach((item) => {
+      if (!item.items) return;
+      const gKey = groupCacheKey(item.key);
+      if (groupHasActive(pathname, item, hash) && collapsedCache[gKey]) {
+        updateCollapsed("ds-group-" + item.key, gKey, false);
+      }
+      buildSections(item.items).forEach((s) => {
+        if (s.children.length === 0) return;
+        const nKey = nestedCacheKey(item.key, s.item.href);
+        if (
+          s.children.some((c) => isActive(pathname, c.href, hash)) &&
+          collapsedCache[nKey]
+        ) {
+          updateCollapsed(nestedStorageKey(item.key, s.item.href), nKey, false);
+        }
+      });
+    });
+  }, [pathname, hash]);
 
   const toggleGroup = (key) => {
     updateCollapsed(
@@ -140,9 +204,8 @@ export default function Sidebar({ open, onClose }) {
     );
   };
 
-  // Rota ativa dentro do grupo: exibe o grupo expandido (sem gravar no storage).
-  const collapsedGroup = (item) =>
-    !!collapsed[groupCacheKey(item.key)] && !groupHasActive(pathname, item);
+  // O colapso é sempre o que o usuário escolheu — a rota ativa não o anula.
+  const collapsedGroup = (item) => !!collapsed[groupCacheKey(item.key)];
 
   const renderSections = (item) =>
     buildSections(item.items).map((section) => {
@@ -153,7 +216,7 @@ export default function Sidebar({ open, onClose }) {
             href={section.item.href}
             className={
               (section.item.sub ? "sub " : "") +
-              (isActive(pathname, section.item.href) ? "active" : "")
+              (isActive(pathname, section.item.href, hash) ? "active" : "")
             }
           >
             {section.item.label}
@@ -163,11 +226,7 @@ export default function Sidebar({ open, onClose }) {
       const storedCollapsed = !!collapsed[
         nestedCacheKey(item.key, section.item.href)
       ];
-      const hasActiveChild = section.children.some((c) =>
-        isActive(pathname, c.href)
-      );
-      // Rota ativa dentro da categoria: exibe expandida (sem gravar).
-      const collapsedNested = storedCollapsed && !hasActiveChild;
+      const collapsedNested = storedCollapsed;
       const gid = groupId(item.key, section.item.href);
       return (
         <div key={section.item.href}>
@@ -190,7 +249,7 @@ export default function Sidebar({ open, onClose }) {
                 key={sub.href + sub.label}
                 href={sub.href}
                 className={
-                  "sub " + (isActive(pathname, sub.href) ? "active" : "")
+                  "sub " + (isActive(pathname, sub.href, hash) ? "active" : "")
                 }
               >
                 {sub.label}
@@ -238,7 +297,10 @@ export default function Sidebar({ open, onClose }) {
             <Link
               key={item.href}
               href={item.href}
-              className={isActive(pathname, item.href) ? "active" : ""}
+              className={
+                "side-title" +
+                (isActive(pathname, item.href, hash) ? " active" : "")
+              }
             >
               {item.label}
             </Link>
