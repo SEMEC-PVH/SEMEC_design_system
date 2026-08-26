@@ -545,11 +545,12 @@ button.side-title {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 61px);
-  padding: 2rem 2rem 0;
+  padding: 2rem 1.5rem 0;
 }
 .content .container {
   margin: 0 auto;
-  max-width: 1200px;
+  width: min(var(--container-max), 100%);
+  min-width: var(--container-min);
 }
 .content > .container:last-child {
   margin-top: auto;
@@ -616,11 +617,15 @@ button.side-title {
   .sidebar.open {
     transform: translateX(0);
   }
-  .content {
-    padding: 2rem 1.25rem 0;
-  }
   .header-search input {
     width: 140px;
+  }
+}
+
+/* Padding lateral segue a spec: 24px desktop, 16px em telas <640px */
+@media (max-width: 640px) {
+  .content {
+    padding: 2rem 1rem 0;
   }
 }
 
@@ -763,20 +768,6 @@ ol {
 }
 li {
   font-size: var(--font-size-sm);
-}
-
-/* Leitura confortável: o texto corrido não estica até a borda em telas
-   largas; os demos, grids e tabelas continuam ocupando toda a largura. */
-.content p,
-.content ul,
-.content ol {
-  max-width: 70ch;
-}
-.demo-frame p,
-.demo-frame ul,
-.demo-frame ol,
-.preview p {
-  max-width: none;
 }
 
 /* ---- Tipografia: escala renderizada ---- */
@@ -1245,8 +1236,6 @@ li {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
-  max-width: 72rem;
-  margin: 0 auto;
 }
 .section-card {
   background: var(--surface);

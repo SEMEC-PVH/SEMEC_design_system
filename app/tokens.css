@@ -219,6 +219,14 @@
   --easing-standard: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* =======================================================================
+     L1 — SEMÂNTICOS · Layout
+     Largura máxima única do container. Todas as páginas usam este valor —
+     nenhuma foge da largura padrão.
+     ======================================================================= */
+  --container-min: 320px;
+  --container-max: 1200px;
+
+  /* =======================================================================
      L1 — SEMÂNTICOS · Densidade
      Fundamento que a especificação ainda não cobre. Sistema administrativo
      com tabela longa é inutilizável na altura de linha de portal público.
@@ -290,4 +298,15 @@
   --elevation-1: 0 1px 2px rgba(0, 0, 0, .40);
   --elevation-2: 0 4px 12px rgba(0, 0, 0, .48);
   --elevation-3: 0 12px 32px rgba(0, 0, 0, .56);
+}
+
+/* ==========================================================================
+   Container — desktop fixo em 1200px
+   A partir de lg (1024px) o container deixa de ser fluido e assume o teto:
+   min = max = 1200px. Janelas entre 1024px e 1199px rolam horizontalmente.
+   ========================================================================== */
+@media (min-width: 1024px) {
+  :root {
+    --container-min: 1200px;
+  }
 }
