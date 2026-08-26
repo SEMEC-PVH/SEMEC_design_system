@@ -1,4 +1,5 @@
 import DemoCard from "@/components/demos/DemoCard";
+import Card from "@/components/ui/Card";
 
 export const metadata = { title: "Layout" };
 
@@ -13,14 +14,15 @@ export default function LayoutPage() {
       <Card>
         <h3>Container &amp; Grid</h3>
         <p style={{ fontSize: "0.85rem", color: "var(--pv-gray-500)", marginBottom: "0.75rem" }}>
-          Container <code>max-w-6xl</code> (72rem) · padding <code>px-4</code> ·{" "}
-          centralizado <code>mx-auto</code>. Grid de cards:{" "}
+          Container <code>var(--container-max)</code> (1200px) · piso{" "}
+          <code>var(--container-min)</code> (320px móvel; fixa 1200px em
+          desktop ≥1024px) · padding lateral <code>24px</code> (16px em telas
+          &lt;640px) · centralizado <code>mx-auto</code>. Grid de cards:{" "}
           <code>grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3</code>.
         </p>
         <p className="note">
-          O limite de <code>72rem</code> vale para as interfaces construídas
-          com o sistema (portal). Este guia de documentação usa largura fluida
-          para leitura e não segue esse limite.
+          O limite de <code>1200px</code> vale para todas as páginas, incluindo
+          este guia de documentação — nenhuma página foge da largura padrão.
         </p>
         <div className="demo-cards">
           <DemoCard
@@ -40,7 +42,7 @@ export default function LayoutPage() {
             description="Espaço interno de card: p-6."
           />
         </div>
-      </div>
+      </Card>
     </>
   );
 }

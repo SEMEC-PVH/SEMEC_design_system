@@ -69,28 +69,27 @@ export default function OverviewPage() {
       <h1>SEMEC design system</h1>
       <p className="subtitle">Guia de referência visual SEMEC</p>
 
+      <h2>O que é um Design System</h2>
+      <p>
+        Um Design System é um conjunto de diretrizes, componentes
+        reutilizáveis, padrões e outros recursos que ajudam designers e
+        desenvolvedores a criar experiências digitais e aplicativos
+        consistentes. O SEMEC Design System (SDS) oferece uma arquitetura nova
+        e rica, componentes reutilizáveis e padrões web modernos que auxiliam
+        no design e na construção de aplicativos alinhados à experiência
+        institucional da PMPV.
+      </p>
+      <p>
+        O SDS inclui recursos para criar interfaces de usuário consistentes com
+        os princípios de design, a linguagem visual e as melhores práticas do
+        Salesforce. Em vez de perder tempo ajustando pixels, os desenvolvedores
+        podem concentrar-se na lógica da aplicação, enquanto os designers focam
+        na experiência do usuário, nas interações e nos fluxos. Esse sistema
+        garante que a criação em todas as aplicações web da PMPV seja
+        consistente, acessível e eficiente.
+      </p>
 
-        <h3>O que é um Design System</h3>
-        <p style={{ fontSize: "0.95rem", color: "var(--pv-gray-600)" }}>
-          Um Design System é um conjunto de diretrizes, componentes
-          reutilizáveis, padrões e outros recursos que ajudam designers e
-          desenvolvedores a criar experiências digitais e aplicativos
-          consistentes. O SEMEC Design System (SDS) oferece uma arquitetura nova
-          e rica, componentes reutilizáveis e padrões web modernos que auxiliam
-          no design e na construção de aplicativos alinhados à experiência institucional da PMPV.
-        </p>
-        <p style={{ fontSize: "0.95rem", color: "var(--pv-gray-600)", marginTop: "0.75rem" }}>
-          O SDS inclui recursos para criar interfaces de usuário consistentes
-          com os princípios de design, a linguagem visual e as melhores práticas
-          do Salesforce. Em vez de perder tempo ajustando pixels, os
-          desenvolvedores podem concentrar-se na lógica da aplicação, enquanto
-          os designers focam na experiência do usuário, nas interações e nos
-          fluxos. Esse sistema garante que a criação em todas as aplicações web
-          da PMPV seja consistente, acessível e eficiente.
-        </p>
-
-
-      <h2>Seções</h2>
+      <h3>Seções</h3>
       <div className="section-cards">
         {secoes.map((s) => (
           <SectionCard
