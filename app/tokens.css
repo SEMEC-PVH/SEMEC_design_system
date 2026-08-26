@@ -128,7 +128,7 @@
   --color-action-primary-active: var(--pv-blue-800);
 
   /* ---- Superfície ------------------------------------------------------- */
-  --color-surface-base:   var(--pv-gray-50);
+  --color-surface-base:   var(--pv-white);
   --color-surface-raised: var(--pv-white);
   --color-surface-sunken: var(--pv-gray-100);
 

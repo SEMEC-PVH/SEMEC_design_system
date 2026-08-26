@@ -1,4 +1,3 @@
-import Card from "@/components/ui/Card";
 import DemoCard from "@/components/demos/DemoCard";
 
 export const metadata = { title: "Componente ServiceCard" };
@@ -11,8 +10,8 @@ export default function ServiceCardPage() {
         Card de serviço com tag, selo de novidade e estado &quot;em breve&quot;.
       </p>
 
-      <Card>
-        <h3>Preview</h3>
+      <h3>Preview</h3>
+      <div className="demo-frame">
         <div className="demo-cards">
           <DemoCard
             tag="IPTU"
@@ -35,16 +34,30 @@ export default function ServiceCardPage() {
             soon
           />
         </div>
-        <p style={{ fontSize: "0.8rem", color: "var(--pv-gray-500)", marginTop: "0.75rem" }}>
-          Card: <code>bg-white rounded-2xl p-6</code> sem borda, sombra{" "}
-          <code>0 4px 16px rgba(0,0,0,0.12)</code> · hover whisper{" "}
-          <code>0 8px 24px rgba(0,0,0,0.16)</code> · selo{" "}
-          <code>bg-pv-yellow-500 text-pv-blue-950</code> · seta{" "}
-          <code>bg-pv-green-50</code> → hover{" "}
-          <code>bg-pv-green-600 text-white</code> · &quot;Em breve&quot;{" "}
-          <code>bg-#efefef</code>.
-        </p>
-      </Card>
+      </div>
+      <p style={{ fontSize: "0.8rem", color: "var(--pv-gray-500)", marginTop: "0.75rem" }}>
+        Card: <code>bg-white rounded-2xl p-6</code> sem borda, sombra{" "}
+        <code>0 4px 16px rgba(0,0,0,0.12)</code> · hover whisper{" "}
+        <code>0 8px 24px rgba(0,0,0,0.16)</code> · selo{" "}
+        <code>bg-pv-yellow-500 text-pv-blue-950</code> · seta{" "}
+        <code>bg-pv-green-50</code> → hover{" "}
+        <code>bg-pv-green-600 text-white</code> · &quot;Em breve&quot;{" "}
+        <code>bg-#efefef</code>.
+      </p>
+
+      <h3>Código</h3>
+      <pre>
+        <code>{`<article className="bg-white rounded-2xl p-6 shadow-[0_4px_16px_rgba(0,0,0,0.12)]">
+  <span className="tag">IPTU</span>
+  <span className="badge bg-pv-yellow-500 text-pv-blue-950">Novo</span>
+  <h3 className="font-bold text-pv-blue-900">Restituição de IPTU</h3>
+  <p>Solicite a restituição de valores pagos a maior no IPTU.</p>
+  <div className="foot">
+    <span>Acessar serviço</span>
+    <span className="bg-pv-green-50 hover:bg-pv-green-600 hover:text-white">→</span>
+  </div>
+</article>`}</code>
+      </pre>
     </>
   );
 }
