@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Card from "@/components/ui/Card";
 
 export const metadata = { title: "Regras" };
 
@@ -35,8 +34,7 @@ export default function RegrasPage() {
         nas interfaces.
       </p>
 
-      <Card>
-        <h3>Índice de regras</h3>
+      <h3>Índice de regras</h3>
         <table>
           <tbody>
             <tr>
@@ -61,7 +59,6 @@ export default function RegrasPage() {
             ))}
           </tbody>
         </table>
-      </Card>
     </>
   );
 }

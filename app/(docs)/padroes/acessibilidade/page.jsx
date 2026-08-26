@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Card from "@/components/ui/Card";
 
 export const metadata = { title: "Padrões · Acessibilidade" };
 
@@ -25,8 +24,7 @@ export default function AcessibilidadePage() {
         sejam utilizáveis por todas as pessoas.
       </p>
 
-      <Card>
-        <h3>Índice de padrões</h3>
+      <h3>Índice de padrões</h3>
         <table>
           <tbody>
             <tr>
@@ -51,7 +49,6 @@ export default function AcessibilidadePage() {
             ))}
           </tbody>
         </table>
-      </Card>
     </>
   );
 }

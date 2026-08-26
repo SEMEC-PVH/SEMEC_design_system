@@ -1,4 +1,3 @@
-import Card from "@/components/ui/Card";
 import DemoCard from "@/components/demos/DemoCard";
 
 export const metadata = { title: "Layout" };
@@ -41,7 +40,7 @@ export default function LayoutPage() {
             description="Espaço interno de card: p-6."
           />
         </div>
-      </Card>
+      </div>
     </>
   );
 }

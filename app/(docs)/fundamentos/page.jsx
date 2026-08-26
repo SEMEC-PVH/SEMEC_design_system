@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Card from "@/components/ui/Card";
 
 export const metadata = { title: "Fundamentos" };
 
@@ -35,8 +34,7 @@ export default function FundamentosPage() {
         layout e acabamentos.
       </p>
 
-      <Card>
-        <h3>Índice de fundamentos</h3>
+      <h3>Índice de fundamentos</h3>
         <table>
           <tbody>
             <tr>
@@ -61,7 +59,6 @@ export default function FundamentosPage() {
             ))}
           </tbody>
         </table>
-      </Card>
     </>
   );
 }

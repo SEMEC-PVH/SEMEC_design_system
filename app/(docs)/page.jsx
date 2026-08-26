@@ -1,4 +1,3 @@
-import Card from "@/components/ui/Card";
 import SectionCard from "@/components/ui/SectionCard";
 import {
   ArtTipografia,

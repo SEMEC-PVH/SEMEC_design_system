@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Card from "@/components/ui/Card";
 
 export const metadata = { title: "Padrões · Dados e relatórios" };
 
@@ -26,8 +25,7 @@ export default function DadosRelatoriosPage() {
         conjuntos de dados.
       </p>
 
-      <Card>
-        <h3>Índice de padrões</h3>
+      <h3>Índice de padrões</h3>
         <table>
           <tbody>
             <tr>
@@ -52,7 +50,6 @@ export default function DadosRelatoriosPage() {
             ))}
           </tbody>
         </table>
-      </Card>
     </>
   );
 }
