@@ -1231,6 +1231,31 @@ li {
   letter-spacing: 0.05em;
 }
 
+/* ---- Categorias da página inicial ---- */
+.intro-category {
+  margin-top: 2.75rem;
+}
+.intro-category h3 {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--text-strong);
+  margin-bottom: 0.25rem;
+}
+.intro-category h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+.intro-category h3 a:is(:hover, :focus-visible) {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--pv-green-700);
+}
+.category-head p {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
 /* ---- Cards de seção (Visão geral) ---- */
 .section-cards {
   display: grid;
@@ -1684,6 +1709,135 @@ footer {
 }
 
 @keyframes art-cortar {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---- Header: o CTA avança ---- */
+.section-card:is(:hover, :focus-visible) .art__cta {
+  transform: translateY(-2px);
+}
+
+/* ---- Hero: a linha do título se estica ---- */
+.section-card-art .art__hero-line {
+  transform-origin: left center;
+}
+.section-card:is(:hover, :focus-visible) .art__hero-line {
+  transform: scaleX(1.12);
+}
+
+/* ---- Controles: os chips sobem em sequência ---- */
+.section-card:is(:hover, :focus-visible) .art__chip {
+  transform: translateY(-3px);
+}
+.section-card:is(:hover, :focus-visible) .art__chip--b {
+  transition-delay: var(--art-escalonamento);
+}
+
+/* ---- ServiceCard: a tag sobe ---- */
+.section-card:is(:hover, :focus-visible) .art__tag {
+  transform: translateY(-3px);
+}
+
+/* ---- Botões: o primário cresce ---- */
+.section-card:is(:hover, :focus-visible) .art__btn {
+  transform: scale(1.08);
+}
+
+/* ---- ErrorSummary: o primeiro alerta pulsa ---- */
+.section-card:is(:hover, :focus-visible) .art__erro {
+  transform: scale(1.3);
+}
+
+/* ---- Footer: as colunas assentam, uma depois da outra ---- */
+.section-card:is(:hover, :focus-visible) .art__col {
+  transform: translateY(-3px);
+}
+.section-card:is(:hover, :focus-visible) .art__col--b {
+  transition-delay: var(--art-escalonamento);
+}
+.section-card:is(:hover, :focus-visible) .art__col--c {
+  transition-delay: calc(var(--art-escalonamento) * 2);
+}
+
+/* ---- Navegação: os nós avançam pelo caminho ---- */
+.section-card:is(:hover, :focus-visible) .art__no {
+  transform: scale(1.35);
+}
+.section-card:is(:hover, :focus-visible) .art__no--b {
+  transition-delay: var(--art-escalonamento);
+}
+.section-card:is(:hover, :focus-visible) .art__no--c {
+  transition-delay: calc(var(--art-escalonamento) * 2);
+}
+
+/* ---- Formulários: o campo do meio ganha largura (foco) ---- */
+.section-card-art .art__campo {
+  transform-origin: left center;
+}
+.section-card:is(:hover, :focus-visible) .art__campo {
+  transform: scaleX(1.05);
+}
+
+/* ---- Dados e relatórios: as barras crescem em sequência ----
+   A origem vira a base da barra, então o crescimento acontece do chão
+   para cima. Em repouso as barras já aparecem reduzidas (0.6) e o hover
+   as leva ao tamanho cheio — o aumento é o próprio movimento. */
+.section-card-art .art__barra {
+  transform-origin: bottom center;
+  transform: scaleY(0.6);
+  transition: transform var(--art-duracao) var(--easing-standard);
+}
+.section-card:is(:hover, :focus-visible) .art__barra {
+  transform: scaleY(1);
+}
+.section-card:is(:hover, :focus-visible) .art__barra--b {
+  transition-delay: var(--art-escalonamento);
+}
+.section-card:is(:hover, :focus-visible) .art__barra--c {
+  transition-delay: calc(var(--art-escalonamento) * 2);
+}
+
+/* ---- Feedback: o ponto de status pulsa ---- */
+.section-card:is(:hover, :focus-visible) .art__status {
+  animation: art-pulso calc(var(--art-duracao) * 2) var(--easing-standard);
+}
+
+@keyframes art-pulso {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.4);
+  }
+  60% {
+    transform: scale(1.4);
+  }
+}
+
+/* ---- Acessibilidade (padrões): o eixo central sobe ---- */
+.section-card:is(:hover, :focus-visible) .art__eixo {
+  transform: translateY(-3px);
+}
+
+/* ---- Pendências: o item pendente se risca ----
+   Mesma técnica do corte anti-padrão: `pathLength="1"` normaliza o
+   comprimento e em repouso a linha fica inteira (nenhuma pista falsa
+   para quem prefere menos movimento). */
+.section-card-art .art__pendencia {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.section-card:is(:hover, :focus-visible) .art__pendencia {
+  animation: art-riscar calc(var(--art-duracao) * 1.5) var(--easing-standard);
+}
+
+@keyframes art-riscar {
   from {
     stroke-dashoffset: 1;
   }
