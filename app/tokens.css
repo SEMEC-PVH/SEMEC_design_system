@@ -220,11 +220,20 @@
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Layout
-     Largura máxima única do container. Todas as páginas usam este valor —
-     nenhuma foge da largura padrão.
+     Largura máxima do container de produto. Nenhuma página de serviço foge
+     deste valor. O guia de documentação usa uma coluna mais estreita
+     (`--container-docs`) por legibilidade — ver comentário abaixo.
      ======================================================================= */
-  --container-min: 320px;
   --container-max: 1200px;
+
+  /* Coluna de conteúdo do guia de documentação. Mais estreita que o padrão
+     de produto (1200px): leitura confortável de manuais não pede o mesmo
+     teto de um portal com tabelas e telas administrativas. */
+  --container-docs: 48rem;
+
+  /* Medida de leitura do texto corrido (p, ul, ol). Componentes visuais —
+     cards, tabelas, código e demos — continuam usando toda a coluna. */
+  --measure: 72ch;
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Densidade
@@ -300,13 +309,4 @@
   --elevation-3: 0 12px 32px rgba(0, 0, 0, .56);
 }
 
-/* ==========================================================================
-   Container — desktop fixo em 1200px
-   A partir de lg (1024px) o container deixa de ser fluido e assume o teto:
-   min = max = 1200px. Janelas entre 1024px e 1199px rolam horizontalmente.
-   ========================================================================== */
-@media (min-width: 1024px) {
-  :root {
-    --container-min: 1200px;
-  }
-}
+

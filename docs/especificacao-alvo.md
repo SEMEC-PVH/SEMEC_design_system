@@ -266,7 +266,8 @@ Não existem 800 e 900 no sistema. O navegador sintetiza esses pesos quando a fo
 | Token | Valor |
 |---|---|
 | `container-max` | 1200px (`--container-max`) |
-| `container-min` | 320px (móvel) · 1200px (desktop ≥1024px) (`--container-min`) |
+| `container-docs` | 48rem (768px) (`--container-docs`) — coluna do guia de documentação |
+| `measure` | 72ch (`--measure`) — largura de leitura do texto corrido |
 | Colunas | 12 |
 | Calha | 24px |
 | Margem lateral (móvel) | 16px |

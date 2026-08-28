@@ -273,9 +273,28 @@ a {
   background: var(--surface-alt);
   border-radius: 0.75rem;
   padding: 0.45rem 0.9rem;
+  padding-right: 3.4rem;
   font-family: inherit;
   font-size: var(--font-size-xs);
   color: var(--fg);
+}
+.search-field {
+  position: relative;
+}
+.header-search .search-hint {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 0.375rem;
+  padding: 0.1rem 0.45rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  color: var(--text-muted);
 }
 .header-search input::placeholder {
   color: var(--text-muted);
@@ -310,7 +329,8 @@ a {
   color: var(--fg);
   white-space: nowrap;
 }
-.header-search .results a:hover {
+.header-search .results a:hover,
+.header-search .results a[aria-selected="true"] {
   background: var(--tint);
   color: var(--pv-green-800);
 }
@@ -549,8 +569,7 @@ button.side-title {
 }
 .content .container {
   margin: 0 auto;
-  width: min(var(--container-max), 100%);
-  min-width: var(--container-min);
+  width: min(var(--container-docs), 100%);
 }
 .content > .container:last-child {
   margin-top: auto;
@@ -645,6 +664,9 @@ button.side-title {
   .header-search input {
     display: none;
   }
+  .header-search .search-hint {
+    display: none;
+  }
   .header-search.open {
     position: absolute;
     top: 100%;
@@ -654,6 +676,13 @@ button.side-title {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
     z-index: 60;
+  }
+  .header-search.open .search-field {
+    flex: 1;
+    min-width: 0;
+  }
+  .header-search.open .search-hint {
+    display: block;
   }
   .header-search.open input {
     display: block;
@@ -768,6 +797,21 @@ ol {
 }
 li {
   font-size: var(--font-size-sm);
+}
+
+/* Leitura confortável: o texto corrido não estica até a borda da coluna
+   em telas largas; cards, tabelas, código e demos continuam ocupando toda
+   a largura do container. */
+.content p,
+.content ul,
+.content ol {
+  max-width: var(--measure);
+}
+.demo-frame p,
+.demo-frame ul,
+.demo-frame ol,
+.preview p {
+  max-width: none;
 }
 
 /* ---- Tipografia: escala renderizada ---- */

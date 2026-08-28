@@ -14,6 +14,14 @@ const allItems = () =>
       : [{ label: item.label, href: item.href, group: "Introdução" }]
   );
 
+const groupOf = (href) => {
+  for (const item of navigation) {
+    if (item.href === href) return item.label;
+    if (item.items && item.items.some((s) => s.href === href)) return item.label;
+  }
+  return "Introdução";
+};
+
 const LISTBOX_ID = "header-search-results";
 const optionId = (index) => `${LISTBOX_ID}-opt-${index}`;
 
@@ -36,6 +44,7 @@ export default function Header({ open, onToggle }) {
   const [activeIndex, setActiveIndex] = useState(-1);
   const [mobileOpen, setMobileOpen] = useState(false);
   const wrapRef = useRef(null);
+  const inputRef = useRef(null);
   const router = useRouter();
 
   const results = useMemo(() => {
@@ -74,6 +83,25 @@ export default function Header({ open, onToggle }) {
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setMobileOpen(true);
+        requestAnimationFrame(() => inputRef.current?.focus());
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (activeIndex < 0) return;
+    wrapRef.current
+      ?.querySelector(`[id="${optionId(activeIndex)}"]`)
+      ?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex]);
+
   const closeResults = () => {
     setQuery("");
     setActiveIndex(-1);
@@ -100,7 +128,7 @@ export default function Header({ open, onToggle }) {
       e.preventDefault();
       setActiveIndex(results.length - 1);
     } else if (e.key === "Enter") {
-      const target = results[activeIndex];
+      const target = results[activeIndex >= 0 ? activeIndex : 0];
       if (target) {
         e.preventDefault();
         closeResults();
@@ -150,27 +178,33 @@ export default function Header({ open, onToggle }) {
             <path d="M21 21l-4.35-4.35" />
           </svg>
         </button>
-        <input
-          id="header-search-input"
-          type="search"
-          placeholder="Buscar seções…"
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setActiveIndex(-1);
-          }}
-          onKeyDown={onKeyDown}
-          aria-label="Buscar no guia"
-          role="combobox"
-          aria-expanded={expanded}
-          aria-controls={LISTBOX_ID}
-          aria-autocomplete="list"
-          aria-activedescendant={
-            activeIndex >= 0 && results[activeIndex]
-              ? optionId(activeIndex)
-              : undefined
-          }
-        />
+        <div className="search-field">
+          <input
+            ref={inputRef}
+            id="header-search-input"
+            type="search"
+            placeholder="Buscar seções…"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setActiveIndex(e.target.value.trim() ? 0 : -1);
+            }}
+            onKeyDown={onKeyDown}
+            aria-label="Buscar no guia"
+            role="combobox"
+            aria-expanded={expanded}
+            aria-controls={LISTBOX_ID}
+            aria-autocomplete="list"
+            aria-activedescendant={
+              activeIndex >= 0 && results[activeIndex]
+                ? optionId(activeIndex)
+                : undefined
+            }
+          />
+          <kbd className="search-hint" aria-hidden="true">
+            Ctrl K
+          </kbd>
+        </div>
         {expanded && (
           <div
             className="results"
