@@ -1,0 +1,72 @@
+/* =========================================================================
+   Design System SEMEC — variáveis no formato shadcn (claro/escuro)
+   =========================================================================
+
+   Valores mapeados para a paleta `pv-*` (ver `tokens.css`), em HSL para
+   os modifiers de opacidade (`bg-primary/80`) funcionarem.
+
+   O tema escuro segue a convenção do design system: `[data-theme="dark"]`
+   (ADR-012), não a classe `.dark` do shadcn.
+   ========================================================================= */
+
+:root {
+  --background: 216 29% 97%;
+  --foreground: 216 49% 15%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 216 49% 15%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 216 49% 15%;
+
+  --primary: 212 48% 44%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 210 55% 96%;
+  --secondary-foreground: 213 49% 29%;
+
+  --muted: 0 0% 96%;
+  --muted-foreground: 215 14% 34%;
+
+  --accent: 210 55% 96%;
+  --accent-foreground: 216 49% 15%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 220 13% 91%;
+  --input: 220 13% 91%;
+  --ring: 225 64% 37%;
+
+  --radius: 0.5rem;
+}
+
+[data-theme="dark"] {
+  --background: 0 0% 7%;
+  --foreground: 214 32% 91%;
+
+  --card: 0 0% 10%;
+  --card-foreground: 214 32% 91%;
+
+  --popover: 0 0% 10%;
+  --popover-foreground: 214 32% 91%;
+
+  --primary: 212 39% 62%;
+  --primary-foreground: 212 58% 14%;
+
+  --secondary: 0 0% 13%;
+  --secondary-foreground: 213 27% 84%;
+
+  --muted: 0 0% 13%;
+  --muted-foreground: 218 11% 65%;
+
+  --accent: 0 0% 13%;
+  --accent-foreground: 214 32% 91%;
+
+  --destructive: 0 91% 71%;
+  --destructive-foreground: 0 75% 15%;
+
+  --border: 0 0% 16%;
+  --input: 219 15% 29%;
+  --ring: 214 100% 74%;
+}
