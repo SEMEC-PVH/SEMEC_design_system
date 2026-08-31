@@ -1,0 +1,298 @@
+/* =========================================================================
+   Design System SEMEC — Base de estilos genéricos (camada L0/L1)
+   =========================================================================
+
+   Copie este arquivo para dentro do `globals.css` (ou `index.css`) do site
+   novo, junto com `shadcn.css`. Duas camadas:
+
+   L0 — PRIMITIVOS (`--pv-*`)
+        Valores brutos. Invariantes de tema. Nunca use primitivo direto
+        em componente.
+
+   L1 — SEMÂNTICOS (`--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`,
+        `--feedback-*`, `--space-*`, `--text-*`, `--radius-*`, `--elevation-*`)
+        Camada do dia a dia. Diz o papel, não a cor.
+
+   Tema escuro troca apenas L1 (`[data-theme="dark"]`, ver ADR-012).
+   Subconjunto mínimo: só o que os componentes de `base/components/` usam.
+   ========================================================================= */
+
+:root {
+  /* =======================================================================
+     L0 — PRIMITIVOS
+     ======================================================================= */
+
+  /* ---- Azul — escala primária ------------------------------------------ */
+  --pv-blue-50:  #eef4fa;
+  --pv-blue-100: #dbe6f1;
+  --pv-blue-600: #3a6ca6;
+  --pv-blue-700: #2f5a8a;
+  --pv-blue-800: #26476f;
+  --pv-blue-900: #1e3a5f;
+  --pv-blue-950: #0f2238;
+
+  /* Quarto azul em circulação. Usado no anel de foco (contraste 9,38:1). */
+  --pv-blue-hero: #223f99;
+
+  /* ---- Verde — apoio ------------------------------------------------ */
+  --pv-green-50:  #eef7e6;
+  --pv-green-500: #86c95b;
+  --pv-green-800: #3a6420;
+
+  /* ---- Amarelo — destaque ------------------------------------------- */
+  --pv-yellow-400: #f6d56e;
+  --pv-yellow-500: #f2c94c;
+  --pv-yellow-800: #8a5a00;
+
+  /* ---- Vermelho — estado de erro (provisório, QA-07) ----------------- */
+  --pv-red-50:  #fef2f2;
+  --pv-red-400: #f87171;
+  --pv-red-500: #ef4444;
+  --pv-red-600: #dc2626;
+  --pv-red-700: #b91c1c;
+  --pv-red-800: #991b1b;
+
+  /* ---- Neutros -------------------------------------------------------- */
+  --pv-gray-50:  #f4f6f9;  /* fundo de página do portal */
+  --pv-gray-100: #f5f5f5;
+  --pv-gray-200: #e5e7eb;
+  --pv-gray-400: #78849a;  /* borda de campo — 3,77:1 (WCAG 1.4.11) */
+  --pv-gray-600: #4b5563;  /* texto secundário — 6,98:1 */
+  --pv-gray-700: #374151;
+  --pv-gray-900: #14233a;  /* texto principal do portal */
+
+  --pv-white: #ffffff;
+  --pv-black: #000000;
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Cor (tema claro)
+     ======================================================================= */
+
+  --bg:                var(--pv-gray-50);
+  --fg:                var(--pv-gray-900);
+  --surface:           var(--pv-white);
+  --surface-alt:       var(--pv-gray-100);
+  --border:            var(--pv-gray-200);
+  --border-strong:     var(--pv-gray-400);
+  --focus-ring:        var(--pv-blue-hero);
+  --text-muted:        var(--pv-gray-600);
+  --text-secondary:    var(--pv-gray-700);
+  --text-strong:       var(--pv-gray-900);
+  --text-on-brand:     var(--pv-white);
+  --tint:              var(--pv-blue-50);
+
+  /* ---- Ação ---------------------------------------------------------- */
+  --action-primary:        var(--pv-blue-600);
+  --action-primary-hover:  var(--pv-blue-700);
+  --action-primary-active: var(--pv-blue-800);
+
+  /* ---- Retorno ao usuário -------------------------------------------- */
+  --feedback-success: var(--pv-green-800);
+  --feedback-warning: var(--pv-yellow-800);
+  --feedback-danger:  var(--pv-red-700);
+  --feedback-info:    var(--pv-blue-600);
+
+  --feedback-success-surface: var(--pv-green-50);
+  --feedback-warning-surface: #fdf6e3;
+  --feedback-danger-surface:  var(--pv-red-50);
+  --feedback-info-surface:    var(--pv-blue-50);
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Tipografia
+     ======================================================================= */
+  --font-family-sans: "Poppins", system-ui, -apple-system, sans-serif;
+
+  --text-xs:   0.75rem;  /* 12px */
+  --text-sm:   0.875rem; /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg:   1.125rem; /* 18px */
+  --text-xl:   1.25rem;  /* 20px */
+  --text-2xl:  1.5rem;   /* 24px */
+
+  --leading-xs:   1.4;
+  --leading-sm:   1.5;
+  --leading-base: 1.5;
+  --leading-lg:   1.4;
+  --leading-xl:   1.3;
+  --leading-2xl:  1.25;
+
+  --font-regular:  400;
+  --font-medium:   500;
+  --font-semibold: 600;
+  --font-bold:     700;
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Espaçamento
+     ======================================================================= */
+  --space-0:  0;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Forma
+     ======================================================================= */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   16px;
+  --radius-full: 9999px;
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Elevação
+     ======================================================================= */
+  --elevation-0: none;
+  --elevation-1: 0 1px 2px rgba(20, 35, 58, .08);
+  --elevation-2: 0 4px 12px rgba(20, 35, 58, .10);
+  --elevation-3: 0 12px 32px rgba(20, 35, 58, .14);
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Movimento
+     ======================================================================= */
+  --duration-fast:  150ms;
+  --duration-base:  250ms;
+  --duration-slow:  400ms;
+  --easing-standard: cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: light;
+}
+
+/* ==========================================================================
+   Tema escuro — troca apenas a camada semântica
+   ========================================================================== */
+[data-theme="dark"] {
+  --bg:            #111111;
+  --fg:            #e2e8f0;
+  --surface:       #1a1a1a;
+  --surface-alt:   #222222;
+  --border:        #2a2a2a;
+  --border-strong: #3f4756;
+  --focus-ring:    #7ab3ff;
+  --text-muted:    #9ca3af;
+  --text-secondary:#cbd5e1;
+  --text-strong:   #f1f5f9;
+  --text-on-brand: var(--pv-white);
+  --tint:          #242424;
+
+  /* Sobre fundo escuro é o valor claro da escala que enxerga */
+  --action-primary:        var(--pv-blue-400);
+  --action-primary-hover:  var(--pv-blue-300);
+  --action-primary-active: var(--pv-blue-200);
+
+  --feedback-success: var(--pv-green-500);
+  --feedback-warning: var(--pv-yellow-400);
+  --feedback-danger:  var(--pv-red-400);
+  --feedback-info:    var(--pv-blue-400);
+
+  --feedback-success-surface: #16261a;
+  --feedback-warning-surface: #2a2113;
+  --feedback-danger-surface:  #2a1414;
+  --feedback-info-surface:    #14203a;
+
+  --elevation-1: 0 1px 2px rgba(0, 0, 0, .40);
+  --elevation-2: 0 4px 12px rgba(0, 0, 0, .48);
+  --elevation-3: 0 12px 32px rgba(0, 0, 0, .56);
+
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   Tailwind CSS v4 — caminho CSS-first
+   --------------------------------------------------------------------------
+   `@theme inline` expõe os tokens como utilitários (`bg-pv-blue-600`,
+   `text-foreground`, `ring-ring`…) sem redefinir os valores: as utilities
+   lêem as custom properties acima em runtime (por isso `inline`).
+   ========================================================================== */
+@theme inline {
+  --color-pv-blue-50:  var(--pv-blue-50);
+  --color-pv-blue-100: var(--pv-blue-100);
+  --color-pv-blue-600: var(--pv-blue-600);
+  --color-pv-blue-700: var(--pv-blue-700);
+  --color-pv-blue-800: var(--pv-blue-800);
+  --color-pv-blue-900: var(--pv-blue-900);
+  --color-pv-blue-950: var(--pv-blue-950);
+  --color-pv-blue-hero: var(--pv-blue-hero);
+
+  --color-pv-green-50:  var(--pv-green-50);
+  --color-pv-green-500: var(--pv-green-500);
+  --color-pv-green-800: var(--pv-green-800);
+
+  --color-pv-yellow-400: var(--pv-yellow-400);
+  --color-pv-yellow-500: var(--pv-yellow-500);
+  --color-pv-yellow-800: var(--pv-yellow-800);
+
+  --color-pv-red-50:  var(--pv-red-50);
+  --color-pv-red-400: var(--pv-red-400);
+  --color-pv-red-500: var(--pv-red-500);
+  --color-pv-red-600: var(--pv-red-600);
+  --color-pv-red-700: var(--pv-red-700);
+  --color-pv-red-800: var(--pv-red-800);
+
+  --color-pv-gray-50:  var(--pv-gray-50);
+  --color-pv-gray-100: var(--pv-gray-100);
+  --color-pv-gray-200: var(--pv-gray-200);
+  --color-pv-gray-400: var(--pv-gray-400);
+  --color-pv-gray-600: var(--pv-gray-600);
+  --color-pv-gray-700: var(--pv-gray-700);
+  --color-pv-gray-900: var(--pv-gray-900);
+
+  --color-pv-white: var(--pv-white);
+  --color-pv-black: var(--pv-black);
+
+  --color-background:  var(--bg);
+  --color-foreground:  var(--fg);
+  --color-surface:     var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-border:      var(--border);
+  --color-input:       var(--border-strong);
+  --color-ring:        var(--focus-ring);
+  --color-muted:       var(--surface-alt);
+  --color-muted-foreground: var(--text-muted);
+  --color-primary:     var(--action-primary);
+  --color-primary-foreground: var(--text-on-brand);
+  --color-destructive: var(--feedback-danger);
+
+  --font-sans: var(--font-family-sans);
+
+  --radius-sm:   var(--radius-sm);
+  --radius-md:   var(--radius-md);
+  --radius-lg:   var(--radius-lg);
+  --radius-full: var(--radius-full);
+}
+
+/* ==========================================================================
+   Tailwind v4 — camada base (reset mínimo + tipografia)
+   ========================================================================== */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--font-family-sans);
+    font-size: var(--text-base);
+    line-height: var(--leading-base);
+    background: var(--bg);
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+}

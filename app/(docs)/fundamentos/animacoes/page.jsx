@@ -9,8 +9,9 @@ export default function AnimacoesPage() {
       </p>
 
       <p style={{ fontSize: "0.85rem", color: "var(--pv-gray-500)", marginBottom: "0.75rem" }}>
-        Easing padrão <code>cubic-bezier(0.16, 1, 0.3, 1)</code> (expo-out).
-        Passe o mouse nos cards abaixo.
+        Easing padrão <code>cubic-bezier(0.16, 1, 0.3, 1)</code> (expo-out), no
+        token <code>--easing-standard</code>; durações em{" "}
+        <code>--duration-fast/base/slow</code>. Passe o mouse nos cards abaixo.
       </p>
       <div className="preview">
         <div className="anim-demo">

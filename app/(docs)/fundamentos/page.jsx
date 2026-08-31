@@ -23,6 +23,11 @@ const itens = [
     title: "Raios, bordas e sombras",
     desc: "Escala de raios e família de sombras institucional.",
   },
+  {
+    href: "/fundamentos/animacoes",
+    title: "Animações",
+    desc: "Easing padrão, movimento e prefers-reduced-motion.",
+  },
 ];
 
 export default function FundamentosPage() {

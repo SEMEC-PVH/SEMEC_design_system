@@ -18,9 +18,7 @@ import {
   ArtFeedback,
   ArtAcessibilidadePadroes,
   ArtAnimacoes,
-  ArtAcessibilidade,
   ArtAntiPadroes,
-  ArtPendencias,
 } from "@/components/ui/sectionArt";
 
 export const metadata = { title: "Introdução" };
@@ -54,6 +52,12 @@ const categorias = [
         art: <ArtRaios />,
         title: "Raios, bordas e sombras",
         desc: "Escala de raios e família de sombras institucional.",
+      },
+      {
+        href: "/fundamentos/animacoes",
+        art: <ArtAnimacoes />,
+        title: "Animações",
+        desc: "Easing padrão, movimento e prefers-reduced-motion.",
       },
     ],
   },
@@ -141,36 +145,11 @@ const categorias = [
         title: "Acessibilidade",
         desc: "Padrões para interfaces acessíveis e inclusivas.",
       },
-    ],
-  },
-  {
-    href: "/regras",
-    label: "Regras",
-    desc: "Regras de uso que garantem consistência, acessibilidade e boas práticas.",
-    items: [
       {
-        href: "/regras/animacoes",
-        art: <ArtAnimacoes />,
-        title: "Animações",
-        desc: "Easing padrão, movimento e prefers-reduced-motion.",
-      },
-      {
-        href: "/regras/acessibilidade",
-        art: <ArtAcessibilidade />,
-        title: "Acessibilidade",
-        desc: "Foco visível, contraste e semântica de landmarks.",
-      },
-      {
-        href: "/regras/anti-padroes",
+        href: "/padroes/anti-padroes",
         art: <ArtAntiPadroes />,
         title: "Anti-padrões",
         desc: "O que não fazer ao construir interfaces SEMEC.",
-      },
-      {
-        href: "/regras/pendencias",
-        art: <ArtPendencias />,
-        title: "Pendências",
-        desc: "Dívidas conhecidas e próximos passos do design system.",
       },
     ],
   },
