@@ -1,19 +1,19 @@
 /* ==========================================================================
-   Camada proto — protótipo da vitrine @semec/base no site de docs
+   Camada proto — CSS dos componentes do design system no site de docs
    ==========================================================================
 
    ARQUIVO NOVO. Não altera nenhum CSS existente do site: este arquivo é
    compilado pelo `@tailwindcss/cli` para `public/proto/proto.css` e servido
-   por `<link>` apenas dentro do layout das páginas de protótipo
-   (`app/(docs)/componentes/base/layout.jsx`). O build do site (Next/PostCSS)
-   nunca vê este arquivo.
+   por `<link>` apenas nas páginas de componente do guia
+   (app/(docs)/componentes/...). O build do site (Next/PostCSS) nunca vê
+   este arquivo.
 
    Sem `preflight` de propósito: o reset global do site (globals.css) já vale
    para toda a página; injetar outro estouraria o layout atual.
 
-   Cores: paleta padrão do Tailwind (`blue-600`, `gray-900`...), mapeada nos
-   nomes semânticos que os componentes da base usam (`bg-primary`,
-   `ring-ring`...). Nada aqui lê os tokens do site — é protótipo.
+   Cores: mapeadas nos tokens L1 do site (`--color-action-primary`,
+   `--color-surface-raised`...), que já carregam a paleta `pv-*` e trocam no
+   tema escuro (`[data-theme="dark"]` via ThemeToggle).
 
    Regenerar: `npm run proto:css`
    ========================================================================== */
@@ -25,46 +25,53 @@
 @source "../../base/components";
 @source "../../components/demos/base-previews.jsx";
 @source "../../components/docs/CodeBlock.jsx";
-@source "../../app/(docs)/componentes/base";
+@source "../../components/docs/ComponentDoc.jsx";
+@source "../../app/(docs)/componentes";
 
 @theme inline {
-  /* Semânticos no formato shadcn → paleta padrão do Tailwind */
-  --color-background: var(--color-white);
-  --color-foreground: var(--color-gray-900);
-  --color-surface: var(--color-white);
-  --color-surface-alt: var(--color-gray-50);
-  --color-card: var(--color-white);
-  --color-card-foreground: var(--color-gray-900);
-  --color-popover: var(--color-white);
-  --color-popover-foreground: var(--color-gray-900);
+  /* Semânticos no formato shadcn → tokens L1 do site (pv-*, claro/escuro) */
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--fg);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--fg);
 
-  --color-primary: var(--color-blue-600);
-  --color-primary-hover: var(--color-blue-500);
-  --color-primary-active: var(--color-blue-700);
-  --color-primary-foreground: var(--color-white);
+  --color-primary: var(--color-action-primary);
+  --color-primary-hover: var(--color-action-primary-hover);
+  --color-primary-active: var(--color-action-primary-active);
+  --color-primary-foreground: var(--color-text-on-brand);
 
-  --color-secondary: var(--color-gray-100);
-  --color-secondary-foreground: var(--color-gray-900);
-  --color-muted: var(--color-gray-100);
-  --color-muted-foreground: var(--color-gray-500);
-  --color-accent: var(--color-gray-100);
-  --color-accent-foreground: var(--color-gray-900);
+  --color-secondary: var(--tint);
+  --color-secondary-foreground: var(--text-strong);
+  --color-muted: var(--surface-alt);
+  --color-muted-foreground: var(--text-muted);
+  --color-accent: var(--tint);
+  --color-accent-foreground: var(--text-strong);
 
-  --color-destructive: var(--color-red-600);
-  --color-destructive-foreground: var(--color-white);
-  --color-destructive-surface: var(--color-red-50);
-  --color-success: var(--color-emerald-600);
-  --color-success-surface: var(--color-emerald-50);
-  --color-warning: var(--color-amber-600);
-  --color-warning-surface: var(--color-amber-50);
-  --color-info: var(--color-sky-600);
-  --color-info-surface: var(--color-sky-50);
+  --color-destructive: var(--color-feedback-danger);
+  --color-destructive-foreground: var(--color-text-on-brand);
+  --color-destructive-surface: var(--color-feedback-danger-surface);
+  --color-success: var(--color-feedback-success);
+  --color-success-surface: var(--color-feedback-success-surface);
+  --color-warning: var(--color-feedback-warning);
+  --color-warning-surface: var(--color-feedback-warning-surface);
+  --color-info: var(--color-feedback-info);
+  --color-info-surface: var(--color-feedback-info-surface);
 
-  --color-border: var(--color-gray-200);
-  --color-border-strong: var(--color-gray-400);
-  --color-input: var(--color-gray-300);
-  --color-ring: var(--color-blue-500);
-  --color-tint: var(--color-blue-50);
+  --color-border: var(--border);
+  --color-border-strong: var(--color-border-strong);
+  --color-input: var(--color-border-strong);
+  --color-ring: var(--color-focus-ring);
+  --color-tint: var(--tint);
+
+  /* Raios seguem o L1 do site */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-full: var(--radius-full);
 
   /* Motion e sombras usadas pelos componentes da base */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
