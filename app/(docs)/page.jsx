@@ -159,7 +159,7 @@ export default function OverviewPage() {
   return (
     <>
       <h1>SEMEC design system</h1>
-      <p className="subtitle">Guia de referência visual SEMEC</p>
+      <p className="subtitle">Atualizado em 3 de Setembro de 2026</p>
 
       <h2>O que é um Design System</h2>
       <p>
