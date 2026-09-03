@@ -1,0 +1,37 @@
+export const metadata = { title: "Breadcrumbs" };
+
+# Breadcrumbs
+
+<p className="subtitle">Trilha que mostra a posição do usuário na hierarquia e permite voltar a níveis superiores.</p>
+
+<div className="pattern-placeholder">
+  <svg className="pattern-placeholder-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="12" y="14" width="40" height="36" rx="5" />
+    <circle cx="26" cy="28" r="4" />
+    <path d="M20 44l10-10 8 8 6-6 8 8" />
+  </svg>
+  <p className="pattern-placeholder-title">Componente em desenvolvimento</p>
+  <p className="pattern-placeholder-text">Exemplo visual de “Breadcrumbs” em breve.</p>
+</div>
+
+## Boas práticas
+
+- Começar sempre pela raiz (ex.: Início) e terminar na página atual.
+- Marcar o último item como a página atual, sem link.
+- Usar separadores simples (› ou /) entre os níveis.
+- Manter cada nível intermediário clicável para voltar.
+- Usar breadcrumbs em estruturas com 3 ou mais níveis de profundidade.
+
+## Anti-padrões
+
+- Não usar breadcrumbs em páginas de primeiro nível (sem hierarquia).
+- Não duplicar o menu principal como breadcrumb.
+- Não truncar níveis intermediários sem forma de acessá-los.
+
+## Acessibilidade
+
+- Envolver a trilha em &lt;nav&gt; com aria-label.
+- Marcar a página atual com aria-current="page".
+- Garantir que os links tenham alvo de foco visível.
+
+<p className="note">Breadcrumbs complementam a navegação; não substituem o menu principal nem a indicação de localização.</p>

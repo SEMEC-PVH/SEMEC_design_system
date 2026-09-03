@@ -7,6 +7,7 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import CookieBanner from "./CookieBanner";
 import Footer from "./Footer";
+import TableOfContents from "./TableOfContents";
 import { breadcrumbsFor } from "@/lib/navigation";
 
 export default function DocsShell({ children }) {
@@ -42,30 +43,33 @@ export default function DocsShell({ children }) {
           />
         )}
         <main className="content" id="topo">
-          <div className="container">
-            {crumbs.length > 1 && (
-              <nav className="breadcrumbs" aria-label="Trilha de navegação">
-                {crumbs.map((c, i) => (
-                  <span key={i} className="crumb">
-                    {i > 0 && (
-                      <span className="crumb-sep" aria-hidden="true">
-                        ›
-                      </span>
-                    )}
-                    {i < crumbs.length - 1 ? (
-                      c.href ? (
-                        <Link href={c.href}>{c.label}</Link>
+          <div className="content-inner">
+            <div className="container">
+              {crumbs.length > 1 && (
+                <nav className="breadcrumbs" aria-label="Trilha de navegação">
+                  {crumbs.map((c, i) => (
+                    <span key={i} className="crumb">
+                      {i > 0 && (
+                        <span className="crumb-sep" aria-hidden="true">
+                          ›
+                        </span>
+                      )}
+                      {i < crumbs.length - 1 ? (
+                        c.href ? (
+                          <Link href={c.href}>{c.label}</Link>
+                        ) : (
+                          <span>{c.label}</span>
+                        )
                       ) : (
-                        <span>{c.label}</span>
-                      )
-                    ) : (
-                      <span aria-current="page">{c.label}</span>
-                    )}
-                  </span>
-                ))}
-              </nav>
-            )}
-            {children}
+                        <span aria-current="page">{c.label}</span>
+                      )}
+                    </span>
+                  ))}
+                </nav>
+              )}
+              {children}
+            </div>
+            <TableOfContents />
           </div>
           <div className="container">
             <Footer />
