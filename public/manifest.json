@@ -1,0 +1,514 @@
+{
+  "name": "SEMEC Design System",
+  "version": "0.1.0",
+  "generatedAt": "2026-09-04T17:08:49.283Z",
+  "categories": [
+    {
+      "key": "acoes",
+      "slug": "acoes-e-links",
+      "label": "Ações e links",
+      "desc": "Gatilhos de ação e vínculos de navegação."
+    },
+    {
+      "key": "formularios",
+      "slug": "formularios",
+      "label": "Formulários",
+      "desc": "Campos, controles de escolha e ativação imediata."
+    },
+    {
+      "key": "conteudo-dados",
+      "slug": "conteudo-e-dados",
+      "label": "Conteúdo e dados",
+      "desc": "Superfícies de conteúdo, sinalização e dados tabulares."
+    },
+    {
+      "key": "navegacao",
+      "slug": "navegacao",
+      "label": "Navegação",
+      "desc": "Trilhas, abas e deslocamento entre páginas."
+    },
+    {
+      "key": "feedback",
+      "slug": "feedback-e-estados",
+      "label": "Feedback e estados",
+      "desc": "Mensagens de estado, carregamento e camadas sobre a página."
+    }
+  ],
+  "components": [
+    {
+      "code": "button",
+      "slug": "botoes",
+      "label": "Botões",
+      "file": "base/components/button.tsx",
+      "category": "acoes",
+      "desc": "Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.",
+      "variants": [
+        {
+          "prop": "variant",
+          "values": "primary · secondary · outline · ghost · destructive · link"
+        },
+        {
+          "prop": "size",
+          "values": "sm · md · lg · icon"
+        }
+      ],
+      "usage": "import { Button } from \"@semec/base\";\n\n<Button variant=\"primary\" size=\"md\">Salvar</Button>\n<Button variant=\"outline\">Cancelar</Button>\n<Button asChild><Link href=\"/ok\">Como link</Link></Button>",
+      "prompt": "Crie um button (Botões) usando @semec/base (`base/components/button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link · size: sm · md · lg · icon. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.",
+      "url": "/componentes/botoes",
+      "md": "/components/botoes.md"
+    },
+    {
+      "code": "icon-button",
+      "slug": "botao-de-icone",
+      "label": "Botão de ícone",
+      "file": "base/components/icon-button.tsx",
+      "category": "acoes",
+      "desc": "Botão quadrado só com ícone. Exige `aria-label`.",
+      "variants": [
+        {
+          "prop": "variant",
+          "values": "primary · secondary · outline · ghost · destructive · link"
+        }
+      ],
+      "usage": "import { IconButton } from \"@semec/base\";\nimport { Plus } from \"lucide-react\";\n\n<IconButton aria-label=\"Adicionar\"><Plus /></IconButton>",
+      "prompt": "Crie um icon-button (Botão de ícone) usando @semec/base (`base/components/icon-button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link. Botão quadrado só com ícone. Exige `aria-label`.",
+      "url": "/componentes/botao-de-icone",
+      "md": "/components/botao-de-icone.md"
+    },
+    {
+      "code": "link",
+      "slug": "link",
+      "label": "Link",
+      "file": "base/components/link.tsx",
+      "category": "acoes",
+      "desc": "Link tipográfico com variantes de cor.",
+      "variants": [
+        {
+          "prop": "variant",
+          "values": "primary · muted"
+        }
+      ],
+      "usage": "import { Link } from \"@semec/base\";\n\n<Link href=\"/pagina\">Ir para a página</Link>\n<Link href=\"/ajuda\" variant=\"muted\">Texto de ajuda</Link>",
+      "prompt": "Crie um link (Link) usando @semec/base (`base/components/link.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · muted. Link tipográfico com variantes de cor.",
+      "url": "/componentes/link",
+      "md": "/components/link.md"
+    },
+    {
+      "code": "input",
+      "slug": "caixa-de-texto",
+      "label": "Caixa de texto",
+      "file": "base/components/input.tsx",
+      "category": "formularios",
+      "desc": "Campo de texto. Estado de erro via `aria-invalid`.",
+      "variants": [
+        {
+          "prop": "estados",
+          "values": "padrão · inválido (aria-invalid) · disabled"
+        }
+      ],
+      "usage": "import { Input } from \"@semec/base\";\n\n<Input placeholder=\"Nome completo\" />\n<Input aria-invalid=\"true\" />",
+      "prompt": "Crie um input (Caixa de texto) usando @semec/base (`base/components/input.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido (aria-invalid) · disabled. Campo de texto. Estado de erro via `aria-invalid`.",
+      "url": "/componentes/caixa-de-texto",
+      "md": "/components/caixa-de-texto.md"
+    },
+    {
+      "code": "textarea",
+      "slug": "area-de-texto",
+      "label": "Área de texto",
+      "file": "base/components/textarea.tsx",
+      "category": "formularios",
+      "desc": "Campo multilinha com as mesmas variantes visuais do campo de texto.",
+      "variants": [
+        {
+          "prop": "estados",
+          "values": "padrão · inválido · disabled"
+        }
+      ],
+      "usage": "import { Textarea } from \"@semec/base\";\n\n<Textarea rows={4} placeholder=\"Descreva a demanda\" />",
+      "prompt": "Crie um textarea (Área de texto) usando @semec/base (`base/components/textarea.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido · disabled. Campo multilinha com as mesmas variantes visuais do campo de texto.",
+      "url": "/componentes/area-de-texto",
+      "md": "/components/area-de-texto.md"
+    },
+    {
+      "code": "select",
+      "slug": "menu-de-selecao",
+      "label": "Menu de seleção",
+      "file": "base/components/select.tsx",
+      "category": "formularios",
+      "desc": "Seleção fechada com gatilho, conteúdo e itens compostos.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "Select · SelectTrigger · SelectValue · SelectContent · SelectItem"
+        }
+      ],
+      "usage": "import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from \"@semec/base\";\n\n<Select defaultValue=\"pbh\">\n  <SelectTrigger aria-label=\"Município\"><SelectValue placeholder=\"Município\" /></SelectTrigger>\n  <SelectContent>\n    <SelectItem value=\"pbh\">Porto Velho</SelectItem>\n    <SelectItem value=\"riob\">Rio Branco</SelectItem>\n  </SelectContent>\n</Select>",
+      "prompt": "Crie um select (Menu de seleção) usando @semec/base (`base/components/select.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem. Seleção fechada com gatilho, conteúdo e itens compostos.",
+      "url": "/componentes/menu-de-selecao",
+      "md": "/components/menu-de-selecao.md"
+    },
+    {
+      "code": "combobox",
+      "slug": "combobox",
+      "label": "Combobox",
+      "file": "base/components/combobox.tsx",
+      "category": "formularios",
+      "desc": "Campo com busca e lista filtrada. Opções via `options`.",
+      "variants": [
+        {
+          "prop": "props",
+          "values": "options · value · onChange · placeholder · emptyMessage · disabled"
+        }
+      ],
+      "usage": "import { Combobox } from \"@semec/base\";\n\n<Combobox\n  options={[{ value: \"cnpj\", label: \"CNPJ\" }, { value: \"cpf\", label: \"CPF\" }]}\n  value={valor}\n  onChange={setValor}\n/>",
+      "prompt": "Crie um combobox (Combobox) usando @semec/base (`base/components/combobox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: options · value · onChange · placeholder · emptyMessage · disabled. Campo com busca e lista filtrada. Opções via `options`.",
+      "url": "/componentes/combobox",
+      "md": "/components/combobox.md"
+    },
+    {
+      "code": "date-picker",
+      "slug": "seletor-de-data",
+      "label": "Seletor de data",
+      "file": "base/components/date-picker.tsx",
+      "category": "formularios",
+      "desc": "Data com `<input type=\"date\">` nativo — sem biblioteca de calendário.",
+      "variants": [
+        {
+          "prop": "props",
+          "values": "nativo HTML (min · max · disabled) + variantes visuais do campo"
+        }
+      ],
+      "usage": "import { DatePicker } from \"@semec/base\";\n\n<DatePicker defaultValue=\"2026-08-31\" />",
+      "prompt": "Crie um date-picker (Seletor de data) usando @semec/base (`base/components/date-picker.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: nativo HTML (min · max · disabled) + variantes visuais do campo. Data com `<input type=\"date\">` nativo — sem biblioteca de calendário.",
+      "url": "/componentes/seletor-de-data",
+      "md": "/components/seletor-de-data.md"
+    },
+    {
+      "code": "file-upload",
+      "slug": "envio-de-arquivos",
+      "label": "Envio de arquivos",
+      "file": "base/components/file-upload.tsx",
+      "category": "formularios",
+      "desc": "Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.",
+      "variants": [
+        {
+          "prop": "props",
+          "values": "accept · maxSize · label · hint · error · onChange"
+        }
+      ],
+      "usage": "import { FileUpload } from \"@semec/base\";\n\n<FileUpload accept=\".pdf,image/*\" maxSize={5 * 1024 * 1024} hint=\"PDF ou imagem, até 5 MB\" />",
+      "prompt": "Crie um file-upload (Envio de arquivos) usando @semec/base (`base/components/file-upload.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: accept · maxSize · label · hint · error · onChange. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.",
+      "url": "/componentes/envio-de-arquivos",
+      "md": "/components/envio-de-arquivos.md"
+    },
+    {
+      "code": "checkbox",
+      "slug": "caixa-de-marcacao",
+      "label": "Caixa de marcação",
+      "file": "base/components/checkbox.tsx",
+      "category": "formularios",
+      "desc": "Caixa de marcação com estado indeterminado.",
+      "variants": [
+        {
+          "prop": "estados",
+          "values": "desmarcado · marcado (checked) · indeterminado · disabled"
+        }
+      ],
+      "usage": "import { Checkbox, Label } from \"@semec/base\";\n\n<div className=\"flex items-center gap-2\">\n  <Checkbox id=\"termos\" />\n  <Label htmlFor=\"termos\">Aceito os termos</Label>\n</div>",
+      "prompt": "Crie um checkbox (Caixa de marcação) usando @semec/base (`base/components/checkbox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled. Caixa de marcação com estado indeterminado.",
+      "url": "/componentes/caixa-de-marcacao",
+      "md": "/components/caixa-de-marcacao.md"
+    },
+    {
+      "code": "radio-group",
+      "slug": "botao-de-opcao",
+      "label": "Botão de opção",
+      "file": "base/components/radio-group.tsx",
+      "category": "formularios",
+      "desc": "Escolha única entre duas ou mais opções.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "RadioGroup · RadioGroupItem + Label"
+        }
+      ],
+      "usage": "import { RadioGroup, RadioGroupItem, Label } from \"@semec/base\";\n\n<RadioGroup defaultValue=\"pessoa-fisica\">\n  <div className=\"flex items-center gap-2\">\n    <RadioGroupItem value=\"pessoa-fisica\" id=\"pf\" />\n    <Label htmlFor=\"pf\">Pessoa física</Label>\n  </div>\n</RadioGroup>",
+      "prompt": "Crie um radio-group (Botão de opção) usando @semec/base (`base/components/radio-group.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: RadioGroup · RadioGroupItem + Label. Escolha única entre duas ou mais opções.",
+      "url": "/componentes/botao-de-opcao",
+      "md": "/components/botao-de-opcao.md"
+    },
+    {
+      "code": "switch",
+      "slug": "interruptor",
+      "label": "Interruptor",
+      "file": "base/components/switch.tsx",
+      "category": "formularios",
+      "desc": "Interruptor on/off para ativação imediata.",
+      "variants": [
+        {
+          "prop": "estados",
+          "values": "off · on (checked) · disabled · inválido"
+        }
+      ],
+      "usage": "import { Switch, Label } from \"@semec/base\";\n\n<div className=\"flex items-center gap-2\">\n  <Switch id=\"alertas\" defaultChecked />\n  <Label htmlFor=\"alertas\">Receber alertas</Label>\n</div>",
+      "prompt": "Crie um switch (Interruptor) usando @semec/base (`base/components/switch.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: off · on (checked) · disabled · inválido. Interruptor on/off para ativação imediata.",
+      "url": "/componentes/interruptor",
+      "md": "/components/interruptor.md"
+    },
+    {
+      "code": "label",
+      "slug": "rotulo",
+      "label": "Rótulo",
+      "file": "base/components/label.tsx",
+      "category": "formularios",
+      "desc": "Rótulo acessível vinculado ao campo.",
+      "variants": [],
+      "usage": "import { Label, Input } from \"@semec/base\";\n\n<Label htmlFor=\"nome\">Nome</Label>\n<Input id=\"nome\" />",
+      "prompt": "Crie um label (Rótulo) usando @semec/base (`base/components/label.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Rótulo acessível vinculado ao campo.",
+      "url": "/componentes/rotulo",
+      "md": "/components/rotulo.md"
+    },
+    {
+      "code": "form-field",
+      "slug": "campo-de-formulario",
+      "label": "Campo de formulário",
+      "file": "base/components/form-field.tsx",
+      "category": "formularios",
+      "desc": "Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.",
+      "variants": [
+        {
+          "prop": "props",
+          "values": "label · htmlFor · required · hint · error"
+        }
+      ],
+      "usage": "import { FormField, Input } from \"@semec/base\";\n\n<FormField label=\"E-mail\" htmlFor=\"email\" required hint=\"Usado para o comprovante\" error=\"Informe um e-mail válido\">\n  <Input id=\"email\" aria-invalid />\n</FormField>",
+      "prompt": "Crie um form-field (Campo de formulário) usando @semec/base (`base/components/form-field.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: label · htmlFor · required · hint · error. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.",
+      "url": "/componentes/campo-de-formulario",
+      "md": "/components/campo-de-formulario.md"
+    },
+    {
+      "code": "card",
+      "slug": "cartao",
+      "label": "Cartão",
+      "file": "base/components/card.tsx",
+      "category": "conteudo-dados",
+      "desc": "Superfície de conteúdo com header, corpo e footer.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter"
+        }
+      ],
+      "usage": "import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from \"@semec/base\";\n\n<Card>\n  <CardHeader><CardTitle>IPTU 2026</CardTitle></CardHeader>\n  <CardContent>Parcela em dia.</CardContent>\n  <CardFooter><Button>Emitir boleto</Button></CardFooter>\n</Card>",
+      "prompt": "Crie um card (Cartão) usando @semec/base (`base/components/card.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter. Superfície de conteúdo com header, corpo e footer.",
+      "url": "/componentes/cartao",
+      "md": "/components/cartao.md"
+    },
+    {
+      "code": "badge",
+      "slug": "etiqueta",
+      "label": "Etiqueta",
+      "file": "base/components/badge.tsx",
+      "category": "conteudo-dados",
+      "desc": "Etiqueta curta de status ou contagem.",
+      "variants": [
+        {
+          "prop": "variant",
+          "values": "default · secondary · outline · success · warning · danger · info"
+        }
+      ],
+      "usage": "import { Badge } from \"@semec/base\";\n\n<Badge>Pendente</Badge>\n<Badge variant=\"success\">Deferido</Badge>\n<Badge variant=\"danger\">Indeferido</Badge>",
+      "prompt": "Crie um badge (Etiqueta) usando @semec/base (`base/components/badge.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · secondary · outline · success · warning · danger · info. Etiqueta curta de status ou contagem.",
+      "url": "/componentes/etiqueta",
+      "md": "/components/etiqueta.md"
+    },
+    {
+      "code": "table",
+      "slug": "tabela",
+      "label": "Tabela",
+      "file": "base/components/table.tsx",
+      "category": "conteudo-dados",
+      "desc": "Tabela de dados semântica com caption, header, body e footer.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption"
+        }
+      ],
+      "usage": "import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from \"@semec/base\";\n\n<Table>\n  <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>\n  <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>\n</Table>",
+      "prompt": "Crie um table (Tabela) usando @semec/base (`base/components/table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption. Tabela de dados semântica com caption, header, body e footer.",
+      "url": "/componentes/tabela",
+      "md": "/components/tabela.md"
+    },
+    {
+      "code": "skeleton",
+      "slug": "esqueleto",
+      "label": "Esqueleto",
+      "file": "base/components/skeleton.tsx",
+      "category": "feedback",
+      "desc": "Placeholder pulsante de carregamento.",
+      "variants": [],
+      "usage": "import { Skeleton } from \"@semec/base\";\n\n<Skeleton className=\"h-4 w-[250px]\" />\n<Skeleton className=\"h-4 w-[180px]\" />",
+      "prompt": "Crie um skeleton (Esqueleto) usando @semec/base (`base/components/skeleton.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Placeholder pulsante de carregamento.",
+      "url": "/componentes/esqueleto",
+      "md": "/components/esqueleto.md"
+    },
+    {
+      "code": "empty-state",
+      "slug": "estado-vazio",
+      "label": "Estado vazio",
+      "file": "base/components/empty-state.tsx",
+      "category": "feedback",
+      "desc": "Estado vazio com ícone, título, descrição e ação opcional.",
+      "variants": [
+        {
+          "prop": "props",
+          "values": "icon · title · description · action"
+        }
+      ],
+      "usage": "import { EmptyState, Button } from \"@semec/base\";\nimport { Inbox } from \"lucide-react\";\n\n<EmptyState\n  icon={<Inbox />}\n  title=\"Nenhum protocolo encontrado\"\n  description=\"Ajuste os filtros ou abra um novo requerimento.\"\n  action={<Button>Abrir requerimento</Button>}\n/>",
+      "prompt": "Crie um empty-state (Estado vazio) usando @semec/base (`base/components/empty-state.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: icon · title · description · action. Estado vazio com ícone, título, descrição e ação opcional.",
+      "url": "/componentes/estado-vazio",
+      "md": "/components/estado-vazio.md"
+    },
+    {
+      "code": "breadcrumb",
+      "slug": "trilha-de-navegacao",
+      "label": "Trilha de navegação",
+      "file": "base/components/breadcrumb.tsx",
+      "category": "navegacao",
+      "desc": "Trilha com o item atual marcado (`current`).",
+      "variants": [
+        {
+          "prop": "props",
+          "values": "items: { label, href?, current? }[]"
+        }
+      ],
+      "usage": "import { Breadcrumb } from \"@semec/base\";\n\n<Breadcrumb items={[\n  { label: \"Início\", href: \"/\" },\n  { label: \"Serviços\", href: \"/servicos\" },\n  { label: \"IPTU\", current: true },\n]} />",
+      "prompt": "Crie um breadcrumb (Trilha de navegação) usando @semec/base (`base/components/breadcrumb.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: items: { label, href?, current? }[]. Trilha com o item atual marcado (`current`).",
+      "url": "/componentes/trilha-de-navegacao",
+      "md": "/components/trilha-de-navegacao.md"
+    },
+    {
+      "code": "tabs",
+      "slug": "abas",
+      "label": "Abas",
+      "file": "base/components/tabs.tsx",
+      "category": "navegacao",
+      "desc": "Abas para alternar conteúdo na mesma tela.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "Tabs · TabsList · TabsTrigger · TabsContent"
+        }
+      ],
+      "usage": "import { Tabs, TabsList, TabsTrigger, TabsContent } from \"@semec/base\";\n\n<Tabs defaultValue=\"resumo\">\n  <TabsList>\n    <TabsTrigger value=\"resumo\">Resumo</TabsTrigger>\n    <TabsTrigger value=\"debitos\">Débitos</TabsTrigger>\n  </TabsList>\n  <TabsContent value=\"resumo\">…</TabsContent>\n  <TabsContent value=\"debitos\">…</TabsContent>\n</Tabs>",
+      "prompt": "Crie um tabs (Abas) usando @semec/base (`base/components/tabs.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent. Abas para alternar conteúdo na mesma tela.",
+      "url": "/componentes/abas",
+      "md": "/components/abas.md"
+    },
+    {
+      "code": "pagination",
+      "slug": "paginacao",
+      "label": "Paginação",
+      "file": "base/components/pagination.tsx",
+      "category": "navegacao",
+      "desc": "Controle de páginas com elipses (janela por `siblingCount`).",
+      "variants": [
+        {
+          "prop": "props",
+          "values": "page · pageCount · onPageChange · siblingCount"
+        }
+      ],
+      "usage": "import { Pagination } from \"@semec/base\";\n\n<Pagination page={pagina} pageCount={42} onPageChange={setPagina} />",
+      "prompt": "Crie um pagination (Paginação) usando @semec/base (`base/components/pagination.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: page · pageCount · onPageChange · siblingCount. Controle de páginas com elipses (janela por `siblingCount`).",
+      "url": "/componentes/paginacao",
+      "md": "/components/paginacao.md"
+    },
+    {
+      "code": "dialog",
+      "slug": "modal",
+      "label": "Modal",
+      "file": "base/components/dialog.tsx",
+      "category": "feedback",
+      "desc": "Diálogo modal acessível com overlay, header, título, descrição e footer.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose"
+        }
+      ],
+      "usage": "import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from \"@semec/base\";\n\n<Dialog>\n  <DialogTrigger asChild><Button variant=\"destructive\">Excluir</Button></DialogTrigger>\n  <DialogContent>\n    <DialogHeader>\n      <DialogTitle>Excluir requerimento?</DialogTitle>\n      <DialogDescription>Esta ação não pode ser desfeita.</DialogDescription>\n    </DialogHeader>\n    <DialogFooter><DialogClose asChild><Button variant=\"outline\">Cancelar</Button></DialogClose></DialogFooter>\n  </DialogContent>\n</Dialog>",
+      "prompt": "Crie um dialog (Modal) usando @semec/base (`base/components/dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose. Diálogo modal acessível com overlay, header, título, descrição e footer.",
+      "url": "/componentes/modal",
+      "md": "/components/modal.md"
+    },
+    {
+      "code": "toast",
+      "slug": "notificacao",
+      "label": "Notificação",
+      "file": "base/components/toast.tsx",
+      "category": "feedback",
+      "desc": "Mensagem temporária com `useToast()` e viewport empilhável.",
+      "variants": [
+        {
+          "prop": "variant",
+          "values": "default · success · warning · destructive"
+        }
+      ],
+      "usage": "import { ToastProvider, ToastViewport, useToast } from \"@semec/base\";\n\nfunction Acao() {\n  const { toast } = useToast();\n  return <Button onClick={() => toast({ variant: \"success\", title: \"Protocolo enviado\" })}>Enviar</Button>;\n}\n\n// no app: <ToastProvider><App /><ToastViewport /></ToastProvider>",
+      "prompt": "Crie um toast (Notificação) usando @semec/base (`base/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem temporária com `useToast()` e viewport empilhável.",
+      "url": "/componentes/notificacao",
+      "md": "/components/notificacao.md"
+    },
+    {
+      "code": "tooltip",
+      "slug": "dica",
+      "label": "Dica",
+      "file": "base/components/tooltip.tsx",
+      "category": "feedback",
+      "desc": "Dica curta ao passar o ponteiro ou focar o elemento.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "TooltipProvider · Tooltip · TooltipTrigger · TooltipContent"
+        }
+      ],
+      "usage": "import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } from \"@semec/base\";\n\n<TooltipProvider>\n  <Tooltip>\n    <TooltipTrigger asChild><IconButton aria-label=\"Ajuda\"><HelpCircle /></IconButton></TooltipTrigger>\n    <TooltipContent>Explica o campo ao lado</TooltipContent>\n  </Tooltip>\n</TooltipProvider>",
+      "prompt": "Crie um tooltip (Dica) usando @semec/base (`base/components/tooltip.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: TooltipProvider · Tooltip · TooltipTrigger · TooltipContent. Dica curta ao passar o ponteiro ou focar o elemento.",
+      "url": "/componentes/dica",
+      "md": "/components/dica.md"
+    },
+    {
+      "code": "alert",
+      "slug": "aviso",
+      "label": "Aviso",
+      "file": "base/components/alert.tsx",
+      "category": "feedback",
+      "desc": "Mensagem de feedback em linha, com ícone automático por variante.",
+      "variants": [
+        {
+          "prop": "variant",
+          "values": "default · success · warning · destructive"
+        }
+      ],
+      "usage": "import { Alert, AlertTitle, AlertDescription } from \"@semec/base\";\n\n<Alert variant=\"warning\">\n  <AlertTitle>Carnê indisponível</AlertTitle>\n  <AlertDescription>O sistema volta às 14h.</AlertDescription>\n</Alert>",
+      "prompt": "Crie um alert (Aviso) usando @semec/base (`base/components/alert.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem de feedback em linha, com ícone automático por variante.",
+      "url": "/componentes/aviso",
+      "md": "/components/aviso.md"
+    }
+  ],
+  "install": {
+    "tokens": "base/tokens.css",
+    "shadcn": "base/shadcn.css",
+    "preset": "base/pv-preset.ts",
+    "utils": "base/lib/utils.ts"
+  },
+  "tokens": {
+    "files": [
+      "base/tokens.css",
+      "base/shadcn.css",
+      "base/pv-preset.ts"
+    ]
+  }
+}

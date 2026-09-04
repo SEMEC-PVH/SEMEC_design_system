@@ -25,7 +25,10 @@
 /* Fontes varridas em busca de classes utilitárias */
 @source "../../base/components";
 @source "../../components/demos/base-previews.jsx";
+@source "../../components/demos/examples";
+@source "../../components/demos/patterns";
 @source "../../components/docs/CodeBlock.jsx";
+@source "../../components/docs/MdxPre.jsx";
 @source "../../components/docs/ComponentDoc.jsx";
 @source "../../components/docs/PreviewFrame.jsx";
 @source "../../app/(docs)/componentes";
