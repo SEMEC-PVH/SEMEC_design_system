@@ -20,12 +20,14 @@
 
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
+@import "tw-animate-css";
 
 /* Fontes varridas em busca de classes utilitárias */
 @source "../../base/components";
 @source "../../components/demos/base-previews.jsx";
 @source "../../components/docs/CodeBlock.jsx";
 @source "../../components/docs/ComponentDoc.jsx";
+@source "../../components/docs/PreviewFrame.jsx";
 @source "../../app/(docs)/componentes";
 
 @theme inline {

@@ -66,6 +66,7 @@ import {
   useToast,
 } from "@/base";
 import { HelpCircle, Inbox, Plus } from "lucide-react";
+import PreviewFrame from "@/components/docs/PreviewFrame";
 
 const ROW = "flex flex-wrap items-center gap-3";
 
@@ -500,8 +501,10 @@ export default function BasePreview({ slug }) {
   const Preview = PREVIEWS[slug];
   if (!Preview) return <p className="text-sm text-muted-foreground">Preview indisponível.</p>;
   return (
-    <div className="proto-preview">
-      <Preview />
-    </div>
+    <PreviewFrame>
+      <div style={{ padding: "1.5rem" }}>
+        <Preview />
+      </div>
+    </PreviewFrame>
   );
 }

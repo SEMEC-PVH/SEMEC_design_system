@@ -3,9 +3,7 @@ import ComponentDoc from "@/components/docs/ComponentDoc";
 import { dsBySlug, dsComponents } from "@/lib/base-manifest";
 
 export function generateStaticParams() {
-  return dsComponents
-    .filter((c) => c.slug !== "botoes")
-    .map((c) => ({ slug: c.slug }));
+  return dsComponents.map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({ params }) {
