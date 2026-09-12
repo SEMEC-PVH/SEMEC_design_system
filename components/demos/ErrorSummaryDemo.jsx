@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ErrorSummary from "@/components/ds/ErrorSummary";
+import { ErrorSummary } from "@/base";
 
 const CAMPOS = [
   { id: "nome", label: "Nome completo", tipo: "text" },

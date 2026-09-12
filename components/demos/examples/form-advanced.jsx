@@ -18,38 +18,12 @@ import {
   SelectTrigger,
   SelectValue,
   Textarea,
+  maskCPF,
+  maskCNPJ,
+  maskCEP,
+  maskCurrency,
+  validateEmail,
 } from "@/base";
-
-// Máscaras simples (sem lib externa) — demonstra padrão DS
-function maskCPF(v) {
-  v = v.replace(/\D/g, "").slice(0, 11);
-  v = v.replace(/(\d{3})(\d)/, "$1.$2");
-  v = v.replace(/(\d{3})(\d)/, "$1.$2");
-  v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-  return v;
-}
-function maskCNPJ(v) {
-  v = v.replace(/\D/g, "").slice(0, 14);
-  v = v.replace(/^(\d{2})(\d)/, "$1.$2");
-  v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-  v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
-  v = v.replace(/(\d{4})(\d{1,2})$/, "$1-$2");
-  return v;
-}
-function maskCEP(v) {
-  v = v.replace(/\D/g, "").slice(0, 8);
-  v = v.replace(/(\d{5})(\d)/, "$1-$2");
-  return v;
-}
-function maskCurrency(v) {
-  v = v.replace(/\D/g, "").slice(0, 12);
-  const n = Number(v) / 100;
-  return isNaN(n) ? "" : n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-function validateEmail(v) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-}
 
 export function FormAdvanced() {
   const [tipo, setTipo] = useState("pf"); // pf | pj

@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
   "version": "0.1.0",
-  "generatedAt": "2026-09-04T17:08:49.283Z",
+  "generatedAt": "2026-09-12T16:33:07.110Z",
   "categories": [
     {
       "key": "acoes",
@@ -285,6 +285,24 @@
       "prompt": "Crie um form-field (Campo de formulário) usando @semec/base (`base/components/form-field.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: label · htmlFor · required · hint · error. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.",
       "url": "/componentes/campo-de-formulario",
       "md": "/components/campo-de-formulario.md"
+    },
+    {
+      "code": "error-summary",
+      "slug": "error-summary",
+      "label": "ErrorSummary",
+      "file": "base/components/error-summary.tsx",
+      "category": "formularios",
+      "desc": "Resumo de erros de validação no topo do formulário, com links para cada campo. A11y: `role=\"alert\"`, foco automático.",
+      "variants": [
+        {
+          "prop": "props",
+          "values": "title · errors [{ id, message }] · autoFocus · focusKey"
+        }
+      ],
+      "usage": "import { ErrorSummary } from \"@semec/base\";\n\n<ErrorSummary\n  errors={[\n    { id: \"cpf\", message: \"O CPF precisa ter 11 dígitos.\" },\n    { id: \"email\", message: \"O e-mail precisa conter @.\" },\n  ]}\n  focusKey={tentativa}\n/>",
+      "prompt": "Crie um error-summary (ErrorSummary) usando @semec/base (`base/components/error-summary.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: title · errors [{ id, message }] · autoFocus · focusKey. Resumo de erros de validação no topo do formulário, com links para cada campo. A11y: `role=\"alert\"`, foco automático.",
+      "url": "/componentes/error-summary",
+      "md": "/components/error-summary.md"
     },
     {
       "code": "card",

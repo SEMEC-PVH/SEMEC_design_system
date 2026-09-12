@@ -2,7 +2,9 @@
 
 Este repositório é o **site de documentação (guia visual) do Design System da SEMEC** — Secretaria Municipal de Educação da Prefeitura de Porto Velho. Ele **documenta** os fundamentos visuais (tipografia, cores, layout, raios e sombras), replica a aparência dos componentes do portal e registra as regras de uso. Ele **não é a biblioteca de componentes**: não existe pacote npm publicado, não há componente consumível por outro projeto e as classes utilitárias no estilo Tailwind citadas nas páginas de componentes (`bg-pv-blue-900`, `focus-visible:ring-pv-green-500`, etc.) descrevem o código do repositório **`semec-digital`**, não este. Aqui elas aparecem apenas como texto de referência — o próprio site é escrito em CSS puro com custom properties, sem Tailwind.
 
-Em outras palavras: para **consultar** as decisões visuais, use este site. Para **implementar** uma interface, aplique as regras daqui no repositório do portal.
+*Iframe para scopar estilos. Ponto de atenção: Componentes do Kit renderizados não devem herdar estilização do Site.
+
+Em outras palavras: para **consultar** as decisões visuais, use este site. Para **implementar** uma interface, aplique as regras daqui, exemplo de componentes e guias para seus agentes.
 
 ## Stack
 
@@ -17,7 +19,7 @@ Em outras palavras: para **consultar** as decisões visuais, use este site. Para
 | Lint | ESLint 9 (flat config) + `eslint-config-next` + `eslint-plugin-jsx-a11y` |
 | Node | >= 20 |
 
-Não há Tailwind, TypeScript, Storybook nem testes automatizados no projeto.
+Não há Storybook nem testes automatizados no projeto.
 
 ## Como rodar
 

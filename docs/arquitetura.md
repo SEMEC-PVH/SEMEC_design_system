@@ -191,7 +191,7 @@ Critério de aceite bloqueante, não recomendação.
 
 ## 10. Identidade visual
 
-Ponto que precisa de decisão institucional: a paleta parte da identidade da Prefeitura de Porto Velho, da SEMEC, ou é uma paleta neutra de sistema? A arquitetura suporta os três casos — o tema é uma troca de mapeamento — mas a escolha define o primeiro conjunto de tokens primitivos. **Questão em aberto (Q1).**
+Uma paleta neutra. A arquitetura suporta os três casos — o tema é uma troca de mapeamento — mas a escolha define o primeiro conjunto de tokens primitivos. **Questão em aberto (Q1).**
 
 Suporte previsto desde o início a **tema claro e escuro** e a **multi-tema por órgão** (`data-theme="semec"`), o que permite reaproveitar o DS em outras secretarias sem fork.
 
