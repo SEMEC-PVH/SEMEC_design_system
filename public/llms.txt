@@ -70,6 +70,14 @@ Ver `base/README.md` e `/llms-full.txt#instalacao`. Copie `base/`, importe `base
   Uso: `import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } from "@semec/base";`
 - [Aviso (`alert`) — Mensagem de feedback em linha, com ícone automático por variante.](/componentes/aviso) — `base/components/alert.tsx` — md: `/components/aviso.md`
   Uso: `import { Alert, AlertTitle, AlertDescription } from "@semec/base";`
+- [Acordeão (`accordion`) — Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`).](/componentes/acordeao) — `base/components/accordion.tsx` — md: `/components/acordeao.md`
+  Uso: `import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@semec/base";`
+- [Diálogo de alerta (`alert-dialog`) — Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.](/componentes/dialogo-de-alerta) — `base/components/alert-dialog.tsx` — md: `/components/dialogo-de-alerta.md`
+  Uso: `import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from "@semec/base";`
+- [Popover (`popover`) — Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.](/componentes/popover) — `base/components/popover.tsx` — md: `/components/popover.md`
+  Uso: `import { Popover, PopoverTrigger, PopoverContent, Button } from "@semec/base";`
+- [Separador (`separator`) — Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.](/componentes/separador) — `base/components/separator.tsx` — md: `/components/separador.md`
+  Uso: `import { Separator } from "@semec/base";`
 
 ## Padrões
 
@@ -95,4 +103,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--color-action-primary` etc.), nunca hex solto
 
-> Gerado em 2026-09-12T17:40:56.446Z a partir de lib/base-manifest.js. Site: https://semec-pvh.github.io/SEMEC_design_system
+> Gerado em 2026-09-12T18:14:51.109Z a partir de lib/base-manifest.js. Site: https://semec-pvh.github.io/SEMEC_design_system

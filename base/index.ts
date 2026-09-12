@@ -1,4 +1,6 @@
+export * from "./components/accordion";
 export * from "./components/alert";
+export * from "./components/alert-dialog";
 export * from "./components/badge";
 export * from "./components/breadcrumb";
 export * from "./components/button";
@@ -16,8 +18,10 @@ export * from "./components/input";
 export * from "./components/label";
 export * from "./components/link";
 export * from "./components/pagination";
+export * from "./components/popover";
 export * from "./components/radio-group";
 export * from "./components/select";
+export * from "./components/separator";
 export * from "./components/skeleton";
 export * from "./components/switch";
 export * from "./components/table";

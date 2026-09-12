@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
   "version": "0.1.0",
-  "generatedAt": "2026-09-12T17:40:56.404Z",
+  "generatedAt": "2026-09-12T18:14:51.070Z",
   "categories": [
     {
       "key": "acoes",
@@ -530,6 +530,90 @@
       "prompt": "Crie um alert (Aviso) usando @semec/base (`base/components/alert.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem de feedback em linha, com ícone automático por variante.",
       "url": "/componentes/aviso",
       "md": "/components/aviso.md"
+    },
+    {
+      "code": "accordion",
+      "slug": "acordeao",
+      "label": "Acordeão",
+      "file": "base/components/accordion.tsx",
+      "category": "conteudo-dados",
+      "desc": "Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`).",
+      "variants": [
+        {
+          "prop": "type",
+          "values": "single · multiple"
+        },
+        {
+          "prop": "composição",
+          "values": "Accordion · AccordionItem · AccordionTrigger · AccordionContent"
+        }
+      ],
+      "usage": "import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from \"@semec/base\";\n\n<Accordion type=\"single\" collapsible>\n  <AccordionItem value=\"item-1\">\n    <AccordionTrigger>Pergunta frequente</AccordionTrigger>\n    <AccordionContent>Resposta aqui.</AccordionContent>\n  </AccordionItem>\n</Accordion>",
+      "prompt": "Crie um accordion (Acordeão) usando @semec/base (`base/components/accordion.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: type: single · multiple · composição: Accordion · AccordionItem · AccordionTrigger · AccordionContent. Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`).",
+      "url": "/componentes/acordeao",
+      "md": "/components/acordeao.md"
+    },
+    {
+      "code": "alert-dialog",
+      "slug": "dialogo-de-alerta",
+      "label": "Diálogo de alerta",
+      "file": "base/components/alert-dialog.tsx",
+      "category": "feedback",
+      "desc": "Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel"
+        }
+      ],
+      "usage": "import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from \"@semec/base\";\n\n<AlertDialog>\n  <AlertDialogTrigger asChild>\n    <Button variant=\"destructive\">Excluir</Button>\n  </AlertDialogTrigger>\n  <AlertDialogContent>\n    <AlertDialogHeader>\n      <AlertDialogTitle>Excluir requerimento?</AlertDialogTitle>\n      <AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription>\n    </AlertDialogHeader>\n    <AlertDialogFooter>\n      <AlertDialogCancel>Cancelar</AlertDialogCancel>\n      <AlertDialogAction>Excluir</AlertDialogAction>\n    </AlertDialogFooter>\n  </AlertDialogContent>\n</AlertDialog>",
+      "prompt": "Crie um alert-dialog (Diálogo de alerta) usando @semec/base (`base/components/alert-dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.",
+      "url": "/componentes/dialogo-de-alerta",
+      "md": "/components/dialogo-de-alerta.md"
+    },
+    {
+      "code": "popover",
+      "slug": "popover",
+      "label": "Popover",
+      "file": "base/components/popover.tsx",
+      "category": "feedback",
+      "desc": "Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "Popover · PopoverTrigger · PopoverContent · PopoverAnchor"
+        },
+        {
+          "prop": "props",
+          "values": "sideOffset · align · side (top/right/bottom/left)"
+        }
+      ],
+      "usage": "import { Popover, PopoverTrigger, PopoverContent, Button } from \"@semec/base\";\n\n<Popover>\n  <PopoverTrigger asChild>\n    <Button variant=\"outline\">Filtros</Button>\n  </PopoverTrigger>\n  <PopoverContent>\n    <p>Opções de filtro aqui.</p>\n  </PopoverContent>\n</Popover>",
+      "prompt": "Crie um popover (Popover) usando @semec/base (`base/components/popover.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Popover · PopoverTrigger · PopoverContent · PopoverAnchor · props: sideOffset · align · side (top/right/bottom/left). Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.",
+      "url": "/componentes/popover",
+      "md": "/components/popover.md"
+    },
+    {
+      "code": "separator",
+      "slug": "separador",
+      "label": "Separador",
+      "file": "base/components/separator.tsx",
+      "category": "conteudo-dados",
+      "desc": "Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.",
+      "variants": [
+        {
+          "prop": "orientation",
+          "values": "horizontal · vertical"
+        },
+        {
+          "prop": "decorative",
+          "values": "true (role=none) · false (role=separator)"
+        }
+      ],
+      "usage": "import { Separator } from \"@semec/base\";\n\n<Separator />\n<Separator orientation=\"vertical\" className=\"h-6\" />",
+      "prompt": "Crie um separator (Separador) usando @semec/base (`base/components/separator.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: orientation: horizontal · vertical · decorative: true (role=none) · false (role=separator). Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.",
+      "url": "/componentes/separador",
+      "md": "/components/separador.md"
     }
   ],
   "install": {

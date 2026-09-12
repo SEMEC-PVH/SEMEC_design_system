@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-09-12T17:40:56.447Z — lib/base-manifest.js + base/*
+> Gerado 2026-09-12T18:14:51.110Z — lib/base-manifest.js + base/*
 
 ## Instalação — base/README.md
 
@@ -98,7 +98,9 @@ convenção do design system (ADR-012). Exemplo:
 ## base/index.ts — barrel
 
 ```ts
+export * from "./components/accordion";
 export * from "./components/alert";
+export * from "./components/alert-dialog";
 export * from "./components/badge";
 export * from "./components/breadcrumb";
 export * from "./components/button";
@@ -116,8 +118,10 @@ export * from "./components/input";
 export * from "./components/label";
 export * from "./components/link";
 export * from "./components/pagination";
+export * from "./components/popover";
 export * from "./components/radio-group";
 export * from "./components/select";
+export * from "./components/separator";
 export * from "./components/skeleton";
 export * from "./components/switch";
 export * from "./components/table";
@@ -3234,6 +3238,381 @@ const AlertDescription = React.forwardRef<
 AlertDescription.displayName = "AlertDescription";
 
 export { Alert, AlertTitle, AlertDescription };
+```
+
+---
+
+### Acordeão (`accordion`) — `base/components/accordion.tsx` — slug: acordeao
+
+Desc: Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`).
+
+Variantes: type: single · multiple · composição: Accordion · AccordionItem · AccordionTrigger · AccordionContent
+
+Uso:
+```tsx
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@semec/base";
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="item-1">
+    <AccordionTrigger>Pergunta frequente</AccordionTrigger>
+    <AccordionContent>Resposta aqui.</AccordionContent>
+  </AccordionItem>
+</Accordion>
+```
+
+Prompt:
+```text
+Crie um accordion (Acordeão) usando @semec/base (`base/components/accordion.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: type: single · multiple · composição: Accordion · AccordionItem · AccordionTrigger · AccordionContent. Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`).
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as AccordionPrimitive from "@radix-ui/react-accordion";
+import { ChevronDown } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+const Accordion = AccordionPrimitive.Root;
+
+const AccordionItem = React.forwardRef<
+  React.ElementRef<typeof AccordionPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
+>(({ className, ...props }, ref) => (
+  <AccordionPrimitive.Item
+    ref={ref}
+    className={cn("border-b border-border", className)}
+    {...props}
+  />
+));
+AccordionItem.displayName = "AccordionItem";
+
+const AccordionTrigger = React.forwardRef<
+  React.ElementRef<typeof AccordionPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
+>(({ className, children, ...props }, ref) => (
+  <AccordionPrimitive.Header className="flex">
+    <AccordionPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        "flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" aria-hidden="true" />
+    </AccordionPrimitive.Trigger>
+  </AccordionPrimitive.Header>
+));
+AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
+
+const AccordionContent = React.forwardRef<
+  React.ElementRef<typeof AccordionPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <AccordionPrimitive.Content
+    ref={ref}
+    className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+    {...props}
+  >
+    <div className={cn("pb-4 pt-0", className)}>{children}</div>
+  </AccordionPrimitive.Content>
+));
+AccordionContent.displayName = AccordionPrimitive.Content.displayName;
+
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };
+
+```
+
+---
+
+### Diálogo de alerta (`alert-dialog`) — `base/components/alert-dialog.tsx` — slug: dialogo-de-alerta
+
+Desc: Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.
+
+Variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel
+
+Uso:
+```tsx
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from "@semec/base";
+
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button variant="destructive">Excluir</Button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Excluir requerimento?</AlertDialogTitle>
+      <AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+      <AlertDialogAction>Excluir</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+Prompt:
+```text
+Crie um alert-dialog (Diálogo de alerta) usando @semec/base (`base/components/alert-dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as AlertDialogPrimitive from "@radix-ui/react-dialog";
+
+import { cn } from "../lib/utils";
+
+const AlertDialog = AlertDialogPrimitive.Root;
+
+const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
+
+const AlertDialogPortal = AlertDialogPrimitive.Portal;
+
+const AlertDialogOverlay = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Overlay
+    className={cn(
+      "fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      className
+    )}
+    {...props}
+    ref={ref}
+  />
+));
+AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName;
+
+const AlertDialogContent = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <AlertDialogPortal>
+    <AlertDialogOverlay />
+    <AlertDialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-elevation-3 duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </AlertDialogPrimitive.Content>
+  </AlertDialogPortal>
+));
+AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName;
+
+const AlertDialogHeader = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("flex flex-col space-y-2 text-center sm:text-left", className)}
+    {...props}
+  />
+);
+AlertDialogHeader.displayName = "AlertDialogHeader";
+
+const AlertDialogFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
+    {...props}
+  />
+);
+AlertDialogFooter.displayName = "AlertDialogFooter";
+
+const AlertDialogTitle = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Title
+    ref={ref}
+    className={cn("text-lg font-semibold", className)}
+    {...props}
+  />
+));
+AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName;
+
+const AlertDialogDescription = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Description
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+));
+AlertDialogDescription.displayName = AlertDialogPrimitive.Description.displayName;
+
+const AlertDialogAction = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Close>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Close>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Close
+    ref={ref}
+    className={cn(
+      "inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+      className
+    )}
+    {...props}
+  />
+));
+AlertDialogAction.displayName = "AlertDialogAction";
+
+const AlertDialogCancel = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Close>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Close>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Close
+    ref={ref}
+    className={cn(
+      "inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+      className
+    )}
+    {...props}
+  />
+));
+AlertDialogCancel.displayName = "AlertDialogCancel";
+
+export {
+  AlertDialog,
+  AlertDialogPortal,
+  AlertDialogOverlay,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+};
+
+```
+
+---
+
+### Popover (`popover`) — `base/components/popover.tsx` — slug: popover
+
+Desc: Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.
+
+Variantes: composição: Popover · PopoverTrigger · PopoverContent · PopoverAnchor · props: sideOffset · align · side (top/right/bottom/left)
+
+Uso:
+```tsx
+import { Popover, PopoverTrigger, PopoverContent, Button } from "@semec/base";
+
+<Popover>
+  <PopoverTrigger asChild>
+    <Button variant="outline">Filtros</Button>
+  </PopoverTrigger>
+  <PopoverContent>
+    <p>Opções de filtro aqui.</p>
+  </PopoverContent>
+</Popover>
+```
+
+Prompt:
+```text
+Crie um popover (Popover) usando @semec/base (`base/components/popover.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Popover · PopoverTrigger · PopoverContent · PopoverAnchor · props: sideOffset · align · side (top/right/bottom/left). Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as PopoverPrimitive from "@radix-ui/react-popover";
+
+import { cn } from "../lib/utils";
+
+const Popover = PopoverPrimitive.Root;
+
+const PopoverTrigger = PopoverPrimitive.Trigger;
+
+const PopoverAnchor = PopoverPrimitive.Anchor;
+
+const PopoverContent = React.forwardRef<
+  React.ElementRef<typeof PopoverPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
+>(({ className, align = "center", sideOffset = 4, ...props }, ref) => (
+  <PopoverPrimitive.Portal>
+    <PopoverPrimitive.Content
+      ref={ref}
+      align={align}
+      sideOffset={sideOffset}
+      className={cn(
+        "z-50 w-72 rounded-md border border-border bg-card p-4 text-card-foreground shadow-elevation-2 outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        className
+      )}
+      {...props}
+    />
+  </PopoverPrimitive.Portal>
+));
+PopoverContent.displayName = PopoverPrimitive.Content.displayName;
+
+export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor };
+
+```
+
+---
+
+### Separador (`separator`) — `base/components/separator.tsx` — slug: separador
+
+Desc: Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.
+
+Variantes: orientation: horizontal · vertical · decorative: true (role=none) · false (role=separator)
+
+Uso:
+```tsx
+import { Separator } from "@semec/base";
+
+<Separator />
+<Separator orientation="vertical" className="h-6" />
+```
+
+Prompt:
+```text
+Crie um separator (Separador) usando @semec/base (`base/components/separator.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: orientation: horizontal · vertical · decorative: true (role=none) · false (role=separator). Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+
+import { cn } from "../lib/utils";
+
+interface SeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
+  orientation?: "horizontal" | "vertical";
+  decorative?: boolean;
+}
+
+const Separator = React.forwardRef<HTMLDivElement, SeparatorProps>(
+  ({ className, orientation = "horizontal", decorative = true, ...props }, ref) => (
+    <div
+      ref={ref}
+      role={decorative ? "none" : "separator"}
+      aria-orientation={!decorative ? orientation : undefined}
+      className={cn(
+        "shrink-0 bg-border",
+        orientation === "horizontal" ? "h-px w-full" : "h-full w-px",
+        className
+      )}
+      {...props}
+    />
+  )
+);
+Separator.displayName = "Separator";
+
+export { Separator };
+
 ```
 
 ---
