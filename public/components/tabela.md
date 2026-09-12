@@ -4,18 +4,19 @@ code: "table"
 slug: "tabela"
 file: "base/components/table.tsx"
 category: "conteudo-dados"
-variants: "composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption"
+variants: "composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount"
 ---
 
 # Tabela — `table`
 
-> Tabela de dados semântica com caption, header, body e footer.
+> Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
 
 **Arquivo:** `base/components/table.tsx` | **Categoria:** Conteúdo e dados | **Rota:** `/componentes/tabela`
 
 ## Variantes
 
 - **composição**: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption
+- **a11y**: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount
 
 ## Instalação (kit @semec/base)
 
@@ -42,16 +43,20 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ```tsx
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/base";
 
+// Básico
 <Table>
   <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
   <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>
 </Table>
+
+// Avançado: ordenação + filtro + paginação + seleção
+// Ver padroes/dados-relatorios/tabelas → demo com TableAdvanced
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um table (Tabela) usando @semec/base (`base/components/table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption. Tabela de dados semântica com caption, header, body e footer.
+Crie um table (Tabela) usando @semec/base (`base/components/table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
 ```
 
 ## Fonte
@@ -68,6 +73,7 @@ const Table = React.forwardRef<
   <div className="relative w-full overflow-auto">
     <table
       ref={ref}
+      role="table"
       className={cn("w-full caption-bottom text-sm", className)}
       {...props}
     />
@@ -128,6 +134,7 @@ const TableHead = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <th
     ref={ref}
+    scope="col"
     className={cn(
       "h-11 px-4 text-left align-middle font-medium text-muted-foreground",
       className

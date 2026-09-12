@@ -50,7 +50,7 @@ Ver `base/README.md` e `/llms-full.txt#instalacao`. Copie `base/`, importe `base
   Uso: `import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@semec/base";`
 - [Etiqueta (`badge`) — Etiqueta curta de status ou contagem.](/componentes/etiqueta) — `base/components/badge.tsx` — md: `/components/etiqueta.md`
   Uso: `import { Badge } from "@semec/base";`
-- [Tabela (`table`) — Tabela de dados semântica com caption, header, body e footer.](/componentes/tabela) — `base/components/table.tsx` — md: `/components/tabela.md`
+- [Tabela (`table`) — Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.](/componentes/tabela) — `base/components/table.tsx` — md: `/components/tabela.md`
   Uso: `import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/base";`
 - [Esqueleto (`skeleton`) — Placeholder pulsante de carregamento.](/componentes/esqueleto) — `base/components/skeleton.tsx` — md: `/components/esqueleto.md`
   Uso: `import { Skeleton } from "@semec/base";`
@@ -95,4 +95,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--color-action-primary` etc.), nunca hex solto
 
-> Gerado em 2026-09-12T16:33:07.136Z a partir de lib/base-manifest.js. Site: https://semec-pvh.github.io/SEMEC_design_system
+> Gerado em 2026-09-12T17:30:48.170Z a partir de lib/base-manifest.js. Site: https://semec-pvh.github.io/SEMEC_design_system

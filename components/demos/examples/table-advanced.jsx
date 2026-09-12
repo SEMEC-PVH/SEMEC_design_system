@@ -108,7 +108,7 @@ export function TableAdvanced() {
           <Input id="tbl-busca" placeholder="ID ou objeto" value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} />
         </div>
         <div className="w-44">
-          <label className="mb-1 block text-xs font-medium text-muted-foreground">Status</label>
+          <span className="mb-1 block text-xs font-medium text-muted-foreground">Status</span>
           <Select value={status} onValueChange={(v) => simulateLoading(v)}>
             <SelectTrigger aria-label="Filtrar por status"><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -126,14 +126,14 @@ export function TableAdvanced() {
 
       {/* Tabela */}
       <div className="rounded-lg border">
-        <Table>
+        <Table aria-rowcount={filtered.length} aria-colcount={6}>
           <TableCaption>Contratos — exemplo SIGO Módulo IV. Use seleção para ação em lote.</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead className="w-10">
                 <Checkbox aria-label="Selecionar todos da página" checked={allSelected ? true : someSelected ? "indeterminate" : false} onCheckedChange={toggleAll} />
               </TableHead>
-              <TableHead>
+              <TableHead aria-sort={sortDir === "asc" ? "ascending" : "descending"}>
                 <button
                   type="button"
                   onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}

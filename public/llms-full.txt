@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-09-12T16:33:07.137Z — lib/base-manifest.js + base/*
+> Gerado 2026-09-12T17:30:48.172Z — lib/base-manifest.js + base/*
 
 ## Instalação — base/README.md
 
@@ -2114,23 +2114,27 @@ export { Badge, badgeVariants };
 
 ### Tabela (`table`) — `base/components/table.tsx` — slug: tabela
 
-Desc: Tabela de dados semântica com caption, header, body e footer.
+Desc: Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
 
-Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption
+Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount
 
 Uso:
 ```tsx
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/base";
 
+// Básico
 <Table>
   <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
   <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>
 </Table>
+
+// Avançado: ordenação + filtro + paginação + seleção
+// Ver padroes/dados-relatorios/tabelas → demo com TableAdvanced
 ```
 
 Prompt:
 ```text
-Crie um table (Tabela) usando @semec/base (`base/components/table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption. Tabela de dados semântica com caption, header, body e footer.
+Crie um table (Tabela) usando @semec/base (`base/components/table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
 ```
 
 Fonte:
@@ -2146,6 +2150,7 @@ const Table = React.forwardRef<
   <div className="relative w-full overflow-auto">
     <table
       ref={ref}
+      role="table"
       className={cn("w-full caption-bottom text-sm", className)}
       {...props}
     />
@@ -2206,6 +2211,7 @@ const TableHead = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <th
     ref={ref}
+    scope="col"
     className={cn(
       "h-11 px-4 text-left align-middle font-medium text-muted-foreground",
       className
