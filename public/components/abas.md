@@ -4,18 +4,19 @@ code: "tabs"
 slug: "abas"
 file: "base/components/tabs.tsx"
 category: "navegacao"
-variants: "composição: Tabs · TabsList · TabsTrigger · TabsContent"
+variants: "composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y: role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas)"
 ---
 
 # Abas — `tabs`
 
-> Abas para alternar conteúdo na mesma tela.
+> Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.
 
 **Arquivo:** `base/components/tabs.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/abas`
 
 ## Variantes
 
 - **composição**: Tabs · TabsList · TabsTrigger · TabsContent
+- **a11y**: role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas)
 
 ## Instalação (kit @semec/base)
 
@@ -55,7 +56,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@semec/base";
 ## Prompt para IA
 
 ```text
-Crie um tabs (Abas) usando @semec/base (`base/components/tabs.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent. Abas para alternar conteúdo na mesma tela.
+Crie um tabs (Abas) usando @semec/base (`base/components/tabs.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y: role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas). Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.
 ```
 
 ## Fonte

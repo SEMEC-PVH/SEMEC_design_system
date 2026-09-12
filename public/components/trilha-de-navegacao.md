@@ -4,18 +4,19 @@ code: "breadcrumb"
 slug: "trilha-de-navegacao"
 file: "base/components/breadcrumb.tsx"
 category: "navegacao"
-variants: "props: items: { label, href?, current? }[]"
+variants: "props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores"
 ---
 
 # Trilha de navegação — `breadcrumb`
 
-> Trilha com o item atual marcado (`current`).
+> Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
 
 **Arquivo:** `base/components/breadcrumb.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/trilha-de-navegacao`
 
 ## Variantes
 
-- **props**: items: { label, href?, current? }[]
+- **props**: items: { label, href? }[]
+- **a11y**: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores
 
 ## Instalação (kit @semec/base)
 
@@ -45,14 +46,14 @@ import { Breadcrumb } from "@semec/base";
 <Breadcrumb items={[
   { label: "Início", href: "/" },
   { label: "Serviços", href: "/servicos" },
-  { label: "IPTU", current: true },
+  { label: "IPTU" },
 ]} />
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um breadcrumb (Trilha de navegação) usando @semec/base (`base/components/breadcrumb.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: items: { label, href?, current? }[]. Trilha com o item atual marcado (`current`).
+Crie um breadcrumb (Trilha de navegação) usando @semec/base (`base/components/breadcrumb.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores. Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
 ```
 
 ## Fonte

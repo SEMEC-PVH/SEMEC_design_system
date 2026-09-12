@@ -4,18 +4,19 @@ code: "pagination"
 slug: "paginacao"
 file: "base/components/pagination.tsx"
 category: "navegacao"
-variants: "props: page · pageCount · onPageChange · siblingCount"
+variants: "props: page · pageCount · onPageChange · siblingCount · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses"
 ---
 
 # Paginação — `pagination`
 
-> Controle de páginas com elipses (janela por `siblingCount`).
+> Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.
 
 **Arquivo:** `base/components/pagination.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/paginacao`
 
 ## Variantes
 
 - **props**: page · pageCount · onPageChange · siblingCount
+- **a11y**: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses
 
 ## Instalação (kit @semec/base)
 
@@ -48,7 +49,7 @@ import { Pagination } from "@semec/base";
 ## Prompt para IA
 
 ```text
-Crie um pagination (Paginação) usando @semec/base (`base/components/pagination.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: page · pageCount · onPageChange · siblingCount. Controle de páginas com elipses (janela por `siblingCount`).
+Crie um pagination (Paginação) usando @semec/base (`base/components/pagination.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: page · pageCount · onPageChange · siblingCount · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.
 ```
 
 ## Fonte

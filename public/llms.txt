@@ -56,11 +56,11 @@ Ver `base/README.md` e `/llms-full.txt#instalacao`. Copie `base/`, importe `base
   Uso: `import { Skeleton } from "@semec/base";`
 - [Estado vazio (`empty-state`) — Estado vazio com ícone, título, descrição e ação opcional.](/componentes/estado-vazio) — `base/components/empty-state.tsx` — md: `/components/estado-vazio.md`
   Uso: `import { EmptyState, Button } from "@semec/base";`
-- [Trilha de navegação (`breadcrumb`) — Trilha com o item atual marcado (`current`).](/componentes/trilha-de-navegacao) — `base/components/breadcrumb.tsx` — md: `/components/trilha-de-navegacao.md`
+- [Trilha de navegação (`breadcrumb`) — Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.](/componentes/trilha-de-navegacao) — `base/components/breadcrumb.tsx` — md: `/components/trilha-de-navegacao.md`
   Uso: `import { Breadcrumb } from "@semec/base";`
-- [Abas (`tabs`) — Abas para alternar conteúdo na mesma tela.](/componentes/abas) — `base/components/tabs.tsx` — md: `/components/abas.md`
+- [Abas (`tabs`) — Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.](/componentes/abas) — `base/components/tabs.tsx` — md: `/components/abas.md`
   Uso: `import { Tabs, TabsList, TabsTrigger, TabsContent } from "@semec/base";`
-- [Paginação (`pagination`) — Controle de páginas com elipses (janela por `siblingCount`).](/componentes/paginacao) — `base/components/pagination.tsx` — md: `/components/paginacao.md`
+- [Paginação (`pagination`) — Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.](/componentes/paginacao) — `base/components/pagination.tsx` — md: `/components/paginacao.md`
   Uso: `import { Pagination } from "@semec/base";`
 - [Modal (`dialog`) — Diálogo modal acessível com overlay, header, título, descrição e footer.](/componentes/modal) — `base/components/dialog.tsx` — md: `/components/modal.md`
   Uso: `import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "@semec/base";`
@@ -95,4 +95,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--color-action-primary` etc.), nunca hex solto
 
-> Gerado em 2026-09-12T17:30:48.170Z a partir de lib/base-manifest.js. Site: https://semec-pvh.github.io/SEMEC_design_system
+> Gerado em 2026-09-12T17:40:56.446Z a partir de lib/base-manifest.js. Site: https://semec-pvh.github.io/SEMEC_design_system

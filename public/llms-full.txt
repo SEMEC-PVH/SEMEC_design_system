@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-09-12T17:30:48.172Z — lib/base-manifest.js + base/*
+> Gerado 2026-09-12T17:40:56.447Z — lib/base-manifest.js + base/*
 
 ## Instalação — base/README.md
 
@@ -2368,9 +2368,9 @@ export { EmptyState };
 
 ### Trilha de navegação (`breadcrumb`) — `base/components/breadcrumb.tsx` — slug: trilha-de-navegacao
 
-Desc: Trilha com o item atual marcado (`current`).
+Desc: Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
 
-Variantes: props: items: { label, href?, current? }[]
+Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores
 
 Uso:
 ```tsx
@@ -2379,13 +2379,13 @@ import { Breadcrumb } from "@semec/base";
 <Breadcrumb items={[
   { label: "Início", href: "/" },
   { label: "Serviços", href: "/servicos" },
-  { label: "IPTU", current: true },
+  { label: "IPTU" },
 ]} />
 ```
 
 Prompt:
 ```text
-Crie um breadcrumb (Trilha de navegação) usando @semec/base (`base/components/breadcrumb.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: items: { label, href?, current? }[]. Trilha com o item atual marcado (`current`).
+Crie um breadcrumb (Trilha de navegação) usando @semec/base (`base/components/breadcrumb.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores. Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
 ```
 
 Fonte:
@@ -2446,9 +2446,9 @@ export { Breadcrumb };
 
 ### Abas (`tabs`) — `base/components/tabs.tsx` — slug: abas
 
-Desc: Abas para alternar conteúdo na mesma tela.
+Desc: Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.
 
-Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent
+Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y: role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas)
 
 Uso:
 ```tsx
@@ -2466,7 +2466,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@semec/base";
 
 Prompt:
 ```text
-Crie um tabs (Abas) usando @semec/base (`base/components/tabs.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent. Abas para alternar conteúdo na mesma tela.
+Crie um tabs (Abas) usando @semec/base (`base/components/tabs.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y: role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas). Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.
 ```
 
 Fonte:
@@ -2530,9 +2530,9 @@ export { Tabs, TabsList, TabsTrigger, TabsContent };
 
 ### Paginação (`pagination`) — `base/components/pagination.tsx` — slug: paginacao
 
-Desc: Controle de páginas com elipses (janela por `siblingCount`).
+Desc: Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.
 
-Variantes: props: page · pageCount · onPageChange · siblingCount
+Variantes: props: page · pageCount · onPageChange · siblingCount · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses
 
 Uso:
 ```tsx
@@ -2543,7 +2543,7 @@ import { Pagination } from "@semec/base";
 
 Prompt:
 ```text
-Crie um pagination (Paginação) usando @semec/base (`base/components/pagination.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: page · pageCount · onPageChange · siblingCount. Controle de páginas com elipses (janela por `siblingCount`).
+Crie um pagination (Paginação) usando @semec/base (`base/components/pagination.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: page · pageCount · onPageChange · siblingCount · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.
 ```
 
 Fonte:

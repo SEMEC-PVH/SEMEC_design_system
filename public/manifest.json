@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
   "version": "0.1.0",
-  "generatedAt": "2026-09-12T17:30:48.127Z",
+  "generatedAt": "2026-09-12T17:40:56.404Z",
   "categories": [
     {
       "key": "acoes",
@@ -399,15 +399,19 @@
       "label": "Trilha de navegação",
       "file": "base/components/breadcrumb.tsx",
       "category": "navegacao",
-      "desc": "Trilha com o item atual marcado (`current`).",
+      "desc": "Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.",
       "variants": [
         {
           "prop": "props",
-          "values": "items: { label, href?, current? }[]"
+          "values": "items: { label, href? }[]"
+        },
+        {
+          "prop": "a11y",
+          "values": "aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores"
         }
       ],
-      "usage": "import { Breadcrumb } from \"@semec/base\";\n\n<Breadcrumb items={[\n  { label: \"Início\", href: \"/\" },\n  { label: \"Serviços\", href: \"/servicos\" },\n  { label: \"IPTU\", current: true },\n]} />",
-      "prompt": "Crie um breadcrumb (Trilha de navegação) usando @semec/base (`base/components/breadcrumb.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: items: { label, href?, current? }[]. Trilha com o item atual marcado (`current`).",
+      "usage": "import { Breadcrumb } from \"@semec/base\";\n\n<Breadcrumb items={[\n  { label: \"Início\", href: \"/\" },\n  { label: \"Serviços\", href: \"/servicos\" },\n  { label: \"IPTU\" },\n]} />",
+      "prompt": "Crie um breadcrumb (Trilha de navegação) usando @semec/base (`base/components/breadcrumb.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores. Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.",
       "url": "/componentes/trilha-de-navegacao",
       "md": "/components/trilha-de-navegacao.md"
     },
@@ -417,15 +421,19 @@
       "label": "Abas",
       "file": "base/components/tabs.tsx",
       "category": "navegacao",
-      "desc": "Abas para alternar conteúdo na mesma tela.",
+      "desc": "Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.",
       "variants": [
         {
           "prop": "composição",
           "values": "Tabs · TabsList · TabsTrigger · TabsContent"
+        },
+        {
+          "prop": "a11y",
+          "values": "role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas)"
         }
       ],
       "usage": "import { Tabs, TabsList, TabsTrigger, TabsContent } from \"@semec/base\";\n\n<Tabs defaultValue=\"resumo\">\n  <TabsList>\n    <TabsTrigger value=\"resumo\">Resumo</TabsTrigger>\n    <TabsTrigger value=\"debitos\">Débitos</TabsTrigger>\n  </TabsList>\n  <TabsContent value=\"resumo\">…</TabsContent>\n  <TabsContent value=\"debitos\">…</TabsContent>\n</Tabs>",
-      "prompt": "Crie um tabs (Abas) usando @semec/base (`base/components/tabs.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent. Abas para alternar conteúdo na mesma tela.",
+      "prompt": "Crie um tabs (Abas) usando @semec/base (`base/components/tabs.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y: role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas). Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.",
       "url": "/componentes/abas",
       "md": "/components/abas.md"
     },
@@ -435,15 +443,19 @@
       "label": "Paginação",
       "file": "base/components/pagination.tsx",
       "category": "navegacao",
-      "desc": "Controle de páginas com elipses (janela por `siblingCount`).",
+      "desc": "Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.",
       "variants": [
         {
           "prop": "props",
           "values": "page · pageCount · onPageChange · siblingCount"
+        },
+        {
+          "prop": "a11y",
+          "values": "role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses"
         }
       ],
       "usage": "import { Pagination } from \"@semec/base\";\n\n<Pagination page={pagina} pageCount={42} onPageChange={setPagina} />",
-      "prompt": "Crie um pagination (Paginação) usando @semec/base (`base/components/pagination.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: page · pageCount · onPageChange · siblingCount. Controle de páginas com elipses (janela por `siblingCount`).",
+      "prompt": "Crie um pagination (Paginação) usando @semec/base (`base/components/pagination.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: page · pageCount · onPageChange · siblingCount · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.",
       "url": "/componentes/paginacao",
       "md": "/components/paginacao.md"
     },
