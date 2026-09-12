@@ -18,7 +18,7 @@ formato shadcn (Radix + CVA + clsx + tailwind-merge).
 | `shadcn.css` | Variáveis no formato shadcn (`--background`, `--primary`, `--ring`…) mapeadas para a paleta, em HSL |
 | `pv-preset.ts` | Preset Tailwind v4 para projetos que usam config JS (`@config`) |
 | `lib/utils.ts` | `cn()` (clsx + tailwind-merge) |
-| `components/` | Button, IconButton, Link, Input, Textarea, Select, Combobox, DatePicker, FileUpload, Checkbox, RadioGroup, Switch, Label, FormField, Breadcrumb, Tabs, Pagination, Card, Badge, Alert, Table, Skeleton, EmptyState, Dialog (Modal), Toast, Tooltip |
+| `components/` | Accordion, Alert, AlertDialog, Badge, Breadcrumb, Button, Card, Checkbox, Combobox, DatePicker, Dialog, EmptyState, ErrorSummary, FileUpload, FormField, IconButton, Input, Label, Link, Pagination, Popover, RadioGroup, Select, Separator, Skeleton, Switch, Table, Tabs, Textarea, Toast, Tooltip |
 | `index.ts` | Barrel de export |
 | `package.json` | Dependências necessárias (peer: React 19) |
 
@@ -33,7 +33,7 @@ formato shadcn (Radix + CVA + clsx + tailwind-merge).
      @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
      @radix-ui/react-radio-group @radix-ui/react-select @radix-ui/react-switch \
      @radix-ui/react-popover @radix-ui/react-tabs @radix-ui/react-dialog \
-     @radix-ui/react-toast @radix-ui/react-tooltip
+     @radix-ui/react-toast @radix-ui/react-tooltip @radix-ui/react-accordion
    npm i -D tailwindcss @tailwindcss/vite
    ```
 

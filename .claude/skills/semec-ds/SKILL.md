@@ -9,8 +9,8 @@ Kit `@semec/base` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tai
 
 ## Onde ler
 
-1. **Índice rápido (2KB):** `public/llms.txt` — lista categorias + 26 componentes com links
-2. **Dump completo (97KB):** `public/llms-full.txt` — base/README.md + base/tokens.css + base/shadcn.css + base/pv-preset.ts + todos os 26 componentes (uso + fonte + prompt)
+1. **Índice rápido (2KB):** `public/llms.txt` — lista categorias + 31 componentes com links
+2. **Dump completo (115KB):** `public/llms-full.txt` — base/README.md + base/tokens.css + base/shadcn.css + base/pv-preset.ts + todos os 31 componentes (uso + fonte + prompt)
 3. **Per-component md (RAG):** `public/components/<slug>.md` — 1 arquivo por componente (ex: `public/components/botoes.md`)
 4. **JSON máquina:** `public/manifest.json` — `dsComponents` + `dsCategories` + `dsPrompt()`
 5. **Fonte única:** `lib/base-manifest.js` — categorias, componentes, `usage`, `dsPrompt()`
@@ -25,7 +25,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
   @radix-ui/react-radio-group @radix-ui/react-select @radix-ui/react-switch \
   @radix-ui/react-popover @radix-ui/react-tabs @radix-ui/react-dialog \
-  @radix-ui/react-toast @radix-ui/react-tooltip
+  @radix-ui/react-toast @radix-ui/react-tooltip @radix-ui/react-accordion
 ```
 
 ```css

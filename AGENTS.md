@@ -12,7 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Kit `@semec/base` (React + Tailwind v4 + shadcn + Radix + CVA). Conteúdo PT-BR, código EN (ADR-016), tema `data-theme="dark"` (ADR-012).
 
-**Fontes IA:** `public/llms.txt` (índice), `public/llms-full.txt` (dump 97KB), `public/components/<slug>.md` (1 md por componente, 26), `public/manifest.json` (JSON), `lib/base-manifest.js` (fonte única usage+prompt).
+**Fontes IA:** `public/llms.txt` (índice), `public/llms-full.txt` (dump 115KB), `public/components/<slug>.md` (1 md por componente, 31), `public/manifest.json` (JSON), `lib/base-manifest.js` (fonte única usage+prompt).
 
 **Gerar:** `node scripts/generate-llms.mjs` ou `npm run generate:llms` (roda no `prebuild` antes de `next build`). Proto CSS: `npm run proto:css` → `public/proto/proto.css` (`app/proto/proto.css` com `@source` para `base/components` + `components/demos` + `components/docs`).
 

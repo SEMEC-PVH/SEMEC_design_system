@@ -11,7 +11,7 @@ Kit `@semec/base` — React + Tailwind v4 + shadcn (Radix + CVA + clsx + tailwin
 
 - `public/llms.txt` — índice rápido
 - `public/llms-full.txt` — dump completo (97KB)
-- `public/components/<slug>.md` — 1 md por componente (26) — RAG chunk
+- `public/components/<slug>.md` — 1 md por componente (31) — RAG chunk
 - `public/manifest.json` — JSON dsComponents + dsCategories + dsPrompt()
 - `lib/base-manifest.js` — fonte única (usage + prompt)
 
@@ -24,7 +24,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
   @radix-ui/react-radio-group @radix-ui/react-select @radix-ui/react-switch \
   @radix-ui/react-popover @radix-ui/react-tabs @radix-ui/react-dialog \
-  @radix-ui/react-toast @radix-ui/react-tooltip
+  @radix-ui/react-toast @radix-ui/react-tooltip @radix-ui/react-accordion
 ```
 ```css
 @import "tailwindcss";
