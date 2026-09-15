@@ -1,13 +1,14 @@
 ---
 adr: 2
 titulo: "Monorepo pnpm com múltiplos pacotes publicados"
-status: Aceito
+status: Substituído
 data: 2026-08-20
+substituido_por: 0017-workspace-apps-packages.md
 ---
 
 # ADR-002 — Monorepo pnpm com múltiplos pacotes publicados
 
-**Status:** Aceito
+**Status:** Substituído pelo [ADR-017](0017-workspace-apps-packages.md) (15/09/2026) — o alvo de múltiplos pacotes permanece; o gerenciador passou de pnpm para npm workspaces.
 
 **Contexto.** Os alvos de consumo são heterogêneos: React (Next e Vite), HTML puro e painéis de dados. Um pacote único obrigaria uma página estática a baixar React.
 

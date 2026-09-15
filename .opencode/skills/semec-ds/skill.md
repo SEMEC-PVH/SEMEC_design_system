@@ -1,19 +1,19 @@
 ---
 name: semec-ds
-description: Use SEMEC Design System (@semec/base) — React + Tailwind v4 + shadcn + Radix. Tokens pv-*, tema data-theme=dark, conteúdo PT-BR/código EN. Use para UI, migração portal, snippets.
+description: Use SEMEC Design System (@semec/ds-react) — React + Tailwind v4 + shadcn + Radix. Tokens pv-*, tema data-theme=dark, conteúdo PT-BR/código EN. Use para UI, migração portal, snippets.
 ---
 
 # SEMEC Design System — Skill OpenCode
 
-Kit `@semec/base` — React + Tailwind v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
+Kit `@semec/ds-react` (`packages/react/`) — React + Tailwind v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
 ## Fontes para agentes
 
 - `public/llms.txt` — índice rápido
-- `public/llms-full.txt` — dump completo (97KB)
-- `public/components/<slug>.md` — 1 md por componente (31) — RAG chunk
+- `public/llms-full.txt` — dump completo (~119KB)
+- `public/components/<slug>.md` — 1 md por componente (32) — RAG chunk
 - `public/manifest.json` — JSON dsComponents + dsCategories + dsPrompt()
-- `lib/base-manifest.js` — fonte única (usage + prompt)
+- `packages/react/manifest.js` — fonte única (usage + prompt)
 
 Gera: `node scripts/generate-llms.mjs` (prebuild).
 
@@ -41,9 +41,9 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 1. `read public/llms.txt` → escolhe code
 2. `read public/components/<slug>.md` → copia usage
 3. aplica tokens L1 (`--bg`, `--color-action-primary` etc.), sem hex solto
-4. checa variantes em `lib/base-manifest.js`
+4. checa variantes em `packages/react/manifest.js`
 
-Ex: `import { Button } from "./base"; <Button variant="primary">Salvar</Button>`
+Ex: `import { Button } from "@semec/ds-react"; <Button variant="primary">Salvar</Button>`
 
 ## Snippets e demos
 

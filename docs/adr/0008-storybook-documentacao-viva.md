@@ -1,13 +1,14 @@
 ---
 adr: 8
 titulo: "Storybook como documentação viva, publicado como site do DS"
-status: Aceito
+status: Substituído
 data: 2026-08-20
+substituido_por: 0019-documentacao-no-site-storybook-adiado.md
 ---
 
 # ADR-008 — Storybook como documentação viva, publicado como site do DS
 
-**Status:** Aceito
+**Status:** Substituído pelo [ADR-019](0019-documentacao-no-site-storybook-adiado.md) (15/09/2026) — a documentação passou a ser o site em `apps/docs/`; o Storybook fica adiado.
 
 **Contexto.** Documentação separada do código envelhece em semanas.
 

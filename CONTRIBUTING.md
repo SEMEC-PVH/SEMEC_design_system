@@ -2,7 +2,7 @@
 
 Este documento descreve a governança do Design System da SEMEC. Ele deriva de duas fontes escritas antes deste repositório existir: a seção "Governança" do [documento de arquitetura](docs/arquitetura.md) e os guias "Para quem contribui" e "Definição de pronto" da [especificação-alvo](docs/especificacao-alvo.md).
 
-Essas duas fontes descrevem o processo de uma **biblioteca de componentes publicada** — com pacotes, Storybook, testes automatizados de acessibilidade, regressão visual e changesets. Este repositório ainda não é isso. Hoje ele é o **site de documentação**: um projeto Next.js 16 com App Router e `output: 'export'`, que gera HTML estático. Não há pacote publicável, não há componente exportado, não há Storybook e não há integração contínua. É o mesmo diagnóstico do [veredito da auditoria](docs/auditoria/2026-08-21-repositorio.md).
+Essas duas fontes descrevem o processo de uma **biblioteca de componentes publicada** — com pacotes em registry, Storybook, testes automatizados de acessibilidade, regressão visual e changesets. Este repositório **ainda não publica** nada num registry, mas já contém um kit de componentes consumível: `packages/react/` (`@semec/ds-react`), ligado por workspace e também copiável para outro projeto. O site de documentação vive em `apps/docs/` (Next.js 16, `output: 'export'`) e os artefatos para agentes são gerados a partir de `packages/react/manifest.js`. Não há Storybook, suíte de testes nem integração contínua. Ver [objetivo.md](docs/objetivo.md) e o [veredito da auditoria](docs/auditoria/2026-08-21-repositorio.md).
 
 Por isso a governança está dividida em duas partes. A **Parte 1** vale hoje e só cita ferramenta que existe. A **Parte 2** é o processo previsto para quando a biblioteca existir, e nenhum item dela é exigível agora. Exigir hoje um `axe` que ninguém configurou seria pedir a quem contribui que finja — e documentação que finge é o problema que este repositório está tentando corrigir.
 
@@ -39,7 +39,7 @@ Quem avalia são os mantenedores, na issue, antes de haver código.
 
 ## 3. Implementação
 
-Aprovada a proposta, a issue ganha critérios de aceite e vira trabalho. Neste repositório, "implementar" significa mexer nas páginas de `app/(docs)/` e nos componentes de `components/` que as servem.
+Aprovada a proposta, a issue ganha critérios de aceite e vira trabalho. Neste repositório, "implementar" significa mexer nas páginas de `apps/docs/app/(docs)/`, nos componentes de `apps/docs/components/` que as servem, ou nos componentes do kit em `packages/react/src/components/`.
 
 Duas regras que o próprio site publica e que valem para quem edita o site:
 
@@ -59,7 +59,7 @@ Sem `axe` configurado, a verificação de acessibilidade **é manual** — e pre
 
 ## 5. Merge
 
-Aprovado, o pull request entra por merge na branch de destino. **Não há changeset, não há release e não há publicação** — não existe pacote para versionar. Isso muda quando a Parte 2 valer.
+Aprovado, o pull request entra por merge na branch de destino. **Não há changeset, não há release e não há publicação** — o pacote existe no workspace, mas não é publicado num registry. Isso muda quando a Parte 2 valer.
 
 ## O que um pull request precisa ter hoje
 
@@ -71,9 +71,9 @@ Aprovado, o pull request entra por merge na branch de destino. **Não há change
 - [ ] Revisão de outra pessoa
 - [ ] Mensagens de commit na convenção abaixo
 
-**Scripts que existem hoje** no `package.json`: `dev`, `build` e `start`. Nada além disso.
+**Scripts que existem hoje** (na raiz, delegando para `apps/docs`): `dev`, `build`, `start`, `lint`, `generate:llms` e `proto:css`.
 
-> **Sobre o `lint`.** A branch `fix/acessibilidade-e-build`, ainda não mesclada, acrescenta um script `lint` (`eslint .`, com `eslint-config-next` e `eslint-plugin-jsx-a11y`). Quando ela for mesclada, `npm run lint` passa a fazer parte do checklist acima — inclusive com regras de acessibilidade em JSX, que hoje ninguém verifica automaticamente. Até lá, o comando não existe: não o cite em revisão e não o coloque em nenhuma instrução.
+> **Sobre o `lint`.** O script `lint` (`eslint .`, com `eslint-config-next` e `eslint-plugin-jsx-a11y`) já existe e roda em `apps/docs`. Ainda há uma violação conhecida de `react-hooks/set-state-in-effect` em `apps/docs/components/docs/Sidebar.jsx`, herdada antes da migração.
 
 ## Convenção de commits
 
@@ -90,9 +90,7 @@ Os commits mais antigos do repositório (`initial commit`, `migration to nextjs`
 
 ## Fim de linha
 
-Todo arquivo de texto usa **LF**. Configure seu editor para isso.
-
-> **Sobre o `.gitattributes`.** O arquivo **não existe nesta branch**. Ele vem da branch `fix/acessibilidade-e-build` (commit `chore: normaliza fim de linha para LF`), que ainda não foi mesclada, e declara `* text=auto eol=lf` mais as exceções binárias para `png`, `jpg`, `pdf`, `woff`, `woff2` e `ico`. Enquanto essa branch não entrar, a normalização depende inteiramente da configuração de cada máquina — e é por isso que a auditoria encontrou o working tree inteiro aparecendo como modificado sem nenhuma mudança real de conteúdo.
+Todo arquivo de texto usa **LF**. O `.gitattributes` da raiz (`* text=auto eol=lf`, com exceções binárias para `png`, `jpg`, `pdf`, `woff`, `woff2` e `ico`) garante isso. Configure seu editor para LF também.
 
 ---
 

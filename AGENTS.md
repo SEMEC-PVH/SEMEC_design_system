@@ -10,13 +10,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # SEMEC Design System — instruções para agentes
 
-Kit `@semec/base` (React + Tailwind v4 + shadcn + Radix + CVA). Conteúdo PT-BR, código EN (ADR-016), tema `data-theme="dark"` (ADR-012).
+Kit `@semec/ds-react` (`packages/react/`, React + Tailwind v4 + shadcn + Radix + CVA). Conteúdo PT-BR, código EN (ADR-016), tema `data-theme="dark"` (ADR-012).
 
-**Fontes IA:** `public/llms.txt` (índice), `public/llms-full.txt` (dump 115KB), `public/components/<slug>.md` (1 md por componente, 31), `public/manifest.json` (JSON), `lib/base-manifest.js` (fonte única usage+prompt).
+**Fontes IA:** `public/llms.txt` (índice), `public/llms-full.txt` (dump 119KB), `public/components/<slug>.md` (1 md por componente, 32), `public/manifest.json` (JSON), `packages/react/manifest.js` (fonte única usage+prompt).
 
-**Gerar:** `node scripts/generate-llms.mjs` ou `npm run generate:llms` (roda no `prebuild` antes de `next build`). Proto CSS: `npm run proto:css` → `public/proto/proto.css` (`app/proto/proto.css` com `@source` para `base/components` + `components/demos` + `components/docs`).
+**Gerar:** `node scripts/generate-llms.mjs` ou `npm run generate:llms` (roda no `prebuild` antes de `next build`). Proto CSS: `npm run proto:css` → `public/proto/proto.css` (`app/proto/proto.css` com `@source` para `packages/react/src/components` + `components/demos` + `components/docs`).
 
-**Copiar kit:** copie `base/` (tokens.css + shadcn.css + pv-preset.ts + components + lib/utils.ts + index.ts), importe em `globals.css` (`@import "tailwindcss"; @import "./base/tokens.css"; @import "./base/shadcn.css";`), use `import { Button } from "./base"`.
+**Usar o kit:** importe `@semec/ds-react` (workspace) ou copie `packages/react/` (tokens.css + shadcn.css + pv-preset.ts + src/components + src/lib), importe em `globals.css` (`@import "tailwindcss"; @import "./base/tokens.css"; @import "./base/shadcn.css";`), use `import { Button } from "@semec/ds-react"`.
 
 **Snippets:** `components/docs/CodeBlock.jsx` (Copiar código/prompt) + `components/docs/MdxPre.jsx` (rehype-pretty-code shiki) copiáveis.
 

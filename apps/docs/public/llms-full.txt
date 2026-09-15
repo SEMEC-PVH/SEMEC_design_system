@@ -1,0 +1,3735 @@
+# SEMEC Design System — Dump completo para IA
+
+> Gerado 2026-09-15T18:16:07.336Z — packages/react/manifest.js + packages/react/*
+
+## Instalação — packages/react/README.md
+
+```md
+# Base de estilos genéricos SEMEC
+
+Ponto de partida para sites novos em **React + Tailwind CSS v4 + shadcn**, com a
+paleta `pv-*` já em produção no portal SEMEC Digital.
+
+Camada L0 (primitivos) + L1 (semânticos) + componentes base (L2 genéricos), no
+formato shadcn (Radix + CVA + clsx + tailwind-merge).
+
+> Este diretório não faz parte do build do site de documentação. É copiado para
+> dentro do site novo; a evolução e a distribuição futuras do design system
+> seguem o ADR-007 (registry npm `@semec`).
+
+## O que tem aqui
+
+| Arquivo | Papel |
+|---|---|
+| `tokens.css` | Primitivos `pv-*` + semânticos (`--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`, feedback…) + `@theme inline` + `@layer base`, claro/escuro (`[data-theme="dark"]`) |
+| `shadcn.css` | Variáveis no formato shadcn (`--background`, `--primary`, `--ring`…) mapeadas para a paleta, em HSL |
+| `pv-preset.ts` | Preset Tailwind v4 para projetos que usam config JS (`@config`) |
+| `src/lib/utils.ts` | `cn()` (clsx + tailwind-merge) |
+| `src/components/` | Accordion, Alert, AlertDialog, Badge, Breadcrumb, Button, Card, Checkbox, Combobox, DatePicker, Dialog, EmptyState, ErrorSummary, FileUpload, FormField, IconButton, Input, Label, Link, Pagination, Popover, RadioGroup, Select, Separator, Skeleton, Switch, Table, Tabs, Textarea, Toast, Tooltip |
+| `src/index.ts` | Barrel de export |
+| `package.json` | Dependências necessárias (peer: React 19) |
+
+## Como usar num site novo
+
+1. **Copie a pasta** `packages/react/` para o projeto (ex.: `src/base/`). Mantenha os
+   imports relativos dentro dela — não depende de alias.
+
+2. **Instale as dependências** (do `package.json`):
+   ```bash
+   npm i class-variance-authority clsx tailwind-merge lucide-react \
+     @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
+     @radix-ui/react-radio-group @radix-ui/react-select @radix-ui/react-switch \
+     @radix-ui/react-popover @radix-ui/react-tabs @radix-ui/react-dialog \
+     @radix-ui/react-toast @radix-ui/react-tooltip @radix-ui/react-accordion
+   npm i -D tailwindcss @tailwindcss/vite
+   ```
+
+3. **Carregue Poppins** (400–700) pelo `next/font`/Google Fonts do seu app. A
+   base declara `--font-family-sans: "Poppins", …`; redefina essa variável se o
+   app nomear a fonte de outro jeito.
+
+4. **Importe os CSS no `globals.css`** (caminho CSS-first, recomendado):
+   ```css
+   @import "tailwindcss";
+   @import "./base/tokens.css";
+   @import "./base/shadcn.css";
+   ```
+
+   Ou, se preferir preset JS:
+   ```css
+   @import "tailwindcss";
+   @config "./base/pv-preset.ts";
+   @import "./base/tokens.css";
+   @import "./base/shadcn.css";
+   ```
+
+5. **Use os componentes**:
+   ```tsx
+   import { Button, Input, Card, Badge } from "./base";
+   ```
+   Ou importe arquivos individuais (`./base/components/button`).
+
+## Tema escuro
+
+Ative com `data-theme="dark"` em um ancestral (ex.: no `<html>`), mesma
+convenção do design system (ADR-012). Exemplo:
+
+```html
+<html lang="pt-BR" data-theme="dark">
+```
+
+## Convenções
+
+- **Semântica antes de aparência:** `variant="destructive"`, nunca
+  `color="vermelho"`.
+- **Escapatória:** todo componente aceita `className` e repassa props ao
+  elemento raiz.
+- **Ícones:** `lucide-react` (padrão do portal).
+- **Acessibilidade:** foco visível via `--focus-ring`, alvo de toque mínimo
+  44px no tamanho `md` de controles, `aria-[invalid]` nos campos de formulário.
+- **Link:** componente é `<a>` estilizado (framework-agnóstico). Em Next,
+  envolva com `asChild` + `next/link` ou use o seu Link e aplique a classe.
+- **Toast:** requer `<ToastProvider>` no app + `<ToastViewport />`; dispare com
+  `useToast().toast(...)` (Radix Toast, sem Sonner).
+- **DatePicker:** usa o `<input type="date">` nativo (valor ISO `YYYY-MM-DD`),
+  sem biblioteca de calendário. Para período, use dois campos.
+```
+
+## packages/react/src/index.ts — barrel
+
+```ts
+export * from "./components/accordion";
+export * from "./components/alert";
+export * from "./components/alert-dialog";
+export * from "./components/badge";
+export * from "./components/breadcrumb";
+export * from "./components/button";
+export * from "./components/card";
+export * from "./components/checkbox";
+export * from "./components/combobox";
+export * from "./components/date-picker";
+export * from "./components/dialog";
+export * from "./components/error-summary";
+export * from "./components/empty-state";
+export * from "./components/file-upload";
+export * from "./components/form-field";
+export * from "./components/icon-button";
+export * from "./components/input";
+export * from "./components/label";
+export * from "./components/link";
+export * from "./components/pagination";
+export * from "./components/popover";
+export * from "./components/radio-group";
+export * from "./components/select";
+export * from "./components/separator";
+export * from "./components/sidebar-trigger";
+export * from "./components/skeleton";
+export * from "./components/switch";
+export * from "./components/table";
+export * from "./components/tabs";
+export * from "./components/textarea";
+export * from "./components/toast";
+export * from "./components/tooltip";
+export * from "./lib/masks";
+export * from "./lib/validators";
+```
+
+## packages/react/tokens.css
+
+```css
+/* =========================================================================
+   Design System SEMEC — Base de estilos genéricos (camada L0/L1)
+   =========================================================================
+
+   Copie este arquivo para dentro do `globals.css` (ou `index.css`) do site
+   novo, junto com `shadcn.css`. Duas camadas:
+
+   L0 — PRIMITIVOS (`--pv-*`)
+        Valores brutos. Invariantes de tema. Nunca use primitivo direto
+        em componente.
+
+   L1 — SEMÂNTICOS (`--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`,
+        `--feedback-*`, `--space-*`, `--text-*`, `--radius-*`, `--elevation-*`)
+        Camada do dia a dia. Diz o papel, não a cor.
+
+   Tema escuro troca apenas L1 (`[data-theme="dark"]`, ver ADR-012).
+   Subconjunto mínimo: só o que os componentes de `base/components/` usam.
+   ========================================================================= */
+
+:root {
+  /* =======================================================================
+     L0 — PRIMITIVOS
+     ======================================================================= */
+
+  /* ---- Azul — escala primária ------------------------------------------ */
+  --pv-blue-50:  #eef4fa;
+  --pv-blue-100: #dbe6f1;
+  --pv-blue-600: #3a6ca6;
+  --pv-blue-700: #2f5a8a;
+  --pv-blue-800: #26476f;
+  --pv-blue-900: #1e3a5f;
+  --pv-blue-950: #0f2238;
+
+  /* Quarto azul em circulação. Usado no anel de foco (contraste 9,38:1). */
+  --pv-blue-hero: #223f99;
+
+  /* ---- Verde — apoio ------------------------------------------------ */
+  --pv-green-50:  #eef7e6;
+  --pv-green-500: #86c95b;
+  --pv-green-800: #3a6420;
+
+  /* ---- Amarelo — destaque ------------------------------------------- */
+  --pv-yellow-400: #f6d56e;
+  --pv-yellow-500: #f2c94c;
+  --pv-yellow-800: #8a5a00;
+
+  /* ---- Vermelho — estado de erro (provisório, QA-07) ----------------- */
+  --pv-red-50:  #fef2f2;
+  --pv-red-400: #f87171;
+  --pv-red-500: #ef4444;
+  --pv-red-600: #dc2626;
+  --pv-red-700: #b91c1c;
+  --pv-red-800: #991b1b;
+
+  /* ---- Neutros -------------------------------------------------------- */
+  --pv-gray-50:  #f4f6f9;  /* fundo de página do portal */
+  --pv-gray-100: #f5f5f5;
+  --pv-gray-200: #e5e7eb;
+  --pv-gray-400: #78849a;  /* borda de campo — 3,77:1 (WCAG 1.4.11) */
+  --pv-gray-600: #4b5563;  /* texto secundário — 6,98:1 */
+  --pv-gray-700: #374151;
+  --pv-gray-900: #14233a;  /* texto principal do portal */
+
+  --pv-white: #ffffff;
+  --pv-black: #000000;
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Cor (tema claro)
+     ======================================================================= */
+
+  --bg:                var(--pv-gray-50);
+  --fg:                var(--pv-gray-900);
+  --surface:           var(--pv-white);
+  --surface-alt:       var(--pv-gray-100);
+  --border:            var(--pv-gray-200);
+  --border-strong:     var(--pv-gray-400);
+  --focus-ring:        var(--pv-blue-hero);
+  --text-muted:        var(--pv-gray-600);
+  --text-secondary:    var(--pv-gray-700);
+  --text-strong:       var(--pv-gray-900);
+  --text-on-brand:     var(--pv-white);
+  --tint:              var(--pv-blue-50);
+
+  /* ---- Ação ---------------------------------------------------------- */
+  --action-primary:        var(--pv-blue-600);
+  --action-primary-hover:  var(--pv-blue-700);
+  --action-primary-active: var(--pv-blue-800);
+
+  /* ---- Retorno ao usuário -------------------------------------------- */
+  --feedback-success: var(--pv-green-800);
+  --feedback-warning: var(--pv-yellow-800);
+  --feedback-danger:  var(--pv-red-700);
+  --feedback-info:    var(--pv-blue-600);
+
+  --feedback-success-surface: var(--pv-green-50);
+  --feedback-warning-surface: #fdf6e3;
+  --feedback-danger-surface:  var(--pv-red-50);
+  --feedback-info-surface:    var(--pv-blue-50);
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Tipografia
+     ======================================================================= */
+  --font-family-sans: "Poppins", system-ui, -apple-system, sans-serif;
+
+  --text-xs:   0.75rem;  /* 12px */
+  --text-sm:   0.875rem; /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg:   1.125rem; /* 18px */
+  --text-xl:   1.25rem;  /* 20px */
+  --text-2xl:  1.5rem;   /* 24px */
+
+  --leading-xs:   1.4;
+  --leading-sm:   1.5;
+  --leading-base: 1.5;
+  --leading-lg:   1.4;
+  --leading-xl:   1.3;
+  --leading-2xl:  1.25;
+
+  --font-regular:  400;
+  --font-medium:   500;
+  --font-semibold: 600;
+  --font-bold:     700;
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Espaçamento
+     ======================================================================= */
+  --space-0:  0;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Forma
+     ======================================================================= */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   16px;
+  --radius-full: 9999px;
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Elevação
+     ======================================================================= */
+  --elevation-0: none;
+  --elevation-1: 0 1px 2px rgba(20, 35, 58, .08);
+  --elevation-2: 0 4px 12px rgba(20, 35, 58, .10);
+  --elevation-3: 0 12px 32px rgba(20, 35, 58, .14);
+
+  /* =======================================================================
+     L1 — SEMÂNTICOS · Movimento
+     ======================================================================= */
+  --duration-fast:  150ms;
+  --duration-base:  250ms;
+  --duration-slow:  400ms;
+  --easing-standard: cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: light;
+}
+
+/* ==========================================================================
+   Tema escuro — troca apenas a camada semântica
+   ========================================================================== */
+[data-theme="dark"] {
+  --bg:            #111111;
+  --fg:            #e2e8f0;
+  --surface:       #1a1a1a;
+  --surface-alt:   #222222;
+  --border:        #2a2a2a;
+  --border-strong: #3f4756;
+  --focus-ring:    #7ab3ff;
+  --text-muted:    #9ca3af;
+  --text-secondary:#cbd5e1;
+  --text-strong:   #f1f5f9;
+  --text-on-brand: var(--pv-white);
+  --tint:          #242424;
+
+  /* Sobre fundo escuro é o valor claro da escala que enxerga */
+  --action-primary:        var(--pv-blue-400);
+  --action-primary-hover:  var(--pv-blue-300);
+  --action-primary-active: var(--pv-blue-200);
+
+  --feedback-success: var(--pv-green-500);
+  --feedback-warning: var(--pv-yellow-400);
+  --feedback-danger:  var(--pv-red-400);
+  --feedback-info:    var(--pv-blue-400);
+
+  --feedback-success-surface: #16261a;
+  --feedback-warning-surface: #2a2113;
+  --feedback-danger-surface:  #2a1414;
+  --feedback-info-surface:    #14203a;
+
+  --elevation-1: 0 1px 2px rgba(0, 0, 0, .40);
+  --elevation-2: 0 4px 12px rgba(0, 0, 0, .48);
+  --elevation-3: 0 12px 32px rgba(0, 0, 0, .56);
+
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   Tailwind CSS v4 — caminho CSS-first
+   --------------------------------------------------------------------------
+   `@theme inline` expõe os tokens como utilitários (`bg-pv-blue-600`,
+   `text-foreground`, `ring-ring`…) sem redefinir os valores: as utilities
+   lêem as custom properties acima em runtime (por isso `inline`).
+   ========================================================================== */
+@theme inline {
+  --color-pv-blue-50:  var(--pv-blue-50);
+  --color-pv-blue-100: var(--pv-blue-100);
+  --color-pv-blue-600: var(--pv-blue-600);
+  --color-pv-blue-700: var(--pv-blue-700);
+  --color-pv-blue-800: var(--pv-blue-800);
+  --color-pv-blue-900: var(--pv-blue-900);
+  --color-pv-blue-950: var(--pv-blue-950);
+  --color-pv-blue-hero: var(--pv-blue-hero);
+
+  --color-pv-green-50:  var(--pv-green-50);
+  --color-pv-green-500: var(--pv-green-500);
+  --color-pv-green-800: var(--pv-green-800);
+
+  --color-pv-yellow-400: var(--pv-yellow-400);
+  --color-pv-yellow-500: var(--pv-yellow-500);
+  --color-pv-yellow-800: var(--pv-yellow-800);
+
+  --color-pv-red-50:  var(--pv-red-50);
+  --color-pv-red-400: var(--pv-red-400);
+  --color-pv-red-500: var(--pv-red-500);
+  --color-pv-red-600: var(--pv-red-600);
+  --color-pv-red-700: var(--pv-red-700);
+  --color-pv-red-800: var(--pv-red-800);
+
+  --color-pv-gray-50:  var(--pv-gray-50);
+  --color-pv-gray-100: var(--pv-gray-100);
+  --color-pv-gray-200: var(--pv-gray-200);
+  --color-pv-gray-400: var(--pv-gray-400);
+  --color-pv-gray-600: var(--pv-gray-600);
+  --color-pv-gray-700: var(--pv-gray-700);
+  --color-pv-gray-900: var(--pv-gray-900);
+
+  --color-pv-white: var(--pv-white);
+  --color-pv-black: var(--pv-black);
+
+  --color-background:  var(--bg);
+  --color-foreground:  var(--fg);
+  --color-surface:     var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-border:      var(--border);
+  --color-input:       var(--border-strong);
+  --color-ring:        var(--focus-ring);
+  --color-muted:       var(--surface-alt);
+  --color-muted-foreground: var(--text-muted);
+  --color-primary:     var(--action-primary);
+  --color-primary-foreground: var(--text-on-brand);
+  --color-destructive: var(--feedback-danger);
+
+  --font-sans: var(--font-family-sans);
+
+  --radius-sm:   var(--radius-sm);
+  --radius-md:   var(--radius-md);
+  --radius-lg:   var(--radius-lg);
+  --radius-full: var(--radius-full);
+}
+
+/* ==========================================================================
+   Tailwind v4 — camada base (reset mínimo + tipografia)
+   ========================================================================== */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--font-family-sans);
+    font-size: var(--text-base);
+    line-height: var(--leading-base);
+    background: var(--bg);
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+}
+```
+
+## packages/react/shadcn.css
+
+```css
+/* =========================================================================
+   Design System SEMEC — variáveis no formato shadcn (claro/escuro)
+   =========================================================================
+
+   Valores mapeados para a paleta `pv-*` (ver `tokens.css`), em HSL para
+   os modifiers de opacidade (`bg-primary/80`) funcionarem.
+
+   O tema escuro segue a convenção do design system: `[data-theme="dark"]`
+   (ADR-012), não a classe `.dark` do shadcn.
+   ========================================================================= */
+
+:root {
+  --background: 216 29% 97%;
+  --foreground: 216 49% 15%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 216 49% 15%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 216 49% 15%;
+
+  --primary: 212 48% 44%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 210 55% 96%;
+  --secondary-foreground: 213 49% 29%;
+
+  --muted: 0 0% 96%;
+  --muted-foreground: 215 14% 34%;
+
+  --accent: 210 55% 96%;
+  --accent-foreground: 216 49% 15%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 220 13% 91%;
+  --input: 220 13% 91%;
+  --ring: 225 64% 37%;
+
+  --radius: 0.5rem;
+}
+
+[data-theme="dark"] {
+  --background: 0 0% 7%;
+  --foreground: 214 32% 91%;
+
+  --card: 0 0% 10%;
+  --card-foreground: 214 32% 91%;
+
+  --popover: 0 0% 10%;
+  --popover-foreground: 214 32% 91%;
+
+  --primary: 212 39% 62%;
+  --primary-foreground: 212 58% 14%;
+
+  --secondary: 0 0% 13%;
+  --secondary-foreground: 213 27% 84%;
+
+  --muted: 0 0% 13%;
+  --muted-foreground: 218 11% 65%;
+
+  --accent: 0 0% 13%;
+  --accent-foreground: 214 32% 91%;
+
+  --destructive: 0 91% 71%;
+  --destructive-foreground: 0 75% 15%;
+
+  --border: 0 0% 16%;
+  --input: 219 15% 29%;
+  --ring: 214 100% 74%;
+}
+```
+
+## packages/react/pv-preset.ts
+
+```ts
+/**
+ * Preset Tailwind CSS v4 da SEMEC (caminho JS via `@config`).
+ *
+ * Mapeia os tokens de `tokens.css` para utilitários. O caminho CSS-first
+ * (`@theme inline`, dentro do próprio `tokens.css`) é o recomendado — este
+ * preset existe para projetos que preferem config JS.
+ *
+ * Uso no `globals.css` do site novo:
+ *   @import "tailwindcss";
+ *   @config "../pv-preset.ts";
+ *   @import "./tokens.css";
+ *   @import "./shadcn.css";
+ */
+import type { Config } from "tailwindcss";
+
+export default {
+  theme: {
+    extend: {
+      colors: {
+        background: "var(--bg)",
+        foreground: "var(--fg)",
+        surface: "var(--surface)",
+        "surface-alt": "var(--surface-alt)",
+        border: "var(--border)",
+        input: "var(--border-strong)",
+        ring: "var(--focus-ring)",
+        muted: "var(--surface-alt)",
+        "muted-foreground": "var(--text-muted)",
+        primary: {
+          DEFAULT: "var(--action-primary)",
+          hover: "var(--action-primary-hover)",
+          active: "var(--action-primary-active)",
+          foreground: "var(--text-on-brand)",
+        },
+        destructive: {
+          DEFAULT: "var(--feedback-danger)",
+          foreground: "var(--text-on-brand)",
+          surface: "var(--feedback-danger-surface)",
+        },
+        success: {
+          DEFAULT: "var(--feedback-success)",
+          surface: "var(--feedback-success-surface)",
+        },
+        warning: {
+          DEFAULT: "var(--feedback-warning)",
+          surface: "var(--feedback-warning-surface)",
+        },
+        info: {
+          DEFAULT: "var(--feedback-info)",
+          surface: "var(--feedback-info-surface)",
+        },
+        tint: "var(--tint)",
+        "pv-blue": {
+          50: "var(--pv-blue-50)",
+          100: "var(--pv-blue-100)",
+          600: "var(--pv-blue-600)",
+          700: "var(--pv-blue-700)",
+          800: "var(--pv-blue-800)",
+          900: "var(--pv-blue-900)",
+          950: "var(--pv-blue-950)",
+          hero: "var(--pv-blue-hero)",
+        },
+        "pv-green": {
+          50: "var(--pv-green-50)",
+          500: "var(--pv-green-500)",
+          800: "var(--pv-green-800)",
+        },
+        "pv-yellow": {
+          400: "var(--pv-yellow-400)",
+          500: "var(--pv-yellow-500)",
+          800: "var(--pv-yellow-800)",
+        },
+        "pv-red": {
+          50: "var(--pv-red-50)",
+          400: "var(--pv-red-400)",
+          500: "var(--pv-red-500)",
+          600: "var(--pv-red-600)",
+          700: "var(--pv-red-700)",
+          800: "var(--pv-red-800)",
+        },
+        "pv-gray": {
+          50: "var(--pv-gray-50)",
+          100: "var(--pv-gray-100)",
+          200: "var(--pv-gray-200)",
+          400: "var(--pv-gray-400)",
+          600: "var(--pv-gray-600)",
+          700: "var(--pv-gray-700)",
+          900: "var(--pv-gray-900)",
+        },
+        "pv-white": "var(--pv-white)",
+        "pv-black": "var(--pv-black)",
+      },
+      fontFamily: {
+        sans: ["var(--font-family-sans)", "system-ui", "sans-serif"],
+      },
+      borderRadius: {
+        sm: "var(--radius-sm)",
+        md: "var(--radius-md)",
+        lg: "var(--radius-lg)",
+        full: "var(--radius-full)",
+      },
+      boxShadow: {
+        "elevation-1": "var(--elevation-1)",
+        "elevation-2": "var(--elevation-2)",
+        "elevation-3": "var(--elevation-3)",
+      },
+      spacing: {
+        0: "var(--space-0)",
+        1: "var(--space-1)",
+        2: "var(--space-2)",
+        3: "var(--space-3)",
+        4: "var(--space-4)",
+        6: "var(--space-6)",
+        8: "var(--space-8)",
+        12: "var(--space-12)",
+        16: "var(--space-16)",
+      },
+      transitionDuration: {
+        fast: "var(--duration-fast)",
+        base: "var(--duration-base)",
+        slow: "var(--duration-slow)",
+      },
+      transitionTimingFunction: {
+        standard: "var(--easing-standard)",
+      },
+    },
+  },
+} satisfies Config;
+```
+
+## Manifest — categorias
+
+```json
+[
+  {
+    "key": "acoes",
+    "slug": "acoes-e-links",
+    "label": "Ações e links",
+    "desc": "Gatilhos de ação e vínculos de navegação."
+  },
+  {
+    "key": "formularios",
+    "slug": "formularios",
+    "label": "Formulários",
+    "desc": "Campos, controles de escolha e ativação imediata."
+  },
+  {
+    "key": "conteudo-dados",
+    "slug": "conteudo-e-dados",
+    "label": "Conteúdo e dados",
+    "desc": "Superfícies de conteúdo, sinalização e dados tabulares."
+  },
+  {
+    "key": "navegacao",
+    "slug": "navegacao",
+    "label": "Navegação",
+    "desc": "Trilhas, abas e deslocamento entre páginas."
+  },
+  {
+    "key": "feedback",
+    "slug": "feedback-e-estados",
+    "label": "Feedback e estados",
+    "desc": "Mensagens de estado, carregamento e camadas sobre a página."
+  }
+]
+```
+
+## Componentes — todos (32)
+
+
+### Botões (`button`) — `src/components/button.tsx` — slug: botoes
+
+Desc: Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.
+
+Variantes: variant: primary · secondary · outline · ghost · destructive · link · size: sm · md · lg · icon
+
+Uso:
+```tsx
+import { Button } from "@semec/ds-react";
+
+<Button variant="primary" size="md">Salvar</Button>
+<Button variant="outline">Cancelar</Button>
+<Button asChild><Link href="/ok">Como link</Link></Button>
+```
+
+Prompt:
+```text
+Crie um button (Botões) usando @semec/ds-react (`src/components/button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link · size: sm · md · lg · icon. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { cn } from "../lib/utils";
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  {
+    variants: {
+      variant: {
+        primary:
+          "bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        outline:
+          "border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground",
+        ghost: "text-foreground hover:bg-accent hover:text-accent-foreground",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        sm: "h-9 rounded-md px-3 text-sm",
+        md: "h-11 rounded-md px-4 text-sm",
+        lg: "h-12 rounded-md px-6 text-base",
+        icon: "h-11 w-11 rounded-md",
+      },
+    },
+    defaultVariants: {
+      variant: "primary",
+      size: "md",
+    },
+  }
+);
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
+);
+Button.displayName = "Button";
+
+export { Button, buttonVariants };
+```
+
+---
+
+### Botão de ícone (`icon-button`) — `src/components/icon-button.tsx` — slug: botao-de-icone
+
+Desc: Botão quadrado só com ícone. Exige `aria-label`.
+
+Variantes: variant: primary · secondary · outline · ghost · destructive · link
+
+Uso:
+```tsx
+import { IconButton } from "@semec/ds-react";
+import { Plus } from "lucide-react";
+
+<IconButton aria-label="Adicionar"><Plus /></IconButton>
+```
+
+Prompt:
+```text
+Crie um icon-button (Botão de ícone) usando @semec/ds-react (`src/components/icon-button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link. Botão quadrado só com ícone. Exige `aria-label`.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { Button } from "./button";
+
+const iconButtonVariants = cva("", {
+  variants: {
+    variant: {
+      primary: "",
+      secondary: "",
+      outline: "",
+      ghost: "",
+      destructive: "",
+      link: "",
+    },
+  },
+  defaultVariants: { variant: "outline" },
+});
+
+export interface IconButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof iconButtonVariants> {
+  label: string;
+}
+
+/**
+ * Botão representado apenas por ícone. O rótulo acessível é obrigatório
+ * (`label`) — sem ele, leitores de tela anunciam um botão vazio.
+ */
+const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
+  ({ className, label, variant = "outline", type = "button", ...props }, ref) => (
+    <Button
+      ref={ref}
+      type={type}
+      size="icon"
+      variant={variant}
+      aria-label={label}
+      title={label}
+      className={className}
+      {...props}
+    />
+  )
+);
+IconButton.displayName = "IconButton";
+
+export { IconButton };
+```
+
+---
+
+### Link (`link`) — `src/components/link.tsx` — slug: link
+
+Desc: Link tipográfico com variantes de cor.
+
+Variantes: variant: primary · muted
+
+Uso:
+```tsx
+import { Link } from "@semec/ds-react";
+
+<Link href="/pagina">Ir para a página</Link>
+<Link href="/ajuda" variant="muted">Texto de ajuda</Link>
+```
+
+Prompt:
+```text
+Crie um link (Link) usando @semec/ds-react (`src/components/link.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · muted. Link tipográfico com variantes de cor.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { cn } from "../lib/utils";
+
+const linkVariants = cva(
+  "inline-flex items-center gap-1 text-sm font-medium transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+  {
+    variants: {
+      variant: {
+        primary: "text-primary underline-offset-4 hover:underline",
+        onSurface: "text-foreground underline-offset-4 hover:underline",
+        muted: "text-muted-foreground underline-offset-4 hover:text-foreground hover:underline",
+      },
+    },
+    defaultVariants: {
+      variant: "primary",
+    },
+  }
+);
+
+export interface LinkProps
+  extends React.AnchorHTMLAttributes<HTMLAnchorElement>,
+    VariantProps<typeof linkVariants> {}
+
+const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
+  ({ className, variant, ...props }, ref) => (
+    <a
+      ref={ref}
+      className={cn(linkVariants({ variant, className }))}
+      {...props}
+    />
+  )
+);
+Link.displayName = "Link";
+
+export { Link, linkVariants };
+```
+
+---
+
+### Caixa de texto (`input`) — `src/components/input.tsx` — slug: caixa-de-texto
+
+Desc: Campo de texto. Estado de erro via `aria-invalid`.
+
+Variantes: estados: padrão · inválido (aria-invalid) · disabled
+
+Uso:
+```tsx
+import { Input } from "@semec/ds-react";
+
+<Input placeholder="Nome completo" />
+<Input aria-invalid="true" />
+```
+
+Prompt:
+```text
+Crie um input (Caixa de texto) usando @semec/ds-react (`src/components/input.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido (aria-invalid) · disabled. Campo de texto. Estado de erro via `aria-invalid`.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+
+import { cn } from "../lib/utils";
+
+const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
+  ({ className, type, ...props }, ref) => (
+    <input
+      type={type}
+      className={cn(
+        "flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/30",
+        className
+      )}
+      ref={ref}
+      {...props}
+    />
+  )
+);
+Input.displayName = "Input";
+
+export { Input };
+```
+
+---
+
+### Área de texto (`textarea`) — `src/components/textarea.tsx` — slug: area-de-texto
+
+Desc: Campo multilinha com as mesmas variantes visuais do campo de texto.
+
+Variantes: estados: padrão · inválido · disabled
+
+Uso:
+```tsx
+import { Textarea } from "@semec/ds-react";
+
+<Textarea rows={4} placeholder="Descreva a demanda" />
+```
+
+Prompt:
+```text
+Crie um textarea (Área de texto) usando @semec/ds-react (`src/components/textarea.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido · disabled. Campo multilinha com as mesmas variantes visuais do campo de texto.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+
+import { cn } from "../lib/utils";
+
+const Textarea = React.forwardRef<
+  HTMLTextAreaElement,
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>
+>(({ className, ...props }, ref) => (
+  <textarea
+    className={cn(
+      "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/30",
+      className
+    )}
+    ref={ref}
+    {...props}
+  />
+));
+Textarea.displayName = "Textarea";
+
+export { Textarea };
+```
+
+---
+
+### Menu de seleção (`select`) — `src/components/select.tsx` — slug: menu-de-selecao
+
+Desc: Seleção fechada com gatilho, conteúdo e itens compostos.
+
+Variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem
+
+Uso:
+```tsx
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@semec/ds-react";
+
+<Select defaultValue="pbh">
+  <SelectTrigger aria-label="Município"><SelectValue placeholder="Município" /></SelectTrigger>
+  <SelectContent>
+    <SelectItem value="pbh">Porto Velho</SelectItem>
+    <SelectItem value="riob">Rio Branco</SelectItem>
+  </SelectContent>
+</Select>
+```
+
+Prompt:
+```text
+Crie um select (Menu de seleção) usando @semec/ds-react (`src/components/select.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem. Seleção fechada com gatilho, conteúdo e itens compostos.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as SelectPrimitive from "@radix-ui/react-select";
+import { Check, ChevronDown, ChevronUp } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+const Select = SelectPrimitive.Root;
+
+const SelectGroup = SelectPrimitive.Group;
+
+const SelectValue = SelectPrimitive.Value;
+
+const SelectTrigger = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
+>(({ className, children, ...props }, ref) => (
+  <SelectPrimitive.Trigger
+    ref={ref}
+    className={cn(
+      "flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left",
+      className
+    )}
+    {...props}
+  >
+    {children}
+    <SelectPrimitive.Icon asChild>
+      <ChevronDown className="h-4 w-4 opacity-50" />
+    </SelectPrimitive.Icon>
+  </SelectPrimitive.Trigger>
+));
+SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
+
+const SelectScrollUpButton = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
+>(({ className, ...props }, ref) => (
+  <SelectPrimitive.ScrollUpButton
+    ref={ref}
+    className={cn("flex cursor-default items-center justify-center py-1", className)}
+    {...props}
+  >
+    <ChevronUp className="h-4 w-4" />
+  </SelectPrimitive.ScrollUpButton>
+));
+SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
+
+const SelectScrollDownButton = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
+>(({ className, ...props }, ref) => (
+  <SelectPrimitive.ScrollDownButton
+    ref={ref}
+    className={cn("flex cursor-default items-center justify-center py-1", className)}
+    {...props}
+  >
+    <ChevronDown className="h-4 w-4" />
+  </SelectPrimitive.ScrollDownButton>
+));
+SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayName;
+
+const SelectContent = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
+>(({ className, children, position = "popper", ...props }, ref) => (
+  <SelectPrimitive.Portal>
+    <SelectPrimitive.Content
+      ref={ref}
+      className={cn(
+        "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 data-[state=open]:animate-in data-[state=closed]:animate-out",
+        position === "popper" &&
+          "data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
+        className
+      )}
+      position={position}
+      {...props}
+    >
+      <SelectScrollUpButton />
+      <SelectPrimitive.Viewport
+        className={cn(
+          "p-1",
+          position === "popper" &&
+            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+        )}
+      >
+        {children}
+      </SelectPrimitive.Viewport>
+      <SelectScrollDownButton />
+    </SelectPrimitive.Content>
+  </SelectPrimitive.Portal>
+));
+SelectContent.displayName = SelectPrimitive.Content.displayName;
+
+const SelectLabel = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Label>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
+>(({ className, ...props }, ref) => (
+  <SelectPrimitive.Label
+    ref={ref}
+    className={cn("px-2 py-1.5 text-sm font-semibold", className)}
+    {...props}
+  />
+));
+SelectLabel.displayName = SelectPrimitive.Label.displayName;
+
+const SelectItem = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
+>(({ className, children, ...props }, ref) => (
+  <SelectPrimitive.Item
+    ref={ref}
+    className={cn(
+      "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      className
+    )}
+    {...props}
+  >
+    <span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
+      <SelectPrimitive.ItemIndicator>
+        <Check className="h-4 w-4" />
+      </SelectPrimitive.ItemIndicator>
+    </span>
+    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+  </SelectPrimitive.Item>
+));
+SelectItem.displayName = SelectPrimitive.Item.displayName;
+
+const SelectSeparator = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Separator>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>
+>(({ className, ...props }, ref) => (
+  <SelectPrimitive.Separator
+    ref={ref}
+    className={cn("-mx-1 my-1 h-px bg-muted", className)}
+    {...props}
+  />
+));
+SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
+
+export {
+  Select,
+  SelectGroup,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+  SelectLabel,
+  SelectItem,
+  SelectSeparator,
+  SelectScrollUpButton,
+  SelectScrollDownButton,
+};
+```
+
+---
+
+### Combobox (`combobox`) — `src/components/combobox.tsx` — slug: combobox
+
+Desc: Campo com busca e lista filtrada. Opções via `options`.
+
+Variantes: props: options · value · onChange · placeholder · emptyMessage · disabled
+
+Uso:
+```tsx
+import { Combobox } from "@semec/ds-react";
+
+<Combobox
+  options={[{ value: "cnpj", label: "CNPJ" }, { value: "cpf", label: "CPF" }]}
+  value={valor}
+  onChange={setValor}
+/>
+```
+
+Prompt:
+```text
+Crie um combobox (Combobox) usando @semec/ds-react (`src/components/combobox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: options · value · onChange · placeholder · emptyMessage · disabled. Campo com busca e lista filtrada. Opções via `options`.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as PopoverPrimitive from "@radix-ui/react-popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+export interface ComboboxOption {
+  value: string;
+  label: string;
+}
+
+interface ComboboxProps {
+  options: ComboboxOption[];
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  emptyMessage?: string;
+  disabled?: boolean;
+  ariaLabel?: string;
+  className?: string;
+}
+
+const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
+  (
+    {
+      options,
+      value,
+      onChange,
+      placeholder = "Selecione…",
+      emptyMessage = "Nenhum resultado.",
+      disabled,
+      ariaLabel = "Selecionar",
+      className,
+    },
+    ref
+  ) => {
+    const [open, setOpen] = React.useState(false);
+    const [query, setQuery] = React.useState("");
+
+    const selected = options.find((o) => o.value === value);
+    const filtered = React.useMemo(() => {
+      const q = query.trim().toLowerCase();
+      if (!q) return options;
+      return options.filter((o) => o.label.toLowerCase().includes(q));
+    }, [options, query]);
+
+    return (
+      <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
+        <PopoverPrimitive.Trigger asChild>
+          <button
+            ref={ref}
+            type="button"
+            disabled={disabled}
+            aria-label={ariaLabel}
+            aria-expanded={open}
+            className={cn(
+              "flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50",
+              className
+            )}
+          >
+            <span className={cn("truncate", !selected && "text-muted-foreground")}>
+              {selected ? selected.label : placeholder}
+            </span>
+            <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" aria-hidden="true" />
+          </button>
+        </PopoverPrimitive.Trigger>
+        <PopoverPrimitive.Portal>
+          <PopoverPrimitive.Content
+            align="start"
+            sideOffset={4}
+            className="z-50 w-[var(--radix-popover-trigger-width)] rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 outline-none data-[state=open]:animate-in"
+          >
+            <div className="border-b border-border p-2">
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Buscar…"
+                aria-label={`Buscar em ${ariaLabel}`}
+                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              />
+            </div>
+            <div className="max-h-64 overflow-y-auto p-1" role="listbox" aria-label={ariaLabel}>
+              {filtered.length > 0 ? (
+                filtered.map((option) => {
+                  const active = option.value === value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      role="option"
+                      aria-selected={active}
+                      onClick={() => {
+                        onChange?.(option.value);
+                        setOpen(false);
+                        setQuery("");
+                      }}
+                      className={cn(
+                        "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-sm text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        active && "bg-accent text-accent-foreground"
+                      )}
+                    >
+                      {option.label}
+                      {active ? (
+                        <Check className="h-4 w-4" aria-hidden="true" />
+                      ) : null}
+                    </button>
+                  );
+                })
+              ) : (
+                <p className="px-2 py-1.5 text-sm text-muted-foreground">
+                  {emptyMessage}
+                </p>
+              )}
+            </div>
+          </PopoverPrimitive.Content>
+        </PopoverPrimitive.Portal>
+      </PopoverPrimitive.Root>
+    );
+  }
+);
+Combobox.displayName = "Combobox";
+
+export { Combobox };
+```
+
+---
+
+### Seletor de data (`date-picker`) — `src/components/date-picker.tsx` — slug: seletor-de-data
+
+Desc: Data com `<input type="date">` nativo — sem biblioteca de calendário.
+
+Variantes: props: nativo HTML (min · max · disabled) + variantes visuais do campo
+
+Uso:
+```tsx
+import { DatePicker } from "@semec/ds-react";
+
+<DatePicker defaultValue="2026-08-31" />
+```
+
+Prompt:
+```text
+Crie um date-picker (Seletor de data) usando @semec/ds-react (`src/components/date-picker.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: nativo HTML (min · max · disabled) + variantes visuais do campo. Data com `<input type="date">` nativo — sem biblioteca de calendário.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import { Calendar as CalendarIcon } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+export interface DatePickerProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "onChange"> {
+  value?: string;
+  onChange?: (value: string) => void;
+}
+
+/**
+ * Campo de data. Usa o `<input type="date">` nativo (sem biblioteca de
+ * calendário), estilizado com os tokens do sistema. Valor ISO (`YYYY-MM-DD`).
+ */
+const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
+  ({ className, value, onChange, disabled, ...props }, ref) => (
+    <div className="relative">
+      <input
+        ref={ref}
+        type="date"
+        value={value}
+        disabled={disabled}
+        onChange={(e) => onChange?.(e.target.value)}
+        className={cn(
+          "flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm text-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive",
+          className
+        )}
+        {...props}
+      />
+      <CalendarIcon
+        className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+        aria-hidden="true"
+      />
+    </div>
+  )
+);
+DatePicker.displayName = "DatePicker";
+
+export { DatePicker };
+```
+
+---
+
+### Envio de arquivos (`file-upload`) — `src/components/file-upload.tsx` — slug: envio-de-arquivos
+
+Desc: Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.
+
+Variantes: props: accept · maxSize · label · hint · error · onChange
+
+Uso:
+```tsx
+import { FileUpload } from "@semec/ds-react";
+
+<FileUpload accept=".pdf,image/*" maxSize={5 * 1024 * 1024} hint="PDF ou imagem, até 5 MB" />
+```
+
+Prompt:
+```text
+Crie um file-upload (Envio de arquivos) usando @semec/ds-react (`src/components/file-upload.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: accept · maxSize · label · hint · error · onChange. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import { UploadCloud } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+export interface FileUploadProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
+  accept?: string;
+  maxSize?: number;
+  label?: string;
+  hint?: string;
+  error?: string;
+  onChange?: (files: File[]) => void;
+}
+
+const formatBytes = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
+  ({ className, accept, maxSize, label, hint, error, onChange, ...props }, ref) => {
+    const [files, setFiles] = React.useState<File[]>([]);
+    const [drag, setDrag] = React.useState(false);
+    const [localError, setLocalError] = React.useState<string | undefined>(undefined);
+    const inputRef = React.useRef<HTMLInputElement>(null);
+    const id = React.useId();
+
+    const acceptFiles = (list: FileList | null) => {
+      if (!list) return;
+      const next = Array.from(list);
+      if (maxSize) {
+        const oversized = next.filter((f) => f.size > maxSize);
+        if (oversized.length > 0) {
+          setLocalError(
+            `Arquivo excede o limite de ${formatBytes(maxSize)}.`
+          );
+          return;
+        }
+      }
+      setLocalError(undefined);
+      setFiles(next);
+      onChange?.(next);
+    };
+
+    return (
+      <div
+        ref={ref}
+        className={cn("grid gap-1.5", className)}
+        {...props}
+      >
+        {label ? (
+          <label htmlFor={id} className="text-sm font-medium text-foreground">
+            {label}
+          </label>
+        ) : null}
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDrag(true);
+          }}
+          onDragLeave={() => setDrag(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDrag(false);
+            acceptFiles(e.dataTransfer.files);
+          }}
+          onClick={() => inputRef.current?.click()}
+          className={cn(
+            "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background px-6 py-8 text-center transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:border-border-strong",
+            drag && "border-ring bg-tint",
+            (localError ?? error) && "border-destructive",
+            className
+          )}
+        >
+          <input
+            ref={inputRef}
+            id={id}
+            type="file"
+            accept={accept}
+            multiple
+            className="sr-only"
+            onChange={(e) => {
+              acceptFiles(e.target.files);
+              e.currentTarget.value = "";
+            }}
+          />
+          <UploadCloud className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
+          <p className="text-sm text-foreground">
+            Arraste um arquivo ou <span className="font-medium text-primary">clique para escolher</span>
+          </p>
+          {hint ? (
+            <p className="text-xs text-muted-foreground">{hint}</p>
+          ) : null}
+        </div>
+        {files.length > 0 ? (
+          <ul className="space-y-1">
+            {files.map((file) => (
+              <li
+                key={`${file.name}-${file.size}`}
+                className="flex items-center justify-between gap-2 rounded-md border border-border bg-surface-alt px-3 py-2 text-sm text-foreground"
+              >
+                <span className="truncate">{file.name}</span>
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  {formatBytes(file.size)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {localError ?? error ? (
+          <p role="alert" className="text-xs text-destructive">
+            {localError ?? error}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+);
+FileUpload.displayName = "FileUpload";
+
+export { FileUpload };
+```
+
+---
+
+### Caixa de marcação (`checkbox`) — `src/components/checkbox.tsx` — slug: caixa-de-marcacao
+
+Desc: Caixa de marcação com estado indeterminado.
+
+Variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled
+
+Uso:
+```tsx
+import { Checkbox, Label } from "@semec/ds-react";
+
+<div className="flex items-center gap-2">
+  <Checkbox id="termos" />
+  <Label htmlFor="termos">Aceito os termos</Label>
+</div>
+```
+
+Prompt:
+```text
+Crie um checkbox (Caixa de marcação) usando @semec/ds-react (`src/components/checkbox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled. Caixa de marcação com estado indeterminado.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { Check } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+const Checkbox = React.forwardRef<
+  React.ElementRef<typeof CheckboxPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
+>(({ className, ...props }, ref) => (
+  <CheckboxPrimitive.Root
+    ref={ref}
+    className={cn(
+      "peer h-5 w-5 shrink-0 rounded-sm border border-input shadow-sm transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground aria-[invalid=true]:border-destructive",
+      className
+    )}
+    {...props}
+  >
+    <CheckboxPrimitive.Indicator
+      className={cn("flex items-center justify-center text-current")}
+    >
+      <Check className="h-4 w-4" />
+    </CheckboxPrimitive.Indicator>
+  </CheckboxPrimitive.Root>
+));
+Checkbox.displayName = CheckboxPrimitive.Root.displayName;
+
+export { Checkbox };
+```
+
+---
+
+### Botão de opção (`radio-group`) — `src/components/radio-group.tsx` — slug: botao-de-opcao
+
+Desc: Escolha única entre duas ou mais opções.
+
+Variantes: composição: RadioGroup · RadioGroupItem + Label
+
+Uso:
+```tsx
+import { RadioGroup, RadioGroupItem, Label } from "@semec/ds-react";
+
+<RadioGroup defaultValue="pessoa-fisica">
+  <div className="flex items-center gap-2">
+    <RadioGroupItem value="pessoa-fisica" id="pf" />
+    <Label htmlFor="pf">Pessoa física</Label>
+  </div>
+</RadioGroup>
+```
+
+Prompt:
+```text
+Crie um radio-group (Botão de opção) usando @semec/ds-react (`src/components/radio-group.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: RadioGroup · RadioGroupItem + Label. Escolha única entre duas ou mais opções.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
+import { Circle } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+const RadioGroup = React.forwardRef<
+  React.ElementRef<typeof RadioGroupPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
+>(({ className, ...props }, ref) => {
+  return (
+    <RadioGroupPrimitive.Root
+      className={cn("grid gap-2", className)}
+      {...props}
+      ref={ref}
+    />
+  );
+});
+RadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
+
+const RadioGroupItem = React.forwardRef<
+  React.ElementRef<typeof RadioGroupPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
+>(({ className, ...props }, ref) => {
+  return (
+    <RadioGroupPrimitive.Item
+      ref={ref}
+      className={cn(
+        "aspect-square h-5 w-5 rounded-full border border-input text-primary shadow-sm transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive",
+        className
+      )}
+      {...props}
+    >
+      <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
+        <Circle className="h-3 w-3 fill-current" />
+      </RadioGroupPrimitive.Indicator>
+    </RadioGroupPrimitive.Item>
+  );
+});
+RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;
+
+export { RadioGroup, RadioGroupItem };
+```
+
+---
+
+### Interruptor (`switch`) — `src/components/switch.tsx` — slug: interruptor
+
+Desc: Interruptor on/off para ativação imediata.
+
+Variantes: estados: off · on (checked) · disabled · inválido
+
+Uso:
+```tsx
+import { Switch, Label } from "@semec/ds-react";
+
+<div className="flex items-center gap-2">
+  <Switch id="alertas" defaultChecked />
+  <Label htmlFor="alertas">Receber alertas</Label>
+</div>
+```
+
+Prompt:
+```text
+Crie um switch (Interruptor) usando @semec/ds-react (`src/components/switch.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: off · on (checked) · disabled · inválido. Interruptor on/off para ativação imediata.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as SwitchPrimitives from "@radix-ui/react-switch";
+
+import { cn } from "../lib/utils";
+
+const Switch = React.forwardRef<
+  React.ElementRef<typeof SwitchPrimitives.Root>,
+  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
+>(({ className, ...props }, ref) => (
+  <SwitchPrimitives.Root
+    className={cn(
+      "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input aria-[invalid=true]:border-destructive",
+      className
+    )}
+    {...props}
+    ref={ref}
+  >
+    <SwitchPrimitives.Thumb
+      className={cn(
+        "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
+      )}
+    />
+  </SwitchPrimitives.Root>
+));
+Switch.displayName = SwitchPrimitives.Root.displayName;
+
+export { Switch };
+```
+
+---
+
+### Rótulo (`label`) — `src/components/label.tsx` — slug: rotulo
+
+Desc: Rótulo acessível vinculado ao campo.
+
+Uso:
+```tsx
+import { Label, Input } from "@semec/ds-react";
+
+<Label htmlFor="nome">Nome</Label>
+<Input id="nome" />
+```
+
+Prompt:
+```text
+Crie um label (Rótulo) usando @semec/ds-react (`src/components/label.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Rótulo acessível vinculado ao campo.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as LabelPrimitive from "@radix-ui/react-label";
+
+import { cn } from "../lib/utils";
+
+const Label = React.forwardRef<
+  React.ElementRef<typeof LabelPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
+>(({ className, ...props }, ref) => (
+  <LabelPrimitive.Root
+    ref={ref}
+    className={cn(
+      "text-sm font-medium text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+      className
+    )}
+    {...props}
+  />
+));
+Label.displayName = LabelPrimitive.Root.displayName;
+
+export { Label };
+```
+
+---
+
+### Campo de formulário (`form-field`) — `src/components/form-field.tsx` — slug: campo-de-formulario
+
+Desc: Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.
+
+Variantes: props: label · htmlFor · required · hint · error
+
+Uso:
+```tsx
+import { FormField, Input } from "@semec/ds-react";
+
+<FormField label="E-mail" htmlFor="email" required hint="Usado para o comprovante" error="Informe um e-mail válido">
+  <Input id="email" aria-invalid />
+</FormField>
+```
+
+Prompt:
+```text
+Crie um form-field (Campo de formulário) usando @semec/ds-react (`src/components/form-field.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: label · htmlFor · required · hint · error. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+
+import { cn } from "../lib/utils";
+
+interface FormFieldProps extends React.HTMLAttributes<HTMLDivElement> {
+  label?: string;
+  htmlFor?: string;
+  required?: boolean;
+  error?: string;
+  hint?: string;
+  id?: string;
+}
+
+const FormField = React.forwardRef<HTMLDivElement, FormFieldProps>(
+  ({ className, label, htmlFor, required, error, hint, id, children, ...props }, ref) => {
+    const errorId = id ? `${id}-error` : undefined;
+    const hintId = id ? `${id}-hint` : undefined;
+    return (
+      <div ref={ref} className={cn("grid gap-1.5", className)} {...props}>
+        {label ? (
+          <label
+            htmlFor={htmlFor}
+            className="text-sm font-medium text-foreground"
+          >
+            {label}
+            {required ? <span className="text-destructive"> *</span> : null}
+          </label>
+        ) : null}
+        {children}
+        {hint && !error ? (
+          <p id={hintId} className="text-xs text-muted-foreground">
+            {hint}
+          </p>
+        ) : null}
+        {error ? (
+          <p id={errorId} role="alert" className="text-xs text-destructive">
+            {error}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+);
+FormField.displayName = "FormField";
+
+export { FormField };
+```
+
+---
+
+### ErrorSummary (`error-summary`) — `src/components/error-summary.tsx` — slug: error-summary
+
+Desc: Resumo de erros de validação no topo do formulário, com links para cada campo. A11y: `role="alert"`, foco automático.
+
+Variantes: props: title · errors [{ id, message }] · autoFocus · focusKey
+
+Uso:
+```tsx
+import { ErrorSummary } from "@semec/ds-react";
+
+<ErrorSummary
+  errors={[
+    { id: "cpf", message: "O CPF precisa ter 11 dígitos." },
+    { id: "email", message: "O e-mail precisa conter @." },
+  ]}
+  focusKey={tentativa}
+/>
+```
+
+Prompt:
+```text
+Crie um error-summary (ErrorSummary) usando @semec/ds-react (`src/components/error-summary.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: title · errors [{ id, message }] · autoFocus · focusKey. Resumo de erros de validação no topo do formulário, com links para cada campo. A11y: `role="alert"`, foco automático.
+```
+
+Fonte:
+```tsx
+"use client";
+
+import * as React from "react";
+import { useEffect, useRef } from "react";
+
+import { cn } from "../lib/utils";
+
+interface ErrorSummaryProps extends React.HTMLAttributes<HTMLDivElement> {
+  title?: string;
+  errors?: Array<{ id: string; message: string }>;
+  autoFocus?: boolean;
+  focusKey?: unknown;
+}
+
+const ErrorSummary = React.forwardRef<HTMLDivElement, ErrorSummaryProps>(
+  ({ title = "Há um problema", errors = [], autoFocus = true, focusKey, className, ...props }, ref) => {
+    const internalRef = useRef<HTMLDivElement>(null);
+    const resolvedRef = (ref as React.RefObject<HTMLDivElement>) || internalRef;
+
+    useEffect(() => {
+      if (autoFocus && errors.length > 0) {
+        resolvedRef.current?.focus();
+      }
+    }, [autoFocus, errors.length, focusKey, resolvedRef]);
+
+    if (errors.length === 0) return null;
+
+    function irParaCampo(event: React.MouseEvent<HTMLAnchorElement>, id: string) {
+      const alvo =
+        document.getElementById(id) ??
+        document.querySelector(`[name="${id}"]`);
+      if (!alvo) return;
+
+      event.preventDefault();
+
+      const focavel = alvo.matches("input, select, textarea, button")
+        ? alvo
+        : alvo.querySelector("input, select, textarea, button") ?? alvo;
+
+      (focavel as HTMLElement).focus({ preventScroll: true });
+
+      const menosMovimento = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      focavel.scrollIntoView({
+        block: "center",
+        behavior: menosMovimento ? "auto" : "smooth",
+      });
+    }
+
+    return (
+      <div
+        ref={resolvedRef}
+        role="alert"
+        tabIndex={-1}
+        aria-labelledby="ds-error-summary-title"
+        className={cn(
+          "border-2 border-l-[3px] border-destructive rounded-md bg-destructive/5 p-4 px-6 mb-6",
+          "focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-1",
+          className
+        )}
+        {...props}
+      >
+        <h2
+          id="ds-error-summary-title"
+          className="text-xl font-semibold text-destructive mb-3"
+        >
+          {title}
+        </h2>
+
+        <ul className="space-y-2 ml-0 pl-6 text-base">
+          {errors.map((erro) => (
+            <li key={erro.id}>
+              <a
+                href={`#${erro.id}`}
+                onClick={(event) => irParaCampo(event, erro.id)}
+                className="text-destructive font-medium underline underline-offset-[0.2em] hover:decoration-2 focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-1 rounded-sm"
+              >
+                {erro.message}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+);
+ErrorSummary.displayName = "ErrorSummary";
+
+export { ErrorSummary };
+
+```
+
+---
+
+### Cartão (`card`) — `src/components/card.tsx` — slug: cartao
+
+Desc: Superfície de conteúdo com header, corpo e footer.
+
+Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter
+
+Uso:
+```tsx
+import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@semec/ds-react";
+
+<Card>
+  <CardHeader><CardTitle>IPTU 2026</CardTitle></CardHeader>
+  <CardContent>Parcela em dia.</CardContent>
+  <CardFooter><Button>Emitir boleto</Button></CardFooter>
+</Card>
+```
+
+Prompt:
+```text
+Crie um card (Cartão) usando @semec/ds-react (`src/components/card.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter. Superfície de conteúdo com header, corpo e footer.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+
+import { cn } from "../lib/utils";
+
+const Card = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-lg border border-border bg-card text-card-foreground shadow-elevation-1",
+      className
+    )}
+    {...props}
+  />
+));
+Card.displayName = "Card";
+
+const CardHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    {...props}
+  />
+));
+CardHeader.displayName = "CardHeader";
+
+const CardTitle = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("text-lg font-semibold leading-none tracking-tight", className)}
+    {...props}
+  />
+));
+CardTitle.displayName = "CardTitle";
+
+const CardDescription = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+));
+CardDescription.displayName = "CardDescription";
+
+const CardContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+));
+CardContent.displayName = "CardContent";
+
+const CardFooter = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex items-center p-6 pt-0", className)}
+    {...props}
+  />
+));
+CardFooter.displayName = "CardFooter";
+
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+```
+
+---
+
+### Etiqueta (`badge`) — `src/components/badge.tsx` — slug: etiqueta
+
+Desc: Etiqueta curta de status ou contagem.
+
+Variantes: variant: default · secondary · outline · success · warning · danger · info
+
+Uso:
+```tsx
+import { Badge } from "@semec/ds-react";
+
+<Badge>Pendente</Badge>
+<Badge variant="success">Deferido</Badge>
+<Badge variant="danger">Indeferido</Badge>
+```
+
+Prompt:
+```text
+Crie um badge (Etiqueta) usando @semec/ds-react (`src/components/badge.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · secondary · outline · success · warning · danger · info. Etiqueta curta de status ou contagem.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { cn } from "../lib/utils";
+
+const badgeVariants = cva(
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default: "border-transparent bg-primary text-primary-foreground",
+        secondary: "border-transparent bg-secondary text-secondary-foreground",
+        outline: "text-foreground",
+        success: "border-transparent bg-success/15 text-success",
+        warning: "border-transparent bg-warning/15 text-warning",
+        danger: "border-transparent bg-destructive/15 text-destructive",
+        info: "border-transparent bg-info/15 text-info",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return (
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  );
+}
+
+export { Badge, badgeVariants };
+```
+
+---
+
+### Tabela (`table`) — `src/components/table.tsx` — slug: tabela
+
+Desc: Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
+
+Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount
+
+Uso:
+```tsx
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/ds-react";
+
+// Básico
+<Table>
+  <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
+  <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>
+</Table>
+
+// Avançado: ordenação + filtro + paginação + seleção
+// Ver padroes/dados-relatorios/tabelas → demo com TableAdvanced
+```
+
+Prompt:
+```text
+Crie um table (Tabela) usando @semec/ds-react (`src/components/table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+
+import { cn } from "../lib/utils";
+
+const Table = React.forwardRef<
+  HTMLTableElement,
+  React.HTMLAttributes<HTMLTableElement>
+>(({ className, ...props }, ref) => (
+  <div className="relative w-full overflow-auto">
+    <table
+      ref={ref}
+      role="table"
+      className={cn("w-full caption-bottom text-sm", className)}
+      {...props}
+    />
+  </div>
+));
+Table.displayName = "Table";
+
+const TableHeader = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
+));
+TableHeader.displayName = "TableHeader";
+
+const TableBody = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <tbody
+    ref={ref}
+    className={cn("[&_tr:last-child]:border-0", className)}
+    {...props}
+  />
+));
+TableBody.displayName = "TableBody";
+
+const TableFooter = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <tfoot
+    ref={ref}
+    className={cn("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", className)}
+    {...props}
+  />
+));
+TableFooter.displayName = "TableFooter";
+
+const TableRow = React.forwardRef<
+  HTMLTableRowElement,
+  React.HTMLAttributes<HTMLTableRowElement>
+>(({ className, ...props }, ref) => (
+  <tr
+    ref={ref}
+    className={cn(
+      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+      className
+    )}
+    {...props}
+  />
+));
+TableRow.displayName = "TableRow";
+
+const TableHead = React.forwardRef<
+  HTMLTableCellElement,
+  React.ThHTMLAttributes<HTMLTableCellElement>
+>(({ className, ...props }, ref) => (
+  <th
+    ref={ref}
+    scope="col"
+    className={cn(
+      "h-11 px-4 text-left align-middle font-medium text-muted-foreground",
+      className
+    )}
+    {...props}
+  />
+));
+TableHead.displayName = "TableHead";
+
+const TableCell = React.forwardRef<
+  HTMLTableCellElement,
+  React.TdHTMLAttributes<HTMLTableCellElement>
+>(({ className, ...props }, ref) => (
+  <td
+    ref={ref}
+    className={cn("p-4 align-middle", className)}
+    {...props}
+  />
+));
+TableCell.displayName = "TableCell";
+
+const TableCaption = React.forwardRef<
+  HTMLTableCaptionElement,
+  React.HTMLAttributes<HTMLTableCaptionElement>
+>(({ className, ...props }, ref) => (
+  <caption
+    ref={ref}
+    className={cn("mt-4 text-sm text-muted-foreground", className)}
+    {...props}
+  />
+));
+TableCaption.displayName = "TableCaption";
+
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+};
+```
+
+---
+
+### Esqueleto (`skeleton`) — `src/components/skeleton.tsx` — slug: esqueleto
+
+Desc: Placeholder pulsante de carregamento.
+
+Uso:
+```tsx
+import { Skeleton } from "@semec/ds-react";
+
+<Skeleton className="h-4 w-[250px]" />
+<Skeleton className="h-4 w-[180px]" />
+```
+
+Prompt:
+```text
+Crie um skeleton (Esqueleto) usando @semec/ds-react (`src/components/skeleton.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Placeholder pulsante de carregamento.
+```
+
+Fonte:
+```tsx
+import { cn } from "../lib/utils";
+
+function Skeleton({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={cn("animate-pulse rounded-md bg-muted", className)}
+      {...props}
+    />
+  );
+}
+
+export { Skeleton };
+```
+
+---
+
+### Estado vazio (`empty-state`) — `src/components/empty-state.tsx` — slug: estado-vazio
+
+Desc: Estado vazio com ícone, título, descrição e ação opcional.
+
+Variantes: props: icon · title · description · action
+
+Uso:
+```tsx
+import { EmptyState, Button } from "@semec/ds-react";
+import { Inbox } from "lucide-react";
+
+<EmptyState
+  icon={<Inbox />}
+  title="Nenhum protocolo encontrado"
+  description="Ajuste os filtros ou abra um novo requerimento."
+  action={<Button>Abrir requerimento</Button>}
+/>
+```
+
+Prompt:
+```text
+Crie um empty-state (Estado vazio) usando @semec/ds-react (`src/components/empty-state.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: icon · title · description · action. Estado vazio com ícone, título, descrição e ação opcional.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+
+import { cn } from "../lib/utils";
+
+interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
+  icon?: React.ReactNode;
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+}
+
+const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
+  ({ className, icon, title, description, action, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        "flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border bg-surface-alt/50 px-6 py-12 text-center",
+        className
+      )}
+      {...props}
+    >
+      {icon ? (
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground [&>svg]:h-6 [&>svg]:w-6">
+          {icon}
+        </div>
+      ) : null}
+      <div className="space-y-1">
+        <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+        {description ? (
+          <p className="text-sm text-muted-foreground">{description}</p>
+        ) : null}
+      </div>
+      {action ? <div className="mt-1">{action}</div> : null}
+    </div>
+  )
+);
+EmptyState.displayName = "EmptyState";
+
+export { EmptyState };
+```
+
+---
+
+### Trilha de navegação (`breadcrumb`) — `src/components/breadcrumb.tsx` — slug: trilha-de-navegacao
+
+Desc: Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
+
+Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores
+
+Uso:
+```tsx
+import { Breadcrumb } from "@semec/ds-react";
+
+<Breadcrumb items={[
+  { label: "Início", href: "/" },
+  { label: "Serviços", href: "/servicos" },
+  { label: "IPTU" },
+]} />
+```
+
+Prompt:
+```text
+Crie um breadcrumb (Trilha de navegação) usando @semec/ds-react (`src/components/breadcrumb.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores. Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import { ChevronRight } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+export interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {
+  items: BreadcrumbItem[];
+}
+
+const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
+  ({ className, items, ...props }, ref) => (
+    <nav ref={ref} aria-label="Trilha de navegação" className={className} {...props}>
+      <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
+        {items.map((item, index) => {
+          const isLast = index === items.length - 1;
+          return (
+            <li key={`${item.label}-${index}`} className="flex items-center gap-1.5">
+              {index > 0 ? (
+                <ChevronRight
+                  className="h-3.5 w-3.5 shrink-0 opacity-50"
+                  aria-hidden="true"
+                />
+              ) : null}
+              {isLast || !item.href ? (
+                <span aria-current={isLast ? "page" : undefined} className={cn(isLast && "font-medium text-foreground")}>
+                  {item.label}
+                </span>
+              ) : (
+                <a
+                  href={item.href}
+                  className="underline-offset-4 transition-colors duration-fast ease-standard hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  {item.label}
+                </a>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  )
+);
+Breadcrumb.displayName = "Breadcrumb";
+
+export { Breadcrumb };
+```
+
+---
+
+### Abas (`tabs`) — `src/components/tabs.tsx` — slug: abas
+
+Desc: Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.
+
+Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y: role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas)
+
+Uso:
+```tsx
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@semec/ds-react";
+
+<Tabs defaultValue="resumo">
+  <TabsList>
+    <TabsTrigger value="resumo">Resumo</TabsTrigger>
+    <TabsTrigger value="debitos">Débitos</TabsTrigger>
+  </TabsList>
+  <TabsContent value="resumo">…</TabsContent>
+  <TabsContent value="debitos">…</TabsContent>
+</Tabs>
+```
+
+Prompt:
+```text
+Crie um tabs (Abas) usando @semec/ds-react (`src/components/tabs.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y: role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas). Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as TabsPrimitive from "@radix-ui/react-tabs";
+
+import { cn } from "../lib/utils";
+
+const Tabs = TabsPrimitive.Root;
+
+const TabsList = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.List>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.List
+    ref={ref}
+    className={cn(
+      "inline-flex h-11 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
+      className
+    )}
+    {...props}
+  />
+));
+TabsList.displayName = TabsPrimitive.List.displayName;
+
+const TabsTrigger = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.Trigger
+    ref={ref}
+    className={cn(
+      "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
+      className
+    )}
+    {...props}
+  />
+));
+TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
+
+const TabsContent = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.Content
+    ref={ref}
+    className={cn(
+      "mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+      className
+    )}
+    {...props}
+  />
+));
+TabsContent.displayName = TabsPrimitive.Content.displayName;
+
+export { Tabs, TabsList, TabsTrigger, TabsContent };
+```
+
+---
+
+### Paginação (`pagination`) — `src/components/pagination.tsx` — slug: paginacao
+
+Desc: Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.
+
+Variantes: props: page · pageCount · onPageChange · siblingCount · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses
+
+Uso:
+```tsx
+import { Pagination } from "@semec/ds-react";
+
+<Pagination page={pagina} pageCount={42} onPageChange={setPagina} />
+```
+
+Prompt:
+```text
+Crie um pagination (Paginação) usando @semec/ds-react (`src/components/pagination.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: page · pageCount · onPageChange · siblingCount · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+export interface PaginationProps extends React.HTMLAttributes<HTMLElement> {
+  page: number;
+  pageCount: number;
+  onPageChange: (page: number) => void;
+  siblingCount?: number;
+}
+
+const range = (start: number, end: number) =>
+  Array.from({ length: end - start + 1 }, (_, i) => start + i);
+
+const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
+  ({ className, page, pageCount, onPageChange, siblingCount = 1, ...props }, ref) => {
+    const go = (p: number) => {
+      if (p >= 1 && p <= pageCount && p !== page) onPageChange(p);
+    };
+
+    const pages = React.useMemo(() => {
+      const total = pageCount;
+      const current = page;
+      const sib = Math.max(siblingCount, 1);
+      const first = 1;
+      const last = total;
+
+      if (total <= 7) return range(first, last);
+
+      const left = Math.max(current - sib, first);
+      const right = Math.min(current + sib, last);
+      const withLeftGap = left > first + 1;
+      const withRightGap = right < last - 1;
+
+      const out: (number | "…")[] = [];
+      if (!withLeftGap) {
+        out.push(...range(first, right));
+      } else {
+        out.push(first, "…", ...range(left, right));
+      }
+      if (withRightGap) out.push("…", last);
+      else out.push(...range(right + 1, last));
+      return out;
+    }, [page, pageCount, siblingCount]);
+
+    return (
+      <nav
+        ref={ref}
+        role="navigation"
+        aria-label="Paginação"
+        className={cn("flex items-center justify-center gap-1", className)}
+        {...props}
+      >
+        <button
+          type="button"
+          onClick={() => go(page - 1)}
+          disabled={page <= 1}
+          aria-label="Página anterior"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+        >
+          <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+        </button>
+        {pages.map((p, i) =>
+          p === "…" ? (
+            <span
+              key={`gap-${i}`}
+              aria-hidden="true"
+              className="flex h-9 w-9 items-center justify-center text-sm text-muted-foreground"
+            >
+              …
+            </span>
+          ) : (
+            <button
+              key={p}
+              type="button"
+              onClick={() => go(p)}
+              aria-current={p === page ? "page" : undefined}
+              className={cn(
+                "inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-input px-2 text-sm text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                p === page && "border-transparent bg-primary text-primary-foreground hover:bg-primary"
+              )}
+            >
+              {p}
+            </button>
+          )
+        )}
+        <button
+          type="button"
+          onClick={() => go(page + 1)}
+          disabled={page >= pageCount}
+          aria-label="Próxima página"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+        >
+          <ChevronRight className="h-4 w-4" aria-hidden="true" />
+        </button>
+      </nav>
+    );
+  }
+);
+Pagination.displayName = "Pagination";
+
+export { Pagination };
+```
+
+---
+
+### Gatilho da barra lateral (`sidebar-trigger`) — `src/components/sidebar-trigger.tsx` — slug: gatilho-da-barra-lateral
+
+Desc: Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
+
+Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu)
+
+Uso:
+```tsx
+import { SidebarTrigger } from "@semec/ds-react";
+
+<SidebarTrigger open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />
+```
+
+Prompt:
+```text
+Crie um sidebar-trigger (Gatilho da barra lateral) usando @semec/ds-react (`src/components/sidebar-trigger.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+
+import { IconButton, type IconButtonProps } from "./icon-button";
+
+/**
+ * Gatilho para colapsar/expandir a sidebar. Deve ser usado dentro do
+ * componente de layout que gerencia o estado da sidebar (ex.: Header).
+ *
+ * **Props herdadas de IconButton:** `open` controla qual ícone exibir
+ * (PanelLeftClose quando aberto, PanelLeftOpen quando fechado). `onToggle`
+ * é chamado ao clicar. `label` pode ser sobrescrito para rótulos
+ * específicos.
+ */
+export interface SidebarTriggerProps
+  extends Omit<IconButtonProps, "icon"> {
+  /** Estado atual da sidebar (aberta = true). */
+  open?: boolean;
+  /** Callback chamado ao clicar no gatilho. */
+  onToggle?: () => void;
+  /** Rótulo acessível quando a sidebar está aberta. Padrão: "Fechar menu". */
+  labelOpen?: string;
+  /** Rótulo acessível quando a sidebar está fechada. Padrão: "Abrir menu". */
+  labelClosed?: string;
+}
+
+const PanelLeftOpen = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    focusable="false"
+    aria-hidden="true"
+  >
+    <rect width="18" height="18" x="3" y="3" rx="2" />
+    <path d="M9 3v18" />
+  </svg>
+);
+
+const PanelLeftClose = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    focusable="false"
+    aria-hidden="true"
+  >
+    <rect width="18" height="18" x="3" y="3" rx="2" />
+    <path d="M9 3v18" />
+    <path d="m14 9 3 3-3 3" />
+  </svg>
+);
+
+const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTriggerProps>(
+  (
+    {
+      open = false,
+      onToggle,
+      labelOpen = "Fechar menu",
+      labelClosed = "Abrir menu",
+      variant = "ghost",
+      ...props
+    },
+    ref
+  ) => (
+    <IconButton
+      ref={ref}
+      variant={variant}
+      label={open ? labelOpen : labelClosed}
+      aria-expanded={open}
+      onClick={onToggle}
+      {...props}
+    >
+      {open ? <PanelLeftClose /> : <PanelLeftOpen />}
+    </IconButton>
+  )
+);
+SidebarTrigger.displayName = "SidebarTrigger";
+
+export { SidebarTrigger };
+
+```
+
+---
+
+### Modal (`dialog`) — `src/components/dialog.tsx` — slug: modal
+
+Desc: Diálogo modal acessível com overlay, header, título, descrição e footer.
+
+Variantes: composição: Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose
+
+Uso:
+```tsx
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "@semec/ds-react";
+
+<Dialog>
+  <DialogTrigger asChild><Button variant="destructive">Excluir</Button></DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Excluir requerimento?</DialogTitle>
+      <DialogDescription>Esta ação não pode ser desfeita.</DialogDescription>
+    </DialogHeader>
+    <DialogFooter><DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose></DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+Prompt:
+```text
+Crie um dialog (Modal) usando @semec/ds-react (`src/components/dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose. Diálogo modal acessível com overlay, header, título, descrição e footer.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+const Dialog = DialogPrimitive.Root;
+
+const DialogTrigger = DialogPrimitive.Trigger;
+
+const DialogClose = DialogPrimitive.Close;
+
+const DialogPortal = DialogPrimitive.Portal;
+
+const DialogOverlay = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Overlay
+    ref={ref}
+    className={cn(
+      "fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in",
+      className
+    )}
+    {...props}
+  />
+));
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
+
+const DialogContent = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-elevation-3 duration-base ease-standard data-[state=open]:animate-in",
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm text-muted-foreground transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+        <X className="h-4 w-4" aria-hidden="true" />
+        <span className="sr-only">Fechar</span>
+      </DialogPrimitive.Close>
+    </DialogPrimitive.Content>
+  </DialogPortal>
+));
+DialogContent.displayName = DialogPrimitive.Content.displayName;
+
+const DialogHeader = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("flex flex-col space-y-1.5 text-left", className)}
+    {...props}
+  />
+);
+DialogHeader.displayName = "DialogHeader";
+
+const DialogFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
+    {...props}
+  />
+);
+DialogFooter.displayName = "DialogFooter";
+
+const DialogTitle = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Title
+    ref={ref}
+    className={cn("text-lg font-semibold leading-none tracking-tight", className)}
+    {...props}
+  />
+));
+DialogTitle.displayName = DialogPrimitive.Title.displayName;
+
+const DialogDescription = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Description
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+));
+DialogDescription.displayName = DialogPrimitive.Description.displayName;
+
+export {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogTrigger,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+};
+```
+
+---
+
+### Notificação (`toast`) — `src/components/toast.tsx` — slug: notificacao
+
+Desc: Mensagem temporária com `useToast()` e viewport empilhável.
+
+Variantes: variant: default · success · warning · destructive
+
+Uso:
+```tsx
+import { ToastProvider, ToastViewport, useToast } from "@semec/ds-react";
+
+function Acao() {
+  const { toast } = useToast();
+  return <Button onClick={() => toast({ variant: "success", title: "Protocolo enviado" })}>Enviar</Button>;
+}
+
+// no app: <ToastProvider><App /><ToastViewport /></ToastProvider>
+```
+
+Prompt:
+```text
+Crie um toast (Notificação) usando @semec/ds-react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem temporária com `useToast()` e viewport empilhável.
+```
+
+Fonte:
+```tsx
+"use client";
+
+import * as React from "react";
+import * as ToastPrimitives from "@radix-ui/react-toast";
+import { cva, type VariantProps } from "class-variance-authority";
+import { X } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+const ToastProvider = ToastPrimitives.Provider;
+
+const ToastViewport = React.forwardRef<
+  React.ElementRef<typeof ToastPrimitives.Viewport>,
+  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport>
+>(({ className, ...props }, ref) => (
+  <ToastPrimitives.Viewport
+    ref={ref}
+    className={cn(
+      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse gap-2 p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
+      className
+    )}
+    {...props}
+  />
+));
+ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
+
+const toastVariants = cva(
+  "group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-md border border-border bg-card p-4 text-card-foreground shadow-elevation-2 transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out",
+  {
+    variants: {
+      variant: {
+        default: "border-border bg-card text-card-foreground",
+        success: "border-success/40 bg-success-surface text-foreground",
+        warning: "border-warning/40 bg-warning-surface text-foreground",
+        destructive: "border-destructive/40 bg-destructive-surface text-destructive",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+const Toast = React.forwardRef<
+  React.ElementRef<typeof ToastPrimitives.Root>,
+  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> &
+    VariantProps<typeof toastVariants>
+>(({ className, variant, ...props }, ref) => (
+  <ToastPrimitives.Root
+    ref={ref}
+    className={cn(toastVariants({ variant }), className)}
+    {...props}
+  />
+));
+Toast.displayName = ToastPrimitives.Root.displayName;
+
+const ToastAction = React.forwardRef<
+  React.ElementRef<typeof ToastPrimitives.Action>,
+  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Action>
+>(({ className, ...props }, ref) => (
+  <ToastPrimitives.Action
+    ref={ref}
+    className={cn(
+      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border border-border bg-transparent px-3 text-sm font-medium transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+      className
+    )}
+    {...props}
+  />
+));
+ToastAction.displayName = ToastPrimitives.Action.displayName;
+
+const ToastClose = React.forwardRef<
+  React.ElementRef<typeof ToastPrimitives.Close>,
+  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Close>
+>(({ className, ...props }, ref) => (
+  <ToastPrimitives.Close
+    ref={ref}
+    className={cn(
+      "shrink-0 rounded-md p-1 text-muted-foreground opacity-60 transition-opacity duration-fast ease-standard hover:text-foreground hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      className
+    )}
+    toast-close=""
+    {...props}
+  >
+    <X className="h-4 w-4" aria-hidden="true" />
+  </ToastPrimitives.Close>
+));
+ToastClose.displayName = ToastPrimitives.Close.displayName;
+
+const ToastTitle = React.forwardRef<
+  React.ElementRef<typeof ToastPrimitives.Title>,
+  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Title>
+>(({ className, ...props }, ref) => (
+  <ToastPrimitives.Title
+    ref={ref}
+    className={cn("text-sm font-semibold", className)}
+    {...props}
+  />
+));
+ToastTitle.displayName = ToastPrimitives.Title.displayName;
+
+const ToastDescription = React.forwardRef<
+  React.ElementRef<typeof ToastPrimitives.Description>,
+  React.ComponentPropsWithoutRef<typeof ToastPrimitives.Description>
+>(({ className, ...props }, ref) => (
+  <ToastPrimitives.Description
+    ref={ref}
+    className={cn("text-sm opacity-90", className)}
+    {...props}
+  />
+));
+ToastDescription.displayName = ToastPrimitives.Description.displayName;
+
+type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
+
+type ToastActionElement = React.ReactElement<typeof ToastAction>;
+
+type ToasterToast = ToastProps & {
+  id: string;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: ToastActionElement;
+};
+
+const TOAST_LIMIT = 3;
+const TOAST_REMOVE_DELAY = 5000;
+
+const actionTypes = {
+  ADD_TOAST: "ADD_TOAST",
+  UPDATE_TOAST: "UPDATE_TOAST",
+  DISMISS_TOAST: "DISMISS_TOAST",
+  REMOVE_TOAST: "REMOVE_TOAST",
+} as const;
+
+let count = 0;
+const genId = () => `${count++}`;
+
+type ActionType = typeof actionTypes;
+
+type Action =
+  | { type: ActionType["ADD_TOAST"]; toast: ToasterToast }
+  | { type: ActionType["UPDATE_TOAST"]; toast: Partial<ToasterToast> }
+  | { type: ActionType["DISMISS_TOAST"]; toastId?: ToasterToast["id"] }
+  | { type: ActionType["REMOVE_TOAST"]; toastId?: ToasterToast["id"] };
+
+interface State {
+  toasts: ToasterToast[];
+}
+
+const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
+
+const addToRemoveQueue = (toastId: string) => {
+  if (toastTimeouts.has(toastId)) return;
+  const timeout = setTimeout(() => {
+    toastTimeouts.delete(toastId);
+    dispatch({ type: "REMOVE_TOAST", toastId });
+  }, TOAST_REMOVE_DELAY);
+  toastTimeouts.set(toastId, timeout);
+};
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case "ADD_TOAST":
+      return { toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT) };
+    case "UPDATE_TOAST":
+      return {
+        toasts: state.toasts.map((t) =>
+          t.id === action.toast.id ? { ...t, ...action.toast } : t
+        ),
+      };
+    case "DISMISS_TOAST": {
+      const { toastId } = action;
+      if (toastId) {
+        addToRemoveQueue(toastId);
+      } else {
+        state.toasts.forEach((t) => addToRemoveQueue(t.id));
+      }
+      return { toasts: state.toasts.map((t) => (t.id === toastId || toastId === undefined ? { ...t, open: false } : t)) };
+    }
+    case "REMOVE_TOAST":
+      return { toasts: action.toastId === undefined ? [] : state.toasts.filter((t) => t.id !== action.toastId) };
+  }
+};
+
+const listeners: Array<(state: State) => void> = [];
+
+let memoryState: State = { toasts: [] };
+
+function dispatch(action: Action) {
+  memoryState = reducer(memoryState, action);
+  listeners.forEach((listener) => listener(memoryState));
+}
+
+type Toast = Omit<ToasterToast, "id">;
+
+function toast({ ...props }: Toast) {
+  const id = genId();
+  const update = (props: ToasterToast) =>
+    dispatch({ type: "UPDATE_TOAST", toast: { ...props, id } });
+  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
+
+  dispatch({
+    type: "ADD_TOAST",
+    toast: {
+      ...props,
+      id,
+      open: true,
+      onOpenChange: (open) => {
+        if (!open) dismiss();
+      },
+    },
+  });
+
+  return { id, dismiss, update };
+}
+
+function useToast() {
+  const [state, setState] = React.useState<State>(memoryState);
+
+  React.useEffect(() => {
+    listeners.push(setState);
+    return () => {
+      const index = listeners.indexOf(setState);
+      if (index > -1) listeners.splice(index, 1);
+    };
+  }, []);
+
+  return {
+    ...state,
+    toast,
+    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
+  };
+}
+
+export {
+  ToastProvider,
+  ToastViewport,
+  Toast,
+  ToastTitle,
+  ToastDescription,
+  ToastClose,
+  ToastAction,
+  useToast,
+};
+```
+
+---
+
+### Dica (`tooltip`) — `src/components/tooltip.tsx` — slug: dica
+
+Desc: Dica curta ao passar o ponteiro ou focar o elemento.
+
+Variantes: composição: TooltipProvider · Tooltip · TooltipTrigger · TooltipContent
+
+Uso:
+```tsx
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } from "@semec/ds-react";
+
+<TooltipProvider>
+  <Tooltip>
+    <TooltipTrigger asChild><IconButton aria-label="Ajuda"><HelpCircle /></IconButton></TooltipTrigger>
+    <TooltipContent>Explica o campo ao lado</TooltipContent>
+  </Tooltip>
+</TooltipProvider>
+```
+
+Prompt:
+```text
+Crie um tooltip (Dica) usando @semec/ds-react (`src/components/tooltip.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: TooltipProvider · Tooltip · TooltipTrigger · TooltipContent. Dica curta ao passar o ponteiro ou focar o elemento.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+
+import { cn } from "../lib/utils";
+
+const TooltipProvider = TooltipPrimitive.Provider;
+
+const Tooltip = TooltipPrimitive.Root;
+
+const TooltipTrigger = TooltipPrimitive.Trigger;
+
+const TooltipContent = React.forwardRef<
+  React.ElementRef<typeof TooltipPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
+>(({ className, sideOffset = 4, ...props }, ref) => (
+  <TooltipPrimitive.Portal>
+    <TooltipPrimitive.Content
+      ref={ref}
+      sideOffset={sideOffset}
+      className={cn(
+        "z-50 overflow-hidden rounded-md bg-foreground px-3 py-1.5 text-xs text-background shadow-elevation-2 data-[state=delayed-open]:animate-in data-[side=bottom]:slide-in-from-top-1 data-[side=top]:slide-in-from-bottom-1",
+        className
+      )}
+      {...props}
+    />
+  </TooltipPrimitive.Portal>
+));
+TooltipContent.displayName = TooltipPrimitive.Content.displayName;
+
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };
+```
+
+---
+
+### Aviso (`alert`) — `src/components/alert.tsx` — slug: aviso
+
+Desc: Mensagem de feedback em linha, com ícone automático por variante.
+
+Variantes: variant: default · success · warning · destructive
+
+Uso:
+```tsx
+import { Alert, AlertTitle, AlertDescription } from "@semec/ds-react";
+
+<Alert variant="warning">
+  <AlertTitle>Carnê indisponível</AlertTitle>
+  <AlertDescription>O sistema volta às 14h.</AlertDescription>
+</Alert>
+```
+
+Prompt:
+```text
+Crie um alert (Aviso) usando @semec/ds-react (`src/components/alert.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem de feedback em linha, com ícone automático por variante.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { AlertCircle, AlertTriangle, CheckCircle2, Info } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+const alertVariants = cva(
+  "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:h-4 [&>svg]:w-4",
+  {
+    variants: {
+      variant: {
+        default: "border-info/40 bg-info-surface text-foreground [&>svg]:text-info",
+        success:
+          "border-success/40 bg-success-surface text-foreground [&>svg]:text-success",
+        warning:
+          "border-warning/40 bg-warning-surface text-foreground [&>svg]:text-warning",
+        destructive:
+          "border-destructive/40 bg-destructive-surface text-foreground [&>svg]:text-destructive",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+const iconMap: Record<NonNullable<VariantProps<typeof alertVariants>["variant"]>, React.ComponentType<{ className?: string }>> = {
+  default: Info,
+  success: CheckCircle2,
+  warning: AlertTriangle,
+  destructive: AlertCircle,
+};
+
+interface AlertProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof alertVariants> {}
+
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
+  ({ className, variant = "default", children, ...props }, ref) => {
+    const Icon = iconMap[variant ?? "default"];
+    return (
+      <div
+        ref={ref}
+        role="alert"
+        className={cn(alertVariants({ variant }), "pl-10", className)}
+        {...props}
+      >
+        <Icon className="absolute left-4 top-4" aria-hidden="true" />
+        {children}
+      </div>
+    );
+  }
+);
+Alert.displayName = "Alert";
+
+const AlertTitle = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h5
+    ref={ref}
+    className={cn("mb-1 font-semibold leading-none tracking-tight", className)}
+    {...props}
+  />
+));
+AlertTitle.displayName = "AlertTitle";
+
+const AlertDescription = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("text-sm [&_p]:leading-relaxed", className)}
+    {...props}
+  />
+));
+AlertDescription.displayName = "AlertDescription";
+
+export { Alert, AlertTitle, AlertDescription };
+```
+
+---
+
+### Acordeão (`accordion`) — `src/components/accordion.tsx` — slug: acordeao
+
+Desc: Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`).
+
+Variantes: type: single · multiple · composição: Accordion · AccordionItem · AccordionTrigger · AccordionContent
+
+Uso:
+```tsx
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@semec/ds-react";
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="item-1">
+    <AccordionTrigger>Pergunta frequente</AccordionTrigger>
+    <AccordionContent>Resposta aqui.</AccordionContent>
+  </AccordionItem>
+</Accordion>
+```
+
+Prompt:
+```text
+Crie um accordion (Acordeão) usando @semec/ds-react (`src/components/accordion.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: type: single · multiple · composição: Accordion · AccordionItem · AccordionTrigger · AccordionContent. Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`).
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as AccordionPrimitive from "@radix-ui/react-accordion";
+import { ChevronDown } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+const Accordion = AccordionPrimitive.Root;
+
+const AccordionItem = React.forwardRef<
+  React.ElementRef<typeof AccordionPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
+>(({ className, ...props }, ref) => (
+  <AccordionPrimitive.Item
+    ref={ref}
+    className={cn("border-b border-border", className)}
+    {...props}
+  />
+));
+AccordionItem.displayName = "AccordionItem";
+
+const AccordionTrigger = React.forwardRef<
+  React.ElementRef<typeof AccordionPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
+>(({ className, children, ...props }, ref) => (
+  <AccordionPrimitive.Header className="flex">
+    <AccordionPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        "flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" aria-hidden="true" />
+    </AccordionPrimitive.Trigger>
+  </AccordionPrimitive.Header>
+));
+AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
+
+const AccordionContent = React.forwardRef<
+  React.ElementRef<typeof AccordionPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <AccordionPrimitive.Content
+    ref={ref}
+    className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+    {...props}
+  >
+    <div className={cn("pb-4 pt-0", className)}>{children}</div>
+  </AccordionPrimitive.Content>
+));
+AccordionContent.displayName = AccordionPrimitive.Content.displayName;
+
+export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };
+
+```
+
+---
+
+### Diálogo de alerta (`alert-dialog`) — `src/components/alert-dialog.tsx` — slug: dialogo-de-alerta
+
+Desc: Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.
+
+Variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel
+
+Uso:
+```tsx
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from "@semec/ds-react";
+
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button variant="destructive">Excluir</Button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Excluir requerimento?</AlertDialogTitle>
+      <AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+      <AlertDialogAction>Excluir</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+Prompt:
+```text
+Crie um alert-dialog (Diálogo de alerta) usando @semec/ds-react (`src/components/alert-dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as AlertDialogPrimitive from "@radix-ui/react-dialog";
+
+import { cn } from "../lib/utils";
+
+const AlertDialog = AlertDialogPrimitive.Root;
+
+const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
+
+const AlertDialogPortal = AlertDialogPrimitive.Portal;
+
+const AlertDialogOverlay = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Overlay
+    className={cn(
+      "fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      className
+    )}
+    {...props}
+    ref={ref}
+  />
+));
+AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName;
+
+const AlertDialogContent = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <AlertDialogPortal>
+    <AlertDialogOverlay />
+    <AlertDialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-elevation-3 duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </AlertDialogPrimitive.Content>
+  </AlertDialogPortal>
+));
+AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName;
+
+const AlertDialogHeader = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("flex flex-col space-y-2 text-center sm:text-left", className)}
+    {...props}
+  />
+);
+AlertDialogHeader.displayName = "AlertDialogHeader";
+
+const AlertDialogFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
+    {...props}
+  />
+);
+AlertDialogFooter.displayName = "AlertDialogFooter";
+
+const AlertDialogTitle = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Title
+    ref={ref}
+    className={cn("text-lg font-semibold", className)}
+    {...props}
+  />
+));
+AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName;
+
+const AlertDialogDescription = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Description
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+));
+AlertDialogDescription.displayName = AlertDialogPrimitive.Description.displayName;
+
+const AlertDialogAction = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Close>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Close>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Close
+    ref={ref}
+    className={cn(
+      "inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+      className
+    )}
+    {...props}
+  />
+));
+AlertDialogAction.displayName = "AlertDialogAction";
+
+const AlertDialogCancel = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Close>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Close>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Close
+    ref={ref}
+    className={cn(
+      "inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+      className
+    )}
+    {...props}
+  />
+));
+AlertDialogCancel.displayName = "AlertDialogCancel";
+
+export {
+  AlertDialog,
+  AlertDialogPortal,
+  AlertDialogOverlay,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+};
+
+```
+
+---
+
+### Popover (`popover`) — `src/components/popover.tsx` — slug: popover
+
+Desc: Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.
+
+Variantes: composição: Popover · PopoverTrigger · PopoverContent · PopoverAnchor · props: sideOffset · align · side (top/right/bottom/left)
+
+Uso:
+```tsx
+import { Popover, PopoverTrigger, PopoverContent, Button } from "@semec/ds-react";
+
+<Popover>
+  <PopoverTrigger asChild>
+    <Button variant="outline">Filtros</Button>
+  </PopoverTrigger>
+  <PopoverContent>
+    <p>Opções de filtro aqui.</p>
+  </PopoverContent>
+</Popover>
+```
+
+Prompt:
+```text
+Crie um popover (Popover) usando @semec/ds-react (`src/components/popover.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Popover · PopoverTrigger · PopoverContent · PopoverAnchor · props: sideOffset · align · side (top/right/bottom/left). Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as PopoverPrimitive from "@radix-ui/react-popover";
+
+import { cn } from "../lib/utils";
+
+const Popover = PopoverPrimitive.Root;
+
+const PopoverTrigger = PopoverPrimitive.Trigger;
+
+const PopoverAnchor = PopoverPrimitive.Anchor;
+
+const PopoverContent = React.forwardRef<
+  React.ElementRef<typeof PopoverPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
+>(({ className, align = "center", sideOffset = 4, ...props }, ref) => (
+  <PopoverPrimitive.Portal>
+    <PopoverPrimitive.Content
+      ref={ref}
+      align={align}
+      sideOffset={sideOffset}
+      className={cn(
+        "z-50 w-72 rounded-md border border-border bg-card p-4 text-card-foreground shadow-elevation-2 outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        className
+      )}
+      {...props}
+    />
+  </PopoverPrimitive.Portal>
+));
+PopoverContent.displayName = PopoverPrimitive.Content.displayName;
+
+export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor };
+
+```
+
+---
+
+### Separador (`separator`) — `src/components/separator.tsx` — slug: separador
+
+Desc: Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.
+
+Variantes: orientation: horizontal · vertical · decorative: true (role=none) · false (role=separator)
+
+Uso:
+```tsx
+import { Separator } from "@semec/ds-react";
+
+<Separator />
+<Separator orientation="vertical" className="h-6" />
+```
+
+Prompt:
+```text
+Crie um separator (Separador) usando @semec/ds-react (`src/components/separator.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: orientation: horizontal · vertical · decorative: true (role=none) · false (role=separator). Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+
+import { cn } from "../lib/utils";
+
+interface SeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
+  orientation?: "horizontal" | "vertical";
+  decorative?: boolean;
+}
+
+const Separator = React.forwardRef<HTMLDivElement, SeparatorProps>(
+  ({ className, orientation = "horizontal", decorative = true, ...props }, ref) => (
+    <div
+      ref={ref}
+      role={decorative ? "none" : "separator"}
+      aria-orientation={!decorative ? orientation : undefined}
+      className={cn(
+        "shrink-0 bg-border",
+        orientation === "horizontal" ? "h-px w-full" : "h-full w-px",
+        className
+      )}
+      {...props}
+    />
+  )
+);
+Separator.displayName = "Separator";
+
+export { Separator };
+
+```
+
+---
