@@ -1,7 +1,8 @@
 import PatternPage from "@/components/ui/PatternPage";
 import PreviewFrame from "@/components/docs/PreviewFrame";
 import CodeBlock from "@/components/docs/CodeBlock";
-import { TableAdvanced, tableAdvancedUsage } from "@/components/demos/examples/table-advanced";
+import { TableAdvanced } from "@/components/demos/examples/table-advanced";
+import { tableAdvancedUsage } from "@/components/demos/examples/table-advanced-data";
 
 export const metadata = { title: "Tabelas" };
 

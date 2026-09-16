@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
   "version": "0.1.0",
-  "generatedAt": "2026-09-15T18:16:07.327Z",
+  "generatedAt": "2026-09-16T18:04:16.332Z",
   "categories": [
     {
       "key": "acoes",
@@ -52,7 +52,7 @@
           "values": "sm · md · lg · icon"
         }
       ],
-      "usage": "import { Button } from \"@semec/ds-react\";\n\n<Button variant=\"primary\" size=\"md\">Salvar</Button>\n<Button variant=\"outline\">Cancelar</Button>\n<Button asChild><Link href=\"/ok\">Como link</Link></Button>",
+      "usage": "import { Button } from \"@semec/ds-react\";\nimport Link from \"next/link\";\nimport { Plus } from \"lucide-react\";\n\n<Button variant=\"primary\">Emitir boleto</Button>\n<Button variant=\"outline\">Salvar rascunho</Button>\n<Button variant=\"ghost\">Cancelar</Button>\n\n<Button variant=\"destructive\">Excluir requerimento</Button>\n\n<Button><Plus /> Adicionar serviço</Button>\n\n<Button asChild>\n  <Link href=\"/iptu\">Ver meu IPTU</Link>\n</Button>",
       "prompt": "Crie um button (Botões) usando @semec/ds-react (`src/components/button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link · size: sm · md · lg · icon. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.",
       "url": "/componentes/botoes",
       "md": "/components/botoes.md"
@@ -63,15 +63,15 @@
       "label": "Botão de ícone",
       "file": "src/components/icon-button.tsx",
       "category": "acoes",
-      "desc": "Botão quadrado só com ícone. Exige `aria-label`.",
+      "desc": "Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).",
       "variants": [
         {
           "prop": "variant",
           "values": "primary · secondary · outline · ghost · destructive · link"
         }
       ],
-      "usage": "import { IconButton } from \"@semec/ds-react\";\nimport { Plus } from \"lucide-react\";\n\n<IconButton aria-label=\"Adicionar\"><Plus /></IconButton>",
-      "prompt": "Crie um icon-button (Botão de ícone) usando @semec/ds-react (`src/components/icon-button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link. Botão quadrado só com ícone. Exige `aria-label`.",
+      "usage": "import { IconButton } from \"@semec/ds-react\";\nimport { Download, Search, Trash2 } from \"lucide-react\";\n\n<IconButton label=\"Buscar requerimento\"><Search /></IconButton>\n<IconButton label=\"Baixar carnê\"><Download /></IconButton>\n<IconButton label=\"Excluir requerimento\" variant=\"destructive\"><Trash2 /></IconButton>",
+      "prompt": "Crie um icon-button (Botão de ícone) usando @semec/ds-react (`src/components/icon-button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).",
       "url": "/componentes/botao-de-icone",
       "md": "/components/botao-de-icone.md"
     },
@@ -81,15 +81,15 @@
       "label": "Link",
       "file": "src/components/link.tsx",
       "category": "acoes",
-      "desc": "Link tipográfico com variantes de cor.",
+      "desc": "Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.",
       "variants": [
         {
           "prop": "variant",
-          "values": "primary · muted"
+          "values": "primary · onSurface · muted"
         }
       ],
-      "usage": "import { Link } from \"@semec/ds-react\";\n\n<Link href=\"/pagina\">Ir para a página</Link>\n<Link href=\"/ajuda\" variant=\"muted\">Texto de ajuda</Link>",
-      "prompt": "Crie um link (Link) usando @semec/ds-react (`src/components/link.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · muted. Link tipográfico com variantes de cor.",
+      "usage": "import { Link } from \"@semec/ds-react\";\n\n<Link href=\"/iptu\">Acessar guia do IPTU 2026</Link>\n<Link href=\"/protocolo\" variant=\"onSurface\">Acompanhar protocolo</Link>\n<Link href=\"/ajuda\" variant=\"muted\">Saiba mais sobre prazos</Link>",
+      "prompt": "Crie um link (Link) usando @semec/ds-react (`src/components/link.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · onSurface · muted. Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.",
       "url": "/componentes/link",
       "md": "/components/link.md"
     },

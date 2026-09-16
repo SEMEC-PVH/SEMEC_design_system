@@ -1,7 +1,8 @@
 import PatternPage from "@/components/ui/PatternPage";
 import PreviewFrame from "@/components/docs/PreviewFrame";
 import CodeBlock from "@/components/docs/CodeBlock";
-import { FormAdvanced, formAdvancedUsage } from "@/components/demos/examples/form-advanced";
+import { FormAdvanced } from "@/components/demos/examples/form-advanced";
+import { formAdvancedUsage } from "@/components/demos/examples/form-advanced-data";
 
 export const metadata = { title: "Validação" };
 

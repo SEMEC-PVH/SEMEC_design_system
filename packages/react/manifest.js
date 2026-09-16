@@ -53,10 +53,20 @@ export const dsComponents = [
       { prop: "size", values: "sm · md · lg · icon" },
     ],
     usage: `import { Button } from "@semec/ds-react";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 
-<Button variant="primary" size="md">Salvar</Button>
-<Button variant="outline">Cancelar</Button>
-<Button asChild><Link href="/ok">Como link</Link></Button>`,
+<Button variant="primary">Emitir boleto</Button>
+<Button variant="outline">Salvar rascunho</Button>
+<Button variant="ghost">Cancelar</Button>
+
+<Button variant="destructive">Excluir requerimento</Button>
+
+<Button><Plus /> Adicionar serviço</Button>
+
+<Button asChild>
+  <Link href="/iptu">Ver meu IPTU</Link>
+</Button>`,
   },
   {
     code: "icon-button",
@@ -64,12 +74,14 @@ export const dsComponents = [
     label: "Botão de ícone",
     file: "src/components/icon-button.tsx",
     category: "acoes",
-    desc: "Botão quadrado só com ícone. Exige `aria-label`.",
+    desc: "Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).",
     variants: [{ prop: "variant", values: "primary · secondary · outline · ghost · destructive · link" }],
     usage: `import { IconButton } from "@semec/ds-react";
-import { Plus } from "lucide-react";
+import { Download, Search, Trash2 } from "lucide-react";
 
-<IconButton aria-label="Adicionar"><Plus /></IconButton>`,
+<IconButton label="Buscar requerimento"><Search /></IconButton>
+<IconButton label="Baixar carnê"><Download /></IconButton>
+<IconButton label="Excluir requerimento" variant="destructive"><Trash2 /></IconButton>`,
   },
   {
     code: "link",
@@ -77,12 +89,13 @@ import { Plus } from "lucide-react";
     label: "Link",
     file: "src/components/link.tsx",
     category: "acoes",
-    desc: "Link tipográfico com variantes de cor.",
-    variants: [{ prop: "variant", values: "primary · muted" }],
+    desc: "Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.",
+    variants: [{ prop: "variant", values: "primary · onSurface · muted" }],
     usage: `import { Link } from "@semec/ds-react";
 
-<Link href="/pagina">Ir para a página</Link>
-<Link href="/ajuda" variant="muted">Texto de ajuda</Link>`,
+<Link href="/iptu">Acessar guia do IPTU 2026</Link>
+<Link href="/protocolo" variant="onSurface">Acompanhar protocolo</Link>
+<Link href="/ajuda" variant="muted">Saiba mais sobre prazos</Link>`,
   },
   {
     code: "input",

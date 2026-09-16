@@ -4,18 +4,18 @@ code: "link"
 slug: "link"
 file: "src/components/link.tsx"
 category: "acoes"
-variants: "variant: primary · muted"
+variants: "variant: primary · onSurface · muted"
 ---
 
 # Link — `link`
 
-> Link tipográfico com variantes de cor.
+> Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.
 
 **Arquivo:** `src/components/link.tsx` | **Categoria:** Ações e links | **Rota:** `/componentes/link`
 
 ## Variantes
 
-- **variant**: primary · muted
+- **variant**: primary · onSurface · muted
 
 ## Instalação (@semec/ds-react)
 
@@ -42,14 +42,15 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ```tsx
 import { Link } from "@semec/ds-react";
 
-<Link href="/pagina">Ir para a página</Link>
-<Link href="/ajuda" variant="muted">Texto de ajuda</Link>
+<Link href="/iptu">Acessar guia do IPTU 2026</Link>
+<Link href="/protocolo" variant="onSurface">Acompanhar protocolo</Link>
+<Link href="/ajuda" variant="muted">Saiba mais sobre prazos</Link>
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um link (Link) usando @semec/ds-react (`src/components/link.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · muted. Link tipográfico com variantes de cor.
+Crie um link (Link) usando @semec/ds-react (`src/components/link.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · onSurface · muted. Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.
 ```
 
 ## Fonte

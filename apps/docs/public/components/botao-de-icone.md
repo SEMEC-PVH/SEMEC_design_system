@@ -9,7 +9,7 @@ variants: "variant: primary · secondary · outline · ghost · destructive · l
 
 # Botão de ícone — `icon-button`
 
-> Botão quadrado só com ícone. Exige `aria-label`.
+> Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).
 
 **Arquivo:** `src/components/icon-button.tsx` | **Categoria:** Ações e links | **Rota:** `/componentes/botao-de-icone`
 
@@ -41,15 +41,17 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 
 ```tsx
 import { IconButton } from "@semec/ds-react";
-import { Plus } from "lucide-react";
+import { Download, Search, Trash2 } from "lucide-react";
 
-<IconButton aria-label="Adicionar"><Plus /></IconButton>
+<IconButton label="Buscar requerimento"><Search /></IconButton>
+<IconButton label="Baixar carnê"><Download /></IconButton>
+<IconButton label="Excluir requerimento" variant="destructive"><Trash2 /></IconButton>
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um icon-button (Botão de ícone) usando @semec/ds-react (`src/components/icon-button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link. Botão quadrado só com ícone. Exige `aria-label`.
+Crie um icon-button (Botão de ícone) usando @semec/ds-react (`src/components/icon-button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).
 ```
 
 ## Fonte

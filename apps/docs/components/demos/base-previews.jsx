@@ -65,27 +65,49 @@ import {
   TooltipTrigger,
   useToast,
 } from "@semec/ds-react";
-import { HelpCircle, Inbox, Plus } from "lucide-react";
+import { Bell, Download, HelpCircle, Inbox, Plus, Printer, Search, Trash2 } from "lucide-react";
 import PreviewFrame from "@/components/docs/PreviewFrame";
 
 const ROW = "flex flex-wrap items-center gap-3";
 
 function ButtonPreview() {
   return (
-    <div className="space-y-4">
-      <div className={ROW}>
-        <Button variant="primary">Primary</Button>
-        <Button variant="secondary">Secondary</Button>
-        <Button variant="outline">Outline</Button>
-        <Button variant="ghost">Ghost</Button>
-        <Button variant="destructive">Destructive</Button>
-        <Button variant="link">Link</Button>
+    <div className="space-y-5">
+      <div className="space-y-1.5">
+        <p className="text-xs font-medium text-muted-foreground">Hierarquia de ação</p>
+        <div className={ROW}>
+          <Button variant="primary">Emitir boleto</Button>
+          <Button variant="outline">Salvar rascunho</Button>
+          <Button variant="ghost">Cancelar</Button>
+        </div>
       </div>
-      <div className={ROW}>
-        <Button size="sm">sm</Button>
-        <Button size="md">md</Button>
-        <Button size="lg">lg</Button>
-        <Button disabled>disabled</Button>
+      <div className="space-y-1.5">
+        <p className="text-xs font-medium text-muted-foreground">Ação destrutiva</p>
+        <div className={ROW}>
+          <Button variant="destructive">Excluir requerimento</Button>
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        <p className="text-xs font-medium text-muted-foreground">Com ícone</p>
+        <div className={ROW}>
+          <Button><Plus /> Adicionar serviço</Button>
+          <Button variant="outline"><Download /> Baixar carnê</Button>
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        <p className="text-xs font-medium text-muted-foreground">Tamanhos</p>
+        <div className={ROW}>
+          <Button size="sm">Pequeno</Button>
+          <Button size="md">Médio</Button>
+          <Button size="lg">Grande</Button>
+          <Button disabled>Enviando…</Button>
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        <p className="text-xs font-medium text-muted-foreground">Botão como link</p>
+        <div className={ROW}>
+          <Button asChild><a href="#proto">Ver meu IPTU</a></Button>
+        </div>
       </div>
     </div>
   );
@@ -94,21 +116,28 @@ function ButtonPreview() {
 function IconButtonPreview() {
   return (
     <div className={ROW}>
-      <IconButton aria-label="Adicionar" variant="primary"><Plus /></IconButton>
-      <IconButton aria-label="Adicionar" variant="secondary"><Plus /></IconButton>
-      <IconButton aria-label="Adicionar" variant="outline"><Plus /></IconButton>
-      <IconButton aria-label="Adicionar" variant="ghost"><Plus /></IconButton>
-      <IconButton aria-label="Adicionar" variant="destructive"><Plus /></IconButton>
-      <IconButton aria-label="Ajuda" variant="link"><HelpCircle /></IconButton>
+      <IconButton label="Adicionar serviço" variant="primary"><Plus /></IconButton>
+      <IconButton label="Buscar requerimento"><Search /></IconButton>
+      <IconButton label="Baixar carnê"><Download /></IconButton>
+      <IconButton label="Imprimir comprovante" variant="ghost"><Printer /></IconButton>
+      <IconButton label="Notificações" variant="secondary"><Bell /></IconButton>
+      <IconButton label="Excluir requerimento" variant="destructive"><Trash2 /></IconButton>
     </div>
   );
 }
 
 function LinkPreview() {
   return (
-    <div className={ROW}>
-      <Link href="#proto">Link primary</Link>
-      <Link href="#proto" variant="muted">Link muted</Link>
+    <div className="space-y-3">
+      <p className="text-sm text-foreground">
+        Consulte a <Link href="#proto">guia do IPTU 2026</Link> e{" "}
+        <Link href="#proto" variant="muted">saiba mais sobre prazos de contestação</Link>.
+      </p>
+      <div className={ROW}>
+        <Link href="#proto">Acessar serviços</Link>
+        <Link href="#proto" variant="onSurface">Acompanhar protocolo</Link>
+        <Link href="#proto" variant="muted">Voltar ao topo</Link>
+      </div>
     </div>
   );
 }

@@ -18,9 +18,9 @@ Ver `packages/react/README.md` e `/llms-full.txt#instalacao`. Copie `packages/re
 
 - [Botões (`button`) — Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.](/componentes/botoes) — `src/components/button.tsx` — md: `/components/botoes.md`
   Uso: `import { Button } from "@semec/ds-react";`
-- [Botão de ícone (`icon-button`) — Botão quadrado só com ícone. Exige `aria-label`.](/componentes/botao-de-icone) — `src/components/icon-button.tsx` — md: `/components/botao-de-icone.md`
+- [Botão de ícone (`icon-button`) — Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).](/componentes/botao-de-icone) — `src/components/icon-button.tsx` — md: `/components/botao-de-icone.md`
   Uso: `import { IconButton } from "@semec/ds-react";`
-- [Link (`link`) — Link tipográfico com variantes de cor.](/componentes/link) — `src/components/link.tsx` — md: `/components/link.md`
+- [Link (`link`) — Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.](/componentes/link) — `src/components/link.tsx` — md: `/components/link.md`
   Uso: `import { Link } from "@semec/ds-react";`
 - [Caixa de texto (`input`) — Campo de texto. Estado de erro via `aria-invalid`.](/componentes/caixa-de-texto) — `src/components/input.tsx` — md: `/components/caixa-de-texto.md`
   Uso: `import { Input } from "@semec/ds-react";`
@@ -105,4 +105,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--color-action-primary` etc.), nunca hex solto
 
-> Gerado em 2026-09-15T18:16:07.336Z a partir de packages/react/manifest.js. Site: https://semec-pvh.github.io/SEMEC_design_system
+> Gerado em 2026-09-16T18:04:16.344Z a partir de packages/react/manifest.js. Site: https://semec-pvh.github.io/SEMEC_design_system

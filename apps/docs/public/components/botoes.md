@@ -42,10 +42,20 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 
 ```tsx
 import { Button } from "@semec/ds-react";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 
-<Button variant="primary" size="md">Salvar</Button>
-<Button variant="outline">Cancelar</Button>
-<Button asChild><Link href="/ok">Como link</Link></Button>
+<Button variant="primary">Emitir boleto</Button>
+<Button variant="outline">Salvar rascunho</Button>
+<Button variant="ghost">Cancelar</Button>
+
+<Button variant="destructive">Excluir requerimento</Button>
+
+<Button><Plus /> Adicionar serviço</Button>
+
+<Button asChild>
+  <Link href="/iptu">Ver meu IPTU</Link>
+</Button>
 ```
 
 ## Prompt para IA

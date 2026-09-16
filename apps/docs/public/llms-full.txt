@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-09-15T18:16:07.336Z — packages/react/manifest.js + packages/react/*
+> Gerado 2026-09-16T18:04:16.344Z — packages/react/manifest.js + packages/react/*
 
 ## Instalação — packages/react/README.md
 
@@ -696,10 +696,20 @@ Variantes: variant: primary · secondary · outline · ghost · destructive · l
 Uso:
 ```tsx
 import { Button } from "@semec/ds-react";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 
-<Button variant="primary" size="md">Salvar</Button>
-<Button variant="outline">Cancelar</Button>
-<Button asChild><Link href="/ok">Como link</Link></Button>
+<Button variant="primary">Emitir boleto</Button>
+<Button variant="outline">Salvar rascunho</Button>
+<Button variant="ghost">Cancelar</Button>
+
+<Button variant="destructive">Excluir requerimento</Button>
+
+<Button><Plus /> Adicionar serviço</Button>
+
+<Button asChild>
+  <Link href="/iptu">Ver meu IPTU</Link>
+</Button>
 ```
 
 Prompt:
@@ -772,21 +782,23 @@ export { Button, buttonVariants };
 
 ### Botão de ícone (`icon-button`) — `src/components/icon-button.tsx` — slug: botao-de-icone
 
-Desc: Botão quadrado só com ícone. Exige `aria-label`.
+Desc: Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).
 
 Variantes: variant: primary · secondary · outline · ghost · destructive · link
 
 Uso:
 ```tsx
 import { IconButton } from "@semec/ds-react";
-import { Plus } from "lucide-react";
+import { Download, Search, Trash2 } from "lucide-react";
 
-<IconButton aria-label="Adicionar"><Plus /></IconButton>
+<IconButton label="Buscar requerimento"><Search /></IconButton>
+<IconButton label="Baixar carnê"><Download /></IconButton>
+<IconButton label="Excluir requerimento" variant="destructive"><Trash2 /></IconButton>
 ```
 
 Prompt:
 ```text
-Crie um icon-button (Botão de ícone) usando @semec/ds-react (`src/components/icon-button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link. Botão quadrado só com ícone. Exige `aria-label`.
+Crie um icon-button (Botão de ícone) usando @semec/ds-react (`src/components/icon-button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).
 ```
 
 Fonte:
@@ -843,21 +855,22 @@ export { IconButton };
 
 ### Link (`link`) — `src/components/link.tsx` — slug: link
 
-Desc: Link tipográfico com variantes de cor.
+Desc: Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.
 
-Variantes: variant: primary · muted
+Variantes: variant: primary · onSurface · muted
 
 Uso:
 ```tsx
 import { Link } from "@semec/ds-react";
 
-<Link href="/pagina">Ir para a página</Link>
-<Link href="/ajuda" variant="muted">Texto de ajuda</Link>
+<Link href="/iptu">Acessar guia do IPTU 2026</Link>
+<Link href="/protocolo" variant="onSurface">Acompanhar protocolo</Link>
+<Link href="/ajuda" variant="muted">Saiba mais sobre prazos</Link>
 ```
 
 Prompt:
 ```text
-Crie um link (Link) usando @semec/ds-react (`src/components/link.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · muted. Link tipográfico com variantes de cor.
+Crie um link (Link) usando @semec/ds-react (`src/components/link.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · onSurface · muted. Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.
 ```
 
 Fonte:
