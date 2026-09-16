@@ -604,7 +604,11 @@ button.side-title {
     flex-shrink: 0;
     margin-top: auto;
     border-top: 1px solid var(--border);
+    padding: 0.75rem 1rem;
   }
+}
+.sidebar.collapsed .sidebar-footer {
+  padding: 0.75rem 0;
 }
 @media print {
   .sidebar-footer {
@@ -612,13 +616,26 @@ button.side-title {
   }
 }
 .sidebar-collapse-btn {
-  height: 2rem !important;
-  width: 2rem !important;
-  padding: 0 !important;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 0.75rem;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--fg);
+  --tw-ring-offset-color: var(--surface);
+}
+.sidebar-collapse-btn:hover,
+.sidebar-collapse-btn:active {
+  background: var(--tint);
+  color: var(--fg);
 }
 .sidebar-collapse-btn svg {
   width: 1rem;
   height: 1rem;
+}
+.sidebar-collapse-btn svg path,
+.sidebar-collapse-btn svg rect {
+  stroke-width: 1.5;
 }
 .sidebar > nav {
   flex: 1;
