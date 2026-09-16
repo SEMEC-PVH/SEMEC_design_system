@@ -3,6 +3,7 @@ import createMDX from '@next/mdx'
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
+  basePath: '/SEMEC_design_system',
   trailingSlash: true,
   allowedDevOrigins: ['10.102.3.109'],
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
