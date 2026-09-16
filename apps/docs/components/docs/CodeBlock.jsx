@@ -25,18 +25,29 @@ function CopyButton({ text, label }) {
 }
 
 export default function CodeBlock({ code, filename, prompt }) {
+  const safeCode = typeof code === "string" ? code : "";
+  const safePrompt = typeof prompt === "string" ? prompt : "";
+  if (code !== undefined && !safeCode) {
+    console.warn("[CodeBlock] `code` não é string (client reference?) para", filename);
+  }
   return (
     <div className="proto-codeblock">
       <div className="proto-codeblock-head">
         {filename && <span className="proto-codeblock-file">{filename}</span>}
         <span className="proto-codeblock-actions">
-          <CopyButton text={code} label="Copiar código" />
-          {prompt && <CopyButton text={prompt} label="Copiar prompt" />}
+          <CopyButton text={safeCode} label="Copiar código" />
+          {safePrompt && <CopyButton text={safePrompt} label="Copiar prompt" />}
         </span>
       </div>
-      <pre>
-        <code>{code}</code>
-      </pre>
+      {safeCode ? (
+        <pre>
+          <code>{safeCode}</code>
+        </pre>
+      ) : (
+        <pre>
+          <code className="proto-codeblock-empty">Snippet indisponível.</code>
+        </pre>
+      )}
     </div>
   );
 }

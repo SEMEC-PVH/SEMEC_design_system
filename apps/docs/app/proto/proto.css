@@ -86,8 +86,12 @@
   --shadow-elevation-3: 0 12px 24px rgb(0 0 0 / 0.12), 0 4px 8px rgb(0 0 0 / 0.08);
 }
 
-@layer components {
-  .proto-preview {
+/* Regras proto ficam FORA de @layer de propósito: globals.css não usa camadas
+   (estilos un-layered vencem qualquer @layer). Se estas regras entrarem em
+   @layer components, o `pre`/`code` genéricos do globals.css (un-layered)
+   sobrescrevem o fundo/cor do codeblock e o código fica invisível no tema claro. */
+
+.proto-preview {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg, 0.5rem);
     background: var(--color-surface-alt);
@@ -151,4 +155,3 @@
     font-size: 0.8rem;
     white-space: pre;
   }
-}
