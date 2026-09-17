@@ -203,9 +203,9 @@ a {
 /* Marca do header — Poppins, cor por tema */
 .site-header .brand-title {
   font-family: var(--font-poppins), "Poppins", sans-serif;
-  font-size: var(--font-size-base);
+  font-size: 2rem;
   font-weight: 700;
-  color: #1e4399;
+  color: #275bd6;
   white-space: nowrap;
 }
 [data-theme="dark"] .site-header .brand-title {
@@ -837,6 +837,9 @@ h3[id] {
 
 /* Padding lateral segue a spec: 24px desktop, 16px em telas <640px */
 @media (max-width: 640px) {
+  .site-header .brand-title {
+    font-size: var(--font-size-base);
+  }
   .content {
     padding: 2rem 1rem 0;
   }
