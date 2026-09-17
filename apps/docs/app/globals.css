@@ -1707,6 +1707,128 @@ footer {
   text-shadow: 2px 2px 0 var(--ps-accent);
   letter-spacing: 0.02em;
   margin-right: auto;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transform: translateY(0);
+  transition: transform 150ms ease-in-out, text-shadow 150ms ease-in-out;
+}
+.site-footer-brand:hover {
+  transform: translateY(-2px);
+  text-shadow: 3px 3px 0 var(--ps-accent), 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+.site-footer-brand:active {
+  transform: translateY(2px);
+  text-shadow: 1px 1px 0 var(--ps-accent);
+}
+
+/* ---- Quem Somos — Grid de equipe ---------------------------------------- */
+
+.team-section {
+  margin-top: 2.5rem;
+}
+.team-section-title {
+  font-size: var(--font-size-lg);
+  margin-bottom: 1rem;
+  color: var(--text-strong);
+}
+.team-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+.team-grid--directors,
+.team-grid--interns {
+  grid-template-columns: repeat(2, 1fr);
+}
+.team-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  transition: box-shadow 150ms ease, border-color 150ms ease;
+}
+.team-card:hover {
+  border-color: var(--color-action-primary);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+.team-card--lg {
+  padding: 1.5rem;
+}
+
+/* Avatar */
+.team-avatar {
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.team-avatar--lg {
+  width: 80px;
+  height: 80px;
+}
+.team-avatar--md {
+  width: 64px;
+  height: 64px;
+}
+.team-avatar--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--border);
+  color: var(--text-muted);
+}
+.team-avatar--placeholder svg {
+  width: 50%;
+  height: 50%;
+}
+
+/* Info */
+.team-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.team-card-name {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-strong);
+  margin: 0;
+}
+.team-card-role {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin: 0;
+}
+.team-card-techs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+}
+.team-card-tech {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-action-primary);
+  color: var(--ps-body);
+  white-space: nowrap;
+}
+.team-card-linkedin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+.team-card-linkedin:hover {
+  color: var(--color-action-primary);
 }
 
 /* ---- Animação da arte dos cards de seção ------------------------------
