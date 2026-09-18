@@ -7,7 +7,7 @@ export default defineConfig([
     },
     outDir: "dist",
     format: "esm",
-    dts: true,
+    dts: false,
     sourcemap: true,
     external: [
       /^@radix-ui/,
@@ -26,7 +26,7 @@ export default defineConfig([
     },
     outDir: "dist",
     format: "esm",
-    dts: true,
+    dts: false,
     platform: "node",
     external: [/^node:/],
   },
@@ -36,7 +36,7 @@ export default defineConfig([
     },
     outDir: "dist",
     format: "esm",
-    dts: true,
+    dts: false,
     external: ["tailwindcss"],
   },
   {

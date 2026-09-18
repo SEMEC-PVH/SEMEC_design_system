@@ -43,8 +43,9 @@
     "**/*.css"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsup && node scripts/build-skills.mjs",
+    "build": "rm -rf dist && tsup && tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/build-skills.mjs",
     "build:react": "tsup",
+    "build:types": "tsc --emitDeclarationOnly --rootDir src --outDir dist/react",
     "build:skills": "node scripts/build-skills.mjs",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
