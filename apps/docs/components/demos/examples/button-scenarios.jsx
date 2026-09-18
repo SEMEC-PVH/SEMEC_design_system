@@ -17,7 +17,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@semec/ds-react";
+} from "@semec/ds/react";
 import { Download, Loader2, Pencil, Plus, Printer, Send, Trash2 } from "lucide-react";
 
 export function ButtonFormFooter() {

@@ -1,11 +1,11 @@
 ---
 name: semec-ds
-description: Use SEMEC Design System (@semec/ds-react) — React + Tailwind v4 + shadcn + Radix. Tokens pv-*, tema data-theme=dark, conteúdo PT-BR/código EN. Use para UI, migração portal, snippets.
+description: Use SEMEC Design System (@semec/ds/react) — React + Tailwind v4 + shadcn + Radix. Tokens pv-*, tema data-theme=dark, conteúdo PT-BR/código EN. Use para UI, migração portal, snippets.
 ---
 
 # SEMEC Design System — Skill OpenCode
 
-Kit `@semec/ds-react` (`packages/react/`) — React + Tailwind v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
+Kit `@semec/ds/react` (`packages/react/`) — React + Tailwind v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
 ## Fontes para agentes
 
@@ -43,7 +43,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 3. aplica tokens L1 (`--bg`, `--color-action-primary` etc.), sem hex solto
 4. checa variantes em `packages/react/manifest.js`
 
-Ex: `import { Button } from "@semec/ds-react"; <Button variant="primary">Salvar</Button>`
+Ex: `import { Button } from "@semec/ds/react"; <Button variant="primary">Salvar</Button>`
 
 ## Snippets e demos
 

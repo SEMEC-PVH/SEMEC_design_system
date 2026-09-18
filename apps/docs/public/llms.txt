@@ -14,7 +14,7 @@ Ver `packages/react/README.md` e `/llms-full.txt#instalacao`. Copie `packages/re
 - **Navegação** (`navegacao`) — Trilhas, abas e deslocamento entre páginas.
 - **Feedback e estados** (`feedback-e-estados`) — Mensagens de estado, carregamento e camadas sobre a página.
 
-## Componentes (32)
+## Componentes (47)
 
 - [Botões (`button`) — Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.](/componentes/botoes) — `src/components/button.tsx` — md: `/components/botoes.md`
   Uso: `import { Button } from "@semec/ds-react";`
@@ -80,6 +80,36 @@ Ver `packages/react/README.md` e `/llms-full.txt#instalacao`. Copie `packages/re
   Uso: `import { Popover, PopoverTrigger, PopoverContent, Button } from "@semec/ds-react";`
 - [Separador (`separator`) — Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.](/componentes/separador) — `src/components/separator.tsx` — md: `/components/separador.md`
   Uso: `import { Separator } from "@semec/ds-react";`
+- [Avatar (`avatar`) — Foto de perfil com fallback automático (iniciais).](/componentes/avatar) — `src/components/avatar.tsx` — md: `/components/avatar.md`
+  Uso: `import { Avatar, AvatarImage, AvatarFallback } from "@semec/ds-react";`
+- [Toggle (`toggle`) — Botão binário para estados on/off em toolbars.](/componentes/toggle) — `src/components/toggle.tsx` — md: `/components/toggle.md`
+  Uso: `import { Toggle } from "@semec/ds-react";`
+- [Spinner (`spinner`) — Indicador de carregamento inline.](/componentes/spinner) — `src/components/spinner.tsx` — md: `/components/spinner.md`
+  Uso: `import { Spinner } from "@semec/ds-react";`
+- [Progresso (`progress`) — Barra de progresso determinada.](/componentes/progress) — `src/components/progress.tsx` — md: `/components/progress.md`
+  Uso: `import { Progress } from "@semec/ds-react";`
+- [Slider (`slider`) — Controle deslizante para faixas de valor.](/componentes/slider) — `src/components/slider.tsx` — md: `/components/slider.md`
+  Uso: `import { Slider } from "@semec/ds-react";`
+- [Input OTP (`input-otp`) — Campo de código OTP com foco automático entre dígitos.](/componentes/input-otp) — `src/components/input-otp.tsx` — md: `/components/input-otp.md`
+  Uso: `import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec/ds-react";`
+- [Calendário (`calendar`) — Calendário visual para seleção de data.](/componentes/calendario) — `src/components/calendar.tsx` — md: `/components/calendario.md`
+  Uso: `import { Calendar } from "@semec/ds-react";`
+- [Área de scroll (`scroll-area`) — Scroll customizado e consistente entre navegadores.](/componentes/scroll-area) — `src/components/scroll-area.tsx` — md: `/components/scroll-area.md`
+  Uso: `import { ScrollArea } from "@semec/ds-react";`
+- [Menu suspenso (`dropdown-menu`) — Menu flutuante com itens, checkbox, radio, sub-menus e separadores.](/componentes/menu-suspenso) — `src/components/dropdown-menu.tsx` — md: `/components/menu-suspenso.md`
+  Uso: `import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@semec/ds-react";`
+- [Drawer (`drawer`) — Painel deslizante de qualquer lado da tela.](/componentes/drawer) — `src/components/drawer.tsx` — md: `/components/drawer.md`
+  Uso: `import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, Button } from "@semec/ds-react";`
+- [Sheet (`sheet`) — Painel lateral modal com overlay. Variantes left/right/top/bottom.](/componentes/sheet) — `src/components/sheet.tsx` — md: `/components/sheet.md`
+  Uso: `import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "@semec/ds-react";`
+- [Tabela de dados (`data-table`) — Tabela com ordenação visual, paginação e空 states.](/componentes/tabela-de-dados) — `src/components/data-table.tsx` — md: `/components/tabela-de-dados.md`
+  Uso: `import { DataTable } from "@semec/ds-react";`
+- [Linha do tempo (`timeline`) — Sequência temporal com dots, conectores e conteúdo.](/componentes/timeline) — `src/components/timeline.tsx` — md: `/components/timeline.md`
+  Uso: `import { Timeline, TimelineItem, TimelineSeparator, TimelineDot, TimelineConnector, TimelineContent, TimelineTitle, TimelineDescription } from "@semec/ds-react";`
+- [Menu de navegação (`navigation-menu`) — Navegação principal com mega-menu e viewport animado.](/componentes/menu-de-navegacao) — `src/components/navigation-menu.tsx` — md: `/components/menu-de-navegacao.md`
+  Uso: `import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@semec/ds-react";`
+- [Barra lateral (`sidebar`) — Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile.](/componentes/sidebar) — `src/components/sidebar.tsx` — md: `/components/sidebar.md`
+  Uso: `import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@semec/ds-react";`
 
 ## Padrões
 
@@ -105,4 +135,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--color-action-primary` etc.), nunca hex solto
 
-> Gerado em 2026-09-16T18:04:16.344Z a partir de packages/react/manifest.js. Site: https://semec-pvh.github.io/SEMEC_design_system
+> Gerado em 2026-09-17T17:21:55.806Z a partir de packages/react/manifest.js. Site: https://semec-pvh.github.io/SEMEC_design_system

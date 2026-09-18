@@ -68,7 +68,7 @@ import { IconButton, type IconButtonProps } from "./icon-button";
  * é chamado ao clicar. `label` pode ser sobrescrito para rótulos
  * específicos.
  */
-export interface SidebarTriggerProps
+export interface SidebarToggleButtonProps
   extends Omit<IconButtonProps, "icon"> {
   /** Estado atual da sidebar (aberta = true). */
   open?: boolean;
@@ -119,7 +119,7 @@ const PanelLeftClose = () => (
   </svg>
 );
 
-const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTriggerProps>(
+const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarTriggerProps>(
   (
     {
       open = false,
@@ -143,9 +143,9 @@ const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTriggerProps>(
     </IconButton>
   )
 );
-SidebarTrigger.displayName = "SidebarTrigger";
+SidebarToggleButton.displayName = "SidebarToggleButton";
 
-export { SidebarTrigger };
+export { SidebarToggleButton };
 
 ```
 

@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
   "version": "0.1.0",
-  "generatedAt": "2026-09-16T18:04:16.332Z",
+  "generatedAt": "2026-09-17T17:21:55.794Z",
   "categories": [
     {
       "key": "acoes",
@@ -636,6 +636,301 @@
       "prompt": "Crie um separator (Separador) usando @semec/ds-react (`src/components/separator.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: orientation: horizontal · vertical · decorative: true (role=none) · false (role=separator). Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.",
       "url": "/componentes/separador",
       "md": "/components/separador.md"
+    },
+    {
+      "code": "avatar",
+      "slug": "avatar",
+      "label": "Avatar",
+      "file": "src/components/avatar.tsx",
+      "category": "conteudo-dados",
+      "desc": "Foto de perfil com fallback automático (iniciais).",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "Avatar · AvatarImage · AvatarFallback"
+        },
+        {
+          "prop": "tamanhos",
+          "values": "h-10 w-10 (padrão) — sobrescreva com className"
+        }
+      ],
+      "usage": "import { Avatar, AvatarImage, AvatarFallback } from \"@semec/ds-react\";\n\n<Avatar>\n  <AvatarImage src=\"/foto.jpg\" alt=\"João Silva\" />\n  <AvatarFallback>JS</AvatarFallback>\n</Avatar>",
+      "prompt": "Crie um avatar (Avatar) usando @semec/ds-react (`src/components/avatar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className. Foto de perfil com fallback automático (iniciais).",
+      "url": "/componentes/avatar",
+      "md": "/components/avatar.md"
+    },
+    {
+      "code": "toggle",
+      "slug": "toggle",
+      "label": "Toggle",
+      "file": "src/components/toggle.tsx",
+      "category": "formularios",
+      "desc": "Botão binário para estados on/off em toolbars.",
+      "variants": [
+        {
+          "prop": "variant",
+          "values": "default · outline"
+        },
+        {
+          "prop": "size",
+          "values": "sm · md · lg"
+        }
+      ],
+      "usage": "import { Toggle } from \"@semec/ds-react\";\nimport { Bold } from \"lucide-react\";\n\n<Toggle variant=\"outline\" aria-label=\"Negrito\">\n  <Bold />\n</Toggle>",
+      "prompt": "Crie um toggle (Toggle) usando @semec/ds-react (`src/components/toggle.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · outline · size: sm · md · lg. Botão binário para estados on/off em toolbars.",
+      "url": "/componentes/toggle",
+      "md": "/components/toggle.md"
+    },
+    {
+      "code": "spinner",
+      "slug": "spinner",
+      "label": "Spinner",
+      "file": "src/components/spinner.tsx",
+      "category": "feedback",
+      "desc": "Indicador de carregamento inline.",
+      "variants": [],
+      "usage": "import { Spinner } from \"@semec/ds-react\";\n\n<Spinner />\n<p className=\"text-muted-foreground\">Carregando dados…</p>",
+      "prompt": "Crie um spinner (Spinner) usando @semec/ds-react (`src/components/spinner.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Indicador de carregamento inline.",
+      "url": "/componentes/spinner",
+      "md": "/components/spinner.md"
+    },
+    {
+      "code": "progress",
+      "slug": "progress",
+      "label": "Progresso",
+      "file": "src/components/progress.tsx",
+      "category": "feedback",
+      "desc": "Barra de progresso determinada.",
+      "variants": [],
+      "usage": "import { Progress } from \"@semec/ds-react\";\n\n<Progress value={60} />\n<p className=\"text-sm text-muted-foreground\">60% concluído</p>",
+      "prompt": "Crie um progress (Progresso) usando @semec/ds-react (`src/components/progress.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Barra de progresso determinada.",
+      "url": "/componentes/progress",
+      "md": "/components/progress.md"
+    },
+    {
+      "code": "slider",
+      "slug": "slider",
+      "label": "Slider",
+      "file": "src/components/slider.tsx",
+      "category": "formularios",
+      "desc": "Controle deslizante para faixas de valor.",
+      "variants": [],
+      "usage": "import { Slider } from \"@semec/ds-react\";\n\n<Slider defaultValue={[50]} max={100} step={1} />",
+      "prompt": "Crie um slider (Slider) usando @semec/ds-react (`src/components/slider.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Controle deslizante para faixas de valor.",
+      "url": "/componentes/slider",
+      "md": "/components/slider.md"
+    },
+    {
+      "code": "input-otp",
+      "slug": "input-otp",
+      "label": "Input OTP",
+      "file": "src/components/input-otp.tsx",
+      "category": "formularios",
+      "desc": "Campo de código OTP com foco automático entre dígitos.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator"
+        },
+        {
+          "prop": "props",
+          "values": "maxLength · disabled"
+        }
+      ],
+      "usage": "import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from \"@semec/ds-react\";\n\n<InputOTP value={code} onChange={setCode} maxLength={6}>\n  <InputOTPGroup>\n    <InputOTPSlot index={0} />\n    <InputOTPSlot index={1} />\n    <InputOTPSlot index={2} />\n  </InputOTPGroup>\n  <InputOTPSeparator />\n  <InputOTPGroup>\n    <InputOTPSlot index={3} />\n    <InputOTPSlot index={4} />\n    <InputOTPSlot index={5} />\n  </InputOTPGroup>\n</InputOTP>",
+      "prompt": "Crie um input-otp (Input OTP) usando @semec/ds-react (`src/components/input-otp.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled. Campo de código OTP com foco automático entre dígitos.",
+      "url": "/componentes/input-otp",
+      "md": "/components/input-otp.md"
+    },
+    {
+      "code": "calendar",
+      "slug": "calendario",
+      "label": "Calendário",
+      "file": "src/components/calendar.tsx",
+      "category": "formularios",
+      "desc": "Calendário visual para seleção de data.",
+      "variants": [
+        {
+          "prop": "props",
+          "values": "value · onChange · min · max · disabled"
+        }
+      ],
+      "usage": "import { Calendar } from \"@semec/ds-react\";\n\n<Calendar value={data} onChange={setData} />",
+      "prompt": "Crie um calendar (Calendário) usando @semec/ds-react (`src/components/calendar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: value · onChange · min · max · disabled. Calendário visual para seleção de data.",
+      "url": "/componentes/calendario",
+      "md": "/components/calendario.md"
+    },
+    {
+      "code": "scroll-area",
+      "slug": "scroll-area",
+      "label": "Área de scroll",
+      "file": "src/components/scroll-area.tsx",
+      "category": "navegacao",
+      "desc": "Scroll customizado e consistente entre navegadores.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "ScrollArea · ScrollBar"
+        },
+        {
+          "prop": "orientation",
+          "values": "vertical · horizontal"
+        }
+      ],
+      "usage": "import { ScrollArea } from \"@semec/ds-react\";\n\n<ScrollArea className=\"h-48\">\n  <div className=\"p-4\">Conteúdo longo aqui…</div>\n</ScrollArea>",
+      "prompt": "Crie um scroll-area (Área de scroll) usando @semec/ds-react (`src/components/scroll-area.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal. Scroll customizado e consistente entre navegadores.",
+      "url": "/componentes/scroll-area",
+      "md": "/components/scroll-area.md"
+    },
+    {
+      "code": "dropdown-menu",
+      "slug": "menu-suspenso",
+      "label": "Menu suspenso",
+      "file": "src/components/dropdown-menu.tsx",
+      "category": "navegacao",
+      "desc": "Menu flutuante com itens, checkbox, radio, sub-menus e separadores.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "DropdownMenu · Trigger · Content · Item · CheckboxItem · RadioItem · Label · Separator · Sub · SubTrigger · SubContent"
+        }
+      ],
+      "usage": "import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from \"@semec/ds-react\";\nimport { Button } from \"@semec/ds-react\";\nimport { MoreHorizontal } from \"lucide-react\";\n\n<DropdownMenu>\n  <DropdownMenuTrigger asChild>\n    <Button variant=\"ghost\" size=\"icon\"><MoreHorizontal /></Button>\n  </DropdownMenuTrigger>\n  <DropdownMenuContent>\n    <DropdownMenuItem>Editar</DropdownMenuItem>\n    <DropdownMenuItem>Duplicar</DropdownMenuItem>\n    <DropdownMenuSeparator />\n    <DropdownMenuItem className=\"text-destructive\">Excluir</DropdownMenuItem>\n  </DropdownMenuContent>\n</DropdownMenu>",
+      "prompt": "Crie um dropdown-menu (Menu suspenso) usando @semec/ds-react (`src/components/dropdown-menu.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: DropdownMenu · Trigger · Content · Item · CheckboxItem · RadioItem · Label · Separator · Sub · SubTrigger · SubContent. Menu flutuante com itens, checkbox, radio, sub-menus e separadores.",
+      "url": "/componentes/menu-suspenso",
+      "md": "/components/menu-suspenso.md"
+    },
+    {
+      "code": "drawer",
+      "slug": "drawer",
+      "label": "Drawer",
+      "file": "src/components/drawer.tsx",
+      "category": "feedback",
+      "desc": "Painel deslizante de qualquer lado da tela.",
+      "variants": [
+        {
+          "prop": "side",
+          "values": "top · bottom · left · right"
+        },
+        {
+          "prop": "composição",
+          "values": "Drawer · Trigger · Content · Header · Footer · Title · Description · Close"
+        }
+      ],
+      "usage": "import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, Button } from \"@semec/ds-react\";\n\n<Drawer>\n  <DrawerTrigger asChild><Button>Abrir painel</Button></DrawerTrigger>\n  <DrawerContent side=\"right\">\n    <DrawerHeader>\n      <DrawerTitle>Detalhes</DrawerTitle>\n      <DrawerDescription>Informações do protocolo.</DrawerDescription>\n    </DrawerHeader>\n    <div className=\"p-6\">Conteúdo aqui</div>\n    <DrawerFooter>\n      <DrawerClose asChild><Button variant=\"outline\">Fechar</Button></DrawerClose>\n    </DrawerFooter>\n  </DrawerContent>\n</Drawer>",
+      "prompt": "Crie um drawer (Drawer) usando @semec/ds-react (`src/components/drawer.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: top · bottom · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close. Painel deslizante de qualquer lado da tela.",
+      "url": "/componentes/drawer",
+      "md": "/components/drawer.md"
+    },
+    {
+      "code": "sheet",
+      "slug": "sheet",
+      "label": "Sheet",
+      "file": "src/components/sheet.tsx",
+      "category": "feedback",
+      "desc": "Painel lateral modal com overlay. Variantes left/right/top/bottom.",
+      "variants": [
+        {
+          "prop": "side",
+          "values": "left · right · top · bottom"
+        },
+        {
+          "prop": "composição",
+          "values": "Sheet · Trigger · Content · Header · Footer · Title · Description · Close"
+        }
+      ],
+      "usage": "import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from \"@semec/ds-react\";\n\n<Sheet>\n  <SheetTrigger asChild><Button variant=\"outline\">Abrir filtros</Button></SheetTrigger>\n  <SheetContent side=\"left\">\n    <SheetHeader>\n      <SheetTitle>Filtros</SheetTitle>\n      <SheetDescription>Refine sua busca.</SheetDescription>\n    </SheetHeader>\n    <div className=\"p-6\">Filtros aqui</div>\n    <SheetFooter>\n      <SheetClose asChild><Button>Aplicar</Button></SheetClose>\n    </SheetFooter>\n  </SheetContent>\n</Sheet>",
+      "prompt": "Crie um sheet (Sheet) usando @semec/ds-react (`src/components/sheet.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: left · right · top · bottom · composição: Sheet · Trigger · Content · Header · Footer · Title · Description · Close. Painel lateral modal com overlay. Variantes left/right/top/bottom.",
+      "url": "/componentes/sheet",
+      "md": "/components/sheet.md"
+    },
+    {
+      "code": "data-table",
+      "slug": "tabela-de-dados",
+      "label": "Tabela de dados",
+      "file": "src/components/data-table.tsx",
+      "category": "conteudo-dados",
+      "desc": "Tabela com ordenação visual, paginação e空 states.",
+      "variants": [
+        {
+          "prop": "props",
+          "values": "columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption"
+        }
+      ],
+      "usage": "import { DataTable } from \"@semec/ds-react\";\n\nconst columns = [\n  { key: \"nome\", header: \"Nome\", sortable: true },\n  { key: \"status\", header: \"Status\" },\n];\n\n<DataTable\n  columns={columns}\n  data={registros}\n  sortKey={sortField}\n  sortDir={sortDir}\n  onSort={handleSort}\n  page={pagina}\n  pageCount={totalPaginas}\n  onPageChange={setPagina}\n/>",
+      "prompt": "Crie um data-table (Tabela de dados) usando @semec/ds-react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption. Tabela com ordenação visual, paginação e空 states.",
+      "url": "/componentes/tabela-de-dados",
+      "md": "/components/tabela-de-dados.md"
+    },
+    {
+      "code": "timeline",
+      "slug": "timeline",
+      "label": "Linha do tempo",
+      "file": "src/components/timeline.tsx",
+      "category": "conteudo-dados",
+      "desc": "Sequência temporal com dots, conectores e conteúdo.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "Timeline · TimelineItem · TimelineSeparator · TimelineDot · TimelineConnector · TimelineContent · TimelineTitle · TimelineDescription"
+        },
+        {
+          "prop": "dot variant",
+          "values": "default · success · warning · destructive · info"
+        }
+      ],
+      "usage": "import { Timeline, TimelineItem, TimelineSeparator, TimelineDot, TimelineConnector, TimelineContent, TimelineTitle, TimelineDescription } from \"@semec/ds-react\";\n\n<Timeline>\n  <TimelineItem>\n    <TimelineSeparator>\n      <TimelineDot variant=\"success\" />\n      <TimelineConnector />\n    </TimelineSeparator>\n    <TimelineContent>\n      <TimelineTitle>Protocolo recebido</TimelineTitle>\n      <TimelineDescription>12/08/2026 às 14:30</TimelineDescription>\n    </TimelineContent>\n  </TimelineItem>\n  <TimelineItem>\n    <TimelineSeparator>\n      <TimelineDot />\n    </TimelineSeparator>\n    <TimelineContent>\n      <TimelineTitle>Em análise</TimelineTitle>\n      <TimelineDescription>Aguardando parecer</TimelineDescription>\n    </TimelineContent>\n  </TimelineItem>\n</Timeline>",
+      "prompt": "Crie um timeline (Linha do tempo) usando @semec/ds-react (`src/components/timeline.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Timeline · TimelineItem · TimelineSeparator · TimelineDot · TimelineConnector · TimelineContent · TimelineTitle · TimelineDescription · dot variant: default · success · warning · destructive · info. Sequência temporal com dots, conectores e conteúdo.",
+      "url": "/componentes/timeline",
+      "md": "/components/timeline.md"
+    },
+    {
+      "code": "navigation-menu",
+      "slug": "menu-de-navegacao",
+      "label": "Menu de navegação",
+      "file": "src/components/navigation-menu.tsx",
+      "category": "navegacao",
+      "desc": "Navegação principal com mega-menu e viewport animado.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator"
+        }
+      ],
+      "usage": "import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from \"@semec/ds-react\";\n\n<NavigationMenu>\n  <NavigationMenuList>\n    <NavigationMenuItem>\n      <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>\n      <NavigationMenuContent>\n        <NavigationMenuLink href=\"/iptu\">IPTU</NavigationMenuLink>\n        <NavigationMenuLink href=\"/alvara\">Alvará</NavigationMenuLink>\n      </NavigationMenuContent>\n    </NavigationMenuItem>\n  </NavigationMenuList>\n</NavigationMenu>",
+      "prompt": "Crie um navigation-menu (Menu de navegação) usando @semec/ds-react (`src/components/navigation-menu.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator. Navegação principal com mega-menu e viewport animado.",
+      "url": "/componentes/menu-de-navegacao",
+      "md": "/components/menu-de-navegacao.md"
+    },
+    {
+      "code": "sidebar",
+      "slug": "sidebar",
+      "label": "Barra lateral",
+      "file": "src/components/sidebar.tsx",
+      "category": "navegacao",
+      "desc": "Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile.",
+      "variants": [
+        {
+          "prop": "side",
+          "values": "left · right"
+        },
+        {
+          "prop": "variant",
+          "values": "sidebar · floating · inset"
+        },
+        {
+          "prop": "collapsible",
+          "values": "offcanvas · icon · none"
+        },
+        {
+          "prop": "composição",
+          "values": "SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail"
+        }
+      ],
+      "usage": "import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from \"@semec/ds-react\";\n\n<SidebarProvider>\n  <Sidebar>\n    <SidebarHeader>Logo</SidebarHeader>\n    <SidebarContent>\n      <SidebarGroup>\n        <SidebarGroupLabel>Menu</SidebarGroupLabel>\n        <SidebarGroupContent>\n          <SidebarMenu>\n            <SidebarMenuItem>\n              <SidebarMenuButton isActive>Dashboard</SidebarMenuButton>\n            </SidebarMenuItem>\n            <SidebarMenuItem>\n              <SidebarMenuButton>Protocolos</SidebarMenuButton>\n            </SidebarMenuItem>\n          </SidebarMenu>\n        </SidebarGroupContent>\n      </SidebarGroup>\n    </SidebarContent>\n    <SidebarFooter>Footer</SidebarFooter>\n  </Sidebar>\n  <SidebarInset>\n    <SidebarTrigger />\n    <main>Conteúdo</main>\n  </SidebarInset>\n</SidebarProvider>",
+      "prompt": "Crie um sidebar (Barra lateral) usando @semec/ds-react (`src/components/sidebar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: left · right · variant: sidebar · floating · inset · collapsible: offcanvas · icon · none · composição: SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail. Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile.",
+      "url": "/componentes/sidebar",
+      "md": "/components/sidebar.md"
     }
   ],
   "install": {

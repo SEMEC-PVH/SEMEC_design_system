@@ -64,7 +64,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
   useToast,
-} from "@semec/ds-react";
+} from "@semec/ds/react";
 import { Bell, Download, HelpCircle, Inbox, Plus, Printer, Search, Trash2 } from "lucide-react";
 import PreviewFrame from "@/components/docs/PreviewFrame";
 

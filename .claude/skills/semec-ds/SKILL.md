@@ -1,11 +1,11 @@
 ---
 name: semec-ds
-description: Use SEMEC Design System (@semec/ds-react) para construir UI. Tokens pv-*, componentes Radix+CVA, tema dark via data-theme. Use quando criar/editar UI, migrar portal, ou copiar snippets.
+description: Use SEMEC Design System (@semec/ds) para construir UI. Tokens pv-*, componentes Radix+CVA, tema dark via data-theme. Use quando criar/editar UI, migrar portal, ou copiar snippets.
 ---
 
 # SEMEC Design System — Skill para Claude
 
-Kit `@semec/ds-react` (`packages/react/`) — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
+Kit `@semec/ds` (`packages/react/`) — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
 ## Onde ler
 
@@ -20,7 +20,7 @@ Gere local: `node scripts/generate-llms.mjs` ou `npm run generate:llms` (roda no
 ## Instalação kit (packages/react/README.md)
 
 ```bash
-# Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# Copie packages/react/ para seu projeto (ou instale @semec/ds pelo registry)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
   @radix-ui/react-radio-group @radix-ui/react-select @radix-ui/react-switch \
@@ -55,7 +55,7 @@ Tokens trocam via `[data-theme="dark"]` em `packages/react/tokens.css`. Proto is
 
 Exemplo:
 ```tsx
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge } from "@semec/ds-react";
+import { Button, Card, CardHeader, CardTitle, CardContent, Badge } from "@semec/ds/react";
 // ou arquivo: "./base/components/button" quando copiado para src/base
 
 <Button variant="primary" size="md">Salvar</Button>
@@ -66,7 +66,7 @@ import { Button, Card, CardHeader, CardTitle, CardContent, Badge } from "@semec/
 - Site docs: `components/docs/CodeBlock.jsx` (botão "Copiar código" + "Copiar prompt")
 - MDX: `components/docs/MdxPre.jsx` + `rehype-pretty-code` (shiki github-light/dark)
 - Swatches: `components/ui/Swatch.jsx`
-- Prompt IA: `dsPrompt(c)` em `packages/react/manifest.js` → “Crie um button (Botões) usando @semec/ds-react …”
+- Prompt IA: `dsPrompt(c)` em `packages/react/manifest.js` → “Crie um button (Botões) usando @semec/ds/react …”
 
 ## Protótipo isolado
 

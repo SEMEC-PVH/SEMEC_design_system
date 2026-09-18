@@ -86,10 +86,10 @@ variants: "${variantsLine.replace(/"/g, "'")}"
 
 ${c.variants.length ? c.variants.map((v) => `- **${v.prop}**: ${v.values}`).join("\n") : "_Sem variantes_"}
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 \`\`\`bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \\
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \\
@@ -138,7 +138,7 @@ Gerado a partir de \`packages/react/manifest.js\` — não edite manualmente. Co
 const siteUrl = "https://semec-pvh.github.io/SEMEC_design_system"; // fallback, sem url exata conhecida
 let llms = `# SEMEC Design System — SEMEC Digital (Porto Velho)
 
-> Kit @semec/ds-react (React + Tailwind v4 + shadcn + Radix + CVA). Conteúdo PT-BR, código EN (ADR-016). Tema via [data-theme="dark"] (ADR-012).
+> Kit @semec/ds/react (React + Tailwind v4 + shadcn + Radix + CVA). Conteúdo PT-BR, código EN (ADR-016). Tema via [data-theme="dark"] (ADR-012).
 
 ## Instalar
 

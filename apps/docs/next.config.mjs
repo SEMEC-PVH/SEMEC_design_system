@@ -7,7 +7,7 @@ const nextConfig = {
   trailingSlash: true,
   allowedDevOrigins: ['10.102.3.109'],
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
-  transpilePackages: ['@semec/ds-react'],
+  transpilePackages: ['@semec/ds'],
 };
 
 const withMDX = createMDX({

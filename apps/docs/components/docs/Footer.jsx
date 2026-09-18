@@ -3,7 +3,11 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <footer className="site-footer">
-    <Link href="/quem-somos" className="site-footer-brand">DEVSEMEC</Link>
+    <Link href="/quem-somos" className="site-footer-brand">
+      {"DEVSEMEC".split("").map((letter, i) => (
+        <span key={i} className="site-footer-letter">{letter}</span>
+      ))}
+    </Link>
       <div className="site-footer-left">
         <span className="site-footer-copy">
           © 2026. Prefeitura de Porto Velho.

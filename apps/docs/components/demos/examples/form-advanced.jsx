@@ -23,7 +23,7 @@ import {
   maskCEP,
   maskCurrency,
   validateEmail,
-} from "@semec/ds-react";
+} from "@semec/ds/react";
 
 export function FormAdvanced() {
   const [tipo, setTipo] = useState("pf"); // pf | pj
