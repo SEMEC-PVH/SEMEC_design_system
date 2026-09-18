@@ -3,8 +3,8 @@ import { join } from "path";
 import Link from "next/link";
 import BasePreview from "@/components/demos/base-previews";
 import CodeBlock from "@/components/docs/CodeBlock";
-import { dsByCategory, dsCategories, dsPrompt } from "@semec/ds-react/manifest";
-import { dsPackageRootResolve } from "@semec/ds-react/server";
+import { dsByCategory, dsCategories, dsPrompt } from "@semec/ds/skills";
+import { dsPackageRootResolve } from "@semec/ds/react/server";
 
 export function ProtoStyle() {
   return (

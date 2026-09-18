@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-09-16T18:04:16.344Z — packages/react/manifest.js + packages/react/*
+> Gerado 2026-09-17T17:21:55.806Z — packages/react/manifest.js + packages/react/*
 
 ## Instalação — packages/react/README.md
 
@@ -101,37 +101,52 @@ convenção do design system (ADR-012). Exemplo:
 export * from "./components/accordion";
 export * from "./components/alert";
 export * from "./components/alert-dialog";
+export * from "./components/avatar";
 export * from "./components/badge";
 export * from "./components/breadcrumb";
 export * from "./components/button";
+export * from "./components/calendar";
 export * from "./components/card";
 export * from "./components/checkbox";
 export * from "./components/combobox";
+export * from "./components/data-table";
 export * from "./components/date-picker";
 export * from "./components/dialog";
+export * from "./components/drawer";
+export * from "./components/dropdown-menu";
 export * from "./components/error-summary";
 export * from "./components/empty-state";
 export * from "./components/file-upload";
 export * from "./components/form-field";
 export * from "./components/icon-button";
 export * from "./components/input";
+export * from "./components/input-otp";
 export * from "./components/label";
 export * from "./components/link";
+export * from "./components/navigation-menu";
 export * from "./components/pagination";
 export * from "./components/popover";
+export * from "./components/progress";
 export * from "./components/radio-group";
+export * from "./components/scroll-area";
 export * from "./components/select";
 export * from "./components/separator";
+export * from "./components/sidebar";
 export * from "./components/sidebar-trigger";
 export * from "./components/skeleton";
+export * from "./components/slider";
+export * from "./components/spinner";
 export * from "./components/switch";
 export * from "./components/table";
 export * from "./components/tabs";
 export * from "./components/textarea";
+export * from "./components/timeline";
 export * from "./components/toast";
+export * from "./components/toggle";
 export * from "./components/tooltip";
 export * from "./lib/masks";
 export * from "./lib/validators";
+
 ```
 
 ## packages/react/tokens.css
@@ -684,7 +699,7 @@ export default {
 ]
 ```
 
-## Componentes — todos (32)
+## Componentes — todos (47)
 
 
 ### Botões (`button`) — `src/components/button.tsx` — slug: botoes
@@ -2706,7 +2721,7 @@ import { IconButton, type IconButtonProps } from "./icon-button";
  * é chamado ao clicar. `label` pode ser sobrescrito para rótulos
  * específicos.
  */
-export interface SidebarTriggerProps
+export interface SidebarToggleButtonProps
   extends Omit<IconButtonProps, "icon"> {
   /** Estado atual da sidebar (aberta = true). */
   open?: boolean;
@@ -2757,7 +2772,7 @@ const PanelLeftClose = () => (
   </svg>
 );
 
-const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTriggerProps>(
+const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarTriggerProps>(
   (
     {
       open = false,
@@ -2781,9 +2796,9 @@ const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTriggerProps>(
     </IconButton>
   )
 );
-SidebarTrigger.displayName = "SidebarTrigger";
+SidebarToggleButton.displayName = "SidebarToggleButton";
 
-export { SidebarTrigger };
+export { SidebarToggleButton };
 
 ```
 
@@ -3742,6 +3757,2507 @@ const Separator = React.forwardRef<HTMLDivElement, SeparatorProps>(
 Separator.displayName = "Separator";
 
 export { Separator };
+
+```
+
+---
+
+### Avatar (`avatar`) — `src/components/avatar.tsx` — slug: avatar
+
+Desc: Foto de perfil com fallback automático (iniciais).
+
+Variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className
+
+Uso:
+```tsx
+import { Avatar, AvatarImage, AvatarFallback } from "@semec/ds-react";
+
+<Avatar>
+  <AvatarImage src="/foto.jpg" alt="João Silva" />
+  <AvatarFallback>JS</AvatarFallback>
+</Avatar>
+```
+
+Prompt:
+```text
+Crie um avatar (Avatar) usando @semec/ds-react (`src/components/avatar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className. Foto de perfil com fallback automático (iniciais).
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as AvatarPrimitive from "@radix-ui/react-avatar";
+
+import { cn } from "../lib/utils";
+
+const Avatar = React.forwardRef<
+  React.ElementRef<typeof AvatarPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
+>(({ className, ...props }, ref) => (
+  <AvatarPrimitive.Root
+    ref={ref}
+    className={cn(
+      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
+      className
+    )}
+    {...props}
+  />
+));
+Avatar.displayName = AvatarPrimitive.Root.displayName;
+
+const AvatarImage = React.forwardRef<
+  React.ElementRef<typeof AvatarPrimitive.Image>,
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
+>(({ className, ...props }, ref) => (
+  <AvatarPrimitive.Image
+    ref={ref}
+    className={cn("aspect-square h-full w-full", className)}
+    {...props}
+  />
+));
+AvatarImage.displayName = AvatarPrimitive.Image.displayName;
+
+const AvatarFallback = React.forwardRef<
+  React.ElementRef<typeof AvatarPrimitive.Fallback>,
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
+>(({ className, ...props }, ref) => (
+  <AvatarPrimitive.Fallback
+    ref={ref}
+    className={cn(
+      "flex h-full w-full items-center justify-center rounded-full bg-muted text-sm font-medium text-muted-foreground",
+      className
+    )}
+    {...props}
+  />
+));
+AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
+
+export { Avatar, AvatarImage, AvatarFallback };
+
+```
+
+---
+
+### Toggle (`toggle`) — `src/components/toggle.tsx` — slug: toggle
+
+Desc: Botão binário para estados on/off em toolbars.
+
+Variantes: variant: default · outline · size: sm · md · lg
+
+Uso:
+```tsx
+import { Toggle } from "@semec/ds-react";
+import { Bold } from "lucide-react";
+
+<Toggle variant="outline" aria-label="Negrito">
+  <Bold />
+</Toggle>
+```
+
+Prompt:
+```text
+Crie um toggle (Toggle) usando @semec/ds-react (`src/components/toggle.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · outline · size: sm · md · lg. Botão binário para estados on/off em toolbars.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as TogglePrimitive from "@radix-ui/react-toggle";
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { cn } from "../lib/utils";
+
+const toggleVariants = cva(
+  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors duration-fast ease-standard hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground",
+  {
+    variants: {
+      variant: {
+        default: "bg-transparent",
+        outline:
+          "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
+      },
+      size: {
+        sm: "h-9 px-3",
+        md: "h-10 px-3",
+        lg: "h-11 px-5",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "md",
+    },
+  }
+);
+
+export interface ToggleProps
+  extends React.ComponentPropsWithoutRef<typeof TogglePrimitive.Root>,
+    VariantProps<typeof toggleVariants> {}
+
+const Toggle = React.forwardRef<
+  React.ElementRef<typeof TogglePrimitive.Root>,
+  ToggleProps
+>(({ className, variant, size, ...props }, ref) => (
+  <TogglePrimitive.Root
+    ref={ref}
+    className={cn(toggleVariants({ variant, size, className }))}
+    {...props}
+  />
+));
+Toggle.displayName = TogglePrimitive.Root.displayName;
+
+export { Toggle, toggleVariants };
+
+```
+
+---
+
+### Spinner (`spinner`) — `src/components/spinner.tsx` — slug: spinner
+
+Desc: Indicador de carregamento inline.
+
+Uso:
+```tsx
+import { Spinner } from "@semec/ds-react";
+
+<Spinner />
+<p className="text-muted-foreground">Carregando dados…</p>
+```
+
+Prompt:
+```text
+Crie um spinner (Spinner) usando @semec/ds-react (`src/components/spinner.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Indicador de carregamento inline.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+
+import { cn } from "../lib/utils";
+
+const Spinner = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    role="status"
+    aria-label="Carregando"
+    className={cn("inline-flex items-center justify-center", className)}
+    {...props}
+  >
+    <svg
+      className="h-5 w-5 animate-spin text-current"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
+    </svg>
+    <span className="sr-only">Carregando</span>
+  </div>
+));
+Spinner.displayName = "Spinner";
+
+export { Spinner };
+
+```
+
+---
+
+### Progresso (`progress`) — `src/components/progress.tsx` — slug: progress
+
+Desc: Barra de progresso determinada.
+
+Uso:
+```tsx
+import { Progress } from "@semec/ds-react";
+
+<Progress value={60} />
+<p className="text-sm text-muted-foreground">60% concluído</p>
+```
+
+Prompt:
+```text
+Crie um progress (Progresso) usando @semec/ds-react (`src/components/progress.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Barra de progresso determinada.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as ProgressPrimitive from "@radix-ui/react-progress";
+
+import { cn } from "../lib/utils";
+
+const Progress = React.forwardRef<
+  React.ElementRef<typeof ProgressPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
+>(({ className, value, ...props }, ref) => (
+  <ProgressPrimitive.Root
+    ref={ref}
+    className={cn(
+      "relative h-3 w-full overflow-hidden rounded-full bg-secondary",
+      className
+    )}
+    {...props}
+  >
+    <ProgressPrimitive.Indicator
+      className="h-full w-full flex-1 rounded-full bg-primary transition-all duration-base ease-standard"
+      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+    />
+  </ProgressPrimitive.Root>
+));
+Progress.displayName = ProgressPrimitive.Root.displayName;
+
+export { Progress };
+
+```
+
+---
+
+### Slider (`slider`) — `src/components/slider.tsx` — slug: slider
+
+Desc: Controle deslizante para faixas de valor.
+
+Uso:
+```tsx
+import { Slider } from "@semec/ds-react";
+
+<Slider defaultValue={[50]} max={100} step={1} />
+```
+
+Prompt:
+```text
+Crie um slider (Slider) usando @semec/ds-react (`src/components/slider.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Controle deslizante para faixas de valor.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as SliderPrimitive from "@radix-ui/react-slider";
+
+import { cn } from "../lib/utils";
+
+const Slider = React.forwardRef<
+  React.ElementRef<typeof SliderPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
+>(({ className, ...props }, ref) => (
+  <SliderPrimitive.Root
+    ref={ref}
+    className={cn(
+      "relative flex w-full touch-none select-none items-center",
+      className
+    )}
+    {...props}
+  >
+    <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
+      <SliderPrimitive.Range className="absolute h-full bg-primary" />
+    </SliderPrimitive.Track>
+    <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-primary bg-background shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50" />
+  </SliderPrimitive.Root>
+));
+Slider.displayName = SliderPrimitive.Root.displayName;
+
+export { Slider };
+
+```
+
+---
+
+### Input OTP (`input-otp`) — `src/components/input-otp.tsx` — slug: input-otp
+
+Desc: Campo de código OTP com foco automático entre dígitos.
+
+Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled
+
+Uso:
+```tsx
+import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec/ds-react";
+
+<InputOTP value={code} onChange={setCode} maxLength={6}>
+  <InputOTPGroup>
+    <InputOTPSlot index={0} />
+    <InputOTPSlot index={1} />
+    <InputOTPSlot index={2} />
+  </InputOTPGroup>
+  <InputOTPSeparator />
+  <InputOTPGroup>
+    <InputOTPSlot index={3} />
+    <InputOTPSlot index={4} />
+    <InputOTPSlot index={5} />
+  </InputOTPGroup>
+</InputOTP>
+```
+
+Prompt:
+```text
+Crie um input-otp (Input OTP) usando @semec/ds-react (`src/components/input-otp.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled. Campo de código OTP com foco automático entre dígitos.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+
+import { cn } from "../lib/utils";
+
+interface InputOTPContextValue {
+  slots: string[];
+  activeSlot: number;
+  handleSlotChange: (index: number, value: string) => void;
+  handleKeyDown: (index: number, e: React.KeyboardEvent<HTMLInputElement>) => void;
+  handlePaste: (e: React.ClipboardEvent<HTMLInputElement>) => void;
+  focusSlot: (index: number) => void;
+  maxLength: number;
+  disabled?: boolean;
+}
+
+const InputOTPContext = React.createContext<InputOTPContextValue | null>(null);
+
+function useInputOTP() {
+  const ctx = React.useContext(InputOTPContext);
+  if (!ctx) throw new Error("InputOTP compound components must be used within <InputOTP>");
+  return ctx;
+}
+
+interface InputOTPProps extends React.HTMLAttributes<HTMLDivElement> {
+  value: string;
+  onChange: (value: string) => void;
+  maxLength?: number;
+  disabled?: boolean;
+}
+
+const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
+  ({ className, value, onChange, maxLength = 6, disabled, children, ...props }, ref) => {
+    const [activeSlot, setActiveSlot] = React.useState(0);
+    const slotsRef = React.useRef<(HTMLInputElement | null)[]>([]);
+
+    const handleSlotChange = React.useCallback(
+      (index: number, char: string) => {
+        if (disabled) return;
+        const digits = value.split("");
+        digits[index] = char;
+        const next = digits.join("").slice(0, maxLength);
+        onChange(next);
+        if (char && index < maxLength - 1) {
+          setActiveSlot(index + 1);
+          slotsRef.current[index + 1]?.focus();
+        }
+      },
+      [value, onChange, maxLength, disabled]
+    );
+
+    const handleKeyDown = React.useCallback(
+      (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (disabled) return;
+        if (e.key === "Backspace") {
+          e.preventDefault();
+          const digits = value.split("");
+          if (digits[index]) {
+            digits[index] = "";
+            onChange(digits.join(""));
+          } else if (index > 0) {
+            digits[index - 1] = "";
+            onChange(digits.join(""));
+            setActiveSlot(index - 1);
+            slotsRef.current[index - 1]?.focus();
+          }
+        } else if (e.key === "ArrowLeft" && index > 0) {
+          e.preventDefault();
+          setActiveSlot(index - 1);
+          slotsRef.current[index - 1]?.focus();
+        } else if (e.key === "ArrowRight" && index < maxLength - 1) {
+          e.preventDefault();
+          setActiveSlot(index + 1);
+          slotsRef.current[index + 1]?.focus();
+        }
+      },
+      [value, onChange, maxLength, disabled]
+    );
+
+    const handlePaste = React.useCallback(
+      (e: React.ClipboardEvent<HTMLInputElement>) => {
+        if (disabled) return;
+        e.preventDefault();
+        const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, maxLength);
+        if (pasted) {
+          onChange(pasted);
+          const nextIndex = Math.min(pasted.length, maxLength - 1);
+          setActiveSlot(nextIndex);
+          slotsRef.current[nextIndex]?.focus();
+        }
+      },
+      [onChange, maxLength, disabled]
+    );
+
+    const focusSlot = React.useCallback((index: number) => {
+      setActiveSlot(index);
+      slotsRef.current[index]?.focus();
+    }, []);
+
+    const contextValue: InputOTPContextValue = {
+      slots: value.split(""),
+      activeSlot,
+      handleSlotChange,
+      handleKeyDown,
+      handlePaste,
+      focusSlot,
+      maxLength,
+      disabled,
+    };
+
+    return (
+      <InputOTPContext.Provider value={contextValue}>
+        <div
+          ref={ref}
+          className={cn("flex items-center gap-2", className)}
+          {...props}
+        >
+          {children}
+        </div>
+      </InputOTPContext.Provider>
+    );
+  }
+);
+InputOTP.displayName = "InputOTP";
+
+const InputOTPGroup = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex items-center gap-1", className)}
+    {...props}
+  />
+));
+InputOTPGroup.displayName = "InputOTPGroup";
+
+interface InputOTPSlotProps extends React.HTMLAttributes<HTMLDivElement> {
+  index: number;
+}
+
+const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
+  ({ className, index, ...props }, ref) => {
+    const { slots, activeSlot, handleSlotChange, handleKeyDown, handlePaste, focusSlot, disabled } =
+      useInputOTP();
+    const value = slots[index] || "";
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "relative flex h-11 w-11 items-center justify-center rounded-md border border-input bg-background text-lg shadow-sm transition-colors duration-fast ease-standard",
+          activeSlot === index && "ring-2 ring-ring ring-offset-2 ring-offset-background",
+          disabled && "opacity-50 cursor-not-allowed",
+          className
+        )}
+        {...props}
+      >
+        <input
+          type="text"
+          inputMode="numeric"
+          maxLength={1}
+          value={value}
+          disabled={disabled}
+          onChange={(e) => handleSlotChange(index, e.target.value.replace(/\D/g, ""))}
+          onKeyDown={(e) => handleKeyDown(index, e)}
+          onPaste={handlePaste}
+          onFocus={() => focusSlot(index)}
+          className="absolute inset-0 h-full w-full cursor-pointer bg-transparent text-center text-lg font-medium text-foreground caret-transparent outline-none"
+          aria-label={`Dígito ${index + 1}`}
+        />
+        <span aria-hidden="true" className="pointer-events-none">
+          {value || ""}
+        </span>
+      </div>
+    );
+  }
+);
+InputOTPSlot.displayName = "InputOTPSlot";
+
+const InputOTPSeparator = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    role="separator"
+    className={cn("text-muted-foreground", className)}
+    {...props}
+  >
+    &ndash;
+  </div>
+));
+InputOTPSeparator.displayName = "InputOTPSeparator";
+
+export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator };
+
+```
+
+---
+
+### Calendário (`calendar`) — `src/components/calendar.tsx` — slug: calendario
+
+Desc: Calendário visual para seleção de data.
+
+Variantes: props: value · onChange · min · max · disabled
+
+Uso:
+```tsx
+import { Calendar } from "@semec/ds-react";
+
+<Calendar value={data} onChange={setData} />
+```
+
+Prompt:
+```text
+Crie um calendar (Calendário) usando @semec/ds-react (`src/components/calendar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: value · onChange · min · max · disabled. Calendário visual para seleção de data.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+const MONTHS = [
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+];
+
+interface CalendarProps extends React.HTMLAttributes<HTMLDivElement> {
+  value?: Date | null;
+  onChange?: (date: Date) => void;
+  disabled?: boolean;
+  min?: string;
+  max?: string;
+}
+
+function getDaysInMonth(year: number, month: number) {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+function getFirstDayOfMonth(year: number, month: number) {
+  return new Date(year, month, 1).getDay();
+}
+
+const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
+  ({ className, value, onChange, disabled, min, max, ...props }, ref) => {
+    const today = new Date();
+    const [viewDate, setViewDate] = React.useState(
+      value ? new Date(value.getFullYear(), value.getMonth(), 1) : new Date(today.getFullYear(), today.getMonth(), 1)
+    );
+
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+    const daysInMonth = getDaysInMonth(year, month);
+    const firstDay = getFirstDayOfMonth(year, month);
+
+    const minDate = min ? new Date(min) : undefined;
+    const maxDate = max ? new Date(max) : undefined;
+
+    const isSelected = (day: number) => {
+      if (!value) return false;
+      return value.getFullYear() === year && value.getMonth() === month && value.getDate() === day;
+    };
+
+    const isToday = (day: number) => {
+      return (
+        today.getFullYear() === year &&
+        today.getMonth() === month &&
+        today.getDate() === day
+      );
+    };
+
+    const isDisabled = (day: number) => {
+      if (disabled) return true;
+      const date = new Date(year, month, day);
+      if (minDate && date < minDate) return true;
+      if (maxDate && date > maxDate) return true;
+      return false;
+    };
+
+    const handleSelect = (day: number) => {
+      if (isDisabled(day)) return;
+      onChange?.(new Date(year, month, day));
+    };
+
+    const prevMonth = () => {
+      setViewDate(new Date(year, month - 1, 1));
+    };
+
+    const nextMonth = () => {
+      setViewDate(new Date(year, month + 1, 1));
+    };
+
+    const cells: (number | null)[] = [];
+    for (let i = 0; i < firstDay; i++) cells.push(null);
+    for (let i = 1; i <= daysInMonth; i++) cells.push(i);
+
+    return (
+      <div
+        ref={ref}
+        className={cn("p-3", className)}
+        {...props}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <button
+            type="button"
+            onClick={prevMonth}
+            className="inline-flex items-center justify-center rounded-md h-8 w-8 text-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            aria-label="Mês anterior"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <div className="text-sm font-medium text-foreground">
+            {MONTHS[month]} {year}
+          </div>
+          <button
+            type="button"
+            onClick={nextMonth}
+            className="inline-flex items-center justify-center rounded-md h-8 w-8 text-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            aria-label="Próximo mês"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-7 gap-1 mb-1">
+          {WEEKDAYS.map((day) => (
+            <div
+              key={day}
+              className="flex h-8 items-center justify-center text-xs font-medium text-muted-foreground"
+            >
+              {day}
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-7 gap-1">
+          {cells.map((day, i) => {
+            if (day === null) {
+              return <div key={`empty-${i}`} />;
+            }
+            return (
+              <button
+                key={day}
+                type="button"
+                onClick={() => handleSelect(day)}
+                disabled={isDisabled(day)}
+                className={cn(
+                  "inline-flex h-9 w-9 items-center justify-center rounded-md text-sm transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  isSelected(day)
+                    ? "bg-primary text-primary-foreground"
+                    : isToday(day)
+                      ? "bg-accent text-accent-foreground"
+                      : "text-foreground hover:bg-accent hover:text-accent-foreground",
+                  isDisabled(day) && "pointer-events-none opacity-50"
+                )}
+              >
+                {day}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+);
+Calendar.displayName = "Calendar";
+
+export { Calendar };
+
+```
+
+---
+
+### Área de scroll (`scroll-area`) — `src/components/scroll-area.tsx` — slug: scroll-area
+
+Desc: Scroll customizado e consistente entre navegadores.
+
+Variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal
+
+Uso:
+```tsx
+import { ScrollArea } from "@semec/ds-react";
+
+<ScrollArea className="h-48">
+  <div className="p-4">Conteúdo longo aqui…</div>
+</ScrollArea>
+```
+
+Prompt:
+```text
+Crie um scroll-area (Área de scroll) usando @semec/ds-react (`src/components/scroll-area.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal. Scroll customizado e consistente entre navegadores.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
+
+import { cn } from "../lib/utils";
+
+const ScrollArea = React.forwardRef<
+  React.ElementRef<typeof ScrollAreaPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
+>(({ className, children, ...props }, ref) => (
+  <ScrollAreaPrimitive.Root
+    ref={ref}
+    className={cn("relative overflow-hidden", className)}
+    {...props}
+  >
+    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
+      {children}
+    </ScrollAreaPrimitive.Viewport>
+    <ScrollBar />
+    <ScrollAreaPrimitive.Corner />
+  </ScrollAreaPrimitive.Root>
+));
+ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
+
+const ScrollBar = React.forwardRef<
+  React.ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>
+>(({ className, orientation = "vertical", ...props }, ref) => (
+  <ScrollAreaPrimitive.ScrollAreaScrollbar
+    ref={ref}
+    orientation={orientation}
+    className={cn(
+      "flex touch-none select-none transition-colors duration-fast ease-standard",
+      orientation === "vertical" &&
+        "h-full w-2.5 border-l border-l-transparent p-[1px]",
+      orientation === "horizontal" &&
+        "h-2.5 flex-col border-t border-t-transparent p-[1px]",
+      className
+    )}
+    {...props}
+  >
+    <ScrollAreaPrimitive.ScrollAreaThumb className="relative flex-1 rounded-full bg-border" />
+  </ScrollAreaPrimitive.ScrollAreaScrollbar>
+));
+ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName;
+
+export { ScrollArea, ScrollBar };
+
+```
+
+---
+
+### Menu suspenso (`dropdown-menu`) — `src/components/dropdown-menu.tsx` — slug: menu-suspenso
+
+Desc: Menu flutuante com itens, checkbox, radio, sub-menus e separadores.
+
+Variantes: composição: DropdownMenu · Trigger · Content · Item · CheckboxItem · RadioItem · Label · Separator · Sub · SubTrigger · SubContent
+
+Uso:
+```tsx
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@semec/ds-react";
+import { Button } from "@semec/ds-react";
+import { MoreHorizontal } from "lucide-react";
+
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="ghost" size="icon"><MoreHorizontal /></Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuItem>Editar</DropdownMenuItem>
+    <DropdownMenuItem>Duplicar</DropdownMenuItem>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem className="text-destructive">Excluir</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+Prompt:
+```text
+Crie um dropdown-menu (Menu suspenso) usando @semec/ds-react (`src/components/dropdown-menu.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: DropdownMenu · Trigger · Content · Item · CheckboxItem · RadioItem · Label · Separator · Sub · SubTrigger · SubContent. Menu flutuante com itens, checkbox, radio, sub-menus e separadores.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import { Check, ChevronRight, Circle } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+const DropdownMenu = DropdownMenuPrimitive.Root;
+
+const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
+
+const DropdownMenuGroup = DropdownMenuPrimitive.Group;
+
+const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
+
+const DropdownMenuSub = DropdownMenuPrimitive.Sub;
+
+const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
+
+const DropdownMenuSubTrigger = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
+    inset?: boolean;
+  }
+>(({ className, inset, children, ...props }, ref) => (
+  <DropdownMenuPrimitive.SubTrigger
+    ref={ref}
+    className={cn(
+      "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent",
+      inset && "pl-8",
+      className
+    )}
+    {...props}
+  >
+    {children}
+    <ChevronRight className="ml-auto h-4 w-4" />
+  </DropdownMenuPrimitive.SubTrigger>
+));
+DropdownMenuSubTrigger.displayName =
+  DropdownMenuPrimitive.SubTrigger.displayName;
+
+const DropdownMenuSubContent = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.SubContent>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>
+>(({ className, ...props }, ref) => (
+  <DropdownMenuPrimitive.SubContent
+    ref={ref}
+    className={cn(
+      "z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-elevation-2 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+      className
+    )}
+    {...props}
+  />
+));
+DropdownMenuSubContent.displayName =
+  DropdownMenuPrimitive.SubContent.displayName;
+
+const DropdownMenuContent = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
+>(({ className, sideOffset = 4, ...props }, ref) => (
+  <DropdownMenuPrimitive.Portal>
+    <DropdownMenuPrimitive.Content
+      ref={ref}
+      sideOffset={sideOffset}
+      className={cn(
+        "z-50 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-elevation-2 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        className
+      )}
+      {...props}
+    />
+  </DropdownMenuPrimitive.Portal>
+));
+DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
+
+const DropdownMenuItem = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
+    inset?: boolean;
+  }
+>(({ className, inset, ...props }, ref) => (
+  <DropdownMenuPrimitive.Item
+    ref={ref}
+    className={cn(
+      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      inset && "pl-8",
+      className
+    )}
+    {...props}
+  />
+));
+DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
+
+const DropdownMenuCheckboxItem = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>
+>(({ className, children, checked, ...props }, ref) => (
+  <DropdownMenuPrimitive.CheckboxItem
+    ref={ref}
+    className={cn(
+      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      className
+    )}
+    checked={checked}
+    {...props}
+  >
+    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+      <DropdownMenuPrimitive.ItemIndicator>
+        <Check className="h-4 w-4" />
+      </DropdownMenuPrimitive.ItemIndicator>
+    </span>
+    {children}
+  </DropdownMenuPrimitive.CheckboxItem>
+));
+DropdownMenuCheckboxItem.displayName =
+  DropdownMenuPrimitive.CheckboxItem.displayName;
+
+const DropdownMenuRadioItem = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>
+>(({ className, children, ...props }, ref) => (
+  <DropdownMenuPrimitive.RadioItem
+    ref={ref}
+    className={cn(
+      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      className
+    )}
+    {...props}
+  >
+    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+      <DropdownMenuPrimitive.ItemIndicator>
+        <Circle className="h-2 w-2 fill-current" />
+      </DropdownMenuPrimitive.ItemIndicator>
+    </span>
+    {children}
+  </DropdownMenuPrimitive.RadioItem>
+));
+DropdownMenuRadioItem.displayName =
+  DropdownMenuPrimitive.RadioItem.displayName;
+
+const DropdownMenuLabel = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Label>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label> & {
+    inset?: boolean;
+  }
+>(({ className, inset, ...props }, ref) => (
+  <DropdownMenuPrimitive.Label
+    ref={ref}
+    className={cn(
+      "px-2 py-1.5 text-sm font-semibold",
+      inset && "pl-8",
+      className
+    )}
+    {...props}
+  />
+));
+DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
+
+const DropdownMenuSeparator = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Separator>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>
+>(({ className, ...props }, ref) => (
+  <DropdownMenuPrimitive.Separator
+    ref={ref}
+    className={cn("-mx-1 my-1 h-px bg-border", className)}
+    {...props}
+  />
+));
+DropdownMenuSeparator.displayName =
+  DropdownMenuPrimitive.Separator.displayName;
+
+const DropdownMenuShortcut = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span
+    className={cn("ml-auto text-xs tracking-widest opacity-60", className)}
+    {...props}
+  />
+);
+DropdownMenuShortcut.displayName = "DropdownMenuShortcut";
+
+export {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuGroup,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuRadioGroup,
+};
+
+```
+
+---
+
+### Drawer (`drawer`) — `src/components/drawer.tsx` — slug: drawer
+
+Desc: Painel deslizante de qualquer lado da tela.
+
+Variantes: side: top · bottom · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close
+
+Uso:
+```tsx
+import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, Button } from "@semec/ds-react";
+
+<Drawer>
+  <DrawerTrigger asChild><Button>Abrir painel</Button></DrawerTrigger>
+  <DrawerContent side="right">
+    <DrawerHeader>
+      <DrawerTitle>Detalhes</DrawerTitle>
+      <DrawerDescription>Informações do protocolo.</DrawerDescription>
+    </DrawerHeader>
+    <div className="p-6">Conteúdo aqui</div>
+    <DrawerFooter>
+      <DrawerClose asChild><Button variant="outline">Fechar</Button></DrawerClose>
+    </DrawerFooter>
+  </DrawerContent>
+</Drawer>
+```
+
+Prompt:
+```text
+Crie um drawer (Drawer) usando @semec/ds-react (`src/components/drawer.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: top · bottom · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close. Painel deslizante de qualquer lado da tela.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { cn } from "../lib/utils";
+
+const Drawer = DialogPrimitive.Root;
+
+const DrawerTrigger = DialogPrimitive.Trigger;
+
+const DrawerClose = DialogPrimitive.Close;
+
+const DrawerPortal = DialogPrimitive.Portal;
+
+const drawerVariants = cva(
+  "fixed z-50 gap-4 bg-card p-6 shadow-elevation-3 transition-base ease-standard",
+  {
+    variants: {
+      side: {
+        top: "inset-x-0 top-0 border-b border-border data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
+        bottom:
+          "inset-x-0 bottom-0 border-t border-border data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+        left: "inset-y-0 left-0 h-full w-3/4 border-r border-border data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
+        right:
+          "inset-y-0 right-0 h-full w-3/4 border-l border-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+      },
+    },
+    defaultVariants: {
+      side: "bottom",
+    },
+  }
+);
+
+export interface DrawerContentProps
+  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>,
+    VariantProps<typeof drawerVariants> {}
+
+const DrawerContent = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  DrawerContentProps
+>(({ side = "bottom", className, children, ...props }, ref) => (
+  <DrawerPortal>
+    <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(drawerVariants({ side }), className)}
+      {...props}
+    >
+      {children}
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm text-muted-foreground transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none">
+        <X className="h-4 w-4" aria-hidden="true" />
+        <span className="sr-only">Fechar</span>
+      </DialogPrimitive.Close>
+    </DialogPrimitive.Content>
+  </DrawerPortal>
+));
+DrawerContent.displayName = "DrawerContent";
+
+const DrawerHeader = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("flex flex-col space-y-1.5 text-left", className)}
+    {...props}
+  />
+);
+DrawerHeader.displayName = "DrawerHeader";
+
+const DrawerFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
+    {...props}
+  />
+);
+DrawerFooter.displayName = "DrawerFooter";
+
+const DrawerTitle = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Title
+    ref={ref}
+    className={cn("text-lg font-semibold leading-none tracking-tight", className)}
+    {...props}
+  />
+));
+DrawerTitle.displayName = DialogPrimitive.Title.displayName;
+
+const DrawerDescription = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Description
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+));
+DrawerDescription.displayName = DialogPrimitive.Description.displayName;
+
+export {
+  Drawer,
+  DrawerPortal,
+  DrawerTrigger,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerFooter,
+  DrawerTitle,
+  DrawerDescription,
+};
+
+```
+
+---
+
+### Sheet (`sheet`) — `src/components/sheet.tsx` — slug: sheet
+
+Desc: Painel lateral modal com overlay. Variantes left/right/top/bottom.
+
+Variantes: side: left · right · top · bottom · composição: Sheet · Trigger · Content · Header · Footer · Title · Description · Close
+
+Uso:
+```tsx
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "@semec/ds-react";
+
+<Sheet>
+  <SheetTrigger asChild><Button variant="outline">Abrir filtros</Button></SheetTrigger>
+  <SheetContent side="left">
+    <SheetHeader>
+      <SheetTitle>Filtros</SheetTitle>
+      <SheetDescription>Refine sua busca.</SheetDescription>
+    </SheetHeader>
+    <div className="p-6">Filtros aqui</div>
+    <SheetFooter>
+      <SheetClose asChild><Button>Aplicar</Button></SheetClose>
+    </SheetFooter>
+  </SheetContent>
+</Sheet>
+```
+
+Prompt:
+```text
+Crie um sheet (Sheet) usando @semec/ds-react (`src/components/sheet.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: left · right · top · bottom · composição: Sheet · Trigger · Content · Header · Footer · Title · Description · Close. Painel lateral modal com overlay. Variantes left/right/top/bottom.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { cn } from "../lib/utils";
+
+const Sheet = DialogPrimitive.Root;
+
+const SheetTrigger = DialogPrimitive.Trigger;
+
+const SheetClose = DialogPrimitive.Close;
+
+const SheetPortal = DialogPrimitive.Portal;
+
+const SheetOverlay = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Overlay
+    className={cn(
+      "fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      className
+    )}
+    {...props}
+    ref={ref}
+  />
+));
+SheetOverlay.displayName = DialogPrimitive.Overlay.displayName;
+
+const sheetVariants = cva(
+  "fixed z-50 gap-4 bg-card p-6 shadow-elevation-3 transition-base ease-standard",
+  {
+    variants: {
+      side: {
+        top: "inset-x-0 top-0 border-b border-border data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
+        bottom:
+          "inset-x-0 bottom-0 border-t border-border data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+        left: "inset-y-0 left-0 h-full w-3/4 border-r border-border data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
+        right:
+          "inset-y-0 right-0 h-full w-3/4 border-l border-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+      },
+    },
+    defaultVariants: {
+      side: "right",
+    },
+  }
+);
+
+export interface SheetContentProps
+  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>,
+    VariantProps<typeof sheetVariants> {}
+
+const SheetContent = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  SheetContentProps
+>(({ side = "right", className, children, ...props }, ref) => (
+  <SheetPortal>
+    <SheetOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(sheetVariants({ side }), className)}
+      {...props}
+    >
+      {children}
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm text-muted-foreground transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none">
+        <X className="h-4 w-4" aria-hidden="true" />
+        <span className="sr-only">Fechar</span>
+      </DialogPrimitive.Close>
+    </DialogPrimitive.Content>
+  </SheetPortal>
+));
+SheetContent.displayName = DialogPrimitive.Content.displayName;
+
+const SheetHeader = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("flex flex-col space-y-2 text-left", className)}
+    {...props}
+  />
+);
+SheetHeader.displayName = "SheetHeader";
+
+const SheetFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
+    {...props}
+  />
+);
+SheetFooter.displayName = "SheetFooter";
+
+const SheetTitle = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Title
+    ref={ref}
+    className={cn("text-lg font-semibold text-foreground", className)}
+    {...props}
+  />
+));
+SheetTitle.displayName = DialogPrimitive.Title.displayName;
+
+const SheetDescription = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Description
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+));
+SheetDescription.displayName = DialogPrimitive.Description.displayName;
+
+export {
+  Sheet,
+  SheetPortal,
+  SheetOverlay,
+  SheetTrigger,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+};
+
+```
+
+---
+
+### Tabela de dados (`data-table`) — `src/components/data-table.tsx` — slug: tabela-de-dados
+
+Desc: Tabela com ordenação visual, paginação e空 states.
+
+Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption
+
+Uso:
+```tsx
+import { DataTable } from "@semec/ds-react";
+
+const columns = [
+  { key: "nome", header: "Nome", sortable: true },
+  { key: "status", header: "Status" },
+];
+
+<DataTable
+  columns={columns}
+  data={registros}
+  sortKey={sortField}
+  sortDir={sortDir}
+  onSort={handleSort}
+  page={pagina}
+  pageCount={totalPaginas}
+  onPageChange={setPagina}
+/>
+```
+
+Prompt:
+```text
+Crie um data-table (Tabela de dados) usando @semec/ds-react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption. Tabela com ordenação visual, paginação e空 states.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+type SortDirection = "asc" | "desc" | null;
+
+interface Column<T> {
+  key: string;
+  header: string;
+  sortable?: boolean;
+  className?: string;
+  render?: (row: T, index: number) => React.ReactNode;
+}
+
+interface DataTableProps<T> extends React.HTMLAttributes<HTMLDivElement> {
+  columns: Column<T>[];
+  data: T[];
+  sortKey?: string | null;
+  sortDir?: SortDirection;
+  onSort?: (key: string) => void;
+  page?: number;
+  pageCount?: number;
+  onPageChange?: (page: number) => void;
+  emptyMessage?: string;
+  rowKey?: (row: T, index: number) => string | number;
+  onRowClick?: (row: T, index: number) => void;
+  caption?: string;
+}
+
+function DataTableInner<T extends Record<string, unknown>>(
+  {
+    columns,
+    data,
+    sortKey,
+    sortDir,
+    onSort,
+    page,
+    pageCount,
+    onPageChange,
+    emptyMessage = "Nenhum registro encontrado.",
+    rowKey,
+    onRowClick,
+    caption,
+    className,
+    ...props
+  }: DataTableProps<T>,
+  _ref: React.Ref<HTMLDivElement>
+) {
+  const handleSort = (key: string) => {
+    onSort?.(key);
+  };
+
+  const getSortIcon = (key: string) => {
+    if (sortKey !== key) return <ArrowUpDown className="h-3 w-3 opacity-50" />;
+    if (sortDir === "asc") return <ArrowUp className="h-3 w-3" />;
+    return <ArrowDown className="h-3 w-3" />;
+  };
+
+  return (
+    <div ref={_ref} className={cn("w-full", className)} {...props}>
+      <div className="relative w-full overflow-auto rounded-md border border-border">
+        <table className="w-full caption-bottom text-sm">
+          {caption && (
+            <caption className="mt-4 text-sm text-muted-foreground">
+              {caption}
+            </caption>
+          )}
+          <thead className="border-b border-border bg-muted/50">
+            <tr>
+              {columns.map((col) => (
+                <th
+                  key={col.key}
+                  className={cn(
+                    "h-11 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+                    col.sortable && "cursor-pointer select-none hover:text-foreground",
+                    col.className
+                  )}
+                  onClick={col.sortable ? () => handleSort(col.key) : undefined}
+                >
+                  <div className="flex items-center gap-2">
+                    {col.header}
+                    {col.sortable && getSortIcon(col.key)}
+                  </div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  {emptyMessage}
+                </td>
+              </tr>
+            ) : (
+              data.map((row, index) => (
+                <tr
+                  key={rowKey ? rowKey(row, index) : index}
+                  className={cn(
+                    "border-b border-border transition-colors duration-fast ease-standard hover:bg-muted/50 data-[state=selected]:bg-muted",
+                    onRowClick && "cursor-pointer"
+                  )}
+                  onClick={onRowClick ? () => onRowClick(row, index) : undefined}
+                >
+                  {columns.map((col) => (
+                    <td
+                      key={col.key}
+                      className={cn(
+                        "p-4 align-middle [&:has([role=checkbox])]:pr-0",
+                        col.className
+                      )}
+                    >
+                      {col.render
+                        ? col.render(row, index)
+                        : String(row[col.key] ?? "")}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {page !== undefined && pageCount !== undefined && pageCount > 1 && (
+        <div className="flex items-center justify-between px-2 py-4">
+          <div className="text-sm text-muted-foreground">
+            Página {page} de {pageCount}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onPageChange?.(page - 1)}
+              disabled={page <= 1}
+              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Anterior
+            </button>
+            <button
+              type="button"
+              onClick={() => onPageChange?.(page + 1)}
+              disabled={page >= pageCount}
+              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              Próximo
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const DataTable = React.forwardRef(DataTableInner) as <
+  T extends Record<string, unknown>
+>(
+  props: DataTableProps<T> & { ref?: React.Ref<HTMLDivElement> }
+) => React.ReactElement;
+
+export { DataTable };
+export type { Column, DataTableProps, SortDirection };
+
+```
+
+---
+
+### Linha do tempo (`timeline`) — `src/components/timeline.tsx` — slug: timeline
+
+Desc: Sequência temporal com dots, conectores e conteúdo.
+
+Variantes: composição: Timeline · TimelineItem · TimelineSeparator · TimelineDot · TimelineConnector · TimelineContent · TimelineTitle · TimelineDescription · dot variant: default · success · warning · destructive · info
+
+Uso:
+```tsx
+import { Timeline, TimelineItem, TimelineSeparator, TimelineDot, TimelineConnector, TimelineContent, TimelineTitle, TimelineDescription } from "@semec/ds-react";
+
+<Timeline>
+  <TimelineItem>
+    <TimelineSeparator>
+      <TimelineDot variant="success" />
+      <TimelineConnector />
+    </TimelineSeparator>
+    <TimelineContent>
+      <TimelineTitle>Protocolo recebido</TimelineTitle>
+      <TimelineDescription>12/08/2026 às 14:30</TimelineDescription>
+    </TimelineContent>
+  </TimelineItem>
+  <TimelineItem>
+    <TimelineSeparator>
+      <TimelineDot />
+    </TimelineSeparator>
+    <TimelineContent>
+      <TimelineTitle>Em análise</TimelineTitle>
+      <TimelineDescription>Aguardando parecer</TimelineDescription>
+    </TimelineContent>
+  </TimelineItem>
+</Timeline>
+```
+
+Prompt:
+```text
+Crie um timeline (Linha do tempo) usando @semec/ds-react (`src/components/timeline.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Timeline · TimelineItem · TimelineSeparator · TimelineDot · TimelineConnector · TimelineContent · TimelineTitle · TimelineDescription · dot variant: default · success · warning · destructive · info. Sequência temporal com dots, conectores e conteúdo.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+
+import { cn } from "../lib/utils";
+
+const Timeline = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("relative flex flex-col gap-0", className)}
+    {...props}
+  />
+));
+Timeline.displayName = "Timeline";
+
+const TimelineItem = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("relative flex gap-4 pb-8 last:pb-0", className)}
+    {...props}
+  />
+));
+TimelineItem.displayName = "TimelineItem";
+
+const TimelineSeparator = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("relative flex flex-col items-center", className)}
+    {...props}
+  />
+));
+TimelineSeparator.displayName = "TimelineSeparator";
+
+const TimelineDot = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { variant?: "default" | "success" | "warning" | "destructive" | "info" }
+>(({ className, variant = "default", ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "z-10 flex h-3 w-3 items-center justify-center rounded-full border-2 border-background",
+      variant === "default" && "bg-primary",
+      variant === "success" && "bg-success",
+      variant === "warning" && "bg-warning",
+      variant === "destructive" && "bg-destructive",
+      variant === "info" && "bg-info",
+      className
+    )}
+    {...props}
+  />
+));
+TimelineDot.displayName = "TimelineDot";
+
+const TimelineConnector = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("absolute left-[5px] top-3 h-full w-px bg-border", className)}
+    {...props}
+  />
+));
+TimelineConnector.displayName = "TimelineConnector";
+
+const TimelineContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex-1 pt-0", className)}
+    {...props}
+  />
+));
+TimelineContent.displayName = "TimelineContent";
+
+const TimelineTitle = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("text-sm font-medium text-foreground leading-none mb-1", className)}
+    {...props}
+  />
+));
+TimelineTitle.displayName = "TimelineTitle";
+
+const TimelineDescription = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+));
+TimelineDescription.displayName = "TimelineDescription";
+
+export {
+  Timeline,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineDot,
+  TimelineConnector,
+  TimelineContent,
+  TimelineTitle,
+  TimelineDescription,
+};
+
+```
+
+---
+
+### Menu de navegação (`navigation-menu`) — `src/components/navigation-menu.tsx` — slug: menu-de-navegacao
+
+Desc: Navegação principal com mega-menu e viewport animado.
+
+Variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator
+
+Uso:
+```tsx
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@semec/ds-react";
+
+<NavigationMenu>
+  <NavigationMenuList>
+    <NavigationMenuItem>
+      <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>
+      <NavigationMenuContent>
+        <NavigationMenuLink href="/iptu">IPTU</NavigationMenuLink>
+        <NavigationMenuLink href="/alvara">Alvará</NavigationMenuLink>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
+  </NavigationMenuList>
+</NavigationMenu>
+```
+
+Prompt:
+```text
+Crie um navigation-menu (Menu de navegação) usando @semec/ds-react (`src/components/navigation-menu.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator. Navegação principal com mega-menu e viewport animado.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
+import { cva } from "class-variance-authority";
+import { ChevronDown } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+const NavigationMenu = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root>
+>(({ className, children, ...props }, ref) => (
+  <NavigationMenuPrimitive.Root
+    ref={ref}
+    className={cn(
+      "relative z-10 flex max-w-max flex-1 items-center justify-center",
+      className
+    )}
+    {...props}
+  >
+    {children}
+    <NavigationMenuViewport />
+  </NavigationMenuPrimitive.Root>
+));
+NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName;
+
+const NavigationMenuList = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.List>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.List>
+>(({ className, ...props }, ref) => (
+  <NavigationMenuPrimitive.List
+    ref={ref}
+    className={cn(
+      "group flex flex-1 list-none items-center justify-center space-x-1",
+      className
+    )}
+    {...props}
+  />
+));
+NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
+
+const NavigationMenuItem = NavigationMenuPrimitive.Item;
+
+const navigationMenuTriggerStyle = cva(
+  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+);
+
+const NavigationMenuTrigger = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Trigger>
+>(({ className, children, ...props }, ref) => (
+  <NavigationMenuPrimitive.Trigger
+    ref={ref}
+    className={cn(navigationMenuTriggerStyle(), "group", className)}
+    {...props}
+  >
+    {children}{" "}
+    <ChevronDown
+      className="relative top-[1px] ml-1 h-3 w-3 transition duration-fast ease-standard group-data-[state=open]:rotate-180"
+      aria-hidden="true"
+    />
+  </NavigationMenuPrimitive.Trigger>
+));
+NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName;
+
+const NavigationMenuContent = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Content>
+>(({ className, ...props }, ref) => (
+  <NavigationMenuPrimitive.Content
+    ref={ref}
+    className={cn(
+      "left-0 top-0 w-full data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52 data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52 md:absolute md:w-auto",
+      className
+    )}
+    {...props}
+  />
+));
+NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName;
+
+const NavigationMenuLink = NavigationMenuPrimitive.Link;
+
+const NavigationMenuViewport = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Viewport>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Viewport>
+>(({ className, ...props }, ref) => (
+  <div className={cn("absolute left-0 top-full flex justify-center")}>
+    <NavigationMenuPrimitive.Viewport
+      className={cn(
+        "origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]",
+        className
+      )}
+      ref={ref}
+      {...props}
+    />
+  </div>
+));
+NavigationMenuViewport.displayName =
+  NavigationMenuPrimitive.Viewport.displayName;
+
+const NavigationMenuIndicator = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Indicator>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Indicator>
+>(({ className, ...props }, ref) => (
+  <NavigationMenuPrimitive.Indicator
+    ref={ref}
+    className={cn(
+      "top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden data-[state=visible]:animate-in data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:fade-in",
+      className
+    )}
+    {...props}
+  >
+    <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md" />
+  </NavigationMenuPrimitive.Indicator>
+));
+NavigationMenuIndicator.displayName =
+  NavigationMenuPrimitive.Indicator.displayName;
+
+export {
+  navigationMenuTriggerStyle,
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuContent,
+  NavigationMenuTrigger,
+  NavigationMenuLink,
+  NavigationMenuIndicator,
+  NavigationMenuViewport,
+};
+
+```
+
+---
+
+### Barra lateral (`sidebar`) — `src/components/sidebar.tsx` — slug: sidebar
+
+Desc: Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile.
+
+Variantes: side: left · right · variant: sidebar · floating · inset · collapsible: offcanvas · icon · none · composição: SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail
+
+Uso:
+```tsx
+import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@semec/ds-react";
+
+<SidebarProvider>
+  <Sidebar>
+    <SidebarHeader>Logo</SidebarHeader>
+    <SidebarContent>
+      <SidebarGroup>
+        <SidebarGroupLabel>Menu</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton isActive>Dashboard</SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton>Protocolos</SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </SidebarContent>
+    <SidebarFooter>Footer</SidebarFooter>
+  </Sidebar>
+  <SidebarInset>
+    <SidebarTrigger />
+    <main>Conteúdo</main>
+  </SidebarInset>
+</SidebarProvider>
+```
+
+Prompt:
+```text
+Crie um sidebar (Barra lateral) usando @semec/ds-react (`src/components/sidebar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: left · right · variant: sidebar · floating · inset · collapsible: offcanvas · icon · none · composição: SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail. Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile.
+```
+
+Fonte:
+```tsx
+"use client";
+
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { PanelLeft } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+const SIDEBAR_COOKIE_NAME = "sidebar:state";
+const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
+const SIDEBAR_WIDTH = "16rem";
+const SIDEBAR_WIDTH_MOBILE = "18rem";
+const SIDEBAR_WIDTH_ICON = "3rem";
+const SIDEBAR_KEYBOARD_SHORTCUT = "b";
+
+type SidebarContext = {
+  state: "expanded" | "collapsed";
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  openMobile: boolean;
+  setOpenMobile: (open: boolean) => void;
+  isMobile: boolean;
+  toggleSidebar: () => void;
+};
+
+const SidebarContext = React.createContext<SidebarContext | null>(null);
+
+const defaultSidebarContext: SidebarContext = {
+  state: "expanded",
+  open: true,
+  setOpen: () => {},
+  openMobile: false,
+  setOpenMobile: () => {},
+  isMobile: false,
+  toggleSidebar: () => {},
+};
+
+function useSidebar() {
+  return React.useContext(SidebarContext) ?? defaultSidebarContext;
+}
+
+const SidebarProvider = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div"> & {
+    defaultOpen?: boolean;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+  }
+>(
+  (
+    {
+      defaultOpen = true,
+      open: openProp,
+      onOpenChange: setOpenProp,
+      className,
+      style,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    const [isMobile, setIsMobile] = React.useState(false);
+    const [openMobile, setOpenMobile] = React.useState(false);
+
+    const [_open, _setOpen] = React.useState(defaultOpen);
+    const open = openProp ?? _open;
+    const setOpen = React.useCallback(
+      (value: boolean | ((value: boolean) => boolean)) => {
+        const openState = typeof value === "function" ? value(open) : value;
+        if (setOpenProp) {
+          setOpenProp(openState);
+        } else {
+          _setOpen(openState);
+        }
+        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+      },
+      [setOpenProp, open]
+    );
+
+    const toggleSidebar = React.useCallback(() => {
+      return isMobile
+        ? setOpenMobile((prev) => !prev)
+        : setOpen((prev) => !prev);
+    }, [isMobile, setOpen]);
+
+    React.useEffect(() => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (
+          event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
+          (event.metaKey || event.ctrlKey)
+        ) {
+          event.preventDefault();
+          toggleSidebar();
+        }
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [toggleSidebar]);
+
+    React.useEffect(() => {
+      const handleResize = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    const state = open ? "expanded" : "collapsed";
+
+    const contextValue = React.useMemo<SidebarContext>(
+      () => ({
+        state,
+        open,
+        setOpen,
+        isMobile,
+        openMobile,
+        setOpenMobile,
+        toggleSidebar,
+      }),
+      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+    );
+
+    return (
+      <SidebarContext.Provider value={contextValue}>
+        <div
+          style={
+            {
+              "--sidebar-width": SIDEBAR_WIDTH,
+              "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
+              ...style,
+            } as React.CSSProperties
+          }
+          className={cn(
+            "group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar",
+            className
+          )}
+          ref={ref}
+          {...props}
+        >
+          {children}
+        </div>
+      </SidebarContext.Provider>
+    );
+  }
+);
+SidebarProvider.displayName = "SidebarProvider";
+
+const Sidebar = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div"> & {
+    side?: "left" | "right";
+    variant?: "sidebar" | "floating" | "inset";
+    collapsible?: "offcanvas" | "icon" | "none";
+  }
+>(
+  (
+    {
+      side = "left",
+      variant = "sidebar",
+      collapsible = "offcanvas",
+      className,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+
+    if (collapsible === "none") {
+      return (
+        <div
+          className={cn(
+            "flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
+            className
+          )}
+          ref={ref}
+          {...props}
+        >
+          {children}
+        </div>
+      );
+    }
+
+    if (isMobile) {
+      return (
+        <div ref={ref} {...props}>
+          {openMobile && (
+            <div
+              className="fixed inset-0 z-40 bg-black/50"
+              onClick={() => setOpenMobile(false)}
+            />
+          )}
+          <div
+            className={cn(
+              "fixed inset-y-0 z-50 h-svh w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground transition-base ease-standard",
+              side === "left"
+                ? "left-0 data-[state=closed]:-translate-x-full"
+                : "right-0 data-[state=closed]:translate-x-full",
+              openMobile ? "data-[state=open]:translate-x-0" : "",
+              className
+            )}
+            data-state={openMobile ? "open" : "closed"}
+          >
+            {children}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div
+        ref={ref}
+        className="group peer hidden md:block text-sidebar-foreground"
+        data-state={state}
+        data-collapsible={state === "collapsed" ? collapsible : ""}
+        data-variant={variant}
+        data-side={side}
+      >
+        <div
+          className={cn(
+            "duration-base ease-standard relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear",
+            "group-data-[collapsible=offcanvas]:w-0",
+            "group-data-[side=right]:rotate-180",
+            variant === "floating" || variant === "inset"
+              ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]"
+              : "group-data-[collapsible=icon]:w-[--sidebar-width-icon]"
+          )}
+        />
+        <div
+          className={cn(
+            "duration-base ease-standard fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex",
+            side === "left"
+              ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
+              : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
+            variant === "floating" || variant === "inset"
+              ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]"
+              : "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l border-border",
+            className
+          )}
+          {...props}
+        >
+          <div
+            data-sidebar="sidebar"
+            className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-border group-data-[variant=floating]:shadow-elevation-1"
+          >
+            {children}
+          </div>
+        </div>
+      </div>
+    );
+  }
+);
+Sidebar.displayName = "Sidebar";
+
+const SidebarTrigger = React.forwardRef<
+  React.ComponentRef<typeof Slot>,
+  React.ComponentProps<typeof Slot>
+>(({ className, onClick, ...props }, ref) => {
+  const { toggleSidebar } = useSidebar();
+
+  return (
+    <button
+      ref={ref}
+      data-sidebar="trigger"
+      className={cn(
+        "inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+        className
+      )}
+      onClick={(event) => {
+        onClick?.(event);
+        toggleSidebar();
+      }}
+      {...props}
+    >
+      <PanelLeft />
+      <span className="sr-only">Alternar barra lateral</span>
+    </button>
+  );
+});
+SidebarTrigger.displayName = "SidebarTrigger";
+
+const SidebarRail = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentProps<"button">
+>(({ className, ...props }, ref) => {
+  const { toggleSidebar } = useSidebar();
+
+  return (
+    <button
+      ref={ref}
+      data-sidebar="rail"
+      aria-label="Alternar barra lateral"
+      tabIndex={-1}
+      onClick={toggleSidebar}
+      title="Alternar barra lateral"
+      className={cn(
+        "absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex",
+        "[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize",
+        "[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize",
+        "group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full group-data-[collapsible=offcanvas]:hover:bg-sidebar",
+        "[[data-side=left][data-collapsible=offcanvas]_&]:-right-2",
+        "[[data-side=right][data-collapsible=offcanvas]_&]:-left-2",
+        className
+      )}
+      {...props}
+    />
+  );
+});
+SidebarRail.displayName = "SidebarRail";
+
+const SidebarInset = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"main">
+>(({ className, ...props }, ref) => (
+  <main
+    ref={ref}
+    className={cn(
+      "relative flex min-h-svh flex-1 flex-col bg-background",
+      "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow",
+      className
+    )}
+    {...props}
+  />
+));
+SidebarInset.displayName = "SidebarInset";
+
+const SidebarHeader = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div">
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    data-sidebar="header"
+    className={cn("flex flex-col gap-2 p-2", className)}
+    {...props}
+  />
+));
+SidebarHeader.displayName = "SidebarHeader";
+
+const SidebarFooter = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div">
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    data-sidebar="footer"
+    className={cn("flex flex-col gap-2 p-2", className)}
+    {...props}
+  />
+));
+SidebarFooter.displayName = "SidebarFooter";
+
+const SidebarSeparator = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div">
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    data-sidebar="separator"
+    className={cn("mx-2 w-auto bg-border h-px", className)}
+    {...props}
+  />
+));
+SidebarSeparator.displayName = "SidebarSeparator";
+
+const SidebarContent = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div">
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    data-sidebar="content"
+    className={cn(
+      "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
+      className
+    )}
+    {...props}
+  />
+));
+SidebarContent.displayName = "SidebarContent";
+
+const SidebarGroup = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div"> & { asChild?: boolean }
+>(({ className, asChild = false, ...props }, ref) => {
+  const Comp = asChild ? Slot : "div";
+  return (
+    <Comp
+      ref={ref}
+      data-sidebar="group"
+      className={cn("relative flex w-full min-w-0 flex-col p-2", className)}
+      {...props}
+    />
+  );
+});
+SidebarGroup.displayName = "SidebarGroup";
+
+const SidebarGroupLabel = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div"> & { asChild?: boolean }
+>(({ className, asChild = false, ...props }, ref) => {
+  const Comp = asChild ? Slot : "div";
+  return (
+    <Comp
+      ref={ref}
+      data-sidebar="group-label"
+      className={cn(
+        "duration-base ease-standard flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
+        className
+      )}
+      {...props}
+    />
+  );
+});
+SidebarGroupLabel.displayName = "SidebarGroupLabel";
+
+const SidebarGroupContent = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div"> & { asChild?: boolean }
+>(({ className, asChild = false, ...props }, ref) => {
+  const Comp = asChild ? Slot : "div";
+  return (
+    <Comp
+      ref={ref}
+      data-sidebar="group-content"
+      className={cn("w-full text-sm", className)}
+      {...props}
+    />
+  );
+});
+SidebarGroupContent.displayName = "SidebarGroupContent";
+
+const SidebarMenu = React.forwardRef<
+  HTMLUListElement,
+  React.ComponentProps<"ul">
+>(({ className, ...props }, ref) => (
+  <ul
+    ref={ref}
+    data-sidebar="menu"
+    className={cn("flex w-full min-w-0 flex-col gap-1", className)}
+    {...props}
+  />
+));
+SidebarMenu.displayName = "SidebarMenu";
+
+const SidebarMenuItem = React.forwardRef<
+  HTMLLIElement,
+  React.ComponentProps<"li">
+>(({ className, ...props }, ref) => (
+  <li
+    ref={ref}
+    data-sidebar="menu-item"
+    className={cn("group/menu-item relative", className)}
+    {...props}
+  />
+));
+SidebarMenuItem.displayName = "SidebarMenuItem";
+
+const SidebarMenuButton = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentProps<"button"> & {
+    asChild?: boolean;
+    isActive?: boolean;
+    tooltip?: string | React.ComponentProps<"div">;
+  }
+>(
+  (
+    {
+      asChild = false,
+      isActive = false,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const Comp = asChild ? Slot : "button";
+    return (
+      <Comp
+        ref={ref}
+        data-sidebar="menu-button"
+        data-active={isActive}
+        className={cn(
+          "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding] duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 active:bg-accent active:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-accent data-[active=true]:font-medium data-[active=true]:text-accent-foreground data-[state=open]:hover:bg-accent data-[state=open]:hover:text-accent-foreground",
+          "group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+          className
+        )}
+        {...props}
+      />
+    );
+  }
+);
+SidebarMenuButton.displayName = "SidebarMenuButton";
+
+const SidebarMenuSub = React.forwardRef<
+  HTMLUListElement,
+  React.ComponentProps<"ul">
+>(({ className, ...props }, ref) => (
+  <ul
+    ref={ref}
+    data-sidebar="menu-sub"
+    className={cn(
+      "mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-border px-2.5 py-0.5",
+      "group-data-[collapsible=icon]:hidden",
+      className
+    )}
+    {...props}
+  />
+));
+SidebarMenuSub.displayName = "SidebarMenuSub";
+
+const SidebarMenuSubItem = React.forwardRef<
+  HTMLLIElement,
+  React.ComponentProps<"li">
+>(({ ...props }, ref) => <li ref={ref} {...props} />);
+SidebarMenuSubItem.displayName = "SidebarMenuSubItem";
+
+const SidebarMenuSubButton = React.forwardRef<
+  HTMLAnchorElement,
+  React.ComponentProps<"a"> & {
+    asChild?: boolean;
+    size?: "sm" | "md";
+    isActive?: boolean;
+  }
+>(({ asChild = false, size = "md", isActive, className, ...props }, ref) => {
+  const Comp = asChild ? Slot : "a";
+  return (
+    <Comp
+      ref={ref}
+      data-sidebar="menu-sub-button"
+      data-active={isActive}
+      className={cn(
+        "flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 active:bg-accent active:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+        "data-[active=true]:bg-accent data-[active=true]:text-accent-foreground",
+        size === "sm" && "text-xs",
+        size === "md" && "text-sm",
+        "group-data-[collapsible=icon]:hidden",
+        className
+      )}
+      {...props}
+    />
+  );
+});
+SidebarMenuSubButton.displayName = "SidebarMenuSubButton";
+
+export {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarSeparator,
+  SidebarTrigger,
+  useSidebar,
+};
 
 ```
 

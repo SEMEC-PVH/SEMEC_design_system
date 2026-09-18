@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { dsCategories, dsComponents, dsPortal } from "@semec/ds-react/manifest";
+import { dsCategories, dsComponents, dsPortal } from "@semec/ds/skills";
 
 export const metadata = { title: "Componentes · Visão geral" };
 

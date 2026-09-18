@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { SidebarTrigger } from "@semec/ds-react";
+import { SidebarTrigger } from "@semec/ds/react";
 import { navigation } from "@/lib/navigation";
 import { safeGet, safeSet } from "@/lib/storage";
 

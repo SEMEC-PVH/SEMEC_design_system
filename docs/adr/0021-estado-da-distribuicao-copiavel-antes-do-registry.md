@@ -1,14 +1,14 @@
 ---
 adr: 21
 titulo: "Estado da distribuição: kit copiável antes do registry"
-status: Aceito
+status: Substituído por 022
 data: 2026-09-15
-pendencia: "QA-06 — confirmar se o registry npm do Gitea está habilitado e sob qual owner"
+substituido_por: 22
 ---
 
 # ADR-021 — Estado da distribuição: kit copiável antes do registry
 
-**Status:** Aceito, com a verificação pendente do [ADR-007](0007-distribuicao-registry-npm-gitea.md) (QA-06).
+**Status:** Substituído por [ADR-022](0022-publicacao-npm-publico.md).
 
 **Contexto.** O [ADR-007](0007-distribuicao-registry-npm-gitea.md) definiu publicar os pacotes sob o escopo `@semec` no registry npm do Gitea institucional. Essa publicação nunca aconteceu: o registry não foi confirmado e o remoto atual do repositório é o GitHub. Enquanto isso, o kit `@semec/ds-react` já é consumível por workspace (`import { Button } from "@semec/ds-react"`) ou copiando `packages/react/` para o projeto.
 

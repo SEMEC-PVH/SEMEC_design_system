@@ -1,5 +1,5 @@
 /**
- * Manifesto dos componentes do design system (kit @semec/ds-react, `packages/react/`).
+ * Manifesto dos componentes do design system (kit @semec/ds/react, `packages/react/`).
  * Fonte única: páginas de rota, índice, sidebar, snippets, prompts e registry.
  * `file` é relativo a `packages/react/`; a página lê o fonte real via fs.
  * `code` é o nome no código (usado no prompt); `label`/`slug` são PT.
@@ -52,7 +52,7 @@ export const dsComponents = [
       { prop: "variant", values: "primary · secondary · outline · ghost · destructive · link" },
       { prop: "size", values: "sm · md · lg · icon" },
     ],
-    usage: `import { Button } from "@semec/ds-react";
+    usage: `import { Button } from "@semec/ds/react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
@@ -76,7 +76,7 @@ import { Plus } from "lucide-react";
     category: "acoes",
     desc: "Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).",
     variants: [{ prop: "variant", values: "primary · secondary · outline · ghost · destructive · link" }],
-    usage: `import { IconButton } from "@semec/ds-react";
+    usage: `import { IconButton } from "@semec/ds/react";
 import { Download, Search, Trash2 } from "lucide-react";
 
 <IconButton label="Buscar requerimento"><Search /></IconButton>
@@ -91,7 +91,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "acoes",
     desc: "Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.",
     variants: [{ prop: "variant", values: "primary · onSurface · muted" }],
-    usage: `import { Link } from "@semec/ds-react";
+    usage: `import { Link } from "@semec/ds/react";
 
 <Link href="/iptu">Acessar guia do IPTU 2026</Link>
 <Link href="/protocolo" variant="onSurface">Acompanhar protocolo</Link>
@@ -105,7 +105,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Campo de texto. Estado de erro via `aria-invalid`.",
     variants: [{ prop: "estados", values: "padrão · inválido (aria-invalid) · disabled" }],
-    usage: `import { Input } from "@semec/ds-react";
+    usage: `import { Input } from "@semec/ds/react";
 
 <Input placeholder="Nome completo" />
 <Input aria-invalid="true" />`,
@@ -118,7 +118,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Campo multilinha com as mesmas variantes visuais do campo de texto.",
     variants: [{ prop: "estados", values: "padrão · inválido · disabled" }],
-    usage: `import { Textarea } from "@semec/ds-react";
+    usage: `import { Textarea } from "@semec/ds/react";
 
 <Textarea rows={4} placeholder="Descreva a demanda" />`,
   },
@@ -130,7 +130,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Seleção fechada com gatilho, conteúdo e itens compostos.",
     variants: [{ prop: "composição", values: "Select · SelectTrigger · SelectValue · SelectContent · SelectItem" }],
-    usage: `import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@semec/ds-react";
+    usage: `import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@semec/ds/react";
 
 <Select defaultValue="pbh">
   <SelectTrigger aria-label="Município"><SelectValue placeholder="Município" /></SelectTrigger>
@@ -148,7 +148,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Campo com busca e lista filtrada. Opções via `options`.",
     variants: [{ prop: "props", values: "options · value · onChange · placeholder · emptyMessage · disabled" }],
-    usage: `import { Combobox } from "@semec/ds-react";
+    usage: `import { Combobox } from "@semec/ds/react";
 
 <Combobox
   options={[{ value: "cnpj", label: "CNPJ" }, { value: "cpf", label: "CPF" }]}
@@ -164,7 +164,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: 'Data com `<input type="date">` nativo — sem biblioteca de calendário.',
     variants: [{ prop: "props", values: "nativo HTML (min · max · disabled) + variantes visuais do campo" }],
-    usage: `import { DatePicker } from "@semec/ds-react";
+    usage: `import { DatePicker } from "@semec/ds/react";
 
 <DatePicker defaultValue="2026-08-31" />`,
   },
@@ -176,7 +176,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.",
     variants: [{ prop: "props", values: "accept · maxSize · label · hint · error · onChange" }],
-    usage: `import { FileUpload } from "@semec/ds-react";
+    usage: `import { FileUpload } from "@semec/ds/react";
 
 <FileUpload accept=".pdf,image/*" maxSize={5 * 1024 * 1024} hint="PDF ou imagem, até 5 MB" />`,
   },
@@ -188,7 +188,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Caixa de marcação com estado indeterminado.",
     variants: [{ prop: "estados", values: "desmarcado · marcado (checked) · indeterminado · disabled" }],
-    usage: `import { Checkbox, Label } from "@semec/ds-react";
+    usage: `import { Checkbox, Label } from "@semec/ds/react";
 
 <div className="flex items-center gap-2">
   <Checkbox id="termos" />
@@ -203,7 +203,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Escolha única entre duas ou mais opções.",
     variants: [{ prop: "composição", values: "RadioGroup · RadioGroupItem + Label" }],
-    usage: `import { RadioGroup, RadioGroupItem, Label } from "@semec/ds-react";
+    usage: `import { RadioGroup, RadioGroupItem, Label } from "@semec/ds/react";
 
 <RadioGroup defaultValue="pessoa-fisica">
   <div className="flex items-center gap-2">
@@ -220,7 +220,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Interruptor on/off para ativação imediata.",
     variants: [{ prop: "estados", values: "off · on (checked) · disabled · inválido" }],
-    usage: `import { Switch, Label } from "@semec/ds-react";
+    usage: `import { Switch, Label } from "@semec/ds/react";
 
 <div className="flex items-center gap-2">
   <Switch id="alertas" defaultChecked />
@@ -235,7 +235,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Rótulo acessível vinculado ao campo.",
     variants: [],
-    usage: `import { Label, Input } from "@semec/ds-react";
+    usage: `import { Label, Input } from "@semec/ds/react";
 
 <Label htmlFor="nome">Nome</Label>
 <Input id="nome" />`,
@@ -248,7 +248,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.",
     variants: [{ prop: "props", values: "label · htmlFor · required · hint · error" }],
-    usage: `import { FormField, Input } from "@semec/ds-react";
+    usage: `import { FormField, Input } from "@semec/ds/react";
 
 <FormField label="E-mail" htmlFor="email" required hint="Usado para o comprovante" error="Informe um e-mail válido">
   <Input id="email" aria-invalid />
@@ -262,7 +262,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Resumo de erros de validação no topo do formulário, com links para cada campo. A11y: `role=\"alert\"`, foco automático.",
     variants: [{ prop: "props", values: "title · errors [{ id, message }] · autoFocus · focusKey" }],
-    usage: `import { ErrorSummary } from "@semec/ds-react";
+    usage: `import { ErrorSummary } from "@semec/ds/react";
 
 <ErrorSummary
   errors={[
@@ -280,7 +280,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "conteudo-dados",
     desc: "Superfície de conteúdo com header, corpo e footer.",
     variants: [{ prop: "composição", values: "Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter" }],
-    usage: `import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@semec/ds-react";
+    usage: `import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@semec/ds/react";
 
 <Card>
   <CardHeader><CardTitle>IPTU 2026</CardTitle></CardHeader>
@@ -296,7 +296,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "conteudo-dados",
     desc: "Etiqueta curta de status ou contagem.",
     variants: [{ prop: "variant", values: "default · secondary · outline · success · warning · danger · info" }],
-    usage: `import { Badge } from "@semec/ds-react";
+    usage: `import { Badge } from "@semec/ds/react";
 
 <Badge>Pendente</Badge>
 <Badge variant="success">Deferido</Badge>
@@ -313,7 +313,7 @@ import { Download, Search, Trash2 } from "lucide-react";
       { prop: "composição", values: "Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption" },
       { prop: "a11y", values: "role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount" },
     ],
-    usage: `import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/ds-react";
+    usage: `import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/ds/react";
 
 // Básico
 <Table>
@@ -332,7 +332,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "feedback",
     desc: "Placeholder pulsante de carregamento.",
     variants: [],
-    usage: `import { Skeleton } from "@semec/ds-react";
+    usage: `import { Skeleton } from "@semec/ds/react";
 
 <Skeleton className="h-4 w-[250px]" />
 <Skeleton className="h-4 w-[180px]" />`,
@@ -345,7 +345,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "feedback",
     desc: "Estado vazio com ícone, título, descrição e ação opcional.",
     variants: [{ prop: "props", values: "icon · title · description · action" }],
-    usage: `import { EmptyState, Button } from "@semec/ds-react";
+    usage: `import { EmptyState, Button } from "@semec/ds/react";
 import { Inbox } from "lucide-react";
 
 <EmptyState
@@ -366,7 +366,7 @@ import { Inbox } from "lucide-react";
       { prop: "props", values: "items: { label, href? }[]" },
       { prop: "a11y", values: "aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores" },
     ],
-    usage: `import { Breadcrumb } from "@semec/ds-react";
+    usage: `import { Breadcrumb } from "@semec/ds/react";
 
 <Breadcrumb items={[
   { label: "Início", href: "/" },
@@ -385,7 +385,7 @@ import { Inbox } from "lucide-react";
       { prop: "composição", values: "Tabs · TabsList · TabsTrigger · TabsContent" },
       { prop: "a11y", values: "role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas)" },
     ],
-    usage: `import { Tabs, TabsList, TabsTrigger, TabsContent } from "@semec/ds-react";
+    usage: `import { Tabs, TabsList, TabsTrigger, TabsContent } from "@semec/ds/react";
 
 <Tabs defaultValue="resumo">
   <TabsList>
@@ -407,7 +407,7 @@ import { Inbox } from "lucide-react";
       { prop: "props", values: "page · pageCount · onPageChange · siblingCount" },
       { prop: "a11y", values: "role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses" },
     ],
-    usage: `import { Pagination } from "@semec/ds-react";
+    usage: `import { Pagination } from "@semec/ds/react";
 
 <Pagination page={pagina} pageCount={42} onPageChange={setPagina} />`,
   },
@@ -422,7 +422,7 @@ import { Inbox } from "lucide-react";
       { prop: "props", values: "open · onToggle · labelOpen · labelClosed" },
       { prop: "a11y", values: "aria-expanded · aria-label dinâmico (Abrir/Fechar menu)" },
     ],
-    usage: `import { SidebarTrigger } from "@semec/ds-react";
+    usage: `import { SidebarTrigger } from "@semec/ds/react";
 
 <SidebarTrigger open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />`,
   },
@@ -434,7 +434,7 @@ import { Inbox } from "lucide-react";
     category: "feedback",
     desc: "Diálogo modal acessível com overlay, header, título, descrição e footer.",
     variants: [{ prop: "composição", values: "Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose" }],
-    usage: `import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "@semec/ds-react";
+    usage: `import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "@semec/ds/react";
 
 <Dialog>
   <DialogTrigger asChild><Button variant="destructive">Excluir</Button></DialogTrigger>
@@ -455,7 +455,7 @@ import { Inbox } from "lucide-react";
     category: "feedback",
     desc: "Mensagem temporária com `useToast()` e viewport empilhável.",
     variants: [{ prop: "variant", values: "default · success · warning · destructive" }],
-    usage: `import { ToastProvider, ToastViewport, useToast } from "@semec/ds-react";
+    usage: `import { ToastProvider, ToastViewport, useToast } from "@semec/ds/react";
 
 function Acao() {
   const { toast } = useToast();
@@ -472,7 +472,7 @@ function Acao() {
     category: "feedback",
     desc: "Dica curta ao passar o ponteiro ou focar o elemento.",
     variants: [{ prop: "composição", values: "TooltipProvider · Tooltip · TooltipTrigger · TooltipContent" }],
-    usage: `import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } from "@semec/ds-react";
+    usage: `import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } from "@semec/ds/react";
 
 <TooltipProvider>
   <Tooltip>
@@ -489,7 +489,7 @@ function Acao() {
     category: "feedback",
     desc: "Mensagem de feedback em linha, com ícone automático por variante.",
     variants: [{ prop: "variant", values: "default · success · warning · destructive" }],
-    usage: `import { Alert, AlertTitle, AlertDescription } from "@semec/ds-react";
+    usage: `import { Alert, AlertTitle, AlertDescription } from "@semec/ds/react";
 
 <Alert variant="warning">
   <AlertTitle>Carnê indisponível</AlertTitle>
@@ -507,7 +507,7 @@ function Acao() {
       { prop: "type", values: "single · multiple" },
       { prop: "composição", values: "Accordion · AccordionItem · AccordionTrigger · AccordionContent" },
     ],
-    usage: `import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@semec/ds-react";
+    usage: `import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@semec/ds/react";
 
 <Accordion type="single" collapsible>
   <AccordionItem value="item-1">
@@ -526,7 +526,7 @@ function Acao() {
     variants: [
       { prop: "composição", values: "AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel" },
     ],
-    usage: `import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from "@semec/ds-react";
+    usage: `import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from "@semec/ds/react";
 
 <AlertDialog>
   <AlertDialogTrigger asChild>
@@ -555,7 +555,7 @@ function Acao() {
       { prop: "composição", values: "Popover · PopoverTrigger · PopoverContent · PopoverAnchor" },
       { prop: "props", values: "sideOffset · align · side (top/right/bottom/left)" },
     ],
-    usage: `import { Popover, PopoverTrigger, PopoverContent, Button } from "@semec/ds-react";
+    usage: `import { Popover, PopoverTrigger, PopoverContent, Button } from "@semec/ds/react";
 
 <Popover>
   <PopoverTrigger asChild>
@@ -577,10 +577,350 @@ function Acao() {
       { prop: "orientation", values: "horizontal · vertical" },
       { prop: "decorative", values: "true (role=none) · false (role=separator)" },
     ],
-    usage: `import { Separator } from "@semec/ds-react";
+    usage: `import { Separator } from "@semec/ds/react";
 
 <Separator />
 <Separator orientation="vertical" className="h-6" />`,
+  },
+  {
+    code: "avatar",
+    slug: "avatar",
+    label: "Avatar",
+    file: "src/components/avatar.tsx",
+    category: "conteudo-dados",
+    desc: "Foto de perfil com fallback automático (iniciais).",
+    variants: [
+      { prop: "composição", values: "Avatar · AvatarImage · AvatarFallback" },
+      { prop: "tamanhos", values: "h-10 w-10 (padrão) — sobrescreva com className" },
+    ],
+    usage: `import { Avatar, AvatarImage, AvatarFallback } from "@semec/ds/react";
+
+<Avatar>
+  <AvatarImage src="/foto.jpg" alt="João Silva" />
+  <AvatarFallback>JS</AvatarFallback>
+</Avatar>`,
+  },
+  {
+    code: "toggle",
+    slug: "toggle",
+    label: "Toggle",
+    file: "src/components/toggle.tsx",
+    category: "formularios",
+    desc: "Botão binário para estados on/off em toolbars.",
+    variants: [
+      { prop: "variant", values: "default · outline" },
+      { prop: "size", values: "sm · md · lg" },
+    ],
+    usage: `import { Toggle } from "@semec/ds/react";
+import { Bold } from "lucide-react";
+
+<Toggle variant="outline" aria-label="Negrito">
+  <Bold />
+</Toggle>`,
+  },
+  {
+    code: "spinner",
+    slug: "spinner",
+    label: "Spinner",
+    file: "src/components/spinner.tsx",
+    category: "feedback",
+    desc: "Indicador de carregamento inline.",
+    variants: [],
+    usage: `import { Spinner } from "@semec/ds/react";
+
+<Spinner />
+<p className="text-muted-foreground">Carregando dados…</p>`,
+  },
+  {
+    code: "progress",
+    slug: "progress",
+    label: "Progresso",
+    file: "src/components/progress.tsx",
+    category: "feedback",
+    desc: "Barra de progresso determinada.",
+    variants: [],
+    usage: `import { Progress } from "@semec/ds/react";
+
+<Progress value={60} />
+<p className="text-sm text-muted-foreground">60% concluído</p>`,
+  },
+  {
+    code: "slider",
+    slug: "slider",
+    label: "Slider",
+    file: "src/components/slider.tsx",
+    category: "formularios",
+    desc: "Controle deslizante para faixas de valor.",
+    variants: [],
+    usage: `import { Slider } from "@semec/ds/react";
+
+<Slider defaultValue={[50]} max={100} step={1} />`,
+  },
+  {
+    code: "input-otp",
+    slug: "input-otp",
+    label: "Input OTP",
+    file: "src/components/input-otp.tsx",
+    category: "formularios",
+    desc: "Campo de código OTP com foco automático entre dígitos.",
+    variants: [
+      { prop: "composição", values: "InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator" },
+      { prop: "props", values: "maxLength · disabled" },
+    ],
+    usage: `import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec/ds/react";
+
+<InputOTP value={code} onChange={setCode} maxLength={6}>
+  <InputOTPGroup>
+    <InputOTPSlot index={0} />
+    <InputOTPSlot index={1} />
+    <InputOTPSlot index={2} />
+  </InputOTPGroup>
+  <InputOTPSeparator />
+  <InputOTPGroup>
+    <InputOTPSlot index={3} />
+    <InputOTPSlot index={4} />
+    <InputOTPSlot index={5} />
+  </InputOTPGroup>
+</InputOTP>`,
+  },
+  {
+    code: "calendar",
+    slug: "calendario",
+    label: "Calendário",
+    file: "src/components/calendar.tsx",
+    category: "formularios",
+    desc: "Calendário visual para seleção de data.",
+    variants: [
+      { prop: "props", values: "value · onChange · min · max · disabled" },
+    ],
+    usage: `import { Calendar } from "@semec/ds/react";
+
+<Calendar value={data} onChange={setData} />`,
+  },
+  {
+    code: "scroll-area",
+    slug: "scroll-area",
+    label: "Área de scroll",
+    file: "src/components/scroll-area.tsx",
+    category: "navegacao",
+    desc: "Scroll customizado e consistente entre navegadores.",
+    variants: [
+      { prop: "composição", values: "ScrollArea · ScrollBar" },
+      { prop: "orientation", values: "vertical · horizontal" },
+    ],
+    usage: `import { ScrollArea } from "@semec/ds/react";
+
+<ScrollArea className="h-48">
+  <div className="p-4">Conteúdo longo aqui…</div>
+</ScrollArea>`,
+  },
+  {
+    code: "dropdown-menu",
+    slug: "menu-suspenso",
+    label: "Menu suspenso",
+    file: "src/components/dropdown-menu.tsx",
+    category: "navegacao",
+    desc: "Menu flutuante com itens, checkbox, radio, sub-menus e separadores.",
+    variants: [
+      { prop: "composição", values: "DropdownMenu · Trigger · Content · Item · CheckboxItem · RadioItem · Label · Separator · Sub · SubTrigger · SubContent" },
+    ],
+    usage: `import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@semec/ds/react";
+import { Button } from "@semec/ds/react";
+import { MoreHorizontal } from "lucide-react";
+
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="ghost" size="icon"><MoreHorizontal /></Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuItem>Editar</DropdownMenuItem>
+    <DropdownMenuItem>Duplicar</DropdownMenuItem>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem className="text-destructive">Excluir</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>`,
+  },
+  {
+    code: "drawer",
+    slug: "drawer",
+    label: "Drawer",
+    file: "src/components/drawer.tsx",
+    category: "feedback",
+    desc: "Painel deslizante de qualquer lado da tela.",
+    variants: [
+      { prop: "side", values: "top · bottom · left · right" },
+      { prop: "composição", values: "Drawer · Trigger · Content · Header · Footer · Title · Description · Close" },
+    ],
+    usage: `import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, Button } from "@semec/ds/react";
+
+<Drawer>
+  <DrawerTrigger asChild><Button>Abrir painel</Button></DrawerTrigger>
+  <DrawerContent side="right">
+    <DrawerHeader>
+      <DrawerTitle>Detalhes</DrawerTitle>
+      <DrawerDescription>Informações do protocolo.</DrawerDescription>
+    </DrawerHeader>
+    <div className="p-6">Conteúdo aqui</div>
+    <DrawerFooter>
+      <DrawerClose asChild><Button variant="outline">Fechar</Button></DrawerClose>
+    </DrawerFooter>
+  </DrawerContent>
+</Drawer>`,
+  },
+  {
+    code: "sheet",
+    slug: "sheet",
+    label: "Sheet",
+    file: "src/components/sheet.tsx",
+    category: "feedback",
+    desc: "Painel lateral modal com overlay. Variantes left/right/top/bottom.",
+    variants: [
+      { prop: "side", values: "left · right · top · bottom" },
+      { prop: "composição", values: "Sheet · Trigger · Content · Header · Footer · Title · Description · Close" },
+    ],
+    usage: `import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "@semec/ds/react";
+
+<Sheet>
+  <SheetTrigger asChild><Button variant="outline">Abrir filtros</Button></SheetTrigger>
+  <SheetContent side="left">
+    <SheetHeader>
+      <SheetTitle>Filtros</SheetTitle>
+      <SheetDescription>Refine sua busca.</SheetDescription>
+    </SheetHeader>
+    <div className="p-6">Filtros aqui</div>
+    <SheetFooter>
+      <SheetClose asChild><Button>Aplicar</Button></SheetClose>
+    </SheetFooter>
+  </SheetContent>
+</Sheet>`,
+  },
+  {
+    code: "data-table",
+    slug: "tabela-de-dados",
+    label: "Tabela de dados",
+    file: "src/components/data-table.tsx",
+    category: "conteudo-dados",
+    desc: "Tabela com ordenação visual, paginação e空 states.",
+    variants: [
+      { prop: "props", values: "columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption" },
+    ],
+    usage: `import { DataTable } from "@semec/ds/react";
+
+const columns = [
+  { key: "nome", header: "Nome", sortable: true },
+  { key: "status", header: "Status" },
+];
+
+<DataTable
+  columns={columns}
+  data={registros}
+  sortKey={sortField}
+  sortDir={sortDir}
+  onSort={handleSort}
+  page={pagina}
+  pageCount={totalPaginas}
+  onPageChange={setPagina}
+/>`,
+  },
+  {
+    code: "timeline",
+    slug: "timeline",
+    label: "Linha do tempo",
+    file: "src/components/timeline.tsx",
+    category: "conteudo-dados",
+    desc: "Sequência temporal com dots, conectores e conteúdo.",
+    variants: [
+      { prop: "composição", values: "Timeline · TimelineItem · TimelineSeparator · TimelineDot · TimelineConnector · TimelineContent · TimelineTitle · TimelineDescription" },
+      { prop: "dot variant", values: "default · success · warning · destructive · info" },
+    ],
+    usage: `import { Timeline, TimelineItem, TimelineSeparator, TimelineDot, TimelineConnector, TimelineContent, TimelineTitle, TimelineDescription } from "@semec/ds/react";
+
+<Timeline>
+  <TimelineItem>
+    <TimelineSeparator>
+      <TimelineDot variant="success" />
+      <TimelineConnector />
+    </TimelineSeparator>
+    <TimelineContent>
+      <TimelineTitle>Protocolo recebido</TimelineTitle>
+      <TimelineDescription>12/08/2026 às 14:30</TimelineDescription>
+    </TimelineContent>
+  </TimelineItem>
+  <TimelineItem>
+    <TimelineSeparator>
+      <TimelineDot />
+    </TimelineSeparator>
+    <TimelineContent>
+      <TimelineTitle>Em análise</TimelineTitle>
+      <TimelineDescription>Aguardando parecer</TimelineDescription>
+    </TimelineContent>
+  </TimelineItem>
+</Timeline>`,
+  },
+  {
+    code: "navigation-menu",
+    slug: "menu-de-navegacao",
+    label: "Menu de navegação",
+    file: "src/components/navigation-menu.tsx",
+    category: "navegacao",
+    desc: "Navegação principal com mega-menu e viewport animado.",
+    variants: [
+      { prop: "composição", values: "NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator" },
+    ],
+    usage: `import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@semec/ds/react";
+
+<NavigationMenu>
+  <NavigationMenuList>
+    <NavigationMenuItem>
+      <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>
+      <NavigationMenuContent>
+        <NavigationMenuLink href="/iptu">IPTU</NavigationMenuLink>
+        <NavigationMenuLink href="/alvara">Alvará</NavigationMenuLink>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
+  </NavigationMenuList>
+</NavigationMenu>`,
+  },
+  {
+    code: "sidebar",
+    slug: "sidebar",
+    label: "Barra lateral",
+    file: "src/components/sidebar.tsx",
+    category: "navegacao",
+    desc: "Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile.",
+    variants: [
+      { prop: "side", values: "left · right" },
+      { prop: "variant", values: "sidebar · floating · inset" },
+      { prop: "collapsible", values: "offcanvas · icon · none" },
+      { prop: "composição", values: "SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail" },
+    ],
+    usage: `import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@semec/ds/react";
+
+<SidebarProvider>
+  <Sidebar>
+    <SidebarHeader>Logo</SidebarHeader>
+    <SidebarContent>
+      <SidebarGroup>
+        <SidebarGroupLabel>Menu</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton isActive>Dashboard</SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton>Protocolos</SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </SidebarContent>
+    <SidebarFooter>Footer</SidebarFooter>
+  </Sidebar>
+  <SidebarInset>
+    <SidebarTrigger />
+    <main>Conteúdo</main>
+  </SidebarInset>
+</SidebarProvider>`,
   },
 ];
 
@@ -589,7 +929,7 @@ export const dsByCategory = (key) => dsComponents.filter((c) => c.category === k
 
 export function dsPrompt(c) {
   const v = c.variants.map((x) => `${x.prop}: ${x.values}`).join(" · ");
-  return `Crie um ${c.code} (${c.label}) usando @semec/ds-react (\`${c.file}\`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4.${v ? ` Variantes: ${v}.` : ""} ${c.desc}`;
+  return `Crie um ${c.code} (${c.label}) usando @semec/ds/react (\`${c.file}\`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4.${v ? ` Variantes: ${v}.` : ""} ${c.desc}`;
 }
 
 /**

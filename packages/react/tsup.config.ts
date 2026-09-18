@@ -1,0 +1,50 @@
+import { defineConfig } from "tsup";
+
+export default defineConfig([
+  {
+    entry: {
+      "react/index": "src/index.ts",
+    },
+    outDir: "dist",
+    format: "esm",
+    dts: true,
+    sourcemap: true,
+    external: [
+      /^@radix-ui/,
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "lucide-react",
+      "class-variance-authority",
+      "clsx",
+      "tailwind-merge",
+    ],
+  },
+  {
+    entry: {
+      "react/server": "src/server.ts",
+    },
+    outDir: "dist",
+    format: "esm",
+    dts: true,
+    platform: "node",
+    external: [/^node:/],
+  },
+  {
+    entry: {
+      "react/pv-preset": "src/pv-preset.ts",
+    },
+    outDir: "dist",
+    format: "esm",
+    dts: true,
+    external: ["tailwindcss"],
+  },
+  {
+    entry: {
+      "skills/index": "src/skills/index.ts",
+    },
+    outDir: "dist",
+    format: "esm",
+    dts: false,
+  },
+]);

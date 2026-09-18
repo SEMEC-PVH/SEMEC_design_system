@@ -2,7 +2,7 @@
 
 Este documento descreve a governança do Design System da SEMEC. Ele deriva de duas fontes escritas antes deste repositório existir: a seção "Governança" do [documento de arquitetura](docs/arquitetura.md) e os guias "Para quem contribui" e "Definição de pronto" da [especificação-alvo](docs/especificacao-alvo.md).
 
-Essas duas fontes descrevem o processo de uma **biblioteca de componentes publicada** — com pacotes em registry, Storybook, testes automatizados de acessibilidade, regressão visual e changesets. Este repositório **ainda não publica** nada num registry, mas já contém um kit de componentes consumível: `packages/react/` (`@semec/ds-react`), ligado por workspace e também copiável para outro projeto. O site de documentação vive em `apps/docs/` (Next.js 16, `output: 'export'`) e os artefatos para agentes são gerados a partir de `packages/react/manifest.js`. Não há Storybook, suíte de testes nem integração contínua. Ver [objetivo.md](docs/objetivo.md) e o [veredito da auditoria](docs/auditoria/2026-08-21-repositorio.md).
+Essas duas fontes descrevem o processo de uma **biblioteca de componentes publicada** — com pacotes em registry, Storybook, testes automatizados de acessibilidade, regressão visual e changesets. Este repositório **publica** o pacote `@semec/ds` no npm público, com subpath exports (`@semec/ds/react` para componentes, `@semec/ds/skills` para artefatos de agentes). O site de documentação vive em `apps/docs/` (Next.js 16, `output: 'export'`) e os artefatos para agentes são gerados a partir de `packages/react/manifest.js`. Ver [objetivo.md](docs/objetivo.md), [ADR-022](docs/adr/0022-publicacao-npm-publico.md) e o [veredito da auditoria](docs/auditoria/2026-08-21-repositorio.md).
 
 Por isso a governança está dividida em duas partes. A **Parte 1** vale hoje e só cita ferramenta que existe. A **Parte 2** é o processo previsto para quando a biblioteca existir, e nenhum item dela é exigível agora. Exigir hoje um `axe` que ninguém configurou seria pedir a quem contribui que finja — e documentação que finge é o problema que este repositório está tentando corrigir.
 
@@ -64,14 +64,16 @@ Aprovado, o pull request entra por merge na branch de destino. **Não há change
 ## O que um pull request precisa ter hoje
 
 - [ ] Issue de proposta vinculada (exceto correção pontual)
-- [ ] `npm run build` passando — é o único portão automatizado que existe; ele roda o `next build` com `output: 'export'` e falha em erro de compilação e em rota que não exporta
+- [ ] `npm run build:ds` passando — roda tsup + build-skills, verifica se o pacote compila sem erros
+- [ ] `npm run typecheck` passando — verifica tipos
+- [ ] `npm run build` passando — roda next build com output: 'export' e verifica se o site compila
 - [ ] Página conferida com teclado, foco visível ponta a ponta
 - [ ] Contraste calculado para qualquer cor nova
 - [ ] Nenhum hex, `rgba()` ou `style` inline novo fora das variáveis existentes
 - [ ] Revisão de outra pessoa
 - [ ] Mensagens de commit na convenção abaixo
 
-**Scripts que existem hoje** (na raiz, delegando para `apps/docs`): `dev`, `build`, `start`, `lint`, `generate:llms` e `proto:css`.
+**Scripts que existem hoje** (na raiz, delegando para `apps/docs` e `packages/react`): `dev`, `build`, `build:ds`, `start`, `lint`, `typecheck`, `generate:llms`, `proto:css`, `changeset`, `version-packages`, `release`.
 
 > **Sobre o `lint`.** O script `lint` (`eslint .`, com `eslint-config-next` e `eslint-plugin-jsx-a11y`) já existe e roda em `apps/docs`. Ainda há uma violação conhecida de `react-hooks/set-state-in-effect` em `apps/docs/components/docs/Sidebar.jsx`, herdada antes da migração.
 
@@ -133,9 +135,7 @@ Nada nesta parte é exigível hoje. Cada item aqui depende de infraestrutura que
 - **Versionamento semântico estrito**: quebra de API ou mudança visual disruptiva incrementa a maior; componente ou propriedade nova, a menor; correção, a de correção.
 - **Canais**: `latest` para produção, `next` para validação prévia.
 - **Depreciação**: propriedade ou componente marcado como obsoleto continua funcionando por **duas versões menores**, com aviso, antes de sair em uma versão maior — conforme o [ADR-013](docs/adr/0013-politica-de-depreciacao-duas-minors.md). Toda versão maior traz guia de migração.
-- **Registry**: escopo `@semec` no Gitea institucional, com token de publicação exclusivo do CI, conforme o [ADR-007](docs/adr/0007-distribuicao-registry-npm-gitea.md) — que segue com verificação pendente, registrada em [QA-06](docs/questoes-abertas.md).
-
-Enquanto o registry não estiver confirmado e não houver CI, nenhuma dessas regras tem onde rodar.
+- **Registry**: npm público, escopo `@semec`, conforme o [ADR-022](docs/adr/0022-publicacao-npm-publico.md). CI publica automaticamente em tags `v*`.
 
 ---
 

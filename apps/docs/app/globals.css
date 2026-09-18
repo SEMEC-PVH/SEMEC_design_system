@@ -1704,21 +1704,23 @@ footer {
   font-family: var(--font-press-start), "Press Start 2P", monospace;
   font-size: var(--font-size-md);
   color: var(--ps-body);
-  text-shadow: 2px 2px 0 var(--ps-accent);
   letter-spacing: 0.02em;
   margin-right: auto;
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
-  transform: translateY(0);
-  transition: transform 150ms ease-in-out, text-shadow 150ms ease-in-out;
 }
-.site-footer-brand:hover {
+.site-footer-letter {
+  display: inline-block;
+  text-shadow: 2px 2px 0 var(--ps-accent);
+  transition: transform 80ms ease, text-shadow 80ms ease;
+}
+.site-footer-letter:hover {
   transform: translateY(-2px);
-  text-shadow: 3px 3px 0 var(--ps-accent), 0 6px 12px rgba(0, 0, 0, 0.3);
+  text-shadow: 3px 3px 0 var(--ps-accent);
 }
-.site-footer-brand:active {
+.site-footer-letter:active {
   transform: translateY(2px);
   text-shadow: 1px 1px 0 var(--ps-accent);
 }
@@ -1802,20 +1804,6 @@ footer {
   font-size: var(--font-size-xs);
   color: var(--text-muted);
   margin: 0;
-}
-.team-card-techs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-top: 0.25rem;
-}
-.team-card-tech {
-  font-size: 0.65rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: var(--radius-full);
-  background: var(--color-action-primary);
-  color: var(--ps-body);
-  white-space: nowrap;
 }
 .team-card-linkedin {
   display: inline-flex;

@@ -6,14 +6,12 @@ const directors = [
   {
     name: "Nome Sobrenome",
     role: "Diretor(a) de Tecnologia",
-    techs: ["React", "Node.js", "TypeScript"],
     linkedin: "https://linkedin.com/in/",
     photo: null,
   },
   {
     name: "Nome Sobrenome",
     role: "Diretor(a) de Design",
-    techs: ["Figma", "UX", "Design System"],
     linkedin: "https://linkedin.com/in/",
     photo: null,
   },
@@ -23,28 +21,24 @@ const interns = [
   {
     name: "Nome Sobrenome",
     role: "Dev Front-end",
-    techs: ["React", "TypeScript", "Tailwind"],
     linkedin: "https://linkedin.com/in/",
     photo: null,
   },
   {
     name: "Nome Sobrenome",
     role: "Dev Back-end",
-    techs: ["Node.js", "PostgreSQL", "REST"],
     linkedin: "https://linkedin.com/in/",
     photo: null,
   },
   {
     name: "Nome Sobrenome",
     role: "Design UI/UX",
-    techs: ["Figma", "Prototipação", "Acessibilidade"],
     linkedin: "https://linkedin.com/in/",
     photo: null,
   },
   {
     name: "Nome Sobrenome",
     role: "DevOps / Infra",
-    techs: ["Docker", "CI/CD", "Linux"],
     linkedin: "https://linkedin.com/in/",
     photo: null,
   },
@@ -73,11 +67,6 @@ function TeamCard({ member, size = "md" }) {
       <div className="team-card-info">
         <h3 className="team-card-name">{member.name}</h3>
         <p className="team-card-role">{member.role}</p>
-        <div className="team-card-techs">
-          {member.techs.map((tech) => (
-            <span key={tech} className="team-card-tech">{tech}</span>
-          ))}
-        </div>
         {member.linkedin && (
           <a
             href={member.linkedin}
