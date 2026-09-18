@@ -8,7 +8,7 @@ formato shadcn (Radix + CVA + clsx + tailwind-merge).
 
 > Este diretório não faz parte do build do site de documentação. É copiado para
 > dentro do site novo; a evolução e a distribuição futuras do design system
-> seguem o ADR-022 (npm público, pacote `@semec/ds`).
+> seguem o ADR-022 (npm público, pacote `semec-ds`).
 
 ## O que tem aqui
 

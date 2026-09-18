@@ -1,5 +1,5 @@
 /**
- * Helpers de Node do pacote @semec/ds — apenas para uso em
+ * Helpers de Node do pacote semec-ds — apenas para uso em
  * Server Components / scripts. NÃO importar em Client Components.
  */
 import { existsSync } from "node:fs";

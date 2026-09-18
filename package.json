@@ -2,7 +2,7 @@
   "name": "semec-design-system",
   "version": "1.0.0",
   "private": true,
-  "description": "Monorepo do Design System SEMEC: kit @semec/ds + site de documentação + artefatos para agentes.",
+  "description": "Monorepo do Design System SEMEC: kit semec-ds + site de documentação + artefatos para agentes.",
   "engines": {
     "node": ">=20"
   },
@@ -13,13 +13,13 @@
   "scripts": {
     "dev": "npm run dev --workspace @semec/docs",
     "build": "npm run build --workspace @semec/docs",
-    "build:ds": "npm run build --workspace @semec/ds",
+    "build:ds": "npm run build --workspace semec-ds",
     "start": "npm run start --workspace @semec/docs",
     "lint": "npm run lint --workspace @semec/docs",
-    "typecheck": "npm run typecheck --workspace @semec/ds",
+    "typecheck": "npm run typecheck --workspace semec-ds",
     "generate:llms": "npm run generate:llms --workspace @semec/docs",
     "proto:css": "npm run proto:css --workspace @semec/docs",
-    "clean": "npm run clean --workspace @semec/ds",
+    "clean": "npm run clean --workspace semec-ds",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build:ds && changeset publish"

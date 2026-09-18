@@ -1,5 +1,5 @@
 {
-  "name": "@semec/ds",
+  "name": "semec-ds",
   "version": "1.0.0",
   "private": false,
   "description": "Design System SEMEC: componentes React + tokens CSS + artefatos para agentes IA.",
