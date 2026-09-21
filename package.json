@@ -4,7 +4,7 @@
   "private": true,
   "description": "Monorepo do Design System SEMEC: kit semec-ds + site de documentação + artefatos para agentes.",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "workspaces": [
     "apps/*",

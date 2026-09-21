@@ -4,7 +4,7 @@
   "private": true,
   "description": "Site de documentação do Design System SEMEC (Next.js, export estático).",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "dev": "next dev",

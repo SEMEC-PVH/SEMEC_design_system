@@ -57,7 +57,7 @@ Não há Storybook, suíte de testes automatizados nem CI de acessibilidade. O s
 
 ## Como rodar
 
-Requer Node >= 20. Na raiz:
+Requer Node >= 22. Na raiz:
 
 ```bash
 npm install       # instala o workspace (apps/* e packages/*)

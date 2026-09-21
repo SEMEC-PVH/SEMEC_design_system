@@ -21,7 +21,7 @@ legacy/           Versão anterior do guia + MIV da PMPV (a limpar)
 
 ## Como rodar
 
-Requer Node >= 20. Na raiz (workspace npm):
+Requer Node >= 22. Na raiz (workspace npm):
 
 ```bash
 npm install
