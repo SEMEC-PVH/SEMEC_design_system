@@ -18,10 +18,10 @@ variants: "side: top · bottom · left · right · composição: Drawer · Trigg
 - **side**: top · bottom · left · right
 - **composição**: Drawer · Trigger · Content · Header · Footer · Title · Description · Close
 
-## Instalação (@semec/ds/react)
+## Instalação (semec-ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale semec-ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \

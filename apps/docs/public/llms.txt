@@ -1,6 +1,6 @@
 # SEMEC Design System — SEMEC Digital (Porto Velho)
 
-> Kit @semec/ds/react (React + Tailwind v4 + shadcn + Radix + CVA). Conteúdo PT-BR, código EN (ADR-016). Tema via [data-theme="dark"] (ADR-012).
+> Kit semec-ds/react (React + Tailwind v4 + shadcn + Radix + CVA). Conteúdo PT-BR, código EN (ADR-016). Tema via [data-theme="dark"] (ADR-012).
 
 ## Instalar
 
@@ -135,4 +135,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--color-action-primary` etc.), nunca hex solto
 
-> Gerado em 2026-09-21T00:58:27.087Z a partir de packages/react/manifest.js. Site: https://semec-pvh.github.io/SEMEC_design_system
+> Gerado em 2026-09-21T13:48:56.134Z a partir de packages/react/manifest.js. Site: https://semec-pvh.github.io/SEMEC_design_system

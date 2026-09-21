@@ -18,10 +18,10 @@ variants: "props: page · pageCount · onPageChange · siblingCount · a11y: rol
 - **props**: page · pageCount · onPageChange · siblingCount
 - **a11y**: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses
 
-## Instalação (@semec/ds/react)
+## Instalação (semec-ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale semec-ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
