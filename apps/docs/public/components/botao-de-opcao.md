@@ -17,10 +17,10 @@ variants: "composição: RadioGroup · RadioGroupItem + Label"
 
 - **composição**: RadioGroup · RadioGroupItem + Label
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { RadioGroup, RadioGroupItem, Label } from "@semec/ds-react";
+import { RadioGroup, RadioGroupItem, Label } from "semec-ds/react";
 
 <RadioGroup defaultValue="pessoa-fisica">
   <div className="flex items-center gap-2">
@@ -53,7 +53,7 @@ import { RadioGroup, RadioGroupItem, Label } from "@semec/ds-react";
 ## Prompt para IA
 
 ```text
-Crie um radio-group (Botão de opção) usando @semec/ds-react (`src/components/radio-group.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: RadioGroup · RadioGroupItem + Label. Escolha única entre duas ou mais opções.
+Crie um radio-group (Botão de opção) usando semec-ds/react (`src/components/radio-group.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: RadioGroup · RadioGroupItem + Label. Escolha única entre duas ou mais opções.
 ```
 
 ## Fonte

@@ -17,10 +17,10 @@ variants: "estados: desmarcado · marcado (checked) · indeterminado · disabled
 
 - **estados**: desmarcado · marcado (checked) · indeterminado · disabled
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Checkbox, Label } from "@semec/ds-react";
+import { Checkbox, Label } from "semec-ds/react";
 
 <div className="flex items-center gap-2">
   <Checkbox id="termos" />
@@ -51,7 +51,7 @@ import { Checkbox, Label } from "@semec/ds-react";
 ## Prompt para IA
 
 ```text
-Crie um checkbox (Caixa de marcação) usando @semec/ds-react (`src/components/checkbox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled. Caixa de marcação com estado indeterminado.
+Crie um checkbox (Caixa de marcação) usando semec-ds/react (`src/components/checkbox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled. Caixa de marcação com estado indeterminado.
 ```
 
 ## Fonte
@@ -70,7 +70,7 @@ const Checkbox = React.forwardRef<
   <CheckboxPrimitive.Root
     ref={ref}
     className={cn(
-      "peer h-5 w-5 shrink-0 rounded-sm border border-input shadow-sm transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground aria-[invalid=true]:border-destructive",
+      "peer h-5 w-5 shrink-0 rounded-lg border border-input shadow-sm transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground aria-[invalid=true]:border-destructive",
       className
     )}
     {...props}

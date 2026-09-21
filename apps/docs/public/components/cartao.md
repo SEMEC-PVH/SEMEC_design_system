@@ -17,10 +17,10 @@ variants: "composição: Card · CardHeader · CardTitle · CardDescription · C
 
 - **composição**: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@semec/ds-react";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "semec-ds/react";
 
 <Card>
   <CardHeader><CardTitle>IPTU 2026</CardTitle></CardHeader>
@@ -52,7 +52,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@s
 ## Prompt para IA
 
 ```text
-Crie um card (Cartão) usando @semec/ds-react (`src/components/card.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter. Superfície de conteúdo com header, corpo e footer.
+Crie um card (Cartão) usando semec-ds/react (`src/components/card.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter. Superfície de conteúdo com header, corpo e footer.
 ```
 
 ## Fonte
@@ -69,7 +69,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border border-border bg-card text-card-foreground shadow-elevation-1",
+      "rounded-2xl border border-border bg-card text-card-foreground shadow-md ring-1 ring-foreground/5",
       className
     )}
     {...props}

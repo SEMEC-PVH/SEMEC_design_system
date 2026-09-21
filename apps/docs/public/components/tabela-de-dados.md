@@ -17,10 +17,10 @@ variants: "props: columns · data · sortKey · sortDir · onSort · page · pag
 
 - **props**: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { DataTable } from "@semec/ds-react";
+import { DataTable } from "semec-ds/react";
 
 const columns = [
   { key: "nome", header: "Nome", sortable: true },
@@ -62,7 +62,7 @@ const columns = [
 ## Prompt para IA
 
 ```text
-Crie um data-table (Tabela de dados) usando @semec/ds-react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption. Tabela com ordenação visual, paginação e空 states.
+Crie um data-table (Tabela de dados) usando semec-ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption. Tabela com ordenação visual, paginação e空 states.
 ```
 
 ## Fonte

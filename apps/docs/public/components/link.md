@@ -17,10 +17,10 @@ variants: "variant: primary · onSurface · muted"
 
 - **variant**: primary · onSurface · muted
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Link } from "@semec/ds-react";
+import { Link } from "semec-ds/react";
 
 <Link href="/iptu">Acessar guia do IPTU 2026</Link>
 <Link href="/protocolo" variant="onSurface">Acompanhar protocolo</Link>
@@ -50,7 +50,7 @@ import { Link } from "@semec/ds-react";
 ## Prompt para IA
 
 ```text
-Crie um link (Link) usando @semec/ds-react (`src/components/link.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · onSurface · muted. Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.
+Crie um link (Link) usando semec-ds/react (`src/components/link.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · onSurface · muted. Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.
 ```
 
 ## Fonte

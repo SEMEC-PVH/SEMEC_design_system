@@ -17,10 +17,10 @@ variants: "—"
 
 _Sem variantes_
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Progress } from "@semec/ds-react";
+import { Progress } from "semec-ds/react";
 
 <Progress value={60} />
 <p className="text-sm text-muted-foreground">60% concluído</p>
@@ -49,7 +49,7 @@ import { Progress } from "@semec/ds-react";
 ## Prompt para IA
 
 ```text
-Crie um progress (Progresso) usando @semec/ds-react (`src/components/progress.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Barra de progresso determinada.
+Crie um progress (Progresso) usando semec-ds/react (`src/components/progress.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Barra de progresso determinada.
 ```
 
 ## Fonte

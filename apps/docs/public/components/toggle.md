@@ -18,10 +18,10 @@ variants: "variant: default · outline · size: sm · md · lg"
 - **variant**: default · outline
 - **size**: sm · md · lg
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -41,7 +41,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Toggle } from "@semec/ds-react";
+import { Toggle } from "semec-ds/react";
 import { Bold } from "lucide-react";
 
 <Toggle variant="outline" aria-label="Negrito">
@@ -52,7 +52,7 @@ import { Bold } from "lucide-react";
 ## Prompt para IA
 
 ```text
-Crie um toggle (Toggle) usando @semec/ds-react (`src/components/toggle.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · outline · size: sm · md · lg. Botão binário para estados on/off em toolbars.
+Crie um toggle (Toggle) usando semec-ds/react (`src/components/toggle.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · outline · size: sm · md · lg. Botão binário para estados on/off em toolbars.
 ```
 
 ## Fonte

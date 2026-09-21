@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import ComponentDoc from "@/components/docs/ComponentDoc";
-import { dsBySlug, dsComponents } from "@semec/ds/skills";
+import { dsBySlug, dsComponents } from "semec-ds/skills";
 import { BotoesExtras, BotaoDeIconeExtras, LinkExtras } from "@/components/demos/action-extras";
 
 export function generateStaticParams() {

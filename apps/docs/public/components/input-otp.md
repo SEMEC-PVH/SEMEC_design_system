@@ -18,10 +18,10 @@ variants: "composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSe
 - **composição**: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator
 - **props**: maxLength · disabled
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -41,7 +41,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec/ds-react";
+import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "semec-ds/react";
 
 <InputOTP value={code} onChange={setCode} maxLength={6}>
   <InputOTPGroup>
@@ -61,7 +61,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec
 ## Prompt para IA
 
 ```text
-Crie um input-otp (Input OTP) usando @semec/ds-react (`src/components/input-otp.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled. Campo de código OTP com foco automático entre dígitos.
+Crie um input-otp (Input OTP) usando semec-ds/react (`src/components/input-otp.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled. Campo de código OTP com foco automático entre dígitos.
 ```
 
 ## Fonte
@@ -90,7 +90,7 @@ function useInputOTP() {
   return ctx;
 }
 
-interface InputOTPProps extends React.HTMLAttributes<HTMLDivElement> {
+interface InputOTPProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
   value: string;
   onChange: (value: string) => void;
   maxLength?: number;

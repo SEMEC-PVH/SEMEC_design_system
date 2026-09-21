@@ -49,7 +49,7 @@ export default function TabelasPage() {
           <TableAdvanced />
         </div>
       </PreviewFrame>
-      <CodeBlock code={tableAdvancedUsage} filename="TableAdvanced.jsx" prompt="Crie Tabela avançada com ordenação, filtros, paginação, seleção, EmptyState e Skeleton usando @semec/ds-react" />
+      <CodeBlock code={tableAdvancedUsage} filename="TableAdvanced.jsx" prompt="Crie Tabela avançada com ordenação, filtros, paginação, seleção, EmptyState e Skeleton usando semec-ds-react" />
     </>
   );
 }

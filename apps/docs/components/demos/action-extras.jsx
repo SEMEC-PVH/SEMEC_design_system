@@ -43,7 +43,7 @@ export function BotoesExtras() {
         desc="Uma ação principal, uma secundária que preserva o trabalho e um escape silencioso."
         code={buttonFormFooterUsage}
         filename="ButtonFormFooter.jsx"
-        prompt="Crie rodapé de formulário SEMEC com Enviar (primary), Salvar rascunho (outline) e Cancelar (ghost) usando @semec/ds-react Button"
+        prompt="Crie rodapé de formulário SEMEC com Enviar (primary), Salvar rascunho (outline) e Cancelar (ghost) usando semec-ds-react Button"
       >
         <ButtonFormFooter />
       </Scenario>
@@ -52,7 +52,7 @@ export function BotoesExtras() {
         desc="Ação destrutiva nunca dispara direto — pede confirmação e oferece saída clara."
         code={buttonDestructiveUsage}
         filename="ButtonDestructive.jsx"
-        prompt="Crie confirmação de exclusão com Dialog e Button destructive + outline usando @semec/ds-react"
+        prompt="Crie confirmação de exclusão com Dialog e Button destructive + outline usando semec-ds-react"
       >
         <ButtonDestructive />
       </Scenario>
@@ -61,7 +61,7 @@ export function BotoesExtras() {
         desc="Enquanto processa, o botão desabilita e mostra um indicador — evita duplo envio."
         code={buttonLoadingUsage}
         filename="ButtonLoading.jsx"
-        prompt="Crie botão com estado de carregamento (spinner Loader2 animate-spin + disabled) usando @semec/ds-react Button"
+        prompt="Crie botão com estado de carregamento (spinner Loader2 animate-spin + disabled) usando semec-ds-react Button"
       >
         <ButtonLoading />
       </Scenario>
@@ -70,7 +70,7 @@ export function BotoesExtras() {
         desc="`asChild` transforma o botão num link com a mesma aparência — útil quando a ação navega."
         code={buttonAsLinkUsage}
         filename="ButtonAsLink.jsx"
-        prompt="Crie botão como link usando asChild do @semec/ds-react Button"
+        prompt="Crie botão como link usando asChild do semec-ds-react Button"
       >
         <ButtonAsLink />
       </Scenario>
@@ -79,7 +79,7 @@ export function BotoesExtras() {
         desc="Primária em destaque, ações auxiliares em outline/ghost no mesmo nível."
         code={buttonToolbarUsage}
         filename="ButtonToolbar.jsx"
-        prompt="Crie barra de ações (primária + outline + ghost sm) usando @semec/ds-react Button"
+        prompt="Crie barra de ações (primária + outline + ghost sm) usando semec-ds-react Button"
       >
         <ButtonToolbar />
       </Scenario>
@@ -96,7 +96,7 @@ export function BotaoDeIconeExtras() {
         desc="Ícones agrupados na mesma ação de linha; o `label` nomeia cada botão e o tooltip reforça no hover."
         code={iconToolbarUsage}
         filename="IconToolbar.jsx"
-        prompt="Crie toolbar de IconButton com Tooltip usando @semec/ds-react (label obrigatório)"
+        prompt="Crie toolbar de IconButton com Tooltip usando semec-ds-react (label obrigatório)"
       >
         <IconToolbar />
       </Scenario>
@@ -117,7 +117,7 @@ export function LinkExtras() {
         desc="Links inline no corpo do parágrafo, com a variante adequada ao contraste do entorno."
         code={linkInlineUsage}
         filename="LinkInline.jsx"
-        prompt="Crie links inline em parágrafo com variantes primary/onSurface/muted usando @semec/ds-react Link"
+        prompt="Crie links inline em parágrafo com variantes primary/onSurface/muted usando semec-ds-react Link"
       >
         <LinkInline />
       </Scenario>
@@ -126,7 +126,7 @@ export function LinkExtras() {
         desc="Navegação vertical de atalhos, com variantes para hierarquia visual."
         code={linkListUsage}
         filename="LinkList.jsx"
-        prompt="Crie lista de links úteis com variantes primary/onSurface/muted usando @semec/ds-react Link"
+        prompt="Crie lista de links úteis com variantes primary/onSurface/muted usando semec-ds-react Link"
       >
         <LinkList />
       </Scenario>

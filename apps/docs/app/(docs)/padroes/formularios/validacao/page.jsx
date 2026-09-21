@@ -48,7 +48,7 @@ export default function ValidacaoPage() {
           <FormAdvanced />
         </div>
       </PreviewFrame>
-      <CodeBlock code={formAdvancedUsage} filename="FormAdvanced.jsx" prompt="Crie formulário com máscara CPF/CNPJ/CEP/moeda e validação a11y usando @semec/ds-react (FormField + ErrorSummary + aria-live)" />
+      <CodeBlock code={formAdvancedUsage} filename="FormAdvanced.jsx" prompt="Crie formulário com máscara CPF/CNPJ/CEP/moeda e validação a11y usando semec-ds-react (FormField + ErrorSummary + aria-live)" />
     </>
   );
 }

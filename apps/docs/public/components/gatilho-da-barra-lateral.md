@@ -18,10 +18,10 @@ variants: "props: open · onToggle · labelOpen · labelClosed · a11y: aria-exp
 - **props**: open · onToggle · labelOpen · labelClosed
 - **a11y**: aria-expanded · aria-label dinâmico (Abrir/Fechar menu)
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -41,7 +41,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { SidebarTrigger } from "@semec/ds-react";
+import { SidebarTrigger } from "semec-ds/react";
 
 <SidebarTrigger open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />
 ```
@@ -49,7 +49,7 @@ import { SidebarTrigger } from "@semec/ds-react";
 ## Prompt para IA
 
 ```text
-Crie um sidebar-trigger (Gatilho da barra lateral) usando @semec/ds-react (`src/components/sidebar-trigger.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
+Crie um sidebar-trigger (Gatilho da barra lateral) usando semec-ds/react (`src/components/sidebar-trigger.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
 ```
 
 ## Fonte
@@ -119,7 +119,7 @@ const PanelLeftClose = () => (
   </svg>
 );
 
-const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarTriggerProps>(
+const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleButtonProps>(
   (
     {
       open = false,
@@ -127,6 +127,7 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarTriggerPr
       labelOpen = "Fechar menu",
       labelClosed = "Abrir menu",
       variant = "ghost",
+      label: _label,
       ...props
     },
     ref

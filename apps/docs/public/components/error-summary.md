@@ -17,10 +17,10 @@ variants: "props: title · errors [{ id, message }] · autoFocus · focusKey"
 
 - **props**: title · errors [{ id, message }] · autoFocus · focusKey
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { ErrorSummary } from "@semec/ds-react";
+import { ErrorSummary } from "semec-ds/react";
 
 <ErrorSummary
   errors={[
@@ -54,7 +54,7 @@ import { ErrorSummary } from "@semec/ds-react";
 ## Prompt para IA
 
 ```text
-Crie um error-summary (ErrorSummary) usando @semec/ds-react (`src/components/error-summary.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: title · errors [{ id, message }] · autoFocus · focusKey. Resumo de erros de validação no topo do formulário, com links para cada campo. A11y: `role="alert"`, foco automático.
+Crie um error-summary (ErrorSummary) usando semec-ds/react (`src/components/error-summary.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: title · errors [{ id, message }] · autoFocus · focusKey. Resumo de erros de validação no topo do formulário, com links para cada campo. A11y: `role="alert"`, foco automático.
 ```
 
 ## Fonte

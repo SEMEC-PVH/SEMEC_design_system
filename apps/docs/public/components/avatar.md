@@ -18,10 +18,10 @@ variants: "composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-
 - **composição**: Avatar · AvatarImage · AvatarFallback
 - **tamanhos**: h-10 w-10 (padrão) — sobrescreva com className
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -41,7 +41,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Avatar, AvatarImage, AvatarFallback } from "@semec/ds-react";
+import { Avatar, AvatarImage, AvatarFallback } from "semec-ds/react";
 
 <Avatar>
   <AvatarImage src="/foto.jpg" alt="João Silva" />
@@ -52,7 +52,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@semec/ds-react";
 ## Prompt para IA
 
 ```text
-Crie um avatar (Avatar) usando @semec/ds-react (`src/components/avatar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className. Foto de perfil com fallback automático (iniciais).
+Crie um avatar (Avatar) usando semec-ds/react (`src/components/avatar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className. Foto de perfil com fallback automático (iniciais).
 ```
 
 ## Fonte

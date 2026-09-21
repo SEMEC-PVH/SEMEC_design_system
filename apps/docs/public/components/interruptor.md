@@ -17,10 +17,10 @@ variants: "estados: off · on (checked) · disabled · inválido"
 
 - **estados**: off · on (checked) · disabled · inválido
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Switch, Label } from "@semec/ds-react";
+import { Switch, Label } from "semec-ds/react";
 
 <div className="flex items-center gap-2">
   <Switch id="alertas" defaultChecked />
@@ -51,7 +51,7 @@ import { Switch, Label } from "@semec/ds-react";
 ## Prompt para IA
 
 ```text
-Crie um switch (Interruptor) usando @semec/ds-react (`src/components/switch.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: off · on (checked) · disabled · inválido. Interruptor on/off para ativação imediata.
+Crie um switch (Interruptor) usando semec-ds/react (`src/components/switch.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: off · on (checked) · disabled · inválido. Interruptor on/off para ativação imediata.
 ```
 
 ## Fonte

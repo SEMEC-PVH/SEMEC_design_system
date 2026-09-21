@@ -48,7 +48,7 @@ export default function MascarasPage() {
           <FormAdvanced />
         </div>
       </PreviewFrame>
-      <CodeBlock code={formAdvancedUsage} filename="FormAdvanced.jsx" prompt="Crie campos com máscara CPF CNPJ CEP moeda usando @semec/ds-react — Input com inputMode numeric e formatação ao digitar" />
+      <CodeBlock code={formAdvancedUsage} filename="FormAdvanced.jsx" prompt="Crie campos com máscara CPF CNPJ CEP moeda usando semec-ds-react — Input com inputMode numeric e formatação ao digitar" />
     </>
   );
 }

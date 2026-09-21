@@ -17,10 +17,10 @@ variants: "props: label · htmlFor · required · hint · error"
 
 - **props**: label · htmlFor · required · hint · error
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { FormField, Input } from "@semec/ds-react";
+import { FormField, Input } from "semec-ds/react";
 
 <FormField label="E-mail" htmlFor="email" required hint="Usado para o comprovante" error="Informe um e-mail válido">
   <Input id="email" aria-invalid />
@@ -50,7 +50,7 @@ import { FormField, Input } from "@semec/ds-react";
 ## Prompt para IA
 
 ```text
-Crie um form-field (Campo de formulário) usando @semec/ds-react (`src/components/form-field.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: label · htmlFor · required · hint · error. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.
+Crie um form-field (Campo de formulário) usando semec-ds/react (`src/components/form-field.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: label · htmlFor · required · hint · error. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.
 ```
 
 ## Fonte

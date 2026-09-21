@@ -17,10 +17,10 @@ variants: "props: nativo HTML (min · max · disabled) + variantes visuais do ca
 
 - **props**: nativo HTML (min · max · disabled) + variantes visuais do campo
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { DatePicker } from "@semec/ds-react";
+import { DatePicker } from "semec-ds/react";
 
 <DatePicker defaultValue="2026-08-31" />
 ```
@@ -48,7 +48,7 @@ import { DatePicker } from "@semec/ds-react";
 ## Prompt para IA
 
 ```text
-Crie um date-picker (Seletor de data) usando @semec/ds-react (`src/components/date-picker.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: nativo HTML (min · max · disabled) + variantes visuais do campo. Data com `<input type="date">` nativo — sem biblioteca de calendário.
+Crie um date-picker (Seletor de data) usando semec-ds/react (`src/components/date-picker.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: nativo HTML (min · max · disabled) + variantes visuais do campo. Data com `<input type="date">` nativo — sem biblioteca de calendário.
 ```
 
 ## Fonte

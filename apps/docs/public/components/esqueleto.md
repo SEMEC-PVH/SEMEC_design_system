@@ -17,10 +17,10 @@ variants: "—"
 
 _Sem variantes_
 
-## Instalação (@semec/ds-react)
+## Instalação (@semec/ds/react)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds-react pelo registry)
+# 1. Copie packages/react/ para seu projeto (ou instale @semec/ds/react pelo registry)
 # 2. Instale deps (ver packages/react/README.md)
 npm i class-variance-authority clsx tailwind-merge lucide-react \
   @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Skeleton } from "@semec/ds-react";
+import { Skeleton } from "semec-ds/react";
 
 <Skeleton className="h-4 w-[250px]" />
 <Skeleton className="h-4 w-[180px]" />
@@ -49,7 +49,7 @@ import { Skeleton } from "@semec/ds-react";
 ## Prompt para IA
 
 ```text
-Crie um skeleton (Esqueleto) usando @semec/ds-react (`src/components/skeleton.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Placeholder pulsante de carregamento.
+Crie um skeleton (Esqueleto) usando semec-ds/react (`src/components/skeleton.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Placeholder pulsante de carregamento.
 ```
 
 ## Fonte

@@ -1,4 +1,4 @@
-import { dsCategories, dsComponents, dsPortal } from "@semec/ds/skills";
+import { dsCategories, dsComponents, dsPortal } from "semec-ds/skills";
 
 export function breadcrumbsFor(pathname) {
   const crumbs = [{ label: "Início", href: "/" }];

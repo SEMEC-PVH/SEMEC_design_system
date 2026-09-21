@@ -49,7 +49,7 @@ export default function MensagensDeErroPage() {
           <FormAdvanced />
         </div>
       </PreviewFrame>
-      <CodeBlock code={formAdvancedUsage} filename="FormAdvanced.jsx" prompt="Crie mensagens de erro acessíveis com ErrorSummary e FormField aria-invalid usando @semec/ds-react" />
+      <CodeBlock code={formAdvancedUsage} filename="FormAdvanced.jsx" prompt="Crie mensagens de erro acessíveis com ErrorSummary e FormField aria-invalid usando semec-ds-react" />
     </>
   );
 }

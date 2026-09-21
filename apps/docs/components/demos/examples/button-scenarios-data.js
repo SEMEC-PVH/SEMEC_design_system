@@ -1,4 +1,4 @@
-export const buttonFormFooterUsage = `import { Button } from "@semec/ds/react";
+export const buttonFormFooterUsage = `import { Button } from "semec-ds/react";
 
 <div className="flex flex-wrap gap-3">
   <Button>Enviar requerimento</Button>
@@ -6,7 +6,7 @@ export const buttonFormFooterUsage = `import { Button } from "@semec/ds/react";
   <Button variant="ghost">Cancelar</Button>
 </div>`;
 
-export const buttonDestructiveUsage = `import { Button, Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@semec/ds/react";
+export const buttonDestructiveUsage = `import { Button, Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "semec-ds/react";
 
 <Dialog>
   <DialogTrigger asChild>
@@ -24,19 +24,19 @@ export const buttonDestructiveUsage = `import { Button, Dialog, DialogClose, Dia
   </DialogContent>
 </Dialog>`;
 
-export const buttonLoadingUsage = `import { Button } from "@semec/ds/react";
+export const buttonLoadingUsage = `import { Button } from "semec-ds/react";
 import { Loader2, Send } from "lucide-react";
 
 <Button disabled={loading}>
   {loading ? (<><Loader2 className="animate-spin" /> Enviando…</>) : (<><Send /> Enviar requerimento</>)}
 </Button>`;
 
-export const buttonAsLinkUsage = `import { Button } from "@semec/ds/react";
+export const buttonAsLinkUsage = `import { Button } from "semec-ds/react";
 
 <Button asChild><a href="/iptu">Ver situação do IPTU</a></Button>
 <Button asChild variant="outline"><a href="/iptu/2via">Emitir segunda via</a></Button>`;
 
-export const buttonToolbarUsage = `import { Button } from "@semec/ds/react";
+export const buttonToolbarUsage = `import { Button } from "semec-ds/react";
 import { Download, Plus, Printer } from "lucide-react";
 
 <div className="flex flex-wrap gap-2">
@@ -45,7 +45,7 @@ import { Download, Plus, Printer } from "lucide-react";
   <Button size="sm" variant="ghost"><Printer /> Imprimir</Button>
 </div>`;
 
-export const iconToolbarUsage = `import { IconButton, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@semec/ds/react";
+export const iconToolbarUsage = `import { IconButton, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "semec-ds/react";
 import { Download, Pencil, Trash2 } from "lucide-react";
 
 <TooltipProvider>
@@ -71,7 +71,7 @@ import { Download, Pencil, Trash2 } from "lucide-react";
   </div>
 </TooltipProvider>`;
 
-export const linkInlineUsage = `import { Link } from "@semec/ds/react";
+export const linkInlineUsage = `import { Link } from "semec-ds/react";
 
 <p>
   Para contestar o lançamento, consulte a{" "}
@@ -80,7 +80,7 @@ export const linkInlineUsage = `import { Link } from "@semec/ds/react";
   <Link href="/ajuda" variant="muted">Saiba mais aqui</Link>.
 </p>`;
 
-export const linkListUsage = `import { Link } from "@semec/ds/react";
+export const linkListUsage = `import { Link } from "semec-ds/react";
 
 <nav aria-label="Links úteis">
   <Link href="/servicos">Acessar serviços online</Link>

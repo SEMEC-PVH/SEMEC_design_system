@@ -3,8 +3,8 @@ import { join } from "path";
 import Link from "next/link";
 import BasePreview from "@/components/demos/base-previews";
 import CodeBlock from "@/components/docs/CodeBlock";
-import { dsByCategory, dsCategories, dsPrompt } from "@semec/ds/skills";
-import { dsPackageRootResolve } from "@semec/ds/react/server";
+import { dsByCategory, dsCategories, dsPrompt } from "semec-ds/skills";
+import { dsPackageRootResolve } from "semec-ds/react/server";
 
 export function ProtoStyle() {
   return (
@@ -65,7 +65,7 @@ export default function ComponentDoc({ c, extra }) {
       )}
 
       <h3>Uso</h3>
-      <CodeBlock code={c.usage} filename="@semec/ds-react" prompt={dsPrompt(c)} />
+      <CodeBlock code={c.usage} filename="semec-ds-react" prompt={dsPrompt(c)} />
 
       <h3>Fonte do componente</h3>
       <CodeBlock code={source} filename={c.file} prompt={dsPrompt(c)} />

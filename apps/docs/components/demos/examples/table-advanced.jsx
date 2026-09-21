@@ -21,7 +21,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@semec/ds/react";
+} from "semec-ds/react";
 import { ArrowUpDown, Inbox } from "lucide-react";
 
 // Dataset exemplo — SIGO contratos

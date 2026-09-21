@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { dsCategories, dsComponents, dsPortal } from "@semec/ds/skills";
+import { dsCategories, dsComponents, dsPortal } from "semec-ds/skills";
 
 export const metadata = { title: "Componentes · Visão geral" };
 
@@ -27,7 +27,7 @@ export default function ComponentesPage() {
       <p className="subtitle">
         Visão geral · cada componente tem página própria com preview, código e
         prompt copiável. Os componentes do sistema vivem em{" "}
-        <code>packages/react/</code> (pacote <code>@semec/ds-react</code>); a{" "}
+        <code>packages/react/</code> (pacote <code>semec-ds-react</code>); a{" "}
         <strong>{dsPortal.label}</strong> reúne a casca do portal, base para os
         componentes que o kit vai criar.
       </p>

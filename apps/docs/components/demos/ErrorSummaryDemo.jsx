@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ErrorSummary } from "@semec/ds/react";
+import { ErrorSummary } from "semec-ds/react";
 
 const CAMPOS = [
   { id: "nome", label: "Nome completo", tipo: "text" },

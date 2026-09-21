@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ProtoStyle } from "@/components/docs/ComponentDoc";
-import { dsByCategory, dsCategories } from "@semec/ds/skills";
+import { dsByCategory, dsCategories } from "semec-ds/skills";
 
 export default function CategoryIndex({ catKey }) {
   const cat = dsCategories.find((k) => k.key === catKey);
