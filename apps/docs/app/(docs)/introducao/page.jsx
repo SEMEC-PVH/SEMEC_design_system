@@ -156,10 +156,16 @@ const categorias = [
 ];
 
 export default function IntroPage() {
+  const dataAtualizacao = new Intl.DateTimeFormat("pt-BR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date());
+
   return (
     <>
       <h1>SEMEC design system</h1>
-      <p className="subtitle">Atualizado em 3 de Setembro de 2026</p>
+      <p className="subtitle">Atualizado em {dataAtualizacao}</p>
 
       <h2>O que é um Design System</h2>
       <p>
