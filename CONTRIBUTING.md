@@ -59,11 +59,12 @@ Sem `axe` configurado, a verificação de acessibilidade **é manual** — e pre
 
 ## 5. Merge
 
-Aprovado, o pull request entra por merge na branch de destino. **Não há changeset, não há release e não há publicação** — o pacote existe no workspace, mas não é publicado num registry. Isso muda quando a Parte 2 valer.
+Aprovado, o pull request entra por merge na branch de destino. Se houver changesets pendentes, a CI publica automaticamente no npm (ver seção "Publicação e versionamento" abaixo).
 
 ## O que um pull request precisa ter hoje
 
 - [ ] Issue de proposta vinculada (exceto correção pontual)
+- [ ] Changeset criado (se houver mudança relevante)
 - [ ] `npm run build:ds` passando — roda tsup + build-skills, verifica se o pacote compila sem erros
 - [ ] `npm run typecheck` passando — verifica tipos
 - [ ] `npm run build` passando — roda next build com output: 'export' e verifica se o site compila
@@ -98,7 +99,7 @@ Todo arquivo de texto usa **LF**. O `.gitattributes` da raiz (`* text=auto eol=l
 
 # Parte 2 — O processo previsto, para quando a biblioteca existir
 
-Nada nesta parte é exigível hoje. Cada item aqui depende de infraestrutura que ainda não foi construída: os pacotes em `packages/`, o Storybook, a suíte de testes e a integração contínua descritos na [arquitetura](docs/arquitetura.md). Esta parte existe para que, quando a infraestrutura chegar, a régua já esteja escrita — e para deixar explícito o que **não** está sendo cobrado enquanto isso.
+Nesta parte, apenas a **publicação e versionamento** já está ativa (ver Parte 1). Os demais itens dependem de infraestrutura que ainda não foi construída: o Storybook, a suíte de testes e a integração contínua descritos na [arquitetura](docs/arquitetura.md). Esta parte existe para que, quando a infraestrutura chegar, a régua já esteja escrita — e para deixar explícito o que **não** está sendo cobrado enquanto isso.
 
 ## Fluxo completo de entrada de um componente
 
@@ -131,11 +132,45 @@ Nada nesta parte é exigível hoje. Cada item aqui depende de infraestrutura que
 
 ## Publicação e versionamento
 
-- **Changesets** geram versão e registro de mudanças a cada release.
-- **Versionamento semântico estrito**: quebra de API ou mudança visual disruptiva incrementa a maior; componente ou propriedade nova, a menor; correção, a de correção.
-- **Canais**: `latest` para produção, `next` para validação prévia.
-- **Depreciação**: propriedade ou componente marcado como obsoleto continua funcionando por **duas versões menores**, com aviso, antes de sair em uma versão maior — conforme o [ADR-013](docs/adr/0013-politica-de-depreciacao-duas-minors.md). Toda versão maior traz guia de migração.
-- **Registry**: npm público, escopo `@semec`, conforme o [ADR-022](docs/adr/0022-publicacao-npm-publico.md). CI publica automaticamente em tags `v*`.
+O pacote `@semec/ds` é publicado no npm público. A CI publica automaticamente sempre que há mudanças na branch `main`:
+
+### Fluxo de release
+
+1. **Crie um changeset** descrevendo sua mudança:
+   ```bash
+   npm run changeset
+   ```
+   Escolha o tipo:
+   - **patch** (1.0.0 → 1.0.1) — bugfix, correção de typo, ajuste de estilo
+   - **minor** (1.0.0 → 1.1.0) — componente novo, propriedade nova, funcionalidade
+   - **major** (1.0.0 → 2.0.0) — quebra de API, remoção de componente
+
+2. **Commit e push** para a branch `main`
+
+3. **A CI roda automaticamente**:
+   - Roda `typecheck` e `build:ds`
+   - Executa `changeset publish` — que lê os changesets pendentes, bumpa a versão, cria tag git e publica no npm
+
+### Consumidores do pacote
+
+```bash
+# Última versão
+npm install @semec/ds
+
+# Versão específica
+npm install @semec/ds@1.2.3
+
+# Dentro do range semver
+npm install @semec/ds@^1.0.0
+```
+
+### Versionamento semântico
+
+- **Major**: quebra de API ou mudança visual disruptiva
+- **Minor**: componente ou propriedade nova
+- **Patch**: correção de bug, ajuste de tipografia, contrato
+
+**Depreciação**: propriedade ou componente marcado como obsoleto continua funcionando por **duas versões menores**, com aviso, antes de sair em uma versão maior — conforme o [ADR-013](docs/adr/0013-politica-de-depreciacao-duas-minors.md). Toda versão maior traz guia de migração.
 
 ---
 

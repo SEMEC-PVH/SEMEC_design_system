@@ -2,22 +2,14 @@ name: Publish @semec/ds
 
 on:
   push:
-    tags:
-      - "v*"
-  workflow_dispatch:
-    inputs:
-      publish:
-        description: "Publish to npm"
-        required: false
-        default: "false"
-        type: boolean
+    branches: [main]
 
 permissions:
-  contents: read
-  id-token: write
+  contents: write
+  pull-requests: write
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,35 +29,8 @@ jobs:
       - name: Build package
         run: npm run build:ds
 
-      - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: packages/react/dist
-
-  publish:
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.publish == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Install
-        run: npm ci
-
-      - name: Download dist artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: packages/react/dist
-
-      - name: Publish to npm
-        run: npm publish --workspace packages/react --access public
+      - name: Create release
+        run: npx changeset publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
