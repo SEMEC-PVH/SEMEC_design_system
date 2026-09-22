@@ -29,8 +29,10 @@ npm run dev          # site em http://localhost:3000
 npm run build        # artefatos de IA (prebuild) + export estático em apps/docs/out
 npm run build:ds     # build do pacote @semec/ds (tsup + build-skills)
 npm run typecheck    # verifica tipos do pacote
-npm run lint         # ESLint do site
+npm run lint         # ESLint (flat config + jsx-a11y)
 npm run proto:css    # CSS isolado dos componentes
+npm run generate:llms  # regenera artefatos IA (llms.txt, manifest.json, componentes/*.md)
+npm run start        # serve o site após build
 ```
 
 ## Instalar o kit
@@ -58,10 +60,13 @@ import { Button, Card, CardHeader, CardTitle, CardContent } from "@semec/ds/reac
 | `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) |
 | `@semec/ds/react/shadcn.css` | Variáveis shadcn HSL |
 | `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS) |
+| `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 (source TS) |
 | `@semec/ds/react/server` | Helpers Node.js |
 | `@semec/ds/skills` | Manifest + componentes para agentes IA |
 | `@semec/ds/skills/llms.txt` | Índice para IA |
+| `@semec/ds/skills/llms-full.txt` | Documentação completa para IA |
 | `@semec/ds/skills/manifest.json` | JSON completo para máquinas |
+| `@semec/ds/skills/manifest.js` | Manifest JS para agentes IA |
 | `@semec/ds/skills/components/*.md` | Chunk RAG por componente |
 
 ## Publicação
