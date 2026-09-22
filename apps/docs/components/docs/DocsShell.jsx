@@ -101,9 +101,7 @@ export default function DocsShell({ children }) {
             </div>
             <TableOfContents />
           </div>
-          <div className="container">
-            <Footer />
-          </div>
+          <Footer />
         </main>
       </div>
     </>

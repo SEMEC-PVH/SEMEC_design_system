@@ -8,6 +8,18 @@
   padding: 0;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* ==========================================================================
    Compatibilidade com os nomes antigos
    --------------------------------------------------------------------------
@@ -1672,13 +1684,12 @@ footer {
   margin-top: 3rem;
   font-size: var(--font-size-xs);
   color: var(--text-muted);
-  padding: 3rem 0 2rem;
+  padding: 3rem 3rem 2rem;
   border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
-  flex-wrap: wrap;
 }
 .site-footer-left {
   display: flex;

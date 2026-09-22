@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { SidebarTrigger } from "semec-ds/react";
+import { SidebarToggleButton } from "semec-ds/react";
 import { navigation } from "@/lib/navigation";
 import { safeGet, safeSet } from "@/lib/storage";
 
@@ -204,6 +204,15 @@ export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
   }, [pathname, hash]);
 
   const toggleGroup = (key) => {
+    const willExpand = collapsedCache[groupCacheKey(key)];
+    if (willExpand) {
+      navigation.forEach((item) => {
+        if (!item.items) return;
+        if (item.key !== key && !collapsedCache[groupCacheKey(item.key)]) {
+          updateCollapsed("ds-group-" + item.key, groupCacheKey(item.key), true);
+        }
+      });
+    }
     updateCollapsed(
       "ds-group-" + key,
       groupCacheKey(key),
@@ -323,7 +332,7 @@ export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
         )}
       </nav>
       <div className="sidebar-footer">
-        <SidebarTrigger
+        <SidebarToggleButton
           open={collapsed}
           onToggle={onCollapse}
           variant="outline"
