@@ -232,6 +232,21 @@ export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
   };
 
   const toggleNested = (groupKey, href) => {
+    const willExpand = collapsedCache[nestedCacheKey(groupKey, href)];
+    if (willExpand) {
+      buildSections(
+        navigation.find((n) => n.key === groupKey)?.items ?? []
+      ).forEach((s) => {
+        if (s.children.length === 0) return;
+        if (s.item.href !== href && !collapsedCache[nestedCacheKey(groupKey, s.item.href)]) {
+          updateCollapsed(
+            nestedStorageKey(groupKey, s.item.href),
+            nestedCacheKey(groupKey, s.item.href),
+            true
+          );
+        }
+      });
+    }
     updateCollapsed(
       nestedStorageKey(groupKey, href),
       nestedCacheKey(groupKey, href),
