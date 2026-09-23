@@ -305,43 +305,46 @@ export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
       id="sidebar"
       inert={inert}
     >
-      <nav aria-label="Seções do guia">
-        {navigation.map((item) =>
-          item.items ? (
-            <div key={item.key}>
-              <button
-                type="button"
-                className={"side-title" + (collapsedGroup(item) ? "" : " open")}
-                onClick={() => toggleGroup(item.key)}
-                aria-expanded={!collapsedGroup(item)}
-                aria-controls={"side-group-" + item.key}
-              >
-                <Caret />
-                <span className="nav-label">{item.label}</span>
-              </button>
-              <div
-                id={"side-group-" + item.key}
-                className={
-                  "side-group" + (collapsedGroup(item) ? " collapsed" : "")
-                }
-              >
-                {renderSections(item)}
-              </div>
+      <div className="sidebar-scroll">
+        <nav aria-label="Seções do guia">
+          {navigation.map((item) => (
+            <div key={item.key} className={"sidebar-section" + (item.section === "reference" ? " sidebar-section--reference" : "")}>
+              {item.items ? (
+                <>
+                  <button
+                    type="button"
+                    className={"side-title" + (collapsedGroup(item) ? "" : " open")}
+                    onClick={() => toggleGroup(item.key)}
+                    aria-expanded={!collapsedGroup(item)}
+                    aria-controls={"side-group-" + item.key}
+                  >
+                    <Caret />
+                    <span className="nav-label">{item.label}</span>
+                  </button>
+                  <div
+                    id={"side-group-" + item.key}
+                    className={
+                      "side-group" + (collapsedGroup(item) ? " collapsed" : "")
+                    }
+                  >
+                    {renderSections(item)}
+                  </div>
+                </>
+              ) : (
+                <Link
+                  href={item.href}
+                  className={
+                    "side-title" +
+                    (isActive(pathname, item.href, hash) ? " active" : "")
+                  }
+                >
+                  <span className="nav-label">{item.label}</span>
+                </Link>
+              )}
             </div>
-          ) : (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={
-                "side-title" +
-                (isActive(pathname, item.href, hash) ? " active" : "")
-              }
-            >
-              <span className="nav-label">{item.label}</span>
-            </Link>
-          )
-        )}
-      </nav>
+          ))}
+        </nav>
+      </div>
       <div className="sidebar-footer">
         <SidebarToggleButton
           open={collapsed}

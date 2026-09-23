@@ -50,25 +50,19 @@ const componentesItems = [
 
 export const navigation = [
   {
-    key: "visao-geral",
-    label: "Visão Geral",
+    key: "guia",
+    label: "Guia",
     items: [
       { href: "/introducao", label: "Introdução" },
       { href: "/introducao/o-que-e-ds", label: "O que é DS?" },
       { href: "/introducao/para-quem", label: "Para quem é" },
       { href: "/introducao/requisitos", label: "Requisitos" },
-    ],
-  },
-  {
-    key: "fundamentos",
-    label: "Fundamentos",
-    items: [
-      { href: "/fundamentos", label: "Visão geral" },
-      { href: "/fundamentos/tipografia", label: "Tipografia" },
-      { href: "/fundamentos/cores", label: "Cores" },
-      { href: "/fundamentos/layout", label: "Layout" },
-      { href: "/fundamentos/raios-sombras", label: "Raios, bordas e sombras" },
-      { href: "/fundamentos/animacoes", label: "Animações" },
+      { href: "/fundamentos", label: "Fundamentos" },
+      { href: "/fundamentos/tipografia", label: "Tipografia", sub: true },
+      { href: "/fundamentos/cores", label: "Cores", sub: true },
+      { href: "/fundamentos/layout", label: "Layout", sub: true },
+      { href: "/fundamentos/raios-sombras", label: "Raios, bordas e sombras", sub: true },
+      { href: "/fundamentos/animacoes", label: "Animações", sub: true },
     ],
   },
   {
@@ -79,6 +73,7 @@ export const navigation = [
   {
     key: "padroes",
     label: "Padrões",
+    section: "reference",
     items: [
       { href: "/padroes", label: "Visão geral" },
       { href: "/padroes/navegacao", label: "Navegação" },
