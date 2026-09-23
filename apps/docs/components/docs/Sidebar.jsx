@@ -26,6 +26,7 @@ const isActive = (pathname, href, currentHash = "", hasChildren = false) => {
 };
 
 const MOBILE_QUERY = "(max-width: 900px)";
+const MAX_EXPANDED = 3;
 
 const GROUP_PREFIX = "group:";
 const NESTED_PREFIX = "nested:";
@@ -145,6 +146,46 @@ function updateCollapsed(storageKey, cacheKey, value) {
   listeners.forEach((l) => l());
 }
 
+// Conta todos os itens expandidos (grupos + subgrupos) no total da sidebar.
+function countExpanded() {
+  if (!collapsedCache) return 0;
+  let count = 0;
+  for (const item of navigation) {
+    if (!item.items) continue;
+    if (!collapsedCache[groupCacheKey(item.key)]) count++;
+    for (const section of buildSections(item.items)) {
+      if (section.children.length === 0) continue;
+      if (!collapsedCache[nestedCacheKey(item.key, section.item.href)]) count++;
+    }
+  }
+  return count;
+}
+
+// Colapsa o item mais antigo (segundo a ordem da navigation) que está expandido,
+// exceto o item que está sendo expandido agora (skipKey).
+function collapseOldest(skipGroupKey, skipHref) {
+  for (const item of navigation) {
+    if (!item.items) continue;
+    // Tenta colapsar um grupo de topo
+    if (item.key !== skipGroupKey && !collapsedCache[groupCacheKey(item.key)]) {
+      updateCollapsed("ds-group-" + item.key, groupCacheKey(item.key), true);
+      return true;
+    }
+    // Dentro do grupo, tenta colapsar um subgrupo
+    if (item.key !== skipGroupKey || !skipHref) {
+      for (const section of buildSections(item.items)) {
+        if (section.children.length === 0) continue;
+        const nKey = nestedCacheKey(item.key, section.item.href);
+        if (section.item.href !== skipHref && !collapsedCache[nKey]) {
+          updateCollapsed(nestedStorageKey(item.key, section.item.href), nKey, true);
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
 export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
   const pathname = usePathname();
   const hash = useHash();
@@ -182,12 +223,10 @@ export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
   const toggleGroup = (key) => {
     const willExpand = collapsedCache[groupCacheKey(key)];
     if (willExpand) {
-      navigation.forEach((item) => {
-        if (!item.items) return;
-        if (item.key !== key && !collapsedCache[groupCacheKey(item.key)]) {
-          updateCollapsed("ds-group-" + item.key, groupCacheKey(item.key), true);
-        }
-      });
+      // Enforce MAX_EXPANDED: colapsa o mais antigo antes de expandir
+      while (countExpanded() >= MAX_EXPANDED) {
+        if (!collapseOldest(key, null)) break;
+      }
     }
     updateCollapsed(
       "ds-group-" + key,
@@ -199,18 +238,10 @@ export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
   const toggleNested = (groupKey, href) => {
     const willExpand = collapsedCache[nestedCacheKey(groupKey, href)];
     if (willExpand) {
-      buildSections(
-        navigation.find((n) => n.key === groupKey)?.items ?? []
-      ).forEach((s) => {
-        if (s.children.length === 0) return;
-        if (s.item.href !== href && !collapsedCache[nestedCacheKey(groupKey, s.item.href)]) {
-          updateCollapsed(
-            nestedStorageKey(groupKey, s.item.href),
-            nestedCacheKey(groupKey, s.item.href),
-            true
-          );
-        }
-      });
+      // Enforce MAX_EXPANDED: colapsa o mais antigo antes de expandir
+      while (countExpanded() >= MAX_EXPANDED) {
+        if (!collapseOldest(groupKey, href)) break;
+      }
     }
     updateCollapsed(
       nestedStorageKey(groupKey, href),
