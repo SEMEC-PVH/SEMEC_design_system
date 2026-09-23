@@ -184,10 +184,21 @@ export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
   // sair da categoria (ou o usuário voltar a colapsar nesta página).
   useEffect(() => {
     if (typeof window === "undefined") return;
+    let expandedOne = false;
     navigation.forEach((item) => {
       if (!item.items) return;
       const gKey = groupCacheKey(item.key);
       if (groupHasActive(pathname, item, hash) && collapsedCache[gKey]) {
+        if (!expandedOne) {
+          navigation.forEach((other) => {
+            if (!other.items) return;
+            const oKey = groupCacheKey(other.key);
+            if (other.key !== item.key && !collapsedCache[oKey]) {
+              updateCollapsed("ds-group-" + other.key, oKey, true);
+            }
+          });
+          expandedOne = true;
+        }
         updateCollapsed("ds-group-" + item.key, gKey, false);
       }
       buildSections(item.items).forEach((s) => {
