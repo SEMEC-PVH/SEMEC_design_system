@@ -179,41 +179,6 @@ export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
     onClose();
   }, [pathname, onClose]);
 
-  // Ao navegar para dentro de um grupo/subgrupo colapsado, expande-o — a rota
-  // atual nunca fica oculta, mas o colapso manual continua valendo até a rota
-  // sair da categoria (ou o usuário voltar a colapsar nesta página).
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    let expandedOne = false;
-    navigation.forEach((item) => {
-      if (!item.items) return;
-      const gKey = groupCacheKey(item.key);
-      if (groupHasActive(pathname, item, hash) && collapsedCache[gKey]) {
-        if (!expandedOne) {
-          navigation.forEach((other) => {
-            if (!other.items) return;
-            const oKey = groupCacheKey(other.key);
-            if (other.key !== item.key && !collapsedCache[oKey]) {
-              updateCollapsed("ds-group-" + other.key, oKey, true);
-            }
-          });
-          expandedOne = true;
-        }
-        updateCollapsed("ds-group-" + item.key, gKey, false);
-      }
-      buildSections(item.items).forEach((s) => {
-        if (s.children.length === 0) return;
-        const nKey = nestedCacheKey(item.key, s.item.href);
-        if (
-          s.children.some((c) => isActive(pathname, c.href, hash)) &&
-          collapsedCache[nKey]
-        ) {
-          updateCollapsed(nestedStorageKey(item.key, s.item.href), nKey, false);
-        }
-      });
-    });
-  }, [pathname, hash]);
-
   const toggleGroup = (key) => {
     const willExpand = collapsedCache[groupCacheKey(key)];
     if (willExpand) {
