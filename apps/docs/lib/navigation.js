@@ -73,7 +73,6 @@ export const navigation = [
   {
     key: "padroes",
     label: "Padrões",
-    section: "reference",
     items: [
       { href: "/padroes", label: "Visão geral" },
       { href: "/padroes/navegacao", label: "Navegação" },
