@@ -26,7 +26,7 @@ const isActive = (pathname, href, currentHash = "", hasChildren = false) => {
 };
 
 const MOBILE_QUERY = "(max-width: 900px)";
-const MAX_EXPANDED = 3;
+const MAX_EXPANDED = 1;
 
 const GROUP_PREFIX = "group:";
 const NESTED_PREFIX = "nested:";
