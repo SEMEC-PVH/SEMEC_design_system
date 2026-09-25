@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-09-21T15:36:38.976Z — packages/react/manifest.js + packages/react/*
+> Gerado 2026-09-23T21:56:46.672Z — packages/react/manifest.js + packages/react/*
 
 ## Instalação — packages/react/README.md
 
@@ -153,6 +153,7 @@ export * from "./components/radio-group";
 export * from "./components/scroll-area";
 export * from "./components/select";
 export * from "./components/separator";
+export * from "./components/sheet";
 export * from "./components/sidebar";
 export * from "./components/sidebar-trigger";
 export * from "./components/skeleton";
@@ -310,13 +311,12 @@ export * from "./lib/validators";
   --space-12: 48px;
   --space-16: 64px;
 
-  /* =======================================================================
-     L1 — SEMÂNTICOS · Forma (estilo Luma — arrojado, macio)
-     ======================================================================= */
-  --radius-sm:   12px;
-  --radius-md:   16px;
-  --radius-lg:   24px;
-  --radius-xl:   32px;
+   /* =======================================================================
+      L1 — SEMÂNTICOS · Forma (sóbrio — cantos moderados)
+      ======================================================================= */
+  --radius-sm:   2px;
+  --radius-md:   4px;
+  --radius-lg:   8px;
   --radius-full: 9999px;
 
   /* =======================================================================
@@ -984,7 +984,7 @@ const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLI
     <input
       type={type}
       className={cn(
-        "flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/30",
+        "flex h-11 w-full rounded-md border border-input bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/30",
         className
       )}
       ref={ref}
@@ -1029,7 +1029,7 @@ const Textarea = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <textarea
     className={cn(
-      "flex min-h-[80px] w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/30",
+      "flex min-h-[80px] w-full rounded-md border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/30",
       className
     )}
     ref={ref}
@@ -1088,7 +1088,7 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-11 w-full items-center justify-between whitespace-nowrap rounded-xl border border-input bg-background px-4 py-2 text-sm text-foreground shadow-sm placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left",
+      "flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm text-foreground shadow-sm placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left",
       className
     )}
     {...props}
@@ -1137,7 +1137,7 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-elevation-2 data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 data-[state=open]:animate-in data-[state=closed]:animate-out",
         position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
         className
@@ -1621,7 +1621,7 @@ const Checkbox = React.forwardRef<
   <CheckboxPrimitive.Root
     ref={ref}
     className={cn(
-      "peer h-5 w-5 shrink-0 rounded-lg border border-input shadow-sm transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground aria-[invalid=true]:border-destructive",
+      "peer h-5 w-5 shrink-0 rounded-md border border-input shadow-sm transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground aria-[invalid=true]:border-destructive",
       className
     )}
     {...props}
@@ -2037,7 +2037,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-2xl border border-border bg-card text-card-foreground shadow-md ring-1 ring-foreground/5",
+      "rounded-lg border border-border bg-card text-card-foreground shadow-md ring-1 ring-foreground/5",
       className
     )}
     {...props}
@@ -2541,7 +2541,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-11 items-center justify-center rounded-xl bg-muted p-1 text-muted-foreground",
+      "inline-flex h-11 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground",
       className
     )}
     {...props}
@@ -2895,7 +2895,7 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-elevation-3 ring-1 ring-foreground/5 duration-base ease-standard data-[state=open]:animate-in",
+        "fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-elevation-3 ring-1 ring-foreground/5 duration-base ease-standard data-[state=open]:animate-in",
         className
       )}
       {...props}
@@ -3024,7 +3024,7 @@ const ToastViewport = React.forwardRef<
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-xl border border-border bg-card p-4 text-card-foreground shadow-elevation-2 transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out",
+  "group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-lg border border-border bg-card p-4 text-card-foreground shadow-elevation-2 transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out",
   {
     variants: {
       variant: {
@@ -3334,7 +3334,7 @@ import { AlertCircle, AlertTriangle, CheckCircle2, Info } from "lucide-react";
 import { cn } from "../lib/utils";
 
 const alertVariants = cva(
-  "relative w-full rounded-xl border px-4 py-3 text-sm [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:h-4 [&>svg]:w-4",
+  "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:h-4 [&>svg]:w-4",
   {
     variants: {
       variant: {
@@ -3565,7 +3565,7 @@ const AlertDialogContent = React.forwardRef<
     <AlertDialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-elevation-3 ring-1 ring-foreground/5 duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
+        "fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-elevation-3 ring-1 ring-foreground/5 duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
         className
       )}
       {...props}
@@ -3718,7 +3718,7 @@ const PopoverContent = React.forwardRef<
       align={align}
       sideOffset={sideOffset}
       className={cn(
-        "z-50 w-72 rounded-xl border border-border bg-card p-4 text-card-foreground shadow-elevation-2 outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "z-50 w-72 rounded-lg border border-border bg-card p-4 text-card-foreground shadow-elevation-2 outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       )}
       {...props}
@@ -6034,7 +6034,7 @@ const SidebarInset = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex min-h-svh flex-1 flex-col bg-background",
-      "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow",
+      "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-lg md:peer-data-[variant=inset]:shadow",
       className
     )}
     {...props}
