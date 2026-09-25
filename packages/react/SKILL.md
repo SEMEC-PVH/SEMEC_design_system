@@ -1,7 +1,8 @@
 ---
 name: semec-ds
 description: Use SEMEC Design System (@semec/ds) para construir UI. Tokens pv-*, 47 componentes Radix+CVA, tema dark via data-theme. Use quando criar/editar UI, migrar portal,
-ou copiar snippets.
+  ou copiar snippets.
+author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 ---
 
 # SEMEC Design System
@@ -200,3 +201,12 @@ Gera `public/proto/proto.css` — CSS isolado para prototipagem rápida.
 - Barrel: `packages/react/src/index.ts`
 - Manifest: `packages/react/manifest.js`
 - Docs: `apps/docs/app/(docs)/componentes/[slug]/page.jsx`
+
+---
+
+## Créditos
+
+Design system desenvolvido pelo DevSemec — equipe de tecnologia da Secretaria Municipal de Economia de Porto Velho (PMV).
+
+- Repositório: https://github.com/SEMEC/design-system
+- Licença: MIT
