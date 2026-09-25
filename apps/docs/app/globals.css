@@ -610,6 +610,10 @@ button.side-title {
 /* ---- Sidebar colapsável (desktop) ---- */
 .sidebar-footer {
   flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: var(--surface);
   padding: 0.75rem 0;
   border-top: 1px solid var(--border);
 }
@@ -931,6 +935,16 @@ h1 {
   font-size: var(--font-size-sm);
   color: var(--text-muted);
   margin-bottom: 2.5rem;
+}
+.component-meta {
+  font-size: 0.8rem;
+  color: var(--pv-gray-500);
+}
+.doc-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
 h2 {
@@ -1734,17 +1748,15 @@ footer {
   border: none;
   padding: 0;
   cursor: pointer;
-}
-.site-footer-letter {
   display: inline-block;
   text-shadow: 2px 2px 0 var(--ps-accent);
   transition: transform 80ms ease, text-shadow 80ms ease;
 }
-.site-footer-letter:hover {
+.site-footer-brand:hover {
   transform: translateY(-2px);
   text-shadow: 3px 3px 0 var(--ps-accent);
 }
-.site-footer-letter:active {
+.site-footer-brand:active {
   transform: translateY(2px);
   text-shadow: 1px 1px 0 var(--ps-accent);
 }
