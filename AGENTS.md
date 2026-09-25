@@ -14,7 +14,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 npm workspaces monorepo. Two main locations:
 
-- **`packages/react/`** — `@semec/ds` kit (32 React components, Tailwind v4, shadcn/Radix/CVA). This is the publishable package.
+- **`packages/react/`** — `@semec/ds` kit (47 React components, Tailwind v4, shadcn/Radix/CVA). This is the publishable package.
 - **`apps/docs/`** — `@semec/docs` documentation site (Next.js 16, static export via `output: 'export'`).
 
 Other dirs: `docs/` (ADRs, architecture decisions), `legacy/` (old content, ignore).
@@ -69,7 +69,7 @@ For component documentation, read in this order:
 
 1. `apps/docs/public/llms.txt` — quick index (~2KB)
 2. `apps/docs/public/manifest.json` — full JSON with `dsComponents`, `dsCategories`, `dsPrompt()`
-3. `apps/docs/public/components/<slug>.md` — one file per component (32 total, good for RAG)
+3. `apps/docs/public/components/<slug>.md` — one file per component (47 total, good for RAG)
 4. `packages/react/manifest.js` — canonical source (usage + prompts)
 
 Regenerate: `npm run generate:llms` (auto-runs before `build`).

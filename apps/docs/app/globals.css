@@ -735,9 +735,11 @@ button.side-title {
   top: 80px;
   max-height: calc(100vh - 100px);
   overflow-y: auto;
+  z-index: 10;
+  background: var(--surface-alt);
+  padding: 1rem;
+  border-radius: 0.5rem;
   font-size: var(--font-size-xs);
-  border-left: 1px solid var(--border);
-  padding-left: 1rem;
   scrollbar-width: thin;
 }
 .toc-title {
@@ -813,7 +815,6 @@ h3[id] {
 }
 .breadcrumbs a {
   color: var(--text-muted);
-  text-decoration: underline;
   text-underline-offset: 3px;
 }
 .breadcrumbs a:hover {

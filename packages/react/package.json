@@ -28,7 +28,8 @@
     "./skills/llms-full.txt": "./dist/skills/llms-full.txt",
     "./skills/manifest.json": "./dist/skills/manifest.json",
     "./skills/manifest.js": "./dist/skills/manifest.js",
-    "./skills/components/*": "./dist/skills/components/*"
+    "./skills/components/*": "./dist/skills/components/*",
+    "./skills/ds-semec-skill": "./dist/skills/ds-semec-skill.md"
   },
   "files": [
     "dist",

@@ -212,20 +212,11 @@ for (const c of dsComponents) {
 }
 console.log(`  generated ${dsComponents.length} component .md files`);
 
-// --- 5. Copiar SKILL.md files ---
-const claudeSkillSrc = path.join(repoRoot, ".claude/skills/semec-ds/SKILL.md");
-const opencodeSkillSrc = path.join(
-  repoRoot,
-  ".opencode/skills/semec-ds/skill.md"
-);
-
-if (fs.existsSync(claudeSkillSrc)) {
-  copyFile(claudeSkillSrc, path.join(skillsDir, "claude-SKILL.md"));
-  console.log("  copied claude-SKILL.md");
-}
-if (fs.existsSync(opencodeSkillSrc)) {
-  copyFile(opencodeSkillSrc, path.join(skillsDir, "opencode-skill.md"));
-  console.log("  copied opencode-skill.md");
+// --- 5. Copiar skill genérico ---
+const skillSrc = path.join(pkgRoot, "SKILL.md");
+if (fs.existsSync(skillSrc)) {
+  copyFile(skillSrc, path.join(skillsDir, "ds-semec-skill.md"));
+  console.log("  copied ds-semec-skill.md");
 }
 
 console.log("\nbuild-skills: done.");

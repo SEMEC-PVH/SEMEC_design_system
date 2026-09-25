@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-09-23T21:56:46.672Z — packages/react/manifest.js + packages/react/*
+> Gerado 2026-09-25T16:59:42.469Z — packages/react/manifest.js + packages/react/*
 
 ## Instalação — packages/react/README.md
 
@@ -202,6 +202,9 @@ export * from "./lib/validators";
   /* ---- Azul — escala primária ------------------------------------------ */
   --pv-blue-50:  #eef4fa;
   --pv-blue-100: #dbe6f1;
+  --pv-blue-200: #b3cde4;
+  --pv-blue-300: #8ab4d9;
+  --pv-blue-400: #6199ce;
   --pv-blue-600: #3a6ca6;
   --pv-blue-700: #2f5a8a;
   --pv-blue-800: #26476f;
@@ -315,8 +318,8 @@ export * from "./lib/validators";
       L1 — SEMÂNTICOS · Forma (sóbrio — cantos moderados)
       ======================================================================= */
   --radius-sm:   2px;
-  --radius-md:   4px;
-  --radius-lg:   8px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
   --radius-full: 9999px;
 
   /* =======================================================================
@@ -2463,11 +2466,11 @@ interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {
 const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
   ({ className, items, ...props }, ref) => (
     <nav ref={ref} aria-label="Trilha de navegação" className={className} {...props}>
-      <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
+      <ol className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           return (
-            <li key={`${item.label}-${index}`} className="flex items-center gap-1.5">
+            <li key={`${item.label}-${index}`} className="flex items-center gap-4">
               {index > 0 ? (
                 <ChevronRight
                   className="h-3.5 w-3.5 shrink-0 opacity-50"
