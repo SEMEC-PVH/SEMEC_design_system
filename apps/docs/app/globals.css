@@ -810,7 +810,6 @@ h3[id] {
 .breadcrumbs .crumb {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
 }
 .breadcrumbs a {
   color: var(--text-muted);
@@ -825,6 +824,7 @@ h3[id] {
   font-weight: 600;
 }
 .crumb-sep {
+  margin: 0 1rem;
   color: var(--text-muted);
   opacity: 0.7;
 }

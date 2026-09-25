@@ -79,11 +79,6 @@ export default function DocsShell({ children }) {
                 <nav className="breadcrumbs" aria-label="Trilha de navegação">
                   {crumbs.map((c, i) => (
                     <span key={i} className="crumb">
-                      {i > 0 && (
-                        <span className="crumb-sep" aria-hidden="true">
-                          ›
-                        </span>
-                      )}
                       {i < crumbs.length - 1 ? (
                         c.href ? (
                           <Link href={c.href}>{c.label}</Link>
@@ -94,7 +89,10 @@ export default function DocsShell({ children }) {
                         <span aria-current="page">{c.label}</span>
                       )}
                     </span>
-                  ))}
+                  )).reduce((acc, crumb, i) => {
+                    if (i === 0) return [crumb];
+                    return [...acc, <span key={`sep-${i}`} className="crumb-sep" aria-hidden="true">›</span>, crumb];
+                  }, [])}
                 </nav>
               )}
               {children}
