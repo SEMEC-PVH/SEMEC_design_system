@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export const metadata = { title: "Quem Somos" };
 
@@ -46,8 +47,9 @@ const interns = [
 
 function Avatar({ src, name, size }) {
   if (src) {
+    const px = size === "lg" ? 120 : 80;
     return (
-      <img src={src} alt={`Foto de ${name}`} className={`team-avatar team-avatar--${size}`} />
+      <Image src={src} alt={`Foto de ${name}`} width={px} height={px} className={`team-avatar team-avatar--${size}`} />
     );
   }
   return (

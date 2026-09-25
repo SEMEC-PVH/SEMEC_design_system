@@ -29,7 +29,7 @@ export default function ComponentDoc({ c, extra }) {
       <h1>{c.label}</h1>
       <p className="subtitle">
         {c.desc}{" "}
-        <span style={{ fontSize: "0.8rem", color: "var(--pv-gray-500)" }}>
+        <span className="component-meta">
           No código: <code>{c.code}</code> — <code>{c.file}</code> ·{" "}
           <Link href={`/componentes/${cat.slug}`}>{cat.label}</Link>
         </span>
@@ -70,7 +70,7 @@ export default function ComponentDoc({ c, extra }) {
       <h3>Fonte do componente</h3>
       <CodeBlock code={source} filename={c.file} prompt={dsPrompt(c)} />
 
-      <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", marginTop: "2rem" }}>
+      <div className="doc-nav">
         {prev ? (
           <Link href={`/componentes/${prev.slug}`}>← {prev.label}</Link>
         ) : (

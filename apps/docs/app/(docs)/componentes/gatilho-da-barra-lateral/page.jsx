@@ -58,9 +58,9 @@ export default function SidebarTriggerPage() {
 
       <h3>Uso</h3>
       <pre>
-        <code>{`import { SidebarTrigger } from "semec-ds/react";
+        <code>{`import { SidebarToggleButton } from "semec-ds/react";
 
-<SidebarTrigger
+<SidebarToggleButton
   open={sidebarOpen}
   onToggle={() => setSidebarOpen(v => !v)}
 />`}</code>

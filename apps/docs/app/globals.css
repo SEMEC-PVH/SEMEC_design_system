@@ -741,6 +741,10 @@ button.side-title {
   scrollbar-width: thin;
 }
 .toc-title {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
   font-size: var(--font-size-xs);
   font-weight: 700;
   text-transform: uppercase;
@@ -940,6 +944,35 @@ h1 {
   font-size: 0.8rem;
   color: var(--pv-gray-500);
 }
+
+/* ---- Demo layout helpers ---- */
+.demo-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.demo-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.demo-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.demo-label {
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+.demo-hint {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
 .doc-nav {
   display: flex;
   justify-content: space-between;
@@ -1133,6 +1166,10 @@ li {
   color: var(--text-muted);
   text-align: center;
 }
+/* Sombras de demonstração */
+.shadow-card-rest { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12); border: none; }
+.shadow-card-hover { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16); border: none; }
+.shadow-elevated { box-shadow: 0 10px 30px -10px rgba(15, 35, 56, 0.15); border: none; }
 
 /* ---- Componentes (previews reais) ---- */
 .preview {

@@ -27,15 +27,15 @@ export default function RaiosSombrasPage() {
         <div className="shape-grid">
           <Shape
             caption="Card repouso"
-            style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.12)", border: "none" }}
+            className="shadow-card-rest"
           />
           <Shape
             caption="Card hover"
-            style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.16)", border: "none" }}
+            className="shadow-card-hover"
           />
           <Shape
             caption="Elevado"
-            style={{ boxShadow: "0 10px 30px -10px rgba(15,35,56,0.15)", border: "none" }}
+            className="shadow-elevated"
           />
         </div>
       </div>

@@ -51,7 +51,7 @@ export default function TipografiaPage() {
           </span>
         </TypeRow>
         <TypeRow label="Corpo">
-          <span style={{ fontSize: "0.875rem", color: "#475569" }}>
+          <span className="demo-hint">
             Solicite a restituição de valores pagos a maior.
           </span>
         </TypeRow>
