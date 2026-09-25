@@ -707,7 +707,8 @@ button.side-title {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 61px);
-  padding: 2rem 1.5rem 0;
+  padding: 2rem 1.5rem 0 1.5rem;
+  padding-right: 16rem;
 }
 .content .container {
   margin: 0 auto;
@@ -715,10 +716,9 @@ button.side-title {
 }
 .content-inner {
   display: grid;
-  grid-template-columns: minmax(0, var(--container-docs)) 220px;
-  gap: 2rem;
+  grid-template-columns: minmax(0, var(--container-docs));
   align-items: start;
-  width: min(calc(var(--container-docs) + 220px + 2rem), 100%);
+  width: min(var(--container-docs), 100%);
   margin: 0 auto;
 }
 .content-inner > .container {
@@ -793,6 +793,9 @@ h3[id] {
   scroll-margin-top: 80px;
 }
 @media (max-width: 1120px) {
+  .content {
+    padding-right: 1.5rem;
+  }
   .content-inner {
     grid-template-columns: 1fr;
   }
