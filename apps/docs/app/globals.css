@@ -731,8 +731,10 @@ button.side-title {
 
 /* ---- TOC: nesta página ---- */
 .toc {
-  position: sticky;
+  position: fixed;
   top: 80px;
+  right: calc(50% - var(--container-docs) / 2 - 1.5rem);
+  width: 220px;
   max-height: calc(100vh - 100px);
   overflow-y: auto;
   z-index: 10;
