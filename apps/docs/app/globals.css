@@ -714,16 +714,18 @@ button.side-title {
   width: min(var(--container-docs), 100%);
 }
 .content-inner {
-  display: grid;
-  grid-template-columns: minmax(0, var(--container-docs)) 220px;
-  gap: 2rem;
-  align-items: start;
-  width: min(calc(var(--container-docs) + 220px + 2rem), 100%);
-  margin: 0 auto;
+  flex: 1;
+  min-width: 0;
 }
 .content-inner > .container {
   margin: 0;
   width: 100%;
+}
+.content-main {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  padding-right: 260px;
 }
 .content > .container:last-child {
   margin-top: auto;
@@ -731,30 +733,25 @@ button.side-title {
 
 /* ---- TOC: nesta página ---- */
 .toc {
-  position: sticky;
-  top: 80px;
-  max-height: calc(100vh - 100px);
-  overflow-y: auto;
-  z-index: 10;
-  background: var(--surface-alt);
-  padding: 1rem;
+  position: fixed;
+  top: calc(61px + 3rem);
+  right: 1.5rem;
+  width: 220px;
+  border: 1px solid var(--border);
   border-radius: 0.5rem;
+  padding: 1rem;
   font-size: var(--font-size-xs);
   scrollbar-width: thin;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
 }
 .toc-title {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--surface);
   font-size: var(--font-size-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
-  padding: 0.4rem 0.5rem;
-  margin: -0.4rem -0.4rem 0.6rem;
-  border-radius: 0.35rem;
+  padding: 0 0 0.5rem 0;
 }
 .toc ol {
   list-style: none;
@@ -774,6 +771,7 @@ button.side-title {
   border-left: 2px solid transparent;
   margin-left: -0.4rem;
   padding-left: 0.6rem;
+  font-size: inherit;
 }
 .toc a:hover {
   color: var(--fg);
@@ -786,16 +784,12 @@ button.side-title {
 }
 .toc .toc-h3 a {
   padding-left: 1.2rem;
-  font-size: 0.82em;
 }
 h2[id],
 h3[id] {
   scroll-margin-top: 80px;
 }
 @media (max-width: 1120px) {
-  .content-inner {
-    grid-template-columns: 1fr;
-  }
   .toc {
     display: none;
   }

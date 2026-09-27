@@ -73,29 +73,31 @@ export default function DocsShell({ children }) {
           />
         )}
         <main className="content" id="topo">
-          <div className="content-inner">
-            <div className="container">
-              {crumbs.length > 1 && (
-                <nav className="breadcrumbs" aria-label="Trilha de navegação">
-                  {crumbs.map((c, i) => (
-                    <span key={i} className="crumb">
-                      {i < crumbs.length - 1 ? (
-                        c.href ? (
-                          <Link href={c.href}>{c.label}</Link>
+          <div className="content-main">
+            <div className="content-inner">
+              <div className="container">
+                {crumbs.length > 1 && (
+                  <nav className="breadcrumbs" aria-label="Trilha de navegação">
+                    {crumbs.map((c, i) => (
+                      <span key={i} className="crumb">
+                        {i < crumbs.length - 1 ? (
+                          c.href ? (
+                            <Link href={c.href}>{c.label}</Link>
+                          ) : (
+                            <span>{c.label}</span>
+                          )
                         ) : (
-                          <span>{c.label}</span>
-                        )
-                      ) : (
-                        <span aria-current="page">{c.label}</span>
-                      )}
-                    </span>
-                  )).reduce((acc, crumb, i) => {
-                    if (i === 0) return [crumb];
-                    return [...acc, <span key={`sep-${i}`} className="crumb-sep" aria-hidden="true">›</span>, crumb];
-                  }, [])}
-                </nav>
-              )}
-              {children}
+                          <span aria-current="page">{c.label}</span>
+                        )}
+                      </span>
+                    )).reduce((acc, crumb, i) => {
+                      if (i === 0) return [crumb];
+                      return [...acc, <span key={`sep-${i}`} className="crumb-sep" aria-hidden="true">›</span>, crumb];
+                    }, [])}
+                  </nav>
+                )}
+                {children}
+              </div>
             </div>
             <TableOfContents />
           </div>
