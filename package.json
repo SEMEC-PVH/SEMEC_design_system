@@ -12,6 +12,7 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspace @semec/docs",
+    "prebuild": "npm run build:ds",
     "build": "npm run build --workspace @semec/docs",
     "build:ds": "npm run build --workspace @semec/ds",
     "start": "npm run start --workspace @semec/docs",
