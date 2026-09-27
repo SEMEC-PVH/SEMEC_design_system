@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-09-25T16:59:42.469Z — packages/react/manifest.js + packages/react/*
+> Gerado 2026-09-27T22:39:04.652Z — packages/react/manifest.js + packages/react/*
 
 ## Instalação — packages/react/README.md
 
@@ -2484,7 +2484,7 @@ const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
               ) : (
                 <a
                   href={item.href}
-                  className="underline-offset-4 transition-colors duration-fast ease-standard hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="transition-colors duration-fast ease-standard hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   {item.label}
                 </a>

@@ -100,7 +100,6 @@ export default function QuemSomosPage() {
       </p>
 
       <section className="team-section">
-        <h2 className="team-section-title">Diretores</h2>
         <div className="team-grid team-grid--directors">
           {directors.map((member) => (
             <TeamCard key={member.name} member={member} size="lg" />
@@ -109,7 +108,6 @@ export default function QuemSomosPage() {
       </section>
 
       <section className="team-section">
-        <h2 className="team-section-title">Estagiários</h2>
         <div className="team-grid team-grid--interns">
           {interns.map((member) => (
             <TeamCard key={member.name} member={member} size="md" />

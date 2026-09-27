@@ -1,0 +1,385 @@
+- generic [active] [ref=f4e1]:
+  - link "Pular para o conteúdo" [ref=f4e2] [cursor=pointer]:
+    - /url: "#topo"
+  - dialog [ref=f4e3]:
+    - generic [ref=f4e4]:
+      - heading "Cookies no Design System da SEMEC Porto Velho" [level=2] [ref=f4e5]
+      - paragraph [ref=f4e6]: Usamos cookies analíticos para entender como você utiliza o Design System e fazer melhorias.
+    - generic [ref=f4e7]:
+      - button "Aceitar cookies analíticos" [ref=f4e8] [cursor=pointer]
+      - button "Recusar cookies analíticos" [ref=f4e9] [cursor=pointer]
+      - link "Ver cookies" [ref=f4e10] [cursor=pointer]:
+        - /url: /cookies/
+  - banner [ref=f4e11]:
+    - generic [ref=f4e12]: SEMEC | Design System
+    - generic [ref=f4e14]:
+      - generic [ref=f4e15]:
+        - combobox "Buscar no guia" [ref=f4e16]
+        - generic [aria-hidden]: Ctrl K
+      - status [ref=f4e17]
+    - button "Ativar modo escuro" [ref=f4e18] [cursor=pointer]
+  - generic [ref=f4e21]:
+    - complementary [ref=f4e22]:
+      - navigation "Seções do guia" [ref=f4e24]:
+        - generic [ref=f4e25]:
+          - button "Guia" [expanded] [ref=f4e26] [cursor=pointer]
+          - generic [ref=f4e31]:
+            - link "Introdução" [ref=f4e32] [cursor=pointer]:
+              - /url: /introducao/
+            - link "O que é DS?" [ref=f4e34] [cursor=pointer]:
+              - /url: /introducao/o-que-e-ds/
+            - link "Para quem é" [ref=f4e36] [cursor=pointer]:
+              - /url: /introducao/para-quem/
+            - link "Requisitos" [ref=f4e38] [cursor=pointer]:
+              - /url: /introducao/requisitos/
+            - generic [ref=f4e40]:
+              - button "Fundamentos" [expanded] [ref=f4e41] [cursor=pointer]
+              - generic [ref=f4e46]:
+                - link "Tipografia" [ref=f4e47] [cursor=pointer]:
+                  - /url: /fundamentos/tipografia/
+                - link "Cores" [ref=f4e49] [cursor=pointer]:
+                  - /url: /fundamentos/cores/
+                - link "Layout" [ref=f4e51] [cursor=pointer]:
+                  - /url: /fundamentos/layout/
+                - link "Raios, bordas e sombras" [ref=f4e53] [cursor=pointer]:
+                  - /url: /fundamentos/raios-sombras/
+                - link "Animações" [ref=f4e55] [cursor=pointer]:
+                  - /url: /fundamentos/animacoes/
+        - generic [ref=f4e57]:
+          - button "Componentes" [expanded] [ref=f4e58] [cursor=pointer]
+          - generic [ref=f4e63]:
+            - link "Visão geral" [ref=f4e64] [cursor=pointer]:
+              - /url: /componentes/
+            - generic [ref=f4e66]:
+              - button "Estrutura de página" [expanded] [ref=f4e67] [cursor=pointer]
+              - generic [ref=f4e72]:
+                - link "Header" [ref=f4e73] [cursor=pointer]:
+                  - /url: /componentes/header/
+                - link "Hero" [ref=f4e75] [cursor=pointer]:
+                  - /url: /componentes/hero/
+                - link "Barra de controles" [ref=f4e77] [cursor=pointer]:
+                  - /url: /componentes/controles/
+                - link "ServiceCard" [ref=f4e79] [cursor=pointer]:
+                  - /url: /componentes/service-card/
+                - link "Footer" [ref=f4e81] [cursor=pointer]:
+                  - /url: /componentes/footer/
+            - generic [ref=f4e83]:
+              - button "Ações e links" [expanded] [ref=f4e84] [cursor=pointer]
+              - generic [ref=f4e89]:
+                - link "Botões" [ref=f4e90] [cursor=pointer]:
+                  - /url: /componentes/botoes/
+                - link "Botão de ícone" [ref=f4e92] [cursor=pointer]:
+                  - /url: /componentes/botao-de-icone/
+                - link "Link" [ref=f4e94] [cursor=pointer]:
+                  - /url: /componentes/link/
+            - generic [ref=f4e96]:
+              - button "Formulários" [expanded] [ref=f4e97] [cursor=pointer]
+              - generic [ref=f4e102]:
+                - link "Caixa de texto" [ref=f4e103] [cursor=pointer]:
+                  - /url: /componentes/caixa-de-texto/
+                - link "Área de texto" [ref=f4e105] [cursor=pointer]:
+                  - /url: /componentes/area-de-texto/
+                - link "Menu de seleção" [ref=f4e107] [cursor=pointer]:
+                  - /url: /componentes/menu-de-selecao/
+                - link "Combobox" [ref=f4e109] [cursor=pointer]:
+                  - /url: /componentes/combobox/
+                - link "Seletor de data" [ref=f4e111] [cursor=pointer]:
+                  - /url: /componentes/seletor-de-data/
+                - link "Envio de arquivos" [ref=f4e113] [cursor=pointer]:
+                  - /url: /componentes/envio-de-arquivos/
+                - link "Caixa de marcação" [ref=f4e115] [cursor=pointer]:
+                  - /url: /componentes/caixa-de-marcacao/
+                - link "Botão de opção" [ref=f4e117] [cursor=pointer]:
+                  - /url: /componentes/botao-de-opcao/
+                - link "Interruptor" [ref=f4e119] [cursor=pointer]:
+                  - /url: /componentes/interruptor/
+                - link "Rótulo" [ref=f4e121] [cursor=pointer]:
+                  - /url: /componentes/rotulo/
+                - link "Campo de formulário" [ref=f4e123] [cursor=pointer]:
+                  - /url: /componentes/campo-de-formulario/
+                - link "ErrorSummary" [ref=f4e125] [cursor=pointer]:
+                  - /url: /componentes/error-summary/
+                - link "Toggle" [ref=f4e127] [cursor=pointer]:
+                  - /url: /componentes/toggle/
+                - link "Slider" [ref=f4e129] [cursor=pointer]:
+                  - /url: /componentes/slider/
+                - link "Input OTP" [ref=f4e131] [cursor=pointer]:
+                  - /url: /componentes/input-otp/
+                - link "Calendário" [ref=f4e133] [cursor=pointer]:
+                  - /url: /componentes/calendario/
+            - generic [ref=f4e135]:
+              - button "Conteúdo e dados" [expanded] [ref=f4e136] [cursor=pointer]
+              - generic [ref=f4e141]:
+                - link "Cartão" [ref=f4e142] [cursor=pointer]:
+                  - /url: /componentes/cartao/
+                - link "Etiqueta" [ref=f4e144] [cursor=pointer]:
+                  - /url: /componentes/etiqueta/
+                - link "Tabela" [ref=f4e146] [cursor=pointer]:
+                  - /url: /componentes/tabela/
+                - link "Acordeão" [ref=f4e148] [cursor=pointer]:
+                  - /url: /componentes/acordeao/
+                - link "Separador" [ref=f4e150] [cursor=pointer]:
+                  - /url: /componentes/separador/
+                - link "Avatar" [ref=f4e152] [cursor=pointer]:
+                  - /url: /componentes/avatar/
+                - link "Tabela de dados" [ref=f4e154] [cursor=pointer]:
+                  - /url: /componentes/tabela-de-dados/
+                - link "Linha do tempo" [ref=f4e156] [cursor=pointer]:
+                  - /url: /componentes/timeline/
+            - generic [ref=f4e158]:
+              - button "Navegação" [expanded] [ref=f4e159] [cursor=pointer]
+              - generic [ref=f4e164]:
+                - link "Trilha de navegação" [ref=f4e165] [cursor=pointer]:
+                  - /url: /componentes/trilha-de-navegacao/
+                - link "Abas" [ref=f4e167] [cursor=pointer]:
+                  - /url: /componentes/abas/
+                - link "Paginação" [ref=f4e169] [cursor=pointer]:
+                  - /url: /componentes/paginacao/
+                - link "Gatilho da barra lateral" [ref=f4e171] [cursor=pointer]:
+                  - /url: /componentes/gatilho-da-barra-lateral/
+                - link "Área de scroll" [ref=f4e173] [cursor=pointer]:
+                  - /url: /componentes/scroll-area/
+                - link "Menu suspenso" [ref=f4e175] [cursor=pointer]:
+                  - /url: /componentes/menu-suspenso/
+                - link "Menu de navegação" [ref=f4e177] [cursor=pointer]:
+                  - /url: /componentes/menu-de-navegacao/
+                - link "Barra lateral" [ref=f4e179] [cursor=pointer]:
+                  - /url: /componentes/sidebar/
+            - generic [ref=f4e181]:
+              - button "Feedback e estados" [expanded] [ref=f4e182] [cursor=pointer]
+              - generic [ref=f4e187]:
+                - link "Esqueleto" [ref=f4e188] [cursor=pointer]:
+                  - /url: /componentes/esqueleto/
+                - link "Estado vazio" [ref=f4e190] [cursor=pointer]:
+                  - /url: /componentes/estado-vazio/
+                - link "Modal" [ref=f4e192] [cursor=pointer]:
+                  - /url: /componentes/modal/
+                - link "Notificação" [ref=f4e194] [cursor=pointer]:
+                  - /url: /componentes/notificacao/
+                - link "Dica" [ref=f4e196] [cursor=pointer]:
+                  - /url: /componentes/dica/
+                - link "Aviso" [ref=f4e198] [cursor=pointer]:
+                  - /url: /componentes/aviso/
+                - link "Diálogo de alerta" [ref=f4e200] [cursor=pointer]:
+                  - /url: /componentes/dialogo-de-alerta/
+                - link "Popover" [ref=f4e202] [cursor=pointer]:
+                  - /url: /componentes/popover/
+                - link "Spinner" [ref=f4e204] [cursor=pointer]:
+                  - /url: /componentes/spinner/
+                - link "Progresso" [ref=f4e206] [cursor=pointer]:
+                  - /url: /componentes/progress/
+                - link "Drawer" [ref=f4e208] [cursor=pointer]:
+                  - /url: /componentes/drawer/
+                - link "Sheet" [ref=f4e210] [cursor=pointer]:
+                  - /url: /componentes/sheet/
+        - generic [ref=f4e212]:
+          - button "Padrões" [expanded] [ref=f4e213] [cursor=pointer]
+          - generic [ref=f4e218]:
+            - link "Visão geral" [ref=f4e219] [cursor=pointer]:
+              - /url: /padroes/
+            - generic [ref=f4e221]:
+              - button "Navegação" [expanded] [ref=f4e222] [cursor=pointer]
+              - generic [ref=f4e227]:
+                - link "Menu principal" [ref=f4e228] [cursor=pointer]:
+                  - /url: /padroes/navegacao/menu-principal/
+                - link "Navegação lateral" [ref=f4e230] [cursor=pointer]:
+                  - /url: /padroes/navegacao/navegacao-lateral/
+                - link "Breadcrumbs" [ref=f4e232] [cursor=pointer]:
+                  - /url: /padroes/navegacao/breadcrumbs/
+                - link "Cabeçalho" [ref=f4e234] [cursor=pointer]:
+                  - /url: /padroes/navegacao/cabecalho/
+                - link "Rodapé" [ref=f4e236] [cursor=pointer]:
+                  - /url: /padroes/navegacao/rodape/
+                - link "Busca" [ref=f4e238] [cursor=pointer]:
+                  - /url: /padroes/navegacao/busca/
+                - link "Paginação" [ref=f4e240] [cursor=pointer]:
+                  - /url: /padroes/navegacao/paginacao/
+                - link "Abas" [ref=f4e242] [cursor=pointer]:
+                  - /url: /padroes/navegacao/abas/
+                - link "Indicação da localização atual" [ref=f4e244] [cursor=pointer]:
+                  - /url: /padroes/navegacao/indicacao-localizacao-atual/
+            - generic [ref=f4e246]:
+              - button "Formulários" [expanded] [ref=f4e247] [cursor=pointer]
+              - generic [ref=f4e252]:
+                - link "Campos obrigatórios" [ref=f4e253] [cursor=pointer]:
+                  - /url: /padroes/formularios/campos-obrigatorios/
+                - link "Máscaras" [ref=f4e255] [cursor=pointer]:
+                  - /url: /padroes/formularios/mascaras/
+                - link "Textos de ajuda" [ref=f4e257] [cursor=pointer]:
+                  - /url: /padroes/formularios/textos-de-ajuda/
+                - link "Validação" [ref=f4e259] [cursor=pointer]:
+                  - /url: /padroes/formularios/validacao/
+                - link "Mensagens de erro" [ref=f4e261] [cursor=pointer]:
+                  - /url: /padroes/formularios/mensagens-de-erro/
+                - link "Agrupamento de informações" [ref=f4e263] [cursor=pointer]:
+                  - /url: /padroes/formularios/agrupamento-de-informacoes/
+                - link "Etapas de preenchimento" [ref=f4e265] [cursor=pointer]:
+                  - /url: /padroes/formularios/etapas-de-preenchimento/
+                - link "Confirmação de envio" [ref=f4e267] [cursor=pointer]:
+                  - /url: /padroes/formularios/confirmacao-de-envio/
+                - link "Prevenção de perda de dados" [ref=f4e269] [cursor=pointer]:
+                  - /url: /padroes/formularios/prevencao-de-perda-de-dados/
+            - generic [ref=f4e271]:
+              - button "Dados e relatórios" [expanded] [ref=f4e272] [cursor=pointer]
+              - generic [ref=f4e277]:
+                - link "Tabelas" [ref=f4e278] [cursor=pointer]:
+                  - /url: /padroes/dados-relatorios/tabelas/
+                - link "Ordenação" [ref=f4e280] [cursor=pointer]:
+                  - /url: /padroes/dados-relatorios/ordenacao/
+                - link "Filtros" [ref=f4e282] [cursor=pointer]:
+                  - /url: /padroes/dados-relatorios/filtros/
+                - link "Pesquisa" [ref=f4e284] [cursor=pointer]:
+                  - /url: /padroes/dados-relatorios/pesquisa/
+                - link "Paginação" [ref=f4e286] [cursor=pointer]:
+                  - /url: /padroes/dados-relatorios/paginacao/
+                - link "Seleção de registros" [ref=f4e288] [cursor=pointer]:
+                  - /url: /padroes/dados-relatorios/selecao-de-registros/
+                - link "Exportação" [ref=f4e290] [cursor=pointer]:
+                  - /url: /padroes/dados-relatorios/exportacao/
+                - link "Operações em lote" [ref=f4e292] [cursor=pointer]:
+                  - /url: /padroes/dados-relatorios/operacoes-em-lote/
+                - link "Indicadores" [ref=f4e294] [cursor=pointer]:
+                  - /url: /padroes/dados-relatorios/indicadores/
+                - link "Gráficos" [ref=f4e296] [cursor=pointer]:
+                  - /url: /padroes/dados-relatorios/graficos/
+                - link "Estados sem resultados" [ref=f4e298] [cursor=pointer]:
+                  - /url: /padroes/dados-relatorios/estados-sem-resultados/
+            - generic [ref=f4e300]:
+              - button "Feedback ao usuário" [expanded] [ref=f4e301] [cursor=pointer]
+              - generic [ref=f4e306]:
+                - link "Carregamento" [ref=f4e307] [cursor=pointer]:
+                  - /url: /padroes/feedback/carregamento/
+                - link "Sucesso" [ref=f4e309] [cursor=pointer]:
+                  - /url: /padroes/feedback/sucesso/
+                - link "Erro" [ref=f4e311] [cursor=pointer]:
+                  - /url: /padroes/feedback/erro/
+                - link "Aviso" [ref=f4e313] [cursor=pointer]:
+                  - /url: /padroes/feedback/aviso/
+                - link "Confirmação" [ref=f4e315] [cursor=pointer]:
+                  - /url: /padroes/feedback/confirmacao/
+                - link "Progresso" [ref=f4e317] [cursor=pointer]:
+                  - /url: /padroes/feedback/progresso/
+                - link "Processamento" [ref=f4e319] [cursor=pointer]:
+                  - /url: /padroes/feedback/processamento/
+                - link "Indisponibilidade" [ref=f4e321] [cursor=pointer]:
+                  - /url: /padroes/feedback/indisponibilidade/
+                - link "Sessão expirada" [ref=f4e323] [cursor=pointer]:
+                  - /url: /padroes/feedback/sessao-expirada/
+            - generic [ref=f4e325]:
+              - button "Acessibilidade" [expanded] [ref=f4e326] [cursor=pointer]
+              - generic [ref=f4e331]:
+                - link "Contraste de cores" [ref=f4e332] [cursor=pointer]:
+                  - /url: /padroes/acessibilidade/contraste-de-cores/
+                - link "Navegação por teclado" [ref=f4e334] [cursor=pointer]:
+                  - /url: /padroes/acessibilidade/navegacao-por-teclado/
+                - link "Foco visível" [ref=f4e336] [cursor=pointer]:
+                  - /url: /padroes/acessibilidade/foco-visivel/
+                - link "Leitores de tela" [ref=f4e338] [cursor=pointer]:
+                  - /url: /padroes/acessibilidade/leitores-de-tela/
+                - link "Textos alternativos" [ref=f4e340] [cursor=pointer]:
+                  - /url: /padroes/acessibilidade/textos-alternativos/
+                - link "Estrutura semântica" [ref=f4e342] [cursor=pointer]:
+                  - /url: /padroes/acessibilidade/estrutura-semantica/
+                - link "Tamanho das áreas clicáveis" [ref=f4e344] [cursor=pointer]:
+                  - /url: /padroes/acessibilidade/tamanho-das-areas-clicaveis/
+                - link "Mensagens de erro acessíveis" [ref=f4e346] [cursor=pointer]:
+                  - /url: /padroes/acessibilidade/mensagens-de-erro-acessiveis/
+                - link "Não uso exclusivo de cores" [ref=f4e348] [cursor=pointer]:
+                  - /url: /padroes/acessibilidade/nao-uso-exclusivo-de-cores/
+                - link "Conformidade WCAG e ABNT NBR 17225" [ref=f4e350] [cursor=pointer]:
+                  - /url: /padroes/acessibilidade/conformidade-wcag-nbr/
+            - link "Anti-padrões" [ref=f4e352] [cursor=pointer]:
+              - /url: /padroes/anti-padroes/
+      - button "Abrir menu" [ref=f4e355]
+    - main [ref=f4e356]:
+      - generic [ref=f4e358]:
+        - navigation "Trilha de navegação" [ref=f4e359]:
+          - link "Início" [ref=f4e361] [cursor=pointer]:
+            - /url: /
+          - generic [aria-hidden] [ref=f4e362]: ›
+          - link "Componentes" [ref=f4e364] [cursor=pointer]:
+            - /url: /componentes/
+          - generic [aria-hidden] [ref=f4e365]: ›
+          - generic [ref=f4e366]: Visão geral
+        - heading "Navegação" [level=1] [ref=f4e368]
+        - paragraph [ref=f4e369]: Trilhas, abas e deslocamento entre páginas.
+        - generic [ref=f4e370]:
+          - 'link "breadcrumb Trilha de navegação Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela. Ver componente" [ref=f4e371] [cursor=pointer]':
+            - /url: /componentes/trilha-de-navegacao/
+            - generic [ref=f4e372]: breadcrumb
+            - generic [ref=f4e373]: Trilha de navegação
+            - paragraph [ref=f4e374]: "Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela."
+            - generic [ref=f4e375]:
+              - generic [ref=f4e376]: Ver componente
+              - generic [aria-hidden] [ref=f4e377]: →
+          - link "tabs Abas Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix. Ver componente" [ref=f4e378] [cursor=pointer]:
+            - /url: /componentes/abas/
+            - generic [ref=f4e379]: tabs
+            - generic [ref=f4e380]: Abas
+            - paragraph [ref=f4e381]: Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.
+            - generic [ref=f4e382]:
+              - generic [ref=f4e383]: Ver componente
+              - generic [aria-hidden] [ref=f4e384]: →
+          - 'link "pagination Paginação Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Ver componente" [ref=f4e385] [cursor=pointer]':
+            - /url: /componentes/paginacao/
+            - generic [ref=f4e386]: pagination
+            - generic [ref=f4e387]: Paginação
+            - paragraph [ref=f4e388]: "Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa."
+            - generic [ref=f4e389]:
+              - generic [ref=f4e390]: Ver componente
+              - generic [aria-hidden] [ref=f4e391]: →
+          - link "sidebar-trigger Gatilho da barra lateral Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose. Ver componente" [ref=f4e392] [cursor=pointer]:
+            - /url: /componentes/gatilho-da-barra-lateral/
+            - generic [ref=f4e393]: sidebar-trigger
+            - generic [ref=f4e394]: Gatilho da barra lateral
+            - paragraph [ref=f4e395]: Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
+            - generic [ref=f4e396]:
+              - generic [ref=f4e397]: Ver componente
+              - generic [aria-hidden] [ref=f4e398]: →
+          - link "scroll-area Área de scroll Scroll customizado e consistente entre navegadores. Ver componente" [ref=f4e399] [cursor=pointer]:
+            - /url: /componentes/scroll-area/
+            - generic [ref=f4e400]: scroll-area
+            - generic [ref=f4e401]: Área de scroll
+            - paragraph [ref=f4e402]: Scroll customizado e consistente entre navegadores.
+            - generic [ref=f4e403]:
+              - generic [ref=f4e404]: Ver componente
+              - generic [aria-hidden] [ref=f4e405]: →
+          - link "dropdown-menu Menu suspenso Menu flutuante com itens, checkbox, radio, sub-menus e separadores. Ver componente" [ref=f4e406] [cursor=pointer]:
+            - /url: /componentes/menu-suspenso/
+            - generic [ref=f4e407]: dropdown-menu
+            - generic [ref=f4e408]: Menu suspenso
+            - paragraph [ref=f4e409]: Menu flutuante com itens, checkbox, radio, sub-menus e separadores.
+            - generic [ref=f4e410]:
+              - generic [ref=f4e411]: Ver componente
+              - generic [aria-hidden] [ref=f4e412]: →
+          - link "navigation-menu Menu de navegação Navegação principal com mega-menu e viewport animado. Ver componente" [ref=f4e413] [cursor=pointer]:
+            - /url: /componentes/menu-de-navegacao/
+            - generic [ref=f4e414]: navigation-menu
+            - generic [ref=f4e415]: Menu de navegação
+            - paragraph [ref=f4e416]: Navegação principal com mega-menu e viewport animado.
+            - generic [ref=f4e417]:
+              - generic [ref=f4e418]: Ver componente
+              - generic [aria-hidden] [ref=f4e419]: →
+          - 'link "sidebar Barra lateral Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile. Ver componente" [ref=f4e420] [cursor=pointer]':
+            - /url: /componentes/sidebar/
+            - generic [ref=f4e421]: sidebar
+            - generic [ref=f4e422]: Barra lateral
+            - paragraph [ref=f4e423]: "Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile."
+            - generic [ref=f4e424]:
+              - generic [ref=f4e425]: Ver componente
+              - generic [aria-hidden] [ref=f4e426]: →
+      - generic [ref=f4e427]:
+        - link "DEVSEMEC" [ref=f4e428] [cursor=pointer]:
+          - /url: /quem-somos/
+        - generic [ref=f4e429]:
+          - generic [ref=f4e430]: © 2026. Prefeitura de Porto Velho.
+          - navigation "Links do rodapé" [ref=f4e431]:
+            - link "Contato" [ref=f4e432] [cursor=pointer]:
+              - /url: mailto:contato@semec.gov.br
+            - link "Prefeitura de Porto Velho" [ref=f4e433] [cursor=pointer]:
+              - /url: https://www.portovelho.ro.gov.br/
+            - link "Preferências de cookies" [ref=f4e434] [cursor=pointer]:
+              - /url: /cookies/
+            - link "Termos de uso do site" [ref=f4e435] [cursor=pointer]:
+              - /url: /termos-de-uso/
+  - button "Open Next.js Dev Tools" [ref=f4e441] [cursor=pointer]
