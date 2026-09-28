@@ -470,7 +470,6 @@ a {
 }
 .sidebar nav > a.active {
   color: var(--nav-accent);
-  font-weight: 500;
 }
 .sidebar nav > a.active:hover {
   color: var(--nav-accent);
@@ -551,7 +550,6 @@ a {
 }
 .sidebar a.active {
   color: var(--nav-accent);
-  font-weight: 500;
 }
 .sidebar a.active:hover {
   color: var(--nav-accent);
