@@ -11,6 +11,7 @@ const nextConfig = {
   allowedDevOrigins: ['10.102.3.109'],
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   transpilePackages: ['semec-ds'],
+  images: { unoptimized: true },
 };
 
 const withMDX = createMDX({
