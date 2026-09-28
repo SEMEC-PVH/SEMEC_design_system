@@ -4,9 +4,13 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+  id-token: write
 
 jobs:
   publish:
@@ -29,8 +33,12 @@ jobs:
       - name: Build package
         run: npm run build:ds
 
-      - name: Create release
-        run: npx changeset publish
+      - name: Publish to npm
+        uses: changesets/action@v1
+        with:
+          publish: npx changeset publish
+          title: "chore: release @semec/ds"
+          commit: "chore: release @semec/ds"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
