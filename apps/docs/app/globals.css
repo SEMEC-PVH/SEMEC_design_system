@@ -995,8 +995,6 @@ h2 {
   font-weight: 700;
   color: var(--color-text-primary);
   margin: var(--space-12) 0 var(--space-4);
-  padding-bottom: var(--space-2);
-  border-bottom: 2px solid var(--color-brand-accent);
 }
 h3 {
   font-size: var(--text-base);
