@@ -34,7 +34,7 @@ export default function FormulariosPage() {
             {itens.map((c) => (
               <tr key={c.href}>
                 <td>
-                  <Link href={c.href} style={{ color: "var(--pv-green-800)", fontWeight: 600 }}>
+                  <Link href={c.href} style={{ color: "var(--pv-green-500)", fontWeight: 600 }}>
                     {c.title}
                   </Link>
                 </td>

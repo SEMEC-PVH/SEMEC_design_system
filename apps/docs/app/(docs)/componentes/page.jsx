@@ -48,7 +48,7 @@ export default function ComponentesPage() {
                   <td>
                     <Link
                       href={`/componentes/${c.slug}`}
-                      style={{ color: "var(--pv-green-800)", fontWeight: 600 }}
+                      style={{ color: "var(--pv-green-500)", fontWeight: 600 }}
                     >
                       {c.label}
                     </Link>

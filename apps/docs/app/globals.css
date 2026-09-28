@@ -344,7 +344,7 @@ a {
 .header-search .results a:hover,
 .header-search .results a[aria-selected="true"] {
   background: var(--tint);
-  color: var(--pv-green-800);
+  color: var(--pv-green-500);
 }
 .header-search .results-group {
   color: var(--text-muted);
