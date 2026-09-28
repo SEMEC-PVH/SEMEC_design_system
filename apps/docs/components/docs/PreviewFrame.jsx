@@ -87,7 +87,7 @@ export default function PreviewFrame({ children }) {
       "--pv-green-500", "--pv-green-800",
       // Raios e fonte
       "--radius-sm", "--radius-md", "--radius-lg", "--radius-full",
-      "--font-mono",
+      "--font-mono", "--font-poppins", "--font-inter", "--font-family-sans",
     ];
     const syncTheme = () => {
       const parentHtml = document.documentElement;
