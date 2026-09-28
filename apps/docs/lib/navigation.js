@@ -56,11 +56,6 @@ export const navigation = [
     items: [
       { href: "/introducao", label: "Introdução" },
       { href: "/fundamentos", label: "Fundamentos" },
-      { href: "/fundamentos/tipografia", label: "Tipografia", sub: true },
-      { href: "/fundamentos/cores", label: "Cores", sub: true },
-      { href: "/fundamentos/layout", label: "Layout", sub: true },
-      { href: "/fundamentos/raios-sombras", label: "Raios, bordas e sombras", sub: true },
-      { href: "/fundamentos/animacoes", label: "Animações", sub: true },
     ],
   },
   {
