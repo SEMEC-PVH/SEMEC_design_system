@@ -82,7 +82,7 @@
 }
 
 body {
-  font-family: var(--font-inter), "Inter", sans-serif;
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-base);
   background: var(--bg);
   color: var(--fg);
