@@ -224,6 +224,10 @@ const liteSkillSrc = path.join(pkgRoot, "SEMEC-LITE.md");
 if (fs.existsSync(liteSkillSrc)) {
   copyFile(liteSkillSrc, path.join(distDir, "SEMEC-LITE.md"));
   console.log("  copied SEMEC-LITE.md");
+  // Copiar para apps/docs/public/ para acesso via fetch no client
+  const docsPublicDir = path.join(repoRoot, "apps", "docs", "public");
+  copyFile(liteSkillSrc, path.join(docsPublicDir, "SEMEC-LITE.md"));
+  console.log("  copied SEMEC-LITE.md → apps/docs/public/");
 }
 
 // --- 6. Gerar artefatos lite (tokens + creditos, sem componentes) ---

@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import SectionCard from "@/components/ui/SectionCard";
 import AnimateOnScroll from "@/components/ui/AnimateOnScroll";
+import CopySkillButton from "@/components/ui/CopySkillButton";
 import MdxPre from "@/components/docs/MdxPre";
 import {
   ArtTipografia,
@@ -227,11 +228,9 @@ export default function IntroPage() {
       <h2>Instalação lite (só tokens)</h2>
       <p>
         Se você só precisa dos tokens de identidade visual, sem componentes
-        React, instale o mesmo pacote e importe os CSS:
+        React, copie a skill lite abaixo:
       </p>
-      <MdxPre><code>npm install @semec/ds</code></MdxPre>
-      <MdxPre><code>{`@import "@semec/ds/lite/tokens.css";`}</code></MdxPre>
-      <MdxPre><code>{`@import "@semec/ds/lite/shadcn.css";`}</code></MdxPre>
+      <CopySkillButton />
 
       {categorias.map((categoria, idx) => (
         <AnimateOnScroll key={categoria.href} delay={idx * 0.1}>
