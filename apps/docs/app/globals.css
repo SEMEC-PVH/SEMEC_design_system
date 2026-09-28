@@ -261,6 +261,13 @@ a {
   background: var(--tint);
 }
 
+/* ---- Ações do header (toggle + busca agrupados) ---- */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* ---- Busca no header ---- */
 .header-search {
   position: relative;
@@ -282,7 +289,7 @@ a {
   width: 220px;
   min-height: 44px;
   border: 1px solid var(--border);
-  background: var(--surface-alt);
+  background: transparent;
   border-radius: 0.75rem;
   padding: 0.45rem 0.9rem;
   padding-right: 3.4rem;
@@ -477,13 +484,17 @@ a {
 /* Item de topo (Introdução) no visual dos títulos de grupo — sem a borda
    lateral que os links comuns carregam. */
 .sidebar .side-group {
+  display: grid;
+  grid-template-rows: 1fr;
   overflow: hidden;
-  /* Indentação dos filhos alinhada ao texto do título de grupo
-     (pad 1 + caret 1.25 + label .25) = 2.50 */
   padding-left: 2.75rem;
+  transition: grid-template-rows 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sidebar .side-group > * {
+  overflow: hidden;
 }
 .sidebar .side-group.collapsed {
-  display: none;
+  grid-template-rows: 0fr;
 }
 .sidebar .side-subtitle {
   display: flex;
@@ -522,10 +533,16 @@ a {
   transform: rotate(90deg);
 }
 .sidebar .side-subgroup {
+  display: grid;
+  grid-template-rows: 1fr;
+  overflow: hidden;
+  transition: grid-template-rows 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sidebar .side-subgroup > * {
   overflow: hidden;
 }
 .sidebar .side-subgroup.collapsed {
-  display: none;
+  grid-template-rows: 0fr;
 }
 .sidebar a {
   display: flex;
@@ -1746,7 +1763,7 @@ li {
 }
 
 .hero-mascot {
-  width: 100%;
+  width: auto;
   max-width: 640px;
   height: auto;
   margin-bottom: var(--space-6);
@@ -2388,6 +2405,22 @@ footer {
   to {
     stroke-dashoffset: 0;
   }
+}
+
+/* ---- Animação de entrada (mount) ---- */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* ---- Movimento reduzido ---- */

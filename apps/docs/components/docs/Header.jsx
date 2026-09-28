@@ -150,6 +150,7 @@ export default function Header({ open, onToggle }) {
       <div className="brand">
         <span className="brand-title">SEMEC | Design System</span>
       </div>
+      <div className="header-actions">
       <div
         className={"header-search" + (mobileOpen ? " open" : "")}
         ref={wrapRef}
@@ -241,6 +242,7 @@ export default function Header({ open, onToggle }) {
         </div>
       </div>
       <ThemeToggle />
+      </div>
       <button
         className="menu-btn"
         onClick={onToggle}
