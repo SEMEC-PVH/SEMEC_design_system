@@ -4,6 +4,7 @@ export function breadcrumbsFor(pathname) {
   const crumbs = [{ label: "Início", href: "/" }];
   for (const item of navigation) {
     if (item.href && pathname === item.href) {
+      crumbs.push({ label: item.label, href: item.href });
       return crumbs;
     }
     if (item.items) {
@@ -37,7 +38,6 @@ export function breadcrumbsFor(pathname) {
 // Seção "Componentes" montada a partir do manifest: Estrutura de página
 // (casca do portal, categoria principal) + as categorias oficiais do kit.
 const componentesItems = [
-  { href: "/componentes", label: "Visão geral" },
   { href: dsPortal.items[0].href, label: dsPortal.label },
   ...dsPortal.items.map((p) => ({ href: p.href, label: p.label, sub: true })),
   ...dsCategories.flatMap((cat) => [
@@ -52,11 +52,9 @@ export const navigation = [
   {
     key: "guia",
     label: "Guia",
+    href: "/introducao",
     items: [
       { href: "/introducao", label: "Introdução" },
-      { href: "/introducao/o-que-e-ds", label: "O que é DS?" },
-      { href: "/introducao/para-quem", label: "Para quem é" },
-      { href: "/introducao/requisitos", label: "Requisitos" },
       { href: "/fundamentos", label: "Fundamentos" },
       { href: "/fundamentos/tipografia", label: "Tipografia", sub: true },
       { href: "/fundamentos/cores", label: "Cores", sub: true },
@@ -68,13 +66,14 @@ export const navigation = [
   {
     key: "componentes",
     label: "Componentes",
+    href: "/componentes",
     items: componentesItems,
   },
   {
     key: "padroes",
     label: "Padrões",
+    href: "/padroes",
     items: [
-      { href: "/padroes", label: "Visão geral" },
       { href: "/padroes/navegacao", label: "Navegação" },
       { href: "/padroes/navegacao/menu-principal", label: "Menu principal", sub: true },
       { href: "/padroes/navegacao/navegacao-lateral", label: "Navegação lateral", sub: true },

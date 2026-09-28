@@ -1,6 +1,15 @@
 import FileUploadDemo from "@/components/demos/FileUploadDemo";
+import CodeBlock from "@/components/docs/CodeBlock";
 
 export const metadata = { title: "Envio de arquivos" };
+
+const CODE = `import { FileUpload } from "semec-ds/react";
+
+<FileUpload
+  accept=".pdf,image/*"
+  maxSize={5 * 1024 * 1024}
+  hint="PDF ou imagem, até 5 MB"
+/>`;
 
 export default function EnvioDeArquivosPage() {
   return (
@@ -57,15 +66,7 @@ export default function EnvioDeArquivosPage() {
       </ul>
 
       <h3>Uso</h3>
-      <pre>
-        <code>{`import { FileUpload } from "semec-ds/react";
-
-<FileUpload
-  accept=".pdf,image/*"
-  maxSize={5 * 1024 * 1024}
-  hint="PDF ou imagem, até 5 MB"
-/>`}</code>
-      </pre>
+      <CodeBlock code={CODE} filename="envio-de-arquivos/page.jsx" />
       <p>
         <code>accept</code> limita os tipos de arquivo no seletor.{" "}
         <code>maxSize</code> define o limite em bytes.{" "}

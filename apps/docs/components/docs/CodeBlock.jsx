@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { copyText } from "@/lib/clipboard";
 
 function CopyButton({ text, label }) {
@@ -24,12 +24,55 @@ function CopyButton({ text, label }) {
   );
 }
 
+function getTheme() {
+  if (typeof document === "undefined") return "dark";
+  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+}
+
+const SHIKI_THEMES = { light: "github-light", dark: "github-dark" };
+
 export default function CodeBlock({ code, filename, prompt }) {
   const safeCode = typeof code === "string" ? code : "";
   const safePrompt = typeof prompt === "string" ? prompt : "";
+  const [highlighted, setHighlighted] = useState("");
+
   if (code !== undefined && !safeCode) {
     console.warn("[CodeBlock] `code` não é string (client reference?) para", filename);
   }
+
+  useEffect(() => {
+    if (!safeCode) return;
+    let cancelled = false;
+
+    function renderCode(theme) {
+      import("shiki").then(({ codeToHtml }) => {
+        return codeToHtml(safeCode, {
+          lang: "tsx",
+          theme: SHIKI_THEMES[theme] || "github-dark",
+        });
+      }).then((html) => {
+        if (!cancelled) setHighlighted(html);
+      }).catch(() => {
+        if (!cancelled) setHighlighted("");
+      });
+    }
+
+    renderCode(getTheme());
+
+    const observer = new MutationObserver(() => {
+      renderCode(getTheme());
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
+  }, [safeCode]);
+
   return (
     <div className="proto-codeblock">
       <div className="proto-codeblock-head">
@@ -40,9 +83,13 @@ export default function CodeBlock({ code, filename, prompt }) {
         </span>
       </div>
       {safeCode ? (
-        <pre>
-          <code>{safeCode}</code>
-        </pre>
+        highlighted ? (
+          <div dangerouslySetInnerHTML={{ __html: highlighted }} />
+        ) : (
+          <pre>
+            <code>{safeCode}</code>
+          </pre>
+        )
       ) : (
         <pre>
           <code className="proto-codeblock-empty">Snippet indisponível.</code>

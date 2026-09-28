@@ -23,24 +23,12 @@ export default function MdxPre({ children, ...props }) {
   }
 
   return (
-    <div className="mdx-pre-wrap" style={{ position: "relative" }}>
+    <div className="mdx-pre-wrap">
       <button
         type="button"
         onClick={handleCopy}
         className="mdx-copy-btn"
         aria-live="polite"
-        style={{
-          position: "absolute",
-          top: "0.5rem",
-          right: "0.5rem",
-          zIndex: 1,
-          border: "1px solid var(--color-border-default, #e5e7eb)",
-          background: "var(--color-surface-default, #fff)",
-          borderRadius: "0.375rem",
-          fontSize: "0.75rem",
-          padding: "0.2rem 0.5rem",
-          cursor: "pointer",
-        }}
       >
         {state === "ok" ? "Copiado!" : state === "fail" ? "Falhou" : "Copiar"}
       </button>

@@ -2,12 +2,20 @@
 
 import { useState } from "react";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Alert,
   AlertDescription,
   AlertTitle,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
   Badge,
   Breadcrumb,
   Button,
+  Calendar,
   Card,
   CardContent,
   CardFooter,
@@ -29,17 +37,42 @@ import {
   FormField,
   IconButton,
   Input,
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
   Label,
   Link,
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
   Pagination,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Progress,
   RadioGroup,
   RadioGroupItem,
+  ScrollArea,
+  ScrollBar,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Separator,
+  Sidebar,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
   Skeleton,
+  Slider,
+  Spinner,
   Switch,
   Table,
   TableBody,
@@ -52,6 +85,14 @@ import {
   TabsList,
   TabsTrigger,
   Textarea,
+  Timeline,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDescription,
+  TimelineDot,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineTitle,
   Toast,
   ToastAction,
   ToastClose,
@@ -59,6 +100,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
+  Toggle,
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -497,6 +539,232 @@ function AlertPreview() {
   );
 }
 
+function AccordionPreview() {
+  return (
+    <div className="w-full max-w-sm">
+      <Accordion type="single" collapsible defaultValue="item-1">
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Como emitir o IPTU?</AccordionTrigger>
+          <AccordionContent>
+            Acesse o portal, informe o número do contribuinte e clique em &quot;Emitir carnê&quot;.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-2">
+          <AccordionTrigger>Prazo de pagamento</AccordionTrigger>
+          <AccordionContent>
+            O carnê pode ser pago até 31 de outubro sem juros.
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
+  );
+}
+
+function PopoverPreview() {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline">Abrir popover</Button>
+      </PopoverTrigger>
+      <PopoverContent>
+        <p className="text-sm">Conteúdo do popover com informações adicionais.</p>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function SeparatorPreview() {
+  return (
+    <div className="w-full max-w-sm space-y-4">
+      <p className="text-sm text-muted-foreground">Seção acima</p>
+      <Separator />
+      <p className="text-sm text-muted-foreground">Seção abaixo</p>
+      <Separator orientation="vertical" className="h-16 mx-auto" />
+    </div>
+  );
+}
+
+function AvatarPreview() {
+  return (
+    <div className={ROW}>
+      <Avatar>
+        <AvatarFallback>PV</AvatarFallback>
+      </Avatar>
+      <Avatar className="h-12 w-12">
+        <AvatarFallback>PB</AvatarFallback>
+      </Avatar>
+      <Avatar className="h-16 w-16">
+        <AvatarFallback>CV</AvatarFallback>
+      </Avatar>
+    </div>
+  );
+}
+
+function TogglePreview() {
+  return (
+    <div className={ROW}>
+      <Toggle>Padrão</Toggle>
+      <Toggle variant="outline">Outline</Toggle>
+      <Toggle size="sm">Pequeno</Toggle>
+      <Toggle size="lg">Grande</Toggle>
+      <Toggle disabled>Desabilitado</Toggle>
+    </div>
+  );
+}
+
+function SpinnerPreview() {
+  return (
+    <div className={ROW}>
+      <Spinner />
+      <Spinner className="h-6 w-6" />
+      <Spinner className="h-8 w-8" />
+    </div>
+  );
+}
+
+function ProgressPreview() {
+  const [value, setValue] = useState(45);
+  return (
+    <div className="w-full max-w-sm space-y-3">
+      <Progress value={value} />
+      <div className={ROW}>
+        <Button variant="outline" size="sm" onClick={() => setValue((v) => Math.max(0, v - 10))}>-10</Button>
+        <span className="text-sm text-muted-foreground">{value}%</span>
+        <Button variant="outline" size="sm" onClick={() => setValue((v) => Math.min(100, v + 10))}>+10</Button>
+      </div>
+    </div>
+  );
+}
+
+function SliderPreview() {
+  const [value, setValue] = useState(50);
+  return (
+    <div className="w-full max-w-sm space-y-3">
+      <Slider value={[value]} onValueChange={(v) => setValue(v[0])} max={100} />
+      <p className="text-sm text-muted-foreground">Valor: {value}</p>
+    </div>
+  );
+}
+
+function InputOTPPreview() {
+  return (
+    <InputOTP maxLength={6}>
+      <InputOTPGroup>
+        <InputOTPSlot index={0} />
+        <InputOTPSlot index={1} />
+        <InputOTPSlot index={2} />
+      </InputOTPGroup>
+      <InputOTPSeparator />
+      <InputOTPGroup>
+        <InputOTPSlot index={3} />
+        <InputOTPSlot index={4} />
+        <InputOTPSlot index={5} />
+      </InputOTPGroup>
+    </InputOTP>
+  );
+}
+
+function CalendarPreview() {
+  return <Calendar />;
+}
+
+function ScrollAreaPreview() {
+  return (
+    <ScrollArea className="h-40 w-48 rounded-md border">
+      <div className="p-4">
+        <h4 className="text-sm font-medium mb-2">Itens</h4>
+        {Array.from({ length: 20 }, (_, i) => (
+          <p key={i} className="text-sm py-1">Item {i + 1}</p>
+        ))}
+      </div>
+      <ScrollBar />
+    </ScrollArea>
+  );
+}
+
+function TimelinePreview() {
+  return (
+    <Timeline>
+      <TimelineItem>
+        <TimelineSeparator>
+          <TimelineDot variant="success" />
+          <TimelineConnector />
+        </TimelineSeparator>
+        <TimelineContent>
+          <TimelineTitle>Requerimento aberto</TimelineTitle>
+          <TimelineDescription>01/08/2026</TimelineDescription>
+        </TimelineContent>
+      </TimelineItem>
+      <TimelineItem>
+        <TimelineSeparator>
+          <TimelineDot variant="default" />
+          <TimelineConnector />
+        </TimelineSeparator>
+        <TimelineContent>
+          <TimelineTitle>Em análise</TimelineTitle>
+          <TimelineDescription>05/08/2026</TimelineDescription>
+        </TimelineContent>
+      </TimelineItem>
+      <TimelineItem>
+        <TimelineSeparator>
+          <TimelineDot variant="info" />
+        </TimelineSeparator>
+        <TimelineContent>
+          <TimelineTitle>Deferido</TimelineTitle>
+          <TimelineDescription>10/08/2026</TimelineDescription>
+        </TimelineContent>
+      </TimelineItem>
+    </Timeline>
+  );
+}
+
+function NavigationMenuPreview() {
+  return (
+    <NavigationMenu>
+      <NavigationMenuList>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <NavigationMenuLink href="#proto">IPTU</NavigationMenuLink>
+            <NavigationMenuLink href="#proto">Alvará</NavigationMenuLink>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>Atendimento</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <NavigationMenuLink href="#proto">Agendamento</NavigationMenuLink>
+            <NavigationMenuLink href="#proto">Ouvidoria</NavigationMenuLink>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
+
+function SidebarPreview() {
+  return (
+    <div className="flex h-48 overflow-hidden rounded-md border">
+      <SidebarProvider>
+        <Sidebar>
+          <SidebarContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton>Início</SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton>Serviços</SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton>Configurações</SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarContent>
+        </Sidebar>
+      </SidebarProvider>
+    </div>
+  );
+}
+
 const PREVIEWS = {
   button: ButtonPreview,
   "icon-button": IconButtonPreview,
@@ -524,6 +792,20 @@ const PREVIEWS = {
   toast: ToastPreview,
   tooltip: TooltipPreview,
   alert: AlertPreview,
+  accordion: AccordionPreview,
+  popover: PopoverPreview,
+  separator: SeparatorPreview,
+  avatar: AvatarPreview,
+  toggle: TogglePreview,
+  spinner: SpinnerPreview,
+  progress: ProgressPreview,
+  slider: SliderPreview,
+  "input-otp": InputOTPPreview,
+  calendar: CalendarPreview,
+  "scroll-area": ScrollAreaPreview,
+  timeline: TimelinePreview,
+  "navigation-menu": NavigationMenuPreview,
+  sidebar: SidebarPreview,
 };
 
 export default function BasePreview({ slug }) {
@@ -531,7 +813,7 @@ export default function BasePreview({ slug }) {
   if (!Preview) return <p className="text-sm text-muted-foreground">Preview indisponível.</p>;
   return (
     <PreviewFrame>
-      <div style={{ padding: "1.5rem" }}>
+      <div style={{ padding: "1.5rem", display: "flex", justifyContent: "center", alignItems: "center", minHeight: "120px", textAlign: "center" }}>
         <Preview />
       </div>
     </PreviewFrame>

@@ -1,6 +1,27 @@
 import SheetDemo from "@/components/demos/SheetDemo";
+import CodeBlock from "@/components/docs/CodeBlock";
 
 export const metadata = { title: "Sheet" };
+
+const CODE = `import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "semec-ds/react";
+
+<Sheet>
+  <SheetTrigger asChild>
+    <Button variant="outline">Abrir filtros</Button>
+  </SheetTrigger>
+  <SheetContent side="left">
+    <SheetHeader>
+      <SheetTitle>Filtros</SheetTitle>
+      <SheetDescription>Refine sua busca.</SheetDescription>
+    </SheetHeader>
+    <div className="p-6">Filtros aqui</div>
+    <SheetFooter>
+      <SheetClose asChild>
+        <Button>Aplicar</Button>
+      </SheetClose>
+    </SheetFooter>
+  </SheetContent>
+</Sheet>`;
 
 export default function SheetPage() {
   return (
@@ -50,27 +71,7 @@ export default function SheetPage() {
       </ul>
 
       <h3>Uso</h3>
-      <pre>
-        <code>{`import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "semec-ds/react";
-
-<Sheet>
-  <SheetTrigger asChild>
-    <Button variant="outline">Abrir filtros</Button>
-  </SheetTrigger>
-  <SheetContent side="left">
-    <SheetHeader>
-      <SheetTitle>Filtros</SheetTitle>
-      <SheetDescription>Refine sua busca.</SheetDescription>
-    </SheetHeader>
-    <div className="p-6">Filtros aqui</div>
-    <SheetFooter>
-      <SheetClose asChild>
-        <Button>Aplicar</Button>
-      </SheetClose>
-    </SheetFooter>
-  </SheetContent>
-</Sheet>`}</code>
-      </pre>
+      <CodeBlock code={CODE} filename="sheet/page.jsx" />
     </>
   );
 }

@@ -1,6 +1,29 @@
 import DropdownMenuDemo from "@/components/demos/DropdownMenuDemo";
+import CodeBlock from "@/components/docs/CodeBlock";
 
 export const metadata = { title: "Menu suspenso" };
+
+const CODE = `import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "semec-ds/react";
+import { Button } from "semec-ds/react";
+import { MoreHorizontal } from "lucide-react";
+
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="ghost" size="icon"><MoreHorizontal /></Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuItem>Editar</DropdownMenuItem>
+    <DropdownMenuItem>Duplicar</DropdownMenuItem>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem className="text-destructive">Excluir</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>`;
 
 export default function DropdownMenuPage() {
   return (
@@ -59,29 +82,7 @@ export default function DropdownMenuPage() {
       </ul>
 
       <h3>Uso</h3>
-      <pre>
-        <code>{`import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "semec-ds/react";
-import { Button } from "semec-ds/react";
-import { MoreHorizontal } from "lucide-react";
-
-<DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <Button variant="ghost" size="icon"><MoreHorizontal /></Button>
-  </DropdownMenuTrigger>
-  <DropdownMenuContent>
-    <DropdownMenuItem>Editar</DropdownMenuItem>
-    <DropdownMenuItem>Duplicar</DropdownMenuItem>
-    <DropdownMenuSeparator />
-    <DropdownMenuItem className="text-destructive">Excluir</DropdownMenuItem>
-  </DropdownMenuContent>
-</DropdownMenu>`}</code>
-      </pre>
+      <CodeBlock code={CODE} filename="menu-suspenso/page.jsx" />
     </>
   );
 }

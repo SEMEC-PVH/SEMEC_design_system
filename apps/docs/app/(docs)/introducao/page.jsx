@@ -164,8 +164,22 @@ export default function IntroPage() {
 
   return (
     <>
-      <h1>SEMEC design system</h1>
-      <p className="subtitle">Atualizado em {dataAtualizacao}</p>
+      <section className="hero">
+        <img
+          src="/hero_logo.png"
+          alt=""
+          className="hero-mascot"
+          width={640}
+          height={480}
+        />
+        <h1>SEMEC design system</h1>
+        <p className="hero-subtitle">Atualizado em {dataAtualizacao}</p>
+        <p className="hero-desc">
+          Um conjunto de diretrizes, componentes reutilizáveis e padrões que
+          ajudam a criar experiências digitais consistentes para a Prefeitura de
+          Porto Velho.
+        </p>
+      </section>
 
       <h2>O que é um Design System</h2>
       <p>
@@ -181,6 +195,24 @@ export default function IntroPage() {
         concentra o esforço no que é específico de cada aplicação. O resultado é
         uma experiência coerente, acessível e eficiente em todos os serviços.
       </p>
+
+      <h2>Para quem é</h2>
+      <p>
+        O SEMEC Design System é destinado a designers, desenvolvedores e equipes
+        que constroem interfaces digitais para a Secretaria Municipal de Economia
+        de Porto Velho. Qualquer projeto digital institucional pode adotar o SDS
+        como base — de formulários internos a portais públicos.
+      </p>
+
+      <h2>Requisitos mínimos</h2>
+      <p>
+        Para utilizar o SEMEC Design System, são necessários:
+      </p>
+      <ul>
+        <li><strong>React 19</strong> ou superior</li>
+        <li><strong>Tailwind CSS v4</strong> (CSS-first config)</li>
+        <li><strong>shadcn</strong> — Radix + CVA + clsx + tailwind-merge</li>
+      </ul>
 
       {categorias.map((categoria) => (
         <section key={categoria.href} className="intro-category">

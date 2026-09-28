@@ -1,6 +1,14 @@
 import SidebarTriggerDemo from "@/components/demos/SidebarTriggerDemo";
+import CodeBlock from "@/components/docs/CodeBlock";
 
 export const metadata = { title: "Gatilho da barra lateral" };
+
+const CODE = `import { SidebarToggleButton } from "semec-ds/react";
+
+<SidebarToggleButton
+  open={sidebarOpen}
+  onToggle={() => setSidebarOpen(v => !v)}
+/>`;
 
 export default function SidebarTriggerPage() {
   return (
@@ -57,14 +65,7 @@ export default function SidebarTriggerPage() {
       </ul>
 
       <h3>Uso</h3>
-      <pre>
-        <code>{`import { SidebarToggleButton } from "semec-ds/react";
-
-<SidebarToggleButton
-  open={sidebarOpen}
-  onToggle={() => setSidebarOpen(v => !v)}
-/>`}</code>
-      </pre>
+      <CodeBlock code={CODE} filename="gatilho-da-barra-lateral/page.jsx" />
       <p>
         <code>open</code> controla qual ícone é exibido.{" "}
         <code>onToggle</code> é chamado ao clicar.{" "}

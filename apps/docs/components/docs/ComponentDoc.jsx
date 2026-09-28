@@ -7,10 +7,10 @@ import { dsByCategory, dsCategories, dsPrompt } from "semec-ds/skills";
 import { dsPackageRootResolve } from "semec-ds/react/server";
 
 export function ProtoStyle() {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
   return (
     <>
-      {/* eslint-disable-next-line @next/next/no-css-tags */}
-      <link rel="stylesheet" href="/proto/proto.css" />
+      <link rel="stylesheet" href={`${basePath}/proto/proto.css`} />
     </>
   );
 }

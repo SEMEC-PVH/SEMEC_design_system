@@ -1,6 +1,25 @@
 import DrawerDemo from "@/components/demos/DrawerDemo";
+import CodeBlock from "@/components/docs/CodeBlock";
 
 export const metadata = { title: "Drawer" };
+
+const CODE = `<Drawer>
+  <DrawerTrigger asChild>
+    <Button>Abrir painel</Button>
+  </DrawerTrigger>
+  <DrawerContent side="right">
+    <DrawerHeader>
+      <DrawerTitle>Detalhes</DrawerTitle>
+      <DrawerDescription>Informações do protocolo.</DrawerDescription>
+    </DrawerHeader>
+    <div className="p-6">Conteúdo aqui</div>
+    <DrawerFooter>
+      <DrawerClose asChild>
+        <Button variant="outline">Fechar</Button>
+      </DrawerClose>
+    </DrawerFooter>
+  </DrawerContent>
+</Drawer>`;
 
 export default function DrawerPage() {
   return (
@@ -56,25 +75,7 @@ export default function DrawerPage() {
       </ul>
 
       <h3>Uso</h3>
-      <pre>
-        <code>{`<Drawer>
-  <DrawerTrigger asChild>
-    <Button>Abrir painel</Button>
-  </DrawerTrigger>
-  <DrawerContent side="right">
-    <DrawerHeader>
-      <DrawerTitle>Detalhes</DrawerTitle>
-      <DrawerDescription>Informações do protocolo.</DrawerDescription>
-    </DrawerHeader>
-    <div className="p-6">Conteúdo aqui</div>
-    <DrawerFooter>
-      <DrawerClose asChild>
-        <Button variant="outline">Fechar</Button>
-      </DrawerClose>
-    </DrawerFooter>
-  </DrawerContent>
-</Drawer>`}</code>
-      </pre>
+      <CodeBlock code={CODE} filename="drawer/page.jsx" />
 
       <h3>Props</h3>
       <p>

@@ -1,6 +1,25 @@
 import DataTableDemo from "@/components/demos/DataTableDemo";
+import CodeBlock from "@/components/docs/CodeBlock";
 
 export const metadata = { title: "Tabela de dados" };
+
+const CODE = `import { DataTable } from "semec-ds/react";
+
+const columns = [
+  { key: "nome", header: "Nome", sortable: true },
+  { key: "status", header: "Status" },
+];
+
+<DataTable
+  columns={columns}
+  data={registros}
+  sortKey={sortField}
+  sortDir={sortDir}
+  onSort={handleSort}
+  page={pagina}
+  pageCount={totalPaginas}
+  onPageChange={setPagina}
+/>`;
 
 export default function DataTablePage() {
   return (
@@ -48,25 +67,7 @@ export default function DataTablePage() {
       </ul>
 
       <h3>Uso</h3>
-      <pre>
-        <code>{`import { DataTable } from "semec-ds/react";
-
-const columns = [
-  { key: "nome", header: "Nome", sortable: true },
-  { key: "status", header: "Status" },
-];
-
-<DataTable
-  columns={columns}
-  data={registros}
-  sortKey={sortField}
-  sortDir={sortDir}
-  onSort={handleSort}
-  page={pagina}
-  pageCount={totalPaginas}
-  onPageChange={setPagina}
-/>`}</code>
-      </pre>
+      <CodeBlock code={CODE} filename="tabela-de-dados/page.jsx" />
     </>
   );
 }

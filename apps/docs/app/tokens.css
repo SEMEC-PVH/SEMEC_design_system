@@ -234,7 +234,7 @@
 
   /* Medida de leitura do texto corrido (p, ul, ol). Componentes visuais —
      cards, tabelas, código e demos — continuam usando toda a coluna. */
-  --measure: 72ch;
+  --measure: 65ch;
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Densidade

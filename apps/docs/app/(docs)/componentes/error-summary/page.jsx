@@ -1,6 +1,15 @@
 import ErrorSummaryDemo from "@/components/demos/ErrorSummaryDemo";
+import CodeBlock from "@/components/docs/CodeBlock";
 
 export const metadata = { title: "ErrorSummary" };
+
+const CODE = `<ErrorSummary
+  errors={[
+    { id: "cpf", message: "O CPF precisa ter 11 dígitos." },
+    { id: "email", message: "O e-mail precisa conter @." },
+  ]}
+  focusKey={tentativa}
+/>`;
 
 export default function ErrorSummaryPage() {
   return (
@@ -66,15 +75,7 @@ export default function ErrorSummaryPage() {
       </ul>
 
       <h3>Uso</h3>
-      <pre>
-        <code>{`<ErrorSummary
-  errors={[
-    { id: "cpf", message: "O CPF precisa ter 11 dígitos." },
-    { id: "email", message: "O e-mail precisa conter @." },
-  ]}
-  focusKey={tentativa}
-/>`}</code>
-      </pre>
+      <CodeBlock code={CODE} filename="error-summary/page.jsx" />
       <p>
         <code>id</code> é o do campo. <code>focusKey</code> muda a cada envio,
         para que o resumo refoque quando a pessoa tenta de novo e a lista de

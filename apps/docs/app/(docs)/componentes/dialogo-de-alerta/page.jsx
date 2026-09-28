@@ -1,6 +1,25 @@
 import AlertDialogDemo from "@/components/demos/AlertDialogDemo";
+import CodeBlock from "@/components/docs/CodeBlock";
 
 export const metadata = { title: "Diálogo de alerta" };
+
+const CODE = `<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button variant="destructive">Excluir</Button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Excluir item?</AlertDialogTitle>
+      <AlertDialogDescription>
+        Esta ação não pode ser desfeita.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+      <AlertDialogAction>Excluir</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>`;
 
 export default function AlertDialogPage() {
   return (
@@ -60,25 +79,7 @@ export default function AlertDialogPage() {
       </ul>
 
       <h3>Uso</h3>
-      <pre>
-        <code>{`<AlertDialog>
-  <AlertDialogTrigger asChild>
-    <Button variant="destructive">Excluir</Button>
-  </AlertDialogTrigger>
-  <AlertDialogContent>
-    <AlertDialogHeader>
-      <AlertDialogTitle>Excluir item?</AlertDialogTitle>
-      <AlertDialogDescription>
-        Esta ação não pode ser desfeita.
-      </AlertDialogDescription>
-    </AlertDialogHeader>
-    <AlertDialogFooter>
-      <AlertDialogCancel>Cancelar</AlertDialogCancel>
-      <AlertDialogAction>Excluir</AlertDialogAction>
-    </AlertDialogFooter>
-  </AlertDialogContent>
-</AlertDialog>`}</code>
-      </pre>
+      <CodeBlock code={CODE} filename="dialogo-de-alerta/page.jsx" />
       <p>
         <code>AlertDialogAction</code> é o botão de confirmação.{" "}
         <code>AlertDialogCancel</code> fecha o diálogo sem executar a ação. Ambos

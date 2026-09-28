@@ -1,6 +1,19 @@
 import ComboboxDemo from "@/components/demos/ComboboxDemo";
+import CodeBlock from "@/components/docs/CodeBlock";
 
 export const metadata = { title: "Combobox" };
+
+const CODE = `import { Combobox } from "semec-ds/react";
+
+<Combobox
+  options={[
+    { value: "cnpj", label: "CNPJ" },
+    { value: "cpf", label: "CPF" },
+  ]}
+  value={valor}
+  onChange={setValor}
+  placeholder="Selecione o documento"
+/>`;
 
 export default function ComboboxPage() {
   return (
@@ -53,19 +66,7 @@ export default function ComboboxPage() {
       </ul>
 
       <h3>Uso</h3>
-      <pre>
-        <code>{`import { Combobox } from "semec-ds/react";
-
-<Combobox
-  options={[
-    { value: "cnpj", label: "CNPJ" },
-    { value: "cpf", label: "CPF" },
-  ]}
-  value={valor}
-  onChange={setValor}
-  placeholder="Selecione o documento"
-/>`}</code>
-      </pre>
+      <CodeBlock code={CODE} filename="combobox/page.jsx" />
       <p>
         <code>options</code> é um array de objetos com <code>value</code> e{" "}
         <code>label</code>. <code>value</code> é o valor controlado;{" "}

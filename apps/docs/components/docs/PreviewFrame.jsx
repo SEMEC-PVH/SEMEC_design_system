@@ -19,9 +19,11 @@ export default function PreviewFrame({ children }) {
     const doc = iframe.contentDocument;
     if (!doc) return;
 
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
     // Monta esqueleto do iframe
     doc.open();
-    doc.write(`<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="/proto/proto.css"></head><body><div id="root"></div></body></html>`);
+    doc.write(`<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="${basePath}/proto/proto.css"></head><body><div id="root"></div></body></html>`);
     doc.close();
 
     const root = doc.getElementById("root");
@@ -112,7 +114,7 @@ export default function PreviewFrame({ children }) {
       iframe.style.height = doc.documentElement.scrollHeight + "px";
     };
     // espera proto.css carregar
-    const link = doc.querySelector('link[href="/proto/proto.css"]');
+    const link = doc.querySelector(`link[href="${basePath}/proto/proto.css"]`);
     const onLoad = () => syncHeight();
     if (link) link.addEventListener("load", onLoad);
     // ResizeObserver no root

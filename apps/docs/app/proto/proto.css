@@ -155,3 +155,41 @@
     font-size: 0.8rem;
     white-space: pre;
   }
+
+  /* Shiki syntax highlighting: theme-aware backgrounds */
+  .proto-codeblock pre.shiki {
+    background: var(--color-gray-900) !important;
+  }
+  .proto-codeblock pre.shiki code {
+    color: inherit;
+    font-size: 0.8rem;
+    white-space: pre;
+  }
+  .proto-codeblock pre.shiki code .line {
+    display: inline-block;
+    width: 100%;
+  }
+
+  /* Light theme: codeblock claro */
+  [data-theme="light"] .proto-codeblock {
+    background: var(--color-gray-50, #f9fafb);
+  }
+  [data-theme="light"] .proto-codeblock-head {
+    background: var(--color-gray-100, #f3f4f6);
+  }
+  [data-theme="light"] .proto-codeblock-file {
+    color: var(--color-gray-600, #4b5563);
+  }
+  [data-theme="light"] .proto-copy {
+    border-color: var(--color-gray-300, #d1d5db);
+    color: var(--color-gray-700, #374151);
+  }
+  [data-theme="light"] .proto-copy:hover {
+    background: var(--color-gray-200, #e5e7eb);
+  }
+  [data-theme="light"] .proto-codeblock pre code {
+    color: var(--color-gray-800, #1f2937);
+  }
+  [data-theme="light"] .proto-codeblock pre.shiki {
+    background: var(--color-gray-50, #f9fafb) !important;
+  }

@@ -294,16 +294,31 @@ export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
             <div key={item.key} className={"sidebar-section" + (item.section === "reference" ? " sidebar-section--reference" : "")}>
               {item.items ? (
                 <>
-                  <button
-                    type="button"
-                    className={"side-title" + (collapsedGroup(item) ? "" : " open")}
-                    onClick={() => toggleGroup(item.key)}
-                    aria-expanded={!collapsedGroup(item)}
-                    aria-controls={"side-group-" + item.key}
-                  >
-                    <Caret />
-                    <span className="nav-label">{item.label}</span>
-                  </button>
+                  <div className={"side-title" + (collapsedGroup(item) ? "" : " open")}>
+                    <button
+                      type="button"
+                      className="side-title-caret"
+                      onClick={() => toggleGroup(item.key)}
+                      aria-expanded={!collapsedGroup(item)}
+                      aria-controls={"side-group-" + item.key}
+                    >
+                      <Caret />
+                    </button>
+                    <Link
+                      href={item.href}
+                      className={
+                        "side-title-label" +
+                        (isActive(pathname, item.href, hash, true) ? " active" : "")
+                      }
+                      onClick={() => {
+                        if (collapsedGroup(item)) {
+                          toggleGroup(item.key);
+                        }
+                      }}
+                    >
+                      <span className="nav-label">{item.label}</span>
+                    </Link>
+                  </div>
                   <div
                     id={"side-group-" + item.key}
                     className={
