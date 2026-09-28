@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SectionCard from "@/components/ui/SectionCard";
+import MdxPre from "@/components/docs/MdxPre";
 import {
   ArtTipografia,
   ArtCores,
@@ -156,6 +157,7 @@ const categorias = [
 ];
 
 export default function IntroPage() {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
   const dataAtualizacao = new Intl.DateTimeFormat("pt-BR", {
     day: "numeric",
     month: "long",
@@ -166,8 +168,8 @@ export default function IntroPage() {
     <>
       <section className="hero">
         <img
-          src="/hero_logo.png"
-          alt=""
+          src={`${basePath}/hero_logo.png`}
+          alt="Mascote do SEMEC Design System"
           className="hero-mascot"
           width={640}
           height={480}
@@ -213,6 +215,12 @@ export default function IntroPage() {
         <li><strong>Tailwind CSS v4</strong> (CSS-first config)</li>
         <li><strong>shadcn</strong> — Radix + CVA + clsx + tailwind-merge</li>
       </ul>
+
+      <h2>Instalação</h2>
+      <p>Instale o pacote no seu projeto:</p>
+      <MdxPre><code>npm install @semec/ds</code></MdxPre>
+      <p>Ou, se preferir yarn:</p>
+      <MdxPre><code>yarn add @semec/ds</code></MdxPre>
 
       {categorias.map((categoria) => (
         <section key={categoria.href} className="intro-category">
