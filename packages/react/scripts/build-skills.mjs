@@ -219,4 +219,172 @@ if (fs.existsSync(skillSrc)) {
   console.log("  copied ds-semec-skill.md");
 }
 
+// --- 5b. Copiar skill lite standalone (SEMEC-LITE.md) ---
+const liteSkillSrc = path.join(pkgRoot, "SEMEC-LITE.md");
+if (fs.existsSync(liteSkillSrc)) {
+  copyFile(liteSkillSrc, path.join(distDir, "SEMEC-LITE.md"));
+  console.log("  copied SEMEC-LITE.md");
+}
+
+// --- 6. Gerar artefatos lite (tokens + creditos, sem componentes) ---
+const liteDir = path.join(distDir, "lite");
+mkdirp(liteDir);
+
+// --- lite/llms.txt ---
+const liteLlmsLines = [
+  "# SEMEC Design System — Lite (tokens de identidade visual)",
+  "",
+  "Versão sem componentes React. Fornece tokens CSS para aplicações com a",
+  "identidade visual da Prefeitura de Porto Velho.",
+  "",
+  "## Categorias",
+  "",
+  ...dsCategories.map(
+    (c) => `- **${c.label}** (\`${c.key}\`): ${c.desc}`
+  ),
+  "",
+  "## Tokens",
+  "",
+  "- `tokens.css` — primitives L0 (`--pv-*`) + semânticos L1 + dark theme",
+  "- `shadcn.css` — variáveis HSL shadcn",
+  "- `pv-preset.ts` — preset Tailwind v4 (JS config)",
+  "",
+  "## Instalação",
+  "",
+  '```bash',
+  'npm install @semec/ds',
+  '```',
+  "",
+  '```css',
+  '@import "@semec/ds/lite/tokens.css";',
+  '@import "@semec/ds/lite/shadcn.css";',
+  '```',
+  "",
+  "## Crédito obrigatório",
+  "",
+  "Incluir no README.md do projeto:",
+  "",
+  "## Créditos",
+  "",
+  "Identidade visual e tokens fornecidos pelo",
+  "[SEMEC Design System](https://github.com/SEMEC-PVH/SEMEC_design_system),",
+  "desenvolvido pela equipe de desenvolvimento da Secretaria Municipal de",
+  "Economia de Porto Velho (DevSemec).",
+  "",
+  "## Arquivos para IA",
+  "",
+  "- `llms.txt` — este índice",
+  "- `manifest.json` — JSON com categorias e tokens",
+  "- `ds-semec-skill.md` — skill completa",
+];
+fs.writeFileSync(path.join(liteDir, "llms.txt"), liteLlmsLines.join("\n"), "utf8");
+console.log("  generated lite/llms.txt");
+
+// --- lite/manifest.json ---
+const liteManifestJson = {
+  name: "SEMEC Design System — Lite",
+  version: "1.0.0",
+  generatedAt: new Date().toISOString(),
+  description: "Tokens de identidade visual da Prefeitura de Porto Velho. Sem componentes React.",
+  categories: dsCategories,
+  install: {
+    tokens: 'import "@semec/ds/lite/tokens.css";',
+    shadcn: 'import "@semec/ds/lite/shadcn.css";',
+    preset: '@config "../pv-preset.ts";',
+  },
+  tokens: {
+    files: ["tokens.css", "shadcn.css", "pv-preset.ts"],
+    primitives: "pv-* prefixed (L0)",
+    semantic: "L1 — --bg, --fg, --surface, --action-primary, --feedback-*, etc.",
+  },
+  credit: {
+    required: true,
+    text: "Identidade visual e tokens fornecidos pelo SEMEC Design System (https://github.com/SEMEC-PVH/SEMEC_design_system), desenvolvido pela equipe de desenvolvimento da Secretaria Municipal de Economia de Porto Velho (DevSemec).",
+    location: "README.md do projeto consumidor",
+  },
+};
+fs.writeFileSync(
+  path.join(liteDir, "manifest.json"),
+  JSON.stringify(liteManifestJson, null, 2),
+  "utf8"
+);
+console.log("  generated lite/manifest.json");
+
+// --- lite/ds-semec-skill.md ---
+const liteSkillMd = [
+  `---`,
+  `name: semec-ds-lite`,
+  `description: Tokens de identidade visual SEMEC (Prefeitura de Porto Velho). Use para criar aplicações com a identidade visual da prefeitura.`,
+  `author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"`,
+  `---`,
+  ``,
+  `# SEMEC Design System — Lite`,
+  ``,
+  `Tokens de identidade visual da Prefeitura de Porto Velho. Sem componentes React.`,
+  ``,
+  `## Instalação`,
+  ``,
+  "```bash",
+  "npm install @semec/ds",
+  "```",
+  ``,
+  "```css",
+  '@import "@semec/ds/lite/tokens.css";',
+  '@import "@semec/ds/lite/shadcn.css";',
+  "```",
+  ``,
+  `Poppins 400–700 (self-hosted woff2 ou next/font).`,
+  ``,
+  `## Tokens principais`,
+  ``,
+  `### Cores (L0 primitivas)`,
+  `- Cores da marca: --pv-blue-*, --pv-green-*, --pv-yellow-*, --pv-red-*, --pv-gray-*`,
+  `- Foco: --pv-blue-hero (#223f99) — contraste 9,38:1`,
+  ``,
+  `### Semânticos (L1 — usar no dia a dia)`,
+  `- Fundo: --bg, --surface, --surface-alt`,
+  `- Texto: --fg, --text-muted, --text-secondary, --text-strong`,
+  `- Borda: --border, --border-strong`,
+  `- Ação: --action-primary, --action-primary-hover, --action-primary-active`,
+  `- Feedback: --feedback-success, --feedback-warning, --feedback-danger, --feedback-info`,
+  `- Foco: --focus-ring`,
+  ``,
+  `### Tipografia`,
+  `- Fontes: --font-family-sans, --font-poppins, --font-mono`,
+  `- Tamanhos: --text-xs, --text-sm, --text-base, --text-lg, --text-xl, --text-2xl`,
+  `- Pesos: --font-regular, --font-bold`,
+  ``,
+  `### Espaçamento`,
+  `- --space-0, --space-1, --space-2, --space-3, --space-4, --space-6, --space-8, --space-12, --space-16`,
+  ``,
+  `### Bordas`,
+  `- --radius-sm, --radius-md, --radius-lg, --radius-full`,
+  ``,
+  `### Elevação`,
+  `- --elevation-0, --elevation-1, --elevation-2, --elevation-3`,
+  ``,
+  `## Regra`,
+  ``,
+  `Use tokens L1 (--bg, --fg, --surface, --action-primary, etc.) — nunca cores hexavais soltas.`,
+  ``,
+  `## Crédito obrigatório`,
+  ``,
+  `Ao criar um projeto que utilize estes tokens, o agente DEVE adicionar`,
+  `a seguinte seção no README.md do projeto:`,
+  ``,
+  "```markdown",
+  "## Créditos",
+  "",
+  "Identidade visual e tokens fornecidos pelo",
+  "[SEMEC Design System](https://github.com/SEMEC-PVH/SEMEC_design_system),",
+  "desenvolvido pela equipe de desenvolvimento da Secretaria Municipal de",
+  "Economia de Porto Velho (DevSemec).",
+  "```",
+  ``,
+  `---`,
+  `Desenvolvido pela equipe de desenvolvimento da Secretaria Municipal de Economia de Porto Velho (DevSemec).`,
+].join("\n");
+fs.writeFileSync(path.join(liteDir, "ds-semec-skill.md"), liteSkillMd, "utf8");
+console.log("  generated lite/ds-semec-skill.md");
+
 console.log("\nbuild-skills: done.");

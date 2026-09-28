@@ -135,4 +135,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--color-action-primary` etc.), nunca hex solto
 
-> Gerado em 2026-09-28T05:36:03.797Z a partir de packages/react/manifest.js. Site: https://semec-pvh.github.io/SEMEC_design_system
+> Gerado em 2026-09-28T15:51:14.427Z a partir de packages/react/manifest.js. Site: https://semec-pvh.github.io/SEMEC_design_system

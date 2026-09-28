@@ -47,4 +47,20 @@ export default defineConfig([
     format: "esm",
     dts: false,
   },
+  {
+    entry: {
+      "lite/index": "src/lite/index.ts",
+    },
+    outDir: "dist",
+    format: "esm",
+    dts: false,
+  },
+  {
+    entry: {
+      "lite/skills": "src/lite/skills.ts",
+    },
+    outDir: "dist",
+    format: "esm",
+    dts: false,
+  },
 ]);

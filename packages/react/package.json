@@ -29,7 +29,21 @@
     "./skills/manifest.json": "./dist/skills/manifest.json",
     "./skills/manifest.js": "./dist/skills/manifest.js",
     "./skills/components/*": "./dist/skills/components/*",
-    "./skills/ds-semec-skill": "./dist/skills/ds-semec-skill.md"
+    "./skills/ds-semec-skill": "./dist/skills/ds-semec-skill.md",
+    "./lite/tokens.css": "./dist/react/tokens.css",
+    "./lite/shadcn.css": "./dist/react/shadcn.css",
+    "./lite/pv-preset": {
+      "types": "./dist/react/pv-preset.d.ts",
+      "import": "./dist/react/pv-preset.js"
+    },
+    "./lite/pv-preset.ts": "./pv-preset.ts",
+    "./lite/skills": {
+      "types": "./dist/lite/skills.d.ts",
+      "import": "./dist/lite/skills.js"
+    },
+    "./lite/skills/llms.txt": "./dist/lite/llms.txt",
+    "./lite/skills/manifest.json": "./dist/lite/manifest.json",
+    "./lite/skills/ds-semec-skill": "./dist/lite/ds-semec-skill.md"
   },
   "files": [
     "dist",
