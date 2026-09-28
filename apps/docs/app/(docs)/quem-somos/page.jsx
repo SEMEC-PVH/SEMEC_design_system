@@ -90,7 +90,7 @@ function TeamCard({ member, size = "md" }) {
 
 export default function QuemSomosPage() {
   return (
-    <>
+    <div className="no-toc">
       <h1>Quem Somos</h1>
       <p className="subtitle">
         Somos o time de tecnologia e design por trás do Design System da
@@ -114,6 +114,6 @@ export default function QuemSomosPage() {
           ))}
         </div>
       </section>
-    </>
+    </div>
   );
 }

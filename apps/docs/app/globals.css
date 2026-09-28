@@ -1142,6 +1142,29 @@ pre[data-rehype-pretty-code-figure] code {
   color: var(--color-text-primary);
 }
 
+/* Botão de copiar skill lite */
+.copy-skill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.copy-skill-btn:hover {
+  background: var(--tint);
+}
+.copy-skill-btn svg {
+  flex-shrink: 0;
+}
+
 ul,
 ol {
   padding-left: 1.2rem;
