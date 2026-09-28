@@ -78,12 +78,67 @@
   --radius-lg: var(--radius-lg);
   --radius-full: var(--radius-full);
 
+  /* Fontes: sobrescreve o default do Tailwind com o stack do SEMEC */
+  --font-sans: var(--font-poppins), "Poppins", system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
   /* Motion e sombras usadas pelos componentes da base */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --transition-duration-fast: 150ms;
   --shadow-elevation-1: 0 1px 2px rgb(0 0 0 / 0.06), 0 1px 3px rgb(0 0 0 / 0.1);
   --shadow-elevation-2: 0 4px 8px rgb(0 0 0 / 0.08), 0 2px 4px rgb(0 0 0 / 0.06);
   --shadow-elevation-3: 0 12px 24px rgb(0 0 0 / 0.12), 0 4px 8px rgb(0 0 0 / 0.08);
+}
+
+/* @font-face: carrega woff2 local para o iframe */
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../app/fonts/Poppins-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../../app/fonts/Poppins-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../../app/fonts/Poppins-600.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../../app/fonts/Poppins-700.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("../../app/fonts/Poppins-800.woff2") format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url("../../app/fonts/JetBrainsMono-Variable.woff2") format("woff2");
+}
+
+/* Body dentro do iframe herda a fonte do SEMEC */
+body {
+  font-family: var(--font-poppins), "Poppins", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Regras proto ficam FORA de @layer de propósito: globals.css não usa camadas
