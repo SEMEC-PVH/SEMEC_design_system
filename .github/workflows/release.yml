@@ -1,11 +1,11 @@
-name: Version Packages
+name: Release
 
 on:
   push:
     branches: [main]
 
 concurrency:
-  group: version-${{ github.ref }}
+  group: release-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -13,7 +13,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  version:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,15 +22,24 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          registry-url: "https://registry.npmjs.org"
 
       - name: Install
         run: npm ci
 
-      - name: Create Release Pull Request
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build package
+        run: npm run build:ds
+
+      - name: Create release PR or publish
         uses: changesets/action@v1
         with:
           version: npm run version-packages
+          publish: npx changeset publish
           title: "chore: version packages"
           commit: "chore: version packages"
         env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
