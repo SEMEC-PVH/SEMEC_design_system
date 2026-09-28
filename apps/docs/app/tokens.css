@@ -191,6 +191,8 @@
   --font-semibold: 600;
   --font-bold:     700;
 
+  --font-family-sans: "Poppins", system-ui, -apple-system, sans-serif;
+
   /* =======================================================================
      L1 — SEMÂNTICOS · Forma (estilo Luma — arrojado, macio)
      ======================================================================= */
