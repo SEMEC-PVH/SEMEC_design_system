@@ -447,7 +447,7 @@ a {
   flex: 0 0 auto;
   font-size: var(--font-size-2xs);
   color: inherit;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .sidebar .caret svg {
   width: 1.25rem;
@@ -488,10 +488,11 @@ a {
   grid-template-rows: 1fr;
   overflow: hidden;
   padding-left: 2.75rem;
-  transition: grid-template-rows 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.sidebar .side-group > * {
+.sidebar .side-group-inner {
   overflow: hidden;
+  min-height: 0;
 }
 .sidebar .side-group.collapsed {
   grid-template-rows: 0fr;
@@ -527,7 +528,7 @@ a {
   flex: 0 0 auto;
   font-size: var(--font-size-2xs);
   color: var(--text-muted);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .sidebar .side-subtitle.open .caret {
   transform: rotate(90deg);
@@ -536,10 +537,11 @@ a {
   display: grid;
   grid-template-rows: 1fr;
   overflow: hidden;
-  transition: grid-template-rows 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.sidebar .side-subgroup > * {
+.sidebar .side-subgroup-inner {
   overflow: hidden;
+  min-height: 0;
 }
 .sidebar .side-subgroup.collapsed {
   grid-template-rows: 0fr;
@@ -736,6 +738,8 @@ a {
   display: flex;
   gap: 2rem;
   align-items: flex-start;
+}
+.content-main:has(.toc) {
   padding-right: 260px;
 }
 .content > .container:last-child {
@@ -803,6 +807,9 @@ h3[id] {
 @media (max-width: 1120px) {
   .toc {
     display: none;
+  }
+  .content-main:has(.toc) {
+    padding-right: 0;
   }
 }
 
@@ -2060,6 +2067,12 @@ footer {
 .team-grid--interns {
   grid-template-columns: repeat(2, 1fr);
 }
+@media (max-width: 640px) {
+  .team-grid--directors,
+  .team-grid--interns {
+    grid-template-columns: 1fr;
+  }
+}
 .team-card {
   display: flex;
   align-items: flex-start;
@@ -2411,7 +2424,7 @@ footer {
 @keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -2420,7 +2433,7 @@ footer {
 }
 
 .animate-in {
-  animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fade-in-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* ---- Movimento reduzido ---- */

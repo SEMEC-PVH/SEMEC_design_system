@@ -3,6 +3,7 @@ import { join } from "path";
 import Link from "next/link";
 import BasePreview from "@/components/demos/base-previews";
 import CodeBlock from "@/components/docs/CodeBlock";
+import AnimateOnScroll from "@/components/ui/AnimateOnScroll";
 import { dsByCategory, dsCategories, dsPrompt } from "semec-ds/skills";
 import { dsPackageRootResolve } from "semec-ds/react/server";
 
@@ -37,11 +38,13 @@ export default function ComponentDoc({ c, extra }) {
 
       {extra}
 
-      <h3>Preview</h3>
-      <BasePreview slug={c.code} />
+      <AnimateOnScroll>
+        <h3>Preview</h3>
+        <BasePreview slug={c.code} />
+      </AnimateOnScroll>
 
       {c.variants.length > 0 && (
-        <>
+        <AnimateOnScroll delay={0.1}>
           <h3>Variantes e composição</h3>
           <table>
             <thead>
@@ -61,14 +64,18 @@ export default function ComponentDoc({ c, extra }) {
               ))}
             </tbody>
           </table>
-        </>
+        </AnimateOnScroll>
       )}
 
-      <h3>Uso</h3>
-      <CodeBlock code={c.usage} filename="semec-ds-react" prompt={dsPrompt(c)} />
+      <AnimateOnScroll delay={0.15}>
+        <h3>Uso</h3>
+        <CodeBlock code={c.usage} filename="semec-ds-react" prompt={dsPrompt(c)} />
+      </AnimateOnScroll>
 
-      <h3>Fonte do componente</h3>
-      <CodeBlock code={source} filename={c.file} prompt={dsPrompt(c)} />
+      <AnimateOnScroll delay={0.2}>
+        <h3>Fonte do componente</h3>
+        <CodeBlock code={source} filename={c.file} prompt={dsPrompt(c)} />
+      </AnimateOnScroll>
 
       <div className="doc-nav">
         {prev ? (

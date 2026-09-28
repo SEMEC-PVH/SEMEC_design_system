@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import SectionCard from "@/components/ui/SectionCard";
+import AnimateOnScroll from "@/components/ui/AnimateOnScroll";
 import MdxPre from "@/components/docs/MdxPre";
 import {
   ArtTipografia,
@@ -167,7 +169,7 @@ export default function IntroPage() {
   return (
     <>
       <section className="hero">
-        <img
+        <Image
           src={`${basePath}/hero_logo.png`}
           alt="Mascote do SEMEC Design System"
           className="hero-mascot"
@@ -222,26 +224,28 @@ export default function IntroPage() {
       <p>Ou, se preferir yarn:</p>
       <MdxPre><code>yarn add @semec/ds</code></MdxPre>
 
-      {categorias.map((categoria) => (
-        <section key={categoria.href} className="intro-category">
-          <div className="category-head">
-            <h3>
-              <Link href={categoria.href}>{categoria.label}</Link>
-            </h3>
-            <p>{categoria.desc}</p>
-          </div>
-          <div className="section-cards">
-            {categoria.items.map((s) => (
-              <SectionCard
-                key={s.href}
-                href={s.href}
-                art={s.art}
-                title={s.title}
-                desc={s.desc}
-              />
-            ))}
-          </div>
-        </section>
+      {categorias.map((categoria, idx) => (
+        <AnimateOnScroll key={categoria.href} delay={idx * 0.1}>
+          <section className="intro-category">
+            <div className="category-head">
+              <h3>
+                <Link href={categoria.href}>{categoria.label}</Link>
+              </h3>
+              <p>{categoria.desc}</p>
+            </div>
+            <div className="section-cards">
+              {categoria.items.map((s) => (
+                <SectionCard
+                  key={s.href}
+                  href={s.href}
+                  art={s.art}
+                  title={s.title}
+                  desc={s.desc}
+                />
+              ))}
+            </div>
+          </section>
+        </AnimateOnScroll>
       ))}
     </>
   );

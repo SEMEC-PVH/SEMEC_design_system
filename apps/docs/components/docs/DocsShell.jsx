@@ -11,6 +11,7 @@ import TableOfContents from "./TableOfContents";
 import { breadcrumbsFor } from "@/lib/navigation";
 import { safeGet, safeSet } from "@/lib/storage";
 
+
 const COLLAPSED_KEY = "ds-sidebar-collapsed";
 
 // Estado da sidebar colapsada persistido em localStorage, observado via

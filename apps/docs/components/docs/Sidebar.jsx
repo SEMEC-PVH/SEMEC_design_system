@@ -262,17 +262,19 @@ export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
             id={gid}
             className={"side-subgroup" + (collapsedNested ? " collapsed" : "")}
           >
-            {section.children.map((sub) => (
-              <Link
-                key={sub.href + sub.label}
-                href={sub.href}
-                className={
-                  "sub " + (isActive(pathname, sub.href, hash) ? "active" : "")
-                }
-              >
-                <span className="nav-label">{sub.label}</span>
-              </Link>
-            ))}
+            <div className="side-subgroup-inner">
+              {section.children.map((sub) => (
+                <Link
+                  key={sub.href + sub.label}
+                  href={sub.href}
+                  className={
+                    "sub " + (isActive(pathname, sub.href, hash) ? "active" : "")
+                  }
+                >
+                  <span className="nav-label">{sub.label}</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       );
@@ -325,7 +327,9 @@ export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
                       "side-group" + (collapsedGroup(item) ? " collapsed" : "")
                     }
                   >
-                    {renderSections(item)}
+                    <div className="side-group-inner">
+                      {renderSections(item)}
+                    </div>
                   </div>
                 </>
               ) : (
