@@ -31,7 +31,7 @@ export default function TipografiaPage() {
       </table>
 
       <h3>Escala renderizada</h3>
-      <div className="preview">
+      <div className="preview preview--plain">
         <TypeRow label="Título herói">
           <span style={{ fontSize: "2.25rem", fontWeight: 700, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
             A Secretaria está mais perto

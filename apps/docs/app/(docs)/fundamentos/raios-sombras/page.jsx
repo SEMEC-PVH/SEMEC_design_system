@@ -11,8 +11,8 @@ export default function RaiosSombrasPage() {
       </p>
 
       <h3>Raios</h3>
-      <div className="preview">
-        <div className="shape-grid">
+      <div className="preview preview--plain">
+        <div className="shape-grid shape-grid--row">
           <Shape caption="rounded-sm · 0.25rem" style={{ borderRadius: "0.25rem" }} />
           <Shape caption="rounded-md · 0.375rem" style={{ borderRadius: "0.375rem" }} />
           <Shape caption="rounded-lg · 0.5rem" style={{ borderRadius: "0.5rem" }} />
@@ -23,8 +23,8 @@ export default function RaiosSombrasPage() {
       </div>
 
       <h3>Sombras</h3>
-      <div className="preview">
-        <div className="shape-grid">
+      <div className="preview preview--plain">
+        <div className="shape-grid shape-grid--row">
           <Shape
             caption="Card repouso"
             className="shadow-card-rest"
