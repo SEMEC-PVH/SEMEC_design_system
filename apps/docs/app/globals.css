@@ -143,7 +143,7 @@ a {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex-shrink: 0;
+  flex-wrap: wrap;
 }
 .cookie-banner-actions button {
   font-family: inherit;
@@ -874,9 +874,7 @@ h3[id] {
     transform: translateX(0);
   }
   .sidebar-footer {
-    display: flex;
-    justify-content: flex-end;
-    padding: 0.75rem 1rem;
+    display: none;
   }
   .header-search input {
     width: 140px;
@@ -887,9 +885,40 @@ h3[id] {
 @media (max-width: 640px) {
   .site-header .brand-title {
     font-size: var(--font-size-base);
+    white-space: normal;
   }
   .content {
     padding: 2rem 1rem 0;
+  }
+  .demo-grid-2col {
+    grid-template-columns: 1fr;
+  }
+  .type-row {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .type-row .label {
+    width: auto;
+  }
+  footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .site-footer-links {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .site-footer-links a {
+    white-space: normal;
+  }
+  .doc-nav a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 45%;
+  }
+  .section-cards {
+    gap: var(--space-4);
   }
 }
 
@@ -978,6 +1007,7 @@ h1 {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  flex-wrap: wrap;
 }
 .demo-grid-2col {
   display: grid;
@@ -1001,6 +1031,12 @@ h1 {
   justify-content: space-between;
   gap: 1rem;
   margin-top: 2rem;
+}
+.doc-nav a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 45%;
 }
 
 h2 {
@@ -1220,7 +1256,7 @@ li {
 /* Variante horizontal — para páginas com poucos swatches (ex.: cores) */
 .swatches--row {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 1.5rem;
   justify-content: center;
 }
@@ -1264,7 +1300,7 @@ li {
 /* Variante horizontal — para páginas com poucos elementos */
 .shape-grid--row {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 1.5rem;
   justify-content: center;
 }
@@ -1329,12 +1365,19 @@ li {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg, 0.5rem);
   background: var(--surface-alt);
-  padding: 1.5rem;
+  padding: 0;
   margin: 0.75rem 0;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 120px;
+  overflow: hidden;
+}
+.proto-preview-iframe {
+  width: 100%;
+  border: 0;
+  display: block;
+  background: transparent;
 }
 
 /* CodeBlock — bloco de código com header, copy button e syntax highlight */

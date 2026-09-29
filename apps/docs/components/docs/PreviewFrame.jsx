@@ -137,11 +137,11 @@ export default function PreviewFrame({ children }) {
   }, []);
 
   return (
-    <div className="proto-preview" style={{ padding: 0, overflow: "hidden" }}>
+    <div className="proto-preview">
       <iframe
         ref={iframeRef}
         title="Preview isolado"
-        style={{ width: "100%", border: 0, display: "block", background: "transparent" }}
+        className="proto-preview-iframe"
         sandbox="allow-scripts allow-same-origin"
       />
       {mountNode ? createPortal(children, mountNode) : null}

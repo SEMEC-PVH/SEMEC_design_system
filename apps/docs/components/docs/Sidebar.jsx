@@ -172,9 +172,12 @@ export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
     readCollapsed,
     serverCollapsed
   );
-  // Começa em `false` para que o primeiro render (servidor e cliente) nunca
-  // marque a sidebar como inerte — o valor real chega no efeito abaixo.
-  const [isMobile, setIsMobile] = useState(false);
+  // Começa com o valor correto baseado na viewport atual para evitar
+  // flash de hydration onde a sidebar recebe foco antes do client render.
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia(MOBILE_QUERY).matches;
+  });
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
