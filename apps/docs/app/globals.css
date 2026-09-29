@@ -739,19 +739,17 @@ a {
   gap: 2rem;
   align-items: flex-start;
 }
-.content-main:has(.toc) {
-  padding-right: 260px;
-}
+
 .content > .container:last-child {
   margin-top: auto;
 }
 
 /* ---- TOC: nesta página ---- */
 .toc {
-  position: fixed;
+  position: sticky;
   top: calc(61px + 3rem);
-  right: 5rem;
   width: 220px;
+  flex-shrink: 0;
   border: 1px solid var(--border);
   border-radius: 0.5rem;
   padding: 1rem;
@@ -759,6 +757,7 @@ a {
   scrollbar-width: thin;
   max-height: calc(100vh - 100px);
   overflow-y: auto;
+  align-self: flex-start;
 }
 .toc-title {
   font-size: var(--font-size-xs);
@@ -807,9 +806,6 @@ h3[id] {
 @media (max-width: 1120px) {
   .toc {
     display: none;
-  }
-  .content-main:has(.toc) {
-    padding-right: 0;
   }
 }
 
