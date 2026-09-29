@@ -27,7 +27,7 @@ export default function CopySkillButton() {
 
   async function handleCopy() {
     try {
-      const res = await fetch(`${basePath}/SEMEC-LITE.md`);
+      const res = await fetch(`${basePath}/SEMEC-SKILL.md`);
       const text = await res.text();
       const ok = await copyText(text);
       setState(ok ? "ok" : "fail");
@@ -35,7 +35,7 @@ export default function CopySkillButton() {
       setState("fail");
     }
     setTimeout(() => setState("idle"), 1600);
-  }
+  };
 
   return (
     <button
@@ -43,10 +43,10 @@ export default function CopySkillButton() {
       onClick={handleCopy}
       className="copy-skill-btn"
       aria-live="polite"
-      aria-label={state === "ok" ? "Skill copiada!" : state === "fail" ? "Falhou ao copiar" : "Copiar skill lite"}
+      aria-label={state === "ok" ? "Skill copiada!" : state === "fail" ? "Falhou ao copiar" : "Copiar skill completa"}
     >
       {state === "ok" ? <CheckIcon /> : <ClipboardIcon />}
-      {state === "ok" ? " Copiado!" : state === "fail" ? " Falhou" : " Copiar skill lite"}
+      {state === "ok" ? " Copiado!" : state === "fail" ? " Falhou" : " Copiar skill completa"}
     </button>
   );
 }

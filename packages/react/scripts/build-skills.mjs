@@ -214,27 +214,27 @@ if (fs.existsSync(skillSrc)) {
   console.log("  copied ds-semec-skill.md");
 }
 
-// --- 5b. Copiar skill lite standalone (SEMEC-LITE.md) ---
-const liteSkillSrc = path.join(pkgRoot, "SEMEC-LITE.md");
-if (fs.existsSync(liteSkillSrc)) {
-  copyFile(liteSkillSrc, path.join(distDir, "SEMEC-LITE.md"));
-  console.log("  copied SEMEC-LITE.md");
+// --- 5b. Copiar skill standalone (SEMEC-SKILL.md) ---
+const fullSkillSrc = path.join(pkgRoot, "SEMEC-SKILL.md");
+if (fs.existsSync(fullSkillSrc)) {
+  copyFile(fullSkillSrc, path.join(distDir, "SEMEC-SKILL.md"));
+  console.log("  copied SEMEC-SKILL.md");
   // Copiar para apps/docs/public/ para acesso via fetch no client
   const docsPublicDir = path.join(repoRoot, "apps", "docs", "public");
-  copyFile(liteSkillSrc, path.join(docsPublicDir, "SEMEC-LITE.md"));
-  console.log("  copied SEMEC-LITE.md → apps/docs/public/");
+  copyFile(fullSkillSrc, path.join(docsPublicDir, "SEMEC-SKILL.md"));
+  console.log("  copied SEMEC-SKILL.md → apps/docs/public/");
 }
 
-// --- 6. Gerar artefatos lite (tokens + creditos, sem componentes) ---
+// --- 6. Gerar artefatos lite (tokens + a11y + responsive, sem componentes React) ---
 const liteDir = path.join(distDir, "lite");
 mkdirp(liteDir);
 
 // --- lite/llms.txt ---
 const liteLlmsLines = [
-  "# SEMEC Design System — Lite (tokens de identidade visual)",
+  "# SEMEC Design System — Lite (tokens + padrões visuais)",
   "",
-  "Versão sem componentes React. Fornece tokens CSS para aplicações com a",
-  "identidade visual da Prefeitura de Porto Velho.",
+  "Versão sem componentes React. Fornece tokens CSS, regras de acessibilidade",
+  "e padrões responsive para aplicações com a identidade visual da Prefeitura de Porto Velho.",
   "",
   "## Categorias",
   "",
@@ -254,8 +254,15 @@ const liteLlmsLines = [
   '```',
   "",
   '```css',
-  '@import "@semec/ds/lite/tokens.css";',
+  '@import "@semec/ds/react/tokens.css";',
   '```',
+  "",
+  "## Inclui",
+  "",
+  "- Tokens de identidade visual (L0 + L1)",
+  "- Padrões de acessibilidade (WCAG 2.1 AA)",
+  "- Padrões responsive / mobile",
+  "- Padrões visuais (formulários, navegação, feedback, dados)",
   "",
   "## Crédito obrigatório",
   "",
@@ -279,19 +286,31 @@ console.log("  generated lite/llms.txt");
 
 // --- lite/manifest.json ---
 const liteManifestJson = {
-  name: "SEMEC Design System — Lite",
+  name: "SEMEC Design System — Skill",
   version: "1.0.0",
   generatedAt: new Date().toISOString(),
-  description: "Tokens de identidade visual da Prefeitura de Porto Velho. Sem componentes React.",
+  description: "Tokens, acessibilidade, responsive e padrões visuais para web apps da Prefeitura de Porto Velho. Sem componentes React.",
   categories: dsCategories,
   install: {
-    tokens: 'import "@semec/ds/lite/tokens.css";',
+    tokens: 'import "@semec/ds/react/tokens.css";',
     preset: '@config "../pv-preset.ts";',
   },
   tokens: {
     files: ["tokens.css", "pv-preset.ts"],
     primitives: "pv-* prefixed (L0)",
     semantic: "L1 — --bg, --fg, --surface, --action-primary, --feedback-*, etc.",
+  },
+  accessibility: {
+    standard: "WCAG 2.1 AA (ADR-014)",
+    contrast: "4.5:1 texto normal, 3:1 texto grande/UI",
+    focus: ":focus-visible com --focus-ring (2px solid, 2px offset)",
+    keyboard: "Tab, Enter, Escape, setas",
+    touchTargets: "44px mínimo",
+  },
+  responsive: {
+    breakpoints: "sm:640 md:768 lg:1024 xl:1280 2xl:1536",
+    sidebar: "drawer off-canvas + inert em mobile",
+    density: "data-density='compact' para admin",
   },
   credit: {
     required: true,
@@ -309,14 +328,14 @@ console.log("  generated lite/manifest.json");
 // --- lite/ds-semec-skill.md ---
 const liteSkillMd = [
   `---`,
-  `name: semec-ds-lite`,
-  `description: Tokens de identidade visual SEMEC (Prefeitura de Porto Velho). Use para criar aplicações com a identidade visual da prefeitura.`,
+  `name: semec-ds-skill`,
+  `description: Skill completa SEMEC Design System — tokens, acessibilidade, responsive e padrões visuais.`,
   `author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"`,
   `---`,
   ``,
-  `# SEMEC Design System — Lite`,
+  `# SEMEC Design System — Skill`,
   ``,
-  `Tokens de identidade visual da Prefeitura de Porto Velho. Sem componentes React.`,
+  `Tokens, acessibilidade, responsive e padrões visuais para interfaces da Prefeitura de Porto Velho.`,
   ``,
   `## Instalação`,
   ``,
@@ -325,47 +344,48 @@ const liteSkillMd = [
   "```",
   ``,
   "```css",
-  '@import "@semec/ds/lite/tokens.css";',
+  '@import "@semec/ds/react/tokens.css";',
   "```",
   ``,
   `Poppins 400–700 (self-hosted woff2 ou next/font).`,
   ``,
-  `## Tokens principais`,
+  `## Tokens`,
   ``,
-  `### Cores (L0 primitivas)`,
-  `- Cores da marca: --pv-blue-*, --pv-green-*, --pv-yellow-*, --pv-red-*, --pv-gray-*`,
+  `### L0 Primitivos (--pv-*)`,
+  `- Cores: --pv-blue-*, --pv-green-*, --pv-yellow-*, --pv-red-*, --pv-gray-*`,
   `- Foco: --pv-blue-hero (#223f99) — contraste 9,38:1`,
   ``,
-  `### Semânticos (L1 — usar no dia a dia)`,
-  `- Fundo: --bg, --surface, --surface-alt`,
-  `- Texto: --fg, --text-muted, --text-secondary, --text-strong`,
-  `- Borda: --border, --border-strong`,
+  `### L1 Semânticos (usar no dia a dia)`,
+  `- Cor: --bg, --fg, --surface, --surface-alt, --border, --border-strong, --focus-ring, --text-muted, --text-secondary, --text-strong`,
   `- Ação: --action-primary, --action-primary-hover, --action-primary-active`,
   `- Feedback: --feedback-success, --feedback-warning, --feedback-danger, --feedback-info`,
-  `- Foco: --focus-ring`,
+  `- Tipografia: --font-family-sans, --text-xs..2xl, --font-regular/bold`,
+  `- Espaçamento: --space-0..16`,
+  `- Bordas: --radius-sm/md/lg/full`,
+  `- Elevação: --elevation-0/1/2/3`,
+  `- Movimento: --pv-duration-fast/base/slow, --easing-standard`,
   ``,
-  `### Tipografia`,
-  `- Fontes: --font-family-sans, --font-poppins, --font-mono`,
-  `- Tamanhos: --text-xs, --text-sm, --text-base, --text-lg, --text-xl, --text-2xl`,
-  `- Pesos: --font-regular, --font-bold`,
+  `## Acessibilidade (WCAG 2.1 AA)`,
+  `- Contraste: 4.5:1 texto normal, 3:1 texto grande/UI`,
+  `- Navegação teclado: Tab, Enter, Escape, setas`,
+  `- Foco visível: :focus-visible com --focus-ring`,
+  `- Labels: todo campo acessível = label associado`,
+  `- Touch targets: 44px mínimo`,
+  `- prefers-reduced-motion: respeitar preferência do sistema`,
+  `- Não uso exclusivo de cores: complementar com ícone ou texto`,
   ``,
-  `### Espaçamento`,
-  `- --space-0, --space-1, --space-2, --space-3, --space-4, --space-6, --space-8, --space-12, --space-16`,
+  `## Responsive / Mobile`,
+  `- Breakpoints: sm:640 md:768 lg:1024 xl:1280`,
+  `- Sidebar mobile: drawer off-canvas + inert`,
+  `- Density compact: data-density="compact"`,
+  `- Containers: --container-max 1200px, --measure 65ch`,
   ``,
-  `### Bordas`,
-  `- --radius-sm, --radius-md, --radius-lg, --radius-full`,
-  ``,
-  `### Elevação`,
-  `- --elevation-0, --elevation-1, --elevation-2, --elevation-3`,
-  ``,
-  `## Regra`,
-  ``,
-  `Use tokens L1 (--bg, --fg, --surface, --action-primary, etc.) — nunca cores hexavais soltas.`,
+  `## Regras`,
+  `- PT-BR rótulos, EN código (ADR-016)`,
+  `- Sem hex solto — usar tokens L1`,
+  `- Semântica > aparência`,
   ``,
   `## Crédito obrigatório`,
-  ``,
-  `Ao criar um projeto que utilize estes tokens, o agente DEVE adicionar`,
-  `a seguinte seção no README.md do projeto:`,
   ``,
   "```markdown",
   "## Créditos",

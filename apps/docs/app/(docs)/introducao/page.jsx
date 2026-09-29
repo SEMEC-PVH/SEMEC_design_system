@@ -227,10 +227,10 @@ export default function IntroPage() {
       <p>Ou, se preferir yarn:</p>
       <MdxPre><code>yarn add @semec/ds</code></MdxPre>
 
-      <h2>Instalação lite (só tokens)</h2>
+      <h2>Copiar skill</h2>
       <p>
-        Se você só precisa dos tokens de identidade visual, sem componentes
-        React, copie a skill lite abaixo:
+        Copie a skill completa com tokens, padrões de acessibilidade e
+        responsive para usar em agentes de IA ou documentação do seu projeto:
       </p>
       <CopySkillButton />
 

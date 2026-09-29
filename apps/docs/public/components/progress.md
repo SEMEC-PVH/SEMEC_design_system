@@ -33,7 +33,6 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 /* globals.css */
 @import "tailwindcss";
 @import "./base/tokens.css";
-@import "./base/shadcn.css";
 /* ou @config "./base/pv-preset.ts" */
 ```
 
@@ -70,6 +69,7 @@ const Progress = React.forwardRef<
       "relative h-3 w-full overflow-hidden rounded-full bg-secondary",
       className
     )}
+    value={value}
     {...props}
   >
     <ProgressPrimitive.Indicator
@@ -86,7 +86,7 @@ export { Progress };
 
 ## Tokens relacionados
 
-Tokens semânticos usados: `--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`, `--color-action-primary` etc. Ver `packages/react/tokens.css` e `packages/react/shadcn.css` no dump completo (`/llms-full.txt`).
+Tokens semânticos usados: `--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`, `--color-action-primary` etc. Ver `packages/react/tokens.css` no dump completo (`/llms-full.txt`).
 
 ---
 Gerado a partir de `packages/react/manifest.js` — não edite manualmente. Conteúdo PT-BR, código EN (ADR-016).

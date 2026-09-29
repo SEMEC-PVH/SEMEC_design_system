@@ -33,7 +33,6 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 /* globals.css */
 @import "tailwindcss";
 @import "./base/tokens.css";
-@import "./base/shadcn.css";
 /* ou @config "./base/pv-preset.ts" */
 ```
 
@@ -293,6 +292,28 @@ function useToast() {
   };
 }
 
+function Toaster() {
+  const { toasts } = useToast();
+
+  return (
+    <ToastProvider>
+      {toasts.map(({ id, title, description, action, ...props }) => (
+        <Toast key={id} {...props}>
+          <div className="grid gap-1">
+            {title && <ToastTitle>{title}</ToastTitle>}
+            {description && (
+              <ToastDescription>{description}</ToastDescription>
+            )}
+          </div>
+          {action}
+          <ToastClose />
+        </Toast>
+      ))}
+      <ToastViewport />
+    </ToastProvider>
+  );
+}
+
 export {
   ToastProvider,
   ToastViewport,
@@ -301,13 +322,14 @@ export {
   ToastDescription,
   ToastClose,
   ToastAction,
+  Toaster,
   useToast,
 };
 ```
 
 ## Tokens relacionados
 
-Tokens semânticos usados: `--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`, `--color-action-primary` etc. Ver `packages/react/tokens.css` e `packages/react/shadcn.css` no dump completo (`/llms-full.txt`).
+Tokens semânticos usados: `--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`, `--color-action-primary` etc. Ver `packages/react/tokens.css` no dump completo (`/llms-full.txt`).
 
 ---
 Gerado a partir de `packages/react/manifest.js` — não edite manualmente. Conteúdo PT-BR, código EN (ADR-016).
