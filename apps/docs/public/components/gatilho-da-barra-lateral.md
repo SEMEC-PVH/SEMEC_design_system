@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { SidebarTrigger } from "semec-ds/react";
+import { SidebarTrigger } from "@semec/ds/react";
 
 <SidebarTrigger open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />
 ```
@@ -48,7 +48,7 @@ import { SidebarTrigger } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um sidebar-trigger (Gatilho da barra lateral) usando semec-ds/react (`src/components/sidebar-trigger.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
+Crie um sidebar-trigger (Gatilho da barra lateral) usando @semec/ds/react (`src/components/sidebar-trigger.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
 ```
 
 ## Fonte

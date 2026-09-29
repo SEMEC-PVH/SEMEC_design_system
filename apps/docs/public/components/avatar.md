@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Avatar, AvatarImage, AvatarFallback } from "semec-ds/react";
+import { Avatar, AvatarImage, AvatarFallback } from "@semec/ds/react";
 
 <Avatar>
   <AvatarImage src="/foto.jpg" alt="João Silva" />
@@ -51,7 +51,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um avatar (Avatar) usando semec-ds/react (`src/components/avatar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className. Foto de perfil com fallback automático (iniciais).
+Crie um avatar (Avatar) usando @semec/ds/react (`src/components/avatar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className. Foto de perfil com fallback automático (iniciais).
 ```
 
 ## Fonte

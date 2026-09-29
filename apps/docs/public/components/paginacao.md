@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Pagination } from "semec-ds/react";
+import { Pagination } from "@semec/ds/react";
 
 <Pagination page={pagina} pageCount={42} onPageChange={setPagina} />
 ```
@@ -48,7 +48,7 @@ import { Pagination } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um pagination (Paginação) usando semec-ds/react (`src/components/pagination.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: page · pageCount · onPageChange · siblingCount · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.
+Crie um pagination (Paginação) usando @semec/ds/react (`src/components/pagination.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: page · pageCount · onPageChange · siblingCount · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.
 ```
 
 ## Fonte

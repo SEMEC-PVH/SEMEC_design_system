@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from "semec-ds/react";
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from "@semec/ds/react";
 
 <AlertDialog>
   <AlertDialogTrigger asChild>
@@ -61,7 +61,7 @@ import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader,
 ## Prompt para IA
 
 ```text
-Crie um alert-dialog (Diálogo de alerta) usando semec-ds/react (`src/components/alert-dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.
+Crie um alert-dialog (Diálogo de alerta) usando @semec/ds/react (`src/components/alert-dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.
 ```
 
 ## Fonte

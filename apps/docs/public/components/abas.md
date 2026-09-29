@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "semec-ds/react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@semec/ds/react";
 
 <Tabs defaultValue="resumo">
   <TabsList>
@@ -55,7 +55,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um tabs (Abas) usando semec-ds/react (`src/components/tabs.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y: role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas). Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.
+Crie um tabs (Abas) usando @semec/ds/react (`src/components/tabs.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y: role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas). Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.
 ```
 
 ## Fonte

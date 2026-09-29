@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "semec-ds/react";
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "@semec/ds/react";
 
 <Sheet>
   <SheetTrigger asChild><Button variant="outline">Abrir filtros</Button></SheetTrigger>
@@ -60,7 +60,7 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescri
 ## Prompt para IA
 
 ```text
-Crie um sheet (Sheet) usando semec-ds/react (`src/components/sheet.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: left · right · top · bottom · composição: Sheet · Trigger · Content · Header · Footer · Title · Description · Close. Painel lateral modal com overlay. Variantes left/right/top/bottom.
+Crie um sheet (Sheet) usando @semec/ds/react (`src/components/sheet.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: left · right · top · bottom · composição: Sheet · Trigger · Content · Header · Footer · Title · Description · Close. Painel lateral modal com overlay. Variantes left/right/top/bottom.
 ```
 
 ## Fonte

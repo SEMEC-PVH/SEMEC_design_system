@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Toggle } from "semec-ds/react";
+import { Toggle } from "@semec/ds/react";
 import { Bold } from "lucide-react";
 
 <Toggle variant="outline" aria-label="Negrito">
@@ -51,7 +51,7 @@ import { Bold } from "lucide-react";
 ## Prompt para IA
 
 ```text
-Crie um toggle (Toggle) usando semec-ds/react (`src/components/toggle.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · outline · size: sm · md · lg. Botão binário para estados on/off em toolbars.
+Crie um toggle (Toggle) usando @semec/ds/react (`src/components/toggle.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · outline · size: sm · md · lg. Botão binário para estados on/off em toolbars.
 ```
 
 ## Fonte

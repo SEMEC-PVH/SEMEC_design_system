@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Slider } from "semec-ds/react";
+import { Slider } from "@semec/ds/react";
 
 <Slider defaultValue={[50]} max={100} step={1} />
 ```
@@ -47,7 +47,7 @@ import { Slider } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um slider (Slider) usando semec-ds/react (`src/components/slider.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Controle deslizante para faixas de valor.
+Crie um slider (Slider) usando @semec/ds/react (`src/components/slider.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Controle deslizante para faixas de valor.
 ```
 
 ## Fonte

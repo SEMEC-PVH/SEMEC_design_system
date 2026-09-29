@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Input } from "semec-ds/react";
+import { Input } from "@semec/ds/react";
 
 <Input placeholder="Nome completo" />
 <Input aria-invalid="true" />
@@ -48,7 +48,7 @@ import { Input } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um input (Caixa de texto) usando semec-ds/react (`src/components/input.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido (aria-invalid) · disabled. Campo de texto. Estado de erro via `aria-invalid`.
+Crie um input (Caixa de texto) usando @semec/ds/react (`src/components/input.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido (aria-invalid) · disabled. Campo de texto. Estado de erro via `aria-invalid`.
 ```
 
 ## Fonte

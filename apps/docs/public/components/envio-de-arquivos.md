@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { FileUpload } from "semec-ds/react";
+import { FileUpload } from "@semec/ds/react";
 
 <FileUpload accept=".pdf,image/*" maxSize={5 * 1024 * 1024} hint="PDF ou imagem, até 5 MB" />
 ```
@@ -47,7 +47,7 @@ import { FileUpload } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um file-upload (Envio de arquivos) usando semec-ds/react (`src/components/file-upload.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: accept · maxSize · label · hint · error · onChange. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.
+Crie um file-upload (Envio de arquivos) usando @semec/ds/react (`src/components/file-upload.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: accept · maxSize · label · hint · error · onChange. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.
 ```
 
 ## Fonte

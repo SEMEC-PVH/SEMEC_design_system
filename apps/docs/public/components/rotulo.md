@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Label, Input } from "semec-ds/react";
+import { Label, Input } from "@semec/ds/react";
 
 <Label htmlFor="nome">Nome</Label>
 <Input id="nome" />
@@ -48,7 +48,7 @@ import { Label, Input } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um label (Rótulo) usando semec-ds/react (`src/components/label.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Rótulo acessível vinculado ao campo.
+Crie um label (Rótulo) usando @semec/ds/react (`src/components/label.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Rótulo acessível vinculado ao campo.
 ```
 
 ## Fonte

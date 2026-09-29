@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, Button } from "semec-ds/react";
+import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, Button } from "@semec/ds/react";
 
 <Drawer>
   <DrawerTrigger asChild><Button>Abrir painel</Button></DrawerTrigger>
@@ -60,7 +60,7 @@ import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, Drawer
 ## Prompt para IA
 
 ```text
-Crie um drawer (Drawer) usando semec-ds/react (`src/components/drawer.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: top · bottom · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close. Painel deslizante de qualquer lado da tela.
+Crie um drawer (Drawer) usando @semec/ds/react (`src/components/drawer.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: top · bottom · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close. Painel deslizante de qualquer lado da tela.
 ```
 
 ## Fonte

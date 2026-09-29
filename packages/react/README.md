@@ -15,7 +15,6 @@ npm install @semec/ds
 ```tsx
 // 1. Importar tokens no seu CSS global
 import "@semec/ds/react/tokens.css";
-import "@semec/ds/react/shadcn.css";
 
 // 2. Usar componentes
 import { Button, Input, Card, CardHeader, CardTitle, CardContent } from "@semec/ds/react";
@@ -35,13 +34,59 @@ function App() {
 }
 ```
 
+### Toast
+
+```tsx
+import { Toaster, useToast } from "@semec/ds/react";
+
+// Adicionar Toaster no root do app
+function App() {
+  return (
+    <>
+      <MinhaPagina />
+      <Toaster />
+    </>
+  );
+}
+
+// Usar em qualquer componente
+function MeuComponente() {
+  const { toast } = useToast();
+
+  return (
+    <Button onClick={() => toast({ title: "Salvo!", description: "Dados gravados." })}>
+      Salvar
+    </Button>
+  );
+}
+```
+
+### Sheet (modal lateral)
+
+```tsx
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@semec/ds/react";
+
+function Exemplo() {
+  return (
+    <Sheet>
+      <SheetTrigger>Abrir</SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Título</SheetTitle>
+        </SheetHeader>
+        <p>Conteúdo do sheet.</p>
+      </SheetContent>
+    </Sheet>
+  );
+}
+```
+
 ## Subpath exports
 
 | Import | O que é |
 |---|---|
 | `@semec/ds/react` | Todos os componentes + `cn()` |
-| `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) |
-| `@semec/ds/react/shadcn.css` | Variáveis shadcn HSL |
+| `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) + utilitários animação |
 | `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS config) |
 | `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 (arquivo TS original) |
 | `@semec/ds/react/server` | Helpers Node.js (ex: `getComponentMetadata()`) |
@@ -68,9 +113,6 @@ function App() {
 ```css
 /* Tokens primitivos + semânticos */
 @import "@semec/ds/react/tokens.css";
-
-/* Variáveis shadcn */
-@import "@semec/ds/react/shadcn.css";
 ```
 
 Ou use o preset Tailwind v4:
@@ -79,7 +121,6 @@ Ou use o preset Tailwind v4:
 @import "tailwindcss";
 @config "@semec/ds/react/pv-preset";
 @import "@semec/ds/react/tokens.css";
-@import "@semec/ds/react/shadcn.css";
 ```
 
 ## Tema escuro

@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "semec-ds/react";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "@semec/ds/react";
 
 <Dialog>
   <DialogTrigger asChild><Button variant="destructive">Excluir</Button></DialogTrigger>
@@ -56,7 +56,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 ## Prompt para IA
 
 ```text
-Crie um dialog (Modal) usando semec-ds/react (`src/components/dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose. Diálogo modal acessível com overlay, header, título, descrição e footer.
+Crie um dialog (Modal) usando @semec/ds/react (`src/components/dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose. Diálogo modal acessível com overlay, header, título, descrição e footer.
 ```
 
 ## Fonte

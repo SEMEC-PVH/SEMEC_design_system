@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "semec-ds/react";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@semec/ds/react";
 
 <Select defaultValue="pbh">
   <SelectTrigger aria-label="Município"><SelectValue placeholder="Município" /></SelectTrigger>
@@ -53,7 +53,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "s
 ## Prompt para IA
 
 ```text
-Crie um select (Menu de seleção) usando semec-ds/react (`src/components/select.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem. Seleção fechada com gatilho, conteúdo e itens compostos.
+Crie um select (Menu de seleção) usando @semec/ds/react (`src/components/select.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem. Seleção fechada com gatilho, conteúdo e itens compostos.
 ```
 
 ## Fonte

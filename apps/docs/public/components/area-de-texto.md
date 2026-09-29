@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Textarea } from "semec-ds/react";
+import { Textarea } from "@semec/ds/react";
 
 <Textarea rows={4} placeholder="Descreva a demanda" />
 ```
@@ -47,7 +47,7 @@ import { Textarea } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um textarea (Área de texto) usando semec-ds/react (`src/components/textarea.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido · disabled. Campo multilinha com as mesmas variantes visuais do campo de texto.
+Crie um textarea (Área de texto) usando @semec/ds/react (`src/components/textarea.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido · disabled. Campo multilinha com as mesmas variantes visuais do campo de texto.
 ```
 
 ## Fonte

@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "semec-ds/react";
+import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec/ds/react";
 
 <InputOTP value={code} onChange={setCode} maxLength={6}>
   <InputOTPGroup>
@@ -60,7 +60,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "semec-
 ## Prompt para IA
 
 ```text
-Crie um input-otp (Input OTP) usando semec-ds/react (`src/components/input-otp.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled. Campo de código OTP com foco automático entre dígitos.
+Crie um input-otp (Input OTP) usando @semec/ds/react (`src/components/input-otp.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled. Campo de código OTP com foco automático entre dígitos.
 ```
 
 ## Fonte

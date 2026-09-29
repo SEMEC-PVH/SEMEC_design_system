@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { ScrollArea } from "semec-ds/react";
+import { ScrollArea } from "@semec/ds/react";
 
 <ScrollArea className="h-48">
   <div className="p-4">Conteúdo longo aqui…</div>
@@ -50,7 +50,7 @@ import { ScrollArea } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um scroll-area (Área de scroll) usando semec-ds/react (`src/components/scroll-area.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal. Scroll customizado e consistente entre navegadores.
+Crie um scroll-area (Área de scroll) usando @semec/ds/react (`src/components/scroll-area.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal. Scroll customizado e consistente entre navegadores.
 ```
 
 ## Fonte

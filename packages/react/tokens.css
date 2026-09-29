@@ -17,6 +17,64 @@
      @import "@semec/ds/react/tokens.css";
    ========================================================================= */
 
+/* =========================================================================
+   Animações — keyframes e @property (equivalente ao tw-animate-css)
+   ========================================================================= */
+
+@property --tw-animation-delay { syntax: "*"; inherits: false; initial-value: 0s; }
+@property --tw-animation-direction { syntax: "*"; inherits: false; initial-value: normal; }
+@property --tw-animation-duration { syntax: "*"; inherits: false; }
+@property --tw-animation-fill-mode { syntax: "*"; inherits: false; initial-value: none; }
+@property --tw-animation-iteration-count { syntax: "*"; inherits: false; initial-value: 1; }
+@property --tw-enter-opacity { syntax: "*"; inherits: false; initial-value: 1; }
+@property --tw-enter-rotate { syntax: "*"; inherits: false; initial-value: 0; }
+@property --tw-enter-scale { syntax: "*"; inherits: false; initial-value: 1; }
+@property --tw-enter-translate-x { syntax: "*"; inherits: false; initial-value: 0; }
+@property --tw-enter-translate-y { syntax: "*"; inherits: false; initial-value: 0; }
+@property --tw-exit-opacity { syntax: "*"; inherits: false; initial-value: 1; }
+@property --tw-exit-rotate { syntax: "*"; inherits: false; initial-value: 0; }
+@property --tw-exit-scale { syntax: "*"; inherits: false; initial-value: 1; }
+@property --tw-exit-translate-x { syntax: "*"; inherits: false; initial-value: 0; }
+@property --tw-exit-translate-y { syntax: "*"; inherits: false; initial-value: 0; }
+
+@keyframes enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0)
+      scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), var(--tw-enter-scale, 1))
+      rotate(var(--tw-enter-rotate, 0));
+  }
+}
+
+@keyframes exit {
+  to {
+    opacity: var(--tw-exit-opacity, 1);
+    transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0)
+      scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1))
+      rotate(var(--tw-exit-rotate, 0));
+  }
+}
+
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height, auto); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height, auto); }
+  to { height: 0; }
+}
+
+@keyframes collapsible-down {
+  from { height: 0; }
+  to { height: var(--radix-collapsible-content-height, auto); }
+}
+
+@keyframes collapsible-up {
+  from { height: var(--radix-collapsible-content-height, auto); }
+  to { height: 0; }
+}
+
 :root {
   /* =======================================================================
      L0 — PRIMITIVOS
@@ -206,12 +264,20 @@
   --color-destructive-foreground: var(--text-on-brand);
   --color-tint:                 var(--tint);
 
+  --color-destructive-surface: var(--feedback-danger-surface);
+  --color-primary-hover:      var(--action-primary-hover);
+  --color-primary-active:     var(--action-primary-active);
+
   --color-success:            var(--feedback-success);
   --color-success-surface:    var(--feedback-success-surface);
   --color-warning:            var(--feedback-warning);
   --color-warning-surface:    var(--feedback-warning-surface);
   --color-info:               var(--feedback-info);
   --color-info-surface:       var(--feedback-info-surface);
+
+  --color-sidebar:             var(--surface);
+  --color-sidebar-foreground:  var(--fg);
+  --color-sidebar-ring:        var(--focus-ring);
 
   /* -- Tipografia -- */
   --font-sans: var(--font-family-sans);
@@ -232,6 +298,143 @@
   --duration-base:  var(--pv-duration-base);
   --duration-slow:  var(--pv-duration-slow);
   --ease-standard:  var(--easing-standard);
+
+  /* -- Animações (tw-animate-css embutido) -- */
+  --animate-in: enter var(--tw-animation-duration, var(--tw-duration, 0.15s)) var(--tw-ease, ease) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none);
+  --animate-out: exit var(--tw-animation-duration, var(--tw-duration, 0.15s)) var(--tw-ease, ease) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none);
+  --animate-accordion-down: accordion-down var(--tw-animation-duration, var(--tw-duration, 0.2s)) var(--tw-ease, ease-out) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none);
+  --animate-accordion-up: accordion-up var(--tw-animation-duration, var(--tw-duration, 0.2s)) var(--tw-ease, ease-out) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none);
+  --animate-collapsible-down: collapsible-down var(--tw-animation-duration, var(--tw-duration, 0.2s)) var(--tw-ease, ease-out) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none);
+  --animate-collapsible-up: collapsible-up var(--tw-animation-duration, var(--tw-duration, 0.2s)) var(--tw-ease, ease-out) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none);
+}
+
+/* ==========================================================================
+   Utilitários customizados (Tailwind v4 @utility)
+   ========================================================================== */
+
+@utility duration-fast {
+  transition-duration: var(--pv-duration-fast);
+}
+
+@utility duration-base {
+  transition-duration: var(--pv-duration-base);
+}
+
+@utility duration-slow {
+  transition-duration: var(--pv-duration-slow);
+}
+
+@utility transition-base {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, filter, backdrop-filter;
+  transition-timing-function: var(--easing-standard);
+  transition-duration: var(--pv-duration-base);
+}
+
+/* -- Animações de entrada/saída -- */
+@utility fade-in {
+  --tw-enter-opacity: 0;
+}
+
+@utility fade-in-* {
+  --tw-enter-opacity: calc(--value(number) / 100);
+}
+
+@utility fade-out {
+  --tw-exit-opacity: 0;
+}
+
+@utility fade-out-* {
+  --tw-exit-opacity: calc(--value(number) / 100);
+}
+
+@utility zoom-in {
+  --tw-enter-scale: 0;
+}
+
+@utility zoom-in-* {
+  --tw-enter-scale: calc(--value(number) * 1%);
+  --tw-enter-scale: calc(--value(ratio));
+}
+
+@utility zoom-out {
+  --tw-exit-scale: 0;
+}
+
+@utility zoom-out-* {
+  --tw-exit-scale: calc(--value(number) * 1%);
+  --tw-exit-scale: calc(--value(ratio));
+}
+
+@utility slide-in-from-top {
+  --tw-enter-translate-y: -100%;
+}
+
+@utility slide-in-from-top-* {
+  --tw-enter-translate-y: calc(--value(integer) * var(--spacing) * -1);
+  --tw-enter-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+}
+
+@utility slide-in-from-bottom {
+  --tw-enter-translate-y: 100%;
+}
+
+@utility slide-in-from-bottom-* {
+  --tw-enter-translate-y: calc(--value(integer) * var(--spacing));
+  --tw-enter-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+}
+
+@utility slide-in-from-left {
+  --tw-enter-translate-x: -100%;
+}
+
+@utility slide-in-from-left-* {
+  --tw-enter-translate-x: calc(--value(integer) * var(--spacing) * -1);
+  --tw-enter-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+}
+
+@utility slide-in-from-right {
+  --tw-enter-translate-x: 100%;
+}
+
+@utility slide-in-from-right-* {
+  --tw-enter-translate-x: calc(--value(integer) * var(--spacing));
+  --tw-enter-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+}
+
+@utility slide-out-to-top {
+  --tw-exit-translate-y: -100%;
+}
+
+@utility slide-out-to-top-* {
+  --tw-exit-translate-y: calc(--value(integer) * var(--spacing) * -1);
+  --tw-exit-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+}
+
+@utility slide-out-to-bottom {
+  --tw-exit-translate-y: 100%;
+}
+
+@utility slide-out-to-bottom-* {
+  --tw-exit-translate-y: calc(--value(integer) * var(--spacing));
+  --tw-exit-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+}
+
+@utility slide-out-to-left {
+  --tw-exit-translate-x: -100%;
+}
+
+@utility slide-out-to-left-* {
+  --tw-exit-translate-x: calc(--value(integer) * var(--spacing) * -1);
+  --tw-exit-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+}
+
+@utility slide-out-to-right {
+  --tw-exit-translate-x: 100%;
+}
+
+@utility slide-out-to-right-* {
+  --tw-exit-translate-x: calc(--value(integer) * var(--spacing));
+  --tw-exit-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
 }
 
 /* ==========================================================================

@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { EmptyState, Button } from "semec-ds/react";
+import { EmptyState, Button } from "@semec/ds/react";
 import { Inbox } from "lucide-react";
 
 <EmptyState
@@ -53,7 +53,7 @@ import { Inbox } from "lucide-react";
 ## Prompt para IA
 
 ```text
-Crie um empty-state (Estado vazio) usando semec-ds/react (`src/components/empty-state.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: icon · title · description · action. Estado vazio com ícone, título, descrição e ação opcional.
+Crie um empty-state (Estado vazio) usando @semec/ds/react (`src/components/empty-state.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: icon · title · description · action. Estado vazio com ícone, título, descrição e ação opcional.
 ```
 
 ## Fonte

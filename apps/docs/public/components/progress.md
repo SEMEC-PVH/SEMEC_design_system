@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Progress } from "semec-ds/react";
+import { Progress } from "@semec/ds/react";
 
 <Progress value={60} />
 <p className="text-sm text-muted-foreground">60% concluído</p>
@@ -48,7 +48,7 @@ import { Progress } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um progress (Progresso) usando semec-ds/react (`src/components/progress.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Barra de progresso determinada.
+Crie um progress (Progresso) usando @semec/ds/react (`src/components/progress.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Barra de progresso determinada.
 ```
 
 ## Fonte
@@ -70,6 +70,7 @@ const Progress = React.forwardRef<
       className
     )}
     value={value}
+    aria-valuenow={value}
     {...props}
   >
     <ProgressPrimitive.Indicator

@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Separator } from "semec-ds/react";
+import { Separator } from "@semec/ds/react";
 
 <Separator />
 <Separator orientation="vertical" className="h-6" />
@@ -49,7 +49,7 @@ import { Separator } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um separator (Separador) usando semec-ds/react (`src/components/separator.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: orientation: horizontal · vertical · decorative: true (role=none) · false (role=separator). Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.
+Crie um separator (Separador) usando @semec/ds/react (`src/components/separator.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: orientation: horizontal · vertical · decorative: true (role=none) · false (role=separator). Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.
 ```
 
 ## Fonte

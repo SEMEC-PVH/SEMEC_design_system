@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { ToastProvider, ToastViewport, useToast } from "semec-ds/react";
+import { ToastProvider, ToastViewport, useToast } from "@semec/ds/react";
 
 function Acao() {
   const { toast } = useToast();
@@ -52,7 +52,7 @@ function Acao() {
 ## Prompt para IA
 
 ```text
-Crie um toast (Notificação) usando semec-ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem temporária com `useToast()` e viewport empilhável.
+Crie um toast (Notificação) usando @semec/ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem temporária com `useToast()` e viewport empilhável.
 ```
 
 ## Fonte

@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-09-29T16:36:29.160Z — packages/react/manifest.js + packages/react/*
+> Gerado 2026-09-29T18:13:23.551Z — packages/react/manifest.js + packages/react/*
 
 ## Instalação — packages/react/README.md
 
@@ -22,7 +22,6 @@ npm install @semec/ds
 ```tsx
 // 1. Importar tokens no seu CSS global
 import "@semec/ds/react/tokens.css";
-import "@semec/ds/react/shadcn.css";
 
 // 2. Usar componentes
 import { Button, Input, Card, CardHeader, CardTitle, CardContent } from "@semec/ds/react";
@@ -42,13 +41,59 @@ function App() {
 }
 ```
 
+### Toast
+
+```tsx
+import { Toaster, useToast } from "@semec/ds/react";
+
+// Adicionar Toaster no root do app
+function App() {
+  return (
+    <>
+      <MinhaPagina />
+      <Toaster />
+    </>
+  );
+}
+
+// Usar em qualquer componente
+function MeuComponente() {
+  const { toast } = useToast();
+
+  return (
+    <Button onClick={() => toast({ title: "Salvo!", description: "Dados gravados." })}>
+      Salvar
+    </Button>
+  );
+}
+```
+
+### Sheet (modal lateral)
+
+```tsx
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@semec/ds/react";
+
+function Exemplo() {
+  return (
+    <Sheet>
+      <SheetTrigger>Abrir</SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Título</SheetTitle>
+        </SheetHeader>
+        <p>Conteúdo do sheet.</p>
+      </SheetContent>
+    </Sheet>
+  );
+}
+```
+
 ## Subpath exports
 
 | Import | O que é |
 |---|---|
 | `@semec/ds/react` | Todos os componentes + `cn()` |
-| `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) |
-| `@semec/ds/react/shadcn.css` | Variáveis shadcn HSL |
+| `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) + utilitários animação |
 | `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS config) |
 | `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 (arquivo TS original) |
 | `@semec/ds/react/server` | Helpers Node.js (ex: `getComponentMetadata()`) |
@@ -75,9 +120,6 @@ function App() {
 ```css
 /* Tokens primitivos + semânticos */
 @import "@semec/ds/react/tokens.css";
-
-/* Variáveis shadcn */
-@import "@semec/ds/react/shadcn.css";
 ```
 
 Ou use o preset Tailwind v4:
@@ -86,7 +128,6 @@ Ou use o preset Tailwind v4:
 @import "tailwindcss";
 @config "@semec/ds/react/pv-preset";
 @import "@semec/ds/react/tokens.css";
-@import "@semec/ds/react/shadcn.css";
 ```
 
 ## Tema escuro
@@ -193,6 +234,64 @@ export * from "./lib/validators";
      @import "tailwindcss";
      @import "@semec/ds/react/tokens.css";
    ========================================================================= */
+
+/* =========================================================================
+   Animações — keyframes e @property (equivalente ao tw-animate-css)
+   ========================================================================= */
+
+@property --tw-animation-delay { syntax: "*"; inherits: false; initial-value: 0s; }
+@property --tw-animation-direction { syntax: "*"; inherits: false; initial-value: normal; }
+@property --tw-animation-duration { syntax: "*"; inherits: false; }
+@property --tw-animation-fill-mode { syntax: "*"; inherits: false; initial-value: none; }
+@property --tw-animation-iteration-count { syntax: "*"; inherits: false; initial-value: 1; }
+@property --tw-enter-opacity { syntax: "*"; inherits: false; initial-value: 1; }
+@property --tw-enter-rotate { syntax: "*"; inherits: false; initial-value: 0; }
+@property --tw-enter-scale { syntax: "*"; inherits: false; initial-value: 1; }
+@property --tw-enter-translate-x { syntax: "*"; inherits: false; initial-value: 0; }
+@property --tw-enter-translate-y { syntax: "*"; inherits: false; initial-value: 0; }
+@property --tw-exit-opacity { syntax: "*"; inherits: false; initial-value: 1; }
+@property --tw-exit-rotate { syntax: "*"; inherits: false; initial-value: 0; }
+@property --tw-exit-scale { syntax: "*"; inherits: false; initial-value: 1; }
+@property --tw-exit-translate-x { syntax: "*"; inherits: false; initial-value: 0; }
+@property --tw-exit-translate-y { syntax: "*"; inherits: false; initial-value: 0; }
+
+@keyframes enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0)
+      scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), var(--tw-enter-scale, 1))
+      rotate(var(--tw-enter-rotate, 0));
+  }
+}
+
+@keyframes exit {
+  to {
+    opacity: var(--tw-exit-opacity, 1);
+    transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0)
+      scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1))
+      rotate(var(--tw-exit-rotate, 0));
+  }
+}
+
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height, auto); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height, auto); }
+  to { height: 0; }
+}
+
+@keyframes collapsible-down {
+  from { height: 0; }
+  to { height: var(--radix-collapsible-content-height, auto); }
+}
+
+@keyframes collapsible-up {
+  from { height: var(--radix-collapsible-content-height, auto); }
+  to { height: 0; }
+}
 
 :root {
   /* =======================================================================
@@ -383,12 +482,20 @@ export * from "./lib/validators";
   --color-destructive-foreground: var(--text-on-brand);
   --color-tint:                 var(--tint);
 
+  --color-destructive-surface: var(--feedback-danger-surface);
+  --color-primary-hover:      var(--action-primary-hover);
+  --color-primary-active:     var(--action-primary-active);
+
   --color-success:            var(--feedback-success);
   --color-success-surface:    var(--feedback-success-surface);
   --color-warning:            var(--feedback-warning);
   --color-warning-surface:    var(--feedback-warning-surface);
   --color-info:               var(--feedback-info);
   --color-info-surface:       var(--feedback-info-surface);
+
+  --color-sidebar:             var(--surface);
+  --color-sidebar-foreground:  var(--fg);
+  --color-sidebar-ring:        var(--focus-ring);
 
   /* -- Tipografia -- */
   --font-sans: var(--font-family-sans);
@@ -409,6 +516,143 @@ export * from "./lib/validators";
   --duration-base:  var(--pv-duration-base);
   --duration-slow:  var(--pv-duration-slow);
   --ease-standard:  var(--easing-standard);
+
+  /* -- Animações (tw-animate-css embutido) -- */
+  --animate-in: enter var(--tw-animation-duration, var(--tw-duration, 0.15s)) var(--tw-ease, ease) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none);
+  --animate-out: exit var(--tw-animation-duration, var(--tw-duration, 0.15s)) var(--tw-ease, ease) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none);
+  --animate-accordion-down: accordion-down var(--tw-animation-duration, var(--tw-duration, 0.2s)) var(--tw-ease, ease-out) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none);
+  --animate-accordion-up: accordion-up var(--tw-animation-duration, var(--tw-duration, 0.2s)) var(--tw-ease, ease-out) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none);
+  --animate-collapsible-down: collapsible-down var(--tw-animation-duration, var(--tw-duration, 0.2s)) var(--tw-ease, ease-out) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none);
+  --animate-collapsible-up: collapsible-up var(--tw-animation-duration, var(--tw-duration, 0.2s)) var(--tw-ease, ease-out) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none);
+}
+
+/* ==========================================================================
+   Utilitários customizados (Tailwind v4 @utility)
+   ========================================================================== */
+
+@utility duration-fast {
+  transition-duration: var(--pv-duration-fast);
+}
+
+@utility duration-base {
+  transition-duration: var(--pv-duration-base);
+}
+
+@utility duration-slow {
+  transition-duration: var(--pv-duration-slow);
+}
+
+@utility transition-base {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, filter, backdrop-filter;
+  transition-timing-function: var(--easing-standard);
+  transition-duration: var(--pv-duration-base);
+}
+
+/* -- Animações de entrada/saída -- */
+@utility fade-in {
+  --tw-enter-opacity: 0;
+}
+
+@utility fade-in-* {
+  --tw-enter-opacity: calc(--value(number) / 100);
+}
+
+@utility fade-out {
+  --tw-exit-opacity: 0;
+}
+
+@utility fade-out-* {
+  --tw-exit-opacity: calc(--value(number) / 100);
+}
+
+@utility zoom-in {
+  --tw-enter-scale: 0;
+}
+
+@utility zoom-in-* {
+  --tw-enter-scale: calc(--value(number) * 1%);
+  --tw-enter-scale: calc(--value(ratio));
+}
+
+@utility zoom-out {
+  --tw-exit-scale: 0;
+}
+
+@utility zoom-out-* {
+  --tw-exit-scale: calc(--value(number) * 1%);
+  --tw-exit-scale: calc(--value(ratio));
+}
+
+@utility slide-in-from-top {
+  --tw-enter-translate-y: -100%;
+}
+
+@utility slide-in-from-top-* {
+  --tw-enter-translate-y: calc(--value(integer) * var(--spacing) * -1);
+  --tw-enter-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+}
+
+@utility slide-in-from-bottom {
+  --tw-enter-translate-y: 100%;
+}
+
+@utility slide-in-from-bottom-* {
+  --tw-enter-translate-y: calc(--value(integer) * var(--spacing));
+  --tw-enter-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+}
+
+@utility slide-in-from-left {
+  --tw-enter-translate-x: -100%;
+}
+
+@utility slide-in-from-left-* {
+  --tw-enter-translate-x: calc(--value(integer) * var(--spacing) * -1);
+  --tw-enter-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+}
+
+@utility slide-in-from-right {
+  --tw-enter-translate-x: 100%;
+}
+
+@utility slide-in-from-right-* {
+  --tw-enter-translate-x: calc(--value(integer) * var(--spacing));
+  --tw-enter-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+}
+
+@utility slide-out-to-top {
+  --tw-exit-translate-y: -100%;
+}
+
+@utility slide-out-to-top-* {
+  --tw-exit-translate-y: calc(--value(integer) * var(--spacing) * -1);
+  --tw-exit-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+}
+
+@utility slide-out-to-bottom {
+  --tw-exit-translate-y: 100%;
+}
+
+@utility slide-out-to-bottom-* {
+  --tw-exit-translate-y: calc(--value(integer) * var(--spacing));
+  --tw-exit-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+}
+
+@utility slide-out-to-left {
+  --tw-exit-translate-x: -100%;
+}
+
+@utility slide-out-to-left-* {
+  --tw-exit-translate-x: calc(--value(integer) * var(--spacing) * -1);
+  --tw-exit-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+}
+
+@utility slide-out-to-right {
+  --tw-exit-translate-x: 100%;
+}
+
+@utility slide-out-to-right-* {
+  --tw-exit-translate-x: calc(--value(integer) * var(--spacing));
+  --tw-exit-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
 }
 
 /* ==========================================================================
@@ -637,7 +881,7 @@ Variantes: variant: primary · secondary · outline · ghost · destructive · l
 
 Uso:
 ```tsx
-import { Button } from "semec-ds/react";
+import { Button } from "@semec/ds/react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
@@ -656,7 +900,7 @@ import { Plus } from "lucide-react";
 
 Prompt:
 ```text
-Crie um button (Botões) usando semec-ds/react (`src/components/button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link · size: sm · md · lg · icon. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.
+Crie um button (Botões) usando @semec/ds/react (`src/components/button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link · size: sm · md · lg · icon. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.
 ```
 
 Fonte:
@@ -730,7 +974,7 @@ Variantes: variant: primary · secondary · outline · ghost · destructive · l
 
 Uso:
 ```tsx
-import { IconButton } from "semec-ds/react";
+import { IconButton } from "@semec/ds/react";
 import { Download, Search, Trash2 } from "lucide-react";
 
 <IconButton label="Buscar requerimento"><Search /></IconButton>
@@ -740,7 +984,7 @@ import { Download, Search, Trash2 } from "lucide-react";
 
 Prompt:
 ```text
-Crie um icon-button (Botão de ícone) usando semec-ds/react (`src/components/icon-button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).
+Crie um icon-button (Botão de ícone) usando @semec/ds/react (`src/components/icon-button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).
 ```
 
 Fonte:
@@ -803,7 +1047,7 @@ Variantes: variant: primary · onSurface · muted
 
 Uso:
 ```tsx
-import { Link } from "semec-ds/react";
+import { Link } from "@semec/ds/react";
 
 <Link href="/iptu">Acessar guia do IPTU 2026</Link>
 <Link href="/protocolo" variant="onSurface">Acompanhar protocolo</Link>
@@ -812,7 +1056,7 @@ import { Link } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um link (Link) usando semec-ds/react (`src/components/link.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · onSurface · muted. Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.
+Crie um link (Link) usando @semec/ds/react (`src/components/link.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · onSurface · muted. Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.
 ```
 
 Fonte:
@@ -866,7 +1110,7 @@ Variantes: estados: padrão · inválido (aria-invalid) · disabled
 
 Uso:
 ```tsx
-import { Input } from "semec-ds/react";
+import { Input } from "@semec/ds/react";
 
 <Input placeholder="Nome completo" />
 <Input aria-invalid="true" />
@@ -874,7 +1118,7 @@ import { Input } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um input (Caixa de texto) usando semec-ds/react (`src/components/input.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido (aria-invalid) · disabled. Campo de texto. Estado de erro via `aria-invalid`.
+Crie um input (Caixa de texto) usando @semec/ds/react (`src/components/input.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido (aria-invalid) · disabled. Campo de texto. Estado de erro via `aria-invalid`.
 ```
 
 Fonte:
@@ -911,14 +1155,14 @@ Variantes: estados: padrão · inválido · disabled
 
 Uso:
 ```tsx
-import { Textarea } from "semec-ds/react";
+import { Textarea } from "@semec/ds/react";
 
 <Textarea rows={4} placeholder="Descreva a demanda" />
 ```
 
 Prompt:
 ```text
-Crie um textarea (Área de texto) usando semec-ds/react (`src/components/textarea.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido · disabled. Campo multilinha com as mesmas variantes visuais do campo de texto.
+Crie um textarea (Área de texto) usando @semec/ds/react (`src/components/textarea.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido · disabled. Campo multilinha com as mesmas variantes visuais do campo de texto.
 ```
 
 Fonte:
@@ -955,7 +1199,7 @@ Variantes: composição: Select · SelectTrigger · SelectValue · SelectContent
 
 Uso:
 ```tsx
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "semec-ds/react";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@semec/ds/react";
 
 <Select defaultValue="pbh">
   <SelectTrigger aria-label="Município"><SelectValue placeholder="Município" /></SelectTrigger>
@@ -968,7 +1212,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "s
 
 Prompt:
 ```text
-Crie um select (Menu de seleção) usando semec-ds/react (`src/components/select.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem. Seleção fechada com gatilho, conteúdo e itens compostos.
+Crie um select (Menu de seleção) usando @semec/ds/react (`src/components/select.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem. Seleção fechada com gatilho, conteúdo e itens compostos.
 ```
 
 Fonte:
@@ -1135,7 +1379,7 @@ Variantes: props: options · value · onChange · placeholder · emptyMessage ·
 
 Uso:
 ```tsx
-import { Combobox } from "semec-ds/react";
+import { Combobox } from "@semec/ds/react";
 
 <Combobox
   options={[{ value: "cnpj", label: "CNPJ" }, { value: "cpf", label: "CPF" }]}
@@ -1146,7 +1390,7 @@ import { Combobox } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um combobox (Combobox) usando semec-ds/react (`src/components/combobox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: options · value · onChange · placeholder · emptyMessage · disabled. Campo com busca e lista filtrada. Opções via `options`.
+Crie um combobox (Combobox) usando @semec/ds/react (`src/components/combobox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: options · value · onChange · placeholder · emptyMessage · disabled. Campo com busca e lista filtrada. Opções via `options`.
 ```
 
 Fonte:
@@ -1286,14 +1530,14 @@ Variantes: props: nativo HTML (min · max · disabled) + variantes visuais do ca
 
 Uso:
 ```tsx
-import { DatePicker } from "semec-ds/react";
+import { DatePicker } from "@semec/ds/react";
 
 <DatePicker defaultValue="2026-08-31" />
 ```
 
 Prompt:
 ```text
-Crie um date-picker (Seletor de data) usando semec-ds/react (`src/components/date-picker.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: nativo HTML (min · max · disabled) + variantes visuais do campo. Data com `<input type="date">` nativo — sem biblioteca de calendário.
+Crie um date-picker (Seletor de data) usando @semec/ds/react (`src/components/date-picker.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: nativo HTML (min · max · disabled) + variantes visuais do campo. Data com `<input type="date">` nativo — sem biblioteca de calendário.
 ```
 
 Fonte:
@@ -1350,14 +1594,14 @@ Variantes: props: accept · maxSize · label · hint · error · onChange
 
 Uso:
 ```tsx
-import { FileUpload } from "semec-ds/react";
+import { FileUpload } from "@semec/ds/react";
 
 <FileUpload accept=".pdf,image/*" maxSize={5 * 1024 * 1024} hint="PDF ou imagem, até 5 MB" />
 ```
 
 Prompt:
 ```text
-Crie um file-upload (Envio de arquivos) usando semec-ds/react (`src/components/file-upload.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: accept · maxSize · label · hint · error · onChange. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.
+Crie um file-upload (Envio de arquivos) usando @semec/ds/react (`src/components/file-upload.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: accept · maxSize · label · hint · error · onChange. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.
 ```
 
 Fonte:
@@ -1497,7 +1741,7 @@ Variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled
 
 Uso:
 ```tsx
-import { Checkbox, Label } from "semec-ds/react";
+import { Checkbox, Label } from "@semec/ds/react";
 
 <div className="flex items-center gap-2">
   <Checkbox id="termos" />
@@ -1507,7 +1751,7 @@ import { Checkbox, Label } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um checkbox (Caixa de marcação) usando semec-ds/react (`src/components/checkbox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled. Caixa de marcação com estado indeterminado.
+Crie um checkbox (Caixa de marcação) usando @semec/ds/react (`src/components/checkbox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled. Caixa de marcação com estado indeterminado.
 ```
 
 Fonte:
@@ -1552,7 +1796,7 @@ Variantes: composição: RadioGroup · RadioGroupItem + Label
 
 Uso:
 ```tsx
-import { RadioGroup, RadioGroupItem, Label } from "semec-ds/react";
+import { RadioGroup, RadioGroupItem, Label } from "@semec/ds/react";
 
 <RadioGroup defaultValue="pessoa-fisica">
   <div className="flex items-center gap-2">
@@ -1564,7 +1808,7 @@ import { RadioGroup, RadioGroupItem, Label } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um radio-group (Botão de opção) usando semec-ds/react (`src/components/radio-group.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: RadioGroup · RadioGroupItem + Label. Escolha única entre duas ou mais opções.
+Crie um radio-group (Botão de opção) usando @semec/ds/react (`src/components/radio-group.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: RadioGroup · RadioGroupItem + Label. Escolha única entre duas ou mais opções.
 ```
 
 Fonte:
@@ -1623,7 +1867,7 @@ Variantes: estados: off · on (checked) · disabled · inválido
 
 Uso:
 ```tsx
-import { Switch, Label } from "semec-ds/react";
+import { Switch, Label } from "@semec/ds/react";
 
 <div className="flex items-center gap-2">
   <Switch id="alertas" defaultChecked />
@@ -1633,7 +1877,7 @@ import { Switch, Label } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um switch (Interruptor) usando semec-ds/react (`src/components/switch.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: off · on (checked) · disabled · inválido. Interruptor on/off para ativação imediata.
+Crie um switch (Interruptor) usando @semec/ds/react (`src/components/switch.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: off · on (checked) · disabled · inválido. Interruptor on/off para ativação imediata.
 ```
 
 Fonte:
@@ -1675,7 +1919,7 @@ Desc: Rótulo acessível vinculado ao campo.
 
 Uso:
 ```tsx
-import { Label, Input } from "semec-ds/react";
+import { Label, Input } from "@semec/ds/react";
 
 <Label htmlFor="nome">Nome</Label>
 <Input id="nome" />
@@ -1683,7 +1927,7 @@ import { Label, Input } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um label (Rótulo) usando semec-ds/react (`src/components/label.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Rótulo acessível vinculado ao campo.
+Crie um label (Rótulo) usando @semec/ds/react (`src/components/label.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Rótulo acessível vinculado ao campo.
 ```
 
 Fonte:
@@ -1721,7 +1965,7 @@ Variantes: props: label · htmlFor · required · hint · error
 
 Uso:
 ```tsx
-import { FormField, Input } from "semec-ds/react";
+import { FormField, Input } from "@semec/ds/react";
 
 <FormField label="E-mail" htmlFor="email" required hint="Usado para o comprovante" error="Informe um e-mail válido">
   <Input id="email" aria-invalid />
@@ -1730,7 +1974,7 @@ import { FormField, Input } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um form-field (Campo de formulário) usando semec-ds/react (`src/components/form-field.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: label · htmlFor · required · hint · error. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.
+Crie um form-field (Campo de formulário) usando @semec/ds/react (`src/components/form-field.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: label · htmlFor · required · hint · error. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.
 ```
 
 Fonte:
@@ -1793,7 +2037,7 @@ Variantes: props: title · errors [{ id, message }] · autoFocus · focusKey
 
 Uso:
 ```tsx
-import { ErrorSummary } from "semec-ds/react";
+import { ErrorSummary } from "@semec/ds/react";
 
 <ErrorSummary
   errors={[
@@ -1806,7 +2050,7 @@ import { ErrorSummary } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um error-summary (ErrorSummary) usando semec-ds/react (`src/components/error-summary.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: title · errors [{ id, message }] · autoFocus · focusKey. Resumo de erros de validação no topo do formulário, com links para cada campo. A11y: `role="alert"`, foco automático.
+Crie um error-summary (ErrorSummary) usando @semec/ds/react (`src/components/error-summary.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: title · errors [{ id, message }] · autoFocus · focusKey. Resumo de erros de validação no topo do formulário, com links para cada campo. A11y: `role="alert"`, foco automático.
 ```
 
 Fonte:
@@ -1914,7 +2158,7 @@ Variantes: composição: Card · CardHeader · CardTitle · CardDescription · C
 
 Uso:
 ```tsx
-import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "semec-ds/react";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@semec/ds/react";
 
 <Card>
   <CardHeader><CardTitle>IPTU 2026</CardTitle></CardHeader>
@@ -1925,7 +2169,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "se
 
 Prompt:
 ```text
-Crie um card (Cartão) usando semec-ds/react (`src/components/card.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter. Superfície de conteúdo com header, corpo e footer.
+Crie um card (Cartão) usando @semec/ds/react (`src/components/card.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter. Superfície de conteúdo com header, corpo e footer.
 ```
 
 Fonte:
@@ -2018,7 +2262,7 @@ Variantes: variant: default · secondary · outline · success · warning · dan
 
 Uso:
 ```tsx
-import { Badge } from "semec-ds/react";
+import { Badge } from "@semec/ds/react";
 
 <Badge>Pendente</Badge>
 <Badge variant="success">Deferido</Badge>
@@ -2027,7 +2271,7 @@ import { Badge } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um badge (Etiqueta) usando semec-ds/react (`src/components/badge.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · secondary · outline · success · warning · danger · info. Etiqueta curta de status ou contagem.
+Crie um badge (Etiqueta) usando @semec/ds/react (`src/components/badge.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · secondary · outline · success · warning · danger · info. Etiqueta curta de status ou contagem.
 ```
 
 Fonte:
@@ -2080,7 +2324,7 @@ Variantes: composição: Table · TableHeader · TableRow · TableHead · TableB
 
 Uso:
 ```tsx
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "semec-ds/react";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/ds/react";
 
 // Básico
 <Table>
@@ -2094,7 +2338,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "s
 
 Prompt:
 ```text
-Crie um table (Tabela) usando semec-ds/react (`src/components/table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
+Crie um table (Tabela) usando @semec/ds/react (`src/components/table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
 ```
 
 Fonte:
@@ -2225,7 +2469,7 @@ Desc: Placeholder pulsante de carregamento.
 
 Uso:
 ```tsx
-import { Skeleton } from "semec-ds/react";
+import { Skeleton } from "@semec/ds/react";
 
 <Skeleton className="h-4 w-[250px]" />
 <Skeleton className="h-4 w-[180px]" />
@@ -2233,7 +2477,7 @@ import { Skeleton } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um skeleton (Esqueleto) usando semec-ds/react (`src/components/skeleton.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Placeholder pulsante de carregamento.
+Crie um skeleton (Esqueleto) usando @semec/ds/react (`src/components/skeleton.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Placeholder pulsante de carregamento.
 ```
 
 Fonte:
@@ -2265,7 +2509,7 @@ Variantes: props: icon · title · description · action
 
 Uso:
 ```tsx
-import { EmptyState, Button } from "semec-ds/react";
+import { EmptyState, Button } from "@semec/ds/react";
 import { Inbox } from "lucide-react";
 
 <EmptyState
@@ -2278,7 +2522,7 @@ import { Inbox } from "lucide-react";
 
 Prompt:
 ```text
-Crie um empty-state (Estado vazio) usando semec-ds/react (`src/components/empty-state.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: icon · title · description · action. Estado vazio com ícone, título, descrição e ação opcional.
+Crie um empty-state (Estado vazio) usando @semec/ds/react (`src/components/empty-state.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: icon · title · description · action. Estado vazio com ícone, título, descrição e ação opcional.
 ```
 
 Fonte:
@@ -2334,7 +2578,7 @@ Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navega
 
 Uso:
 ```tsx
-import { Breadcrumb } from "semec-ds/react";
+import { Breadcrumb } from "@semec/ds/react";
 
 <Breadcrumb items={[
   { label: "Início", href: "/" },
@@ -2345,7 +2589,7 @@ import { Breadcrumb } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um breadcrumb (Trilha de navegação) usando semec-ds/react (`src/components/breadcrumb.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores. Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
+Crie um breadcrumb (Trilha de navegação) usando @semec/ds/react (`src/components/breadcrumb.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores. Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
 ```
 
 Fonte:
@@ -2412,7 +2656,7 @@ Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y:
 
 Uso:
 ```tsx
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "semec-ds/react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@semec/ds/react";
 
 <Tabs defaultValue="resumo">
   <TabsList>
@@ -2426,7 +2670,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um tabs (Abas) usando semec-ds/react (`src/components/tabs.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y: role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas). Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.
+Crie um tabs (Abas) usando @semec/ds/react (`src/components/tabs.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y: role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas). Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.
 ```
 
 Fonte:
@@ -2496,14 +2740,14 @@ Variantes: props: page · pageCount · onPageChange · siblingCount · a11y: rol
 
 Uso:
 ```tsx
-import { Pagination } from "semec-ds/react";
+import { Pagination } from "@semec/ds/react";
 
 <Pagination page={pagina} pageCount={42} onPageChange={setPagina} />
 ```
 
 Prompt:
 ```text
-Crie um pagination (Paginação) usando semec-ds/react (`src/components/pagination.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: page · pageCount · onPageChange · siblingCount · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.
+Crie um pagination (Paginação) usando @semec/ds/react (`src/components/pagination.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: page · pageCount · onPageChange · siblingCount · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.
 ```
 
 Fonte:
@@ -2623,14 +2867,14 @@ Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-exp
 
 Uso:
 ```tsx
-import { SidebarTrigger } from "semec-ds/react";
+import { SidebarTrigger } from "@semec/ds/react";
 
 <SidebarTrigger open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />
 ```
 
 Prompt:
 ```text
-Crie um sidebar-trigger (Gatilho da barra lateral) usando semec-ds/react (`src/components/sidebar-trigger.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
+Crie um sidebar-trigger (Gatilho da barra lateral) usando @semec/ds/react (`src/components/sidebar-trigger.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
 ```
 
 Fonte:
@@ -2740,7 +2984,7 @@ Variantes: composição: Dialog · DialogTrigger · DialogContent · DialogHeade
 
 Uso:
 ```tsx
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "semec-ds/react";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "@semec/ds/react";
 
 <Dialog>
   <DialogTrigger asChild><Button variant="destructive">Excluir</Button></DialogTrigger>
@@ -2756,7 +3000,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 
 Prompt:
 ```text
-Crie um dialog (Modal) usando semec-ds/react (`src/components/dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose. Diálogo modal acessível com overlay, header, título, descrição e footer.
+Crie um dialog (Modal) usando @semec/ds/react (`src/components/dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose. Diálogo modal acessível com overlay, header, título, descrição e footer.
 ```
 
 Fonte:
@@ -2884,7 +3128,7 @@ Variantes: variant: default · success · warning · destructive
 
 Uso:
 ```tsx
-import { ToastProvider, ToastViewport, useToast } from "semec-ds/react";
+import { ToastProvider, ToastViewport, useToast } from "@semec/ds/react";
 
 function Acao() {
   const { toast } = useToast();
@@ -2896,7 +3140,7 @@ function Acao() {
 
 Prompt:
 ```text
-Crie um toast (Notificação) usando semec-ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem temporária com `useToast()` e viewport empilhável.
+Crie um toast (Notificação) usando @semec/ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem temporária com `useToast()` e viewport empilhável.
 ```
 
 Fonte:
@@ -3180,7 +3424,7 @@ Variantes: composição: TooltipProvider · Tooltip · TooltipTrigger · Tooltip
 
 Uso:
 ```tsx
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } from "semec-ds/react";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } from "@semec/ds/react";
 
 <TooltipProvider>
   <Tooltip>
@@ -3192,7 +3436,7 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } 
 
 Prompt:
 ```text
-Crie um tooltip (Dica) usando semec-ds/react (`src/components/tooltip.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: TooltipProvider · Tooltip · TooltipTrigger · TooltipContent. Dica curta ao passar o ponteiro ou focar o elemento.
+Crie um tooltip (Dica) usando @semec/ds/react (`src/components/tooltip.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: TooltipProvider · Tooltip · TooltipTrigger · TooltipContent. Dica curta ao passar o ponteiro ou focar o elemento.
 ```
 
 Fonte:
@@ -3239,7 +3483,7 @@ Variantes: variant: default · success · warning · destructive
 
 Uso:
 ```tsx
-import { Alert, AlertTitle, AlertDescription } from "semec-ds/react";
+import { Alert, AlertTitle, AlertDescription } from "@semec/ds/react";
 
 <Alert variant="warning">
   <AlertTitle>Carnê indisponível</AlertTitle>
@@ -3249,7 +3493,7 @@ import { Alert, AlertTitle, AlertDescription } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um alert (Aviso) usando semec-ds/react (`src/components/alert.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem de feedback em linha, com ícone automático por variante.
+Crie um alert (Aviso) usando @semec/ds/react (`src/components/alert.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem de feedback em linha, com ícone automático por variante.
 ```
 
 Fonte:
@@ -3346,7 +3590,7 @@ Variantes: type: single · multiple · composição: Accordion · AccordionItem 
 
 Uso:
 ```tsx
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "semec-ds/react";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@semec/ds/react";
 
 <Accordion type="single" collapsible>
   <AccordionItem value="item-1">
@@ -3358,7 +3602,7 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "se
 
 Prompt:
 ```text
-Crie um accordion (Acordeão) usando semec-ds/react (`src/components/accordion.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: type: single · multiple · composição: Accordion · AccordionItem · AccordionTrigger · AccordionContent. Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`).
+Crie um accordion (Acordeão) usando @semec/ds/react (`src/components/accordion.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: type: single · multiple · composição: Accordion · AccordionItem · AccordionTrigger · AccordionContent. Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`).
 ```
 
 Fonte:
@@ -3431,7 +3675,7 @@ Variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent
 
 Uso:
 ```tsx
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from "semec-ds/react";
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from "@semec/ds/react";
 
 <AlertDialog>
   <AlertDialogTrigger asChild>
@@ -3452,7 +3696,7 @@ import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader,
 
 Prompt:
 ```text
-Crie um alert-dialog (Diálogo de alerta) usando semec-ds/react (`src/components/alert-dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.
+Crie um alert-dialog (Diálogo de alerta) usando @semec/ds/react (`src/components/alert-dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.
 ```
 
 Fonte:
@@ -3605,7 +3849,7 @@ Variantes: composição: Popover · PopoverTrigger · PopoverContent · PopoverA
 
 Uso:
 ```tsx
-import { Popover, PopoverTrigger, PopoverContent, Button } from "semec-ds/react";
+import { Popover, PopoverTrigger, PopoverContent, Button } from "@semec/ds/react";
 
 <Popover>
   <PopoverTrigger asChild>
@@ -3619,7 +3863,7 @@ import { Popover, PopoverTrigger, PopoverContent, Button } from "semec-ds/react"
 
 Prompt:
 ```text
-Crie um popover (Popover) usando semec-ds/react (`src/components/popover.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Popover · PopoverTrigger · PopoverContent · PopoverAnchor · props: sideOffset · align · side (top/right/bottom/left). Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.
+Crie um popover (Popover) usando @semec/ds/react (`src/components/popover.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Popover · PopoverTrigger · PopoverContent · PopoverAnchor · props: sideOffset · align · side (top/right/bottom/left). Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.
 ```
 
 Fonte:
@@ -3668,7 +3912,7 @@ Variantes: orientation: horizontal · vertical · decorative: true (role=none) �
 
 Uso:
 ```tsx
-import { Separator } from "semec-ds/react";
+import { Separator } from "@semec/ds/react";
 
 <Separator />
 <Separator orientation="vertical" className="h-6" />
@@ -3676,7 +3920,7 @@ import { Separator } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um separator (Separador) usando semec-ds/react (`src/components/separator.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: orientation: horizontal · vertical · decorative: true (role=none) · false (role=separator). Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.
+Crie um separator (Separador) usando @semec/ds/react (`src/components/separator.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: orientation: horizontal · vertical · decorative: true (role=none) · false (role=separator). Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.
 ```
 
 Fonte:
@@ -3721,7 +3965,7 @@ Variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-
 
 Uso:
 ```tsx
-import { Avatar, AvatarImage, AvatarFallback } from "semec-ds/react";
+import { Avatar, AvatarImage, AvatarFallback } from "@semec/ds/react";
 
 <Avatar>
   <AvatarImage src="/foto.jpg" alt="João Silva" />
@@ -3731,7 +3975,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um avatar (Avatar) usando semec-ds/react (`src/components/avatar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className. Foto de perfil com fallback automático (iniciais).
+Crie um avatar (Avatar) usando @semec/ds/react (`src/components/avatar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className. Foto de perfil com fallback automático (iniciais).
 ```
 
 Fonte:
@@ -3797,7 +4041,7 @@ Variantes: variant: default · outline · size: sm · md · lg
 
 Uso:
 ```tsx
-import { Toggle } from "semec-ds/react";
+import { Toggle } from "@semec/ds/react";
 import { Bold } from "lucide-react";
 
 <Toggle variant="outline" aria-label="Negrito">
@@ -3807,7 +4051,7 @@ import { Bold } from "lucide-react";
 
 Prompt:
 ```text
-Crie um toggle (Toggle) usando semec-ds/react (`src/components/toggle.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · outline · size: sm · md · lg. Botão binário para estados on/off em toolbars.
+Crie um toggle (Toggle) usando @semec/ds/react (`src/components/toggle.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · outline · size: sm · md · lg. Botão binário para estados on/off em toolbars.
 ```
 
 Fonte:
@@ -3868,7 +4112,7 @@ Desc: Indicador de carregamento inline.
 
 Uso:
 ```tsx
-import { Spinner } from "semec-ds/react";
+import { Spinner } from "@semec/ds/react";
 
 <Spinner />
 <p className="text-muted-foreground">Carregando dados…</p>
@@ -3876,7 +4120,7 @@ import { Spinner } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um spinner (Spinner) usando semec-ds/react (`src/components/spinner.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Indicador de carregamento inline.
+Crie um spinner (Spinner) usando @semec/ds/react (`src/components/spinner.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Indicador de carregamento inline.
 ```
 
 Fonte:
@@ -3934,7 +4178,7 @@ Desc: Barra de progresso determinada.
 
 Uso:
 ```tsx
-import { Progress } from "semec-ds/react";
+import { Progress } from "@semec/ds/react";
 
 <Progress value={60} />
 <p className="text-sm text-muted-foreground">60% concluído</p>
@@ -3942,7 +4186,7 @@ import { Progress } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um progress (Progresso) usando semec-ds/react (`src/components/progress.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Barra de progresso determinada.
+Crie um progress (Progresso) usando @semec/ds/react (`src/components/progress.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Barra de progresso determinada.
 ```
 
 Fonte:
@@ -3963,6 +4207,7 @@ const Progress = React.forwardRef<
       className
     )}
     value={value}
+    aria-valuenow={value}
     {...props}
   >
     <ProgressPrimitive.Indicator
@@ -3985,14 +4230,14 @@ Desc: Controle deslizante para faixas de valor.
 
 Uso:
 ```tsx
-import { Slider } from "semec-ds/react";
+import { Slider } from "@semec/ds/react";
 
 <Slider defaultValue={[50]} max={100} step={1} />
 ```
 
 Prompt:
 ```text
-Crie um slider (Slider) usando semec-ds/react (`src/components/slider.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Controle deslizante para faixas de valor.
+Crie um slider (Slider) usando @semec/ds/react (`src/components/slider.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Controle deslizante para faixas de valor.
 ```
 
 Fonte:
@@ -4036,7 +4281,7 @@ Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSe
 
 Uso:
 ```tsx
-import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "semec-ds/react";
+import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec/ds/react";
 
 <InputOTP value={code} onChange={setCode} maxLength={6}>
   <InputOTPGroup>
@@ -4055,7 +4300,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "semec-
 
 Prompt:
 ```text
-Crie um input-otp (Input OTP) usando semec-ds/react (`src/components/input-otp.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled. Campo de código OTP com foco automático entre dígitos.
+Crie um input-otp (Input OTP) usando @semec/ds/react (`src/components/input-otp.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled. Campo de código OTP com foco automático entre dígitos.
 ```
 
 Fonte:
@@ -4268,14 +4513,14 @@ Variantes: props: value · onChange · min · max · disabled
 
 Uso:
 ```tsx
-import { Calendar } from "semec-ds/react";
+import { Calendar } from "@semec/ds/react";
 
 <Calendar value={data} onChange={setData} />
 ```
 
 Prompt:
 ```text
-Crie um calendar (Calendário) usando semec-ds/react (`src/components/calendar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: value · onChange · min · max · disabled. Calendário visual para seleção de data.
+Crie um calendar (Calendário) usando @semec/ds/react (`src/components/calendar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: value · onChange · min · max · disabled. Calendário visual para seleção de data.
 ```
 
 Fonte:
@@ -4445,7 +4690,7 @@ Variantes: composição: ScrollArea · ScrollBar · orientation: vertical · hor
 
 Uso:
 ```tsx
-import { ScrollArea } from "semec-ds/react";
+import { ScrollArea } from "@semec/ds/react";
 
 <ScrollArea className="h-48">
   <div className="p-4">Conteúdo longo aqui…</div>
@@ -4454,7 +4699,7 @@ import { ScrollArea } from "semec-ds/react";
 
 Prompt:
 ```text
-Crie um scroll-area (Área de scroll) usando semec-ds/react (`src/components/scroll-area.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal. Scroll customizado e consistente entre navegadores.
+Crie um scroll-area (Área de scroll) usando @semec/ds/react (`src/components/scroll-area.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal. Scroll customizado e consistente entre navegadores.
 ```
 
 Fonte:
@@ -4518,8 +4763,8 @@ Variantes: composição: DropdownMenu · Trigger · Content · Item · CheckboxI
 
 Uso:
 ```tsx
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "semec-ds/react";
-import { Button } from "semec-ds/react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@semec/ds/react";
+import { Button } from "@semec/ds/react";
 import { MoreHorizontal } from "lucide-react";
 
 <DropdownMenu>
@@ -4537,7 +4782,7 @@ import { MoreHorizontal } from "lucide-react";
 
 Prompt:
 ```text
-Crie um dropdown-menu (Menu suspenso) usando semec-ds/react (`src/components/dropdown-menu.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: DropdownMenu · Trigger · Content · Item · CheckboxItem · RadioItem · Label · Separator · Sub · SubTrigger · SubContent. Menu flutuante com itens, checkbox, radio, sub-menus e separadores.
+Crie um dropdown-menu (Menu suspenso) usando @semec/ds/react (`src/components/dropdown-menu.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: DropdownMenu · Trigger · Content · Item · CheckboxItem · RadioItem · Label · Separator · Sub · SubTrigger · SubContent. Menu flutuante com itens, checkbox, radio, sub-menus e separadores.
 ```
 
 Fonte:
@@ -4753,7 +4998,7 @@ Variantes: side: top · bottom · left · right · composição: Drawer · Trigg
 
 Uso:
 ```tsx
-import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, Button } from "semec-ds/react";
+import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, Button } from "@semec/ds/react";
 
 <Drawer>
   <DrawerTrigger asChild><Button>Abrir painel</Button></DrawerTrigger>
@@ -4772,7 +5017,7 @@ import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, Drawer
 
 Prompt:
 ```text
-Crie um drawer (Drawer) usando semec-ds/react (`src/components/drawer.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: top · bottom · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close. Painel deslizante de qualquer lado da tela.
+Crie um drawer (Drawer) usando @semec/ds/react (`src/components/drawer.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: top · bottom · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close. Painel deslizante de qualquer lado da tela.
 ```
 
 Fonte:
@@ -4906,7 +5151,7 @@ Variantes: side: left · right · top · bottom · composição: Sheet · Trigge
 
 Uso:
 ```tsx
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "semec-ds/react";
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "@semec/ds/react";
 
 <Sheet>
   <SheetTrigger asChild><Button variant="outline">Abrir filtros</Button></SheetTrigger>
@@ -4925,7 +5170,7 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescri
 
 Prompt:
 ```text
-Crie um sheet (Sheet) usando semec-ds/react (`src/components/sheet.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: left · right · top · bottom · composição: Sheet · Trigger · Content · Header · Footer · Title · Description · Close. Painel lateral modal com overlay. Variantes left/right/top/bottom.
+Crie um sheet (Sheet) usando @semec/ds/react (`src/components/sheet.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: left · right · top · bottom · composição: Sheet · Trigger · Content · Header · Footer · Title · Description · Close. Painel lateral modal com overlay. Variantes left/right/top/bottom.
 ```
 
 Fonte:
@@ -5075,7 +5320,7 @@ Variantes: props: columns · data · sortKey · sortDir · onSort · page · pag
 
 Uso:
 ```tsx
-import { DataTable } from "semec-ds/react";
+import { DataTable } from "@semec/ds/react";
 
 const columns = [
   { key: "nome", header: "Nome", sortable: true },
@@ -5096,7 +5341,7 @@ const columns = [
 
 Prompt:
 ```text
-Crie um data-table (Tabela de dados) usando semec-ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption. Tabela com ordenação visual, paginação e空 states.
+Crie um data-table (Tabela de dados) usando @semec/ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption. Tabela com ordenação visual, paginação e空 states.
 ```
 
 Fonte:
@@ -5281,7 +5526,7 @@ Variantes: composição: Timeline · TimelineItem · TimelineSeparator · Timeli
 
 Uso:
 ```tsx
-import { Timeline, TimelineItem, TimelineSeparator, TimelineDot, TimelineConnector, TimelineContent, TimelineTitle, TimelineDescription } from "semec-ds/react";
+import { Timeline, TimelineItem, TimelineSeparator, TimelineDot, TimelineConnector, TimelineContent, TimelineTitle, TimelineDescription } from "@semec/ds/react";
 
 <Timeline>
   <TimelineItem>
@@ -5308,7 +5553,7 @@ import { Timeline, TimelineItem, TimelineSeparator, TimelineDot, TimelineConnect
 
 Prompt:
 ```text
-Crie um timeline (Linha do tempo) usando semec-ds/react (`src/components/timeline.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Timeline · TimelineItem · TimelineSeparator · TimelineDot · TimelineConnector · TimelineContent · TimelineTitle · TimelineDescription · dot variant: default · success · warning · destructive · info. Sequência temporal com dots, conectores e conteúdo.
+Crie um timeline (Linha do tempo) usando @semec/ds/react (`src/components/timeline.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Timeline · TimelineItem · TimelineSeparator · TimelineDot · TimelineConnector · TimelineContent · TimelineTitle · TimelineDescription · dot variant: default · success · warning · destructive · info. Sequência temporal com dots, conectores e conteúdo.
 ```
 
 Fonte:
@@ -5444,7 +5689,7 @@ Variantes: composição: NavigationMenu · List · Item · Trigger · Content ·
 
 Uso:
 ```tsx
-import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "semec-ds/react";
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@semec/ds/react";
 
 <NavigationMenu>
   <NavigationMenuList>
@@ -5461,7 +5706,7 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuT
 
 Prompt:
 ```text
-Crie um navigation-menu (Menu de navegação) usando semec-ds/react (`src/components/navigation-menu.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator. Navegação principal com mega-menu e viewport animado.
+Crie um navigation-menu (Menu de navegação) usando @semec/ds/react (`src/components/navigation-menu.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator. Navegação principal com mega-menu e viewport animado.
 ```
 
 Fonte:
@@ -5607,7 +5852,7 @@ Variantes: side: left · right · variant: sidebar · floating · inset · colla
 
 Uso:
 ```tsx
-import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "semec-ds/react";
+import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@semec/ds/react";
 
 <SidebarProvider>
   <Sidebar>
@@ -5638,7 +5883,7 @@ import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, 
 
 Prompt:
 ```text
-Crie um sidebar (Barra lateral) usando semec-ds/react (`src/components/sidebar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: left · right · variant: sidebar · floating · inset · collapsible: offcanvas · icon · none · composição: SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail. Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile.
+Crie um sidebar (Barra lateral) usando @semec/ds/react (`src/components/sidebar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: left · right · variant: sidebar · floating · inset · collapsible: offcanvas · icon · none · composição: SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail. Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile.
 ```
 
 Fonte:
@@ -5868,7 +6113,7 @@ const Sidebar = React.forwardRef<
             "group-data-[collapsible=offcanvas]:w-0",
             "group-data-[side=right]:rotate-180",
             variant === "floating" || variant === "inset"
-              ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]"
+              ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_var(--space-4))]"
               : "group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]"
           )}
         />
@@ -5879,7 +6124,7 @@ const Sidebar = React.forwardRef<
               ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
               : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
             variant === "floating" || variant === "inset"
-              ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]"
+              ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_var(--space-4)_+2px)]"
               : "group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)] group-data-[side=left]:border-r group-data-[side=right]:border-l border-border",
             className
           )}

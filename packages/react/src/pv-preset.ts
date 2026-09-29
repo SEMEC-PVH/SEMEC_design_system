@@ -9,7 +9,6 @@
  *   @import "tailwindcss";
  *   @config "../pv-preset.ts";
  *   @import "./tokens.css";
- *   @import "./shadcn.css";
  */
 import type { Config } from "tailwindcss";
 

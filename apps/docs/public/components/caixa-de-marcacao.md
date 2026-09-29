@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Checkbox, Label } from "semec-ds/react";
+import { Checkbox, Label } from "@semec/ds/react";
 
 <div className="flex items-center gap-2">
   <Checkbox id="termos" />
@@ -50,7 +50,7 @@ import { Checkbox, Label } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um checkbox (Caixa de marcação) usando semec-ds/react (`src/components/checkbox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled. Caixa de marcação com estado indeterminado.
+Crie um checkbox (Caixa de marcação) usando @semec/ds/react (`src/components/checkbox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled. Caixa de marcação com estado indeterminado.
 ```
 
 ## Fonte

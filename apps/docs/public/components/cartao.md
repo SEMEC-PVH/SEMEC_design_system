@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "semec-ds/react";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@semec/ds/react";
 
 <Card>
   <CardHeader><CardTitle>IPTU 2026</CardTitle></CardHeader>
@@ -51,7 +51,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "se
 ## Prompt para IA
 
 ```text
-Crie um card (Cartão) usando semec-ds/react (`src/components/card.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter. Superfície de conteúdo com header, corpo e footer.
+Crie um card (Cartão) usando @semec/ds/react (`src/components/card.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter. Superfície de conteúdo com header, corpo e footer.
 ```
 
 ## Fonte

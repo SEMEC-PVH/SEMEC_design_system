@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Spinner } from "semec-ds/react";
+import { Spinner } from "@semec/ds/react";
 
 <Spinner />
 <p className="text-muted-foreground">Carregando dados…</p>
@@ -48,7 +48,7 @@ import { Spinner } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um spinner (Spinner) usando semec-ds/react (`src/components/spinner.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Indicador de carregamento inline.
+Crie um spinner (Spinner) usando @semec/ds/react (`src/components/spinner.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Indicador de carregamento inline.
 ```
 
 ## Fonte

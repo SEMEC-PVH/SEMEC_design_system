@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Calendar } from "semec-ds/react";
+import { Calendar } from "@semec/ds/react";
 
 <Calendar value={data} onChange={setData} />
 ```
@@ -47,7 +47,7 @@ import { Calendar } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um calendar (Calendário) usando semec-ds/react (`src/components/calendar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: value · onChange · min · max · disabled. Calendário visual para seleção de data.
+Crie um calendar (Calendário) usando @semec/ds/react (`src/components/calendar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: value · onChange · min · max · disabled. Calendário visual para seleção de data.
 ```
 
 ## Fonte

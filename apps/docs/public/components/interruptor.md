@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Switch, Label } from "semec-ds/react";
+import { Switch, Label } from "@semec/ds/react";
 
 <div className="flex items-center gap-2">
   <Switch id="alertas" defaultChecked />
@@ -50,7 +50,7 @@ import { Switch, Label } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um switch (Interruptor) usando semec-ds/react (`src/components/switch.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: off · on (checked) · disabled · inválido. Interruptor on/off para ativação imediata.
+Crie um switch (Interruptor) usando @semec/ds/react (`src/components/switch.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: off · on (checked) · disabled · inválido. Interruptor on/off para ativação imediata.
 ```
 
 ## Fonte

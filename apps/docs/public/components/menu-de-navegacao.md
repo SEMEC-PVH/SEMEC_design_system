@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "semec-ds/react";
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@semec/ds/react";
 
 <NavigationMenu>
   <NavigationMenuList>
@@ -57,7 +57,7 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuT
 ## Prompt para IA
 
 ```text
-Crie um navigation-menu (Menu de navegação) usando semec-ds/react (`src/components/navigation-menu.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator. Navegação principal com mega-menu e viewport animado.
+Crie um navigation-menu (Menu de navegação) usando @semec/ds/react (`src/components/navigation-menu.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator. Navegação principal com mega-menu e viewport animado.
 ```
 
 ## Fonte

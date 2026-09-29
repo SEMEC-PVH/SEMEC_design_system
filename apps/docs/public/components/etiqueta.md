@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Badge } from "semec-ds/react";
+import { Badge } from "@semec/ds/react";
 
 <Badge>Pendente</Badge>
 <Badge variant="success">Deferido</Badge>
@@ -49,7 +49,7 @@ import { Badge } from "semec-ds/react";
 ## Prompt para IA
 
 ```text
-Crie um badge (Etiqueta) usando semec-ds/react (`src/components/badge.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · secondary · outline · success · warning · danger · info. Etiqueta curta de status ou contagem.
+Crie um badge (Etiqueta) usando @semec/ds/react (`src/components/badge.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · secondary · outline · success · warning · danger · info. Etiqueta curta de status ou contagem.
 ```
 
 ## Fonte

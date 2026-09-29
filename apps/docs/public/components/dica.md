@@ -39,7 +39,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } from "semec-ds/react";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } from "@semec/ds/react";
 
 <TooltipProvider>
   <Tooltip>
@@ -52,7 +52,7 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } 
 ## Prompt para IA
 
 ```text
-Crie um tooltip (Dica) usando semec-ds/react (`src/components/tooltip.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: TooltipProvider · Tooltip · TooltipTrigger · TooltipContent. Dica curta ao passar o ponteiro ou focar o elemento.
+Crie um tooltip (Dica) usando @semec/ds/react (`src/components/tooltip.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: TooltipProvider · Tooltip · TooltipTrigger · TooltipContent. Dica curta ao passar o ponteiro ou focar o elemento.
 ```
 
 ## Fonte

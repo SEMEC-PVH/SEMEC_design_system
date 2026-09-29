@@ -40,7 +40,7 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \
 ## Uso
 
 ```tsx
-import { Popover, PopoverTrigger, PopoverContent, Button } from "semec-ds/react";
+import { Popover, PopoverTrigger, PopoverContent, Button } from "@semec/ds/react";
 
 <Popover>
   <PopoverTrigger asChild>
@@ -55,7 +55,7 @@ import { Popover, PopoverTrigger, PopoverContent, Button } from "semec-ds/react"
 ## Prompt para IA
 
 ```text
-Crie um popover (Popover) usando semec-ds/react (`src/components/popover.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Popover · PopoverTrigger · PopoverContent · PopoverAnchor · props: sideOffset · align · side (top/right/bottom/left). Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.
+Crie um popover (Popover) usando @semec/ds/react (`src/components/popover.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Popover · PopoverTrigger · PopoverContent · PopoverAnchor · props: sideOffset · align · side (top/right/bottom/left). Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.
 ```
 
 ## Fonte
