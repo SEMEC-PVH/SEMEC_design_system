@@ -8,7 +8,7 @@ export default function SemequinhoAnimation({ className }) {
   return (
     <div className={className} style={{ width: "100%", maxWidth: 640 }}>
       <iframe
-        src="/semequinho-hero.html"
+        src={`${process.env.NEXT_PUBLIC_BASE_PATH}/semequinho-hero.html`}
         title="Mascote Semequinho animado"
         loading="lazy"
         sandbox="allow-scripts"
