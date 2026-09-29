@@ -212,6 +212,15 @@ export default function IntroPage() {
         <li><strong>shadcn</strong> — Radix + CVA + clsx + tailwind-merge</li>
       </ul>
 
+      <h2>Segurança (CSP)</h2>
+      <p>
+        Se seu servidor usa <code>Content-Security-Policy</code>, os componentes
+        Dialog, AlertDialog, Drawer, DropdownMenu, Select e ScrollArea injetam
+        <code>&lt;style&gt;</code> via bibliotecas terceiras. Adicione{" "}
+        <code>style-src 'unsafe-inline'</code> na sua política para que trava de
+        rolagem e scrollbar funcionem corretamente.
+      </p>
+
       <h2>Instalação</h2>
       <p>Instale o pacote no seu projeto:</p>
       <MdxPre><code>npm install @semec/ds</code></MdxPre>

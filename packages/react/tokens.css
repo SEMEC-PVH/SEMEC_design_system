@@ -266,3 +266,13 @@
     outline-offset: 2px;
   }
 }
+
+/* ==========================================================================
+   Scrollbar — esconde scrollbar nativa (Radix ScrollArea/Select)
+   ========================================================================== */
+[data-radix-scroll-area-viewport] {
+  scrollbar-width: none;
+}
+[data-radix-scroll-area-viewport]::-webkit-scrollbar {
+  display: none;
+}
