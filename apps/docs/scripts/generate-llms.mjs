@@ -28,7 +28,6 @@ function readFileSafe(rel) {
 function readBase(rel) { return readFileSafe(rel) ?? ""; }
 
 const tokensCss = readBase("packages/react/tokens.css");
-const shadcnCss = readBase("packages/react/shadcn.css");
 const pvPreset = readBase("packages/react/pv-preset.ts");
 const baseReadme = readBase("packages/react/README.md");
 const baseIndex = readBase("packages/react/src/index.ts");
@@ -54,11 +53,10 @@ const manifest = {
   })),
   install: {
     tokens: "packages/react/tokens.css",
-    shadcn: "packages/react/shadcn.css",
     preset: "packages/react/pv-preset.ts",
     utils: "packages/react/src/lib/utils.ts",
   },
-  tokens: { files: ["packages/react/tokens.css", "packages/react/shadcn.css", "packages/react/pv-preset.ts"] },
+  tokens: { files: ["packages/react/tokens.css", "packages/react/pv-preset.ts"] },
 };
 
 fs.writeFileSync(path.join(publicDir, "manifest.json"), JSON.stringify(manifest, null, 2), "utf8");
@@ -102,7 +100,6 @@ npm i class-variance-authority clsx tailwind-merge lucide-react \\
 /* globals.css */
 @import "tailwindcss";
 @import "./base/tokens.css";
-@import "./base/shadcn.css";
 /* ou @config "./base/pv-preset.ts" */
 \`\`\`
 
@@ -126,7 +123,7 @@ ${source}
 
 ## Tokens relacionados
 
-Tokens semânticos usados: \`--bg\`, \`--fg\`, \`--surface\`, \`--border\`, \`--focus-ring\`, \`--color-action-primary\` etc. Ver \`packages/react/tokens.css\` e \`packages/react/shadcn.css\` no dump completo (\`/llms-full.txt\`).
+Tokens semânticos usados: \`--bg\`, \`--fg\`, \`--surface\`, \`--border\`, \`--focus-ring\`, \`--color-action-primary\` etc. Ver \`packages/react/tokens.css\` no dump completo (\`/llms-full.txt\`).
 
 ---
 Gerado a partir de \`packages/react/manifest.js\` — não edite manualmente. Conteúdo PT-BR, código EN (ADR-016).
@@ -138,11 +135,11 @@ Gerado a partir de \`packages/react/manifest.js\` — não edite manualmente. Co
 const siteUrl = "https://semec-pvh.github.io/SEMEC_design_system"; // fallback, sem url exata conhecida
 let llms = `# SEMEC Design System — SEMEC Digital (Porto Velho)
 
-> Kit semec-ds/react (React + Tailwind v4 + shadcn + Radix + CVA). Conteúdo PT-BR, código EN (ADR-016). Tema via [data-theme="dark"] (ADR-012).
+> Kit semec-ds/react (React + Tailwind v4 + Radix + CVA). Conteúdo PT-BR, código EN (ADR-016).
 
 ## Instalar
 
-Ver \`packages/react/README.md\` e \`/llms-full.txt#instalacao\`. Copie \`packages/react/\`, importe \`packages/react/tokens.css\` + \`packages/react/shadcn.css\`.
+Ver \`packages/react/README.md\` e \`/llms-full.txt#instalacao\`. Copie \`packages/react/\`, importe \`packages/react/tokens.css\`.
 
 ## Categorias
 
@@ -161,8 +158,7 @@ Padrões em \`/padroes/*\` (navegação, formulários, dados-relatórios, feedba
 
 ## Tokens
 
-- \`packages/react/tokens.css\` — primitivos pv-* + semânticos + @theme inline + [data-theme="dark"]
-- \`packages/react/shadcn.css\` — mapeamento HSL shadcn
+- \`packages/react/tokens.css\` — primitivos pv-* + semânticos + @theme inline (Tailwind v4)
 - \`packages/react/pv-preset.ts\` — preset Tailwind @config
 
 ## Arquivos para IA
@@ -205,12 +201,6 @@ ${baseIndex}
 
 \`\`\`css
 ${tokensCss}
-\`\`\`
-
-## packages/react/shadcn.css
-
-\`\`\`css
-${shadcnCss}
 \`\`\`
 
 ## packages/react/pv-preset.ts

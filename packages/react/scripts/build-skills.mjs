@@ -31,7 +31,7 @@ function readFileSafe(rel) {
 }
 
 // --- 1. Copiar CSS para dist/react/ ---
-const cssFiles = ["tokens.css", "shadcn.css"];
+const cssFiles = ["tokens.css"];
 for (const file of cssFiles) {
   const src = path.join(pkgRoot, file);
   if (fs.existsSync(src)) {
@@ -63,7 +63,6 @@ const componentsDir = path.join(skillsDir, "components");
 mkdirp(componentsDir);
 
 const tokensCss = readFileSafe("packages/react/tokens.css") ?? "";
-const shadcnCss = readFileSafe("packages/react/shadcn.css") ?? "";
 const barrel = readFileSafe("packages/react/src/index.ts") ?? "";
 
 // --- llms.txt ---
@@ -87,8 +86,7 @@ const llmsLines = [
   "",
   "## Tokens",
   "",
-  "- `tokens.css` — primitives L0 + semânticos L1 + dark theme",
-  "- `shadcn.css` — variáveis HSL shadcn",
+  "- `tokens.css` — primitives L0 + semânticos L1 + @theme inline (Tailwind v4)",
   "- `pv-preset.ts` — preset Tailwind v4 (JS config)",
   "",
   "## Arquivos para IA",
@@ -109,7 +107,6 @@ let full = `# SEMEC Design System — Dump completo para IA\n\n`;
 full += `> Gerado ${new Date().toISOString()} — packages/react/manifest.js + packages/react/*\n\n`;
 full += `## packages/react/src/index.ts — barrel\n\n\`\`\`ts\n${baseIndex}\n\`\`\`\n\n`;
 full += `## packages/react/tokens.css\n\n\`\`\`css\n${tokensCss}\n\`\`\`\n\n`;
-full += `## packages/react/shadcn.css\n\n\`\`\`css\n${shadcnCss}\n\`\`\`\n\n`;
 full += `## packages/react/pv-preset.ts\n\n\`\`\`ts\n${pvPreset}\n\`\`\`\n\n`;
 full += `## Manifest — categorias\n\n\`\`\`json\n${JSON.stringify(dsCategories, null, 2)}\n\`\`\`\n\n`;
 full += `## Componentes — todos (${dsComponents.length})\n`;
@@ -137,12 +134,11 @@ const manifestJson = {
   })),
   install: {
     tokens: 'import "@semec/ds/react/tokens.css";',
-    shadcn: 'import "@semec/ds/react/shadcn.css";',
     preset: '@config "../pv-preset.ts";',
     utils: 'import { cn } from "@semec/ds/react";',
   },
   tokens: {
-    files: ["tokens.css", "shadcn.css", "pv-preset.ts"],
+    files: ["tokens.css", "pv-preset.ts"],
   },
 };
 fs.writeFileSync(
@@ -186,7 +182,6 @@ for (const c of dsComponents) {
     "```",
     "```css",
     '@import "@semec/ds/react/tokens.css";',
-    '@import "@semec/ds/react/shadcn.css";',
     "```",
     ``,
     `## Uso`,
@@ -249,8 +244,7 @@ const liteLlmsLines = [
   "",
   "## Tokens",
   "",
-  "- `tokens.css` — primitives L0 (`--pv-*`) + semânticos L1 + dark theme",
-  "- `shadcn.css` — variáveis HSL shadcn",
+  "- `tokens.css` — primitives L0 (`--pv-*`) + semânticos L1 + @theme inline",
   "- `pv-preset.ts` — preset Tailwind v4 (JS config)",
   "",
   "## Instalação",
@@ -261,7 +255,6 @@ const liteLlmsLines = [
   "",
   '```css',
   '@import "@semec/ds/lite/tokens.css";',
-  '@import "@semec/ds/lite/shadcn.css";',
   '```',
   "",
   "## Crédito obrigatório",
@@ -293,11 +286,10 @@ const liteManifestJson = {
   categories: dsCategories,
   install: {
     tokens: 'import "@semec/ds/lite/tokens.css";',
-    shadcn: 'import "@semec/ds/lite/shadcn.css";',
     preset: '@config "../pv-preset.ts";',
   },
   tokens: {
-    files: ["tokens.css", "shadcn.css", "pv-preset.ts"],
+    files: ["tokens.css", "pv-preset.ts"],
     primitives: "pv-* prefixed (L0)",
     semantic: "L1 — --bg, --fg, --surface, --action-primary, --feedback-*, etc.",
   },
@@ -334,7 +326,6 @@ const liteSkillMd = [
   ``,
   "```css",
   '@import "@semec/ds/lite/tokens.css";',
-  '@import "@semec/ds/lite/shadcn.css";',
   "```",
   ``,
   `Poppins 400–700 (self-hosted woff2 ou next/font).`,

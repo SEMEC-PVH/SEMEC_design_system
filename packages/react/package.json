@@ -10,7 +10,6 @@
       "import": "./dist/react/index.js"
     },
     "./react/tokens.css": "./dist/react/tokens.css",
-    "./react/shadcn.css": "./dist/react/shadcn.css",
     "./react/pv-preset": {
       "types": "./dist/react/pv-preset.d.ts",
       "import": "./dist/react/pv-preset.js"
@@ -31,7 +30,6 @@
     "./skills/components/*": "./dist/skills/components/*",
     "./skills/ds-semec-skill": "./dist/skills/ds-semec-skill.md",
     "./lite/tokens.css": "./dist/react/tokens.css",
-    "./lite/shadcn.css": "./dist/react/shadcn.css",
     "./lite/pv-preset": {
       "types": "./dist/react/pv-preset.d.ts",
       "import": "./dist/react/pv-preset.js"
@@ -49,7 +47,6 @@
     "dist",
     "src",
     "tokens.css",
-    "shadcn.css",
     "pv-preset.ts",
     "manifest.js",
     "server.js"
