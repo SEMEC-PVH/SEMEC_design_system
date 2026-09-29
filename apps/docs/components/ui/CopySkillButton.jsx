@@ -20,12 +20,14 @@ function CheckIcon() {
   );
 }
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 export default function CopySkillButton() {
   const [state, setState] = useState("idle");
 
   async function handleCopy() {
     try {
-      const res = await fetch("/SEMEC-LITE.md");
+      const res = await fetch(`${basePath}/SEMEC-LITE.md`);
       const text = await res.text();
       const ok = await copyText(text);
       setState(ok ? "ok" : "fail");
