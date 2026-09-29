@@ -8,17 +8,11 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
-  release:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.RELEASE_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
@@ -35,13 +29,7 @@ jobs:
       - name: Build package
         run: npm run build:ds
 
-      - name: Create release PR or publish
-        uses: changesets/action@v1
-        with:
-          version: npm run version-packages
-          publish: npx changeset publish
-          title: "chore: version packages"
-          commit: "chore: version packages"
+      - name: Publish to npm
+        run: npx changeset publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

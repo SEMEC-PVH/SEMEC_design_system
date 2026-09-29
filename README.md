@@ -75,8 +75,9 @@ O pacote é publicado automaticamente no npm sempre que há mudanças na branch 
 
 1. Crie um changeset: `npm run changeset`
 2. Escolha patch/minor/major e descreva a mudança
-3. Faça commit e push para `main`
-4. A CI publica automaticamente no npm
+3. Aplique o versionamento: `npm run version-packages`
+4. Faça commit e push para `main`
+5. A CI publica automaticamente no npm
 
 Detalhes completos: [CONTRIBUTING.md](CONTRIBUTING.md).
 

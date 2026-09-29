@@ -145,11 +145,19 @@ O pacote `@semec/ds` é publicado no npm público. A CI publica automaticamente 
    - **minor** (1.0.0 → 1.1.0) — componente novo, propriedade nova, funcionalidade
    - **major** (1.0.0 → 2.0.0) — quebra de API, remoção de componente
 
-2. **Commit e push** para a branch `main`
+2. **Aplique o versionamento** (bump + changelog):
+   ```bash
+   npm run version-packages
+   ```
 
-3. **A CI roda automaticamente**:
-   - Roda `typecheck` e `build:ds`
-   - Executa `changeset publish` — que lê os changesets pendentes, bumpa a versão, cria tag git e publica no npm
+3. **Commit e push** para a branch `main`:
+   ```bash
+   git add .
+   git commit -m "feat(nome): descrição"
+   git push
+   ```
+
+4. **A CI publica automaticamente** no npm via `changeset publish`
 
 ### Consumidores do pacote
 
