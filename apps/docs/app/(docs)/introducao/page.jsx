@@ -1,6 +1,6 @@
 import Link from "next/link";
-import Image from "next/image";
 import SectionCard from "@/components/ui/SectionCard";
+import SemequinhoAnimation from "@/components/SemequinhoAnimation";
 import AnimateOnScroll from "@/components/ui/AnimateOnScroll";
 import CopySkillButton from "@/components/ui/CopySkillButton";
 import MdxPre from "@/components/docs/MdxPre";
@@ -160,7 +160,6 @@ const categorias = [
 ];
 
 export default function IntroPage() {
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
   const dataAtualizacao = new Intl.DateTimeFormat("pt-BR", {
     day: "numeric",
     month: "long",
@@ -170,13 +169,7 @@ export default function IntroPage() {
   return (
     <>
       <section className="hero">
-        <Image
-          src={`${basePath}/hero_logo.png`}
-          alt="Mascote do SEMEC Design System"
-          className="hero-mascot"
-          width={640}
-          height={480}
-        />
+        <SemequinhoAnimation className="hero-mascot" />
         <h1>SEMEC design system</h1>
         <p className="hero-subtitle">Atualizado em {dataAtualizacao}</p>
         <p className="hero-desc">

@@ -1793,11 +1793,9 @@ li {
 }
 
 .hero-mascot {
-  width: auto;
+  width: 100%;
   max-width: 640px;
-  height: auto;
   margin-bottom: var(--space-6);
-  object-fit: contain;
 }
 
 @media (max-width: 640px) {
@@ -1807,7 +1805,7 @@ li {
   }
 
   .hero-mascot {
-    width: 180px;
+    max-width: 180px;
   }
 
   .hero-desc {
