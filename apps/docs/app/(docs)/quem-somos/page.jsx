@@ -90,14 +90,16 @@ function TeamCard({ member, size = "md" }) {
 
 export default function QuemSomosPage() {
   return (
-    <div className="no-toc">
-      <h1>Quem Somos</h1>
-      <p className="subtitle">
-        Somos o time de tecnologia e design por trás do Design System da
-        SEMEC Porto Velho. Construímos e mantemos essas ferramentas para
-        garantir experiências digitais consistentes e acessíveis para a
-        população.
-      </p>
+    <div className="no-toc quem-somos-wrapper">
+      <div className="quem-somos-content">
+        <h1>Quem Somos</h1>
+        <p className="subtitle">
+          Somos o time de tecnologia e design por trás do Design System da
+          SEMEC Porto Velho. Construímos e mantemos essas ferramentas para
+          garantir experiências digitais consistentes e acessíveis para a
+          população.
+        </p>
+      </div>
 
       <section className="team-section">
         <div className="team-grid team-grid--directors">
@@ -114,6 +116,10 @@ export default function QuemSomosPage() {
           ))}
         </div>
       </section>
+
+      <div className="quem-somos-bg" aria-hidden="true">
+        <Image src="/PortoVelhoPintura.svg" alt="" width={1536} height={1024} priority />
+      </div>
     </div>
   );
 }

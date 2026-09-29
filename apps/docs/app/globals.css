@@ -2172,6 +2172,32 @@ footer {
   color: var(--color-action-primary);
 }
 
+/* Quem Somos — Arte de fundo (marca d'água) */
+.quem-somos-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+.quem-somos-content {
+  position: relative;
+  z-index: 1;
+}
+.quem-somos-bg {
+  position: relative;
+  margin-top: 3rem;
+  opacity: 0.15;
+  pointer-events: none;
+}
+.quem-somos-bg img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+@media (max-width: 768px) {
+  .quem-somos-bg {
+    opacity: 0.1;
+  }
+}
+
 /* ---- Animação da arte dos cards de seção ------------------------------
    Cada card anima a parte do desenho que carrega o seu conceito. Nenhum
    ícone depende do movimento para ser legível: a animação acrescenta,
