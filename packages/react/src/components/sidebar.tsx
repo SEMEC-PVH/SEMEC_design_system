@@ -171,7 +171,7 @@ const Sidebar = React.forwardRef<
       return (
         <div
           className={cn(
-            "flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
+            "flex h-full w-[var(--sidebar-width)] flex-col bg-sidebar text-sidebar-foreground",
             className
           )}
           ref={ref}
@@ -193,7 +193,7 @@ const Sidebar = React.forwardRef<
           )}
           <div
             className={cn(
-              "fixed inset-y-0 z-50 h-svh w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground transition-base ease-standard",
+              "fixed inset-y-0 z-50 h-svh w-[var(--sidebar-width)] bg-sidebar p-0 text-sidebar-foreground transition-base ease-standard",
               side === "left"
                 ? "left-0 data-[state=closed]:-translate-x-full"
                 : "right-0 data-[state=closed]:translate-x-full",
@@ -219,23 +219,23 @@ const Sidebar = React.forwardRef<
       >
         <div
           className={cn(
-            "duration-base ease-standard relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear",
+            "duration-base ease-standard relative h-svh w-[var(--sidebar-width)] bg-transparent transition-[width] ease-linear",
             "group-data-[collapsible=offcanvas]:w-0",
             "group-data-[side=right]:rotate-180",
             variant === "floating" || variant === "inset"
               ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]"
-              : "group-data-[collapsible=icon]:w-[--sidebar-width-icon]"
+              : "group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)]"
           )}
         />
         <div
           className={cn(
-            "duration-base ease-standard fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex",
+            "duration-base ease-standard fixed inset-y-0 z-10 hidden h-svh w-[var(--sidebar-width)] transition-[left,right,width] ease-linear md:flex",
             side === "left"
               ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
               : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
             variant === "floating" || variant === "inset"
               ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]"
-              : "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l border-border",
+              : "group-data-[collapsible=icon]:w-[var(--sidebar-width-icon)] group-data-[side=left]:border-r group-data-[side=right]:border-l border-border",
             className
           )}
           {...props}
