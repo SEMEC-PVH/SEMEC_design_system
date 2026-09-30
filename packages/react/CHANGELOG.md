@@ -1,5 +1,18 @@
 # @semec/ds
 
+## 2.0.0
+
+### Major Changes
+
+- Remove o dark theme dos tokens CSS (`tokens.css`) e enxarga os primitivos; `@theme inline` expandido.
+- Remove o export `@semec/ds/react/shadcn.css` (e o arquivo `shadcn.css` do pacote).
+- Externaliza `zod` do bundle: passa a peerDependency opcional; adiciona `get-nonce` como dependência.
+- Adiciona `SemecProvider` com suporte a nonce CSP (SEM-752).
+- Substitui a skill lite pela skill completa do agente (`SEMEC-SKILL.md`), com tokens, a11y e responsivo (SEM-699).
+- Corrige a11y e CSS v4 em Toaster, Progress e Sidebar (SEM-746/749/750).
+- Corrige bugs de tokens, sidebar e a11y (SEM-743 a SEM-751).
+- Adiciona CSS estático de scrollbar para viewport do Select e doc CSP (SEM-752).
+
 ## 1.1.0
 
 ### Minor Changes
