@@ -1,5 +1,11 @@
 # @semec/ds
 
+## 2.1.0
+
+### Minor Changes
+
+- Pipeline único de artefatos de IA (`build-artifacts.mjs`) e skills canônicas `semec-ds` / `semec-ds-lite` (ADR-023). Novos subpath exports para as skills; aliases `ds-semec-skill` mantidos para compatibilidade.
+
 ## 2.0.0
 
 ### Major Changes
