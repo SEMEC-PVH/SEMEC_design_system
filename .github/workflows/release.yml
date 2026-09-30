@@ -3,6 +3,7 @@ name: Release
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: release-${{ github.ref }}
@@ -29,7 +30,23 @@ jobs:
       - name: Build package
         run: npm run build:ds
 
+      - name: Show publish plan
+        run: |
+          echo "package version: $(node -p "require('./packages/react/package.json').version")"
+          echo "npm whoami: $(npm whoami 2>&1 || true)"
+          npx changeset publish-plan
+
       - name: Publish to npm
         run: npx changeset publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Verify version on npm
+        run: |
+          expected=$(node -p "require('./packages/react/package.json').version")
+          published=$(npm view @semec/ds version)
+          echo "expected=$expected published=$published"
+          if [ "$published" != "$expected" ]; then
+            echo "::error::@semec/ds no npm está em '$published', mas o repo espera '$expected'"
+            exit 1
+          fi
