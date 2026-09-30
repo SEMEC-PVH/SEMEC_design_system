@@ -15,6 +15,8 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -40,21 +42,24 @@ jobs:
             echo ""
             echo "- version local: \`$(node -p "require('./packages/react/package.json').version")\`"
             echo "- npm whoami: \`$(npm whoami 2>&1 || echo '(não autenticado)')\`"
+            echo "- NODE_AUTH_TOKEN set: \`${NODE_AUTH_TOKEN:+yes}${NODE_AUTH_TOKEN:-no}\`"
             echo ""
             echo "### Publish plan"
             echo '```'
             npx changeset publish-plan
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "::error::Secret NPM_TOKEN vazio ou ausente no repo."
+            exit 1
+          fi
           if ! npm whoami >/dev/null 2>&1; then
-            echo "::error::Não autenticado no npm. Configure o secret NPM_TOKEN (Automation token com permissão de publish em @semec)."
+            echo "::error::Token presente mas npm whoami falhou. Verifique se o NPM_TOKEN é válido e tem publish em @semec."
             exit 1
           fi
 
       - name: Publish to npm
         run: npx changeset publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Verify version on npm
         run: |
