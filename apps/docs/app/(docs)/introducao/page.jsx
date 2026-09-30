@@ -217,7 +217,7 @@ export default function IntroPage() {
         Se seu servidor usa <code>Content-Security-Policy</code>, os componentes
         Dialog, AlertDialog, Drawer, DropdownMenu, Select e ScrollArea injetam
         <code>&lt;style&gt;</code> via bibliotecas terceiras. Adicione{" "}
-        <code>style-src 'unsafe-inline'</code> na sua política para que trava de
+        <code>style-src &apos;unsafe-inline&apos;</code> na sua política para que trava de
         rolagem e scrollbar funcionem corretamente.
       </p>
 
