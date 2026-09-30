@@ -17,7 +17,7 @@ Este documento reúne, em um lugar só, as decisões que ainda não foram tomada
 | **QA-03** · `Q6` `D2` | Qual família tipográfica: Rawline/Raleway do gov.br, Poppins ou fonte de sistema? | Responsável pela marca institucional, com os mantenedores | Aberta |
 | **QA-04** · `Q3` | O SIGO nasce sobre o design system ou o design system é extraído dele depois? | Mantenedores com a gestão do SIGO | Aberta |
 | **QA-05** · `Q4` | Existe capacidade de manter um UIKit no Figma, ou a documentação em código é a única fonte? | Mantenedores com quem desenha | Aberta |
-| **QA-06** · `Q5` | O registry npm do Gitea da prefeitura está habilitado, e sob qual owner? | Administração do Gitea institucional, com os mantenedores | Aberta |
+| **QA-06** · `Q5` | ~~O registry npm do Gitea da prefeitura está habilitado, e sob qual owner?~~ | ~~Administração do Gitea institucional, com os mantenedores~~ | **Respondida** — [ADR-022](adr/0022-publicacao-npm-publico.md) |
 | **QA-07** · `D3` | Qual vermelho vira o token de perigo, que hoje não existe na paleta? | Responsável pela marca institucional, com os mantenedores | Aberta |
 | **QA-08** · `D4` | A Calculadora de Taxas migra para os tokens institucionais ou fica como exceção documentada? | Mantenedores com o time da Calculadora | Aberta |
 | **QA-09** · `F10` | O design system assina como DEVSEMEC ou como SEMEC/PMPV? | Responsável pela marca institucional | Aberta |
@@ -44,6 +44,8 @@ A parte tipográfica da Q1 está desdobrada em **QA-03**; a parte de qual marca 
 
 **O que já se sabe.** O [ADR-012](adr/0012-tema-por-atributo-de-dados.md) já decidiu que o tema é aplicado por atributo de dados e que o sistema é multi-órgão, o que torna a resposta possível em qualquer ordem — mas não a dispensa, porque ela define qual órgão é o padrão e qual é a exceção. O [ADR-007](adr/0007-distribuicao-registry-npm-gitea.md) já fixou o escopo `@semec` para publicação. O roadmap da [arquitetura](arquitetura.md) prevê "adoção fora da SEMEC" apenas na fase F4, e a D5 argumenta que vale definir agora, não na F4. O papel de "aprovação de identidade" descrito na governança é de quem detém a identidade institucional — que órgão é esse depende desta resposta.
 
+**Nota de facto (30/09/2026, registro sem ADR).** A parte prática desta questão já está respondida no código e nos ADRs: o pacote é publicado sob o escopo **`@semec`** ([ADR-007](adr/0007-distribuicao-registry-npm-gitea.md), mantido pelo [ADR-022](adr/0022-publicacao-npm-publico.md)) e o projeto se chama **Design System da SEMEC**. O que permanece em aberto é a parte de governança: se o sistema nasce como padrão da SEMEC ou já como padrão da PMPV — decisão da direção, não do código.
+
 **O que a resposta destrava.** O nome do escopo npm e o owner do registry (ver **QA-06**), a composição dos papéis de governança descritos no [CONTRIBUTING.md](../CONTRIBUTING.md), e a hierarquia de temas — qual conjunto de tokens é a base e qual é a variação.
 
 **O que fica desatualizado quando ela for respondida.** [`arquitetura.md`](arquitetura.md), seções 6 (topologia de pacotes), 11 (governança) e 12 (roadmap); [`adr/0007-distribuicao-registry-npm-gitea.md`](adr/0007-distribuicao-registry-npm-gitea.md) e [`adr/0012-tema-por-atributo-de-dados.md`](adr/0012-tema-por-atributo-de-dados.md), que passam a exigir ADR sucessor se o escopo mudar; [`especificacao-alvo.md`](especificacao-alvo.md), nas seções "Instalação" e "Pacotes"; [`CONTRIBUTING.md`](../CONTRIBUTING.md).
@@ -68,6 +70,8 @@ A parte tipográfica da Q1 está desdobrada em **QA-03**; a parte de qual marca 
 
 **O que já se sabe.** O roadmap da [arquitetura](arquitetura.md) coloca o SIGO como projeto piloto da fase F1, "construído inteiramente sobre o DS", e a tabela de riscos usa o piloto obrigatório como mitigação para o risco de o design system virar projeto de uma pessoa e morrer. O [caminho de adoção](adocao.md), escrito depois, propõe o portal SEMEC Digital como primeiro consumidor real, por ser "a maior base de código de frontend da secretaria". **Os dois documentos apontam para primeiros consumidores diferentes**; a divergência fica registrada, não resolvida — decidir qual dos dois é o piloto faz parte desta questão.
 
+**Nota de facto (30/09/2026, registro sem ADR).** O milestone **Piloto & Entrega Final** do Linear aponta o **portal SEMEC Digital** como piloto em andamento (issue SEM-508, "DS M4: Piloto portal + inventário e decisões UX"). O SIGO (projeto Linear P-SEM-16, "SIGO — Controle de Contratos") segue em backlog. Ou seja, na prática o piloto M4 é o portal; a questão de governança (SIGO como piloto de F1) permanece em aberto.
+
 **O que a resposta destrava.** O critério de encerramento das fases F0 e F1 (nenhuma fase termina em "biblioteca pronta esperando usuário") e a ordem de trabalho entre extrair tokens do portal e construir componentes novos para o SIGO.
 
 **O que fica desatualizado quando ela for respondida.** [`arquitetura.md`](arquitetura.md), seções 12 e 13; [`adocao.md`](adocao.md), que define uma sequência de cinco passos amarrada ao portal; [`auditoria/2026-08-21-repositorio.md`](auditoria/2026-08-21-repositorio.md), no veredito e na ordem de ataque sugerida.
@@ -90,11 +94,11 @@ A parte tipográfica da Q1 está desdobrada em **QA-03**; a parte de qual marca 
 
 **A pergunta.** O recurso de pacotes está habilitado na instância de Gitea da prefeitura, e sob qual owner os pacotes seriam publicados — uma organização `semec`?
 
-**O que já se sabe.** Esta é a única questão que já está registrada dentro de um ADR: o [ADR-007](adr/0007-distribuicao-registry-npm-gitea.md) foi aceito com a pendência escrita no próprio frontmatter (`pendencia: "Q5 — confirmar se o registry npm está habilitado na instância da prefeitura e sob qual owner"`), e seu status no [índice de ADRs](adr/README.md) é "Aceito (verificação pendente)". O suporte do Gitea a registry npm com pacotes escopados, dist-tags e autenticação por token está confirmado na documentação oficial do Gitea — o que falta é verificação na instância real. A [arquitetura](arquitetura.md) registra o plano B na tabela de riscos: Verdaccio no Portainer da SMTI, ou tarballs anexados a releases do Gitea. O owner depende de **QA-02**.
+**Resposta (ADR-022, 17/09/2026).** Esta questão foi **encerrada** pelo [ADR-022](adr/0022-publicacao-npm-publico.md): o ADR-007 (registry npm do Gitea) foi **substituído**, e a publicação passou a ser no **npm público**, sob o pacote unificado `@semec/ds`. O caminho Gitea foi abandonado de forma registrada — o registry institucional não foi confirmado, o repositório remoto é o GitHub e a adoção externa esbarra na impossibilidade de instalar de um registry inacessível. O owner do Gitea, se o registry um dia for retomado, segue dependendo de **QA-02**.
 
-**O que a resposta destrava.** A fase F0 inteira: sem registry confirmado não há `@semec/ds-tokens` publicado, e sem pacote publicado nenhum projeto consome nada. Destrava também o token de publicação do CI e a seção de instalação da documentação.
+**O que a resposta destrava.** ~~A fase F0 inteira~~ — destravada: o pacote `@semec/ds` está publicado (v2.1.0) e consumível via `npm install @semec/ds`. O token de publicação do CI e a seção de instalação da documentação seguem o npm público.
 
-**O que fica desatualizado quando ela for respondida.** [`adr/0007-distribuicao-registry-npm-gitea.md`](adr/0007-distribuicao-registry-npm-gitea.md), cuja linha `pendencia` deixa de existir — e que precisa de ADR sucessor se a resposta for o plano B; [`adr/README.md`](adr/README.md), na coluna de status; [`arquitetura.md`](arquitetura.md), seções 8, 12 e 13; [`especificacao-alvo.md`](especificacao-alvo.md), seção "Instalação"; [`CONTRIBUTING.md`](../CONTRIBUTING.md), na parte de processo futuro.
+**O que fica desatualizado quando ela for respondida.** [`adr/0007-distribuicao-registry-npm-gitea.md`](adr/0007-distribuicao-registry-npm-gitea.md) — status `Substituído por 022`; [`adr/README.md`](adr/README.md), na coluna de status; [`arquitetura.md`](arquitetura.md), seções 8, 12 e 13 (nota de estado atual adicionada); [`especificacao-alvo.md`](especificacao-alvo.md), seção "Instalação" (nota de ADR-022 adicionada); [`CONTRIBUTING.md`](../CONTRIBUTING.md), na parte de processo futuro.
 
 ---
 

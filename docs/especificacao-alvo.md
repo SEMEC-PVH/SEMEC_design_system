@@ -50,17 +50,18 @@ Rótulos, mensagens e documentação em pt-BR. Nomes de componentes e propriedad
 ## Instalação
 
 ```bash
-npm config set @semec:registry=https://git.portovelho.ro.gov.br/api/packages/semec/npm/
-npm install @semec/ds-react @semec/ds-tokens
+npm install @semec/ds
 ```
+
+> **Nota (ADR-022).** O pacote é publicado no **npm público**, sob `@semec/ds`. A instalação por registry do Gitea (descrita na versão original deste documento) foi substituída — ver [ADR-022](adr/0022-publicacao-npm-publico.md).
 
 ## Uso conforme o projeto
 
 **Next.js e React + Vite**
 
 ```tsx
-import '@semec/ds-tokens/css'
-import { Button } from '@semec/ds-react/button'
+import '@semec/ds/react/tokens.css'
+import { Button } from '@semec/ds/react'
 ```
 
 **HTML e CSS puro** — sem build, sem React:
@@ -78,14 +79,16 @@ import { paletaCategorica } from '@semec/ds-charts'
 
 ## Pacotes
 
+> **Nota (ADR-022).** Hoje existe um pacote unificado, `@semec/ds`, com subpath exports. Os demais pacotes abaixo são estado-alvo da topologia multi-pacote.
+
 | Pacote | Conteúdo |
 |---|---|
-| `@semec/ds-tokens` | Tokens em CSS, TypeScript e JSON |
-| `@semec/ds-css` | CSS compilado, sem JavaScript |
-| `@semec/ds-icons` | Ícones em React e sprite SVG |
-| `@semec/ds-react` | Componentes e padrões |
-| `@semec/ds-charts` | Camada de visualização de dados |
-| `@semec/ds-config` | Preset do Tailwind, ESLint e TypeScript |
+| `@semec/ds` (hoje) | Componentes React, tokens CSS, preset Tailwind e skills — subpath exports |
+| `@semec/ds-tokens` | Tokens em CSS, TypeScript e JSON (alvo) |
+| `@semec/ds-css` | CSS compilado, sem JavaScript (alvo) |
+| `@semec/ds-icons` | Ícones em React e sprite SVG (alvo) |
+| `@semec/ds-charts` | Camada de visualização de dados (alvo) |
+| `@semec/ds-config` | Preset do Tailwind, ESLint e TypeScript (alvo) |
 
 ---
 
@@ -393,7 +396,7 @@ A curva é a que o portal já usa em todas as suas animações — foi promovida
 | `marca-prefeitura` (horizontal, vertical positiva, vertical negativa) | Assinatura institucional |
 | `ilustracao-cidade` | Elemento gráfico de Porto Velho |
 
-Todos distribuídos como componentes em `@semec/ds-react`, com uma única implementação. Área de proteção mínima: metade da altura do símbolo em todos os lados. A marca nunca é redesenhada, recolorida ou distorcida dentro de um projeto.
+Todos distribuídos como componentes em `@semec/ds`, com uma única implementação. Área de proteção mínima: metade da altura do símbolo em todos os lados. A marca nunca é redesenhada, recolorida ou distorcida dentro de um projeto.
 
 ---
 

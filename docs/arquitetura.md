@@ -127,13 +127,15 @@ Shell administrativo (header institucional + menu + breadcrumb + área de conte�
 
 Monorepo único, múltiplos pacotes publicados sob o escopo `@semec`.
 
+> **Nota (pós-ADR-022, 17/09/2026).** O que existe hoje em código é um pacote único, **`@semec/ds`**, publicado no npm público, com subpath exports (`/react`, `/skills`, `/lite/skills`, tokens CSS, preset Tailwind). A topologia multi-pacote abaixo é **estado-alvo**: os nomes `@semec/ds-react`, `@semec/ds-tokens` etc. descrevem o sistema que se pretende construir, não o que está publicado. O nome vigente do pacote de componentes vem do [ADR-022](adr/0022-publicacao-npm-publico.md); o [ADR-018](adr/0018-pacote-componentes-ds-react.md) é o registro histórico do pacote sob o nome anterior.
+
 ```
 ds-semec/
 ├── packages/
 │   ├── tokens/        @semec/ds-tokens     JSON DTCG → CSS/TS/JSON
 │   ├── css/           @semec/ds-css        CSS compilado, zero JS  ← alvo HTML puro
 │   ├── icons/         @semec/ds-icons      SVG → componentes React + sprite
-│   ├── react/         @semec/ds-react      componentes L2 + L3
+│   ├── react/         @semec/ds            componentes L2 + L3 (hoje: pacote unificado)
 │   ├── charts/        @semec/ds-charts     camada dataviz          ← alvo painéis
 │   └── config/        @semec/ds-config     eslint, tsconfig, tailwind preset
 ├── apps/
@@ -148,10 +150,10 @@ Por que separar `css` de `react`: o alvo "HTML/CSS puro" não pode carregar Reac
 
 | Alvo | Pacotes | Observações |
 |---|---|---|
-| **Next.js (SIGO)** | `ds-react`, `ds-tokens`, `ds-icons`, `ds-charts` | Componentes interativos marcados com `"use client"`; os de apresentação permanecem Server Components. Exportações por subpath para não quebrar tree-shaking. |
+| **Next.js (SIGO)** | `@semec/ds` (subpath `/react`), tokens, ícones, charts | Componentes interativos marcados com `"use client"`; os de apresentação permanecem Server Components. Exportações por subpath para não quebrar tree-shaking. |
 | **React + Vite** | idem | Sem restrição de RSC. |
 | **HTML/CSS puro** | `ds-css`, `ds-icons` (sprite) | Um `<link>` e um `<script>` opcional para comportamentos simples (menu, modal). |
-| **Painéis de dados** | `ds-charts` + `ds-react` | Paleta categórica e sequencial derivada dos tokens, validada para daltonismo e contraste. |
+| **Painéis de dados** | `ds-charts` + `@semec/ds` | Paleta categórica e sequencial derivada dos tokens, validada para daltonismo e contraste. |
 
 ## 7. Stack técnica
 
@@ -226,8 +228,8 @@ Suporte previsto desde o início a **tema claro e escuro** e a **multi-tema por 
 
 | Fase | Escopo | Resultado |
 |---|---|---|
-| **F0 — Fundação** | Monorepo, tooling, CI, publicação no Gitea, tokens primitivos e semânticos, Storybook no ar | `@semec/ds-tokens` 0.1.0 publicado e consumido por um projeto real |
-| **F1 — MVP** | 24 componentes L2 + shell administrativo | SIGO como projeto piloto, construído inteiramente sobre o DS |
+| **F0 — Fundação** | Monorepo, tooling, CI, publicação no registry, tokens primitivos e semânticos, Storybook no ar | Pacote publicado e consumido por um projeto real. **Realidade (ADR-022):** `@semec/ds` no npm público desde 17/09/2026; Storybook adiado ([ADR-019](adr/0019-documentacao-no-site-storybook-adiado.md)) |
+| **F1 — MVP** | 24 componentes L2 + shell administrativo | SIGO como projeto piloto, construído inteiramente sobre o DS (ver QA-04 em [questões abertas](questoes-abertas.md) — piloto em andamento no portal, SEM-508) |
 | **F2 — Padrões** | Tabela de dados, formulário de cadastro, listagem+detalhe | Redução mensurável de código nos apps |
 | **F3 — Dataviz** | `@semec/ds-charts`, paletas validadas | Painel fiscal migrado |
 | **F4 — Expansão** | `@semec/ds-css` para HTML puro, multi-tema por órgão | Adoção fora da SEMEC |

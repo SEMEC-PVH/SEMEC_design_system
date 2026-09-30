@@ -16,7 +16,7 @@ Ele reúne três coisas:
 apps/docs/        Site de documentação (Next.js) + artefatos gerados para IA
 packages/react/   Kit @semec/ds (tokens + componentes) + manifest.js
 docs/             Decisões: objetivo, arquitetura, ADRs, auditorias, questões abertas
-legacy/           Versão anterior do guia + MIV da PMPV (a limpar)
+legacy/           Somente README (conteúdo removido em 15/09/2026)
 ```
 
 ## Como rodar
