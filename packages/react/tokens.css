@@ -472,10 +472,13 @@
 
 /* ==========================================================================
    Scrollbar — esconde scrollbar nativa (Radix ScrollArea/Select)
+   Regra estática: elimina injeção de <style> pelo Radix (CSP-safe).
    ========================================================================== */
-[data-radix-scroll-area-viewport] {
+[data-radix-scroll-area-viewport],
+[data-radix-select-viewport] {
   scrollbar-width: none;
 }
-[data-radix-scroll-area-viewport]::-webkit-scrollbar {
+[data-radix-scroll-area-viewport]::-webkit-scrollbar,
+[data-radix-select-viewport]::-webkit-scrollbar {
   display: none;
 }
