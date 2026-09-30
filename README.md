@@ -71,15 +71,15 @@ import { Button, Card, CardHeader, CardTitle, CardContent } from "@semec/ds/reac
 
 ## Publicação
 
-O pacote é publicado automaticamente no npm sempre que há mudanças na branch `main`:
+O `@semec/ds` vai para o npm público via Changesets + GitHub Actions. A CI só publica se a versão em `packages/react/package.json` for **maior** que a do registry (precisa de changeset + `npm run version-packages`).
 
 1. Crie um changeset: `npm run changeset`
 2. Escolha patch/minor/major e descreva a mudança
 3. Aplique o versionamento: `npm run version-packages`
 4. Faça commit e push para `main`
-5. A CI publica automaticamente no npm
+5. A CI publica (`changeset publish`) e confere `npm view @semec/ds version`
 
-Detalhes completos: [CONTRIBUTING.md](CONTRIBUTING.md).
+A CI depende do secret **`NPM_TOKEN`** no repo (token npm com publish em `@semec`). Detalhes, conferência no registry e fallback local: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Para agentes de IA
 

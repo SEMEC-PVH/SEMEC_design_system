@@ -59,7 +59,7 @@ Sem `axe` configurado, a verificação de acessibilidade **é manual** — e pre
 
 ## 5. Merge
 
-Aprovado, o pull request entra por merge na branch de destino. Se houver changesets pendentes, a CI publica automaticamente no npm (ver seção "Publicação e versionamento" abaixo).
+Aprovado, o pull request entra por merge na branch de destino. Se o `package.json` do pacote tiver versão **superior** à do npm (houver changeset aplicado), a CI publica o `@semec/ds` (ver seção "Publicação e versionamento" abaixo).
 
 ## O que um pull request precisa ter hoje
 
@@ -132,7 +132,21 @@ Nesta parte, apenas a **publicação e versionamento** já está ativa (ver Part
 
 ## Publicação e versionamento
 
-O pacote `@semec/ds` é publicado no npm público. A CI publica automaticamente sempre que há mudanças na branch `main`:
+O pacote `@semec/ds` é publicado no **npm público** ([ADR-022](docs/adr/0022-publicacao-npm-publico.md)). A CI (`.github/workflows/release.yml`) publica em todo push para `main` — **mas só se** a versão local for maior que a do registry. Sem changeset + `version-packages`, o publish é um no-op (não sobe nada).
+
+### Pré-requisito da CI (mantenedores)
+
+O workflow usa o secret do GitHub **`NPM_TOKEN`** (Settings → Secrets and variables → Actions), exposto como `NODE_AUTH_TOKEN` no job:
+
+| Campo | Valor |
+|--------|--------|
+| Nome do secret | `NPM_TOKEN` (exato) |
+| Repo | este repositório (`SEMEC-PVH/SEMEC_design_system`) |
+| Tipo de token npm | **Granular** (ou Automation), na conta mantenedora do scope `@semec` |
+| Packages and scopes | `@semec` → **Read and write** |
+| Bypass 2FA | **Sim**, se a conta tiver 2FA (senão o publish falha com E403) |
+
+Sem esse secret (ou com token inválido), o job falha no passo de diagnóstico (`npm whoami`). O workflow também roda `typecheck` + `build:ds` antes de `changeset publish` e **verifica** ao final se `npm view @semec/ds version` bate com o `package.json`.
 
 ### Fluxo de release
 
@@ -141,41 +155,62 @@ O pacote `@semec/ds` é publicado no npm público. A CI publica automaticamente 
    npm run changeset
    ```
    Escolha o tipo:
-   - **patch** (1.0.0 → 1.0.1) — bugfix, correção de typo, ajuste de estilo
-   - **minor** (1.0.0 → 1.1.0) — componente novo, propriedade nova, funcionalidade
-   - **major** (1.0.0 → 2.0.0) — quebra de API, remoção de componente
+   - **patch** (2.1.0 → 2.1.1) — bugfix, correção de typo, ajuste de estilo
+   - **minor** (2.1.0 → 2.2.0) — componente novo, propriedade nova, funcionalidade
+   - **major** (2.x → 3.0.0) — quebra de API, remoção de componente, mudança de export
 
-2. **Aplique o versionamento** (bump + changelog):
+2. **Aplique o versionamento** (bump em `packages/react/package.json` + CHANGELOG):
    ```bash
    npm run version-packages
    ```
 
-3. **Commit e push** para a branch `main`:
+3. **Commit e push** para a branch `main` (só os arquivos de release + o conteúdo do changeset):
    ```bash
-   git add .
-   git commit -m "feat(nome): descrição"
+   git add packages/react/package.json packages/react/CHANGELOG.md package-lock.json
+   git commit -m "chore(release): @semec/ds x.y.z"
    git push
    ```
 
-4. **A CI publica automaticamente** no npm via `changeset publish`
+4. **A CI publica** (`changeset publish` → npm) e **confirma** a versão no registry. O Changesets cria a tag git `@semec/ds@x.y.z`.
+
+### Como conferir o que está no npm
+
+```bash
+npm view @semec/ds version        # última publicada (dist-tag latest)
+npm view @semec/ds dist-tags
+npx changeset publish-plan        # o que a próxima release publicaria
+```
+
+### Fallback local (sem CI)
+
+Se o `NPM_TOKEN` estiver indisponível, um mantenedor autenticado no npm pode publicar da raiz do monorepo:
+
+```bash
+npm login                          # conta com publish em @semec
+npm whoami
+npm run build:ds
+npx changeset publish              # ou: npm run release
+```
+
+Conta com 2FA no npm: use token granular com bypass 2FA, ou `npx changeset publish --otp=XXXXXX`.
 
 ### Consumidores do pacote
 
 ```bash
-# Última versão
+# Última versão (latest)
 npm install @semec/ds
 
 # Versão específica
-npm install @semec/ds@1.2.3
+npm install @semec/ds@2.1.0
 
 # Dentro do range semver
-npm install @semec/ds@^1.0.0
+npm install @semec/ds@^2.0.0
 ```
 
 ### Versionamento semântico
 
-- **Major**: quebra de API ou mudança visual disruptiva
-- **Minor**: componente ou propriedade nova
+- **Major**: quebra de API, mudança visual disruptiva ou remoção de export
+- **Minor**: componente, propriedade ou export novo
 - **Patch**: correção de bug, ajuste de tipografia, contrato
 
 **Depreciação**: propriedade ou componente marcado como obsoleto continua funcionando por **duas versões menores**, com aviso, antes de sair em uma versão maior — conforme o [ADR-013](docs/adr/0013-politica-de-depreciacao-duas-minors.md). Toda versão maior traz guia de migração.

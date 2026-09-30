@@ -44,3 +44,10 @@ Build via tsup (ESM + dts), CI/CD via GitHub Actions, versionamento via Changese
 - O scope `@semec` no npm precisa ser registrado (gratuito para Organizações npm).
 - Publicações acidentais de código sensível são mitigadas por CI com lint + typecheck + build antes de publish.
 - O ADR-007 e o ADR-021 passam a `Substituído`.
+
+**Operação (como isso roda hoje).**
+- Workflow: `.github/workflows/release.yml` em push para `main` (e `workflow_dispatch`).
+- Auth da CI: secret **`NPM_TOKEN`** → `NODE_AUTH_TOKEN` no job inteiro (token granular com publish em `@semec` e bypass 2FA se a conta tiver 2FA).
+- Publish: `npx changeset publish` **somente se** a versão local for maior que a do registry; em seguida o job verifica `npm view @semec/ds version`.
+- Versionamento: Changesets (`.changeset/`); scripts root `changeset`, `version-packages`, `release`.
+- Runbook de contribuidor/mantenedor: [CONTRIBUTING.md](../../CONTRIBUTING.md) § *Publicação e versionamento*.
