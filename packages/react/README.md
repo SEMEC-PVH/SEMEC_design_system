@@ -131,6 +131,36 @@ Ative com `data-theme="dark"` em um ancestral:
 <html lang="pt-BR" data-theme="dark">
 ```
 
+## Segurança (CSP)
+
+Alguns componentes Radix injetam `<style>` dinamicamente (scrollbar hiding, scroll locking). Para ambientes com **Content Security Policy** estrita, use o `SemecProvider` com o nonce do servidor:
+
+```tsx
+import { SemecProvider } from "@semec/ds/react";
+
+function RootLayout({ nonce }) {
+  return (
+    <html>
+      <body>
+        <SemecProvider nonce={nonce}>
+          <App />
+        </SemecProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+**Componentes sem nonce (CSS estático em `tokens.css`):**
+- ScrollArea — scrollbar escondida via CSS estático
+- Select — scrollbar escondida via CSS estático
+
+**Componentes que precisam de nonce (via `SemecProvider`):**
+- Dialog, AlertDialog, Drawer, Sheet — scroll locking do body
+- DropdownMenu, Popover — scroll locking do body
+
+Sem nonce, esses componentes funcionam mas perdem a trava do fundo e a compensação de layout da scrollbar.
+
 ## Dependências
 
 - **Peer**: React 19+
