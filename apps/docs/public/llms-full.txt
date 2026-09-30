@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-09-30T14:27:29.387Z — packages/react/manifest.js + packages/react/* — versão 2.1.0
+> Gerado 2026-09-30T14:51:16.758Z — packages/react/manifest.js + packages/react/* — versão 2.1.0
 
 ## Instalação
 
