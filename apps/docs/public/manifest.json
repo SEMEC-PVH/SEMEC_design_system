@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
-  "version": "1.1.0",
-  "generatedAt": "2026-09-29T18:13:23.531Z",
+  "version": "2.0.0",
+  "generatedAt": "2026-09-30T13:51:02.558Z",
   "categories": [
     {
       "key": "acoes",
@@ -934,14 +934,14 @@
     }
   ],
   "install": {
-    "tokens": "packages/react/tokens.css",
-    "preset": "packages/react/pv-preset.ts",
-    "utils": "packages/react/src/lib/utils.ts"
+    "tokens": "import \"@semec/ds/react/tokens.css\";",
+    "preset": "@config \"@semec/ds/react/pv-preset\";",
+    "utils": "import { cn } from \"@semec/ds/react\";"
   },
   "tokens": {
     "files": [
-      "packages/react/tokens.css",
-      "packages/react/pv-preset.ts"
+      "tokens.css",
+      "pv-preset.ts"
     ]
   }
 }

@@ -9,10 +9,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "prebuild": "node scripts/generate-llms.mjs",
+    "prebuild": "node ../../packages/react/scripts/build-artifacts.mjs --target=docs-public",
     "start": "next start",
     "lint": "eslint .",
-    "generate:llms": "node scripts/generate-llms.mjs",
+    "generate:llms": "node ../../packages/react/scripts/build-artifacts.mjs --target=docs-public",
     "proto:css": "tailwindcss -i app/proto/proto.css -o public/proto/proto.css --minify"
   },
   "dependencies": {

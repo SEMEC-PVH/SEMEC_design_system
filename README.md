@@ -4,7 +4,7 @@ Monorepo do **Design System da SEMEC** — Secretaria Municipal de Economia da P
 
 Ele reúne três coisas:
 
-- **`packages/react/`** — o pacote npm **`@semec/ds`** (componentes React + Tailwind CSS v4 + shadcn/Radix/CVA, tokens `pv-*`, tema claro/escuro via `data-theme`).
+- **`packages/react/`** — o pacote npm **`@semec/ds`** (componentes React + Tailwind CSS v4 + shadcn/Radix/CVA, tokens `pv-*`, tema claro).
 - **`apps/docs/`** — o **site de documentação** (Next.js 16, export estático), que publica fundamentos, componentes e padrões.
 - **`packages/react/manifest.js`** — a **fonte única** para artefatos de IA (`llms.txt`, `manifest.json`, `components/*.md`), gerados automaticamente no build.
 
@@ -27,11 +27,11 @@ Requer Node >= 22. Na raiz (workspace npm):
 npm install
 npm run dev          # site em http://localhost:3000
 npm run build        # artefatos de IA (prebuild) + export estático em apps/docs/out
-npm run build:ds     # build do pacote @semec/ds (tsup + build-skills)
+npm run build:ds     # build do pacote @semec/ds (tsup + build-artifacts)
 npm run typecheck    # verifica tipos do pacote
 npm run lint         # ESLint (flat config + jsx-a11y)
 npm run proto:css    # CSS isolado dos componentes
-npm run generate:llms  # regenera artefatos IA (llms.txt, manifest.json, componentes/*.md)
+npm run generate:llms  # regenera artefatos IA (pipeline único build-artifacts.mjs)
 npm run start        # serve o site após build
 ```
 
@@ -44,7 +44,6 @@ npm install @semec/ds
 ```tsx
 // Importar tokens
 import "@semec/ds/react/tokens.css";
-import "@semec/ds/react/shadcn.css";
 
 // Usar componentes
 import { Button, Card, CardHeader, CardTitle, CardContent } from "@semec/ds/react";
@@ -58,7 +57,6 @@ import { Button, Card, CardHeader, CardTitle, CardContent } from "@semec/ds/reac
 |---|---|
 | `@semec/ds/react` | Todos os componentes + `cn()` |
 | `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) |
-| `@semec/ds/react/shadcn.css` | Variáveis shadcn HSL |
 | `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS) |
 | `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 (source TS) |
 | `@semec/ds/react/server` | Helpers Node.js |
@@ -68,6 +66,8 @@ import { Button, Card, CardHeader, CardTitle, CardContent } from "@semec/ds/reac
 | `@semec/ds/skills/manifest.json` | JSON completo para máquinas |
 | `@semec/ds/skills/manifest.js` | Manifest JS para agentes IA |
 | `@semec/ds/skills/components/*.md` | Chunk RAG por componente |
+| `@semec/ds/skills/semec-ds` | Skill full do agente (React + tokens + a11y) |
+| `@semec/ds/lite/skills/semec-ds-lite` | Skill lite (tokens + a11y + responsive) |
 
 ## Publicação
 
@@ -83,7 +83,7 @@ Detalhes completos: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Para agentes de IA
 
-Comece por `@semec/ds/skills/llms.txt` (índice) ou `@semec/ds/skills/manifest.json` (JSON com todos os componentes e prompts). A fonte única é `packages/react/manifest.js`.
+Comece por `@semec/ds/skills/llms.txt` (índice) ou `@semec/ds/skills/manifest.json` (JSON com todos os componentes e prompts). Skills: `@semec/ds/skills/semec-ds` (full) e `@semec/ds/lite/skills/semec-ds-lite` (lite). No repositório, as mesmas skills ficam em `.claude/skills/semec-ds/SKILL.md` e `.opencode/skills/semec-ds/SKILL.md`. A fonte única é `packages/react/manifest.js`; o gerador é `packages/react/scripts/build-artifacts.mjs`.
 
 ## Decisões
 

@@ -27,7 +27,7 @@ export default function CopySkillButton() {
 
   async function handleCopy() {
     try {
-      const res = await fetch(`${basePath}/SEMEC-SKILL.md`);
+      const res = await fetch(`${basePath}/skills/semec-ds/SKILL.md`);
       const text = await res.text();
       const ok = await copyText(text);
       setState(ok ? "ok" : "fail");

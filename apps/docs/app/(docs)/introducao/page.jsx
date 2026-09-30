@@ -229,8 +229,8 @@ export default function IntroPage() {
 
       <h2>Copiar skill</h2>
       <p>
-        Copie a skill completa com tokens, padrões de acessibilidade e
-        responsive para usar em agentes de IA ou documentação do seu projeto:
+        Copie a skill completa do agente — componentes React, tokens, acessibilidade e
+        responsive — para usar em agentes de IA ou documentação do seu projeto:
       </p>
       <CopySkillButton />
 

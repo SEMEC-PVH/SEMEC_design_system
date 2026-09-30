@@ -102,6 +102,23 @@ export default function Header({ open, onToggle }) {
       ?.scrollIntoView({ block: "nearest" });
   }, [activeIndex]);
 
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    // Lupa da busca só existe em ≤480px; ao cruzar para desktop, limpa o
+    // estado mobileOpen + query para não deixar a busca "presa" aberta.
+    const mql = window.matchMedia("(min-width: 481px)");
+    const sync = (e) => {
+      if (e.matches) {
+        setMobileOpen(false);
+        setQuery("");
+        setActiveIndex(-1);
+      }
+    };
+    sync(mql);
+    mql.addEventListener("change", sync);
+    return () => mql.removeEventListener("change", sync);
+  }, []);
+
   const closeResults = () => {
     setQuery("");
     setActiveIndex(-1);

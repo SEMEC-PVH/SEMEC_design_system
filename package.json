@@ -18,7 +18,7 @@
     "start": "npm run start --workspace @semec/docs",
     "lint": "npm run lint --workspace @semec/docs",
     "typecheck": "npm run typecheck --workspace @semec/ds",
-    "generate:llms": "npm run generate:llms --workspace @semec/docs",
+    "generate:llms": "npm run build:skills --workspace @semec/ds",
     "proto:css": "npm run proto:css --workspace @semec/docs",
     "clean": "npm run clean --workspace @semec/ds",
     "changeset": "changeset",

@@ -33,12 +33,14 @@ Não há Storybook, suíte de testes automatizados nem CI de acessibilidade. O s
 │       ├── components/    Casca da docs (docs/), demos e blocos de UI
 │       ├── lib/           Helpers do site (navegação, clipboard, busca)
 │       ├── public/        Artefatos GERADOS para IA + proto.css
-│       └── scripts/       generate-llms.mjs (gera os artefatos de IA)
+│       └── public/        Artefatos GERADOS para IA + proto.css
 ├── packages/
-│   └── react/             Kit @semec/ds-react (tokens + 32 componentes)
+│   └── react/             Kit @semec/ds (tokens + componentes)
 │       ├── src/           components/ + lib/ + index.ts
+│       ├── skills/        Skills canônicas semec-ds + semec-ds-lite
+│       ├── scripts/       build-artifacts.mjs (pipeline único de artefatos IA)
 │       ├── manifest.js    Fonte única de metadados/uso/prompt
-│       └── tokens.css · shadcn.css · pv-preset.ts
+│       └── tokens.css · pv-preset.ts
 ├── docs/                  Decisões: objetivo, arquitetura, ADRs, auditorias
 ├── legacy/                Versão anterior do guia + MIV da PMPV (a limpar)
 └── package.json           Raiz do workspace npm

@@ -46,24 +46,26 @@ export default function ComponentDoc({ c, extra }) {
       {c.variants.length > 0 && (
         <AnimateOnScroll delay={0.1}>
           <h3>Variantes e composição</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Prop / grupo</th>
-                <th>Valores</th>
-              </tr>
-            </thead>
-            <tbody>
-              {c.variants.map((v) => (
-                <tr key={v.prop}>
-                  <td>
-                    <code>{v.prop}</code>
-                  </td>
-                  <td>{v.values}</td>
+          <div className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Prop / grupo</th>
+                  <th>Valores</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {c.variants.map((v) => (
+                  <tr key={v.prop}>
+                    <td>
+                      <code>{v.prop}</code>
+                    </td>
+                    <td>{v.values}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </AnimateOnScroll>
       )}
 

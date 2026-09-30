@@ -18,23 +18,16 @@ variants: "composição: Table · TableHeader · TableRow · TableHead · TableB
 - **composição**: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption
 - **a11y**: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount
 
-## Instalação (semec-ds/react)
+## Instalação (@semec/ds)
 
 ```bash
-# 1. Copie packages/react/ para seu projeto (ou instale semec-ds/react pelo registry)
-# 2. Instale deps (ver packages/react/README.md)
-npm i class-variance-authority clsx tailwind-merge lucide-react \
-  @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
-  @radix-ui/react-radio-group @radix-ui/react-select @radix-ui/react-switch \
-  @radix-ui/react-popover @radix-ui/react-tabs @radix-ui/react-dialog \
-  @radix-ui/react-toast @radix-ui/react-tooltip
+npm install @semec/ds
 ```
 
 ```css
-/* globals.css */
 @import "tailwindcss";
-@import "./base/tokens.css";
-/* ou @config "./base/pv-preset.ts" */
+@import "@semec/ds/react/tokens.css";
+@config "@semec/ds/react/pv-preset";
 ```
 
 ## Uso
@@ -181,7 +174,7 @@ export {
 
 ## Tokens relacionados
 
-Tokens semânticos usados: `--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`, `--color-action-primary` etc. Ver `packages/react/tokens.css` no dump completo (`/llms-full.txt`).
+Tokens semânticos: `--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`, `--action-primary` etc. Ver `tokens.css` no dump completo.
 
 ---
 Gerado a partir de `packages/react/manifest.js` — não edite manualmente. Conteúdo PT-BR, código EN (ADR-016).

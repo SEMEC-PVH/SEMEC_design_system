@@ -28,7 +28,8 @@
     "./skills/manifest.json": "./dist/skills/manifest.json",
     "./skills/manifest.js": "./dist/skills/manifest.js",
     "./skills/components/*": "./dist/skills/components/*",
-    "./skills/ds-semec-skill": "./dist/skills/ds-semec-skill.md",
+    "./skills/semec-ds": "./dist/skills/semec-ds/SKILL.md",
+    "./skills/ds-semec-skill": "./dist/skills/semec-ds/SKILL.md",
     "./lite/tokens.css": "./dist/react/tokens.css",
     "./lite/pv-preset": {
       "types": "./dist/react/pv-preset.d.ts",
@@ -41,7 +42,8 @@
     },
     "./lite/skills/llms.txt": "./dist/lite/llms.txt",
     "./lite/skills/manifest.json": "./dist/lite/manifest.json",
-    "./lite/skills/ds-semec-skill": "./dist/lite/ds-semec-skill.md"
+    "./lite/skills/semec-ds-lite": "./dist/lite/semec-ds-lite/SKILL.md",
+    "./lite/skills/ds-semec-skill": "./dist/lite/semec-ds-lite/SKILL.md"
   },
   "files": [
     "dist",
@@ -55,10 +57,10 @@
     "**/*.css"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsup && tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/build-skills.mjs",
+    "build": "rm -rf dist && tsup && tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/build-artifacts.mjs",
     "build:react": "tsup",
     "build:types": "tsc --emitDeclarationOnly --rootDir src --outDir dist/react",
-    "build:skills": "node scripts/build-skills.mjs",
+    "build:skills": "node scripts/build-artifacts.mjs",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build",

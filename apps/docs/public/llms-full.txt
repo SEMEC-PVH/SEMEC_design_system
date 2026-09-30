@@ -1,161 +1,11 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-09-29T18:13:23.551Z — packages/react/manifest.js + packages/react/*
-
-## Instalação — packages/react/README.md
-
-```md
-# @semec/ds
-
-Design System SEMEC — componentes React + tokens CSS + artefatos para agentes de IA.
-
-React 19 + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Tema claro/escuro via `data-theme="dark"`.
+> Gerado 2026-09-30T13:51:02.558Z — packages/react/manifest.js + packages/react/* — versão 2.0.0
 
 ## Instalação
 
 ```bash
 npm install @semec/ds
-```
-
-## Uso rápido
-
-```tsx
-// 1. Importar tokens no seu CSS global
-import "@semec/ds/react/tokens.css";
-
-// 2. Usar componentes
-import { Button, Input, Card, CardHeader, CardTitle, CardContent } from "@semec/ds/react";
-
-function App() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Formulário</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Input placeholder="Nome" />
-        <Button variant="primary">Salvar</Button>
-      </CardContent>
-    </Card>
-  );
-}
-```
-
-### Toast
-
-```tsx
-import { Toaster, useToast } from "@semec/ds/react";
-
-// Adicionar Toaster no root do app
-function App() {
-  return (
-    <>
-      <MinhaPagina />
-      <Toaster />
-    </>
-  );
-}
-
-// Usar em qualquer componente
-function MeuComponente() {
-  const { toast } = useToast();
-
-  return (
-    <Button onClick={() => toast({ title: "Salvo!", description: "Dados gravados." })}>
-      Salvar
-    </Button>
-  );
-}
-```
-
-### Sheet (modal lateral)
-
-```tsx
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@semec/ds/react";
-
-function Exemplo() {
-  return (
-    <Sheet>
-      <SheetTrigger>Abrir</SheetTrigger>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Título</SheetTitle>
-        </SheetHeader>
-        <p>Conteúdo do sheet.</p>
-      </SheetContent>
-    </Sheet>
-  );
-}
-```
-
-## Subpath exports
-
-| Import | O que é |
-|---|---|
-| `@semec/ds/react` | Todos os componentes + `cn()` |
-| `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) + utilitários animação |
-| `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS config) |
-| `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 (arquivo TS original) |
-| `@semec/ds/react/server` | Helpers Node.js (ex: `getComponentMetadata()`) |
-| `@semec/ds/skills` | Manifest + componentes para agentes IA |
-| `@semec/ds/skills/llms.txt` | Índice para IA |
-| `@semec/ds/skills/llms-full.txt` | Dump completo |
-| `@semec/ds/skills/manifest.json` | JSON para consumo por máquinas |
-| `@semec/ds/skills/components/*.md` | Chunk RAG por componente |
-
-## Componentes
-
-46 componentes organizados por categoria:
-
-| Categoria | Componentes |
-|---|---|
-| **Navegação** | Abas, Breadcrumb, Link, Menu de Navegação, Paginação, Sidebar, Trilha de Navegação |
-| **Formulários** | Botão, Botão de Ícone, Caixa de Marcação, Caixa de Texto, Campo de Formulário, Combobox, DatePicker, Envio de Arquivos, Interruptor, Menu de Seleção, Menu Suspenso, RadioGroup, Select, Slider, OTP Input, Toggle |
-| **Dados** | Avatar, Cartão, Etiqueta, Tabela, Tabela de Dados |
-| **Feedback** | Aviso, Dialogo de Alerta, Dica, Drawer, ErrorSummary, Modal, Notificação, Popover, Progress, Toast |
-| **Layout** | Acordeão, Área de Texto, Calendário, Esqueleto, Separador, Sheet, Timeline |
-
-## Tokens
-
-```css
-/* Tokens primitivos + semânticos */
-@import "@semec/ds/react/tokens.css";
-```
-
-Ou use o preset Tailwind v4:
-
-```css
-@import "tailwindcss";
-@config "@semec/ds/react/pv-preset";
-@import "@semec/ds/react/tokens.css";
-```
-
-## Tema escuro
-
-Ative com `data-theme="dark"` em um ancestral:
-
-```html
-<html lang="pt-BR" data-theme="dark">
-```
-
-## Dependências
-
-- **Peer**: React 19+
-- **Tailwind CSS**: v4+
-- **Ícones**: `lucide-react`
-
-Todas as dependências Radix UI são instaladas automaticamente.
-
-## Documentação
-
-- [Site de documentação](https://semec.github.io/design-system)
-- [Guia de contribuição](../../CONTRIBUTING.md)
-- [ADRs](../../docs/adr/README.md)
-
-## Licença
-
-MIT
-
 ```
 
 ## packages/react/src/index.ts — barrel
@@ -193,6 +43,7 @@ export * from "./components/progress";
 export * from "./components/radio-group";
 export * from "./components/scroll-area";
 export * from "./components/select";
+export * from "./components/semec-provider";
 export * from "./components/separator";
 export * from "./components/sheet";
 export * from "./components/sidebar";
@@ -690,11 +541,14 @@ export * from "./lib/validators";
 
 /* ==========================================================================
    Scrollbar — esconde scrollbar nativa (Radix ScrollArea/Select)
+   Regra estática: elimina injeção de <style> pelo Radix (CSP-safe).
    ========================================================================== */
-[data-radix-scroll-area-viewport] {
+[data-radix-scroll-area-viewport],
+[data-radix-select-viewport] {
   scrollbar-width: none;
 }
-[data-radix-scroll-area-viewport]::-webkit-scrollbar {
+[data-radix-scroll-area-viewport]::-webkit-scrollbar,
+[data-radix-select-viewport]::-webkit-scrollbar {
   display: none;
 }
 
@@ -870,8 +724,16 @@ export default {
 ]
 ```
 
-## Componentes — todos (47)
+## Manifest — package.json
 
+```json
+{
+  "name": "@semec/ds",
+  "version": "2.0.0"
+}
+```
+
+## Componentes — todos (47)
 
 ### Botões (`button`) — `src/components/button.tsx` — slug: botoes
 
@@ -4207,7 +4069,7 @@ const Progress = React.forwardRef<
       className
     )}
     value={value}
-    aria-valuenow={value}
+    aria-valuenow={value ?? undefined}
     {...props}
   >
     <ProgressPrimitive.Indicator
@@ -6459,3 +6321,187 @@ export {
 ```
 
 ---
+
+## packages/react/README.md
+
+```md
+# @semec/ds
+
+Design System SEMEC — componentes React + tokens CSS + artefatos para agentes de IA.
+
+React 19 + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Tokens `pv-*` (tema claro).
+
+## Instalação
+
+```bash
+npm install @semec/ds
+```
+
+## Uso rápido
+
+```tsx
+// 1. Importar tokens no seu CSS global
+import "@semec/ds/react/tokens.css";
+
+// 2. Usar componentes
+import { Button, Input, Card, CardHeader, CardTitle, CardContent } from "@semec/ds/react";
+
+function App() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Formulário</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Input placeholder="Nome" />
+        <Button variant="primary">Salvar</Button>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+### Toast
+
+```tsx
+import { Toaster, useToast } from "@semec/ds/react";
+
+// Adicionar Toaster no root do app
+function App() {
+  return (
+    <>
+      <MinhaPagina />
+      <Toaster />
+    </>
+  );
+}
+
+// Usar em qualquer componente
+function MeuComponente() {
+  const { toast } = useToast();
+
+  return (
+    <Button onClick={() => toast({ title: "Salvo!", description: "Dados gravados." })}>
+      Salvar
+    </Button>
+  );
+}
+```
+
+### Sheet (modal lateral)
+
+```tsx
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@semec/ds/react";
+
+function Exemplo() {
+  return (
+    <Sheet>
+      <SheetTrigger>Abrir</SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Título</SheetTitle>
+        </SheetHeader>
+        <p>Conteúdo do sheet.</p>
+      </SheetContent>
+    </Sheet>
+  );
+}
+```
+
+## Subpath exports
+
+| Import | O que é |
+|---|---|
+| `@semec/ds/react` | Todos os componentes + `cn()` |
+| `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) + utilitários animação |
+| `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS config) |
+| `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 (arquivo TS original) |
+| `@semec/ds/react/server` | Helpers Node.js (ex: `getComponentMetadata()`) |
+| `@semec/ds/skills` | Manifest + componentes para agentes IA |
+| `@semec/ds/skills/llms.txt` | Índice para IA |
+| `@semec/ds/skills/llms-full.txt` | Dump completo |
+| `@semec/ds/skills/manifest.json` | JSON para consumo por máquinas |
+| `@semec/ds/skills/components/*.md` | Chunk RAG por componente |
+| `@semec/ds/skills/semec-ds` | Skill full do agente |
+| `@semec/ds/lite/skills/semec-ds-lite` | Skill lite (tokens + a11y + responsive) |
+
+## Componentes
+
+46 componentes organizados por categoria:
+
+| Categoria | Componentes |
+|---|---|
+| **Navegação** | Abas, Breadcrumb, Link, Menu de Navegação, Paginação, Sidebar, Trilha de Navegação |
+| **Formulários** | Botão, Botão de Ícone, Caixa de Marcação, Caixa de Texto, Campo de Formulário, Combobox, DatePicker, Envio de Arquivos, Interruptor, Menu de Seleção, Menu Suspenso, RadioGroup, Select, Slider, OTP Input, Toggle |
+| **Dados** | Avatar, Cartão, Etiqueta, Tabela, Tabela de Dados |
+| **Feedback** | Aviso, Dialogo de Alerta, Dica, Drawer, ErrorSummary, Modal, Notificação, Popover, Progress, Toast |
+| **Layout** | Acordeão, Área de Texto, Calendário, Esqueleto, Separador, Sheet, Timeline |
+
+## Tokens
+
+```css
+/* Tokens primitivos + semânticos */
+@import "@semec/ds/react/tokens.css";
+```
+
+Ou use o preset Tailwind v4:
+
+```css
+@import "tailwindcss";
+@config "@semec/ds/react/pv-preset";
+@import "@semec/ds/react/tokens.css";
+```
+
+## Tema
+
+Os tokens do pacote (`tokens.css`) são tema **claro**. Não há `shadcn.css` no pacote (removido na 2.0.0).
+
+## Segurança (CSP)
+
+Alguns componentes Radix injetam `<style>` dinamicamente (scrollbar hiding, scroll locking). Para ambientes com **Content Security Policy** estrita, use o `SemecProvider` com o nonce do servidor:
+
+```tsx
+import { SemecProvider } from "@semec/ds/react";
+
+function RootLayout({ nonce }) {
+  return (
+    <html>
+      <body>
+        <SemecProvider nonce={nonce}>
+          <App />
+        </SemecProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+**Componentes sem nonce (CSS estático em `tokens.css`):**
+- ScrollArea — scrollbar escondida via CSS estático
+- Select — scrollbar escondida via CSS estático
+
+**Componentes que precisam de nonce (via `SemecProvider`):**
+- Dialog, AlertDialog, Drawer, Sheet — scroll locking do body
+- DropdownMenu, Popover — scroll locking do body
+
+Sem nonce, esses componentes funcionam mas perdem a trava do fundo e a compensação de layout da scrollbar.
+
+## Dependências
+
+- **Peer**: React 19+
+- **Tailwind CSS**: v4+
+- **Ícones**: `lucide-react`
+
+Todas as dependências Radix UI são instaladas automaticamente.
+
+## Documentação
+
+- [Site de documentação](https://semec.github.io/design-system)
+- [Guia de contribuição](../../CONTRIBUTING.md)
+- [ADRs](../../docs/adr/README.md)
+
+## Licença
+
+MIT
+
+```

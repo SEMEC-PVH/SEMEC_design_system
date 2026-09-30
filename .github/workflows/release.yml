@@ -9,6 +9,9 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -30,11 +33,23 @@ jobs:
       - name: Build package
         run: npm run build:ds
 
-      - name: Show publish plan
+      - name: Diagnóstico npm
         run: |
-          echo "package version: $(node -p "require('./packages/react/package.json').version")"
-          echo "npm whoami: $(npm whoami 2>&1 || true)"
-          npx changeset publish-plan
+          {
+            echo "## Release @semec/ds"
+            echo ""
+            echo "- version local: \`$(node -p "require('./packages/react/package.json').version")\`"
+            echo "- npm whoami: \`$(npm whoami 2>&1 || echo '(não autenticado)')\`"
+            echo ""
+            echo "### Publish plan"
+            echo '```'
+            npx changeset publish-plan
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          if ! npm whoami >/dev/null 2>&1; then
+            echo "::error::Não autenticado no npm. Configure o secret NPM_TOKEN (Automation token com permissão de publish em @semec)."
+            exit 1
+          fi
 
       - name: Publish to npm
         run: npx changeset publish
@@ -45,7 +60,7 @@ jobs:
         run: |
           expected=$(node -p "require('./packages/react/package.json').version")
           published=$(npm view @semec/ds version)
-          echo "expected=$expected published=$published"
+          echo "expected=$expected published=$published" | tee -a "$GITHUB_STEP_SUMMARY"
           if [ "$published" != "$expected" ]; then
             echo "::error::@semec/ds no npm está em '$published', mas o repo espera '$expected'"
             exit 1

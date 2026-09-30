@@ -283,13 +283,22 @@ export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
       );
     });
 
+  // Colapso desktop (ds-sidebar-collapsed) não vale em mobile: no drawer,
+  // a classe .collapsed encolhe a sidebar para 64px e esconde nav-labels,
+  // impedindo o usuário de reabrir. A preferência no localStorage permanece.
+  const applyCollapsed = collapsed && !isMobile;
+
   // Fora da tela em mobile: retira do foco e do leitor de tela.
   // No desktop a sidebar está sempre visível, então nunca fica inerte.
   const inert = isMobile && !open;
 
   return (
     <aside
-      className={"sidebar" + (open ? " open" : "") + (collapsed ? " collapsed" : "")}
+      className={
+        "sidebar" +
+        (open ? " open" : "") +
+        (applyCollapsed ? " collapsed" : "")
+      }
       id="sidebar"
       inert={inert}
     >

@@ -41,3 +41,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .playwright-mcp/
+
+# agent dirs gerados no build (ADR-023)
+.claude/
+.opencode/

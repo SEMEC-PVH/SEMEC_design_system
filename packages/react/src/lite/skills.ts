@@ -2,7 +2,7 @@
  * @semec/ds/lite/skills — Dados de identidade visual para agentes IA.
  *
  * Re-exporta apenas categorias e portal (sem componentes).
- * Artefatos estáticos (llms.txt, manifest.json, ds-semec-skill.md)
+ * Artefatos estáticos (llms.txt, manifest.json, skills/semec-ds-lite/SKILL.md)
  * estão em dist/lite/ e acessíveis via subpath exports.
  */
 

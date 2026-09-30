@@ -2,7 +2,7 @@
 
 Design System SEMEC — componentes React + tokens CSS + artefatos para agentes de IA.
 
-React 19 + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Tema claro/escuro via `data-theme="dark"`.
+React 19 + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Tokens `pv-*` (tema claro).
 
 ## Instalação
 
@@ -95,6 +95,8 @@ function Exemplo() {
 | `@semec/ds/skills/llms-full.txt` | Dump completo |
 | `@semec/ds/skills/manifest.json` | JSON para consumo por máquinas |
 | `@semec/ds/skills/components/*.md` | Chunk RAG por componente |
+| `@semec/ds/skills/semec-ds` | Skill full do agente |
+| `@semec/ds/lite/skills/semec-ds-lite` | Skill lite (tokens + a11y + responsive) |
 
 ## Componentes
 
@@ -123,13 +125,9 @@ Ou use o preset Tailwind v4:
 @import "@semec/ds/react/tokens.css";
 ```
 
-## Tema escuro
+## Tema
 
-Ative com `data-theme="dark"` em um ancestral:
-
-```html
-<html lang="pt-BR" data-theme="dark">
-```
+Os tokens do pacote (`tokens.css`) são tema **claro**. Não há `shadcn.css` no pacote (removido na 2.0.0).
 
 ## Segurança (CSP)
 

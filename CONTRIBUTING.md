@@ -65,7 +65,7 @@ Aprovado, o pull request entra por merge na branch de destino. Se houver changes
 
 - [ ] Issue de proposta vinculada (exceto correção pontual)
 - [ ] Changeset criado (se houver mudança relevante)
-- [ ] `npm run build:ds` passando — roda tsup + build-skills, verifica se o pacote compila sem erros
+- [ ] `npm run build:ds` passando — roda tsup + build-artifacts, verifica se o pacote compila sem erros
 - [ ] `npm run typecheck` passando — verifica tipos
 - [ ] `npm run build` passando — roda next build com output: 'export' e verifica se o site compila
 - [ ] Página conferida com teclado, foco visível ponta a ponta

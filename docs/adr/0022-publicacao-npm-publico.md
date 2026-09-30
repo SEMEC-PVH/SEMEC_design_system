@@ -19,14 +19,15 @@ substitui: [7, 21]
 | Subpath | Conteúdo |
 |---------|----------|
 | `@semec/ds/react` | Componentes React (barrel) |
-| `@semec/ds/react/tokens.css` | Tokens CSS (L0 + L1 + dark theme) |
-| `@semec/ds/react/shadcn.css` | Variáveis shadcn HSL |
+| `@semec/ds/react/tokens.css` | Tokens CSS (L0 + L1) |
 | `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 |
 | `@semec/ds/skills` | Manifest + helpers para agentes |
 | `@semec/ds/skills/llms.txt` | Índice leve para LLMs |
-| `@semec/ds/skills/llms-full.txt` | Dump completo (~119KB) |
+| `@semec/ds/skills/llms-full.txt` | Dump completo |
 | `@semec/ds/skills/manifest.json` | JSON para consumo por máquinas |
 | `@semec/ds/skills/components/*.md` | Chunks RAG por componente |
+| `@semec/ds/skills/semec-ds` | Skill full do agente |
+| `@semec/ds/lite/skills/semec-ds-lite` | Skill lite (tokens + a11y + responsive) |
 
 Build via tsup (ESM + dts), CI/CD via GitHub Actions, versionamento via Changesets com SemVer estrito. Tokens CSS permanecem embutidos no pacote nesta fase; separação em `@semec/ds-tokens` fica para quando houver consumidor CSS-only (ver [ADR-002](0002-monorepo-pnpm-multiplos-pacotes.md)).
 
