@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 /**
@@ -8,10 +8,19 @@ import { createPortal } from "react-dom";
  * - Carrega só public/proto/proto.css (sem globals.css), evita vazamento table/a.
  * - Copia variáveis L1 do documento pai (--bg, --fg etc.) e tema dark.
  * - Altura auto via ResizeObserver.
+ * - Expõe o body do iframe via PreviewPortalContext para Radix Portal
+ *   (Combobox/Select/etc. não devem portalar no body do site docs).
  */
+export const PreviewPortalContext = createContext(null);
+
+export function usePreviewPortalContainer() {
+  return useContext(PreviewPortalContext);
+}
+
 export default function PreviewFrame({ children }) {
   const iframeRef = useRef(null);
   const [mountNode, setMountNode] = useState(null);
+  const [portalContainer, setPortalContainer] = useState(null);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -23,7 +32,7 @@ export default function PreviewFrame({ children }) {
 
     // Monta esqueleto do iframe
     doc.open();
-    doc.write(`<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="${basePath}/proto/proto.css"></head><body><div id="root"></div></body></html>`);
+    doc.write(`<!doctype html><html><head><meta charset="utf-8"><style>*,*::before,*::after{box-sizing:border-box}</style><link rel="stylesheet" href="${basePath}/proto/proto.css"></head><body><div id="root"></div></body></html>`);
     doc.close();
 
     const root = doc.getElementById("root");
@@ -102,15 +111,12 @@ export default function PreviewFrame({ children }) {
         if (v) iframeHtml.style.setProperty(name, v.trim());
       });
 
-      // Canvas do iframe é branco por padrão; sem pintar html/body,
-      // o fundo "vaza" branco mesmo com componentes dark.
+      // Canvas do iframe: surface-alt em claro para os componentes (brancos)
+      // se destacarem; dark usa surface-alt também (#222).
       const surfaceAlt = (cs.getPropertyValue("--surface-alt") || "").trim() || "#f5f5f5";
-      const surface = (cs.getPropertyValue("--surface") || "").trim() || "#ffffff";
-      const frameBg = iframeHtml.dataset.theme === "dark" ? surfaceAlt : surface;
+      const frameBg = surfaceAlt;
       iframeHtml.style.background = frameBg;
-      iframeHtml.style.overflow = "hidden";
       doc.body.style.background = frameBg;
-      doc.body.style.overflow = "hidden";
       doc.body.style.minWidth = "0";
     };
     syncTheme();
@@ -120,45 +126,70 @@ export default function PreviewFrame({ children }) {
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "style", "class"] });
 
     setMountNode(root);
+    setPortalContainer(doc.body);
 
     // Auto altura
     let ro;
     const syncHeight = () => {
       if (!doc.body) return;
-      iframe.style.height = doc.documentElement.scrollHeight + "px";
+      let maxBottom = Math.max(
+        doc.documentElement.scrollHeight,
+        doc.body.scrollHeight,
+        160
+      );
+      // Portals Radix (Combobox/Select) não aumentam scrollHeight;
+      // medir o wrapper para o iframe não cortar o popover.
+      doc.querySelectorAll("[data-radix-popper-content-wrapper]").forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        maxBottom = Math.max(maxBottom, rect.bottom + 24);
+      });
+      iframe.style.height = `${Math.ceil(maxBottom)}px`;
     };
     // espera proto.css carregar
     const link = doc.querySelector(`link[href="${basePath}/proto/proto.css"]`);
     const onLoad = () => syncHeight();
     if (link) link.addEventListener("load", onLoad);
-    // ResizeObserver no root
+    // ResizeObserver no root + mutações no DOM do iframe (popover abrir/fechar)
     if (typeof ResizeObserver !== "undefined") {
       ro = new ResizeObserver(syncHeight);
       ro.observe(doc.body);
       ro.observe(doc.documentElement);
     }
+    const domObserver = new MutationObserver(syncHeight);
+    domObserver.observe(doc.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-state", "style", "class"],
+    });
     // fallback interval curto
     const iv = setInterval(syncHeight, 300);
     setTimeout(() => clearInterval(iv), 3000);
+    syncHeight();
 
     return () => {
       observer.disconnect();
+      domObserver.disconnect();
       clearTimeout(retryTimer);
       if (link) link.removeEventListener("load", onLoad);
       if (ro) ro.disconnect();
       clearInterval(iv);
+      setMountNode(null);
+      setPortalContainer(null);
     };
   }, []);
 
   return (
-    <div className="proto-preview">
-      <iframe
-        ref={iframeRef}
-        title="Preview isolado"
-        className="proto-preview-iframe"
-        sandbox="allow-scripts allow-same-origin"
-      />
-      {mountNode ? createPortal(children, mountNode) : null}
-    </div>
+    <PreviewPortalContext.Provider value={portalContainer}>
+      <div className="proto-preview">
+        <iframe
+          ref={iframeRef}
+          title="Preview isolado"
+          className="proto-preview-iframe"
+          sandbox="allow-scripts allow-same-origin"
+        />
+        {mountNode ? createPortal(children, mountNode) : null}
+      </div>
+    </PreviewPortalContext.Provider>
   );
 }

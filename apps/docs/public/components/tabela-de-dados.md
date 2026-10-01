@@ -9,7 +9,7 @@ variants: "props: columns · data · sortKey · sortDir · onSort · page · pag
 
 # Tabela de dados — `data-table`
 
-> Tabela com ordenação visual, paginação e空 states.
+> Tabela com ordenação visual, paginação e empty states.
 
 **Arquivo:** `src/components/data-table.tsx` | **Categoria:** Conteúdo e dados | **Rota:** `/componentes/tabela-de-dados`
 
@@ -54,7 +54,7 @@ const columns = [
 ## Prompt para IA
 
 ```text
-Crie um data-table (Tabela de dados) usando @semec/ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption. Tabela com ordenação visual, paginação e空 states.
+Crie um data-table (Tabela de dados) usando @semec/ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption. Tabela com ordenação visual, paginação e empty states.
 ```
 
 ## Fonte

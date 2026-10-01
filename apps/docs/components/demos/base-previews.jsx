@@ -7,6 +7,15 @@ import {
   AccordionItem,
   AccordionTrigger,
   Alert,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
   AlertDescription,
   AlertTitle,
   Avatar,
@@ -23,6 +32,7 @@ import {
   CardTitle,
   Checkbox,
   Combobox,
+  DataTable,
   DatePicker,
   Dialog,
   DialogClose,
@@ -32,7 +42,21 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   EmptyState,
+  ErrorSummary,
   FileUpload,
   FormField,
   Header,
@@ -68,12 +92,21 @@ import {
   SelectTrigger,
   SelectValue,
   Separator,
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
   Sidebar,
   SidebarContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
+  SidebarToggleButton,
   Skeleton,
   Slider,
   Spinner,
@@ -111,8 +144,8 @@ import {
   TooltipTrigger,
   useToast,
 } from "semec-ds/react";
-import { Bell, Download, HelpCircle, Inbox, Plus, Printer, Search, Trash2 } from "lucide-react";
-import PreviewFrame from "@/components/docs/PreviewFrame";
+import { Bell, Download, HelpCircle, Inbox, MoreHorizontal, Plus, Printer, Search, Trash2 } from "lucide-react";
+import PreviewFrame, { usePreviewPortalContainer } from "@/components/docs/PreviewFrame";
 
 const ROW = "flex flex-wrap items-center gap-3";
 
@@ -227,10 +260,12 @@ function SelectPreview() {
 
 function ComboboxPreview() {
   const [value, setValue] = useState("cnpj");
+  const portalContainer = usePreviewPortalContainer();
   return (
     <div className="w-64">
       <Combobox
         ariaLabel="Tipo de cadastro"
+        portalContainer={portalContainer}
         options={[
           { value: "cnpj", label: "CNPJ" },
           { value: "cpf", label: "CPF" },
@@ -651,20 +686,45 @@ function SliderPreview() {
 }
 
 function InputOTPPreview() {
+  const [value, setValue] = useState("482915");
   return (
-    <InputOTP maxLength={6}>
-      <InputOTPGroup>
-        <InputOTPSlot index={0} />
-        <InputOTPSlot index={1} />
-        <InputOTPSlot index={2} />
-      </InputOTPGroup>
-      <InputOTPSeparator />
-      <InputOTPGroup>
-        <InputOTPSlot index={3} />
-        <InputOTPSlot index={4} />
-        <InputOTPSlot index={5} />
-      </InputOTPGroup>
-    </InputOTP>
+    <div className="w-full max-w-sm space-y-4 text-left">
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-muted-foreground">Código de verificação</p>
+        <InputOTP value={value} onChange={setValue} maxLength={6}>
+          <InputOTPGroup>
+            <InputOTPSlot index={0} />
+            <InputOTPSlot index={1} />
+            <InputOTPSlot index={2} />
+          </InputOTPGroup>
+          <InputOTPSeparator />
+          <InputOTPGroup>
+            <InputOTPSlot index={3} />
+            <InputOTPSlot index={4} />
+            <InputOTPSlot index={5} />
+          </InputOTPGroup>
+        </InputOTP>
+        <p className="text-xs text-muted-foreground">
+          Valor: {value || "—"} ({value.length}/6)
+        </p>
+      </div>
+      <div className="space-y-2">
+        <p className="text-xs font-medium text-muted-foreground">Desabilitado</p>
+        <InputOTP value="000000" disabled maxLength={6}>
+          <InputOTPGroup>
+            <InputOTPSlot index={0} />
+            <InputOTPSlot index={1} />
+            <InputOTPSlot index={2} />
+          </InputOTPGroup>
+          <InputOTPSeparator />
+          <InputOTPGroup>
+            <InputOTPSlot index={3} />
+            <InputOTPSlot index={4} />
+            <InputOTPSlot index={5} />
+          </InputOTPGroup>
+        </InputOTP>
+      </div>
+    </div>
   );
 }
 
@@ -790,6 +850,260 @@ function HeaderPreview() {
   );
 }
 
+function SheetPreview() {
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline">Abrir filtros</Button>
+      </SheetTrigger>
+      <SheetContent side="left">
+        <SheetHeader>
+          <SheetTitle>Filtros</SheetTitle>
+          <SheetDescription>Refine sua busca.</SheetDescription>
+        </SheetHeader>
+        <div className="space-y-4 p-6">
+          <div>
+            <p className="mb-2 text-sm font-medium">Status</p>
+            <div className="flex items-center gap-2 text-sm">
+              <Checkbox id="sh-pendente" defaultChecked />
+              <Label htmlFor="sh-pendente">Pendente</Label>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Checkbox id="sh-andamento" />
+              <Label htmlFor="sh-andamento">Em andamento</Label>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Checkbox id="sh-concluido" defaultChecked />
+              <Label htmlFor="sh-concluido">Concluído</Label>
+            </div>
+          </div>
+          <div>
+            <p className="mb-2 text-sm font-medium">Período</p>
+            <div className="flex items-center gap-2 text-sm">
+              <input type="radio" id="sh-p7" name="periodo" defaultChecked />
+              <Label htmlFor="sh-p7">Últimos 7 dias</Label>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <input type="radio" id="sh-p30" name="periodo" />
+              <Label htmlFor="sh-p30">Últimos 30 dias</Label>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <input type="radio" id="sh-ptodos" name="periodo" />
+              <Label htmlFor="sh-ptodos">Todos</Label>
+            </div>
+          </div>
+        </div>
+        <SheetFooter>
+          <SheetClose asChild>
+            <Button>Aplicar</Button>
+          </SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function DrawerPreview() {
+  return (
+    <Drawer>
+      <DrawerTrigger asChild>
+        <Button>Abrir painel</Button>
+      </DrawerTrigger>
+      <DrawerContent side="right">
+        <DrawerHeader>
+          <DrawerTitle>Detalhes</DrawerTitle>
+          <DrawerDescription>Informações do protocolo.</DrawerDescription>
+        </DrawerHeader>
+        <div className="p-6">
+          <p>
+            Este é o conteúdo do painel. Aqui podem ser exibidos detalhes,
+            configurações ou qualquer informação complementar.
+          </p>
+        </div>
+        <DrawerFooter>
+          <DrawerClose asChild>
+            <Button variant="outline">Fechar</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  );
+}
+
+function AlertDialogPreview() {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="destructive">Excluir requerimento</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Excluir requerimento?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Esta ação não pode ser desfeita.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction>Excluir</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+function SidebarTriggerPreview() {
+  const [open, setOpen] = useState(true);
+  return (
+    <div className="flex flex-col items-start gap-3">
+      <div className="flex items-center gap-3">
+        <SidebarToggleButton open={open} onToggle={() => setOpen((v) => !v)} />
+        <span className="text-sm">
+          Estado: <strong>{open ? "Aberta" : "Fechada"}</strong>
+        </span>
+      </div>
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="flex items-center gap-2">
+          <SidebarToggleButton open={true} onToggle={() => {}} />
+          <span className="text-xs text-muted-foreground">Ícone: fechar</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <SidebarToggleButton open={false} onToggle={() => {}} />
+          <span className="text-xs text-muted-foreground">Ícone: abrir</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DropdownMenuPreview() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" aria-label="Mais opções">
+          <MoreHorizontal />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem>Editar</DropdownMenuItem>
+        <DropdownMenuItem>Duplicar</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="text-destructive">Excluir</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+const DT_COLUMNS = [
+  { key: "nome", header: "Nome", sortable: true },
+  { key: "email", header: "E-mail" },
+  { key: "status", header: "Status", sortable: true },
+];
+
+const DT_DATA = [
+  { nome: "João Silva", email: "joao@email.com", status: "Ativo" },
+  { nome: "Maria Santos", email: "maria@email.com", status: "Pendente" },
+  { nome: "Pedro Lima", email: "pedro@email.com", status: "Inativo" },
+  { nome: "Ana Oliveira", email: "ana@email.com", status: "Ativo" },
+  { nome: "Carlos Souza", email: "carlos@email.com", status: "Pendente" },
+  { nome: "Lucia Ferreira", email: "lucia@email.com", status: "Ativo" },
+  { nome: "Roberto Alves", email: "roberto@email.com", status: "Inativo" },
+  { nome: "Fernanda Costa", email: "fernanda@email.com", status: "Ativo" },
+  { nome: "Marcos Ribeiro", email: "marcos@email.com", status: "Pendente" },
+];
+
+function DataTablePreview() {
+  const [sortKey, setSortKey] = useState(null);
+  const [sortDir, setSortDir] = useState("asc");
+  const [page, setPage] = useState(1);
+
+  const handleSort = (key) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
+
+  return (
+    <div className="w-full max-w-xl">
+      <DataTable
+        columns={DT_COLUMNS}
+        data={DT_DATA}
+        sortKey={sortKey}
+        sortDir={sortDir}
+        onSort={handleSort}
+        page={page}
+        pageCount={3}
+        onPageChange={setPage}
+      />
+    </div>
+  );
+}
+
+function ErrorSummaryPreview() {
+  const [valores, setValores] = useState({ nome: "", email: "" });
+  const [erros, setErros] = useState([]);
+  const [tentativa, setTentativa] = useState(0);
+  const [enviado, setEnviado] = useState(false);
+
+  function aoEnviar(event) {
+    event.preventDefault();
+    const encontrados = [];
+    if (!valores.nome.trim()) {
+      encontrados.push({ id: "nome", message: "Informe o nome completo." });
+    }
+    if (!valores.email.trim()) {
+      encontrados.push({ id: "email", message: "Informe o e-mail." });
+    } else if (!valores.email.includes("@")) {
+      encontrados.push({ id: "email", message: "O e-mail precisa conter @." });
+    }
+    setErros(encontrados);
+    setEnviado(encontrados.length === 0);
+    setTentativa((n) => n + 1);
+  }
+
+  const erroDe = (id) => erros.find((e) => e.id === id);
+
+  return (
+    <form onSubmit={aoEnviar} noValidate className="w-full max-w-md space-y-4 text-left">
+      <ErrorSummary errors={erros} focusKey={tentativa} />
+      {enviado && (
+        <p role="status" className="text-sm text-muted-foreground">
+          Formulário válido — demonstração apenas.
+        </p>
+      )}
+      <FormField
+        label="Nome completo"
+        htmlFor="es-nome"
+        error={erroDe("nome")?.message}
+      >
+        <Input
+          id="es-nome"
+          value={valores.nome}
+          aria-invalid={erroDe("nome") ? true : undefined}
+          onChange={(e) => setValores((v) => ({ ...v, nome: e.target.value }))}
+        />
+      </FormField>
+      <FormField
+        label="E-mail"
+        htmlFor="es-email"
+        error={erroDe("email")?.message}
+      >
+        <Input
+          id="es-email"
+          type="email"
+          value={valores.email}
+          aria-invalid={erroDe("email") ? true : undefined}
+          onChange={(e) => setValores((v) => ({ ...v, email: e.target.value }))}
+        />
+      </FormField>
+      <Button type="submit">Enviar</Button>
+    </form>
+  );
+}
+
 const PREVIEWS = {
   button: ButtonPreview,
   "icon-button": IconButtonPreview,
@@ -832,6 +1146,13 @@ const PREVIEWS = {
   timeline: TimelinePreview,
   "navigation-menu": NavigationMenuPreview,
   sidebar: SidebarPreview,
+  sheet: SheetPreview,
+  drawer: DrawerPreview,
+  "alert-dialog": AlertDialogPreview,
+  "sidebar-trigger": SidebarTriggerPreview,
+  "dropdown-menu": DropdownMenuPreview,
+  "data-table": DataTablePreview,
+  "error-summary": ErrorSummaryPreview,
 };
 
 export default function BasePreview({ slug }) {

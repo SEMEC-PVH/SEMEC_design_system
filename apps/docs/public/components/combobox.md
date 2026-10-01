@@ -70,6 +70,8 @@ interface ComboboxProps {
   disabled?: boolean;
   ariaLabel?: string;
   className?: string;
+  /** Elemento onde o popover é portalado (ex.: body de um iframe de preview). */
+  portalContainer?: HTMLElement | null;
 }
 
 const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
@@ -83,6 +85,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
       disabled,
       ariaLabel = "Selecionar",
       className,
+      portalContainer,
     },
     ref
   ) => {
@@ -116,11 +119,11 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
             <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" aria-hidden="true" />
           </button>
         </PopoverPrimitive.Trigger>
-        <PopoverPrimitive.Portal>
+        <PopoverPrimitive.Portal container={portalContainer}>
           <PopoverPrimitive.Content
             align="start"
             sideOffset={4}
-            className="z-50 w-[var(--radix-popover-trigger-width)] rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 outline-none data-[state=open]:animate-in"
+            className="z-50 w-[var(--radix-popover-trigger-width)] min-w-[12rem] rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 outline-none data-[state=open]:animate-in"
           >
             <div className="border-b border-border p-2">
               <input

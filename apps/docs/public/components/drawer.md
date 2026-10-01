@@ -4,7 +4,7 @@ code: "drawer"
 slug: "drawer"
 file: "src/components/drawer.tsx"
 category: "feedback"
-variants: "side: top · bottom · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close"
+variants: "side: bottom (padrão) · top · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close"
 ---
 
 # Drawer — `drawer`
@@ -15,7 +15,7 @@ variants: "side: top · bottom · left · right · composição: Drawer · Trigg
 
 ## Variantes
 
-- **side**: top · bottom · left · right
+- **side**: bottom (padrão) · top · left · right
 - **composição**: Drawer · Trigger · Content · Header · Footer · Title · Description · Close
 
 ## Instalação (@semec/ds)
@@ -53,7 +53,7 @@ import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, Drawer
 ## Prompt para IA
 
 ```text
-Crie um drawer (Drawer) usando @semec/ds/react (`src/components/drawer.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: top · bottom · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close. Painel deslizante de qualquer lado da tela.
+Crie um drawer (Drawer) usando @semec/ds/react (`src/components/drawer.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: bottom (padrão) · top · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close. Painel deslizante de qualquer lado da tela.
 ```
 
 ## Fonte

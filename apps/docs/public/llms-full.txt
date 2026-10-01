@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-01T00:36:24.672Z — packages/react/manifest.js + packages/react/* — versão 3.0.0
+> Gerado 2026-10-01T13:50:50.745Z — packages/react/manifest.js + packages/react/* — versão 3.0.0
 
 ## Instalação
 
@@ -1314,6 +1314,8 @@ interface ComboboxProps {
   disabled?: boolean;
   ariaLabel?: string;
   className?: string;
+  /** Elemento onde o popover é portalado (ex.: body de um iframe de preview). */
+  portalContainer?: HTMLElement | null;
 }
 
 const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
@@ -1327,6 +1329,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
       disabled,
       ariaLabel = "Selecionar",
       className,
+      portalContainer,
     },
     ref
   ) => {
@@ -1360,11 +1363,11 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
             <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" aria-hidden="true" />
           </button>
         </PopoverPrimitive.Trigger>
-        <PopoverPrimitive.Portal>
+        <PopoverPrimitive.Portal container={portalContainer}>
           <PopoverPrimitive.Content
             align="start"
             sideOffset={4}
-            className="z-50 w-[var(--radix-popover-trigger-width)] rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 outline-none data-[state=open]:animate-in"
+            className="z-50 w-[var(--radix-popover-trigger-width)] min-w-[12rem] rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 outline-none data-[state=open]:animate-in"
           >
             <div className="border-b border-border p-2">
               <input
@@ -2936,9 +2939,9 @@ Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-exp
 
 Uso:
 ```tsx
-import { SidebarTrigger } from "@semec/ds/react";
+import { SidebarToggleButton } from "@semec/ds/react";
 
-<SidebarTrigger open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />
+<SidebarToggleButton open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />
 ```
 
 Prompt:
@@ -4398,21 +4401,22 @@ function useInputOTP() {
 }
 
 interface InputOTPProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
-  value: string;
-  onChange: (value: string) => void;
+  value?: string;
+  onChange?: (value: string) => void;
   maxLength?: number;
   disabled?: boolean;
 }
 
 const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
-  ({ className, value, onChange, maxLength = 6, disabled, children, ...props }, ref) => {
+  ({ className, value = "", onChange, maxLength = 6, disabled, children, ...props }, ref) => {
     const [activeSlot, setActiveSlot] = React.useState(0);
     const slotsRef = React.useRef<(HTMLInputElement | null)[]>([]);
+    const otpValue = value ?? "";
 
     const handleSlotChange = React.useCallback(
       (index: number, char: string) => {
-        if (disabled) return;
-        const digits = value.split("");
+        if (disabled || !onChange) return;
+        const digits = otpValue.split("");
         digits[index] = char;
         const next = digits.join("").slice(0, maxLength);
         onChange(next);
@@ -4421,15 +4425,15 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
           slotsRef.current[index + 1]?.focus();
         }
       },
-      [value, onChange, maxLength, disabled]
+      [otpValue, onChange, maxLength, disabled]
     );
 
     const handleKeyDown = React.useCallback(
       (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (disabled) return;
+        if (disabled || !onChange) return;
         if (e.key === "Backspace") {
           e.preventDefault();
-          const digits = value.split("");
+          const digits = otpValue.split("");
           if (digits[index]) {
             digits[index] = "";
             onChange(digits.join(""));
@@ -4449,12 +4453,12 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
           slotsRef.current[index + 1]?.focus();
         }
       },
-      [value, onChange, maxLength, disabled]
+      [otpValue, onChange, maxLength, disabled]
     );
 
     const handlePaste = React.useCallback(
       (e: React.ClipboardEvent<HTMLInputElement>) => {
-        if (disabled) return;
+        if (disabled || !onChange) return;
         e.preventDefault();
         const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, maxLength);
         if (pasted) {
@@ -4473,7 +4477,7 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
     }, []);
 
     const contextValue: InputOTPContextValue = {
-      slots: value.split(""),
+      slots: otpValue.split(""),
       activeSlot,
       handleSlotChange,
       handleKeyDown,
@@ -4524,7 +4528,7 @@ const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
       <div
         ref={ref}
         className={cn(
-          "relative flex h-11 w-11 items-center justify-center rounded-md border border-input bg-background text-lg shadow-sm transition-colors duration-fast ease-standard",
+          "relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-md border border-input bg-background text-lg font-medium text-foreground shadow-sm transition-colors duration-fast ease-standard",
           activeSlot === index && "ring-2 ring-ring ring-offset-2 ring-offset-background",
           disabled && "opacity-50 cursor-not-allowed",
           className
@@ -4541,7 +4545,7 @@ const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
           onKeyDown={(e) => handleKeyDown(index, e)}
           onPaste={handlePaste}
           onFocus={() => focusSlot(index)}
-          className="absolute inset-0 h-full w-full cursor-pointer bg-transparent text-center text-lg font-medium text-foreground caret-transparent outline-none"
+          className="absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-[inherit] border-0 bg-transparent text-center text-lg font-medium text-foreground caret-transparent outline-none"
           aria-label={`Dígito ${index + 1}`}
         />
         <span aria-hidden="true" className="pointer-events-none">
@@ -4560,10 +4564,11 @@ const InputOTPSeparator = React.forwardRef<
   <div
     ref={ref}
     role="separator"
-    className={cn("text-muted-foreground", className)}
+    aria-hidden="true"
+    className={cn("px-1 text-lg font-medium text-muted-foreground", className)}
     {...props}
   >
-    &ndash;
+    –
   </div>
 ));
 InputOTPSeparator.displayName = "InputOTPSeparator";
@@ -5063,7 +5068,7 @@ export {
 
 Desc: Painel deslizante de qualquer lado da tela.
 
-Variantes: side: top · bottom · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close
+Variantes: side: bottom (padrão) · top · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close
 
 Uso:
 ```tsx
@@ -5086,7 +5091,7 @@ import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, Drawer
 
 Prompt:
 ```text
-Crie um drawer (Drawer) usando @semec/ds/react (`src/components/drawer.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: top · bottom · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close. Painel deslizante de qualquer lado da tela.
+Crie um drawer (Drawer) usando @semec/ds/react (`src/components/drawer.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: bottom (padrão) · top · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close. Painel deslizante de qualquer lado da tela.
 ```
 
 Fonte:
@@ -5383,7 +5388,7 @@ export {
 
 ### Tabela de dados (`data-table`) — `src/components/data-table.tsx` — slug: tabela-de-dados
 
-Desc: Tabela com ordenação visual, paginação e空 states.
+Desc: Tabela com ordenação visual, paginação e empty states.
 
 Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption
 
@@ -5410,7 +5415,7 @@ const columns = [
 
 Prompt:
 ```text
-Crie um data-table (Tabela de dados) usando @semec/ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption. Tabela com ordenação visual, paginação e空 states.
+Crie um data-table (Tabela de dados) usando @semec/ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption. Tabela com ordenação visual, paginação e empty states.
 ```
 
 Fonte:

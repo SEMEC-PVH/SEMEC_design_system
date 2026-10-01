@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
   "version": "3.0.0",
-  "generatedAt": "2026-10-01T00:36:24.672Z",
+  "generatedAt": "2026-10-01T13:50:50.745Z",
   "categories": [
     {
       "key": "acoes",
@@ -498,7 +498,7 @@
           "values": "aria-expanded · aria-label dinâmico (Abrir/Fechar menu)"
         }
       ],
-      "usage": "import { SidebarTrigger } from \"@semec/ds/react\";\n\n<SidebarTrigger open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />",
+      "usage": "import { SidebarToggleButton } from \"@semec/ds/react\";\n\n<SidebarToggleButton open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />",
       "prompt": "Crie um sidebar-trigger (Gatilho da barra lateral) usando @semec/ds/react (`src/components/sidebar-trigger.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.",
       "url": "/componentes/gatilho-da-barra-lateral",
       "md": "/components/gatilho-da-barra-lateral.md"
@@ -832,7 +832,7 @@
       "variants": [
         {
           "prop": "side",
-          "values": "top · bottom · left · right"
+          "values": "bottom (padrão) · top · left · right"
         },
         {
           "prop": "composição",
@@ -840,7 +840,7 @@
         }
       ],
       "usage": "import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, Button } from \"@semec/ds/react\";\n\n<Drawer>\n  <DrawerTrigger asChild><Button>Abrir painel</Button></DrawerTrigger>\n  <DrawerContent side=\"right\">\n    <DrawerHeader>\n      <DrawerTitle>Detalhes</DrawerTitle>\n      <DrawerDescription>Informações do protocolo.</DrawerDescription>\n    </DrawerHeader>\n    <div className=\"p-6\">Conteúdo aqui</div>\n    <DrawerFooter>\n      <DrawerClose asChild><Button variant=\"outline\">Fechar</Button></DrawerClose>\n    </DrawerFooter>\n  </DrawerContent>\n</Drawer>",
-      "prompt": "Crie um drawer (Drawer) usando @semec/ds/react (`src/components/drawer.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: top · bottom · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close. Painel deslizante de qualquer lado da tela.",
+      "prompt": "Crie um drawer (Drawer) usando @semec/ds/react (`src/components/drawer.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: bottom (padrão) · top · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close. Painel deslizante de qualquer lado da tela.",
       "url": "/componentes/drawer",
       "md": "/components/drawer.md"
     },
@@ -872,7 +872,7 @@
       "label": "Tabela de dados",
       "file": "src/components/data-table.tsx",
       "category": "conteudo-dados",
-      "desc": "Tabela com ordenação visual, paginação e空 states.",
+      "desc": "Tabela com ordenação visual, paginação e empty states.",
       "variants": [
         {
           "prop": "props",
@@ -880,7 +880,7 @@
         }
       ],
       "usage": "import { DataTable } from \"@semec/ds/react\";\n\nconst columns = [\n  { key: \"nome\", header: \"Nome\", sortable: true },\n  { key: \"status\", header: \"Status\" },\n];\n\n<DataTable\n  columns={columns}\n  data={registros}\n  sortKey={sortField}\n  sortDir={sortDir}\n  onSort={handleSort}\n  page={pagina}\n  pageCount={totalPaginas}\n  onPageChange={setPagina}\n/>",
-      "prompt": "Crie um data-table (Tabela de dados) usando @semec/ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption. Tabela com ordenação visual, paginação e空 states.",
+      "prompt": "Crie um data-table (Tabela de dados) usando @semec/ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption. Tabela com ordenação visual, paginação e empty states.",
       "url": "/componentes/tabela-de-dados",
       "md": "/components/tabela-de-dados.md"
     },

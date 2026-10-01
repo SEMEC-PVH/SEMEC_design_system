@@ -83,21 +83,22 @@ function useInputOTP() {
 }
 
 interface InputOTPProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
-  value: string;
-  onChange: (value: string) => void;
+  value?: string;
+  onChange?: (value: string) => void;
   maxLength?: number;
   disabled?: boolean;
 }
 
 const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
-  ({ className, value, onChange, maxLength = 6, disabled, children, ...props }, ref) => {
+  ({ className, value = "", onChange, maxLength = 6, disabled, children, ...props }, ref) => {
     const [activeSlot, setActiveSlot] = React.useState(0);
     const slotsRef = React.useRef<(HTMLInputElement | null)[]>([]);
+    const otpValue = value ?? "";
 
     const handleSlotChange = React.useCallback(
       (index: number, char: string) => {
-        if (disabled) return;
-        const digits = value.split("");
+        if (disabled || !onChange) return;
+        const digits = otpValue.split("");
         digits[index] = char;
         const next = digits.join("").slice(0, maxLength);
         onChange(next);
@@ -106,15 +107,15 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
           slotsRef.current[index + 1]?.focus();
         }
       },
-      [value, onChange, maxLength, disabled]
+      [otpValue, onChange, maxLength, disabled]
     );
 
     const handleKeyDown = React.useCallback(
       (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (disabled) return;
+        if (disabled || !onChange) return;
         if (e.key === "Backspace") {
           e.preventDefault();
-          const digits = value.split("");
+          const digits = otpValue.split("");
           if (digits[index]) {
             digits[index] = "";
             onChange(digits.join(""));
@@ -134,12 +135,12 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
           slotsRef.current[index + 1]?.focus();
         }
       },
-      [value, onChange, maxLength, disabled]
+      [otpValue, onChange, maxLength, disabled]
     );
 
     const handlePaste = React.useCallback(
       (e: React.ClipboardEvent<HTMLInputElement>) => {
-        if (disabled) return;
+        if (disabled || !onChange) return;
         e.preventDefault();
         const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, maxLength);
         if (pasted) {
@@ -158,7 +159,7 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
     }, []);
 
     const contextValue: InputOTPContextValue = {
-      slots: value.split(""),
+      slots: otpValue.split(""),
       activeSlot,
       handleSlotChange,
       handleKeyDown,
@@ -209,7 +210,7 @@ const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
       <div
         ref={ref}
         className={cn(
-          "relative flex h-11 w-11 items-center justify-center rounded-md border border-input bg-background text-lg shadow-sm transition-colors duration-fast ease-standard",
+          "relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-md border border-input bg-background text-lg font-medium text-foreground shadow-sm transition-colors duration-fast ease-standard",
           activeSlot === index && "ring-2 ring-ring ring-offset-2 ring-offset-background",
           disabled && "opacity-50 cursor-not-allowed",
           className
@@ -226,7 +227,7 @@ const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
           onKeyDown={(e) => handleKeyDown(index, e)}
           onPaste={handlePaste}
           onFocus={() => focusSlot(index)}
-          className="absolute inset-0 h-full w-full cursor-pointer bg-transparent text-center text-lg font-medium text-foreground caret-transparent outline-none"
+          className="absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-[inherit] border-0 bg-transparent text-center text-lg font-medium text-foreground caret-transparent outline-none"
           aria-label={`Dígito ${index + 1}`}
         />
         <span aria-hidden="true" className="pointer-events-none">
@@ -245,10 +246,11 @@ const InputOTPSeparator = React.forwardRef<
   <div
     ref={ref}
     role="separator"
-    className={cn("text-muted-foreground", className)}
+    aria-hidden="true"
+    className={cn("px-1 text-lg font-medium text-muted-foreground", className)}
     {...props}
   >
-    &ndash;
+    –
   </div>
 ));
 InputOTPSeparator.displayName = "InputOTPSeparator";

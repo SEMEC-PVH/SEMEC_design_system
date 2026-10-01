@@ -41,7 +41,7 @@ export default function HeaderPage() {
       </p>
 
       <h3>Código</h3>
-      <CodeBlock code={CODE} filename="DemoHeader.jsx" />
+      <CodeBlock code={CODE} filename="HeaderExample.jsx" />
     </>
   );
 }

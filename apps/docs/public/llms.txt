@@ -73,7 +73,7 @@ npm install @semec/ds
 - [Paginação (`pagination`) — Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.](/componentes/paginacao) — `src/components/pagination.tsx` — md: `/components/paginacao.md`
   Uso: `import { Pagination } from "@semec/ds/react";`
 - [Gatilho da barra lateral (`sidebar-trigger`) — Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.](/componentes/gatilho-da-barra-lateral) — `src/components/sidebar-trigger.tsx` — md: `/components/gatilho-da-barra-lateral.md`
-  Uso: `import { SidebarTrigger } from "@semec/ds/react";`
+  Uso: `import { SidebarToggleButton } from "@semec/ds/react";`
 - [Modal (`dialog`) — Diálogo modal acessível com overlay, header, título, descrição e footer.](/componentes/modal) — `src/components/dialog.tsx` — md: `/components/modal.md`
   Uso: `import { Dialog } from "@semec/ds/react";`
 - [Notificação (`toast`) — Mensagem temporária com `useToast()` e viewport empilhável.](/componentes/notificacao) — `src/components/toast.tsx` — md: `/components/notificacao.md`
@@ -112,7 +112,7 @@ npm install @semec/ds
   Uso: `import { Drawer } from "@semec/ds/react";`
 - [Sheet (`sheet`) — Painel lateral modal com overlay. Variantes left/right/top/bottom.](/componentes/sheet) — `src/components/sheet.tsx` — md: `/components/sheet.md`
   Uso: `import { Sheet } from "@semec/ds/react";`
-- [Tabela de dados (`data-table`) — Tabela com ordenação visual, paginação e空 states.](/componentes/tabela-de-dados) — `src/components/data-table.tsx` — md: `/components/tabela-de-dados.md`
+- [Tabela de dados (`data-table`) — Tabela com ordenação visual, paginação e empty states.](/componentes/tabela-de-dados) — `src/components/data-table.tsx` — md: `/components/tabela-de-dados.md`
   Uso: `import { DataTable } from "@semec/ds/react";`
 - [Linha do tempo (`timeline`) — Sequência temporal com dots, conectores e conteúdo.](/componentes/timeline) — `src/components/timeline.tsx` — md: `/components/timeline.md`
   Uso: `import { Timeline } from "@semec/ds/react";`
@@ -147,4 +147,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--action-primary` etc.), nunca hex solto
 
-> Gerado 2026-10-01T00:36:24.672Z a partir de packages/react/manifest.js. Versão 3.0.0.
+> Gerado 2026-10-01T13:50:50.745Z a partir de packages/react/manifest.js. Versão 3.0.0.

@@ -22,6 +22,17 @@
 @import "tailwindcss/utilities.css" layer(utilities);
 @import "tw-animate-css";
 
+/* Iframe de preview carrega só este arquivo (sem globals.css do site).
+   Utilitários do kit assumem border-box (preflight do Tailwind); sem isto,
+   w-full + px-* + border estouram o container (ex.: input do Combobox). */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+  }
+}
+
 /* Fontes varridas em busca de classes utilitárias */
 @source "../../../packages/react/src/components";
 @source "../../components/demos/base-previews.jsx";
@@ -73,11 +84,12 @@
   --color-tint: var(--tint);
   --color-brand-hero: var(--brand-hero);
 
-  /* Raios seguem o L1 do site */
-  --radius-sm: var(--radius-sm);
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
-  --radius-full: var(--radius-full);
+  /* Raios: valores fixos (o @theme inline com var(--radius-*) gerava
+     referência circular no CSS compilado e quebrava rounded-*). */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-full: 9999px;
 
   /* Fontes: sobrescreve o default do Tailwind com o stack do SEMEC */
   --font-sans: var(--font-poppins), "Poppins", system-ui, -apple-system, sans-serif;
@@ -91,48 +103,48 @@
   --shadow-elevation-3: 0 12px 24px rgb(0 0 0 / 0.12), 0 4px 8px rgb(0 0 0 / 0.08);
 }
 
-/* @font-face: carrega woff2 local para o iframe */
+/* @font-face: woff2 servidos de public/fonts (caminho relativo a public/proto/) */
 @font-face {
   font-family: "Poppins";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../../app/fonts/Poppins-400.woff2") format("woff2");
+  src: url("../fonts/Poppins-400.woff2") format("woff2");
 }
 @font-face {
   font-family: "Poppins";
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url("../../app/fonts/Poppins-500.woff2") format("woff2");
+  src: url("../fonts/Poppins-500.woff2") format("woff2");
 }
 @font-face {
   font-family: "Poppins";
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("../../app/fonts/Poppins-600.woff2") format("woff2");
+  src: url("../fonts/Poppins-600.woff2") format("woff2");
 }
 @font-face {
   font-family: "Poppins";
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("../../app/fonts/Poppins-700.woff2") format("woff2");
+  src: url("../fonts/Poppins-700.woff2") format("woff2");
 }
 @font-face {
   font-family: "Poppins";
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url("../../app/fonts/Poppins-800.woff2") format("woff2");
+  src: url("../fonts/Poppins-800.woff2") format("woff2");
 }
 @font-face {
   font-family: "JetBrains Mono";
   font-style: normal;
   font-weight: 100 800;
   font-display: swap;
-  src: url("../../app/fonts/JetBrainsMono-Variable.woff2") format("woff2");
+  src: url("../fonts/JetBrainsMono-Variable.woff2") format("woff2");
 }
 
 /* Body dentro do iframe herda a fonte do SEMEC */

@@ -449,9 +449,9 @@ import { Button } from "@semec/ds/react";
       { prop: "props", values: "open · onToggle · labelOpen · labelClosed" },
       { prop: "a11y", values: "aria-expanded · aria-label dinâmico (Abrir/Fechar menu)" },
     ],
-    usage: `import { SidebarTrigger } from "@semec/ds/react";
+    usage: `import { SidebarToggleButton } from "@semec/ds/react";
 
-<SidebarTrigger open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />`,
+<SidebarToggleButton open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />`,
   },
   {
     code: "dialog",
@@ -775,7 +775,7 @@ import { MoreHorizontal } from "lucide-react";
     category: "feedback",
     desc: "Painel deslizante de qualquer lado da tela.",
     variants: [
-      { prop: "side", values: "top · bottom · left · right" },
+      { prop: "side", values: "bottom (padrão) · top · left · right" },
       { prop: "composição", values: "Drawer · Trigger · Content · Header · Footer · Title · Description · Close" },
     ],
     usage: `import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, Button } from "@semec/ds/react";
@@ -827,7 +827,7 @@ import { MoreHorizontal } from "lucide-react";
     label: "Tabela de dados",
     file: "src/components/data-table.tsx",
     category: "conteudo-dados",
-    desc: "Tabela com ordenação visual, paginação e空 states.",
+    desc: "Tabela com ordenação visual, paginação e empty states.",
     variants: [
       { prop: "props", values: "columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption" },
     ],

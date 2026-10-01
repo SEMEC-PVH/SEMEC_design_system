@@ -33,9 +33,9 @@ npm install @semec/ds
 ## Uso
 
 ```tsx
-import { SidebarTrigger } from "@semec/ds/react";
+import { SidebarToggleButton } from "@semec/ds/react";
 
-<SidebarTrigger open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />
+<SidebarToggleButton open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />
 ```
 
 ## Prompt para IA
