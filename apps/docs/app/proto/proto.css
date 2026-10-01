@@ -8,8 +8,11 @@
    (app/(docs)/componentes/...). O build do site (Next/PostCSS) nunca vê
    este arquivo.
 
-   Sem `preflight` de propósito: o reset global do site (globals.css) já vale
-   para toda a página; injetar outro estouraria o layout atual.
+   O iframe de preview NÃO carrega globals.css — só este arquivo. Sem um
+   reset de base, `<button>`/`<input>` do kit renderizam com chrome nativo
+   do browser (calendar, pagination, tabs, radio/checkbox, etc.). O
+   preflight do Tailwind entra em `@layer base`; no documento do site, o
+   globals.css (un-layered) continua vencendo, então o layout não muda.
 
    Cores: mapeadas nos tokens L1 do site (`--color-action-primary`,
    `--color-surface-raised`...), que já carregam a paleta `pv-*` e trocam no
@@ -19,12 +22,10 @@
    ========================================================================== */
 
 @import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css" layer(utilities);
 @import "tw-animate-css";
 
-/* Iframe de preview carrega só este arquivo (sem globals.css do site).
-   Utilitários do kit assumem border-box (preflight do Tailwind); sem isto,
-   w-full + px-* + border estouram o container (ex.: input do Combobox). */
 @layer base {
   *,
   ::before,
@@ -34,8 +35,10 @@
 }
 
 /* Fontes varridas em busca de classes utilitárias */
-@source "../../../packages/react/src/components";
+@source "../../../../packages/react/src/components";
 @source "../../components/demos/base-previews.jsx";
+@source "../../components/demos/kit-extras.jsx";
+@source "../../components/demos/action-extras.jsx";
 @source "../../components/demos/examples";
 @source "../../components/demos/patterns";
 @source "../../components/docs/CodeBlock.jsx";
@@ -84,23 +87,173 @@
   --color-tint: var(--tint);
   --color-brand-hero: var(--brand-hero);
 
+  /* Sidebar (kit usa bg-sidebar / text-sidebar-foreground / ring-sidebar-ring) */
+  --color-sidebar: var(--surface);
+  --color-sidebar-foreground: var(--fg);
+  --color-sidebar-ring: var(--color-focus-ring);
+
   /* Raios: valores fixos (o @theme inline com var(--radius-*) gerava
-     referência circular no CSS compilado e quebrava rounded-*). */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
+     referência circular no CSS compilado e quebrava rounded-*).
+     Alinhados aos L1 do kit (packages/react/tokens.css). */
+  --radius-sm: 2px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   --radius-full: 9999px;
 
   /* Fontes: sobrescreve o default do Tailwind com o stack do SEMEC */
   --font-sans: var(--font-poppins), "Poppins", system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Motion e sombras usadas pelos componentes da base */
-  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Motion e sombras — mesmos valores do kit (packages/react/tokens.css) */
+  --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
   --transition-duration-fast: 150ms;
   --shadow-elevation-1: 0 1px 2px rgb(0 0 0 / 0.06), 0 1px 3px rgb(0 0 0 / 0.1);
   --shadow-elevation-2: 0 4px 8px rgb(0 0 0 / 0.08), 0 2px 4px rgb(0 0 0 / 0.06);
   --shadow-elevation-3: 0 12px 24px rgb(0 0 0 / 0.12), 0 4px 8px rgb(0 0 0 / 0.08);
+}
+
+/* Utilitários customizados do kit (espelham packages/react/tokens.css).
+   O docs não importa tokens.css do pacote (conflitaria com os tokens do
+   site); sem estas regras, dialog/drawer/sidebar perdem animação e chrome. */
+@utility duration-fast {
+  transition-duration: var(--duration-fast, 150ms);
+}
+
+@utility duration-base {
+  transition-duration: var(--duration-base, 250ms);
+}
+
+@utility duration-slow {
+  transition-duration: var(--duration-slow, 400ms);
+}
+
+@utility transition-base {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, filter, backdrop-filter;
+  transition-timing-function: var(--ease-standard);
+  transition-duration: var(--duration-base, 250ms);
+}
+
+@utility fade-in {
+  --tw-enter-opacity: 0;
+}
+
+@utility fade-in-* {
+  --tw-enter-opacity: calc(--value(number) / 100);
+}
+
+@utility fade-out {
+  --tw-exit-opacity: 0;
+}
+
+@utility fade-out-* {
+  --tw-exit-opacity: calc(--value(number) / 100);
+}
+
+@utility zoom-in {
+  --tw-enter-scale: 0.95;
+}
+
+@utility zoom-in-* {
+  --tw-enter-scale: calc(--value(number) / 100);
+}
+
+@utility zoom-out {
+  --tw-exit-scale: 0.95;
+}
+
+@utility zoom-out-* {
+  --tw-exit-scale: calc(--value(number) / 100);
+}
+
+@utility slide-in-from-top {
+  --tw-enter-translate-y: -100%;
+}
+
+@utility slide-in-from-top-* {
+  --tw-enter-translate-y: calc(--value(integer) * var(--spacing) * -1);
+  --tw-enter-translate-y: calc(--value(ratio) * -100%);
+  --tw-enter-translate-y: calc(--value(percentage) * -1);
+  --tw-enter-translate-y: calc(--value([percentage]) * -1);
+}
+
+@utility slide-in-from-bottom {
+  --tw-enter-translate-y: 100%;
+}
+
+@utility slide-in-from-bottom-* {
+  --tw-enter-translate-y: calc(--value(integer) * var(--spacing));
+  --tw-enter-translate-y: calc(--value(ratio) * 100%);
+  --tw-enter-translate-y: calc(--value(percentage));
+  --tw-enter-translate-y: calc(--value([percentage]));
+}
+
+@utility slide-in-from-left {
+  --tw-enter-translate-x: -100%;
+}
+
+@utility slide-in-from-left-* {
+  --tw-enter-translate-x: calc(--value(integer) * var(--spacing) * -1);
+  --tw-enter-translate-x: calc(--value(ratio) * -100%);
+  --tw-enter-translate-x: calc(--value(percentage) * -1);
+  --tw-enter-translate-x: calc(--value([percentage]) * -1);
+}
+
+@utility slide-in-from-right {
+  --tw-enter-translate-x: 100%;
+}
+
+@utility slide-in-from-right-* {
+  --tw-enter-translate-x: calc(--value(integer) * var(--spacing));
+  --tw-enter-translate-x: calc(--value(ratio) * 100%);
+  --tw-enter-translate-x: calc(--value(percentage));
+  --tw-enter-translate-x: calc(--value([percentage]));
+}
+
+@utility slide-out-to-top {
+  --tw-exit-translate-y: -100%;
+}
+
+@utility slide-out-to-top-* {
+  --tw-exit-translate-y: calc(--value(integer) * var(--spacing) * -1);
+  --tw-exit-translate-y: calc(--value(ratio) * -100%);
+  --tw-exit-translate-y: calc(--value(percentage) * -1);
+  --tw-exit-translate-y: calc(--value([percentage]) * -1);
+}
+
+@utility slide-out-to-bottom {
+  --tw-exit-translate-y: 100%;
+}
+
+@utility slide-out-to-bottom-* {
+  --tw-exit-translate-y: calc(--value(integer) * var(--spacing));
+  --tw-exit-translate-y: calc(--value(ratio) * 100%);
+  --tw-exit-translate-y: calc(--value(percentage));
+  --tw-exit-translate-y: calc(--value([percentage]));
+}
+
+@utility slide-out-to-left {
+  --tw-exit-translate-x: -100%;
+}
+
+@utility slide-out-to-left-* {
+  --tw-exit-translate-x: calc(--value(integer) * var(--spacing) * -1);
+  --tw-exit-translate-x: calc(--value(ratio) * -100%);
+  --tw-exit-translate-x: calc(--value(percentage) * -1);
+  --tw-exit-translate-x: calc(--value([percentage]) * -1);
+}
+
+@utility slide-out-to-right {
+  --tw-exit-translate-x: 100%;
+}
+
+@utility slide-out-to-right-* {
+  --tw-exit-translate-x: calc(--value(integer) * var(--spacing));
+  --tw-exit-translate-x: calc(--value(ratio) * 100%);
+  --tw-exit-translate-x: calc(--value(percentage));
+  --tw-exit-translate-x: calc(--value([percentage]));
 }
 
 /* @font-face: woff2 servidos de public/fonts (caminho relativo a public/proto/) */

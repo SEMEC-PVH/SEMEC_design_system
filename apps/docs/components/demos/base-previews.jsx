@@ -223,22 +223,26 @@ function LinkPreview() {
 
 function InputPreview() {
   return (
-    <div className="flex max-w-sm flex-col gap-3">
-      <Input placeholder="Nome completo" />
-      <div>
-        <Input aria-invalid="true" defaultValue="email errado" />
-        <p className="mt-1 text-xs text-destructive">Informe um e-mail válido.</p>
+    <div className="w-full max-w-sm rounded-lg border border-border bg-surface p-4 text-left">
+      <div className="flex flex-col gap-3">
+        <Input placeholder="Nome completo" />
+        <div>
+          <Input aria-invalid="true" defaultValue="email errado" />
+          <p className="mt-1 text-xs text-destructive">Informe um e-mail válido.</p>
+        </div>
+        <Input placeholder="Disabled" disabled />
       </div>
-      <Input placeholder="Disabled" disabled />
     </div>
   );
 }
 
 function TextareaPreview() {
   return (
-    <div className="flex max-w-md flex-col gap-3">
-      <Textarea rows={3} placeholder="Descreva a demanda" />
-      <Textarea rows={3} aria-invalid="true" disabled placeholder="Disabled" />
+    <div className="w-full max-w-md rounded-lg border border-border bg-surface p-4 text-left">
+      <div className="flex flex-col gap-3">
+        <Textarea rows={3} placeholder="Descreva a demanda" />
+        <Textarea rows={3} aria-invalid="true" disabled placeholder="Disabled" />
+      </div>
     </div>
   );
 }
@@ -350,22 +354,26 @@ function SwitchPreview() {
 
 function LabelPreview() {
   return (
-    <div className="flex max-w-xs flex-col gap-1.5">
-      <Label htmlFor="p-nome">Nome do contribuinte</Label>
-      <Input id="p-nome" placeholder="Digite o nome" />
+    <div className="w-full max-w-xs rounded-lg border border-border bg-surface p-4 text-left">
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="p-nome">Nome do contribuinte</Label>
+        <Input id="p-nome" placeholder="Digite o nome" />
+      </div>
     </div>
   );
 }
 
 function FormFieldPreview() {
   return (
-    <div className="flex max-w-xs flex-col gap-5">
-      <FormField label="E-mail" htmlFor="p-email" required hint="Usado para enviar o comprovante">
-        <Input id="p-email" type="email" />
-      </FormField>
-      <FormField label="Telefone" htmlFor="p-tel" error="Formato inválido. Use (RO) 90000-0000.">
-        <Input id="p-tel" aria-invalid="true" defaultValue="123" />
-      </FormField>
+    <div className="w-full max-w-xs rounded-lg border border-border bg-surface p-4 text-left">
+      <div className="flex flex-col gap-5">
+        <FormField label="E-mail" htmlFor="p-email" required hint="Usado para enviar o comprovante">
+          <Input id="p-email" type="email" />
+        </FormField>
+        <FormField label="Telefone" htmlFor="p-tel" error="Formato inválido. Use (RO) 90000-0000.">
+          <Input id="p-tel" aria-invalid="true" defaultValue="123" />
+        </FormField>
+      </div>
     </div>
   );
 }
@@ -729,7 +737,15 @@ function InputOTPPreview() {
 }
 
 function CalendarPreview() {
-  return <Calendar />;
+  const [value, setValue] = useState(() => new Date());
+  return (
+    <div className="w-fit rounded-lg border border-border bg-surface p-2 text-left">
+      <Calendar value={value} onChange={setValue} />
+      <p className="mt-2 px-1 text-xs text-muted-foreground">
+        Selecionado: {value.toLocaleDateString("pt-BR")}
+      </p>
+    </div>
+  );
 }
 
 function ScrollAreaPreview() {
@@ -879,18 +895,20 @@ function SheetPreview() {
           </div>
           <div>
             <p className="mb-2 text-sm font-medium">Período</p>
-            <div className="flex items-center gap-2 text-sm">
-              <input type="radio" id="sh-p7" name="periodo" defaultChecked />
-              <Label htmlFor="sh-p7">Últimos 7 dias</Label>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <input type="radio" id="sh-p30" name="periodo" />
-              <Label htmlFor="sh-p30">Últimos 30 dias</Label>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <input type="radio" id="sh-ptodos" name="periodo" />
-              <Label htmlFor="sh-ptodos">Todos</Label>
-            </div>
+            <RadioGroup defaultValue="7" className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-sm">
+                <RadioGroupItem value="7" id="sh-p7" />
+                <Label htmlFor="sh-p7">Últimos 7 dias</Label>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <RadioGroupItem value="30" id="sh-p30" />
+                <Label htmlFor="sh-p30">Últimos 30 dias</Label>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <RadioGroupItem value="todos" id="sh-ptodos" />
+                <Label htmlFor="sh-ptodos">Todos</Label>
+              </div>
+            </RadioGroup>
           </div>
         </div>
         <SheetFooter>
@@ -1044,7 +1062,10 @@ function DataTablePreview() {
 
 function ErrorSummaryPreview() {
   const [valores, setValores] = useState({ nome: "", email: "" });
-  const [erros, setErros] = useState([]);
+  const [erros, setErros] = useState([
+    { id: "nome", message: "Informe o nome completo." },
+    { id: "email", message: "Informe o e-mail." },
+  ]);
   const [tentativa, setTentativa] = useState(0);
   const [enviado, setEnviado] = useState(false);
 
@@ -1160,19 +1181,7 @@ export default function BasePreview({ slug }) {
   if (!Preview) return <p className="text-sm text-muted-foreground">Preview indisponível.</p>;
   return (
     <PreviewFrame>
-      <div
-        style={{
-          padding: "1.5rem",
-          width: "100%",
-          boxSizing: "border-box",
-          overflow: "hidden",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "120px",
-          textAlign: "center",
-        }}
-      >
+      <div className="box-border flex min-h-[120px] w-full items-center justify-center overflow-hidden p-6">
         <Preview />
       </div>
     </PreviewFrame>
