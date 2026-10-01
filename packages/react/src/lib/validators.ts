@@ -1,7 +1,5 @@
-import { z } from "zod";
-
 /* ------------------------------------------------------------------ */
-/*  Helpers puros (sem Zod) — úteis fora de schema context            */
+/*  Helpers puros (sem Zod) — exportados pelo entry principal          */
 /* ------------------------------------------------------------------ */
 
 /** Remove tudo que não é dígito. */
@@ -56,31 +54,4 @@ export function validateEmail(v: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 }
 
-/* ------------------------------------------------------------------ */
-/*  Schemas Zod                                                       */
-/* ------------------------------------------------------------------ */
-
-export const cpfSchema = z
-  .string()
-  .refine((v) => validateCPF(v), { message: "CPF inválido" });
-
-export const cnpjSchema = z
-  .string()
-  .refine((v) => validateCNPJ(v), { message: "CNPJ inválido" });
-
-export const cpfCnpjSchema = z.string().refine(
-  (v) => {
-    const d = digits(v);
-    return d.length === 11 ? validateCPF(v) : d.length === 14 ? validateCNPJ(v) : false;
-  },
-  { message: "CPF ou CNPJ inválido" }
-);
-
-export const emailSchema = z
-  .string()
-  .email({ message: "E-mail inválido" });
-
-export const cepSchema = z
-  .string()
-  .length(9, { message: "CEP deve ter 8 dígitos" })
-  .refine((v) => /^\d{5}-\d{3}$/.test(v), { message: "CEP inválido (use 00000-000)" });
+export { digits };

@@ -26,7 +26,7 @@ npm install @semec/ds
 ```css
 @import "tailwindcss";
 @import "@semec/ds/react/tokens.css";
-@config "@semec/ds/react/pv-preset";
+@source "../node_modules/@semec/ds/dist/react";
 ```
 
 ## Uso

@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
-  "version": "2.1.0",
-  "generatedAt": "2026-09-30T15:35:01.075Z",
+  "version": "3.0.0",
+  "generatedAt": "2026-10-01T00:36:24.672Z",
   "categories": [
     {
       "key": "acoes",
@@ -414,6 +414,28 @@
       "prompt": "Crie um breadcrumb (Trilha de navegação) usando @semec/ds/react (`src/components/breadcrumb.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores. Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.",
       "url": "/componentes/trilha-de-navegacao",
       "md": "/components/trilha-de-navegacao.md"
+    },
+    {
+      "code": "header",
+      "slug": "cabecalho",
+      "label": "Cabeçalho",
+      "file": "src/components/header.tsx",
+      "category": "navegacao",
+      "desc": "Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "Header · HeaderBrand · HeaderNav · HeaderNavLink"
+        },
+        {
+          "prop": "props",
+          "values": "HeaderBrand: orgName · serviceName · logo · href · HeaderNavLink: current"
+        }
+      ],
+      "usage": "import { Header, HeaderBrand, HeaderNav, HeaderNavLink } from \"@semec/ds/react\";\nimport { Button } from \"@semec/ds/react\";\n\n<Header>\n  <HeaderBrand orgName=\"SEMEC\" serviceName=\"Nome do serviço\" />\n  <div className=\"flex items-center gap-2\">\n    <HeaderNav>\n      <HeaderNavLink href=\"/prefeitura\" current>Prefeitura</HeaderNavLink>\n      <HeaderNavLink href=\"/servicos\">Serviços</HeaderNavLink>\n    </HeaderNav>\n    <Button asChild size=\"sm\">\n      <a href=\"/contato\">Fale Conosco</a>\n    </Button>\n  </div>\n</Header>",
+      "prompt": "Crie um header (Cabeçalho) usando @semec/ds/react (`src/components/header.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href · HeaderNavLink: current. Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.",
+      "url": "/componentes/cabecalho",
+      "md": "/components/cabecalho.md"
     },
     {
       "code": "tabs",
@@ -935,7 +957,7 @@
   ],
   "install": {
     "tokens": "import \"@semec/ds/react/tokens.css\";",
-    "preset": "@config \"@semec/ds/react/pv-preset\";",
+    "preset": "@source \"../node_modules/@semec/ds/dist/react\";",
     "utils": "import { cn } from \"@semec/ds/react\";"
   },
   "tokens": {

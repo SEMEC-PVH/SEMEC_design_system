@@ -26,7 +26,7 @@ npm install @semec/ds
 ```css
 @import "tailwindcss";
 @import "@semec/ds/react/tokens.css";
-@config "@semec/ds/react/pv-preset";
+@source "../node_modules/@semec/ds/dist/react";
 ```
 
 ## Uso
@@ -56,7 +56,7 @@ import { AlertCircle, AlertTriangle, CheckCircle2, Info } from "lucide-react";
 import { cn } from "../lib/utils";
 
 const alertVariants = cva(
-  "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:h-4 [&>svg]:w-4",
+  "relative w-full rounded-lg border border-border px-4 py-3 text-sm [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:h-4 [&>svg]:w-4",
   {
     variants: {
       variant: {

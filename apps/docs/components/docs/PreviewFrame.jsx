@@ -30,7 +30,7 @@ export default function PreviewFrame({ children }) {
     // body reset isolado: remove margin/padding globais, mantém só preview
     doc.body.style.margin = "0";
     doc.body.style.padding = "0";
-    doc.body.style.background = "transparent";
+    // background aplicado no syncTheme (claro/escuro); não usar transparent
 
     // FIX 3: Injeta fallback CSS com valores L1 hardcoded.
     // Garante resolução mesmo se syncTheme() falhar (race com hydration).
@@ -46,6 +46,7 @@ export default function PreviewFrame({ children }) {
       --color-feedback-info:#3a6ca6;--color-feedback-info-surface:#eef4fa;
       --bg:#f4f6f9;--fg:#14233a;--surface:#fff;--surface-alt:#f5f5f5;--border:#e5e7eb;
       --text-muted:#4b5563;--tint:#eef4fa;--text-strong:#14233a;--text-on-brand:#fff;
+      --brand-hero:#223f99;--color-brand-hero:#223f99;
       --radius-sm:12px;--radius-md:16px;--radius-lg:24px;--radius-xl:32px;--radius-full:9999px;
     }
     [data-theme="dark"]{
@@ -54,6 +55,7 @@ export default function PreviewFrame({ children }) {
       --color-action-primary:#7ab3ff;--color-action-primary-hover:#9cc5ff;--color-action-primary-active:#b3d4ff;
       --color-text-on-brand:#fff;--color-text-primary:#e2e8f0;--color-text-muted:#9ca3af;
       --color-border-strong:#3f4756;--color-focus-ring:#7ab3ff;
+      --brand-hero:#7ab3ff;--color-brand-hero:#7ab3ff;
       --color-feedback-danger:#f87171;--color-feedback-danger-surface:#2a1414;
       --color-feedback-success:#86c95b;--color-feedback-success-surface:#16261a;
       --color-feedback-warning:#f6d56e;--color-feedback-warning-surface:#2a2113;
@@ -82,6 +84,7 @@ export default function PreviewFrame({ children }) {
       "--color-muted", "--color-muted-foreground",
       "--color-destructive", "--color-destructive-foreground",
       "--color-input", "--color-ring",
+      "--brand-hero", "--color-brand-hero",
       // Primitivos
       "--pv-blue-50", "--pv-blue-900", "--pv-blue-hero", "--pv-blue-950",
       "--pv-green-500", "--pv-green-800",
@@ -98,6 +101,17 @@ export default function PreviewFrame({ children }) {
         const v = cs.getPropertyValue(name);
         if (v) iframeHtml.style.setProperty(name, v.trim());
       });
+
+      // Canvas do iframe é branco por padrão; sem pintar html/body,
+      // o fundo "vaza" branco mesmo com componentes dark.
+      const surfaceAlt = (cs.getPropertyValue("--surface-alt") || "").trim() || "#f5f5f5";
+      const surface = (cs.getPropertyValue("--surface") || "").trim() || "#ffffff";
+      const frameBg = iframeHtml.dataset.theme === "dark" ? surfaceAlt : surface;
+      iframeHtml.style.background = frameBg;
+      iframeHtml.style.overflow = "hidden";
+      doc.body.style.background = frameBg;
+      doc.body.style.overflow = "hidden";
+      doc.body.style.minWidth = "0";
     };
     syncTheme();
     // Retry: espera 300ms para garantir que CSS do pai já aplicou

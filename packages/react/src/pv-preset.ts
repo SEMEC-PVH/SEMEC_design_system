@@ -7,8 +7,9 @@
  *
  * Uso no `globals.css` do site novo:
  *   @import "tailwindcss";
- *   @config "../pv-preset.ts";
- *   @import "./tokens.css";
+ *   @import "@semec/ds/react/tokens.css";
+ *   @source "../node_modules/@semec/ds/dist/react";
+ *   @config "@semec/ds/react/pv-preset";
  */
 import type { Config } from "tailwindcss";
 
@@ -21,6 +22,7 @@ export default {
         surface: "var(--surface)",
         "surface-alt": "var(--surface-alt)",
         border: "var(--border)",
+        "border-strong": "var(--border-strong)",
         input: "var(--border-strong)",
         ring: "var(--focus-ring)",
         muted: "var(--surface-alt)",
@@ -49,33 +51,24 @@ export default {
           surface: "var(--feedback-info-surface)",
         },
         tint: "var(--tint)",
+        "brand-hero": "var(--brand-hero)",
         "pv-blue": {
           50: "var(--pv-blue-50)",
-          100: "var(--pv-blue-100)",
           600: "var(--pv-blue-600)",
           700: "var(--pv-blue-700)",
           800: "var(--pv-blue-800)",
-          900: "var(--pv-blue-900)",
-          950: "var(--pv-blue-950)",
           hero: "var(--pv-blue-hero)",
         },
         "pv-green": {
           50: "var(--pv-green-50)",
-          500: "var(--pv-green-500)",
           800: "var(--pv-green-800)",
         },
         "pv-yellow": {
-          400: "var(--pv-yellow-400)",
-          500: "var(--pv-yellow-500)",
           800: "var(--pv-yellow-800)",
         },
         "pv-red": {
           50: "var(--pv-red-50)",
-          400: "var(--pv-red-400)",
-          500: "var(--pv-red-500)",
-          600: "var(--pv-red-600)",
           700: "var(--pv-red-700)",
-          800: "var(--pv-red-800)",
         },
         "pv-gray": {
           50: "var(--pv-gray-50)",

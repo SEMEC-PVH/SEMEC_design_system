@@ -26,7 +26,7 @@ npm install @semec/ds
 ```css
 @import "tailwindcss";
 @import "@semec/ds/react/tokens.css";
-@config "@semec/ds/react/pv-preset";
+@source "../node_modules/@semec/ds/dist/react";
 ```
 
 ## Uso
@@ -54,7 +54,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-full border border-border px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
       variant: {

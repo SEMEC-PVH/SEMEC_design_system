@@ -12,7 +12,7 @@ Fonte de dados: `packages/react/manifest.js`. Artefatos gerados: `llms.txt`, `ll
 
 ## Instalação
 
-Peer deps: `react ^19.0.0`, `react-dom ^19.0.0`
+Peer deps: `react ^19.0.0`, `react-dom ^19.0.0`. Peer **opcional**: `zod ^3.23.0` (só se usar schemas em `@semec/ds/react/validacao`).
 
 ```bash
 npm install @semec/ds class-variance-authority clsx tailwind-merge lucide-react \
@@ -25,12 +25,14 @@ npm install @semec/ds class-variance-authority clsx tailwind-merge lucide-react 
 ```css
 @import "tailwindcss";
 @import "@semec/ds/react/tokens.css";
-@config "@semec/ds/react/pv-preset";
+@source "../node_modules/@semec/ds/dist/react";
 ```
+
+O `@source` é obrigatório no Tailwind v4: sem ele o CSS não gera as classes das peças (`bg-card`, `shadow-elevation-*`, `animate-in`…).
 
 Carregue Poppins 400–700 (self-hosted woff2 ou `next/font`).
 
-O pacote **não** exporta `shadcn.css` (removido na 2.0.0). Use só `tokens.css` + preset.
+O pacote **não** exporta `shadcn.css` (removido na 2.0.0). Use só `tokens.css` (+ `@source`). Preset JS opcional: `@config "@semec/ds/react/pv-preset"`.
 
 ## Tema
 
@@ -90,7 +92,7 @@ Camada do dia a dia. Diz o papel, não a cor. Use estes, nunca os L0.
 import { cn } from "@semec/ds/react";
 import { maskCPF, maskCNPJ, maskCEP, maskCurrency } from "@semec/ds/react";
 import { validateCPF, validateCNPJ, validateEmail } from "@semec/ds/react";
-import { cpfSchema, cnpjSchema, cpfCnpjSchema, emailSchema, cepSchema } from "@semec/ds/react";
+import { cpfSchema, cnpjSchema, cpfCnpjSchema, emailSchema, cepSchema } from "@semec/ds/react/validacao";
 ```
 
 ## Componentes (47)
@@ -240,7 +242,7 @@ const errors = [
 - Labels sempre associados
 - Erros via `aria-invalid` + `role="alert"` no FormField
 - ErrorSummary no topo com links para cada campo
-- Zod: `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`
+- Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`
 
 ## Responsive / Mobile
 
@@ -265,7 +267,7 @@ const errors = [
 - Toast: requer `<ToastProvider><ToastViewport/>` + `useToast()`
 - DatePicker: nativo `type="date"` (ISO YYYY-MM-DD); período = 2 campos
 - Sem hex solto — use tokens L1
-- CSP: Dialog/Drawer/Sheet/DropdownMenu/Popover usam `SemecProvider` com nonce
+- CSP: Dialog/Drawer/Sheet/DropdownMenu usam `SemecProvider` com nonce. Medido (SEM-752/780): Popover 0 violações; ScrollArea e Select 1 cada, mesmo com nonce (CSS estático de scrollbar no `tokens.css`).
 
 ## Protótipo isolado
 

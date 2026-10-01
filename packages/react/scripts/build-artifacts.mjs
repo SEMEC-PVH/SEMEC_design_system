@@ -125,7 +125,7 @@ function buildManifest({ site = false } = {}) {
     })),
     install: {
       tokens: 'import "@semec/ds/react/tokens.css";',
-      preset: '@config "@semec/ds/react/pv-preset";',
+      preset: '@source "../node_modules/@semec/ds/dist/react";',
       utils: 'import { cn } from "@semec/ds/react";',
     },
     tokens: { files: ["tokens.css", "pv-preset.ts"] },
@@ -170,7 +170,7 @@ npm install @semec/ds
 \`\`\`css
 @import "tailwindcss";
 @import "@semec/ds/react/tokens.css";
-@config "@semec/ds/react/pv-preset";
+@source "../node_modules/@semec/ds/dist/react";
 \`\`\`
 
 ## Uso
@@ -252,7 +252,7 @@ function llmsIndex({ site = false, lite = false } = {}) {
       "```css",
       '@import "tailwindcss";',
       '@import "@semec/ds/react/tokens.css";',
-      '@config "@semec/ds/react/pv-preset";',
+      '@source "../node_modules/@semec/ds/dist/react";',
       "```",
       "",
       "## Inclui",
@@ -297,7 +297,7 @@ function llmsIndex({ site = false, lite = false } = {}) {
     "```css",
     '@import "tailwindcss";',
     '@import "@semec/ds/react/tokens.css";',
-    '@config "@semec/ds/react/pv-preset";',
+    '@source "../node_modules/@semec/ds/dist/react";',
     "```",
     "",
     "## Categorias",
@@ -312,7 +312,9 @@ function llmsIndex({ site = false, lite = false } = {}) {
 
   for (const c of dsComponents) {
     const importName =
-      c.code.charAt(0).toUpperCase() + c.code.slice(1).replace(/-([a-z])/g, (_, l) => l.toUpperCase());
+      c.usage?.match(/import\s*\{\s*([^,\s}]+)/)?.[1] ??
+      c.code.charAt(0).toUpperCase() +
+        c.code.slice(1).replace(/-([a-z])/g, (_, l) => l.toUpperCase());
     if (site) {
       lines.push(
         `- [${c.label} (\`${c.code}\`) — ${c.desc}](/componentes/${c.slug}) — \`${c.file}\` — md: \`/components/${c.slug}.md\``
@@ -470,7 +472,7 @@ function buildDist() {
         categories: dsCategories,
         install: {
           tokens: 'import "@semec/ds/react/tokens.css";',
-          preset: '@config "@semec/ds/react/pv-preset";',
+          preset: '@source "../node_modules/@semec/ds/dist/react";',
         },
         tokens: {
           files: ["tokens.css", "pv-preset.ts"],

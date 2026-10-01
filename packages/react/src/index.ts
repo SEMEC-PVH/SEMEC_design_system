@@ -18,6 +18,7 @@ export * from "./components/error-summary";
 export * from "./components/empty-state";
 export * from "./components/file-upload";
 export * from "./components/form-field";
+export * from "./components/header";
 export * from "./components/icon-button";
 export * from "./components/input";
 export * from "./components/input-otp";

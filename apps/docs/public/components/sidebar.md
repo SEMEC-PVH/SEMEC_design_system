@@ -29,7 +29,7 @@ npm install @semec/ds
 ```css
 @import "tailwindcss";
 @import "@semec/ds/react/tokens.css";
-@config "@semec/ds/react/pv-preset";
+@source "../node_modules/@semec/ds/dist/react";
 ```
 
 ## Uso
@@ -96,6 +96,8 @@ type SidebarContext = {
   setOpenMobile: (open: boolean) => void;
   isMobile: boolean;
   toggleSidebar: () => void;
+  mobileTriggerRef: React.RefObject<HTMLButtonElement | null>;
+  mobilePanelRef: React.RefObject<HTMLDivElement | null>;
 };
 
 const SidebarContext = React.createContext<SidebarContext | null>(null);
@@ -108,6 +110,8 @@ const defaultSidebarContext: SidebarContext = {
   setOpenMobile: () => {},
   isMobile: false,
   toggleSidebar: () => {},
+  mobileTriggerRef: { current: null },
+  mobilePanelRef: { current: null },
 };
 
 function useSidebar() {
@@ -136,6 +140,8 @@ const SidebarProvider = React.forwardRef<
   ) => {
     const [isMobile, setIsMobile] = React.useState(false);
     const [openMobile, setOpenMobile] = React.useState(false);
+    const mobileTriggerRef = React.useRef<HTMLButtonElement | null>(null);
+    const mobilePanelRef = React.useRef<HTMLDivElement | null>(null);
 
     const [_open, _setOpen] = React.useState(defaultOpen);
     const open = openProp ?? _open;
@@ -166,11 +172,16 @@ const SidebarProvider = React.forwardRef<
         ) {
           event.preventDefault();
           toggleSidebar();
+          return;
+        }
+        if (event.key === "Escape" && openMobile) {
+          event.preventDefault();
+          setOpenMobile(false);
         }
       };
       window.addEventListener("keydown", handleKeyDown);
       return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [toggleSidebar]);
+    }, [toggleSidebar, openMobile, setOpenMobile]);
 
     React.useEffect(() => {
       const handleResize = () => {
@@ -180,6 +191,30 @@ const SidebarProvider = React.forwardRef<
       window.addEventListener("resize", handleResize);
       return () => window.removeEventListener("resize", handleResize);
     }, []);
+
+    React.useEffect(() => {
+      if (!openMobile) {
+        document.body.classList.remove("overflow-hidden");
+        return;
+      }
+
+      document.body.classList.add("overflow-hidden");
+      const panel = mobilePanelRef.current;
+      if (panel) {
+        const focusable = panel.querySelector<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        (focusable ?? panel).focus();
+      }
+
+      return () => {
+        document.body.classList.remove("overflow-hidden");
+        const trigger = mobileTriggerRef.current;
+        if (trigger && document.contains(trigger)) {
+          trigger.focus();
+        }
+      };
+    }, [openMobile]);
 
     const state = open ? "expanded" : "collapsed";
 
@@ -192,8 +227,18 @@ const SidebarProvider = React.forwardRef<
         openMobile,
         setOpenMobile,
         toggleSidebar,
+        mobileTriggerRef,
+        mobilePanelRef,
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+      [
+        state,
+        open,
+        setOpen,
+        isMobile,
+        openMobile,
+        setOpenMobile,
+        toggleSidebar,
+      ]
     );
 
     return (
@@ -202,6 +247,7 @@ const SidebarProvider = React.forwardRef<
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH,
+              "--sidebar-width-mobile": SIDEBAR_WIDTH_MOBILE,
               "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
               ...style,
             } as React.CSSProperties
@@ -240,7 +286,14 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+    const {
+      isMobile,
+      state,
+      openMobile,
+      setOpenMobile,
+      mobileTriggerRef,
+      mobilePanelRef,
+    } = useSidebar();
 
     if (collapsible === "none") {
       return (
@@ -264,11 +317,19 @@ const Sidebar = React.forwardRef<
             <div
               className="fixed inset-0 z-40 bg-black/50"
               onClick={() => setOpenMobile(false)}
+              aria-hidden="true"
             />
           )}
           <div
+            ref={mobilePanelRef}
+            role={openMobile ? "dialog" : undefined}
+            aria-modal={openMobile ? true : undefined}
+            aria-label={openMobile ? "Navegação" : undefined}
+            aria-hidden={!openMobile}
+            inert={!openMobile}
+            tabIndex={-1}
             className={cn(
-              "fixed inset-y-0 z-50 h-svh w-[var(--sidebar-width)] bg-sidebar p-0 text-sidebar-foreground transition-base ease-standard",
+              "fixed inset-y-0 z-50 h-svh w-[var(--sidebar-width-mobile)] bg-sidebar p-0 text-sidebar-foreground outline-none transition-base ease-standard",
               side === "left"
                 ? "left-0 data-[state=closed]:-translate-x-full"
                 : "right-0 data-[state=closed]:translate-x-full",
@@ -332,11 +393,18 @@ const SidebarTrigger = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof Slot>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, mobileTriggerRef } = useSidebar();
 
   return (
     <button
-      ref={ref}
+      ref={(node) => {
+        mobileTriggerRef.current = node;
+        if (typeof ref === "function") {
+          ref(node);
+        } else if (ref) {
+          ref.current = node;
+        }
+      }}
       data-sidebar="trigger"
       className={cn(
         "inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",

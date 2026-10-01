@@ -121,6 +121,7 @@
   --color-brand-primary:   var(--pv-blue-600);
   --color-brand-secondary: var(--pv-green-600);
   --color-brand-accent:    var(--pv-yellow-500);
+  --brand-hero:            var(--pv-blue-hero);
 
   /* ---- Ação ------------------------------------------------------------- */
   --color-action-primary:        var(--pv-blue-600);
@@ -290,6 +291,9 @@
   --color-border-strong:  #3f4756;
 
   --color-focus-ring: #7ab3ff;
+
+  /* Marca do cabeçalho do kit: no escuro o azul-hero não enxerga */
+  --brand-hero: var(--nav-accent);
 
   /* Sobre fundo escuro é o valor claro da escala que enxerga */
   --color-action-primary:        var(--pv-blue-400);

@@ -9,6 +9,7 @@ export default defineConfig([
     format: "esm",
     dts: false,
     sourcemap: true,
+    splitting: true,
     external: [
       /^@radix-ui/,
       "react",
@@ -21,6 +22,16 @@ export default defineConfig([
       "zod",
       "get-nce",
     ],
+  },
+  {
+    entry: {
+      "react/validacao": "src/validacao.ts",
+    },
+    outDir: "dist",
+    format: "esm",
+    dts: false,
+    sourcemap: true,
+    external: ["zod"],
   },
   {
     entry: {

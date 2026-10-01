@@ -15,6 +15,7 @@
    Uso no globals.css do site novo:
      @import "tailwindcss";
      @import "@semec/ds/react/tokens.css";
+     @source "../node_modules/@semec/ds/dist/react";
    ========================================================================= */
 
 /* =========================================================================
@@ -126,6 +127,9 @@
   --text-strong:       var(--pv-gray-900);
   --text-on-brand:     var(--pv-white);
   --tint:              var(--pv-blue-50);
+
+  /* ---- Marca ----------------------------------------------------------- */
+  --brand-hero:        var(--pv-blue-hero);
 
   /* ---- Ação ----------------------------------------------------------- */
   --action-primary:        var(--pv-blue-600);
@@ -256,8 +260,10 @@
   --color-muted:                var(--surface-alt);
   --color-muted-foreground:     var(--text-muted);
   --color-border:               var(--border);
+  --color-border-strong:        var(--border-strong);
   --color-input:                var(--border-strong);
   --color-ring:                 var(--focus-ring);
+  --color-brand-hero:           var(--brand-hero);
   --color-primary:              var(--action-primary);
   --color-primary-foreground:   var(--text-on-brand);
   --color-destructive:          var(--feedback-danger);
@@ -371,7 +377,9 @@
 
 @utility slide-in-from-top-* {
   --tw-enter-translate-y: calc(--value(integer) * var(--spacing) * -1);
-  --tw-enter-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+  --tw-enter-translate-y: calc(--value(ratio) * -100%);
+  --tw-enter-translate-y: calc(--value(percentage) * -1);
+  --tw-enter-translate-y: calc(--value([percentage]) * -1);
 }
 
 @utility slide-in-from-bottom {
@@ -380,7 +388,9 @@
 
 @utility slide-in-from-bottom-* {
   --tw-enter-translate-y: calc(--value(integer) * var(--spacing));
-  --tw-enter-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+  --tw-enter-translate-y: calc(--value(ratio) * 100%);
+  --tw-enter-translate-y: calc(--value(percentage));
+  --tw-enter-translate-y: calc(--value([percentage]));
 }
 
 @utility slide-in-from-left {
@@ -389,7 +399,9 @@
 
 @utility slide-in-from-left-* {
   --tw-enter-translate-x: calc(--value(integer) * var(--spacing) * -1);
-  --tw-enter-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+  --tw-enter-translate-x: calc(--value(ratio) * -100%);
+  --tw-enter-translate-x: calc(--value(percentage) * -1);
+  --tw-enter-translate-x: calc(--value([percentage]) * -1);
 }
 
 @utility slide-in-from-right {
@@ -398,7 +410,9 @@
 
 @utility slide-in-from-right-* {
   --tw-enter-translate-x: calc(--value(integer) * var(--spacing));
-  --tw-enter-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+  --tw-enter-translate-x: calc(--value(ratio) * 100%);
+  --tw-enter-translate-x: calc(--value(percentage));
+  --tw-enter-translate-x: calc(--value([percentage]));
 }
 
 @utility slide-out-to-top {
@@ -407,7 +421,9 @@
 
 @utility slide-out-to-top-* {
   --tw-exit-translate-y: calc(--value(integer) * var(--spacing) * -1);
-  --tw-exit-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+  --tw-exit-translate-y: calc(--value(ratio) * -100%);
+  --tw-exit-translate-y: calc(--value(percentage) * -1);
+  --tw-exit-translate-y: calc(--value([percentage]) * -1);
 }
 
 @utility slide-out-to-bottom {
@@ -416,7 +432,9 @@
 
 @utility slide-out-to-bottom-* {
   --tw-exit-translate-y: calc(--value(integer) * var(--spacing));
-  --tw-exit-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+  --tw-exit-translate-y: calc(--value(ratio) * 100%);
+  --tw-exit-translate-y: calc(--value(percentage));
+  --tw-exit-translate-y: calc(--value([percentage]));
 }
 
 @utility slide-out-to-left {
@@ -425,7 +443,9 @@
 
 @utility slide-out-to-left-* {
   --tw-exit-translate-x: calc(--value(integer) * var(--spacing) * -1);
-  --tw-exit-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+  --tw-exit-translate-x: calc(--value(ratio) * -100%);
+  --tw-exit-translate-x: calc(--value(percentage) * -1);
+  --tw-exit-translate-x: calc(--value([percentage]) * -1);
 }
 
 @utility slide-out-to-right {
@@ -434,7 +454,9 @@
 
 @utility slide-out-to-right-* {
   --tw-exit-translate-x: calc(--value(integer) * var(--spacing));
-  --tw-exit-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+  --tw-exit-translate-x: calc(--value(ratio) * 100%);
+  --tw-exit-translate-x: calc(--value(percentage));
+  --tw-exit-translate-x: calc(--value([percentage]));
 }
 
 /* ==========================================================================
@@ -447,6 +469,15 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+  }
+
+  /* Tailwind v4: cor padrão de borda é currentColor; o pacote usa o token. */
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border, currentcolor);
   }
 
   body {
@@ -467,6 +498,18 @@
   :focus-visible {
     outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
+  }
+}
+
+/* WCAG 2.1 (2.3.3): respeita menos movimento pedido no sistema. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

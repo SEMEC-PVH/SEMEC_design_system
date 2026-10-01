@@ -19,8 +19,10 @@ npm install @semec/ds
 ```css
 @import "tailwindcss";
 @import "@semec/ds/react/tokens.css";
-@config "@semec/ds/react/pv-preset";
+@source "../node_modules/@semec/ds/dist/react";
 ```
+
+O `@source` é obrigatório no Tailwind v4 para gerar utilitários a partir das classes do pacote.
 
 Poppins 400–700 (self-hosted woff2 ou `next/font`).
 

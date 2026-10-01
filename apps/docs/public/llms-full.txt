@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-09-30T15:35:01.075Z — packages/react/manifest.js + packages/react/* — versão 2.1.0
+> Gerado 2026-10-01T00:36:24.672Z — packages/react/manifest.js + packages/react/* — versão 3.0.0
 
 ## Instalação
 
@@ -31,6 +31,7 @@ export * from "./components/error-summary";
 export * from "./components/empty-state";
 export * from "./components/file-upload";
 export * from "./components/form-field";
+export * from "./components/header";
 export * from "./components/icon-button";
 export * from "./components/input";
 export * from "./components/input-otp";
@@ -84,6 +85,7 @@ export * from "./lib/validators";
    Uso no globals.css do site novo:
      @import "tailwindcss";
      @import "@semec/ds/react/tokens.css";
+     @source "../node_modules/@semec/ds/dist/react";
    ========================================================================= */
 
 /* =========================================================================
@@ -195,6 +197,9 @@ export * from "./lib/validators";
   --text-strong:       var(--pv-gray-900);
   --text-on-brand:     var(--pv-white);
   --tint:              var(--pv-blue-50);
+
+  /* ---- Marca ----------------------------------------------------------- */
+  --brand-hero:        var(--pv-blue-hero);
 
   /* ---- Ação ----------------------------------------------------------- */
   --action-primary:        var(--pv-blue-600);
@@ -325,8 +330,10 @@ export * from "./lib/validators";
   --color-muted:                var(--surface-alt);
   --color-muted-foreground:     var(--text-muted);
   --color-border:               var(--border);
+  --color-border-strong:        var(--border-strong);
   --color-input:                var(--border-strong);
   --color-ring:                 var(--focus-ring);
+  --color-brand-hero:           var(--brand-hero);
   --color-primary:              var(--action-primary);
   --color-primary-foreground:   var(--text-on-brand);
   --color-destructive:          var(--feedback-danger);
@@ -440,7 +447,9 @@ export * from "./lib/validators";
 
 @utility slide-in-from-top-* {
   --tw-enter-translate-y: calc(--value(integer) * var(--spacing) * -1);
-  --tw-enter-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+  --tw-enter-translate-y: calc(--value(ratio) * -100%);
+  --tw-enter-translate-y: calc(--value(percentage) * -1);
+  --tw-enter-translate-y: calc(--value([percentage]) * -1);
 }
 
 @utility slide-in-from-bottom {
@@ -449,7 +458,9 @@ export * from "./lib/validators";
 
 @utility slide-in-from-bottom-* {
   --tw-enter-translate-y: calc(--value(integer) * var(--spacing));
-  --tw-enter-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+  --tw-enter-translate-y: calc(--value(ratio) * 100%);
+  --tw-enter-translate-y: calc(--value(percentage));
+  --tw-enter-translate-y: calc(--value([percentage]));
 }
 
 @utility slide-in-from-left {
@@ -458,7 +469,9 @@ export * from "./lib/validators";
 
 @utility slide-in-from-left-* {
   --tw-enter-translate-x: calc(--value(integer) * var(--spacing) * -1);
-  --tw-enter-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+  --tw-enter-translate-x: calc(--value(ratio) * -100%);
+  --tw-enter-translate-x: calc(--value(percentage) * -1);
+  --tw-enter-translate-x: calc(--value([percentage]) * -1);
 }
 
 @utility slide-in-from-right {
@@ -467,7 +480,9 @@ export * from "./lib/validators";
 
 @utility slide-in-from-right-* {
   --tw-enter-translate-x: calc(--value(integer) * var(--spacing));
-  --tw-enter-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+  --tw-enter-translate-x: calc(--value(ratio) * 100%);
+  --tw-enter-translate-x: calc(--value(percentage));
+  --tw-enter-translate-x: calc(--value([percentage]));
 }
 
 @utility slide-out-to-top {
@@ -476,7 +491,9 @@ export * from "./lib/validators";
 
 @utility slide-out-to-top-* {
   --tw-exit-translate-y: calc(--value(integer) * var(--spacing) * -1);
-  --tw-exit-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+  --tw-exit-translate-y: calc(--value(ratio) * -100%);
+  --tw-exit-translate-y: calc(--value(percentage) * -1);
+  --tw-exit-translate-y: calc(--value([percentage]) * -1);
 }
 
 @utility slide-out-to-bottom {
@@ -485,7 +502,9 @@ export * from "./lib/validators";
 
 @utility slide-out-to-bottom-* {
   --tw-exit-translate-y: calc(--value(integer) * var(--spacing));
-  --tw-exit-translate-y: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+  --tw-exit-translate-y: calc(--value(ratio) * 100%);
+  --tw-exit-translate-y: calc(--value(percentage));
+  --tw-exit-translate-y: calc(--value([percentage]));
 }
 
 @utility slide-out-to-left {
@@ -494,7 +513,9 @@ export * from "./lib/validators";
 
 @utility slide-out-to-left-* {
   --tw-exit-translate-x: calc(--value(integer) * var(--spacing) * -1);
-  --tw-exit-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * -100%);
+  --tw-exit-translate-x: calc(--value(ratio) * -100%);
+  --tw-exit-translate-x: calc(--value(percentage) * -1);
+  --tw-exit-translate-x: calc(--value([percentage]) * -1);
 }
 
 @utility slide-out-to-right {
@@ -503,7 +524,9 @@ export * from "./lib/validators";
 
 @utility slide-out-to-right-* {
   --tw-exit-translate-x: calc(--value(integer) * var(--spacing));
-  --tw-exit-translate-x: calc(--value(--percentage-*, --percentage-translate-*) * 100%);
+  --tw-exit-translate-x: calc(--value(ratio) * 100%);
+  --tw-exit-translate-x: calc(--value(percentage));
+  --tw-exit-translate-x: calc(--value([percentage]));
 }
 
 /* ==========================================================================
@@ -516,6 +539,15 @@ export * from "./lib/validators";
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+  }
+
+  /* Tailwind v4: cor padrão de borda é currentColor; o pacote usa o token. */
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border, currentcolor);
   }
 
   body {
@@ -536,6 +568,18 @@ export * from "./lib/validators";
   :focus-visible {
     outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
+  }
+}
+
+/* WCAG 2.1 (2.3.3): respeita menos movimento pedido no sistema. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -566,9 +610,9 @@ export * from "./lib/validators";
  *
  * Uso no `globals.css` do site novo:
  *   @import "tailwindcss";
- *   @config "../pv-preset.ts";
- *   @import "./tokens.css";
- *   @import "./shadcn.css";
+ *   @import "@semec/ds/react/tokens.css";
+ *   @source "../node_modules/@semec/ds/dist/react";
+ *   @config "@semec/ds/react/pv-preset";
  */
 import type { Config } from "tailwindcss";
 
@@ -581,6 +625,7 @@ export default {
         surface: "var(--surface)",
         "surface-alt": "var(--surface-alt)",
         border: "var(--border)",
+        "border-strong": "var(--border-strong)",
         input: "var(--border-strong)",
         ring: "var(--focus-ring)",
         muted: "var(--surface-alt)",
@@ -609,33 +654,24 @@ export default {
           surface: "var(--feedback-info-surface)",
         },
         tint: "var(--tint)",
+        "brand-hero": "var(--brand-hero)",
         "pv-blue": {
           50: "var(--pv-blue-50)",
-          100: "var(--pv-blue-100)",
           600: "var(--pv-blue-600)",
           700: "var(--pv-blue-700)",
           800: "var(--pv-blue-800)",
-          900: "var(--pv-blue-900)",
-          950: "var(--pv-blue-950)",
           hero: "var(--pv-blue-hero)",
         },
         "pv-green": {
           50: "var(--pv-green-50)",
-          500: "var(--pv-green-500)",
           800: "var(--pv-green-800)",
         },
         "pv-yellow": {
-          400: "var(--pv-yellow-400)",
-          500: "var(--pv-yellow-500)",
           800: "var(--pv-yellow-800)",
         },
         "pv-red": {
           50: "var(--pv-red-50)",
-          400: "var(--pv-red-400)",
-          500: "var(--pv-red-500)",
-          600: "var(--pv-red-600)",
           700: "var(--pv-red-700)",
-          800: "var(--pv-red-800)",
         },
         "pv-gray": {
           50: "var(--pv-gray-50)",
@@ -685,6 +721,7 @@ export default {
     },
   },
 } satisfies Config;
+
 ```
 
 ## Manifest — categorias
@@ -729,11 +766,11 @@ export default {
 ```json
 {
   "name": "@semec/ds",
-  "version": "2.1.0"
+  "version": "3.0.0"
 }
 ```
 
-## Componentes — todos (47)
+## Componentes — todos (48)
 
 ### Botões (`button`) — `src/components/button.tsx` — slug: botoes
 
@@ -774,7 +811,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -2144,7 +2181,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-full border border-border px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
       variant: {
@@ -2228,7 +2265,11 @@ const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
+  <thead
+    ref={ref}
+    className={cn("[&_tr]:border-b [&_tr]:border-border", className)}
+    {...props}
+  />
 ));
 TableHeader.displayName = "TableHeader";
 
@@ -2250,7 +2291,10 @@ const TableFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <tfoot
     ref={ref}
-    className={cn("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", className)}
+    className={cn(
+      "border-t border-border bg-muted/50 font-medium [&>tr]:last:border-b-0",
+      className
+    )}
     {...props}
   />
 ));
@@ -2263,7 +2307,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+      "border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
       className
     )}
     {...props}
@@ -2506,6 +2550,169 @@ const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
 Breadcrumb.displayName = "Breadcrumb";
 
 export { Breadcrumb };
+```
+
+---
+
+### Cabeçalho (`header`) — `src/components/header.tsx` — slug: cabecalho
+
+Desc: Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.
+
+Variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href · HeaderNavLink: current
+
+Uso:
+```tsx
+import { Header, HeaderBrand, HeaderNav, HeaderNavLink } from "@semec/ds/react";
+import { Button } from "@semec/ds/react";
+
+<Header>
+  <HeaderBrand orgName="SEMEC" serviceName="Nome do serviço" />
+  <div className="flex items-center gap-2">
+    <HeaderNav>
+      <HeaderNavLink href="/prefeitura" current>Prefeitura</HeaderNavLink>
+      <HeaderNavLink href="/servicos">Serviços</HeaderNavLink>
+    </HeaderNav>
+    <Button asChild size="sm">
+      <a href="/contato">Fale Conosco</a>
+    </Button>
+  </div>
+</Header>
+```
+
+Prompt:
+```text
+Crie um header (Cabeçalho) usando @semec/ds/react (`src/components/header.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href · HeaderNavLink: current. Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.
+```
+
+Fonte:
+```tsx
+import * as React from "react";
+
+import { cn } from "../lib/utils";
+
+const Header = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
+  ({ className, children, ...props }, ref) => (
+    <header
+      ref={ref}
+      className={cn(
+        "flex w-full max-w-full items-center justify-between gap-4 border-b border-border bg-surface px-4 py-3 sm:px-6",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </header>
+  )
+);
+Header.displayName = "Header";
+
+export interface HeaderBrandProps extends React.HTMLAttributes<HTMLElement> {
+  href?: string;
+  orgName?: string;
+  serviceName?: string;
+  logo?: React.ReactNode;
+}
+
+const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
+  (
+    {
+      className,
+      href = "/",
+      orgName = "SEMEC",
+      serviceName = "Nome do serviço",
+      logo,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    const content = (
+      <>
+        {logo ?? (
+          <span
+            role="img"
+            aria-label="Logo do órgão"
+            className="inline-flex h-9 w-[90px] shrink-0 items-center justify-center rounded-md border border-dashed border-border-strong bg-surface-alt text-xs font-medium text-muted-foreground"
+          >
+            Logo
+          </span>
+        )}
+        <span aria-hidden="true" className="h-7 w-px shrink-0 bg-border" />
+        {children ?? (
+          <span className="truncate text-base font-bold leading-normal text-brand-hero">
+            {orgName}
+            <span
+              aria-hidden="true"
+              className="mx-1 font-normal text-muted-foreground"
+            >
+              |
+            </span>
+            <span className="font-semibold text-foreground">{serviceName}</span>
+          </span>
+        )}
+      </>
+    );
+
+    const rootClass = cn(
+      "flex min-w-0 items-center gap-3 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+      className
+    );
+
+    if (href) {
+      return (
+        <a ref={ref as React.Ref<HTMLAnchorElement>} href={href} className={rootClass} {...props}>
+          {content}
+          <span className="sr-only">— ir para o início</span>
+        </a>
+      );
+    }
+
+    return (
+      <div ref={ref as React.Ref<HTMLDivElement>} className={rootClass} {...props}>
+        {content}
+      </div>
+    );
+  }
+);
+HeaderBrand.displayName = "HeaderBrand";
+
+const HeaderNav = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
+  ({ className, children, ...props }, ref) => (
+    <nav
+      ref={ref}
+      aria-label="Principal"
+      className={cn("flex items-center gap-2", className)}
+      {...props}
+    >
+      {children}
+    </nav>
+  )
+);
+HeaderNav.displayName = "HeaderNav";
+
+export interface HeaderNavLinkProps
+  extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  current?: boolean;
+}
+
+const HeaderNavLink = React.forwardRef<HTMLAnchorElement, HeaderNavLinkProps>(
+  ({ className, current, ...props }, ref) => (
+    <a
+      ref={ref}
+      aria-current={current ? "page" : undefined}
+      className={cn(
+        "inline-flex min-h-11 items-center rounded-md px-2 text-sm font-medium text-foreground no-underline transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        current && "font-semibold text-brand-hero",
+        className
+      )}
+      {...props}
+    />
+  )
+);
+HeaderNavLink.displayName = "HeaderNavLink";
+
+export { Header, HeaderBrand, HeaderNav, HeaderNavLink };
+
 ```
 
 ---
@@ -3367,7 +3574,7 @@ import { AlertCircle, AlertTriangle, CheckCircle2, Info } from "lucide-react";
 import { cn } from "../lib/utils";
 
 const alertVariants = cva(
-  "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:h-4 [&>svg]:w-4",
+  "relative w-full rounded-lg border border-border px-4 py-3 text-sm [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:h-4 [&>svg]:w-4",
   {
     variants: {
       variant: {
@@ -4900,7 +5107,7 @@ const DrawerClose = DialogPrimitive.Close;
 const DrawerPortal = DialogPrimitive.Portal;
 
 const drawerVariants = cva(
-  "fixed z-50 gap-4 bg-card p-6 shadow-elevation-3 transition-base ease-standard",
+  "fixed z-50 gap-4 bg-card p-6 shadow-elevation-3 duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
   {
     variants: {
       side: {
@@ -5068,7 +5275,7 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 const sheetVariants = cva(
-  "fixed z-50 gap-4 bg-card p-6 shadow-elevation-3 transition-base ease-standard",
+  "fixed z-50 gap-4 bg-card p-6 shadow-elevation-3 duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
   {
     variants: {
       side: {
@@ -5773,6 +5980,8 @@ type SidebarContext = {
   setOpenMobile: (open: boolean) => void;
   isMobile: boolean;
   toggleSidebar: () => void;
+  mobileTriggerRef: React.RefObject<HTMLButtonElement | null>;
+  mobilePanelRef: React.RefObject<HTMLDivElement | null>;
 };
 
 const SidebarContext = React.createContext<SidebarContext | null>(null);
@@ -5785,6 +5994,8 @@ const defaultSidebarContext: SidebarContext = {
   setOpenMobile: () => {},
   isMobile: false,
   toggleSidebar: () => {},
+  mobileTriggerRef: { current: null },
+  mobilePanelRef: { current: null },
 };
 
 function useSidebar() {
@@ -5813,6 +6024,8 @@ const SidebarProvider = React.forwardRef<
   ) => {
     const [isMobile, setIsMobile] = React.useState(false);
     const [openMobile, setOpenMobile] = React.useState(false);
+    const mobileTriggerRef = React.useRef<HTMLButtonElement | null>(null);
+    const mobilePanelRef = React.useRef<HTMLDivElement | null>(null);
 
     const [_open, _setOpen] = React.useState(defaultOpen);
     const open = openProp ?? _open;
@@ -5843,11 +6056,16 @@ const SidebarProvider = React.forwardRef<
         ) {
           event.preventDefault();
           toggleSidebar();
+          return;
+        }
+        if (event.key === "Escape" && openMobile) {
+          event.preventDefault();
+          setOpenMobile(false);
         }
       };
       window.addEventListener("keydown", handleKeyDown);
       return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [toggleSidebar]);
+    }, [toggleSidebar, openMobile, setOpenMobile]);
 
     React.useEffect(() => {
       const handleResize = () => {
@@ -5857,6 +6075,30 @@ const SidebarProvider = React.forwardRef<
       window.addEventListener("resize", handleResize);
       return () => window.removeEventListener("resize", handleResize);
     }, []);
+
+    React.useEffect(() => {
+      if (!openMobile) {
+        document.body.classList.remove("overflow-hidden");
+        return;
+      }
+
+      document.body.classList.add("overflow-hidden");
+      const panel = mobilePanelRef.current;
+      if (panel) {
+        const focusable = panel.querySelector<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        (focusable ?? panel).focus();
+      }
+
+      return () => {
+        document.body.classList.remove("overflow-hidden");
+        const trigger = mobileTriggerRef.current;
+        if (trigger && document.contains(trigger)) {
+          trigger.focus();
+        }
+      };
+    }, [openMobile]);
 
     const state = open ? "expanded" : "collapsed";
 
@@ -5869,8 +6111,18 @@ const SidebarProvider = React.forwardRef<
         openMobile,
         setOpenMobile,
         toggleSidebar,
+        mobileTriggerRef,
+        mobilePanelRef,
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+      [
+        state,
+        open,
+        setOpen,
+        isMobile,
+        openMobile,
+        setOpenMobile,
+        toggleSidebar,
+      ]
     );
 
     return (
@@ -5879,6 +6131,7 @@ const SidebarProvider = React.forwardRef<
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH,
+              "--sidebar-width-mobile": SIDEBAR_WIDTH_MOBILE,
               "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
               ...style,
             } as React.CSSProperties
@@ -5917,7 +6170,14 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+    const {
+      isMobile,
+      state,
+      openMobile,
+      setOpenMobile,
+      mobileTriggerRef,
+      mobilePanelRef,
+    } = useSidebar();
 
     if (collapsible === "none") {
       return (
@@ -5941,11 +6201,19 @@ const Sidebar = React.forwardRef<
             <div
               className="fixed inset-0 z-40 bg-black/50"
               onClick={() => setOpenMobile(false)}
+              aria-hidden="true"
             />
           )}
           <div
+            ref={mobilePanelRef}
+            role={openMobile ? "dialog" : undefined}
+            aria-modal={openMobile ? true : undefined}
+            aria-label={openMobile ? "Navegação" : undefined}
+            aria-hidden={!openMobile}
+            inert={!openMobile}
+            tabIndex={-1}
             className={cn(
-              "fixed inset-y-0 z-50 h-svh w-[var(--sidebar-width)] bg-sidebar p-0 text-sidebar-foreground transition-base ease-standard",
+              "fixed inset-y-0 z-50 h-svh w-[var(--sidebar-width-mobile)] bg-sidebar p-0 text-sidebar-foreground outline-none transition-base ease-standard",
               side === "left"
                 ? "left-0 data-[state=closed]:-translate-x-full"
                 : "right-0 data-[state=closed]:translate-x-full",
@@ -6009,11 +6277,18 @@ const SidebarTrigger = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof Slot>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, mobileTriggerRef } = useSidebar();
 
   return (
     <button
-      ref={ref}
+      ref={(node) => {
+        mobileTriggerRef.current = node;
+        if (typeof ref === "function") {
+          ref(node);
+        } else if (ref) {
+          ref.current = node;
+        }
+      }}
       data-sidebar="trigger"
       className={cn(
         "inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
@@ -6439,22 +6714,35 @@ function Exemplo() {
 
 ## Tokens
 
-```css
-/* Tokens primitivos + semânticos */
-@import "@semec/ds/react/tokens.css";
-```
-
-Ou use o preset Tailwind v4:
+Config CSS recomendada (Tailwind v4 — o `@source` faz o Tailwind varrer as classes do pacote):
 
 ```css
 @import "tailwindcss";
-@config "@semec/ds/react/pv-preset";
 @import "@semec/ds/react/tokens.css";
+@source "../node_modules/@semec/ds/dist/react";
+```
+
+O caminho CSS-first acima é o que o Tailwind v4 espera. Alternativa com preset JS (opcional):
+
+```css
+@import "tailwindcss";
+@import "@semec/ds/react/tokens.css";
+@source "../node_modules/@semec/ds/dist/react";
+@config "@semec/ds/react/pv-preset";
 ```
 
 ## Tema
 
 Os tokens do pacote (`tokens.css`) são tema **claro**. Não há `shadcn.css` no pacote (removido na 2.0.0).
+
+## Validação (Zod)
+
+Schemas Zod ficam no entry **`@semec/ds/react/validacao`** — o entry principal não importa `zod`:
+
+```ts
+import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
+import { validateCPF } from "@semec/ds/react"; // helpers puros, sem zod
+```
 
 ## Segurança (CSP)
 
@@ -6476,20 +6764,17 @@ function RootLayout({ nonce }) {
 }
 ```
 
-**Componentes sem nonce (CSS estático em `tokens.css`):**
-- ScrollArea — scrollbar escondida via CSS estático
-- Select — scrollbar escondida via CSS estático
+Medido na prova com política estrita (SEM-752/SEM-780):
 
-**Componentes que precisam de nonce (via `SemecProvider`):**
-- Dialog, AlertDialog, Drawer, Sheet — scroll locking do body
-- DropdownMenu, Popover — scroll locking do body
-
-Sem nonce, esses componentes funcionam mas perdem a trava do fundo e a compensação de layout da scrollbar.
+- **Popover** — 0 violações de política (sem nonce).
+- **ScrollArea, Select** — 1 violação cada, mesmo com nonce (continuam com scrollbar CSS estático no `tokens.css`).
+- **Dialog, AlertDialog, Drawer, Sheet, DropdownMenu** — scroll locking do body; use `SemecProvider` com nonce.
 
 ## Dependências
 
-- **Peer**: React 19+
-- **Tailwind CSS**: v4+
+- **Peer**: React 19+, React DOM 19+
+- **Peer opcional**: `zod` ^3.23 — só se usar `@semec/ds/react/validacao`
+- **Tailwind CSS**: v4+ (com `@source` apontando para `node_modules/@semec/ds/dist/react`)
 - **Ícones**: `lucide-react`
 
 Todas as dependências Radix UI são instaladas automaticamente.

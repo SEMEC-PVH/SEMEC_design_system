@@ -1,21 +1,29 @@
+"use client";
+
 /* eslint-disable jsx-a11y/anchor-is-valid -- preview estático, links são placeholders */
+import {
+  Header,
+  HeaderBrand,
+  HeaderNav,
+  HeaderNavLink,
+  Button,
+} from "semec-ds/react";
+
 export default function DemoHeader() {
   return (
-    <div className="demo-header">
-      <div className="brand">
-        <div className="logo"></div>
-        <div className="divider"></div>
-        <div className="name">
-          SEMEC <span className="dig">DIGITAL</span>
-        </div>
+    <Header>
+      <HeaderBrand orgName="SEMEC" serviceName="Nome do serviço" />
+      <div className="flex items-center gap-2">
+        <HeaderNav>
+          <HeaderNavLink href="#" current>
+            Prefeitura
+          </HeaderNavLink>
+          <HeaderNavLink href="#">Serviços</HeaderNavLink>
+        </HeaderNav>
+        <Button asChild size="sm">
+          <a href="#">Fale Conosco</a>
+        </Button>
       </div>
-      <nav>
-        <a href="#">Prefeitura</a>
-        <a href="#">Sobre a SEMEC</a>
-        <a className="cta" href="#">
-          Fale Conosco
-        </a>
-      </nav>
-    </div>
+    </Header>
   );
 }

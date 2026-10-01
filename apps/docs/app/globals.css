@@ -1509,64 +1509,7 @@ li {
   color: var(--text-muted);
 }
 
-/* Header simulado */
-.demo-header {
-  background: #fff;
-  border-bottom: 1px solid var(--pv-blue-100);
-  padding: 1rem 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-family: var(--font-poppins), "Poppins", sans-serif;
-}
-.demo-header .brand {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-.demo-header .logo {
-  width: 90px;
-  height: 36px;
-  background: var(--pv-blue-900);
-  border-radius: 0.3rem;
-}
-.demo-header .divider {
-  width: 1px;
-  height: 28px;
-  background: var(--pv-blue-100);
-}
-.demo-header .name {
-  font-weight: 800;
-  color: var(--hero);
-  font-size: var(--font-size-base);
-}
-.demo-header .name .dig {
-  color: var(--pv-green-600);
-  font-family: var(--font-mono), "IBM Plex Mono", ui-monospace, monospace;
-  letter-spacing: -0.13em;
-}
-.demo-header nav {
-  display: flex;
-  gap: 1.25rem;
-  align-items: center;
-}
-.demo-header nav a {
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-  color: var(--pv-blue-900);
-  text-decoration: none;
-}
-.demo-header nav a:hover {
-  color: var(--pv-green-800);
-}
-.demo-header .cta {
-  background: var(--pv-blue-900);
-  color: #fff;
-  border-radius: 9999px;
-  padding: 0.4rem 1rem;
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-}
+/* Header simulado — removido: preview usa o componente Header do kit */
 
 /* Hero simulado */
 .demo-hero {

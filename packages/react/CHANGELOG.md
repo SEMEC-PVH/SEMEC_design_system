@@ -1,5 +1,27 @@
 # @semec/ds
 
+## 3.0.0
+
+### Major Changes
+
+- Schemas Zod saem do entry principal: use `@semec/ds/react/validacao` (`cpfSchema`, `cnpjSchema`, `cpfCnpjSchema`, `emailSchema`, `cepSchema`). O main (`@semec/ds/react`) não importa mais `zod`; o peer opcional passa a ser verdadeiro (SEM-782).
+- Build com `splitting: true` (ESM por módulo) para poda de árvore em apps que importam poucas peças.
+- `tokens.css`: cor padrão de borda (`border-color: var(--color-border)` na camada base) — tabela e `Badge outline` deixam de sair com borda `currentColor` (SEM-781).
+- `tokens.css`: `@media (prefers-reduced-motion: reduce)` global (SEM-784).
+- `tokens.css`: token `--color-border-strong` (classes `border-border-strong` em Header/FileUpload) e utilitários `slide-in-from-*`/`slide-out-to-*` com fração e percentual arbitrário (SEM-786).
+- Sheet e Drawer animam o painel (`animate-in`/`animate-out` + fade), não só o overlay (SEM-786).
+- Sidebar mobile: papel de diálogo (`role="dialog"`, `aria-modal`), foco no painel, Esc fecha, trava do `body`, largura `SIDEBAR_WIDTH_MOBILE` (SEM-785).
+- Documentação CSS: config recomendada inclui `@source` para o Tailwind v4 varrer as classes do pacote (SEM-783).
+
+### Migration
+
+```diff
+- import { cpfSchema } from "@semec/ds/react";
++ import { cpfSchema } from "@semec/ds/react/validacao";
+```
+
+Helpers puros (`validateCPF`, `validateCNPJ`, `validateEmail`) e masks continuam no main.
+
 ## 2.1.0
 
 ### Minor Changes

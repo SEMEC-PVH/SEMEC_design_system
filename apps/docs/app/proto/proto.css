@@ -71,6 +71,7 @@
   --color-input: var(--color-border-strong);
   --color-ring: var(--color-focus-ring);
   --color-tint: var(--tint);
+  --color-brand-hero: var(--brand-hero);
 
   /* Raios seguem o L1 do site */
   --radius-sm: var(--radius-sm);

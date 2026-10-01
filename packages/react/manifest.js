@@ -375,6 +375,33 @@ import { Inbox } from "lucide-react";
 ]} />`,
   },
   {
+    code: "header",
+    slug: "cabecalho",
+    label: "Cabeçalho",
+    file: "src/components/header.tsx",
+    category: "navegacao",
+    desc: "Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.",
+    variants: [
+      { prop: "composição", values: "Header · HeaderBrand · HeaderNav · HeaderNavLink" },
+      { prop: "props", values: "HeaderBrand: orgName · serviceName · logo · href · HeaderNavLink: current" },
+    ],
+    usage: `import { Header, HeaderBrand, HeaderNav, HeaderNavLink } from "@semec/ds/react";
+import { Button } from "@semec/ds/react";
+
+<Header>
+  <HeaderBrand orgName="SEMEC" serviceName="Nome do serviço" />
+  <div className="flex items-center gap-2">
+    <HeaderNav>
+      <HeaderNavLink href="/prefeitura" current>Prefeitura</HeaderNavLink>
+      <HeaderNavLink href="/servicos">Serviços</HeaderNavLink>
+    </HeaderNav>
+    <Button asChild size="sm">
+      <a href="/contato">Fale Conosco</a>
+    </Button>
+  </div>
+</Header>`,
+  },
+  {
     code: "tabs",
     slug: "abas",
     label: "Abas",
@@ -949,7 +976,7 @@ export const dsPortal = {
       slug: "header",
       label: "Header",
       href: "/componentes/header",
-      desc: "Topo com marca, navegação e CTA.",
+      desc: "Topo com marca, navegação e CTA. Componente `Header` do kit.",
     },
     {
       slug: "hero",

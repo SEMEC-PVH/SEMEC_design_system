@@ -112,22 +112,35 @@ function Exemplo() {
 
 ## Tokens
 
-```css
-/* Tokens primitivos + semânticos */
-@import "@semec/ds/react/tokens.css";
-```
-
-Ou use o preset Tailwind v4:
+Config CSS recomendada (Tailwind v4 — o `@source` faz o Tailwind varrer as classes do pacote):
 
 ```css
 @import "tailwindcss";
-@config "@semec/ds/react/pv-preset";
 @import "@semec/ds/react/tokens.css";
+@source "../node_modules/@semec/ds/dist/react";
+```
+
+O caminho CSS-first acima é o que o Tailwind v4 espera. Alternativa com preset JS (opcional):
+
+```css
+@import "tailwindcss";
+@import "@semec/ds/react/tokens.css";
+@source "../node_modules/@semec/ds/dist/react";
+@config "@semec/ds/react/pv-preset";
 ```
 
 ## Tema
 
 Os tokens do pacote (`tokens.css`) são tema **claro**. Não há `shadcn.css` no pacote (removido na 2.0.0).
+
+## Validação (Zod)
+
+Schemas Zod ficam no entry **`@semec/ds/react/validacao`** — o entry principal não importa `zod`:
+
+```ts
+import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
+import { validateCPF } from "@semec/ds/react"; // helpers puros, sem zod
+```
 
 ## Segurança (CSP)
 
@@ -149,20 +162,17 @@ function RootLayout({ nonce }) {
 }
 ```
 
-**Componentes sem nonce (CSS estático em `tokens.css`):**
-- ScrollArea — scrollbar escondida via CSS estático
-- Select — scrollbar escondida via CSS estático
+Medido na prova com política estrita (SEM-752/SEM-780):
 
-**Componentes que precisam de nonce (via `SemecProvider`):**
-- Dialog, AlertDialog, Drawer, Sheet — scroll locking do body
-- DropdownMenu, Popover — scroll locking do body
-
-Sem nonce, esses componentes funcionam mas perdem a trava do fundo e a compensação de layout da scrollbar.
+- **Popover** — 0 violações de política (sem nonce).
+- **ScrollArea, Select** — 1 violação cada, mesmo com nonce (continuam com scrollbar CSS estático no `tokens.css`).
+- **Dialog, AlertDialog, Drawer, Sheet, DropdownMenu** — scroll locking do body; use `SemecProvider` com nonce.
 
 ## Dependências
 
-- **Peer**: React 19+
-- **Tailwind CSS**: v4+
+- **Peer**: React 19+, React DOM 19+
+- **Peer opcional**: `zod` ^3.23 — só se usar `@semec/ds/react/validacao`
+- **Tailwind CSS**: v4+ (com `@source` apontando para `node_modules/@semec/ds/dist/react`)
 - **Ícones**: `lucide-react`
 
 Todas as dependências Radix UI são instaladas automaticamente.

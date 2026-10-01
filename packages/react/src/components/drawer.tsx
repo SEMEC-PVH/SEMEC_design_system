@@ -14,7 +14,7 @@ const DrawerClose = DialogPrimitive.Close;
 const DrawerPortal = DialogPrimitive.Portal;
 
 const drawerVariants = cva(
-  "fixed z-50 gap-4 bg-card p-6 shadow-elevation-3 transition-base ease-standard",
+  "fixed z-50 gap-4 bg-card p-6 shadow-elevation-3 duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
   {
     variants: {
       side: {

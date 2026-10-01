@@ -35,6 +35,10 @@ import {
   EmptyState,
   FileUpload,
   FormField,
+  Header,
+  HeaderBrand,
+  HeaderNav,
+  HeaderNavLink,
   IconButton,
   Input,
   InputOTP,
@@ -765,6 +769,27 @@ function SidebarPreview() {
   );
 }
 
+function HeaderPreview() {
+  return (
+    <div className="w-full">
+      <Header>
+        <HeaderBrand orgName="SEMEC" serviceName="Nome do serviço" href="#proto" />
+        <div className="flex items-center gap-2">
+          <HeaderNav>
+            <HeaderNavLink href="#proto" current>
+              Prefeitura
+            </HeaderNavLink>
+            <HeaderNavLink href="#proto">Serviços</HeaderNavLink>
+          </HeaderNav>
+          <Button asChild size="sm">
+            <a href="#proto">Fale Conosco</a>
+          </Button>
+        </div>
+      </Header>
+    </div>
+  );
+}
+
 const PREVIEWS = {
   button: ButtonPreview,
   "icon-button": IconButtonPreview,
@@ -780,6 +805,7 @@ const PREVIEWS = {
   switch: SwitchPreview,
   label: LabelPreview,
   "form-field": FormFieldPreview,
+  header: HeaderPreview,
   card: CardPreview,
   badge: BadgePreview,
   table: TablePreview,
@@ -813,7 +839,19 @@ export default function BasePreview({ slug }) {
   if (!Preview) return <p className="text-sm text-muted-foreground">Preview indisponível.</p>;
   return (
     <PreviewFrame>
-      <div style={{ padding: "1.5rem", display: "flex", justifyContent: "center", alignItems: "center", minHeight: "120px", textAlign: "center" }}>
+      <div
+        style={{
+          padding: "1.5rem",
+          width: "100%",
+          boxSizing: "border-box",
+          overflow: "hidden",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "120px",
+          textAlign: "center",
+        }}
+      >
         <Preview />
       </div>
     </PreviewFrame>
