@@ -1,11 +1,17 @@
 @import "./tokens.css";
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* Reset em @layer base: sem a camada, este seletor un-layered vencia
+   qualquer utility de proto.css (@layer utilities) e zerava padding/margin
+   de conteúdo portáilado no documento do site (menu suspenso, drawer,
+   sheet nas seções de extras). Site chrome não usa utilities — só o kit. */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 .sr-only {
@@ -1380,7 +1386,7 @@ li {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 120px;
+  min-height: 96px;
   overflow: hidden;
 }
 .proto-preview-iframe {

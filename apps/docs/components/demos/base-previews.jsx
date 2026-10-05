@@ -750,7 +750,7 @@ function CalendarPreview() {
 
 function ScrollAreaPreview() {
   return (
-    <ScrollArea className="h-40 w-48 rounded-md border">
+    <ScrollArea className="h-32 w-48 rounded-md border">
       <div className="p-4">
         <h4 className="text-sm font-medium mb-2">Itens</h4>
         {Array.from({ length: 20 }, (_, i) => (
@@ -804,16 +804,16 @@ function NavigationMenuPreview() {
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <NavigationMenuLink href="#proto">IPTU</NavigationMenuLink>
-            <NavigationMenuLink href="#proto">Alvará</NavigationMenuLink>
+          <NavigationMenuContent className="flex flex-col gap-1 p-1">
+            <NavigationMenuLink className="rounded-sm px-3 py-2 hover:bg-accent" href="#proto">IPTU</NavigationMenuLink>
+            <NavigationMenuLink className="rounded-sm px-3 py-2 hover:bg-accent" href="#proto">Alvará</NavigationMenuLink>
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuTrigger>Atendimento</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <NavigationMenuLink href="#proto">Agendamento</NavigationMenuLink>
-            <NavigationMenuLink href="#proto">Ouvidoria</NavigationMenuLink>
+          <NavigationMenuContent className="flex flex-col gap-1 p-1">
+            <NavigationMenuLink className="rounded-sm px-3 py-2 hover:bg-accent" href="#proto">Agendamento</NavigationMenuLink>
+            <NavigationMenuLink className="rounded-sm px-3 py-2 hover:bg-accent" href="#proto">Ouvidoria</NavigationMenuLink>
           </NavigationMenuContent>
         </NavigationMenuItem>
       </NavigationMenuList>
@@ -877,7 +877,7 @@ function SheetPreview() {
           <SheetTitle>Filtros</SheetTitle>
           <SheetDescription>Refine sua busca.</SheetDescription>
         </SheetHeader>
-        <div className="space-y-4 p-6">
+        <div className="space-y-4">
           <div>
             <p className="mb-2 text-sm font-medium">Status</p>
             <div className="flex items-center gap-2 text-sm">
@@ -932,7 +932,7 @@ function DrawerPreview() {
           <DrawerTitle>Detalhes</DrawerTitle>
           <DrawerDescription>Informações do protocolo.</DrawerDescription>
         </DrawerHeader>
-        <div className="p-6">
+        <div>
           <p>
             Este é o conteúdo do painel. Aqui podem ser exibidos detalhes,
             configurações ou qualquer informação complementar.
@@ -995,6 +995,7 @@ function SidebarTriggerPreview() {
 }
 
 function DropdownMenuPreview() {
+  const portalContainer = usePreviewPortalContainer();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -1002,7 +1003,7 @@ function DropdownMenuPreview() {
           <MoreHorizontal />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent portalContainer={portalContainer}>
         <DropdownMenuItem>Editar</DropdownMenuItem>
         <DropdownMenuItem>Duplicar</DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -1181,7 +1182,7 @@ export default function BasePreview({ slug }) {
   if (!Preview) return <p className="text-sm text-muted-foreground">Preview indisponível.</p>;
   return (
     <PreviewFrame>
-      <div className="box-border flex min-h-[120px] w-full items-center justify-center overflow-hidden p-6">
+      <div className="box-border flex min-h-[96px] w-full items-center justify-center overflow-x-clip p-4">
         <Preview />
       </div>
     </PreviewFrame>

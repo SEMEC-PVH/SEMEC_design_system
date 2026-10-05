@@ -132,11 +132,9 @@ export default function PreviewFrame({ children }) {
     let ro;
     const syncHeight = () => {
       if (!doc.body) return;
-      let maxBottom = Math.max(
-        doc.documentElement.scrollHeight,
-        doc.body.scrollHeight,
-        160
-      );
+      // Medir pelo body (não documentElement): documentElement.scrollHeight
+      // tem piso = viewport do iframe — uma altura errada sobe e nunca desce.
+      let maxBottom = Math.max(doc.body.scrollHeight, 96);
       // Portals Radix (Combobox/Select) não aumentam scrollHeight;
       // medir o wrapper para o iframe não cortar o popover.
       doc.querySelectorAll("[data-radix-popper-content-wrapper]").forEach((el) => {
