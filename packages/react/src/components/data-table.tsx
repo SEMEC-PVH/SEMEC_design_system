@@ -71,17 +71,35 @@ function DataTableInner<T extends Record<string, unknown>>(
               {columns.map((col) => (
                 <th
                   key={col.key}
+                  scope="col"
+                  aria-sort={
+                    col.sortable
+                      ? sortKey === col.key
+                        ? sortDir === "asc"
+                          ? "ascending"
+                          : "descending"
+                        : "none"
+                      : undefined
+                  }
                   className={cn(
                     "h-11 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
-                    col.sortable && "cursor-pointer select-none hover:text-foreground",
+                    col.sortable && "select-none hover:text-foreground",
                     col.className
                   )}
-                  onClick={col.sortable ? () => handleSort(col.key) : undefined}
                 >
-                  <div className="flex items-center gap-2">
-                    {col.header}
-                    {col.sortable && getSortIcon(col.key)}
-                  </div>
+                  {col.sortable ? (
+                    <button
+                      type="button"
+                      onClick={() => handleSort(col.key)}
+                      aria-label={`Ordenar por ${col.header}`}
+                      className="inline-flex items-center gap-2 rounded-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    >
+                      {col.header}
+                      {getSortIcon(col.key)}
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-2">{col.header}</div>
+                  )}
                 </th>
               ))}
             </tr>
