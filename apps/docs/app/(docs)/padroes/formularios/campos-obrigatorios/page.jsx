@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { CamposObrigatoriosDemo } from "@/components/demos/patterns/formularios/campos-obrigatorios";
 
 export const metadata = { title: "Campos obrigatórios" };
 
@@ -6,7 +8,6 @@ export default function CamposObrigatoriosPage() {
   return (
     <PatternPage
       title="Campos obrigatórios"
-      component="Indicação de campos obrigatórios"
       subtitle="Como indicar, de forma clara e consistente, quais campos precisam ser preenchidos."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function CamposObrigatoriosPage() {
         },
       ]}
       note="A obrigatoriedade deve ser perceptível antes do envio, não apenas após o erro."
-    />
+    >
+      <PatternDemo id="formularios/campos-obrigatorios">
+        <CamposObrigatoriosDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

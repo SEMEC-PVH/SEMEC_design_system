@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { PrevencaoPerdaDemo } from "@/components/demos/patterns/formularios/prevencao-de-perda-de-dados";
 
 export const metadata = { title: "Prevenção de perda de dados" };
 
@@ -6,7 +8,6 @@ export default function PrevencaoDePerdaDeDadosPage() {
   return (
     <PatternPage
       title="Prevenção de perda de dados"
-      component="Aviso de perda de dados"
       subtitle="Proteção do que o usuário digitou contra saídas acidentais ou erros."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function PrevencaoDePerdaDeDadosPage() {
         },
       ]}
       note="Perder o trabalho do usuário é uma das falhas mais frustrantes; prevenir é essencial."
-    />
+    >
+      <PatternDemo id="formularios/prevencao-de-perda-de-dados">
+        <PrevencaoPerdaDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { TextosDeAjudaDemo } from "@/components/demos/patterns/formularios/textos-de-ajuda";
 
 export const metadata = { title: "Textos de ajuda" };
 
@@ -6,7 +8,6 @@ export default function TextosDeAjudaPage() {
   return (
     <PatternPage
       title="Textos de ajuda"
-      component="Textos de ajuda"
       subtitle="Orientação contextual sobre o que preencher em cada campo."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function TextosDeAjudaPage() {
         },
       ]}
       note="Ajuda deve reduzir dúvida, não criar mais texto para ler."
-    />
+    >
+      <PatternDemo id="formularios/textos-de-ajuda">
+        <TextosDeAjudaDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

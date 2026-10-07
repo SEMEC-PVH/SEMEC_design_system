@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { ConfirmacaoEnvioDemo } from "@/components/demos/patterns/formularios/confirmacao-de-envio";
 
 export const metadata = { title: "Confirmação de envio" };
 
@@ -6,7 +8,6 @@ export default function ConfirmacaoDeEnvioPage() {
   return (
     <PatternPage
       title="Confirmação de envio"
-      component="Confirmação de envio"
       subtitle="Feedback claro após o envio bem-sucedido de um formulário."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function ConfirmacaoDeEnvioPage() {
         },
       ]}
       note="A confirmação encerra o ciclo: o usuário sabe que a ação foi concluída."
-    />
+    >
+      <PatternDemo id="formularios/confirmacao-de-envio">
+        <ConfirmacaoEnvioDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

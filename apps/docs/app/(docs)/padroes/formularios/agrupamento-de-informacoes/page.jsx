@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { AgrupamentoDemo } from "@/components/demos/patterns/formularios/agrupamento-de-informacoes";
 
 export const metadata = { title: "Agrupamento de informações" };
 
@@ -6,7 +8,6 @@ export default function AgrupamentoDeInformacoesPage() {
   return (
     <PatternPage
       title="Agrupamento de informações"
-      component="Agrupamento de seções"
       subtitle="Organização lógica dos campos em seções para facilitar o preenchimento."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function AgrupamentoDeInformacoesPage() {
         },
       ]}
       note="Agrupamento reduz carga cognitiva: o usuário entende o que vem a seguir."
-    />
+    >
+      <PatternDemo id="formularios/agrupamento-de-informacoes">
+        <AgrupamentoDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

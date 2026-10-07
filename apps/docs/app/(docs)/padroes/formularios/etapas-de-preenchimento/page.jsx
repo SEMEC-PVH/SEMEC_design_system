@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { EtapasDemo } from "@/components/demos/patterns/formularios/etapas-de-preenchimento";
 
 export const metadata = { title: "Etapas de preenchimento" };
 
@@ -6,7 +8,6 @@ export default function EtapasDePreenchimentoPage() {
   return (
     <PatternPage
       title="Etapas de preenchimento"
-      component="Formulário em etapas"
       subtitle="Divisão de formulários longos em passos sequenciais para reduzir fricção."
       sections={[
         {
@@ -37,6 +38,10 @@ export default function EtapasDePreenchimentoPage() {
         },
       ]}
       note="Etapas organizam o fluxo; nunca devem esconder o que já foi feito ou o que falta."
-    />
+    >
+      <PatternDemo id="formularios/etapas-de-preenchimento">
+        <EtapasDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }
