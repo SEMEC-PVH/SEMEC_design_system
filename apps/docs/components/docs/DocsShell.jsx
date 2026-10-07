@@ -8,6 +8,7 @@ import Sidebar from "./Sidebar";
 import CookieBanner from "./CookieBanner";
 import Footer from "./Footer";
 import TableOfContents from "./TableOfContents";
+import PrevNextNav from "./PrevNextNav";
 import { breadcrumbsFor } from "@/lib/navigation";
 import { safeGet, safeSet } from "@/lib/storage";
 
@@ -130,6 +131,7 @@ export default function DocsShell({ children }) {
                   </nav>
                 )}
                 {children}
+                <PrevNextNav />
               </div>
             </div>
             <TableOfContents />
