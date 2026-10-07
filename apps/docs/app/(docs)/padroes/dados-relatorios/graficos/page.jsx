@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { GraficosDemo } from "@/components/demos/patterns/dados/graficos";
 
 export const metadata = { title: "Gráficos" };
 
@@ -6,7 +8,6 @@ export default function GraficosPage() {
   return (
     <PatternPage
       title="Gráficos"
-      component="Gráficos"
       subtitle="Visualização de tendências, distribuições e comparações de dados."
       sections={[
         {
@@ -37,6 +38,10 @@ export default function GraficosPage() {
         },
       ]}
       note="Gráfico bom comunica; gráfico decorativo confunde. Sempre ofereça os dados em texto."
-    />
+    >
+      <PatternDemo id="dados/graficos">
+        <GraficosDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

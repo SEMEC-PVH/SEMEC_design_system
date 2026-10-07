@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { FiltrosDemo } from "@/components/demos/patterns/dados/filtros";
 
 export const metadata = { title: "Filtros" };
 
@@ -6,7 +8,6 @@ export default function FiltrosPage() {
   return (
     <PatternPage
       title="Filtros"
-      component="Painel de filtros"
       subtitle="Restrição dos dados exibidos por critérios selecionados pelo usuário."
       sections={[
         {
@@ -37,6 +38,10 @@ export default function FiltrosPage() {
         },
       ]}
       note="Filtros reduzem o ruído: o usuário vê apenas o que importa para a tarefa."
-    />
+    >
+      <PatternDemo id="dados/filtros">
+        <FiltrosDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

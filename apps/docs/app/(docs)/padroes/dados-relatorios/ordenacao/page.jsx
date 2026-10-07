@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { OrdenacaoDemo } from "@/components/demos/patterns/dados/ordenacao";
 
 export const metadata = { title: "Ordenação" };
 
@@ -6,7 +8,6 @@ export default function OrdenacaoPage() {
   return (
     <PatternPage
       title="Ordenação"
-      component="Colunas ordenáveis"
       subtitle="Reorganização dos dados por uma coluna, em ordem crescente ou decrescente."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function OrdenacaoPage() {
         },
       ]}
       note="Ordenação dá controle ao usuário sobre como ler os dados."
-    />
+    >
+      <PatternDemo id="dados/ordenacao">
+        <OrdenacaoDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

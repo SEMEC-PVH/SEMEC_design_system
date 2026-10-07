@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { ExportacaoDemo } from "@/components/demos/patterns/dados/exportacao";
 
 export const metadata = { title: "Exportação" };
 
@@ -6,7 +8,6 @@ export default function ExportacaoPage() {
   return (
     <PatternPage
       title="Exportação"
-      component="Menu de exportação"
       subtitle="Geração de arquivos (CSV, XLSX, PDF) a partir dos dados exibidos."
       sections={[
         {
@@ -37,6 +38,10 @@ export default function ExportacaoPage() {
         },
       ]}
       note="Exportação deve refletir exatamente o que o usuário está vendo."
-    />
+    >
+      <PatternDemo id="dados/exportacao">
+        <ExportacaoDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

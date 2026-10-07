@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { IndicadoresDemo } from "@/components/demos/patterns/dados/indicadores";
 
 export const metadata = { title: "Indicadores" };
 
@@ -6,7 +8,6 @@ export default function IndicadoresPage() {
   return (
     <PatternPage
       title="Indicadores"
-      component="Cartões de indicadores"
       subtitle="Números-chave que resumem o estado dos dados em um relance."
       sections={[
         {
@@ -37,6 +38,10 @@ export default function IndicadoresPage() {
         },
       ]}
       note="Indicadores respondem 'como estamos?'; gráficos respondem 'por quê?'."
-    />
+    >
+      <PatternDemo id="dados/indicadores">
+        <IndicadoresDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

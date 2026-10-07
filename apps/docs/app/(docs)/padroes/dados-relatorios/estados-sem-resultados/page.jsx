@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { EstadoVazioDemo } from "@/components/demos/patterns/dados/estados-sem-resultados";
 
 export const metadata = { title: "Estados sem resultados" };
 
@@ -6,7 +8,6 @@ export default function EstadosSemResultadosPage() {
   return (
     <PatternPage
       title="Estados sem resultados"
-      component="Estado vazio"
       subtitle="Como apresentar listas, buscas e filtros que não retornam dados."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function EstadosSemResultadosPage() {
         },
       ]}
       note="Estado vazio é uma oportunidade de orientar, não um beco sem saída."
-    />
+    >
+      <PatternDemo id="dados/estados-sem-resultados">
+        <EstadoVazioDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

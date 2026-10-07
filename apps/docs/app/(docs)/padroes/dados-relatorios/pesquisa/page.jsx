@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { PesquisaDemo } from "@/components/demos/patterns/dados/pesquisa";
 
 export const metadata = { title: "Pesquisa" };
 
@@ -6,7 +8,6 @@ export default function PesquisaPage() {
   return (
     <PatternPage
       title="Pesquisa"
-      component="Campo de pesquisa"
       subtitle="Localização de registros específicos por texto dentro de um conjunto de dados."
       sections={[
         {
@@ -37,6 +38,10 @@ export default function PesquisaPage() {
         },
       ]}
       note="Pesquisa em dados deve ser tolerante: acentos, maiúsculas e trechos parciais."
-    />
+    >
+      <PatternDemo id="dados/pesquisa">
+        <PesquisaDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { OperacoesEmLoteDemo } from "@/components/demos/patterns/dados/operacoes-em-lote";
 
 export const metadata = { title: "Operações em lote" };
 
@@ -6,7 +8,6 @@ export default function OperacoesEmLotePage() {
   return (
     <PatternPage
       title="Operações em lote"
-      component="Barra de ações em lote"
       subtitle="Ações aplicadas a vários registros selecionados de uma só vez."
       sections={[
         {
@@ -37,6 +38,10 @@ export default function OperacoesEmLotePage() {
         },
       ]}
       note="Operações em lote economizam tempo, mas exigem confiança: confirme e reporte."
-    />
+    >
+      <PatternDemo id="dados/operacoes-em-lote">
+        <OperacoesEmLoteDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { SelecaoRegistrosDemo } from "@/components/demos/patterns/dados/selecao-de-registros";
 
 export const metadata = { title: "Seleção de registros" };
 
@@ -6,7 +8,6 @@ export default function SelecaoDeRegistrosPage() {
   return (
     <PatternPage
       title="Seleção de registros"
-      component="Seleção de registros"
       subtitle="Marcação de itens de uma lista para aplicar ações em conjunto."
       sections={[
         {
@@ -37,6 +38,10 @@ export default function SelecaoDeRegistrosPage() {
         },
       ]}
       note="Seleção é o passo anterior a ações em lote; deve ser sempre visível e reversível."
-    />
+    >
+      <PatternDemo id="dados/selecao-de-registros">
+        <SelecaoRegistrosDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }
