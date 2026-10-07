@@ -18,7 +18,7 @@ Este documento reúne, em um lugar só, as decisões que ainda não foram tomada
 | **QA-04** · `Q3` | O SIGO nasce sobre o design system ou o design system é extraído dele depois? | Mantenedores com a gestão do SIGO | Aberta |
 | **QA-05** · `Q4` | Existe capacidade de manter um UIKit no Figma, ou a documentação em código é a única fonte? | Mantenedores com quem desenha | Aberta |
 | **QA-06** · `Q5` | ~~O registry npm do Gitea da prefeitura está habilitado, e sob qual owner?~~ | ~~Administração do Gitea institucional, com os mantenedores~~ | **Respondida** — [ADR-022](adr/0022-publicacao-npm-publico.md) |
-| **QA-07** · `D3` | Qual vermelho vira o token de perigo, que hoje não existe na paleta? | Responsável pela marca institucional, com os mantenedores | Aberta |
+| **QA-07** · `D3` | Qual vermelho vira o token de perigo, que hoje não existe na paleta? | Responsável pela marca institucional, com os mantenedores | **Respondida** — [ADR-024](adr/0024-vermelho-de-perigo-pv-red-700.md) |
 | **QA-08** · `D4` | A Calculadora de Taxas migra para os tokens institucionais ou fica como exceção documentada? | Mantenedores com o time da Calculadora | Aberta |
 | **QA-09** · `F10` | O design system assina como DEVSEMEC ou como SEMEC/PMPV? | Responsável pela marca institucional | Aberta |
 
@@ -105,6 +105,8 @@ A parte tipográfica da Q1 está desdobrada em **QA-03**; a parte de qual marca 
 ## QA-07 — O vermelho de erro · `D3`
 
 **A pergunta.** Qual vermelho vira o token de perigo? Ele não existe na paleta institucional e precisa ser criado e validado para contraste.
+
+**Resposta (ADR-024, 07/10/2026).** A escala **`--pv-red-*` com centro em `--pv-red-700: #b91c1c`** é o token de perigo, com `--pv-red-50: #fef2f2` como superfície. Contraste medido: 5,98:1 sobre o fundo de página e 6,47:1 com texto branco. O tema escuro troca só o L1 (`--pv-red-400`). A escolha é por contraste e por já estar em uso no portal, não por identidade — se a QA-01 ou a QA-09 mudarem a paleta de marca, a escala `pv-red-*` é a única que precisa ser trocada, sem tocar em componente.
 
 **O que já se sabe.** A paleta institucional declarada tem azul, verde, amarelo e neutros — não tem vermelho, como registra o [inventário](inventario-identidade.md), que também cataloga as cores em uso fora de qualquer sistema. A [especificação-alvo](especificacao-alvo.md) já prevê a existência de tokens semânticos e regras de contraste, e o [ADR-014](adr/0014-wcag-21-aa-criterio-bloqueante.md) torna WCAG 2.1 AA critério bloqueante — ou seja, o vermelho escolhido precisa passar no cálculo antes de ser adotado, não depois.
 

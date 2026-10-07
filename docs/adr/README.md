@@ -30,6 +30,8 @@ A regra deste repositório é simples: **decisão estrutural entra como ADR novo
 | [020](0020-artefatos-para-agentes.md) | Artefatos para agentes como entrega oficial | Aceito |
 | [021](0021-estado-da-distribuicao-copiavel-antes-do-registry.md) | Kit copiável antes do registry | Substituído por [022](0022-publicacao-npm-publico.md) |
 | [022](0022-publicacao-npm-publico.md) | Publicação npm público e pacote `@semec/ds` | Aceito |
+| [023](0023-pipeline-unico-artefatos-ia.md) | Pipeline único de artefatos de IA e skills canônicas | Aceito |
+| [024](0024-vermelho-de-perigo-pv-red-700.md) | Vermelho de perigo: escala `pv-red` (`pv-red-700`) | Aceito |
 
 ---
 

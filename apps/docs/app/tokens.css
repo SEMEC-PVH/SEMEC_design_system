@@ -25,8 +25,6 @@
           marca o conflito.
    QA-03  Tipografia não decidida. Aqui há apenas tamanho, entrelinha e
           peso — nenhuma família. A família continua em `globals.css`.
-   QA-07  Não existia vermelho na paleta. A escala `--pv-red-*` abaixo é
-          PROVISÓRIA, escolhida por contraste, não por identidade.
 
    -------------------------------------------------------------------------
    DESVIOS DELIBERADOS DA `especificacao-alvo.md`
@@ -82,9 +80,11 @@
      #8a5a00 -> 5,48:1 sobre o fundo de página. Revisar junto da QA-01. */
   --pv-yellow-800: #8a5a00;
 
-  /* ---- Vermelho — QA-07, escala provisória ------------------------------
+  /* ---- Vermelho — ADR-024 (QA-07 respondida) ---------------------------
      Não havia vermelho no sistema, o que impedia qualquer estado de erro.
-     Valores escolhidos por contraste; a identidade decide depois.          */
+     Escala adotada pelo ADR-024: o token de perigo é --pv-red-700, medido
+     em 5,98:1 sobre o fundo de página e 6,47:1 com texto branco. Identidade
+     futura rebatiza a escala inteira (QA-01), nunca componente por componente. */
   --pv-red-50:  #fef2f2;
   --pv-red-100: #fee2e2;
   --pv-red-200: #fecaca;
