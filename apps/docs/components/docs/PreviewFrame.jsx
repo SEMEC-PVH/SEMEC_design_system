@@ -62,14 +62,18 @@ export default function PreviewFrame({ children }) {
       --bg:#111;--fg:#e2e8f0;--surface:#1a1a1a;--surface-alt:#222;--border:#2a2a2a;
       --text-muted:#9ca3af;--tint:#242424;--text-strong:#f1f5f9;
       --color-action-primary:#7ab3ff;--color-action-primary-hover:#9cc5ff;--color-action-primary-active:#b3d4ff;
-      --color-text-on-brand:#fff;--color-text-primary:#e2e8f0;--color-text-muted:#9ca3af;
+      --color-text-on-brand:#0b1220;--color-text-primary:#e2e8f0;--color-text-muted:#9ca3af;
       --color-border-strong:#3f4756;--color-focus-ring:#7ab3ff;
       --brand-hero:#7ab3ff;--color-brand-hero:#7ab3ff;
       --color-feedback-danger:#f87171;--color-feedback-danger-surface:#2a1414;
       --color-feedback-success:#86c95b;--color-feedback-success-surface:#16261a;
       --color-feedback-warning:#f6d56e;--color-feedback-warning-surface:#2a2113;
       --color-feedback-info:#7ab3ff;--color-feedback-info-surface:#14203a;
-    }`;
+    }
+    /* Cor de base do documento do iframe: proto.css não define color, então
+       texto sem utilitário text-* renderizaria preto (invisível no escuro).
+       O body do proto.css assume depois; isto cobre o carregamento. */
+    body{color:var(--fg)}`;
     doc.head.appendChild(fallbackStyle);
 
     // FIX 2 + FIX 1: syncTheme com variáveis expandidas + retry em 300ms

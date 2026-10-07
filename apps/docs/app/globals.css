@@ -330,7 +330,7 @@ a {
 }
 .header-search input:focus {
   border-color: var(--focus-ring);
-  background: #fff;
+  background: var(--surface);
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
@@ -1000,7 +1000,7 @@ h1 {
 }
 .component-meta {
   font-size: 0.8rem;
-  color: var(--pv-gray-500);
+  color: var(--text-muted);
 }
 
 /* ---- Demo layout helpers ---- */
@@ -1287,7 +1287,7 @@ li {
   width: 100%;
   aspect-ratio: 1;
   border-radius: 0.75rem;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border);
   transition: transform 0.15s;
 }
 .swatch:hover .color {
@@ -1549,8 +1549,8 @@ li {
 
 /* Barra de controles */
 .demo-controls {
-  background: #fff;
-  border: 1px solid var(--pv-blue-100);
+  background: var(--surface);
+  border: 1px solid var(--color-border-default);
   border-radius: 1rem;
   box-shadow: 0 10px 30px -10px rgba(15, 35, 56, 0.15);
   overflow: hidden;
@@ -1565,7 +1565,7 @@ li {
 }
 .demo-tabs {
   display: flex;
-  border-bottom: 1px solid var(--pv-gray-100);
+  border-bottom: 1px solid var(--border);
   overflow-x: auto;
 }
 .demo-tabs button {
@@ -1575,13 +1575,13 @@ li {
   font-family: inherit;
   font-size: var(--font-size-xs);
   font-weight: 600;
-  color: var(--pv-gray-500);
+  color: var(--text-muted);
   cursor: pointer;
   position: relative;
   white-space: nowrap;
 }
 .demo-tabs button.active {
-  color: var(--pv-blue-900);
+  color: var(--color-text-primary);
   font-weight: 700;
 }
 .demo-tabs button.active::after {
@@ -1595,8 +1595,8 @@ li {
   background: var(--pv-green-800);
 }
 .demo-tabs .count {
-  background: var(--pv-gray-100);
-  color: var(--pv-gray-500);
+  background: var(--surface-alt);
+  color: var(--text-muted);
   border-radius: 9999px;
   padding: 0.05rem 0.45rem;
   font-size: var(--font-size-2xs);
@@ -1615,8 +1615,8 @@ li {
 }
 .demo-search input {
   width: 100%;
-  border: 1px solid var(--pv-gray-400);
-  background: var(--pv-gray-100);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface-sunken);
   border-radius: 0.75rem;
   padding: 0.75rem 2.5rem;
   font-family: inherit;
@@ -1624,7 +1624,7 @@ li {
 }
 .demo-search input:focus {
   border-color: var(--focus-ring);
-  background: #fff;
+  background: var(--surface);
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
@@ -1633,7 +1633,7 @@ li {
   left: 0.9rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--pv-gray-500);
+  color: var(--text-muted);
   font-size: var(--font-size-sm);
 }
 .demo-chips {
@@ -1643,15 +1643,15 @@ li {
   padding: 0.75rem 1.25rem 1.25rem;
 }
 .demo-chips .chip {
-  border: 1px solid var(--pv-gray-400);
+  border: 1px solid var(--color-border-strong);
   font-family: inherit;
   font-size: var(--font-size-xs);
   font-weight: 600;
   border-radius: 9999px;
   padding: 0.4rem 0.9rem;
   cursor: pointer;
-  background: var(--pv-gray-100);
-  color: var(--pv-gray-700);
+  background: var(--surface-alt);
+  color: var(--color-text-secondary);
 }
 .demo-chips .chip.active {
   background: var(--pv-blue-900);
@@ -1665,7 +1665,7 @@ li {
   gap: 1.25rem;
 }
 .demo-card {
-  background: #fff;
+  background: var(--surface);
   border-radius: 1rem;
   padding: 1.5rem;
   display: flex;
@@ -1708,18 +1708,18 @@ li {
   margin-top: 0.9rem;
   font-size: var(--font-size-base);
   font-weight: 700;
-  color: var(--pv-blue-900);
+  color: var(--color-text-primary);
   line-height: 1.3;
 }
 .demo-card p {
   margin-top: 0.4rem;
   font-size: var(--font-size-xs);
-  color: #475569;
+  color: var(--text-muted);
   flex: 1;
 }
 .demo-card .foot {
   margin-top: 1rem;
-  border-top: 1px solid var(--pv-gray-100);
+  border-top: 1px solid var(--border);
   padding-top: 0.9rem;
   display: flex;
   align-items: center;
@@ -1728,7 +1728,7 @@ li {
 .demo-card .foot .go {
   font-size: var(--font-size-xs);
   font-weight: 600;
-  color: var(--pv-green-800);
+  color: var(--color-feedback-success);
 }
 .demo-card .foot .arrow {
   width: 32px;
@@ -1747,10 +1747,10 @@ li {
   color: #fff;
 }
 .demo-card.soon {
-  background: #efefef;
+  background: var(--surface-alt);
 }
 .demo-card.soon .foot .go {
-  color: #6b7280;
+  color: var(--text-muted);
   text-transform: uppercase;
   font-size: var(--font-size-xs);
   letter-spacing: 0.05em;

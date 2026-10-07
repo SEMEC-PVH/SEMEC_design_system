@@ -29,7 +29,9 @@ function getTheme() {
   return document.documentElement.dataset.theme === "light" ? "light" : "dark";
 }
 
-const SHIKI_THEMES = { light: "github-light", dark: "github-dark" };
+/* github-dark-default em vez de github-dark: o comentário do tema legado
+   (#6a737d) dá 3,68:1 sobre o fundo do codeblock e reprovava no AA. */
+const SHIKI_THEMES = { light: "github-light", dark: "github-dark-default" };
 
 export default function CodeBlock({ code, filename, prompt }) {
   const safeCode = typeof code === "string" ? code : "";
