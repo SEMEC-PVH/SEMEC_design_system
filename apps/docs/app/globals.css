@@ -1884,6 +1884,76 @@ li {
   }
 }
 
+/* ---- Card do repositório (Introdução) ---- */
+.repo-section {
+  margin-top: var(--space-12);
+  margin-bottom: var(--space-16);
+}
+.repo-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+  padding: var(--space-8) var(--space-6);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow var(--duration-base) var(--easing-standard),
+    border-color var(--duration-base) var(--easing-standard),
+    transform var(--duration-base) var(--easing-standard);
+}
+.repo-card:is(:hover, :focus-visible) {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--elevation-2);
+  transform: translateY(-2px);
+}
+.repo-card-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--color-text-primary);
+}
+.repo-card-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+.repo-card-desc {
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 60ch;
+}
+.repo-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-6);
+  border-radius: var(--radius-full);
+  /* action-primary, não brand-primary: no escuro só a ação clareia
+     (brand-primary continua #3a6ca6 e texto escuro daria 3,46:1). */
+  background: var(--color-action-primary);
+  color: var(--color-text-on-brand);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.repo-card-cta svg {
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .repo-card {
+    padding: var(--space-6) var(--space-4);
+  }
+  .repo-card-icon {
+    width: 40px;
+    height: 40px;
+  }
+}
+
 /* Botões */
 .btn-row {
   display: flex;
