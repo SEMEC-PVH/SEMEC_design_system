@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { CabecalhoDemo } from "@/components/demos/patterns/navegacao/cabecalho";
 
 export const metadata = { title: "Cabeçalho" };
 
@@ -6,7 +8,6 @@ export default function CabecalhoPage() {
   return (
     <PatternPage
       title="Cabeçalho"
-      component="Cabeçalho"
       subtitle="Topo da página com marca, navegação principal e ações contextuais."
       sections={[
         {
@@ -37,6 +38,10 @@ export default function CabecalhoPage() {
         },
       ]}
       note="O cabeçalho é o elemento mais repetido da interface; qualquer mudança nele afeta todas as páginas."
-    />
+    >
+      <PatternDemo id="navegacao/cabecalho">
+        <CabecalhoDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

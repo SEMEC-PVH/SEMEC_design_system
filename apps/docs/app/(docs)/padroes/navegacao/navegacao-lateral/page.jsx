@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { NavegacaoLateralDemo } from "@/components/demos/patterns/navegacao/navegacao-lateral";
 
 export const metadata = { title: "Navegação lateral" };
 
@@ -6,7 +8,6 @@ export default function NavegacaoLateralPage() {
   return (
     <PatternPage
       title="Navegação lateral"
-      component="Navegação lateral"
       subtitle="Menu em coluna que organiza as seções de um contexto, típico de áreas administrativas e documentação."
       sections={[
         {
@@ -37,6 +38,10 @@ export default function NavegacaoLateralPage() {
         },
       ]}
       note="Em telas pequenas, a navegação lateral costuma virar um menu retrátil; preserve a mesma hierarquia."
-    />
+    >
+      <PatternDemo id="navegacao/navegacao-lateral">
+        <NavegacaoLateralDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

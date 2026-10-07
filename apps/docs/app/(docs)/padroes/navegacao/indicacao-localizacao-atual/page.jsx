@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { LocalizacaoDemo } from "@/components/demos/patterns/navegacao/indicacao-localizacao-atual";
 
 export const metadata = { title: "Indicação da localização atual" };
 
@@ -6,7 +8,6 @@ export default function IndicacaoLocalizacaoPage() {
   return (
     <PatternPage
       title="Indicação da localização atual"
-      component="Indicação de localização atual"
       subtitle="Como o usuário sabe onde está dentro da estrutura da interface."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function IndicacaoLocalizacaoPage() {
         },
       ]}
       note="A orientação é responsabilidade de vários elementos trabalhando juntos, não de um único."
-    />
+    >
+      <PatternDemo id="navegacao/indicacao-localizacao-atual">
+        <LocalizacaoDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

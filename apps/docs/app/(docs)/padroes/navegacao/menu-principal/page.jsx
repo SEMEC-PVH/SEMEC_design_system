@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { MenuPrincipalDemo } from "@/components/demos/patterns/navegacao/menu-principal";
 
 export const metadata = { title: "Menu principal" };
 
@@ -6,7 +8,6 @@ export default function MenuPrincipalPage() {
   return (
     <PatternPage
       title="Menu principal"
-      component="Menu principal"
       subtitle="Navegação primária de topo que dá acesso às seções de maior nível da interface."
       sections={[
         {
@@ -38,6 +39,10 @@ export default function MenuPrincipalPage() {
         },
       ]}
       note="O menu principal é o primeiro ponto de orientação do usuário; ele deve ser estável e previsível."
-    />
+    >
+      <PatternDemo id="navegacao/menu-principal">
+        <MenuPrincipalDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

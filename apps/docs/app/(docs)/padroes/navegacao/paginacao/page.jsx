@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { PaginacaoDemo } from "@/components/demos/patterns/navegacao/paginacao";
 
 export const metadata = { title: "Paginação" };
 
@@ -6,7 +8,6 @@ export default function PaginacaoPage() {
   return (
     <PatternPage
       title="Paginação"
-      component="Paginação"
       subtitle="Divisão de listas longas em páginas numeradas para facilitar a navegação."
       sections={[
         {
@@ -37,6 +38,10 @@ export default function PaginacaoPage() {
         },
       ]}
       note="Paginação e ordenação/filtros devem trabalhar juntas sem perder o estado do usuário."
-    />
+    >
+      <PatternDemo id="navegacao/paginacao">
+        <PaginacaoDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

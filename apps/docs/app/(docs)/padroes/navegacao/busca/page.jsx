@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { BuscaDemo } from "@/components/demos/patterns/navegacao/busca";
 
 export const metadata = { title: "Busca" };
 
@@ -6,7 +8,6 @@ export default function BuscaPage() {
   return (
     <PatternPage
       title="Busca"
-      component="Campo de busca"
       subtitle="Mecanismo para localizar conteúdo por palavra-chave, complementar à navegação."
       sections={[
         {
@@ -37,6 +38,10 @@ export default function BuscaPage() {
         },
       ]}
       note="Busca e navegação trabalham juntas: a busca encontra, a navegação orienta."
-    />
+    >
+      <PatternDemo id="navegacao/busca">
+        <BuscaDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { RodapeDemo } from "@/components/demos/patterns/navegacao/rodape";
 
 export const metadata = { title: "Rodapé" };
 
@@ -6,7 +8,6 @@ export default function RodapePage() {
   return (
     <PatternPage
       title="Rodapé"
-      component="Rodapé"
       subtitle="Área inferior com informações institucionais, links complementares e contato."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function RodapePage() {
         },
       ]}
       note="O rodapé complementa a navegação; ele não deve ser o único caminho para conteúdo importante."
-    />
+    >
+      <PatternDemo id="navegacao/rodape">
+        <RodapeDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }
