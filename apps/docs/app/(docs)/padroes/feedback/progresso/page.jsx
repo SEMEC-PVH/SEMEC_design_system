@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { ProgressoDemo } from "@/components/demos/patterns/feedback/progresso";
 
 export const metadata = { title: "Progresso" };
 
@@ -6,7 +8,6 @@ export default function ProgressoPage() {
   return (
     <PatternPage
       title="Progresso"
-      component="Barra de progresso"
       subtitle="Indicação do andamento de tarefas longas, com percentual ou etapas."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function ProgressoPage() {
         },
       ]}
       note="Progresso reduz a ansiedade: o usuário sabe que a tarefa está avançando."
-    />
+    >
+      <PatternDemo id="feedback/progresso">
+        <ProgressoDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

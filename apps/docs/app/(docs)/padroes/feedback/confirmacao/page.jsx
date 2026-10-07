@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { ConfirmacaoDemo } from "@/components/demos/patterns/feedback/confirmacao";
 
 export const metadata = { title: "Confirmação" };
 
@@ -6,7 +8,6 @@ export default function ConfirmacaoPage() {
   return (
     <PatternPage
       title="Confirmação"
-      component="Diálogo de confirmação"
       subtitle="Pedido de confirmação antes de ações importantes ou difíceis de reverter."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function ConfirmacaoPage() {
         },
       ]}
       note="Confirmação protege contra erros; excesso de confirmações também é um erro."
-    />
+    >
+      <PatternDemo id="feedback/confirmacao">
+        <ConfirmacaoDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

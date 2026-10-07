@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { SucessoDemo } from "@/components/demos/patterns/feedback/sucesso";
 
 export const metadata = { title: "Sucesso" };
 
@@ -6,7 +8,6 @@ export default function SucessoPage() {
   return (
     <PatternPage
       title="Sucesso"
-      component="Banner de sucesso"
       subtitle="Confirmação de que uma ação do usuário foi concluída com êxito."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function SucessoPage() {
         },
       ]}
       note="Sucesso confirma e orienta: o usuário sabe que terminou e o que vem depois."
-    />
+    >
+      <PatternDemo id="feedback/sucesso">
+        <SucessoDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { ProcessamentoDemo } from "@/components/demos/patterns/feedback/processamento";
 
 export const metadata = { title: "Processamento" };
 
@@ -6,7 +8,6 @@ export default function ProcessamentoPage() {
   return (
     <PatternPage
       title="Processamento"
-      component="Estado de processamento"
       subtitle="Estado de operações que rodam em segundo plano, sem bloquear o usuário."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function ProcessamentoPage() {
         },
       ]}
       note="Processamento assíncrono mantém o usuário produtivo; a notificação de conclusão fecha o ciclo."
-    />
+    >
+      <PatternDemo id="feedback/processamento">
+        <ProcessamentoDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

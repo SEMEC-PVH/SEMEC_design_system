@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { IndisponibilidadeDemo } from "@/components/demos/patterns/feedback/indisponibilidade";
 
 export const metadata = { title: "Indisponibilidade" };
 
@@ -6,7 +8,6 @@ export default function IndisponibilidadePage() {
   return (
     <PatternPage
       title="Indisponibilidade"
-      component="Tela de indisponibilidade"
       subtitle="Comunicação de serviços ou funcionalidades temporariamente fora do ar."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function IndisponibilidadePage() {
         },
       ]}
       note="Indisponibilidade honesta preserva a confiança: informe, oriente e ofereça saída."
-    />
+    >
+      <PatternDemo id="feedback/indisponibilidade">
+        <IndisponibilidadeDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { CarregamentoDemo } from "@/components/demos/patterns/feedback/carregamento";
 
 export const metadata = { title: "Carregamento" };
 
@@ -6,7 +8,6 @@ export default function CarregamentoPage() {
   return (
     <PatternPage
       title="Carregamento"
-      component="Spinner de carregamento"
       subtitle="Indicação de que o sistema está processando uma solicitação do usuário."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function CarregamentoPage() {
         },
       ]}
       note="Carregamento comunica que o sistema está trabalhando; sem ele, o usuário duvida da ação."
-    />
+    >
+      <PatternDemo id="feedback/carregamento">
+        <CarregamentoDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

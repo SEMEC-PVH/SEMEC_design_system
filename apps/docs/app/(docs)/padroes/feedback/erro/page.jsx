@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { ErroDemo } from "@/components/demos/patterns/feedback/erro";
 
 export const metadata = { title: "Erro" };
 
@@ -6,7 +8,6 @@ export default function ErroPage() {
   return (
     <PatternPage
       title="Erro"
-      component="Banner de erro"
       subtitle="Comunicação de falhas do sistema ou de ações do usuário."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function ErroPage() {
         },
       ]}
       note="Erro bom diz o que aconteceu, por quê e como seguir; erro ruim apenas bloqueia."
-    />
+    >
+      <PatternDemo id="feedback/erro">
+        <ErroDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

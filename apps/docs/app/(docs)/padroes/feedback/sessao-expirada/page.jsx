@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { SessaoExpiradaDemo } from "@/components/demos/patterns/feedback/sessao-expirada";
 
 export const metadata = { title: "Sessão expirada" };
 
@@ -6,7 +8,6 @@ export default function SessaoExpiradaPage() {
   return (
     <PatternPage
       title="Sessão expirada"
-      component="Tela de sessão expirada"
       subtitle="Tratamento de sessões que terminam por inatividade ou tempo limite."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function SessaoExpiradaPage() {
         },
       ]}
       note="Expiração de sessão deve ser previsível e preservar o trabalho do usuário."
-    />
+    >
+      <PatternDemo id="feedback/sessao-expirada">
+        <SessaoExpiradaDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }

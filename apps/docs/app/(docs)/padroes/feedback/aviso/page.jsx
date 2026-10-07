@@ -1,4 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
+import PatternDemo from "@/components/docs/PatternDemo";
+import { AvisoDemo } from "@/components/demos/patterns/feedback/aviso";
 
 export const metadata = { title: "Aviso" };
 
@@ -6,7 +8,6 @@ export default function AvisoPage() {
   return (
     <PatternPage
       title="Aviso"
-      component="Banner de aviso"
       subtitle="Alertas sobre situações que exigem atenção, mas não são erros."
       sections={[
         {
@@ -36,6 +37,10 @@ export default function AvisoPage() {
         },
       ]}
       note="Aviso prepara o usuário para uma decisão; use com parcimônia para manter o valor."
-    />
+    >
+      <PatternDemo id="feedback/aviso">
+        <AvisoDemo />
+      </PatternDemo>
+    </PatternPage>
   );
 }
