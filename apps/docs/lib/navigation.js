@@ -59,9 +59,6 @@ export const navigation = [
     href: "/introducao",
     items: [
       { href: "/introducao", label: "Introdução" },
-      { href: "/introducao/o-que-e-ds", label: "O que é DS", sub: true },
-      { href: "/introducao/para-quem", label: "Para quem é", sub: true },
-      { href: "/introducao/requisitos", label: "Requisitos mínimos", sub: true },
       { href: "/fundamentos", label: "Fundamentos" },
       { href: "/fundamentos/cores", label: "Cores", sub: true },
       { href: "/fundamentos/tipografia", label: "Tipografia", sub: true },
