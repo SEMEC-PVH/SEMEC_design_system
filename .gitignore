@@ -48,3 +48,5 @@ next-env.d.ts
 
 # referências locais (prints de terceiros, mascotes, rascunhos descartados)
 /referencias/
+# arquivos de trabalho do boneco 3D (Blender, ~500 MB; o jogo usa a cópia em apps/docs/public/quem-somos/gava.glb)
+/personagem-gava/
