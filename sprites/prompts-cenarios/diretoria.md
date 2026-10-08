@@ -1,0 +1,31 @@
+# Cenário — Diretoria da SEMEC
+
+| | |
+|---|---|
+| **Arquivo a salvar** | `sprites/cenarios/diretoria.png` |
+| **Onde aparece** | Fundo da batalha contra: Diretoria — chefe final (adversários Figma, Planilha e COBOL) |
+| **Formato** | Paisagem 16:9 ou 3:2 (ex.: 1920×1080). **Sem** fundo verde. |
+| **Referência visual** | o prédio da SEMEC na Vila (azul-marinho e branco) e o print da Vila |
+
+## Prompt
+
+Cole inteiro. Se a ferramenta aceitar imagens de referência, anexe as indicadas acima e o sprite aprovado `sprites/python-frente.png`, para manter o mesmo estilo.
+
+```text
+Pixel art battle background in the style of Game Boy Advance monster-battle games (2003 era), native 240x160 pixel art upscaled with crisp hard pixels, limited 32-color palette, clean dark outlines, simple cel shading, bright and friendly colors. Wide landscape (3:2 or 16:9), camera slightly above eye level looking into the room. Keep two clear empty floor spots for creatures to stand: one on the right half at mid-distance and one on the lower left close to the camera, with nothing placed on them (the game draws the oval platforms itself). The bottom quarter of the image is a calm, low-detail floor, because it will be partly covered by the game interface. No characters, no creatures, no people, no text, no letters, no logos, no user interface. The scene: the grand lobby of the education department headquarters, the final boss arena. Bright and friendly but important: navy blue and white walls, tall windows, a long meeting table pushed against the back wall, a large wall screen showing simple colorful charts, hanging banners in blue, green and yellow, a polished floor with a big circular rug in the center of the room.
+```
+
+## Prompt negativo (se a ferramenta tiver o campo)
+
+```text
+characters, creatures, people, animals, text, letters, words, logos, watermark, signature, user interface, HUD, health bars, battle platforms, blurry, smooth gradients, 3D render, photorealistic, photo, gritty, dark horror, cluttered floor, objects in the center of the floor, fisheye, extreme perspective
+```
+
+## Antes de salvar, confira
+
+- [ ] Sem personagens, pessoas, textos ou logos.
+- [ ] Dois espaços livres no chão: um no meio à direita (adversário) e outro embaixo à esquerda, perto da câmera (sua criatura).
+- [ ] A faixa de baixo (¼ da imagem) é chão calmo, sem detalhes importantes: ela fica atrás do menu.
+- [ ] Mesmo pixel art dos personagens (pixels nítidos, contorno escuro, paleta limitada).
+- [ ] Formato paisagem (16:9 ou 3:2).
+- [ ] Nome do arquivo exatamente `diretoria.png`.
