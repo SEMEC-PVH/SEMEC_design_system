@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Moon, Play, Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
+import TitleScreen from "./TitleScreen";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
@@ -70,7 +71,6 @@ export default function VilaSemec({ members }) {
   // Tela de título ("Começar"): o jogo só abre depois dela; a vila aparece
   // ao fundo em modo vitrine.
   const [started, setStarted] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
   const [dialog, setDialog] = useState(null);
   const [facing, setFacing] = useState(null);
   const [talked, setTalked] = useState(() => new Set());
@@ -134,7 +134,6 @@ export default function VilaSemec({ members }) {
 
   const startGame = useCallback(() => {
     setStarted(true);
-    setShowHelp(false);
     setDialog({ pages: INTRO, page: 0 });
     stageRef.current?.focus({ preventScroll: true });
   }, []);
@@ -243,52 +242,7 @@ export default function VilaSemec({ members }) {
         listada logo abaixo do mapa.
       </p>
 
-      {!started && (
-        <div className="vila-start">
-          <div className="vila-start-card">
-            <h1 id="vila-titulo" className="vila-start-kicker">
-              Quem Somos
-            </h1>
-            <p className="vila-start-logo" aria-hidden="true">
-              <span>Vila</span> SEMEC
-            </p>
-            <p className="vila-start-sub">
-              Explore a vila e conheça o time por trás do Design System da
-              SEMEC Porto Velho.
-            </p>
-            <div className="vila-start-actions">
-              <button type="button" className="vila-start-btn vila-start-btn--primary" onClick={startGame}>
-                <Play aria-hidden="true" size={18} />
-                Começar
-              </button>
-              <button
-                type="button"
-                className="vila-start-btn"
-                aria-expanded={showHelp}
-                aria-controls="vila-start-help"
-                onClick={() => setShowHelp((v) => !v)}
-              >
-                Como jogar
-              </button>
-              <a className="vila-start-btn" href="#equipe">
-                Ver equipe em lista
-              </a>
-            </div>
-            {showHelp && (
-              <ul id="vila-start-help" className="vila-start-help">
-                <li><kbd>Setas</kbd> ou <kbd>W A S D</kbd> andar</li>
-                <li><kbd>Shift</kbd> correr</li>
-                <li><kbd>Espaço</kbd> ou <kbd>Enter</kbd> conversar e ler placas</li>
-                <li><kbd>Esc</kbd> fechar diálogo</li>
-                <li>Ou clique no mapa para andar até lá</li>
-              </ul>
-            )}
-            <p className="vila-start-press" aria-hidden="true">
-              Pressione <kbd>Enter</kbd> para começar
-            </p>
-          </div>
-        </div>
-      )}
+      {!started && <TitleScreen onStart={startGame} />}
 
       {started && (
         <div className="vila-hud vila-hud--top">
