@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Arquivo a salvar** | `sprites/mongodb-frente.png` |
+| **Arquivo a salvar** | `sprites/personagens/mongodb-frente.png` |
 | **Papel no jogo** | Adversário — Ginásio de Dados |
 | **Tipo** | Dados |
 | **Onde aparece** | De frente, no canto superior direito da batalha, como adversária. |

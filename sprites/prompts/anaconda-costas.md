@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Arquivo a salvar** | `sprites/anaconda-costas.png` |
+| **Arquivo a salvar** | `sprites/personagens/anaconda-costas.png` |
 | **Papel no jogo** | Evolução do Python (nível 8) |
 | **Tipo** | Dados |
 | **Onde aparece** | De costas, grande, no canto inferior esquerdo da batalha (é a criatura do jogador). |

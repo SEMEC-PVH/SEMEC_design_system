@@ -5,7 +5,7 @@ Um cenário por ginásio, no mesmo **pixel art de GBA** dos personagens (`../pro
 ## Como usar
 
 1. Abra o documento do cenário e copie o bloco **Prompt** inteiro.
-2. Se a ferramenta aceitar, anexe como referência a imagem do prédio indicada e o sprite aprovado `sprites/python-frente.png`.
+2. Se a ferramenta aceitar, anexe como referência a imagem do prédio indicada e o sprite aprovado `sprites/personagens/python-frente.png`.
 3. Gere em **paisagem 16:9** (ex.: 1920×1080) e salve com o nome indicado na pasta `sprites/cenarios/`.
 4. Marque o ☐ na tabela abaixo.
 
@@ -23,7 +23,7 @@ Pixel art battle background in the style of Game Boy Advance monster-battle game
 
 | Documento | Chefe | Arquivo | Pronto |
 |---|---|---|---|
-| [Ginásio Front-End](frontend.md) | Líder do Ginásio Front-End (adversários CSS e React) | `sprites/cenarios/frontend.png` | ☐ |
-| [Ginásio Back-End](backend.md) | Líder do Ginásio Back-End (adversários PHP e Node.js) | `sprites/cenarios/backend.png` | ☐ |
-| [Ginásio de Dados](database.md) | Líder do Ginásio de Dados (adversários SQL e MongoDB) | `sprites/cenarios/database.png` | ☐ |
-| [Diretoria da SEMEC](diretoria.md) | Diretoria — chefe final (adversários Figma, Planilha e COBOL) | `sprites/cenarios/diretoria.png` | ☐ |
+| [Ginásio Front-End](frontend.md) | Líder do Ginásio Front-End (adversários CSS e React) | `sprites/cenarios/frontend.png` | ☑ |
+| [Ginásio Back-End](backend.md) | Líder do Ginásio Back-End (adversários PHP e Node.js) | `sprites/cenarios/backend.png` | ☑ |
+| [Ginásio de Dados](database.md) | Líder do Ginásio de Dados (adversários SQL e MongoDB) | `sprites/cenarios/database.png` | ☑ |
+| [Diretoria da SEMEC](diretoria.md) | Diretoria — chefe final (adversários Figma, Planilha e COBOL) | `sprites/cenarios/diretoria.png` | ☑ |

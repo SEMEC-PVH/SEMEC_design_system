@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Arquivo a salvar** | `sprites/kotlin-costas.png` |
+| **Arquivo a salvar** | `sprites/personagens/kotlin-costas.png` |
 | **Papel no jogo** | Evolução do Java (nível 8) |
 | **Tipo** | Back-End |
 | **Onde aparece** | De costas, grande, no canto inferior esquerdo da batalha (é a criatura do jogador). |

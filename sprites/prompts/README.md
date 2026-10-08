@@ -6,7 +6,7 @@ Um documento por imagem. Cada um traz o prompt completo, pronto para colar no ge
 
 1. Abra o documento do personagem e copie o bloco **Prompt** inteiro.
 2. Se a ferramenta aceitar, anexe o logo indicado como **imagem de referência**. Depois do primeiro sprite aprovado, anexe também ele, para manter o estilo igual em todos.
-3. Gere em formato **quadrado** (ex.: 1024×1024) e salve com o nome indicado na pasta `sprites/` (um nível acima desta).
+3. Gere em formato **quadrado** (ex.: 1024×1024) e salve com o nome indicado na pasta `sprites/personagens/`.
 4. Marque o ☐ na tabela abaixo quando a imagem estiver pronta.
 
 Recomendação: gere primeiro **um** personagem (por exemplo, `python-frente`) e aprove o estilo antes de produzir os outros.
@@ -31,24 +31,24 @@ Os personagens são inspirados nos logos oficiais das tecnologias. As regras de 
 
 | Documento | Papel | Tipo | Arquivo | Pronto |
 |---|---|---|---|---|
-| [Python — Frente](python-frente.md) | Linguagem inicial do jogador | Dados | `sprites/python-frente.png` | ☐ |
-| [Python — Costas](python-costas.md) | Linguagem inicial do jogador | Dados | `sprites/python-costas.png` | ☐ |
-| [Anaconda — Frente](anaconda-frente.md) | Evolução do Python (nível 8) | Dados | `sprites/anaconda-frente.png` | ☐ |
-| [Anaconda — Costas](anaconda-costas.md) | Evolução do Python (nível 8) | Dados | `sprites/anaconda-costas.png` | ☐ |
-| [JavaScript — Frente](javascript-frente.md) | Linguagem inicial do jogador | Front-End | `sprites/javascript-frente.png` | ☐ |
-| [JavaScript — Costas](javascript-costas.md) | Linguagem inicial do jogador | Front-End | `sprites/javascript-costas.png` | ☐ |
-| [TypeScript — Frente](typescript-frente.md) | Evolução do JavaScript (nível 8) | Front-End | `sprites/typescript-frente.png` | ☐ |
-| [TypeScript — Costas](typescript-costas.md) | Evolução do JavaScript (nível 8) | Front-End | `sprites/typescript-costas.png` | ☐ |
-| [Java — Frente](java-frente.md) | Linguagem inicial do jogador | Back-End | `sprites/java-frente.png` | ☐ |
-| [Java — Costas](java-costas.md) | Linguagem inicial do jogador | Back-End | `sprites/java-costas.png` | ☐ |
-| [Kotlin — Frente](kotlin-frente.md) | Evolução do Java (nível 8) | Back-End | `sprites/kotlin-frente.png` | ☐ |
-| [Kotlin — Costas](kotlin-costas.md) | Evolução do Java (nível 8) | Back-End | `sprites/kotlin-costas.png` | ☐ |
-| [CSS — Frente](css-frente.md) | Adversário — Ginásio Front-End | Front-End | `sprites/css-frente.png` | ☐ |
-| [React — Frente](react-frente.md) | Adversário — Ginásio Front-End | Front-End | `sprites/react-frente.png` | ☐ |
-| [PHP — Frente](php-frente.md) | Adversário — Ginásio Back-End | Back-End | `sprites/php-frente.png` | ☐ |
-| [Node.js — Frente](node-frente.md) | Adversário — Ginásio Back-End | Back-End | `sprites/node-frente.png` | ☐ |
-| [SQL — Frente](sql-frente.md) | Adversário — Ginásio de Dados | Dados | `sprites/sql-frente.png` | ☐ |
-| [MongoDB — Frente](mongodb-frente.md) | Adversário — Ginásio de Dados | Dados | `sprites/mongodb-frente.png` | ☐ |
-| [Figma — Frente](figma-frente.md) | Adversário — Diretoria (chefe final) | Front-End | `sprites/figma-frente.png` | ☐ |
-| [Planilha (Excel) — Frente](planilha-frente.md) | Adversário — Diretoria (chefe final) | Dados | `sprites/planilha-frente.png` | ☐ |
-| [COBOL — Frente](cobol-frente.md) | Adversário — Diretoria (chefe final) | Back-End | `sprites/cobol-frente.png` | ☐ |
+| [Python — Frente](python-frente.md) | Linguagem inicial do jogador | Dados | `sprites/personagens/python-frente.png` | ☑ |
+| [Python — Costas](python-costas.md) | Linguagem inicial do jogador | Dados | `sprites/personagens/python-costas.png` | ☑ |
+| [Anaconda — Frente](anaconda-frente.md) | Evolução do Python (nível 8) | Dados | `sprites/personagens/anaconda-frente.png` | ☑ |
+| [Anaconda — Costas](anaconda-costas.md) | Evolução do Python (nível 8) | Dados | `sprites/personagens/anaconda-costas.png` | ☑ |
+| [JavaScript — Frente](javascript-frente.md) | Linguagem inicial do jogador | Front-End | `sprites/personagens/javascript-frente.png` | ☑ |
+| [JavaScript — Costas](javascript-costas.md) | Linguagem inicial do jogador | Front-End | `sprites/personagens/javascript-costas.png` | ☑ |
+| [TypeScript — Frente](typescript-frente.md) | Evolução do JavaScript (nível 8) | Front-End | `sprites/personagens/typescript-frente.png` | ☑ |
+| [TypeScript — Costas](typescript-costas.md) | Evolução do JavaScript (nível 8) | Front-End | `sprites/personagens/typescript-costas.png` | ☑ |
+| [Java — Frente](java-frente.md) | Linguagem inicial do jogador | Back-End | `sprites/personagens/java-frente.png` | ☑ |
+| [Java — Costas](java-costas.md) | Linguagem inicial do jogador | Back-End | `sprites/personagens/java-costas.png` | ☑ |
+| [Kotlin — Frente](kotlin-frente.md) | Evolução do Java (nível 8) | Back-End | `sprites/personagens/kotlin-frente.png` | ☑ |
+| [Kotlin — Costas](kotlin-costas.md) | Evolução do Java (nível 8) | Back-End | `sprites/personagens/kotlin-costas.png` | ☑ |
+| [CSS — Frente](css-frente.md) | Adversário — Ginásio Front-End | Front-End | `sprites/personagens/css-frente.png` | ☑ |
+| [React — Frente](react-frente.md) | Adversário — Ginásio Front-End | Front-End | `sprites/personagens/react-frente.png` | ☑ |
+| [PHP — Frente](php-frente.md) | Adversário — Ginásio Back-End | Back-End | `sprites/personagens/php-frente.png` | ☑ |
+| [Node.js — Frente](node-frente.md) | Adversário — Ginásio Back-End | Back-End | `sprites/personagens/node-frente.png` | ☑ |
+| [SQL — Frente](sql-frente.md) | Adversário — Ginásio de Dados | Dados | `sprites/personagens/sql-frente.png` | ☑ |
+| [MongoDB — Frente](mongodb-frente.md) | Adversário — Ginásio de Dados | Dados | `sprites/personagens/mongodb-frente.png` | ☑ |
+| [Figma — Frente](figma-frente.md) | Adversário — Diretoria (chefe final) | Front-End | `sprites/personagens/figma-frente.png` | ☑ |
+| [Planilha (Excel) — Frente](planilha-frente.md) | Adversário — Diretoria (chefe final) | Dados | `sprites/personagens/planilha-frente.png` | ☑ |
+| [COBOL — Frente](cobol-frente.md) | Adversário — Diretoria (chefe final) | Back-End | `sprites/personagens/cobol-frente.png` | ☑ |

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Arquivo a salvar** | `sprites/python-costas.png` |
+| **Arquivo a salvar** | `sprites/personagens/python-costas.png` |
 | **Papel no jogo** | Linguagem inicial do jogador |
 | **Tipo** | Dados |
 | **Onde aparece** | De costas, grande, no canto inferior esquerdo da batalha (é a criatura do jogador). |

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Arquivo a salvar** | `sprites/php-frente.png` |
+| **Arquivo a salvar** | `sprites/personagens/php-frente.png` |
 | **Papel no jogo** | Adversário — Ginásio Back-End |
 | **Tipo** | Back-End |
 | **Onde aparece** | De frente, no canto superior direito da batalha, como adversária. |

@@ -11,7 +11,7 @@ Transforma as imagens geradas por IA em arquivos prontos para o jogo:
   ampliados por fator inteiro antes do corte.
 
 Uso:
-  python sprites/converter.py sprites            # sprites/<id>-<frente|costas>.png
+  python sprites/converter.py sprites            # sprites/personagens/<id>-<frente|costas>.png
   python sprites/converter.py cenarios           # sprites/cenarios/<chefe>.png
   python sprites/converter.py arquivo.png --tipo sprite --saida pasta/
   flags: --dry-run, --forcar, --tolerancia N, --estilo pixel|suave
@@ -37,7 +37,7 @@ except ImportError:  # pragma: no cover
 # ---- Caminhos ---------------------------------------------------------------------
 
 RAIZ = Path(__file__).resolve().parent.parent
-PASTA_SPRITES = RAIZ / "sprites"                     # origem principal dos personagens
+PASTA_SPRITES = RAIZ / "sprites" / "personagens"     # origem dos personagens
 PASTA_CENARIOS_ORIGEM = RAIZ / "sprites" / "cenarios"
 PASTA_SPRITES_DESTINO = RAIZ / "apps" / "docs" / "public" / "quem-somos" / "batalha" / "sprites"
 PASTA_CENARIOS_DESTINO = RAIZ / "apps" / "docs" / "public" / "quem-somos" / "batalha" / "cenarios"
@@ -735,7 +735,7 @@ def planejar(args) -> list[tuple[Path, Path | None, str, list[str]]]:
 
     if args.alvo == "sprites":
         tipo = "sprite"
-        # Só a raiz de sprites/ (subpastas como 3d/ e prompts*/ ficam de fora).
+        # Só sprites/personagens/ (sem subpastas).
         # PNGs fora do padrão <id>-<frente|costas> são ignorados em silêncio.
         arquivos = [p for p in _pngs(PASTA_SPRITES) if PADRAO_SPRITE.fullmatch(p.stem.lower())]
         if not arquivos:

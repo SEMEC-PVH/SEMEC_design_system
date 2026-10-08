@@ -45,3 +45,6 @@ next-env.d.ts
 # agent dirs gerados no build (ADR-023)
 .claude/
 .opencode/
+
+# referências locais (prints de terceiros, mascotes, rascunhos descartados)
+/referencias/

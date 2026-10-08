@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Arquivo a salvar** | `sprites/kotlin-frente.png` |
+| **Arquivo a salvar** | `sprites/personagens/kotlin-frente.png` |
 | **Papel no jogo** | Evolução do Java (nível 8) |
 | **Tipo** | Back-End |
 | **Onde aparece** | De frente na escolha da linguagem e na ficha do mapa da jornada. |

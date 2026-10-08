@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Arquivo a salvar** | `sprites/anaconda-frente.png` |
+| **Arquivo a salvar** | `sprites/personagens/anaconda-frente.png` |
 | **Papel no jogo** | Evolução do Python (nível 8) |
 | **Tipo** | Dados |
 | **Onde aparece** | De frente na escolha da linguagem e na ficha do mapa da jornada. |

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Arquivo a salvar** | `sprites/python-frente.png` |
+| **Arquivo a salvar** | `sprites/personagens/python-frente.png` |
 | **Papel no jogo** | Linguagem inicial do jogador |
 | **Tipo** | Dados |
 | **Onde aparece** | De frente na escolha da linguagem e na ficha do mapa da jornada. |

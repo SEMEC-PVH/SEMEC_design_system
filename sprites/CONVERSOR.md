@@ -30,7 +30,7 @@ python sprites/converter.py sprites             # todos os personagens
 python sprites/converter.py cenarios            # todos os cenários
 
 # um arquivo só, numa pasta de teste
-python sprites/converter.py sprites/python-frente.png --tipo sprite --saida teste/
+python sprites/converter.py sprites/personagens/python-frente.png --tipo sprite --saida teste/
 python sprites/converter.py sprites/cenarios/frontend.png --tipo cenario --saida teste/
 ```
 
@@ -85,7 +85,7 @@ Se o recorte não ficar bom, ajuste `--tolerancia`:
 Rode com `--forcar` para regerar o arquivo:
 
 ```bash
-python sprites/converter.py sprites/node-frente.png --tolerancia 0.8 --forcar
+python sprites/converter.py sprites/personagens/node-frente.png --tolerancia 0.8 --forcar
 ```
 
 Para arte que não é pixel art (a antiga versão 3D), use `--estilo suave`. Esse modo usa transparência suave e redimensionamento com filtro.
