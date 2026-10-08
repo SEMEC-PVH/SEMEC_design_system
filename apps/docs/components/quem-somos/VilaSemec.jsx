@@ -94,6 +94,8 @@ export default function VilaSemec({ members }) {
   const actionsRef = useRef(null);
   const actionsShownAt = useRef(0);
   const rodadaRef = useRef(0);
+  // Índices dos líderes vencidos, para marcar um engine recém-criado.
+  const leadersDoneRef = useRef([]);
   const [status, setStatus] = useState("loading");
   // Tela de título ("Começar"): o jogo só abre depois dela; a vila aparece
   // ao fundo em modo vitrine.
@@ -109,7 +111,7 @@ export default function VilaSemec({ members }) {
   // { tipo: "batalha", chefeId, chefe, jogador, rodada }.
   const [modal, setModal] = useState(null);
 
-  const { progresso, temInicial, vencidos, liberado, escolherInicial, registrarResultado } = useProgresso();
+  const { progresso, temInicial, vencidos, liberado, escolherInicial, registrarResultado, recomecar } = useProgresso();
 
   // Índice em members → id do chefe (líderes dos ginásios e Diretoria).
   const lideres = useMemo(() => mapaDeLideres(members), [members]);
@@ -155,6 +157,59 @@ export default function VilaSemec({ members }) {
     [abrirBatalha, dismiss]
   );
 
+  // Abre a escolha da linguagem inicial (modal), entregue pela Diretoria.
+  const acaoEscolherLinguagem = useCallback(
+    (index) => ({
+      label: "Escolher minha linguagem",
+      primary: true,
+      onSelect: () => {
+        setDialog(null);
+        setModal({ tipo: "escolha", diretor: index });
+      },
+    }),
+    []
+  );
+
+  // "Recomeçar jornada": pede confirmação no próprio diálogo antes de apagar o
+  // progresso. "Cancelar" vem primeiro (recebe o foco) e devolve a fala
+  // anterior sem mudar nada; nenhuma das duas é a ação principal.
+  const pedirRecomeco = useCallback(
+    (index, falaAnterior) => {
+      const title = falaAnterior.title;
+      setDialog({
+        pages: [
+          {
+            title,
+            text: "Tem certeza? Você vai perder a sua linguagem, o nível e todas as Stacks conquistadas.",
+            actions: [
+              { label: "Cancelar", onSelect: () => setDialog({ pages: [falaAnterior], page: 0 }) },
+              {
+                label: "Sim, recomeçar",
+                onSelect: () => {
+                  // Limpa o localStorage e o estado: o HUD e os marcadores dos
+                  // líderes (efeito de setLeadersDone) voltam ao início.
+                  recomecar();
+                  setDialog({
+                    pages: [
+                      {
+                        title,
+                        text: "Jornada reiniciada! Quando quiser, escolha a sua primeira linguagem.",
+                        actions: [acaoEscolherLinguagem(index), { label: "Agora não", onSelect: dismiss }],
+                      },
+                    ],
+                    page: 0,
+                  });
+                },
+              },
+            ],
+          },
+        ],
+        page: 0,
+      });
+    },
+    [recomecar, acaoEscolherLinguagem, dismiss]
+  );
+
   // Fala de quem é líder (ginásio ou Diretoria), conforme o progresso.
   const falaDeLider = useCallback(
     (index, chefeId) => {
@@ -169,25 +224,27 @@ export default function VilaSemec({ members }) {
           return {
             ...base,
             text: `${intro} Para fazer parte do time, você vai precisar de uma companheira de jornada: uma linguagem de programação. Vamos escolher a sua?`,
-            actions: [
-              {
-                label: "Escolher minha linguagem",
-                primary: true,
-                onSelect: () => {
-                  setDialog(null);
-                  setModal({ tipo: "escolha", diretor: index });
-                },
-              },
-              { label: "Agora não", onSelect: dismiss },
-            ],
+            actions: [acaoEscolherLinguagem(index), { label: "Agora não", onSelect: dismiss }],
           };
         }
+        // Com linguagem, toda fala da Diretoria oferece recomeçar a jornada
+        // (depois das ações da fala; sem ações, entra um "Fechar" antes).
+        const comRecomeco = (fala) => {
+          const completa = {
+            ...fala,
+            actions: [
+              ...(fala.actions ?? [{ label: "Fechar", onSelect: dismiss }]),
+              { label: "Recomeçar jornada", onSelect: () => pedirRecomeco(index, completa) },
+            ],
+          };
+          return completa;
+        };
         if (venceu) {
-          return {
+          return comRecomeco({
             ...base,
             text: "Parabéns, Full Stack! Você venceu os três ginásios e a Diretoria. Quer uma revanche?",
             actions: acoesBatalha(chefeId, index, "Revanche"),
-          };
+          });
         }
         if (!vencidos.includes("database")) {
           const faltam = GINASIOS.filter((c) => !vencidos.includes(c.id)).length;
@@ -195,9 +252,9 @@ export default function VilaSemec({ members }) {
           const lider = proximo ? members[liderDe(proximo.id)] : null;
           const dica = proximo ? ` Seu próximo desafio é o ${proximo.ginasio}${lider ? `, com ${lider.name}` : ""}.` : "";
           const falta = faltam === 1 ? "Falta 1 Stack" : `Faltam ${faltam} Stacks`;
-          return { ...base, text: `${intro} Continue firme! ${falta} para você virar Full Stack.${dica}` };
+          return comRecomeco({ ...base, text: `${intro} Continue firme! ${falta} para você virar Full Stack.${dica}` });
         }
-        return { ...base, text: `${chefe.falaInicio} Dica: ${chefe.dica}`, actions: acoesBatalha(chefeId, index) };
+        return comRecomeco({ ...base, text: `${chefe.falaInicio} Dica: ${chefe.dica}`, actions: acoesBatalha(chefeId, index) });
       }
 
       // Líder de ginásio.
@@ -216,7 +273,7 @@ export default function VilaSemec({ members }) {
       }
       return { ...base, text: `${chefe.falaInicio} Dica: ${chefe.dica}`, actions: acoesBatalha(chefeId, index) };
     },
-    [members, vencidos, temInicial, liberado, liderDe, acoesBatalha, dismiss]
+    [members, vencidos, temInicial, liberado, liderDe, acoesBatalha, acaoEscolherLinguagem, pedirRecomeco, dismiss]
   );
 
   const openNpc = useCallback(
@@ -293,6 +350,8 @@ export default function VilaSemec({ members }) {
         });
         engineRef.current = engine;
         engine.setPaused(true);
+        // Engine recriado (ex.: recarga a quente) já nasce com os "✓" certos.
+        engine.setLeadersDone(leadersDoneRef.current);
       })
       .catch(() => {
         if (!cancelled) setStatus("error");
@@ -313,6 +372,7 @@ export default function VilaSemec({ members }) {
   useEffect(() => {
     const done = [];
     for (const [i, c] of lideres) if (vencidos.includes(c)) done.push(i);
+    leadersDoneRef.current = done;
     engineRef.current?.setLeadersDone(done);
   }, [lideres, vencidos, status]);
 
