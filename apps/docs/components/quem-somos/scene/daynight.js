@@ -36,20 +36,23 @@ function keyframes(pal) {
     fog: mix(mix(pv("blue-100"), white, 0.5), pv("green-500"), 0.06),
     exposure: 0.92,
   };
+  // Noite de lua: azulada, mas clara o bastante para ler o mapa e os
+  // personagens (jogo, não simulação). A lua é forte e fria; o hemisfério
+  // segura a base para as sombras não virarem breu.
   const night = {
-    sun: mix(pv("blue-300"), white, 0.35),
-    sunI: 0.6,
-    sky: mix(pv("blue-700"), pv("blue-900"), 0.4),
-    ground: mix(pv("gray-900"), pv("blue-900"), 0.5),
-    hemiI: 0.85,
-    fog: mix(pv("blue-950"), pv("blue-900"), 0.35),
-    exposure: 1.05,
+    sun: mix(pv("blue-200"), white, 0.45),
+    sunI: 1.15,
+    sky: mix(pv("blue-400"), pv("blue-600"), 0.45),
+    ground: mix(pv("gray-600"), pv("blue-700"), 0.5),
+    hemiI: 1.45,
+    fog: mix(pv("blue-800"), pv("blue-600"), 0.4),
+    exposure: 1.18,
   };
   const at = (h, k) => ({ h, ...k });
   return [
     at(0, night),
     at(4.6, night),
-    at(SUN_RISE, { ...night, sunI: 0.05, hemiI: 0.8 }),
+    at(SUN_RISE, { ...night, sunI: 0.05, hemiI: 1.6 }),
     at(6.3, {
       sun: mix(pv("red-400"), pv("yellow-400"), 0.55),
       sunI: 1.1,
@@ -72,14 +75,14 @@ function keyframes(pal) {
     }),
     at(18.8, {
       sun: mix(pv("yellow-500"), pv("red-400"), 0.5),
-      sunI: 0.7,
-      sky: mix(pv("blue-700"), pv("red-300"), 0.16),
-      ground: mix(pv("gray-800"), pv("blue-800"), 0.45),
-      hemiI: 0.85,
-      fog: mix(pv("blue-800"), pv("red-300"), 0.14),
-      exposure: 1.0,
+      sunI: 0.9,
+      sky: mix(pv("blue-500"), pv("red-300"), 0.2),
+      ground: mix(pv("gray-600"), pv("blue-700"), 0.45),
+      hemiI: 1.3,
+      fog: mix(pv("blue-700"), pv("red-300"), 0.16),
+      exposure: 1.08,
     }),
-    at(SUN_SET, { ...night, sunI: 0.05, hemiI: 0.85 }),
+    at(SUN_SET, { ...night, sunI: 0.05, hemiI: 1.6 }),
     at(20.6, night),
     at(24, night),
   ];
