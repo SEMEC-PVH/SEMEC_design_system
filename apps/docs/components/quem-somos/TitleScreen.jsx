@@ -8,6 +8,7 @@
 //      volta.
 // O VilaSemec controla `started`; aqui só chamamos onStart().
 import { useCallback, useEffect, useRef, useState } from "react";
+import FullscreenButton from "./FullscreenButton";
 import styles from "./TitleScreen.module.css";
 
 const YEAR = 2026;
@@ -69,6 +70,7 @@ export default function TitleScreen({ onStart }) {
   return (
     <div className={styles.root} data-stage={stage}>
       <div className={styles.vignette} aria-hidden="true" />
+      <FullscreenButton className={styles.fullscreen} />
 
       <header className={styles.brand}>
         <h1 id="vila-titulo" className={styles.ribbon}>

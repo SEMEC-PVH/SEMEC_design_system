@@ -30,6 +30,14 @@
     radial-gradient(ellipse 75% 70% at 50% 45%, transparent 55%, color-mix(in srgb, var(--pv-blue-950) 55%, transparent) 100%);
 }
 
+/* Tela cheia no canto superior direito (como nos jogos de navegador). */
+.fullscreen {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1;
+}
+
 /* ---- Marca -------------------------------------------------------------- */
 .brand {
   position: relative;
