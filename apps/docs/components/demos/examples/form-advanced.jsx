@@ -58,7 +58,7 @@ export function FormAdvanced() {
   const hasAnyError = emailError || nomeError || docError;
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-6 max-w-xl">
+    <form onSubmit={handleSubmit} noValidate className="w-full max-w-xl space-y-6">
       {/* Resumo erros a11y — padrão SEM-505 */}
       {hasAnyError || termosError ? (
         <div

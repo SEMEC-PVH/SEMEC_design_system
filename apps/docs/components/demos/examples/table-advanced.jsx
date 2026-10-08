@@ -100,7 +100,7 @@ export function TableAdvanced() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="w-full space-y-4">
       {/* Barra filtros */}
       <div className="flex flex-wrap items-end gap-3">
         <div className="min-w-48 flex-1">

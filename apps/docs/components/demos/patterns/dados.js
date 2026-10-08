@@ -3,6 +3,9 @@
  * Chave = rota (`/padroes/dados-relatorios/<slug>`). Dados puros: sem "use client".
  */
 
+// Snippet compartilhado com a página /padroes/dados-relatorios/tabelas.
+import { tableAdvancedUsage } from "../examples/table-advanced-data";
+
 export const dadosPatterns = {
   "dados/filtros": {
     label: "Painel de filtros",
@@ -206,5 +209,13 @@ const ALTURA = { baixo: "h-[55px]", medio: "h-[105px]", alto: "h-[145px]", maxim
 </div>
 <Button aria-expanded={mostrarTabela} onClick={alternarTabela}>Ver tabela de dados</Button>
 <div id="gf-tabela" hidden={!mostrarTabela}><Table>…meses e total…</Table></div>`,
+  },
+  "dados/tabelas": {
+    label: "Tabela avançada [KIT SEM-504]",
+    desc: "Ordenação, filtros (busca + status), paginação, seleção em lote, export CSV, EmptyState e Skeleton. Copie snippet.",
+    filename: "TableAdvanced.jsx",
+    prompt:
+      "Crie Tabela avançada com ordenação, filtros, paginação, seleção, EmptyState e Skeleton usando semec-ds-react",
+    usage: tableAdvancedUsage,
   },
 };

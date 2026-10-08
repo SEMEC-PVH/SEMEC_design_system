@@ -1,8 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
-import PreviewFrame from "@/components/docs/PreviewFrame";
-import CodeBlock from "@/components/docs/CodeBlock";
+import PatternDemo from "@/components/docs/PatternDemo";
 import { FormAdvanced } from "@/components/demos/examples/form-advanced";
-import { formAdvancedUsage } from "@/components/demos/examples/form-advanced-data";
 
 export const metadata = { title: "Validação" };
 
@@ -41,14 +39,9 @@ export default function ValidacaoPage() {
         ]}
         note="Validação boa previne erro; validação ruim apenas o descobre tarde demais."
       />
-      <h2>Exemplo interativo — Formulário com validação a11y [KIT SEM-505]</h2>
-      <p>Máscaras CPF/CNPJ/CEP/moeda, validação onBlur + onSubmit, ErrorSummary com links para campos, anúncio aria-live. Copie snippet.</p>
-      <PreviewFrame>
-        <div style={{ padding: "1rem" }}>
-          <FormAdvanced />
-        </div>
-      </PreviewFrame>
-      <CodeBlock code={formAdvancedUsage} filename="FormAdvanced.jsx" prompt="Crie formulário com máscara CPF/CNPJ/CEP/moeda e validação a11y usando semec-ds-react (FormField + ErrorSummary + aria-live)" />
+      <PatternDemo id="formularios/validacao">
+        <FormAdvanced />
+      </PatternDemo>
     </>
   );
 }

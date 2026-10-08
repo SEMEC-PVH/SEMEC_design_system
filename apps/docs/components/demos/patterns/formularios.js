@@ -3,6 +3,10 @@
  * Chave = rota (`/padroes/formularios/<slug>`). Dados puros: sem "use client".
  */
 
+// Snippet compartilhado: as três páginas (máscaras, validação e mensagens de
+// erro) renderizam o mesmo FormAdvanced, então o uso é importado, não duplicado.
+import { formAdvancedUsage } from "../examples/form-advanced-data";
+
 export const formulariosPatterns = {
   "formularios/textos-de-ajuda": {
     label: "Textos de ajuda",
@@ -173,5 +177,29 @@ export function PrevencaoPerda() {
     </div>
   );
 }`,
+  },
+  "formularios/mascaras": {
+    label: "Máscaras CPF/CNPJ/CEP/moeda",
+    desc: "Mesmo formulário da página Validação — altere tipo PF/PJ para ver CPF↔CNPJ, CEP e moeda em tempo real.",
+    filename: "FormAdvanced.jsx",
+    prompt:
+      "Crie campos com máscara CPF CNPJ CEP moeda usando semec-ds-react — Input com inputMode numeric e formatação ao digitar",
+    usage: formAdvancedUsage,
+  },
+  "formularios/validacao": {
+    label: "Formulário com validação a11y [KIT SEM-505]",
+    desc: "Máscaras CPF/CNPJ/CEP/moeda, validação onBlur + onSubmit, ErrorSummary com links para campos, anúncio aria-live. Copie snippet.",
+    filename: "FormAdvanced.jsx",
+    prompt:
+      "Crie formulário com máscara CPF/CNPJ/CEP/moeda e validação a11y usando semec-ds-react (FormField + ErrorSummary + aria-live)",
+    usage: formAdvancedUsage,
+  },
+  "formularios/mensagens-de-erro": {
+    label: "ErrorSummary + FormField a11y",
+    desc: "ErrorSummary no topo com links âncora para cada campo + FormField com aria-invalid e role alert. Deixe campos vazios e envie.",
+    filename: "FormAdvanced.jsx",
+    prompt:
+      "Crie mensagens de erro acessíveis com ErrorSummary e FormField aria-invalid usando semec-ds-react",
+    usage: formAdvancedUsage,
   },
 };
