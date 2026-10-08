@@ -55,6 +55,8 @@ const WALK_CYCLE_STRIDE = 0.68;
 const WALK_MAX_TIMESCALE = 2.6;
 const TURN_LOCK = 0.09;
 const IDLE_BEFORE_CODING = 2.2;
+// Distância da câmera no modo vitrine (tela de título).
+const ATTRACT_ZOOM = 1.75;
 
 const BUILDINGS = [
   { id: "semec", kind: "semec", x: 3, y: 3, w: 6, h: 4, label: "SEMEC" },
@@ -979,6 +981,10 @@ export function createVila(host, options) {
       paused = p;
       if (p) held.length = 0;
     },
+    // Modo vitrine (tela de título): câmera afastada sobrevoando a vila.
+    setAttract(on) {
+      attract = on;
+    },
     dispose,
   };
 
@@ -1062,6 +1068,10 @@ export function createVila(host, options) {
   io.observe(host);
 
   // ---- Loop ---------------------------------------------------------------------
+  let attract = false;
+  let attractT = 0;
+  let zoom = 1;
+  const attractGoal = new THREE.Vector3();
   camTarget.copy(player.root.position);
 
   function tick(ts) {
@@ -1157,14 +1167,21 @@ export function createVila(host, options) {
     // Mato alto balançando e brisa na vegetação.
     veg.update(t, dt);
 
-    // Câmera segue o jogador.
-    const follow = reducedMotion ? 1 : 1 - Math.exp(-dt * 6);
-    camTarget.lerp(player.root.position, follow);
-    camera.position.copy(camTarget).addScaledVector(CAM_OFFSET, camera.userData.far || 1);
+    // Câmera segue o jogador; no modo vitrine, afasta e passeia pelo mapa.
+    zoom += ((attract ? ATTRACT_ZOOM : 1) - zoom) * (reducedMotion ? 1 : 1 - Math.exp(-dt * 2.2));
+    if (attract) {
+      if (!reducedMotion) attractT += dt;
+      attractGoal.set(Math.sin(attractT * 0.07) * 6, 0, Math.cos(attractT * 0.05) * 3 - 1);
+      camTarget.lerp(attractGoal, reducedMotion ? 1 : 1 - Math.exp(-dt * 1.2));
+    } else {
+      camTarget.lerp(player.root.position, reducedMotion ? 1 : 1 - Math.exp(-dt * 6));
+    }
+    const camFar = (camera.userData.far || 1) * zoom;
+    camera.position.copy(camTarget).addScaledVector(CAM_OFFSET, camFar);
     camera.lookAt(camTarget.x, camTarget.y + 0.4, camTarget.z);
     // Sol, frustum de sombra e névoa acompanham a câmera; render (com ou sem
     // pós-processamento) fica no módulo de iluminação.
-    lighting.update(camTarget, camera.userData.far || 1);
+    lighting.update(camTarget, camFar);
     lighting.render(ts);
   }
 

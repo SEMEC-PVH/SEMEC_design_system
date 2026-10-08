@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Play, Sun } from "lucide-react";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
@@ -67,7 +67,11 @@ export default function VilaSemec({ members }) {
   const stageRef = useRef(null);
   const engineRef = useRef(null);
   const [status, setStatus] = useState("loading");
-  const [dialog, setDialog] = useState({ pages: INTRO, page: 0 });
+  // Tela de título ("Começar"): o jogo só abre depois dela; a vila aparece
+  // ao fundo em modo vitrine.
+  const [started, setStarted] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [dialog, setDialog] = useState(null);
   const [facing, setFacing] = useState(null);
   const [talked, setTalked] = useState(() => new Set());
   const [focused, setFocused] = useState(false);
@@ -124,8 +128,30 @@ export default function VilaSemec({ members }) {
   }, [members]);
 
   useEffect(() => {
-    engineRef.current?.setPaused(Boolean(dialog));
-  }, [dialog, status]);
+    engineRef.current?.setPaused(!started || Boolean(dialog));
+    engineRef.current?.setAttract(!started);
+  }, [started, dialog, status]);
+
+  const startGame = useCallback(() => {
+    setStarted(true);
+    setShowHelp(false);
+    setDialog({ pages: INTRO, page: 0 });
+    stageRef.current?.focus({ preventScroll: true });
+  }, []);
+
+  // Enter na tela de título começa o jogo (como "Press Start"), exceto quando
+  // o foco está num campo, link ou botão — esses tratam a própria tecla.
+  useEffect(() => {
+    if (started) return undefined;
+    const onKey = (e) => {
+      if (e.key !== "Enter" || e.repeat) return;
+      if (e.target.closest?.("input, textarea, select, button, a, [contenteditable='true']")) return;
+      e.preventDefault();
+      startGame();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [started, startGame]);
 
   const advance = useCallback(() => {
     setDialog((d) => (d && d.page < d.pages.length - 1 ? { ...d, page: d.page + 1 } : null));
@@ -174,7 +200,7 @@ export default function VilaSemec({ members }) {
 
   const finishDialog = () => {
     advance();
-    stageRef.current?.focus();
+    stageRef.current?.focus({ preventScroll: true });
   };
 
   const current = dialog ? dialog.pages[dialog.page] : null;
@@ -217,26 +243,75 @@ export default function VilaSemec({ members }) {
         listada logo abaixo do mapa.
       </p>
 
-      <div className="vila-hud vila-hud--top">
-        <div className="vila-panel vila-title">
-          <h1 id="vila-titulo">Quem Somos</h1>
-          <p className="vila-counter">
-            Conversas: <strong>{talked.size}</strong>/{total}
-          </p>
-          {clock && (
-            <p className="vila-clock">
-              {clock.night ? <Moon aria-hidden="true" size={14} /> : <Sun aria-hidden="true" size={14} />}
-              <span className="sr-only">{clock.night ? "Noite, " : "Dia, "}</span>
-              <time>{clock.time}</time>
+      {!started && (
+        <div className="vila-start">
+          <div className="vila-start-card">
+            <h1 id="vila-titulo" className="vila-start-kicker">
+              Quem Somos
+            </h1>
+            <p className="vila-start-logo" aria-hidden="true">
+              <span>Vila</span> SEMEC
             </p>
-          )}
+            <p className="vila-start-sub">
+              Explore a vila e conheça o time por trás do Design System da
+              SEMEC Porto Velho.
+            </p>
+            <div className="vila-start-actions">
+              <button type="button" className="vila-start-btn vila-start-btn--primary" onClick={startGame}>
+                <Play aria-hidden="true" size={18} />
+                Começar
+              </button>
+              <button
+                type="button"
+                className="vila-start-btn"
+                aria-expanded={showHelp}
+                aria-controls="vila-start-help"
+                onClick={() => setShowHelp((v) => !v)}
+              >
+                Como jogar
+              </button>
+              <a className="vila-start-btn" href="#equipe">
+                Ver equipe em lista
+              </a>
+            </div>
+            {showHelp && (
+              <ul id="vila-start-help" className="vila-start-help">
+                <li><kbd>Setas</kbd> ou <kbd>W A S D</kbd> andar</li>
+                <li><kbd>Shift</kbd> correr</li>
+                <li><kbd>Espaço</kbd> ou <kbd>Enter</kbd> conversar e ler placas</li>
+                <li><kbd>Esc</kbd> fechar diálogo</li>
+                <li>Ou clique no mapa para andar até lá</li>
+              </ul>
+            )}
+            <p className="vila-start-press" aria-hidden="true">
+              Pressione <kbd>Enter</kbd> para começar
+            </p>
+          </div>
         </div>
-        <a className="vila-panel vila-skip" href="#equipe">
-          Ver equipe em lista
-        </a>
-      </div>
+      )}
 
-      {status === "loading" && (
+      {started && (
+        <div className="vila-hud vila-hud--top">
+          <div className="vila-panel vila-title">
+            <h1 id="vila-titulo">Quem Somos</h1>
+            <p className="vila-counter">
+              Conversas: <strong>{talked.size}</strong>/{total}
+            </p>
+            {clock && (
+              <p className="vila-clock">
+                {clock.night ? <Moon aria-hidden="true" size={14} /> : <Sun aria-hidden="true" size={14} />}
+                <span className="sr-only">{clock.night ? "Noite, " : "Dia, "}</span>
+                <time>{clock.time}</time>
+              </p>
+            )}
+          </div>
+          <a className="vila-panel vila-skip" href="#equipe">
+            Ver equipe em lista
+          </a>
+        </div>
+      )}
+
+      {status === "loading" && started && (
         <p className="vila-status" role="status">
           Carregando a vila…
         </p>
@@ -248,7 +323,7 @@ export default function VilaSemec({ members }) {
         </p>
       )}
 
-      {status === "ready" && !focused && !dialog && (
+      {status === "ready" && started && !focused && !dialog && (
         <p className="vila-chip" aria-hidden="true">
           Clique no mapa para jogar
         </p>
@@ -280,36 +355,38 @@ export default function VilaSemec({ members }) {
         </div>
       )}
 
-      <div className="vila-pad" aria-label="Controles de toque" role="group">
-        {DPAD.map(({ dir, label, glyph }) => (
+      {started && (
+        <div className="vila-pad" aria-label="Controles de toque" role="group">
+          {DPAD.map(({ dir, label, glyph }) => (
+            <button
+              key={dir}
+              type="button"
+              className={`vila-pad-btn vila-pad-btn--${dir}`}
+              aria-label={label}
+              onPointerDown={(e) => {
+                e.currentTarget.setPointerCapture?.(e.pointerId);
+                engineRef.current?.press(dir);
+              }}
+              onPointerUp={() => engineRef.current?.release(dir)}
+              onPointerCancel={() => engineRef.current?.release(dir)}
+              onClick={(e) => {
+                // Ativação por teclado (detail 0): um passo por clique.
+                if (e.detail === 0) engineRef.current?.step(dir);
+              }}
+            >
+              <span aria-hidden="true">{glyph}</span>
+            </button>
+          ))}
           <button
-            key={dir}
             type="button"
-            className={`vila-pad-btn vila-pad-btn--${dir}`}
-            aria-label={label}
-            onPointerDown={(e) => {
-              e.currentTarget.setPointerCapture?.(e.pointerId);
-              engineRef.current?.press(dir);
-            }}
-            onPointerUp={() => engineRef.current?.release(dir)}
-            onPointerCancel={() => engineRef.current?.release(dir)}
-            onClick={(e) => {
-              // Ativação por teclado (detail 0): um passo por clique.
-              if (e.detail === 0) engineRef.current?.step(dir);
-            }}
+            className="vila-pad-btn vila-pad-btn--a"
+            aria-label={dialog ? "Avançar diálogo" : "Conversar"}
+            onClick={() => (dialog ? advance() : engineRef.current?.interact())}
           >
-            <span aria-hidden="true">{glyph}</span>
+            A
           </button>
-        ))}
-        <button
-          type="button"
-          className="vila-pad-btn vila-pad-btn--a"
-          aria-label={dialog ? "Avançar diálogo" : "Conversar"}
-          onClick={() => (dialog ? advance() : engineRef.current?.interact())}
-        >
-          A
-        </button>
-      </div>
+        </div>
+      )}
     </section>
   );
 }

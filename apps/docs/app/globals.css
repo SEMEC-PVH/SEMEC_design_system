@@ -2352,6 +2352,170 @@ footer {
   }
 }
 
+/* Tela de título ("Começar"): a vila sobrevoa ao fundo em modo vitrine. */
+.vila-start {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--pv-blue-950) 25%, transparent),
+    color-mix(in srgb, var(--pv-blue-950) 70%, transparent)
+  );
+}
+.vila .vila-start-card {
+  width: min(36rem, 100%);
+  padding: 2rem 1.75rem 1.5rem;
+  text-align: center;
+  color: var(--pv-white);
+  background: color-mix(in srgb, var(--pv-blue-950) 74%, transparent);
+  border: 2px solid color-mix(in srgb, var(--pv-white) 22%, transparent);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1.25rem 3rem color-mix(in srgb, var(--pv-black) 45%, transparent);
+  backdrop-filter: blur(6px);
+}
+.vila .vila-start-kicker {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--pv-yellow-400);
+}
+.vila .vila-start-logo {
+  margin: 0.35rem 0 0.9rem;
+  font-size: clamp(2.6rem, 9vw, 5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--pv-white);
+  text-shadow:
+    0 3px 0 var(--pv-blue-600),
+    0 6px 0 var(--pv-blue-800),
+    0 12px 22px color-mix(in srgb, var(--pv-black) 50%, transparent);
+}
+.vila .vila-start-logo span {
+  color: var(--pv-yellow-400);
+}
+.vila .vila-start-sub {
+  margin: 0 auto 1.4rem;
+  max-width: 28rem;
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  color: var(--pv-blue-100);
+}
+.vila-start-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+.vila .vila-start-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.1rem;
+  border: 2px solid var(--pv-white);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--pv-white);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--pv-black) 45%, transparent);
+}
+.vila .vila-start-btn:hover {
+  background: color-mix(in srgb, var(--pv-white) 14%, transparent);
+}
+.vila .vila-start-btn--primary {
+  padding: 0.7rem 1.6rem;
+  font-size: var(--font-size-base);
+  background: var(--pv-yellow-400);
+  border-color: var(--pv-yellow-400);
+  color: var(--pv-blue-950);
+}
+.vila .vila-start-btn--primary:hover {
+  background: var(--pv-white);
+  border-color: var(--pv-white);
+}
+.vila-start-btn:focus-visible {
+  outline: 3px solid var(--pv-yellow-400);
+  outline-offset: 3px;
+}
+.vila .vila-start-help {
+  margin: 1.1rem auto 0;
+  padding: 0.85rem 1rem;
+  max-width: 24rem;
+  list-style: none;
+  text-align: left;
+  font-size: var(--font-size-sm);
+  line-height: 1.9;
+  color: var(--pv-blue-100);
+  border-top: 1px solid color-mix(in srgb, var(--pv-white) 22%, transparent);
+}
+.vila .vila-start-help li {
+  margin: 0;
+}
+.vila-start kbd {
+  display: inline-block;
+  padding: 0 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--pv-white) 55%, transparent);
+  border-bottom-width: 3px;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--pv-white);
+}
+.vila .vila-start-press {
+  margin: 1.4rem 0 0;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pv-blue-100);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vila-start-card {
+    animation: vila-start-in 0.6s ease-out both;
+  }
+  .vila-start-logo {
+    animation: vila-start-float 3.2s ease-in-out infinite;
+  }
+  .vila-start-press {
+    animation: vila-pulse 1.4s ease-in-out infinite;
+  }
+}
+@keyframes vila-start-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+@keyframes vila-start-float {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@keyframes vila-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+@media (pointer: coarse) {
+  .vila-start-press {
+    display: none;
+  }
+}
+
 /* Direcional de toque: só em telas de toque. */
 .vila-pad {
   display: none;
