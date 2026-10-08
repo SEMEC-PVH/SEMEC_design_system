@@ -2144,10 +2144,275 @@ footer {
   color: var(--color-action-primary);
 }
 
-/* Quem Somos — Arte de fundo (marca d'água) */
+/* Quem Somos — Vila SEMEC (cenário 3D em three.js)
+   O mapa vaza o padding do .content e ocupa a altura útil da janela; a
+   lista da equipe logo abaixo é a alternativa acessível (e o fallback sem
+   WebGL). Cores do HUD vêm dos tokens semânticos — seguem o tema. */
+.content-inner > .container:has(> .quem-somos-wrapper) {
+  width: 100%;
+}
 .quem-somos-wrapper {
   position: relative;
   overflow: hidden;
+  margin: calc(-1 * var(--space-8)) calc(-1 * var(--space-6)) 0;
+}
+@media (max-width: 900px) {
+  .quem-somos-wrapper {
+    margin: -2rem -1rem 0;
+  }
+}
+.vila {
+  position: relative;
+  height: calc(100dvh - var(--header-h));
+  min-height: 26rem;
+  overflow: hidden;
+  background: var(--pv-blue-100);
+}
+.vila-stage,
+.vila-canvas {
+  position: absolute;
+  inset: 0;
+}
+.vila-stage:focus {
+  outline: none;
+}
+.vila-stage:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: -3px;
+}
+.vila-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.vila-canvas canvas.is-pointer {
+  cursor: pointer;
+}
+
+.vila-hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  pointer-events: none;
+}
+.vila-hud--top {
+  top: 0;
+}
+.vila-panel {
+  pointer-events: auto;
+  background: var(--surface);
+  color: var(--text-strong);
+  border: 2px solid var(--text-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 0 var(--text-strong);
+}
+.vila-title {
+  padding: 0.6rem 1rem;
+}
+.vila-title h1 {
+  font-size: var(--font-size-lg);
+  line-height: 1.2;
+  margin: 0;
+  border: none;
+  padding: 0;
+}
+.vila-counter {
+  margin: 0.15rem 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+.vila-counter strong {
+  color: var(--text-strong);
+}
+.vila-clock {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0.15rem 0 0;
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+.vila-skip {
+  padding: 0.5rem 0.85rem;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-decoration: none;
+}
+.vila-skip:hover {
+  color: var(--color-action-primary);
+}
+.vila-skip:focus-visible,
+.vila-dialog-link:focus-visible,
+.vila-dialog-next:focus-visible,
+.vila-pad-btn:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.vila-status,
+.vila-chip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: var(--text-strong);
+  color: var(--surface);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.vila-status {
+  top: 50%;
+}
+.vila-chip {
+  bottom: 1.25rem;
+}
+.vila-chip--hint {
+  bottom: 3.75rem;
+}
+
+/* Caixa de diálogo no estilo RPG clássico: moldura dupla. */
+.vila-dialog {
+  position: absolute;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  width: min(40rem, calc(100% - 2rem));
+  padding: 1rem 1.25rem 0.85rem;
+  background: var(--surface);
+  color: var(--text-strong);
+  border: 3px solid var(--text-strong);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    inset 0 0 0 4px var(--surface),
+    inset 0 0 0 6px var(--color-action-primary),
+    0 5px 0 var(--text-strong);
+}
+.vila-dialog-title {
+  margin: 0 0 0.3rem;
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  color: var(--color-action-primary);
+}
+.content .vila-dialog-text {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.55;
+  color: var(--text-strong);
+}
+.vila-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.6rem;
+}
+.vila-dialog-link {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-action-primary);
+}
+.vila-dialog-next {
+  border: 2px solid var(--text-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-strong);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  padding: 0.35rem 0.8rem;
+  cursor: pointer;
+}
+.vila-dialog-next:hover {
+  border-color: var(--color-action-primary);
+  color: var(--color-action-primary);
+}
+.vila-dialog-next span {
+  display: inline-block;
+  font-size: 0.7em;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vila-dialog-next span {
+    animation: vila-blink 1s steps(2, start) infinite;
+  }
+}
+@keyframes vila-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+/* Direcional de toque: só em telas de toque. */
+.vila-pad {
+  display: none;
+}
+@media (pointer: coarse) {
+  .vila-pad {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, 3rem);
+    grid-template-rows: repeat(3, 3rem);
+    gap: 0.25rem;
+  }
+  .vila:has(.vila-dialog) .vila-pad {
+    bottom: 11rem;
+  }
+  .vila-chip {
+    left: 1rem;
+    transform: none;
+  }
+}
+.vila-pad-btn {
+  border: 2px solid var(--text-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-strong);
+  font: inherit;
+  font-weight: 700;
+  touch-action: none;
+  user-select: none;
+}
+.vila-pad-btn:active {
+  background: var(--text-strong);
+  color: var(--surface);
+}
+.vila-pad-btn--up { grid-area: 1 / 2; }
+.vila-pad-btn--left { grid-area: 2 / 1; }
+.vila-pad-btn--right { grid-area: 2 / 3; }
+.vila-pad-btn--down { grid-area: 3 / 2; }
+.vila-pad-btn--a {
+  grid-area: 3 / 3;
+  border-radius: 50%;
+  background: var(--color-action-primary);
+  border-color: var(--color-action-primary);
+  color: var(--pv-white);
+}
+
+@media (max-width: 640px) {
+  .vila-hud {
+    padding: 0.75rem;
+  }
+  .vila-title h1 {
+    font-size: var(--font-size-base);
+  }
+}
+
+.quem-somos-lista {
+  width: min(var(--container-docs), 100% - 2rem);
+  margin: 0 auto;
+  padding-top: 3rem;
 }
 .quem-somos-content {
   position: relative;

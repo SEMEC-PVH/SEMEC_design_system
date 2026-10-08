@@ -1,5 +1,5 @@
-import Link from "next/link";
 import Image from "next/image";
+import VilaSemec from "@/components/quem-somos/VilaSemec";
 
 export const metadata = { title: "Quem Somos" };
 
@@ -88,38 +88,45 @@ function TeamCard({ member, size = "md" }) {
   );
 }
 
+const members = [
+  ...directors.map((m) => ({ ...m, group: "directors" })),
+  ...interns.map((m) => ({ ...m, group: "interns" })),
+];
+
 export default function QuemSomosPage() {
   return (
     <div className="no-toc quem-somos-wrapper">
-      <div className="quem-somos-content">
-        <h1>Quem Somos</h1>
+      <VilaSemec members={members} />
+
+      <section id="equipe" className="quem-somos-lista" aria-labelledby="equipe-titulo">
+        <h2 id="equipe-titulo" className="team-section-title">Equipe</h2>
         <p className="subtitle">
           Somos o time de tecnologia e design por trás do Design System da
           SEMEC Porto Velho. Construímos e mantemos essas ferramentas para
           garantir experiências digitais consistentes e acessíveis para a
           população.
         </p>
-      </div>
 
-      <section className="team-section">
-        <div className="team-grid team-grid--directors">
-          {directors.map((member) => (
-            <TeamCard key={member.name} member={member} size="lg" />
-          ))}
+        <div className="team-section">
+          <div className="team-grid team-grid--directors">
+            {directors.map((member, i) => (
+              <TeamCard key={`d-${i}`} member={member} size="lg" />
+            ))}
+          </div>
+        </div>
+
+        <div className="team-section">
+          <div className="team-grid team-grid--interns">
+            {interns.map((member, i) => (
+              <TeamCard key={`i-${i}`} member={member} size="md" />
+            ))}
+          </div>
+        </div>
+
+        <div className="quem-somos-bg" aria-hidden="true">
+          <Image src="/PortoVelhoPintura.svg" alt="" width={1536} height={1024} />
         </div>
       </section>
-
-      <section className="team-section">
-        <div className="team-grid team-grid--interns">
-          {interns.map((member) => (
-            <TeamCard key={member.name} member={member} size="md" />
-          ))}
-        </div>
-      </section>
-
-      <div className="quem-somos-bg" aria-hidden="true">
-        <Image src="/PortoVelhoPintura.svg" alt="" width={1536} height={1024} priority />
-      </div>
     </div>
   );
 }
