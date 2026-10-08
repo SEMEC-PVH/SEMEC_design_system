@@ -2,16 +2,16 @@
 
 import { GOLPES, INICIAIS, LINGUAGENS, VANTAGEM } from "./dados";
 import { nomeTipo } from "./motor";
+import { Sprite } from "./Sprite";
 import s from "./batalha.module.css";
 
-// Cartão de uma linguagem (retrato, nome, tipo e bio) com conteúdo extra.
+// Cartão de uma linguagem (sprite de frente, nome, tipo e bio) com conteúdo
+// extra. Sem a imagem do sprite, aparece o monograma.
 export function CartaoLinguagem({ id, children }) {
   const l = LINGUAGENS[id];
   return (
     <div className={s.cartao} data-tipo={l.tipo}>
-      <div className={s.cartaoRetrato} aria-hidden="true">
-        <span className={s.sigla}>{l.sigla}</span>
-      </div>
+      <Sprite especieId={id} vista="frente" sigla={l.sigla} tipo={l.tipo} className={s.cartaoRetrato} />
       <h3 className={s.cartaoNome}>{l.nome}</h3>
       <span className={s.chip} data-tipo={l.tipo}>
         {nomeTipo(l.tipo)}

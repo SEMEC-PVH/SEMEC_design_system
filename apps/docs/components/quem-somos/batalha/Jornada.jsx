@@ -6,6 +6,7 @@ import EscolhaInicial from "./EscolhaInicial";
 import { CHEFES, LINGUAGENS, MOTIVO_VANTAGEM, VANTAGEM } from "./dados";
 import { nomeTipo, xpParaProximo } from "./motor";
 import { curado, useProgresso } from "./progresso.js";
+import { Sprite } from "./Sprite";
 import { TITULO_FULL_STACK, TelaFullStack, TelaResultado, tituloResultado } from "./TelaResultado";
 import s from "./batalha.module.css";
 
@@ -93,7 +94,13 @@ export default function Jornada() {
   }
 
   if (tela === "batalha" && chefe && progresso) {
-    return <Batalha key={`${chefeId}-${rodada}`} jogador={curado(progresso.jogador)} chefe={chefe} onFim={onFimBatalha} />;
+    // Na rota de protótipo, a batalha fica inline num quadro de jogo (16:10
+    // no desktop; mais alto no celular), com o mesmo visual da Vila.
+    return (
+      <div className={s.quadro}>
+        <Batalha key={`${chefeId}-${rodada}`} jogador={curado(progresso.jogador)} chefe={chefe} onFim={onFimBatalha} />
+      </div>
+    );
   }
 
   if (tela === "preBatalha" && chefe) {
@@ -164,9 +171,7 @@ export default function Jornada() {
       <Titulo foco={tituloRef}>Sua jornada</Titulo>
 
       <div className={s.ficha} data-tipo={j.tipo}>
-        <div className={s.cartaoRetrato} aria-hidden="true">
-          <span className={s.sigla}>{j.sigla}</span>
-        </div>
+        <Sprite especieId={j.especieId} vista="frente" sigla={j.sigla} tipo={j.tipo} className={s.cartaoRetrato} />
         <div>
           <p className={s.cartaoNome}>
             {j.nome} <span className={s.painelNivel}>Nv {j.nivel}</span>

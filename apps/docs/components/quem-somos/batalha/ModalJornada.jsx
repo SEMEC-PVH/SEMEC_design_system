@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from "react";
+import { Cenario } from "./Sprite";
 import s from "./batalha.module.css";
 
 // Diálogo modal da jornada (escolha da linguagem, batalha e resultado) sobre a
@@ -26,6 +27,27 @@ import s from "./batalha.module.css";
 //   do teclado e do leitor de tela), restaurado ao fechar. O que está fora do
 //   pai (cabeçalho do site etc.) fica coberto pelo overlay e protegido pelo
 //   aria-modal e pela trava de foco; em tela cheia, só a section aparece.
+//
+// Variantes:
+// - "caixa" (padrão): painel centralizado sobre a página escurecida
+//   (position: fixed);
+// - "tela": cobre o pai posicionado inteiro (position: absolute; inset: 0) —
+//   na Vila, a <section class="vila">, também em tela cheia. Entra com a
+//   transição clássica de batalha (flash branco + cortina de faixas, ~600 ms)
+//   e sai com a inversa (cortina fecha + fade); com prefers-reduced-motion,
+//   só um fade curto. Com tituloVisivel={false} (a batalha), o h2 do diálogo
+//   fica só para leitor de tela e o conteúdo ocupa a área toda; com título
+//   visível (resultado), o conteúdo fica num cartão claro centralizado sobre
+//   o cenário do ginásio (prop ginasio = id do chefe).
+//
+// Para a saída também animar quando o fechamento vem de um botão do
+// conteúdo (ex.: "Voltar à vila"), o pai chama ref.current.fechar() em vez
+// de onFechar direto: o modal toca a transição e só então chama onFechar.
+
+// Duração da saída (ms): cortina + fade; com movimento reduzido, só o fade.
+// Igual às animações do CSS (.telaFundo[data-saindo]).
+const SAIDA_MS = 520;
+const SAIDA_REDUZIDA_MS = 180;
 
 const FOCAVEIS = [
   "a[href]",
@@ -76,7 +98,16 @@ function inertizarIrmaos(fundo) {
   };
 }
 
-export default function ModalJornada({ titulo, onFechar, children }) {
+export default function ModalJornada({
+  titulo,
+  onFechar,
+  children,
+  variante = "caixa",
+  tituloVisivel = true,
+  ginasio,
+  ref,
+}) {
+  const tela = variante === "tela";
   const tituloId = useId();
   const fundoRef = useRef(null);
   const painelRef = useRef(null);
@@ -89,6 +120,29 @@ export default function ModalJornada({ titulo, onFechar, children }) {
   useEffect(() => {
     onFecharRef.current = onFechar;
   }, [onFechar]);
+
+  // Fecha com a transição de saída (variante "tela"); só depois chama onFechar.
+  const [saindo, setSaindo] = useState(false);
+  const saindoRef = useRef(false);
+  const saidaTimer = useRef(null);
+  const fechar = useCallback(() => {
+    const cb = onFecharRef.current;
+    if (!cb || saindoRef.current) return;
+    if (!tela) {
+      cb();
+      return;
+    }
+    saindoRef.current = true;
+    setSaindo(true);
+    const reduzido = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    saidaTimer.current = setTimeout(() => onFecharRef.current?.(), reduzido ? SAIDA_REDUZIDA_MS : SAIDA_MS);
+  }, [tela]);
+  useImperativeHandle(ref, () => ({ fechar }), [fechar]);
+  useEffect(() => () => clearTimeout(saidaTimer.current), []);
+  const fecharRef = useRef(fechar);
+  useEffect(() => {
+    fecharRef.current = fechar;
+  }, [fechar]);
 
   // Abertura: trava a rolagem, põe o foco no modal e prende Tab/Esc.
   useEffect(() => {
@@ -104,7 +158,7 @@ export default function ModalJornada({ titulo, onFechar, children }) {
         if (!onFecharRef.current) return;
         e.preventDefault();
         e.stopPropagation();
-        onFecharRef.current();
+        fecharRef.current();
         return;
       }
       if (e.key !== "Tab") return;
@@ -159,19 +213,68 @@ export default function ModalJornada({ titulo, onFechar, children }) {
     tituloRef.current?.focus();
   }, [titulo]);
 
+  const tituloEl = (
+    <h2
+      ref={tituloRef}
+      id={tituloId}
+      tabIndex={-1}
+      className={tituloVisivel ? s.titulo : `${s.titulo} sr-only`}
+    >
+      {titulo}
+    </h2>
+  );
+  const botaoFechar = onFechar && (
+    <button type="button" className={s.botaoSecundario} onClick={fechar}>
+      Fechar
+    </button>
+  );
+
+  if (tela) {
+    return (
+      <div ref={fundoRef} className={s.telaFundo} data-saindo={saindo || undefined}>
+        <div
+          ref={painelRef}
+          className={tituloVisivel ? `${s.telaPainel} ${s.cenario}` : s.telaPainel}
+          data-cheio={!tituloVisivel || undefined}
+          data-ginasio={ginasio}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={tituloId}
+        >
+          {tituloVisivel ? (
+            <>
+              {ginasio && <Cenario chefeId={ginasio} />}
+              <div className={s.telaCartao}>
+                <div className={s.jornada}>
+                  <div className={s.modalTopo}>
+                    {tituloEl}
+                    {botaoFechar}
+                  </div>
+                  {children}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {tituloEl}
+              {children}
+            </>
+          )}
+        </div>
+        {/* Transição de batalha: faixas da cortina e flash (decorativos). */}
+        <div className={s.cortina} aria-hidden="true" />
+        <div className={s.flash} aria-hidden="true" />
+      </div>
+    );
+  }
+
   return (
     <div ref={fundoRef} className={s.modalFundo}>
       <div ref={painelRef} className={s.modalPainel} role="dialog" aria-modal="true" aria-labelledby={tituloId}>
         <div className={s.jornada}>
           <div className={s.modalTopo}>
-            <h2 ref={tituloRef} id={tituloId} tabIndex={-1} className={s.titulo}>
-              {titulo}
-            </h2>
-            {onFechar && (
-              <button type="button" className={s.botaoSecundario} onClick={onFechar}>
-                Fechar
-              </button>
-            )}
+            {tituloEl}
+            {botaoFechar}
           </div>
           {children}
         </div>

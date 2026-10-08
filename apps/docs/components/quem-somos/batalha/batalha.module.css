@@ -5,19 +5,19 @@
    green-800 7,0:1, yellow-800 5,9:1, gray-600 7,6:1 (WCAG AA). */
 
 /* ---- Cor por tipo ------------------------------------------------------------ */
-:is(.retrato, .chip, .cartao, .ficha, .golpe)[data-tipo="front"] {
+:is(.sprite, .chip, .cartao, .ficha, .golpe)[data-tipo="front"] {
   --tipo: var(--pv-blue-600);
   --tipo-claro: var(--pv-blue-100);
 }
-:is(.retrato, .chip, .cartao, .ficha, .golpe)[data-tipo="back"] {
+:is(.sprite, .chip, .cartao, .ficha, .golpe)[data-tipo="back"] {
   --tipo: var(--pv-green-800);
   --tipo-claro: var(--pv-green-50);
 }
-:is(.retrato, .chip, .cartao, .ficha, .golpe)[data-tipo="dados"] {
+:is(.sprite, .chip, .cartao, .ficha, .golpe)[data-tipo="dados"] {
   --tipo: var(--pv-yellow-800);
   --tipo-claro: var(--pv-yellow-400);
 }
-:is(.retrato, .chip, .cartao, .ficha, .golpe)[data-tipo="basico"] {
+:is(.sprite, .chip, .cartao, .ficha, .golpe)[data-tipo="basico"] {
   --tipo: var(--pv-gray-600);
   --tipo-claro: var(--pv-gray-100);
 }
@@ -65,65 +65,41 @@
   letter-spacing: 0.02em;
 }
 
-/* ---- Batalha ---------------------------------------------------------------- */
-.batalha {
-  display: grid;
-  gap: 0.75rem;
-  max-width: 48rem;
-  margin: 0 auto;
-}
-
-.arena {
-  position: relative;
-  display: grid;
-  grid-template-rows: 1fr 1fr;
-  gap: 0.5rem;
-  min-height: 20rem;
-  padding: 1rem;
-  /* Cenário sempre claro: a moldura também fica fixa (no escuro, --text-strong
-     clara sumia contra o próprio céu blue-50). */
-  border: 3px solid var(--pv-gray-900);
-  border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, var(--pv-blue-50) 0%, var(--pv-blue-100) 55%, var(--pv-green-50) 55%, var(--pv-green-50) 100%);
-  overflow: hidden;
-}
-/* A arena é sempre um cenário claro. Os painéis por cima dela seguem o
-   cenário, não o tema do site: no escuro, --surface escura e a borda
-   --text-strong clara (1:1 sobre blue-50) viravam caixas pretas sem
-   contorno. Os apelidos são redefinidos só aqui dentro. */
-.ladoOponente,
-.ladoJogador {
-  --surface: var(--pv-white);
-  --text-strong: var(--pv-black);
-  --text-muted: var(--pv-gray-600);
-  color-scheme: light;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-/* Retrato: monograma no lugar de logos de marca. */
-.retrato {
+/* ---- Sprite (imagem com fallback de monograma) ------------------------------- */
+/* Monograma e imagem ocupam a mesma célula; a imagem fica invisível até
+   carregar e some de vez se falhar (Sprite.jsx). */
+.sprite {
   position: relative;
   display: grid;
   place-items: center;
-  width: 6.5rem;
-  height: 6.5rem;
-  border-radius: 1.4rem;
+}
+.monograma {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border-radius: 22%;
   background: var(--tipo);
   color: var(--pv-white);
-  border: 3px solid var(--pv-white);
-  box-shadow: 0 0 0 3px var(--tipo), 0 10px 0 -2px var(--pv-gray-300);
-  flex-shrink: 0;
 }
-.retrato_oponente {
-  margin-right: 1.5rem;
+.spriteImg {
+  /* Absoluta e encaixada pela base: dentro de uma grade com linha de altura
+     automática, `height: 100%` não tem referência e a imagem caía no tamanho
+     natural (512 px), estourando o posto. Pixel art sem suavização (os WebP
+     vêm ampliados por fator inteiro). */
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: 50% 100%;
+  image-rendering: pixelated;
+  user-select: none;
 }
-.retrato_jogador {
-  margin-left: 1.5rem;
-  width: 7.5rem;
-  height: 7.5rem;
+.spriteImg[data-carregada="false"] {
+  opacity: 0;
 }
 .sigla {
   font-size: 2.1rem;
@@ -131,47 +107,276 @@
   letter-spacing: -0.02em;
 }
 
-/* Painel de status (nome, nível, vida). */
-.painel {
-  min-width: 13rem;
-  max-width: 16rem;
-  padding: 0.6rem 0.85rem;
-  border: 2px solid var(--text-strong);
-  border-radius: var(--radius-md);
-  background: var(--surface);
+/* ---- Cenários dos ginásios (fallback desenhado em CSS) ------------------------ */
+/* Parede em cima, "chão" claro embaixo (onde ficam as plataformas) e uma
+   decoração própria de cada ginásio na parede. Se a imagem
+   cenarios/<chefeId>.webp existir, ela cobre tudo isso (.cenarioImg). */
+.cenario {
+  --horizonte: 40%;
+  --parede-1: var(--pv-blue-200);
+  --parede-2: var(--pv-blue-50);
+  --chao-1: var(--pv-green-50);
+  --chao-2: var(--pv-white);
+  --deco: none;
+  --plataforma: var(--pv-green-500);
+  --plataforma-borda: var(--pv-green-700);
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(
+    180deg,
+    var(--parede-1) 0%,
+    var(--parede-2) var(--horizonte),
+    var(--chao-1) var(--horizonte),
+    var(--chao-2) 100%
+  );
+}
+.cenario::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 calc(100% - var(--horizonte)) 0;
+  z-index: 0;
+  background: var(--deco);
+  pointer-events: none;
+}
+/* Front-End: azul e vidro (caixilhos claros e reflexo). */
+.cenario[data-ginasio="frontend"] {
+  --parede-1: var(--pv-blue-300);
+  --parede-2: var(--pv-blue-100);
+  --chao-1: var(--pv-blue-50);
+  --chao-2: var(--pv-white);
+  --deco:
+    linear-gradient(180deg, transparent 46%, color-mix(in srgb, var(--pv-white) 70%, transparent) 46% 49%, transparent 49%),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--pv-white) 70%, transparent) 0 3px, transparent 3px 12.5%),
+    linear-gradient(120deg, transparent 30%, color-mix(in srgb, var(--pv-white) 35%, transparent) 30% 42%, transparent 42%);
+  --plataforma: var(--pv-blue-200);
+  --plataforma-borda: var(--pv-blue-500);
+}
+/* Back-End: grafite com racks e luzes verdes. */
+.cenario[data-ginasio="backend"] {
+  --parede-1: var(--pv-gray-950);
+  --parede-2: var(--pv-gray-700);
+  --chao-1: var(--pv-gray-300);
+  --chao-2: var(--pv-gray-100);
+  --deco:
+    radial-gradient(circle, var(--pv-green-500) 0 2px, transparent 3px) 0 0 / 2.25rem 1.5rem,
+    repeating-linear-gradient(90deg, transparent 0 4%, color-mix(in srgb, var(--pv-gray-800) 85%, transparent) 4% 16%, transparent 16% 20%),
+    repeating-linear-gradient(180deg, transparent 0 1.4rem, color-mix(in srgb, var(--pv-green-600) 35%, transparent) 1.4rem calc(1.4rem + 1px));
+  --plataforma: var(--pv-gray-200);
+  --plataforma-borda: var(--pv-green-700);
+}
+/* Dados: bege e âmbar (estantes de arquivos). */
+.cenario[data-ginasio="database"] {
+  --parede-1: color-mix(in srgb, var(--pv-yellow-500) 55%, var(--pv-white));
+  --parede-2: color-mix(in srgb, var(--pv-yellow-400) 25%, var(--pv-white));
+  --chao-1: color-mix(in srgb, var(--pv-yellow-400) 22%, var(--pv-white));
+  --chao-2: var(--pv-white);
+  --deco:
+    repeating-linear-gradient(180deg, transparent 0 22%, color-mix(in srgb, var(--pv-yellow-800) 45%, transparent) 22% 25%),
+    repeating-linear-gradient(90deg, transparent 0 2.2rem, color-mix(in srgb, var(--pv-yellow-600) 40%, transparent) 2.2rem 2.6rem);
+  --plataforma: color-mix(in srgb, var(--pv-yellow-400) 70%, var(--pv-white));
+  --plataforma-borda: var(--pv-yellow-600);
+}
+/* Diretoria: azul-marinho da SEMEC, janelas do prédio. */
+.cenario[data-ginasio="diretoria"] {
+  --parede-1: var(--pv-blue-950);
+  --parede-2: var(--pv-blue-800);
+  --chao-1: var(--pv-blue-100);
+  --chao-2: var(--pv-blue-50);
+  --deco:
+    repeating-linear-gradient(180deg, transparent 0 18%, color-mix(in srgb, var(--pv-blue-950) 80%, transparent) 18% 24%),
+    repeating-linear-gradient(90deg, transparent 0 6%, color-mix(in srgb, var(--pv-blue-hero) 75%, transparent) 6% 14%);
+  --plataforma: var(--pv-blue-200);
+  --plataforma-borda: var(--pv-blue-hero);
+}
+.cenarioImg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+
+/* ---- Batalha ---------------------------------------------------------------- */
+/* A tela de batalha tem paleta própria, fixa e clara (como um cenário de
+   jogo), nos dois temas do site: os apelidos semânticos são redefinidos
+   aqui dentro. Ocupa todo o container (modal "tela" da Vila ou o .quadro da
+   rota de protótipo): arena em cima, faixa de controles embaixo. */
+.batalha {
+  --surface: var(--pv-white);
+  --text-strong: var(--pv-black);
+  --text-muted: var(--pv-gray-600);
+  --color-action-primary: var(--pv-blue-600);
+  --color-focus-ring: var(--pv-blue-hero);
+  color-scheme: light;
+  container: batalha / size;
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--pv-blue-950);
   color: var(--text-strong);
-  box-shadow: 0 4px 0 var(--text-strong);
+  font-family: var(--font-family-sans);
+  line-height: 1.4;
+}
+
+.arena {
+  container: arena / size;
+  overflow: hidden;
+}
+
+/* Posto = plataforma oval + criatura. (--x, --y) é o centro da plataforma;
+   --tam, o lado do sprite. Adversário de frente, em cima à direita; jogador
+   de costas, maior, embaixo à esquerda (plataforma cortada pela faixa). */
+.posto {
+  position: absolute;
+  z-index: 1;
+  left: calc(var(--x) - var(--tam) * 0.9);
+  top: calc(var(--y) - var(--tam) * 0.99);
+  width: calc(var(--tam) * 1.8);
+  height: calc(var(--tam) * 1.2);
+  display: grid;
+  justify-items: center;
+  align-items: end;
+  pointer-events: none;
+}
+.posto[data-lado="oponente"] {
+  --x: 72cqw;
+  --y: 50cqh;
+  --tam: calc(min(42cqh, 28cqw) * var(--escala, 1));
+}
+.posto[data-lado="jogador"] {
+  --x: 25cqw;
+  --y: 99cqh;
+  --tam: calc(min(66cqh, 42cqw) * var(--escala, 1));
+}
+/* Escala por personagem: o COBOL, chefe final da Diretoria, é bem maior
+   (o ancião do terminal tem de impor respeito). */
+.posto[data-especie="cobol"] {
+  --escala: 1.35;
+}
+.plataforma {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--tam) * 0.42);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 50% 42%,
+    color-mix(in srgb, var(--plataforma) 70%, var(--pv-white)) 0 38%,
+    var(--plataforma) 39% 60%,
+    var(--plataforma-borda) 61% 100%
+  );
+  box-shadow: 0 calc(var(--tam) * 0.03) 0 color-mix(in srgb, var(--pv-gray-950) 25%, transparent);
+}
+.criatura {
+  position: relative;
+  width: var(--tam);
+  height: var(--tam);
+  margin-bottom: calc(var(--tam) * 0.15);
+}
+.retrato {
+  width: 100%;
+  height: 100%;
+}
+.retrato .monograma {
+  width: 76%;
+  height: 76%;
+  align-self: end;
+  border: 3px solid var(--pv-white);
+  box-shadow: 0 0 0 3px var(--tipo);
+}
+/* De costas: o monograma ganha "cabeça" arredondada. */
+.retrato[data-vista="costas"] .monograma {
+  border-radius: 46% 46% 22% 22%;
+}
+.retrato .sigla {
+  font-size: calc(var(--tam) * 0.26);
+}
+
+/* Caixa de status clássica, com o "rabinho" de seta feito em CSS. */
+.painel {
+  position: absolute;
+  z-index: 2;
+  width: min(19rem, 44cqw);
+  box-sizing: border-box;
+  padding: 0.45rem 0.8rem 0.55rem;
+  border: 3px solid var(--pv-gray-900);
+  border-radius: 0.4rem;
+  background: var(--pv-white);
+  color: var(--pv-black);
+  /* Moldura dupla de pixel: filete claro por dentro, sombra dura por fora. */
+  box-shadow:
+    inset 0 0 0 2px var(--pv-gray-200),
+    4px 4px 0 color-mix(in srgb, var(--pv-gray-950) 40%, transparent);
+}
+.painel[data-lado="oponente"] {
+  top: 5cqh;
+  left: 4cqw;
+}
+.painel[data-lado="jogador"] {
+  right: 4cqw;
+  bottom: 6cqh;
+}
+.painel::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  width: 1.4rem;
+  height: 1.1rem;
+  background: var(--pv-gray-900);
+}
+.painel[data-lado="oponente"]::after {
+  right: -1.35rem;
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+}
+.painel[data-lado="jogador"]::after {
+  left: -1.35rem;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
 }
 .painelNome {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
   gap: 0.5rem;
-  --mb: 0.35rem;
-  align-items: baseline;
   margin: 0;
-  font-weight: 700;
-  font-size: var(--font-size-sm);
+  font-weight: 800;
+  font-size: var(--font-size-base);
   line-height: 1.3;
 }
-.painelNivel {
-  font-weight: 600;
-  color: var(--text-muted);
-  font-size: var(--font-size-xs);
+.painelNomeTexto {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.vida {
+.painelNivel {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--pv-gray-700);
+  font-size: var(--font-size-sm);
+}
+.vida,
+.xpLinha {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  margin-top: 0.4rem;
+  margin-top: 0.35rem;
+}
+.xpLinha {
+  margin-top: 0.15rem;
 }
 .vidaRotulo {
   font-size: 0.7rem;
   font-weight: 800;
-  color: var(--text-muted);
+  color: var(--pv-gray-700);
 }
 .barra {
   flex: 1;
-  height: 0.6rem;
+  height: 0.65rem;
   border-radius: 999px;
   background: var(--pv-gray-200);
   border: 1px solid var(--pv-gray-400);
@@ -195,15 +400,15 @@
   fill: var(--pv-red-600);
 }
 .vidaNumero {
-  margin: 0.2rem 0 0;
+  margin: 0.15rem 0 0;
   text-align: right;
-  font-size: var(--font-size-xs);
-  font-weight: 700;
+  font-size: var(--font-size-sm);
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 .xp {
-  height: 0.3rem;
-  margin-top: 0.3rem;
+  flex: 1;
+  height: 0.35rem;
   border-radius: 999px;
   background: var(--pv-gray-200);
   overflow: hidden;
@@ -217,6 +422,12 @@
 @media (prefers-reduced-motion: no-preference) {
   .retrato {
     animation: respirar 2.4s ease-in-out infinite;
+  }
+  .posto[data-lado="oponente"] {
+    animation: entrarDaEsquerda 700ms ease-out 450ms both;
+  }
+  .posto[data-lado="jogador"] {
+    animation: entrarDaDireita 700ms ease-out 450ms both;
   }
   .anim_hit {
     animation: tremer 360ms ease-in-out;
@@ -246,6 +457,16 @@
 @keyframes respirar {
   50% {
     transform: translateY(-4px);
+  }
+}
+@keyframes entrarDaEsquerda {
+  from {
+    transform: translateX(-75cqw);
+  }
+}
+@keyframes entrarDaDireita {
+  from {
+    transform: translateX(75cqw);
   }
 }
 @keyframes tremer {
@@ -282,65 +503,88 @@
   }
 }
 
-/* Base: caixa de texto + menu. */
-.base {
+/* Faixa inferior: caixa de mensagem à esquerda, menu à direita, aviso de
+   marcas embaixo. */
+.faixa {
   display: grid;
-  grid-template-columns: 1fr minmax(15rem, 20rem);
-  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr) minmax(17rem, 42%);
+  gap: 0.5rem;
+  padding: 0.5rem 0.5rem 0.3rem;
+  border-top: 4px solid var(--pv-gray-900);
+  background: var(--pv-blue-950);
 }
-@media (max-width: 640px) {
-  .base {
-    grid-template-columns: 1fr;
-  }
-  .retrato {
-    width: 5rem;
-    height: 5rem;
-  }
-  .retrato_jogador {
-    width: 5.5rem;
-    height: 5.5rem;
-  }
-  .painel {
-    min-width: 0;
-  }
-}
+/* Mensagem: texto branco sobre blue-900 (11,6:1). */
 .caixaTexto {
-  min-height: 6.5rem;
-  padding: 0.85rem 1rem;
-  border: 3px solid var(--text-strong);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  color: var(--text-strong);
-  box-shadow: inset 0 0 0 4px var(--surface), inset 0 0 0 6px var(--color-action-primary);
-  font-size: var(--font-size-sm);
+  min-height: 7.5rem;
+  box-sizing: border-box;
+  padding: 0.8rem 1.1rem;
+  border: 3px solid var(--pv-blue-600);
+  border-left-width: 10px;
+  border-left-color: var(--pv-yellow-500);
+  border-radius: 0.4rem;
+  box-shadow: inset 0 0 0 2px var(--pv-blue-800);
+  background: var(--pv-blue-900);
+  color: var(--pv-white);
+  font-size: var(--font-size-base);
+  font-weight: 600;
   line-height: 1.5;
 }
 .caixaTexto p {
   margin: 0;
 }
+/* Descrição do golpe focado: blue-100 sobre blue-900 (9,6:1). */
 .descricao {
-  margin-top: 0.5rem !important;
-  color: var(--text-muted);
-  font-size: var(--font-size-xs);
+  margin-top: 0.4rem !important;
+  color: var(--pv-blue-100);
+  font-weight: 400;
+  font-size: var(--font-size-sm);
+}
+.caixaMenu {
+  box-sizing: border-box;
+  padding: 0.35rem;
+  border: 3px solid var(--pv-blue-600);
+  border-radius: 0.4rem;
+  box-shadow: inset 0 0 0 2px var(--pv-blue-100);
+  background: var(--pv-white);
+  color: var(--pv-black);
+}
+/* Enquanto a fila de mensagens roda, não há menu: a mensagem ocupa a
+   largura toda, como nos jogos clássicos (a caixa continua no mesmo lugar). */
+.batalha[data-menu="fila"] .caixaMenu {
+  display: none;
+}
+.batalha[data-menu="fila"] .caixaTexto {
+  grid-column: 1 / -1;
+}
+.avisoMarcas {
+  grid-column: 1 / -1;
+  margin: 0;
+  text-align: center;
+  font-size: 0.7rem;
+  line-height: 1.3;
+  /* blue-100 sobre blue-950 (13,9:1) */
+  color: var(--pv-blue-100);
 }
 
 .menu,
 .menuGolpes {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.4rem;
+  gap: 0.25rem;
   align-content: start;
 }
 .menuTipos {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.25rem 0.35rem 0;
   font-size: var(--font-size-xs);
   color: var(--text-strong);
 }
 .menuTipos ul {
-  --mb: 0.5rem;
   margin: 0;
   padding-left: 1rem;
   display: grid;
-  gap: 0.35rem;
+  gap: 0.25rem;
 }
 
 .acao,
@@ -349,55 +593,84 @@
 .botaoPrimario,
 .botaoSecundario,
 .botaoTexto {
-  min-height: 2.75rem; /* alvo de toque de 44px (Voltar e o link de texto tinham 32 e 20px) */
+  min-height: 2.75rem; /* alvo de toque de 44px */
   font: inherit;
   cursor: pointer;
 }
+/* Cursor ▶: aparece no item focado (e no apontado pelo mouse). */
+.cursor {
+  flex-shrink: 0;
+  width: 1em;
+  visibility: hidden;
+  color: var(--pv-blue-hero);
+  font-size: 0.8em;
+}
+.acao:is(:focus, :hover) .cursor,
+.golpe:is(:focus, :hover):not(:disabled) .cursor {
+  visibility: visible;
+}
 .acao {
-  padding: 0.7rem 0.5rem;
-  border: 2px solid var(--text-strong);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  color: var(--text-strong);
-  font-weight: 700;
-  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.5rem;
+  border: 2px solid transparent;
+  border-radius: 0.45rem;
+  background: transparent;
+  color: var(--pv-black);
+  font-weight: 800;
+  font-size: var(--font-size-base);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: left;
 }
 .acao:hover {
-  border-color: var(--color-action-primary);
-  color: var(--color-action-primary);
+  background: var(--pv-blue-50);
 }
 .golpe {
   display: grid;
-  align-content: start;
-  gap: 0.15rem;
-  padding: 0.5rem 0.6rem;
+  grid-template-columns: 1em minmax(0, 1fr);
+  column-gap: 0.25rem;
+  align-content: center;
+  padding: 0.35rem 0.5rem 0.35rem 0.35rem;
   text-align: left;
   border: 2px solid var(--tipo-borda);
   border-left-width: 6px;
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  color: var(--text-strong);
+  border-radius: 0.45rem;
+  background: var(--pv-white);
+  color: var(--pv-black);
+}
+.golpe .cursor {
+  grid-row: 1 / span 2;
+  align-self: center;
 }
 .golpe:hover:not(:disabled) {
-  background: var(--tipo);
-  color: var(--pv-white);
+  background: var(--pv-blue-50);
 }
 .golpe:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 .golpeNome {
-  font-weight: 700;
+  font-weight: 800;
   font-size: var(--font-size-sm);
+  line-height: 1.25;
 }
 .golpeTipo {
   font-size: var(--font-size-xs);
+  line-height: 1.3;
+  color: var(--pv-gray-700);
+}
+/* Na batalha a paleta é clara nos dois temas: a borda do golpe é a própria
+   cor do tipo (≥ 5,4:1 sobre o branco), sem a troca do tema escuro. */
+.batalha.batalha .golpe[data-tipo] {
+  --tipo-borda: var(--tipo);
 }
 .voltar {
   grid-column: 1 / -1;
-  padding: 0.4rem;
+  padding: 0.3rem;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 0.45rem;
   background: transparent;
   color: var(--text-muted);
   text-decoration: underline;
@@ -410,10 +683,104 @@
 .botaoPrimario:focus-visible,
 .botaoSecundario:focus-visible,
 .botaoTexto:focus-visible,
-.caixaTexto:focus-visible,
 .titulo:focus-visible {
   outline: 3px solid var(--color-focus-ring);
   outline-offset: 2px;
+}
+/* Dentro da caixa do menu, o contorno fica por dentro (não é cortado). */
+.acao:focus-visible,
+.golpe:focus-visible,
+.voltar:focus-visible {
+  outline-offset: -1px;
+}
+/* Caixa de mensagem (focada durante a fila): contorno por dentro, em
+   amarelo sobre o blue-900 (8,9:1). */
+.caixaTexto:focus-visible {
+  outline: 3px solid var(--pv-yellow-400);
+  outline-offset: -7px;
+}
+
+/* Telas estreitas ou em retrato: arena em cima, mensagem e menu empilhados
+   embaixo, criaturas e caixas menores. */
+@container batalha (max-width: 640px) or (aspect-ratio < 1) {
+  .faixa {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.4rem;
+    padding: 0.4rem 0.4rem 0.25rem;
+  }
+  .caixaTexto {
+    min-height: 4.6rem;
+    padding: 0.55rem 0.8rem;
+    border-left-width: 8px;
+    font-size: var(--font-size-sm);
+  }
+  .descricao {
+    font-size: var(--font-size-xs);
+  }
+  /* Empilhado, a mensagem sozinha guarda a altura de mensagem + menu
+     principal (4,6 + 0,4 + 6,8rem): a arena não "pula" a cada turno. */
+  .batalha[data-menu="fila"] .caixaTexto {
+    min-height: 11.8rem;
+  }
+  .avisoMarcas {
+    font-size: 0.68rem;
+  }
+}
+@container arena (max-width: 640px) or (aspect-ratio < 1.15) {
+  .painel {
+    width: min(15.5rem, 58cqw);
+    padding: 0.35rem 0.6rem 0.45rem;
+  }
+  .painel[data-lado="oponente"] {
+    top: 3cqh;
+    left: 3cqw;
+  }
+  .painel[data-lado="jogador"] {
+    right: 3cqw;
+    bottom: 4cqh;
+  }
+  .painel::after {
+    width: 1rem;
+    height: 0.8rem;
+  }
+  .painel[data-lado="oponente"]::after {
+    right: -0.95rem;
+  }
+  .painel[data-lado="jogador"]::after {
+    left: -0.95rem;
+  }
+  .painelNome {
+    font-size: var(--font-size-sm);
+  }
+  .posto[data-lado="oponente"] {
+    --x: 72cqw;
+    --y: 52cqh;
+    --tam: calc(min(30cqh, 36cqw) * var(--escala, 1));
+  }
+  .posto[data-lado="jogador"] {
+    --x: 23cqw;
+    --y: 98cqh;
+    --tam: calc(min(40cqh, 40cqw) * var(--escala, 1));
+  }
+}
+
+/* Rota de protótipo: a batalha inline num quadro de jogo. */
+.quadro {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  min-height: 30rem;
+  max-height: calc(100dvh - 6rem);
+  box-sizing: border-box;
+  border: 3px solid var(--pv-gray-900);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+@media (max-width: 640px) {
+  .quadro {
+    aspect-ratio: auto;
+    height: min(46rem, calc(100dvh - 4rem));
+    min-height: 36rem;
+  }
 }
 
 /* ---- Jornada (telas fora da batalha) ------------------------------------------ */
@@ -528,13 +895,12 @@
   background: var(--surface);
 }
 .cartaoRetrato {
-  display: grid;
-  place-items: center;
   width: 4.5rem;
   height: 4.5rem;
+  flex-shrink: 0;
+}
+.cartaoRetrato .monograma {
   border-radius: 1rem;
-  background: var(--tipo);
-  color: var(--pv-white);
 }
 .cartaoRetrato .sigla {
   font-size: 1.6rem;
@@ -705,4 +1071,227 @@
   max-width: none;
   margin-top: 0;
   margin-bottom: var(--mb, 0);
+}
+
+/* ---- Modal em tela inteira (ModalJornada variante="tela") --------------------- */
+/* Cobre o pai posicionado inteiro (na Vila, a <section class="vila">, que é
+   também o elemento em tela cheia), acima do HUD e do 3D. */
+.telaFundo {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+}
+.telaPainel {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  overflow: hidden;
+  font-family: var(--font-family-sans);
+}
+/* Resultado: cartão claro centralizado sobre o cenário do ginásio. */
+.telaPainel:not([data-cheio]) {
+  place-items: center;
+  padding: 1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.telaPainel.telaPainel :is(p, ul, ol) {
+  max-width: none;
+  margin-top: 0;
+  margin-bottom: var(--mb, 0);
+}
+.telaCartao {
+  --surface: var(--pv-white);
+  --text-strong: var(--pv-black);
+  --text-muted: var(--pv-gray-600);
+  --color-action-primary: var(--pv-blue-600);
+  --color-focus-ring: var(--pv-blue-hero);
+  color-scheme: light;
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: min(40rem, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 1.25rem;
+  border: 3px solid var(--pv-gray-900);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  color: var(--text-strong);
+  box-shadow:
+    inset 0 0 0 3px var(--pv-gray-200),
+    6px 6px 0 color-mix(in srgb, var(--pv-gray-950) 45%, transparent);
+  line-height: 1.6;
+  animation: aparecer 220ms ease-out both;
+}
+/* O h2 global do site segue o tema (claro no escuro): no cartão claro, a
+   cor vem da paleta fixa. */
+.telaCartao :is(h2, h3) {
+  color: var(--text-strong);
+}
+@media (max-width: 480px) {
+  .telaCartao {
+    padding: 1rem 0.85rem;
+  }
+}
+
+/* Transição clássica de batalha: o mundo pisca em branco, faixas escuras
+   fecham a tela vindas dos dois lados e abrem já na batalha (~620 ms).
+   Saída: as faixas fecham sobre a batalha e somem num fade, revelando a
+   vila. Com movimento reduzido, só um fade curto. A duração da saída é
+   espelhada em ModalJornada.jsx (SAIDA_MS / SAIDA_REDUZIDA_MS). */
+.cortina,
+.flash {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.flash {
+  background: var(--pv-white);
+  opacity: 0;
+}
+.cortina {
+  display: none;
+}
+.telaFundo[data-saindo] .telaPainel {
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cortina {
+    display: block;
+    overflow: hidden;
+  }
+  .cortina::before,
+  .cortina::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-101%);
+  }
+  .cortina::before {
+    background: repeating-linear-gradient(180deg, var(--pv-gray-950) 0 6.4%, transparent 6.4% 12.5%);
+  }
+  .cortina::after {
+    background: repeating-linear-gradient(180deg, transparent 0 6.2%, var(--pv-gray-950) 6.2% 12.5%);
+    transform: translateX(101%);
+  }
+  /* Entrada */
+  .telaFundo:not([data-saindo]) .flash {
+    animation: piscar 200ms linear both;
+  }
+  .telaFundo:not([data-saindo]) .cortina::before {
+    animation: faixaEsq 440ms ease-in-out 180ms both;
+  }
+  .telaFundo:not([data-saindo]) .cortina::after {
+    animation: faixaDir 440ms ease-in-out 180ms both;
+  }
+  /* A batalha só aparece quando as faixas cobrem tudo (opacidade, não
+     visibility: o foco já pode estar lá dentro). */
+  .telaFundo:not([data-saindo]) .telaPainel {
+    animation: revelar 1ms linear 400ms both;
+  }
+  /* Saída */
+  .telaFundo[data-saindo] .cortina::before {
+    animation: faixaEntraEsq 260ms ease-in both;
+  }
+  .telaFundo[data-saindo] .cortina::after {
+    animation: faixaEntraDir 260ms ease-in both;
+  }
+  .telaFundo[data-saindo] .telaPainel {
+    animation: ocultar 1ms linear 260ms both;
+  }
+  .telaFundo[data-saindo] .cortina {
+    animation: sumir 230ms linear 270ms both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .telaFundo {
+    animation: aparecer 160ms ease-out both;
+  }
+  .telaFundo[data-saindo] {
+    animation: sumir 160ms ease-in both;
+  }
+}
+@keyframes piscar {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes faixaEsq {
+  0% {
+    transform: translateX(-101%);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(101%);
+  }
+}
+@keyframes faixaDir {
+  0% {
+    transform: translateX(101%);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-101%);
+  }
+}
+@keyframes faixaEntraEsq {
+  from {
+    transform: translateX(-101%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes faixaEntraDir {
+  from {
+    transform: translateX(101%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes revelar {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes ocultar {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes sumir {
+  to {
+    opacity: 0;
+  }
 }
