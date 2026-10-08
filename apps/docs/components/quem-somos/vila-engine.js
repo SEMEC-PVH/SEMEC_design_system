@@ -22,6 +22,7 @@ import { createDayNight, formatClock } from "./scene/daynight";
 import { createNightLights } from "./scene/nightlights";
 import { buildVegetation } from "./scene/vegetation";
 import { buildGround } from "./scene/ground";
+import { areaOf } from "./areas";
 
 const W = 30;
 const H = 24;
@@ -132,12 +133,6 @@ const AREA_SPOTS = {
     { x: 23, y: 19, dir: "up" },
   ],
 };
-const AREA_BY_ROLE = [
-  [/front|design|ui|ux/i, "frontend"],
-  [/back|api/i, "backend"],
-  [/devops|infra|dados|data|dba/i, "database"],
-];
-const areaOf = (role = "") => AREA_BY_ROLE.find(([re]) => re.test(role))?.[1] ?? "generic";
 
 const START = { x: 14, y: 20, dir: "up" };
 
@@ -222,6 +217,7 @@ function readPalette() {
     woodLight: mix(pv("yellow-800"), pv("yellow-400"), 0.35),
     wall: pv("gray-50"),
     marker: pv("yellow-500"),
+    markerLeader: pv("blue-600"),
     markerDone: pv("green-600"),
     skin: mix(mix(pv("yellow-400"), pv("red-200"), 0.55), white, 0.25),
     hair: mix(pv("gray-900"), pv("yellow-800"), 0.45),
@@ -498,6 +494,9 @@ function buildFrontEnd(group, b, { pal, track, unitBox }) {
 export function createVila(host, options) {
   const {
     members = [],
+    // Índices (em members) dos líderes de ginásio e da Diretoria: balão com
+    // estrela em vez do "!" (areas.js decide quem são).
+    leaders = new Set(),
     reducedMotion = false,
     modelUrl,
     onInteract = () => {},
@@ -647,14 +646,15 @@ export function createVila(host, options) {
     const fig = makeChibi({ shirt, eye: pal.eye, variant: npcs.length + 1, director: isDirector });
     fig.position.copy(tileToWorld(spot.x, spot.y));
     fig.rotation.y = DIRS[spot.dir].rot;
-    const marker = makeMarker();
+    const leader = leaders.has(index);
+    const marker = makeMarker({ leader });
     marker.position.y = MARKER_Y;
     // Balão sempre de frente para a câmera, qualquer que seja a direção do NPC.
     marker.rotation.set(MARKER_TILT, -fig.rotation.y, 0);
     fig.add(marker);
     fig.traverse((o) => (o.userData.npcIndex = npcs.length));
     scene.add(fig);
-    const npc = { index, member, x: spot.x, y: spot.y, dir: spot.dir, fig, marker, talked: false, phase: rand() * 6 };
+    const npc = { index, member, x: spot.x, y: spot.y, dir: spot.dir, fig, marker, talked: false, leader, beaten: false, phase: rand() * 6 };
     npcs.push(npc);
     occupied.set(`${spot.x},${spot.y}`, npc);
   });
@@ -893,6 +893,11 @@ export function createVila(host, options) {
     return true;
   }
 
+  function paintMarker(npc, color) {
+    npc.marker.material.color.copy(color);
+    npc.marker.material.emissive.copy(color);
+  }
+
   function interact() {
     const f = frontOf();
     const t = targetAt(f.x, f.y);
@@ -903,8 +908,8 @@ export function createVila(host, options) {
       npc.fig.rotation.y = DIRS[npc.dir].rot;
       if (!npc.talked) {
         npc.talked = true;
-        npc.marker.material.color.copy(pal.markerDone);
-        npc.marker.material.emissive.copy(pal.markerDone);
+        // Líder só ganha o "✓" quando o ginásio é vencido (setLeadersDone).
+        if (!npc.leader) paintMarker(npc, pal.markerDone);
       }
       onInteract({ type: "npc", index: npc.index });
     } else {
@@ -980,6 +985,15 @@ export function createVila(host, options) {
     setPaused(p) {
       paused = p;
       if (p) held.length = 0;
+    },
+    // Líderes já vencidos (Set/array de índices em members): estrela → "✓".
+    setLeadersDone(indices) {
+      const done = new Set(indices);
+      for (const n of npcs) {
+        if (!n.leader || n.beaten === done.has(n.index)) continue;
+        n.beaten = done.has(n.index);
+        paintMarker(n, n.beaten ? pal.markerDone : pal.markerLeader);
+      }
     },
     // Modo vitrine (tela de título): câmera afastada sobrevoando a vila.
     setAttract(on) {
@@ -1145,9 +1159,10 @@ export function createVila(host, options) {
     }
 
     // NPCs: balão de frente para a câmera e "!" → "✓" depois da conversa
+    // (líderes: estrela → "✓" depois de vencidos)
     // (estado, não animação: roda mesmo com reduced motion).
     for (const n of npcs) {
-      setMarkerDone(n.marker, n.talked);
+      setMarkerDone(n.marker, n.leader ? n.beaten : n.talked);
       n.marker.rotation.y = -n.fig.rotation.y;
     }
     // NPCs: respiração, cabeça balançando e balão flutuante.

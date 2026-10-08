@@ -13,9 +13,12 @@
 //   createChibiKit({ pal, track }) -> { makeChibi, makeMarker, setMarkerDone }
 //   makeChibi(opts) -> THREE.Group com userData.body (escala na respiração)
 //     e userData.head (balanço leve da cabeça). Frente em +z.
-//   makeMarker() -> Mesh (balão de conversa). marker.material tem color e
-//     emissive (o motor pinta com pal.markerDone ao conversar).
-//   setMarkerDone(marker, done) troca o "!" pelo "✓".
+//   makeMarker({ leader }) -> Mesh (balão de conversa). marker.material tem
+//     color e emissive (o motor pinta com pal.markerDone ao conversar).
+//     Com leader: true (líder de ginásio ou Diretoria), balão maior em
+//     pal.markerLeader com uma estrela no lugar do "!" — forma diferente,
+//     não só cor, para quem não distingue as cores.
+//   setMarkerDone(marker, done) troca o "!" (ou a estrela) pelo "✓".
 
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
@@ -143,6 +146,16 @@ export function createChibiKit({ pal, track }) {
   const glyphDot = track(new THREE.SphereGeometry(0.025, 12, 8));
   const checkShort = track(new THREE.CapsuleGeometry(0.019, 0.045, 4, 10));
   const checkLong = track(new THREE.CapsuleGeometry(0.019, 0.1, 4, 10));
+  // Estrela de 5 pontas (marcador dos líderes).
+  const starShape = new THREE.Shape();
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 === 0 ? 0.085 : 0.036;
+    const a = Math.PI / 2 + (i * Math.PI) / 5;
+    if (i === 0) starShape.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+    else starShape.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  starShape.closePath();
+  const starGeo = track(new THREE.ShapeGeometry(starShape));
 
   // ---- Materiais em cache por cor ------------------------------------------
   const matCache = new Map();
@@ -168,6 +181,7 @@ export function createChibiKit({ pal, track }) {
   const plateMat = track(new THREE.MeshBasicMaterial({ color: white }));
   const inkMat = track(new THREE.MeshBasicMaterial({ color: tones.ink }));
   const doneMat = track(new THREE.MeshBasicMaterial({ color: pal.markerDone }));
+  const starMat = track(new THREE.MeshBasicMaterial({ color: pal.markerLeader ?? pv("blue-600") }));
 
   // Mesh com esfera unitária escalada.
   const blobby = (parent, m, sx, sy, sz, x, y, z, { low = false, shadow = true } = {}) => {
@@ -447,10 +461,11 @@ export function createChibiKit({ pal, track }) {
   }
 
   // ---- Marcador de conversa ------------------------------------------------
-  function makeMarker() {
+  function makeMarker({ leader = false } = {}) {
+    const color = leader ? (pal.markerLeader ?? pv("blue-600")) : pal.marker;
     const marker = new THREE.Mesh(
       bubbleGeo,
-      track(new THREE.MeshStandardMaterial({ color: pal.marker, roughness: 0.45, metalness: 0, emissive: pal.marker, emissiveIntensity: 0.35 }))
+      track(new THREE.MeshStandardMaterial({ color, roughness: 0.45, metalness: 0, emissive: color, emissiveIntensity: 0.35 }))
     );
     marker.rotation.order = "YXZ";
     marker.userData.noShadow = true;
@@ -458,13 +473,17 @@ export function createChibiKit({ pal, track }) {
     plate.position.set(0, 0.005, BUBBLE_FRONT + 0.003);
     marker.add(plate);
 
-    // "!" — ainda não conversou.
+    // "!" — ainda não conversou (líder: estrela — ainda não foi vencido).
     const todo = new THREE.Group();
-    const bar = new THREE.Mesh(glyphBar, inkMat);
-    bar.position.y = 0.035;
-    const dot = new THREE.Mesh(glyphDot, inkMat);
-    dot.position.y = -0.052;
-    todo.add(bar, dot);
+    if (leader) {
+      todo.add(new THREE.Mesh(starGeo, starMat));
+    } else {
+      const bar = new THREE.Mesh(glyphBar, inkMat);
+      bar.position.y = 0.035;
+      const dot = new THREE.Mesh(glyphDot, inkMat);
+      dot.position.y = -0.052;
+      todo.add(bar, dot);
+    }
     todo.position.z = BUBBLE_FRONT + 0.012;
     marker.add(todo);
 
@@ -484,6 +503,9 @@ export function createChibiKit({ pal, track }) {
     marker.traverse((o) => (o.userData.noShadow = true));
     marker.userData.todo = todo;
     marker.userData.done = done;
+    // Líder com balão um pouco maior: chama atenção de longe.
+    marker.userData.baseScale = leader ? 1.15 : 1;
+    marker.scale.setScalar(marker.userData.baseScale);
     return marker;
   }
 
@@ -492,7 +514,7 @@ export function createChibiKit({ pal, track }) {
     if (done.visible === isDone) return;
     todo.visible = !isDone;
     done.visible = isDone;
-    marker.scale.setScalar(isDone ? 0.82 : 1);
+    marker.scale.setScalar((marker.userData.baseScale ?? 1) * (isDone ? 0.82 : 1));
   }
 
   return { makeChibi, makeMarker, setMarkerDone };

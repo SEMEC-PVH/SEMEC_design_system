@@ -2239,6 +2239,67 @@ footer {
   font-variant-numeric: tabular-nums;
   color: var(--text-muted);
 }
+/* O site põe 16px abaixo de todo `.content p`: no painel do HUD, compacto. */
+.content .vila-title p {
+  margin-bottom: 0;
+}
+/* Jornada no HUD: linguagem atual e as quatro Stacks. */
+.vila-lang {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.4rem 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-strong);
+}
+.vila-lang--vazia {
+  color: var(--text-muted);
+}
+.vila-lang-nivel {
+  font-variant-numeric: tabular-nums;
+}
+.vila-lang-tipo {
+  padding: 0 0.4rem;
+  border: 1px solid var(--text-strong);
+  border-radius: 999px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.vila-stacks {
+  display: flex;
+  gap: 0.3rem;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.vila-stack {
+  display: grid;
+  place-items: center;
+  min-width: 1.9rem;
+  height: 1.5rem;
+  margin: 0;
+  padding: 0 0.25rem;
+  border: 2px dashed var(--text-muted);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1;
+}
+.vila-stack[data-ok="true"] {
+  border-style: solid;
+  border-color: var(--color-action-primary);
+  background: var(--color-action-primary);
+  /* --surface (e não branco): no tema escuro o azul de ação é claro. */
+  color: var(--surface);
+}
+/* Ações do canto direito do HUD: lista da equipe e tela cheia. */
+.vila-hud-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
 .vila-skip {
   padding: 0.5rem 0.85rem;
   font-size: var(--font-size-xs);
@@ -2311,6 +2372,7 @@ footer {
   color: var(--text-strong);
 }
 .vila-dialog-actions {
+  flex-wrap: wrap;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -2336,6 +2398,16 @@ footer {
 .vila-dialog-next:hover {
   border-color: var(--color-action-primary);
   color: var(--color-action-primary);
+}
+/* Escolha principal ("Batalhar!", "Escolher minha linguagem"). */
+.vila-dialog-next--primary {
+  border-color: var(--color-action-primary);
+  background: var(--color-action-primary);
+  color: var(--surface);
+}
+.vila-dialog-next--primary:hover {
+  border-color: var(--text-strong);
+  color: var(--surface);
 }
 .vila-dialog-next span {
   display: inline-block;
