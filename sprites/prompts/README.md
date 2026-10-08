@@ -31,24 +31,24 @@ Os personagens são inspirados nos logos oficiais das tecnologias. As regras de 
 
 | Documento | Papel | Tipo | Arquivo | Pronto |
 |---|---|---|---|---|
-| [Python — Frente](python-frente.md) | Linguagem inicial do jogador | Dados | `sprites/personagens/python-frente.png` | ☑ |
-| [Python — Costas](python-costas.md) | Linguagem inicial do jogador | Dados | `sprites/personagens/python-costas.png` | ☑ |
-| [Anaconda — Frente](anaconda-frente.md) | Evolução do Python (nível 8) | Dados | `sprites/personagens/anaconda-frente.png` | ☑ |
-| [Anaconda — Costas](anaconda-costas.md) | Evolução do Python (nível 8) | Dados | `sprites/personagens/anaconda-costas.png` | ☑ |
-| [JavaScript — Frente](javascript-frente.md) | Linguagem inicial do jogador | Front-End | `sprites/personagens/javascript-frente.png` | ☑ |
-| [JavaScript — Costas](javascript-costas.md) | Linguagem inicial do jogador | Front-End | `sprites/personagens/javascript-costas.png` | ☑ |
-| [TypeScript — Frente](typescript-frente.md) | Evolução do JavaScript (nível 8) | Front-End | `sprites/personagens/typescript-frente.png` | ☑ |
-| [TypeScript — Costas](typescript-costas.md) | Evolução do JavaScript (nível 8) | Front-End | `sprites/personagens/typescript-costas.png` | ☑ |
-| [Java — Frente](java-frente.md) | Linguagem inicial do jogador | Back-End | `sprites/personagens/java-frente.png` | ☑ |
-| [Java — Costas](java-costas.md) | Linguagem inicial do jogador | Back-End | `sprites/personagens/java-costas.png` | ☑ |
-| [Kotlin — Frente](kotlin-frente.md) | Evolução do Java (nível 8) | Back-End | `sprites/personagens/kotlin-frente.png` | ☑ |
-| [Kotlin — Costas](kotlin-costas.md) | Evolução do Java (nível 8) | Back-End | `sprites/personagens/kotlin-costas.png` | ☑ |
-| [CSS — Frente](css-frente.md) | Adversário — Ginásio Front-End | Front-End | `sprites/personagens/css-frente.png` | ☑ |
-| [React — Frente](react-frente.md) | Adversário — Ginásio Front-End | Front-End | `sprites/personagens/react-frente.png` | ☑ |
-| [PHP — Frente](php-frente.md) | Adversário — Ginásio Back-End | Back-End | `sprites/personagens/php-frente.png` | ☑ |
-| [Node.js — Frente](node-frente.md) | Adversário — Ginásio Back-End | Back-End | `sprites/personagens/node-frente.png` | ☑ |
-| [SQL — Frente](sql-frente.md) | Adversário — Ginásio de Dados | Dados | `sprites/personagens/sql-frente.png` | ☑ |
-| [MongoDB — Frente](mongodb-frente.md) | Adversário — Ginásio de Dados | Dados | `sprites/personagens/mongodb-frente.png` | ☑ |
-| [Figma — Frente](figma-frente.md) | Adversário — Diretoria (chefe final) | Front-End | `sprites/personagens/figma-frente.png` | ☑ |
-| [Planilha (Excel) — Frente](planilha-frente.md) | Adversário — Diretoria (chefe final) | Dados | `sprites/personagens/planilha-frente.png` | ☑ |
-| [COBOL — Frente](cobol-frente.md) | Adversário — Diretoria (chefe final) | Back-End | `sprites/personagens/cobol-frente.png` | ☑ |
+| [Python — Frente](python-frente.md) | Linguagem inicial do jogador | Dados | `sprites/personagens/dados/python-frente.png` | ☑ |
+| [Python — Costas](python-costas.md) | Linguagem inicial do jogador | Dados | `sprites/personagens/dados/python-costas.png` | ☑ |
+| [Anaconda — Frente](anaconda-frente.md) | Evolução do Python (nível 8) | Dados | `sprites/personagens/dados/anaconda-frente.png` | ☑ |
+| [Anaconda — Costas](anaconda-costas.md) | Evolução do Python (nível 8) | Dados | `sprites/personagens/dados/anaconda-costas.png` | ☑ |
+| [JavaScript — Frente](javascript-frente.md) | Linguagem inicial do jogador | Front-End | `sprites/personagens/front-end/javascript-frente.png` | ☑ |
+| [JavaScript — Costas](javascript-costas.md) | Linguagem inicial do jogador | Front-End | `sprites/personagens/front-end/javascript-costas.png` | ☑ |
+| [TypeScript — Frente](typescript-frente.md) | Evolução do JavaScript (nível 8) | Front-End | `sprites/personagens/front-end/typescript-frente.png` | ☑ |
+| [TypeScript — Costas](typescript-costas.md) | Evolução do JavaScript (nível 8) | Front-End | `sprites/personagens/front-end/typescript-costas.png` | ☑ |
+| [Java — Frente](java-frente.md) | Linguagem inicial do jogador | Back-End | `sprites/personagens/back-end/java-frente.png` | ☑ |
+| [Java — Costas](java-costas.md) | Linguagem inicial do jogador | Back-End | `sprites/personagens/back-end/java-costas.png` | ☑ |
+| [Kotlin — Frente](kotlin-frente.md) | Evolução do Java (nível 8) | Back-End | `sprites/personagens/back-end/kotlin-frente.png` | ☑ |
+| [Kotlin — Costas](kotlin-costas.md) | Evolução do Java (nível 8) | Back-End | `sprites/personagens/back-end/kotlin-costas.png` | ☑ |
+| [CSS — Frente](css-frente.md) | Adversário — Ginásio Front-End | Front-End | `sprites/personagens/front-end/css-frente.png` | ☑ |
+| [React — Frente](react-frente.md) | Adversário — Ginásio Front-End | Front-End | `sprites/personagens/front-end/react-frente.png` | ☑ |
+| [PHP — Frente](php-frente.md) | Adversário — Ginásio Back-End | Back-End | `sprites/personagens/back-end/php-frente.png` | ☑ |
+| [Node.js — Frente](node-frente.md) | Adversário — Ginásio Back-End | Back-End | `sprites/personagens/back-end/node-frente.png` | ☑ |
+| [SQL — Frente](sql-frente.md) | Adversário — Ginásio de Dados | Dados | `sprites/personagens/dados/sql-frente.png` | ☑ |
+| [MongoDB — Frente](mongodb-frente.md) | Adversário — Ginásio de Dados | Dados | `sprites/personagens/dados/mongodb-frente.png` | ☑ |
+| [Figma — Frente](figma-frente.md) | Adversário — Diretoria (chefe final) | Front-End | `sprites/personagens/front-end/figma-frente.png` | ☑ |
+| [Planilha (Excel) — Frente](planilha-frente.md) | Adversário — Diretoria (chefe final) | Dados | `sprites/personagens/dados/planilha-frente.png` | ☑ |
+| [COBOL — Frente](cobol-frente.md) | Adversário — Diretoria (chefe final) | Back-End | `sprites/personagens/back-end/cobol-frente.png` | ☑ |

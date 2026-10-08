@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Arquivo a salvar** | `sprites/personagens/javascript-frente.png` |
+| **Arquivo a salvar** | `sprites/personagens/front-end/javascript-frente.png` |
 | **Papel no jogo** | Linguagem inicial do jogador |
 | **Tipo** | Front-End |
 | **Onde aparece** | De frente na escolha da linguagem e na ficha do mapa da jornada. |

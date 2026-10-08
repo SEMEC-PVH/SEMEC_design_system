@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Arquivo a salvar** | `sprites/personagens/cobol-frente.png` |
+| **Arquivo a salvar** | `sprites/personagens/back-end/cobol-frente.png` |
 | **Papel no jogo** | Adversário — Diretoria (chefe final) |
 | **Tipo** | Back-End |
 | **Onde aparece** | De frente, no canto superior direito da batalha, como adversária. |

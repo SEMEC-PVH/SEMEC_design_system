@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Arquivo a salvar** | `sprites/personagens/react-frente.png` |
+| **Arquivo a salvar** | `sprites/personagens/front-end/react-frente.png` |
 | **Papel no jogo** | Adversário — Ginásio Front-End |
 | **Tipo** | Front-End |
 | **Onde aparece** | De frente, no canto superior direito da batalha, como adversária. |

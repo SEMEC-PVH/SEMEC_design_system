@@ -14,22 +14,22 @@ Leia o README e todos os arquivos .md antes de começar.
 Use a sua ferramenta de geração de imagens. Se você não tiver uma, escreva um script em sprites/tools/gerar.mjs (Node, sem dependências) que chame a API de imagens da OpenAI (modelo gpt-image-1, size 1024x1024, chave em OPENAI_API_KEY) e rode o script.
 - Cada imagem: quadrada, 1024x1024, PNG.
 - Use o texto do bloco "Prompt" do .md exatamente como está. Se a geração for recusada por causa do nome da marca, use o bloco "Se a ferramenta recusar...".
-- Salve em sprites/personagens/<nome>.png, com o nome exato da tabela do README (ex.: sprites/personagens/python-frente.png).
+- Salve em sprites/personagens/<stack>/<nome>.png, com o nome exato da tabela do README (ex.: sprites/personagens/dados/python-frente.png).
 
 ## Fase 1: referência de estilo (você mesmo, sem subagentes)
-1. Gere sprites/personagens/python-frente.png.
+1. Gere sprites/personagens/dados/python-frente.png.
 2. Confira o checklist do python-frente.md: fundo verde (#00FF00) liso, um personagem inteiro e centralizado, sem texto, pixel art nítido. Se falhar, gere de novo (até 3 tentativas).
 3. PARE e me mostre a imagem. Só siga para a fase 2 depois que eu aprovar o estilo.
 
 ## Fase 2: subagentes em paralelo
-Depois da minha aprovação, dispare 4 subagentes em paralelo. Cada um cuida de um grupo e usa sprites/personagens/python-frente.png como imagem de referência de estilo, quando a ferramenta aceitar:
+Depois da minha aprovação, dispare 4 subagentes em paralelo. Cada um cuida de um grupo e usa sprites/personagens/dados/python-frente.png como imagem de referência de estilo, quando a ferramenta aceitar:
 - Agente 1 (Dados): python-costas, anaconda-frente, anaconda-costas, sql-frente, mongodb-frente, planilha-frente
 - Agente 2 (Front-End): javascript-frente, javascript-costas, typescript-frente, typescript-costas, css-frente
 - Agente 3 (Back-End): java-frente, java-costas, kotlin-frente, kotlin-costas, php-frente
 - Agente 4 (outros): react-frente, node-frente, figma-frente, cobol-frente
 
 Regras para cada subagente:
-- Grava só os próprios arquivos sprites/personagens/<nome>.png e não mexe em mais nada.
+- Grava só os próprios arquivos sprites/personagens/<stack>/<nome>.png e não mexe em mais nada.
 - Confere cada imagem contra o checklist do .md correspondente e gera de novo se falhar (até 3 tentativas por imagem).
 - As versões "costas" precisam ser o MESMO personagem da versão "frente", visto de trás. Gere a "frente" primeiro e use-a como referência para a "costas".
 - No fim, informa: arquivos gerados, quantas tentativas cada um precisou, quais usaram a versão sem marca e quais falharam.

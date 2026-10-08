@@ -11,7 +11,7 @@ Transforma as imagens geradas por IA em arquivos prontos para o jogo:
   ampliados por fator inteiro antes do corte.
 
 Uso:
-  python sprites/converter.py sprites            # sprites/personagens/<id>-<frente|costas>.png
+  python sprites/converter.py sprites            # sprites/personagens/<stack>/<id>-<frente|costas>.png
   python sprites/converter.py cenarios           # sprites/cenarios/<chefe>.png
   python sprites/converter.py arquivo.png --tipo sprite --saida pasta/
   flags: --dry-run, --forcar, --tolerancia N, --estilo pixel|suave
@@ -725,6 +725,12 @@ def _pngs(pasta: Path) -> list[Path]:
     return sorted(p for p in pasta.iterdir() if p.is_file() and p.suffix.lower() == ".png")
 
 
+def _pngs_recursivo(pasta: Path) -> list[Path]:
+    if not pasta.is_dir():
+        return []
+    return sorted(p for p in pasta.rglob("*") if p.is_file() and p.suffix.lower() == ".png")
+
+
 def planejar(args) -> list[tuple[Path, Path | None, str, list[str]]]:
     """Lista de (origem, destino, tipo, avisos-de-mapeamento)."""
     especies, chefes, fonte = carregar_ids()
@@ -735,9 +741,9 @@ def planejar(args) -> list[tuple[Path, Path | None, str, list[str]]]:
 
     if args.alvo == "sprites":
         tipo = "sprite"
-        # Só sprites/personagens/ (sem subpastas).
+        # sprites/personagens/<stack>/ (front-end, back-end, dados).
         # PNGs fora do padrão <id>-<frente|costas> são ignorados em silêncio.
-        arquivos = [p for p in _pngs(PASTA_SPRITES) if PADRAO_SPRITE.fullmatch(p.stem.lower())]
+        arquivos = [p for p in _pngs_recursivo(PASTA_SPRITES) if PADRAO_SPRITE.fullmatch(p.stem.lower())]
         if not arquivos:
             print(f"nenhum PNG <personagem>-<frente|costas>.png em {rel(PASTA_SPRITES)}/")
     elif args.alvo == "cenarios":

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Arquivo a salvar** | `sprites/personagens/javascript-costas.png` |
+| **Arquivo a salvar** | `sprites/personagens/front-end/javascript-costas.png` |
 | **Papel no jogo** | Linguagem inicial do jogador |
 | **Tipo** | Front-End |
 | **Onde aparece** | De costas, grande, no canto inferior esquerdo da batalha (é a criatura do jogador). |

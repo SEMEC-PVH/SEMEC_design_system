@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| **Arquivo a salvar** | `sprites/personagens/typescript-costas.png` |
+| **Arquivo a salvar** | `sprites/personagens/front-end/typescript-costas.png` |
 | **Papel no jogo** | Evolução do JavaScript (nível 8) |
 | **Tipo** | Front-End |
 | **Onde aparece** | De costas, grande, no canto inferior esquerdo da batalha (é a criatura do jogador). |
-| **Referência visual** | o sprite aprovado do JavaScript (`sprites/personagens/javascript-frente.png`), agora com armadura azul |
+| **Referência visual** | o sprite aprovado do JavaScript (`sprites/personagens/front-end/javascript-frente.png`), agora com armadura azul |
 
 ## Prompt
 

@@ -9,7 +9,7 @@
 
 ## Prompt
 
-Cole inteiro. Se a ferramenta aceitar imagens de referência, anexe as indicadas acima e o sprite aprovado `sprites/personagens/python-frente.png`, para manter o mesmo estilo.
+Cole inteiro. Se a ferramenta aceitar imagens de referência, anexe as indicadas acima e o sprite aprovado `sprites/personagens/dados/python-frente.png`, para manter o mesmo estilo.
 
 ```text
 Pixel art battle background in the style of Game Boy Advance monster-battle games (2003 era), native 240x160 pixel art upscaled with crisp hard pixels, limited 32-color palette, clean dark outlines, simple cel shading, bright and friendly colors. Wide landscape (3:2 or 16:9), camera slightly above eye level looking into the room. Keep two clear empty floor spots for creatures to stand: one on the right half at mid-distance and one on the lower left close to the camera, with nothing placed on them (the game draws the oval platforms itself). The bottom quarter of the image is a calm, low-detail floor, because it will be partly covered by the game interface. No characters, no creatures, no people, no text, no letters, no logos, no user interface. The scene: inside a modern glass design studio. Large windows with soft daylight on the back wall, white walls with a navy blue accent stripe, a row of white desks against the back wall with monitors showing colorful interface wireframes (blue, yellow and green blocks), a few small potted plants, a light wooden floor.
