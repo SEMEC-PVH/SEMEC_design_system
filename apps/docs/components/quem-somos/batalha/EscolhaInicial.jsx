@@ -23,7 +23,7 @@ export function CartaoLinguagem({ id, children }) {
 }
 
 // Escolha da linguagem inicial: subtítulo + os 3 cartões. Sem título próprio
-// (o modal da Vila ou a página da jornada põem o h2 acima).
+// (o modal da Vila põe o h2 acima).
 export default function EscolhaInicial({ onEscolher }) {
   return (
     <>

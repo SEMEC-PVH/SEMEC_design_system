@@ -67,7 +67,7 @@ function simular(inicial) {
         for (let turno = 0; turno < TETO_TURNOS && !estado.resultado; turno++) {
           estado = jogarTurno(estado, escolherAcao(estado), rng).estado;
         }
-        // O XP ganho (mesmo numa derrota) fica com o jogador, como na Jornada.
+        // O XP ganho (mesmo numa derrota) fica com o jogador, como na Vila.
         jogador = estado.jogador;
         if (estado.resultado === "vitoria") {
           porChefe[chefe.id].vitorias += 1;

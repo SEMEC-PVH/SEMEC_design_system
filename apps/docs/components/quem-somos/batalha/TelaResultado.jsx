@@ -3,9 +3,9 @@
 import { CHEFES } from "./dados";
 import s from "./batalha.module.css";
 
-// Telas de fim de batalha, usadas pela rota de protótipo (Jornada) e pelo
-// modal da Vila (BatalhaOverlay). Não têm título próprio: quem as mostra põe
-// o título (h2 focável) acima, com tituloResultado() / TITULO_FULL_STACK.
+// Telas de fim de batalha, usadas pelo modal da Vila (BatalhaOverlay). Não
+// têm título próprio: quem as mostra põe o título (h2 focável) acima,
+// com tituloResultado() / TITULO_FULL_STACK.
 
 export const TITULO_FULL_STACK = "Você é FULL STACK!";
 

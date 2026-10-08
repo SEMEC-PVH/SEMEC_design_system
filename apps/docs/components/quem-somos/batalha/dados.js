@@ -1,4 +1,4 @@
-// Dados das batalhas da Vila SEMEC (protótipo).
+// Dados das batalhas da Vila SEMEC.
 //
 // Inspirado em RPGs de monstrinhos, mas com termos próprios: o jogador
 // escolhe uma LINGUAGEM inicial, enfrenta os GINÁSIOS (os prédios da vila) e

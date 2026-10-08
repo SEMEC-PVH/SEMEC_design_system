@@ -3,8 +3,8 @@
 //
 // As funções puras (normalizarProgresso, progressoInicial, chefeLiberado,
 // aplicarResultado) não dependem de React nem do DOM e são testadas com o
-// node:test. O hook useProgresso() junta tudo para a rota de protótipo e para
-// a Vila 3D; os componentes que o usam são client-only.
+// node:test. O hook useProgresso() junta tudo para a
+// Vila 3D; os componentes que o usam são client-only.
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CHEFES, INICIAIS, LINGUAGENS } from "./dados.js";
