@@ -172,6 +172,7 @@ export function ganharXp(lutador, quantidade, eventos) {
 
     if (especie.evolui && lutador.nivel >= especie.evolui.nivel) {
       const de = lutador.nome;
+      const deId = lutador.especieId;
       const nova = LINGUAGENS[especie.evolui.para];
       lutador.especieId = especie.evolui.para;
       lutador.nome = nova.nome;
@@ -180,7 +181,7 @@ export function ganharXp(lutador, quantidade, eventos) {
       Object.assign(lutador, calcularStats(nova, lutador.nivel));
       lutador.hp = Math.max(1, Math.round(lutador.maxHp * proporcao));
       lutador.golpes = golpesPara(nova, lutador.nivel);
-      eventos.push({ tipo: "evolucao", de, para: nova.nome, texto: `O quê?! ${de} evoluiu para ${nova.nome}!` });
+      eventos.push({ tipo: "evolucao", de, para: nova.nome, deId, paraId: especie.evolui.para, texto: `O quê?! ${de} evoluiu para ${nova.nome}!` });
     }
   }
 }

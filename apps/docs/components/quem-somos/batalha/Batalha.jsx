@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { GOLPES, ITENS, LINGUAGENS, MOTIVO_VANTAGEM, VANTAGEM, multiplicadorTipo } from "./dados";
 import { criarLutador, iniciarBatalha, jogarTurno, nomeTipo, xpParaProximo } from "./motor";
 import { Cenario, Sprite } from "./Sprite";
+import Evolucao from "./Evolucao";
 import s from "./batalha.module.css";
 
 // Quanto tempo cada evento fica na tela antes do próximo (ms).
@@ -191,6 +192,8 @@ export default function Batalha({ jogador, chefe, onFim }) {
   // abriu, como nos jogos clássicos; depois de um turno, para "Golpes".
   const [focoPrincipal, setFocoPrincipal] = useState("golpes");
   const [anim, setAnim] = useState(null);
+  // Evento de evolução em cena: a fila fica parada até a cena terminar.
+  const [evolucao, setEvolucao] = useState(null);
   const [golpeFoco, setGolpeFoco] = useState(null);
   // Anúncio extra só para leitor de tela (o dano é mostrado só pela barra).
   const [aviso, setAviso] = useState("");
@@ -233,6 +236,14 @@ export default function Batalha({ jogador, chefe, onFim }) {
     const [ev, ...resto] = fila;
     const t = setTimeout(
       () => {
+        if (ev.tipo === "evolucao") {
+          // A cena (Evolucao.jsx) troca o sprite no clarão e devolve a fila
+          // no fim; aqui só começa, sem consumir o evento.
+          setAnim(null);
+          setMensagem(`O quê? ${ev.de} está evoluindo!`);
+          setEvolucao(ev);
+          return;
+        }
         if (ev.texto) setMensagem(ev.texto);
         if (ev.tipo === "dano") {
           setAnim({ lado: ev.lado, tipo: "hit" });
@@ -249,9 +260,6 @@ export default function Batalha({ jogador, chefe, onFim }) {
           setVis((v) => ({ ...v, jogador: { ...v.jogador, xp: v.jogador.xp + ev.valor } }));
         } else if (ev.tipo === "nivel") {
           setVis((v) => aplicarNivel(v, ev.nivel));
-        } else if (ev.tipo === "evolucao") {
-          setAnim({ lado: "jogador", tipo: "evolucao" });
-          setVis(aplicarEvolucao);
         }
         setFila(resto);
       },
@@ -317,6 +325,20 @@ export default function Batalha({ jogador, chefe, onFim }) {
         <Posto lutador={j} lado="jogador" anim={anim} />
         <Painel lutador={op} hp={opHp} rotulo="Adversário" lado="oponente" />
         <Painel lutador={j} hp={vis.jHp} mostrarXp rotulo="Sua linguagem" lado="jogador" />
+        {evolucao && (
+          <Evolucao
+            deId={evolucao.deId}
+            paraId={evolucao.paraId}
+            onRevelar={() => {
+              setVis(aplicarEvolucao);
+              setMensagem(`Parabéns! Seu ${evolucao.de} evoluiu para ${evolucao.para}!`);
+            }}
+            onFim={() => {
+              setEvolucao(null);
+              setFila((f) => f.slice(1));
+            }}
+          />
+        )}
       </div>
 
       <div className={s.faixa}>

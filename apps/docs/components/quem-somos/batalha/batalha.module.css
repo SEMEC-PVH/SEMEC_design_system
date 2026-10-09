@@ -435,9 +435,6 @@
   .anim_desmaio {
     animation: cair 600ms ease-in forwards;
   }
-  .anim_evolucao {
-    animation: evoluir 900ms ease-in-out 2;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .barraFill,
@@ -494,12 +491,6 @@
   to {
     transform: translateY(40px) scale(0.85);
     opacity: 0;
-  }
-}
-@keyframes evoluir {
-  50% {
-    transform: scale(1.12);
-    filter: brightness(2.2);
   }
 }
 
@@ -1190,5 +1181,180 @@
 @keyframes sumir {
   to {
     opacity: 0;
+  }
+}
+
+/* ---- Evolução (Evolucao.jsx) ------------------------------------------------- */
+/* Cobre a arena: fundo noturno, raios girando, a linguagem no centro. Fases
+   em data-fase: intro → brilho (vira silhueta branca) → troca (as silhuetas
+   se alternam, data-ativa) → flash (clarão branco) → revelado (cor e
+   explosão de faíscas). */
+.evolucao {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 55%, var(--pv-blue-800) 0, var(--pv-blue-950) 70%);
+  animation: aparecer 400ms ease-out both;
+}
+.evoRaios {
+  position: absolute;
+  inset: -50%;
+  opacity: 0;
+  background: repeating-conic-gradient(
+    from 0deg,
+    color-mix(in srgb, var(--pv-white) 12%, transparent) 0 7deg,
+    transparent 7deg 22deg
+  );
+  transition: opacity 700ms ease-out;
+}
+.evolucao:not([data-fase="intro"]) .evoRaios {
+  opacity: 1;
+}
+.evoPalco {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(56cqh, 40cqw);
+  aspect-ratio: 1;
+}
+.evoForma {
+  grid-area: 1 / 1;
+  transition:
+    transform 80ms ease-out,
+    opacity 80ms ease-out;
+}
+.evoForma[data-ativa="false"] {
+  opacity: 0;
+  transform: scale(0.5);
+}
+.evoSprite {
+  width: 100%;
+  height: 100%;
+  transition: filter 700ms ease-in-out;
+}
+.evoSprite .monograma {
+  width: 70%;
+  height: 70%;
+  border: 3px solid var(--pv-white);
+}
+.evoSprite .sigla {
+  font-size: min(12cqh, 9cqw);
+}
+/* Silhueta branca com halo dourado. */
+.evolucao:is([data-fase="brilho"], [data-fase="troca"], [data-fase="flash"]) .evoSprite {
+  filter: brightness(0) invert(1) drop-shadow(0 0 0.6rem var(--pv-yellow-400));
+}
+.evoFaiscas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+/* Estrelinha de 4 pontas; --a é o ângulo de cada uma, --d o atraso. */
+.evoFaiscas i {
+  grid-area: 1 / 1;
+  width: 1.4rem;
+  height: 1.4rem;
+  background: var(--pv-yellow-400);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  opacity: 0;
+}
+.evoFaiscas i:nth-child(even) {
+  background: var(--pv-white);
+}
+.evoFaiscas i:nth-child(1) { --a: 0deg; --d: 0ms; }
+.evoFaiscas i:nth-child(2) { --a: 30deg; --d: 420ms; }
+.evoFaiscas i:nth-child(3) { --a: 60deg; --d: 140ms; }
+.evoFaiscas i:nth-child(4) { --a: 90deg; --d: 560ms; }
+.evoFaiscas i:nth-child(5) { --a: 120deg; --d: 280ms; }
+.evoFaiscas i:nth-child(6) { --a: 150deg; --d: 700ms; }
+.evoFaiscas i:nth-child(7) { --a: 180deg; --d: 70ms; }
+.evoFaiscas i:nth-child(8) { --a: 210deg; --d: 490ms; }
+.evoFaiscas i:nth-child(9) { --a: 240deg; --d: 210ms; }
+.evoFaiscas i:nth-child(10) { --a: 270deg; --d: 630ms; }
+.evoFaiscas i:nth-child(11) { --a: 300deg; --d: 350ms; }
+.evoFaiscas i:nth-child(12) { --a: 330deg; --d: 770ms; }
+.evoClarao {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: var(--pv-white);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .evolucao:not([data-fase="intro"]) .evoRaios {
+    animation: evoGirar 9s linear infinite;
+  }
+  /* Faíscas sugadas para a linguagem enquanto ela brilha e troca... */
+  .evolucao:is([data-fase="brilho"], [data-fase="troca"]) .evoFaiscas i {
+    animation: evoConvergir 850ms ease-in var(--d) infinite;
+  }
+  /* ...e espalhadas de uma vez quando a nova forma aparece. */
+  .evolucao[data-fase="revelado"] .evoFaiscas i {
+    animation: evoExplodir 1100ms ease-out both;
+  }
+  .evolucao:is([data-fase="flash"], [data-fase="revelado"]) .evoClarao {
+    animation: evoClarao 1100ms ease-out both;
+  }
+  .evolucao[data-fase="revelado"] .evoPalco {
+    animation: evoPulo 700ms ease-out 450ms both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .evoForma,
+  .evoSprite {
+    transition: opacity 400ms linear;
+  }
+  .evoForma[data-ativa="false"] {
+    transform: none;
+  }
+}
+@keyframes evoGirar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes evoConvergir {
+  from {
+    transform: rotate(var(--a)) translateY(-46cqh) scale(1);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  to {
+    transform: rotate(var(--a)) translateY(0) scale(0.3);
+    opacity: 0;
+  }
+}
+@keyframes evoExplodir {
+  from {
+    transform: rotate(var(--a)) translateY(0) scale(0.4);
+    opacity: 1;
+  }
+  to {
+    transform: rotate(var(--a)) translateY(-52cqh) scale(1.3);
+    opacity: 0;
+  }
+}
+@keyframes evoClarao {
+  40%,
+  55% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes evoPulo {
+  40% {
+    transform: translateY(-6%) scale(1.06);
   }
 }
