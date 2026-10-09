@@ -134,6 +134,19 @@ export function createLighting({ renderer, scene, camera, pal, track, dayNight =
       samples: 16,
     });
     gtao.blendIntensity = 1;
+    // Sprites (balões de fala) ficam fora do AO: no passe de normais/profundidade
+    // eles viram um retângulo cheio e o AO escurece o quadro inteiro. O GTAOPass
+    // já esconde pontos e linhas nesse passe; aqui entram os sprites também.
+    const hideForAO = gtao._overrideVisibility.bind(gtao);
+    gtao._overrideVisibility = () => {
+      hideForAO();
+      scene.traverse((o) => {
+        if (o.isSprite && o.visible) {
+          o.visible = false;
+          gtao._visibilityCache.push(o);
+        }
+      });
+    };
     composer.addPass(gtao);
     composer.addPass(new OutputPass());
     composerSize.set(0, 0);

@@ -20,6 +20,11 @@ import { createLighting } from "./scene/lighting";
 import { buildFences, buildSigns, buildStreetProps, LAMP_SOUTH_OFFSET } from "./scene/props";
 import { createDayNight, formatClock } from "./scene/daynight";
 import { createNightLights } from "./scene/nightlights";
+import { createCutscene } from "./scene/cutscene";
+import { createPedro } from "./scene/pedro";
+import { createOcarinaHideout, createQuestMarker } from "./scene/quest";
+import { createEpocas } from "./scene/epocas";
+import { createWalkers, WALKER_IDS } from "./scene/walkers";
 import { buildVegetation } from "./scene/vegetation";
 import { buildGround } from "./scene/ground";
 import { areaOf } from "./areas";
@@ -58,6 +63,9 @@ const TURN_LOCK = 0.09;
 const IDLE_BEFORE_CODING = 2.2;
 // Distância da câmera no modo vitrine (tela de título).
 const ATTRACT_ZOOM = 1.75;
+// Zoom do jogador (roda do mouse, + e -): multiplica a distância da câmera.
+const ZOOM_MIN = 0.55;
+const ZOOM_MAX = 1.6;
 
 const BUILDINGS = [
   { id: "semec", kind: "semec", x: 3, y: 3, w: 6, h: 4, label: "SEMEC" },
@@ -105,10 +113,21 @@ const PROPS = [
 
 // Diretoria na porta da SEMEC; estagiários na frente do prédio da sua área
 // (pelo cargo). Quem não casar com nenhuma área usa um ponto genérico.
+// O Pedro (3D, quest da ocarina) fica à esquerda da porta, em QUEST_SPOT.
 const DIRECTOR_SPOTS = [
-  { x: 5, y: 7, dir: "down" },
   { x: 7, y: 7, dir: "down" },
   { x: 10, y: 6, dir: "down" },
+  { x: 4, y: 7, dir: "down" },
+];
+const QUEST_SPOT = { x: 5, y: 7, dir: "down" };
+// Onde a ocarina do Pedro caiu: mato alto do parque a sudeste, longe da SEMEC.
+const OCARINA_SPOT = { x: 25, y: 19 };
+// Distância (em tiles) em que o painel da quest aparece ao chegar perto do Pedro.
+const QUEST_NEAR = 3;
+// Cena da ocarina, futuro "festa": onde o time se junta, em volta da estátua
+// do Design System (scene/epocas.js, tile 7,10).
+const FESTA_SPOTS = [
+  [6, 9], [8, 9], [6, 11], [8, 11], [4, 10], [9, 10], [3, 9], [9, 9],
 ];
 const AREA_SPOTS = {
   frontend: [
@@ -154,7 +173,9 @@ function buildMap() {
 
   // Mato alto, flores e árvores soltas.
   rect(16, 2, 17, 2, TALL);
-  rect(17, 17, 20, 20, TALL);
+  // Praça do Front-End (x 17–20, y 17–20): grama baixa para o Rafa e o waffle
+  // passearem sem o capim esconder os dois (scene/walkers.js).
+  for (const [x, y] of [[18, 18], [19, 19]]) g[y][x] = FLOWER;
   rect(2, 10, 4, 13, TALL);
   for (const [x, y] of [[16, 3], [17, 3], [16, 4], [12, 18], [13, 19], [8, 10], [9, 11], [25, 9], [26, 9], [3, 20], [4, 20]]) g[y][x] = FLOWER;
   for (const [x, y] of [[11, 10], [12, 12], [25, 8], [27, 19], [2, 18], [2, 19], [27, 10], [8, 2], [9, 2], [16, 8]]) g[y][x] = TREE;
@@ -501,8 +522,20 @@ export function createVila(host, options) {
     modelUrl,
     onInteract = () => {},
     onFacing = () => {},
+    // Ficha de um personagem 3D ou mascote ({ id }): clique nele ou conversa de
+    // frente pelo teclado. id: "pedro" | "leo" | "tiago" | "rafa" (pessoas) ou
+    // "samurai" | "coelho" | "waffle" (mascotes); "ocarina" fica a cargo da UI.
+    onInspect = () => {},
     onReady = () => {},
     onClock = () => {},
+    // Fala de uma cena ({ title, text }); a cena espera continueCutscene().
+    onCutsceneSay = () => {},
+    // Quest da ocarina: perto do Pedro (true/false) e ocarina encontrada.
+    onQuestNear = () => {},
+    onQuestFind = () => {},
+    // Efeito visual de uma cena, feito na interface: { efeito: "sepia", on }
+    // ou { efeito: "relogio", on, sentido }.
+    onCutsceneEfeito = () => {},
   } = options;
 
   const map = buildMap();
@@ -599,8 +632,10 @@ export function createVila(host, options) {
     semec: (group, b) => buildSemec(group, b, buildCtx),
   };
 
+  const buildingGroups = new Map(); // id → grupo (épocas da cena da ocarina)
   for (const b of BUILDINGS) {
     const group = new THREE.Group();
+    buildingGroups.set(b.id, group);
     group.position.set(b.x + b.w / 2 - W / 2, 0, b.y + b.h / 2 - H / 2);
     const { labelPos, labelBg } = BUILDERS[b.kind](group, b);
     if (b.label) {
@@ -636,9 +671,23 @@ export function createVila(host, options) {
     areaUsed[area] = i + 1;
     return AREA_SPOTS[area][i];
   };
+  // Líderes escolhem primeiro: ficam no ponto principal da área (porta).
+  const spotOf = new Map();
+  const byLeaderFirst = members.map((m, i) => i).sort((a, b) => leaders.has(b) - leaders.has(a));
+  for (const index of byLeaderFirst) {
+    const member = members[index];
+    if (member.group === "directors") continue;
+    spotOf.set(index, takeSpot(areaOf(member.role)) || takeSpot("generic"));
+  }
+  // Líderes com boneco 3D (scene/walkers.js): o chibi vira âncora invisível
+  // (tile, balão de líder, conversa e cenas) e o 3D fica no lugar dele.
+  const anchors = new Map(); // id do boneco 3D → fig do líder
+  // Quem dá quest (o Pedro) não vira chibi: é o NPC 3D de scene/pedro.js.
+  const questIndex = members.findIndex((m) => m.quest);
   members.forEach((member, index) => {
+    if (member.quest) return;
     const isDirector = member.group === "directors";
-    const spot = isDirector ? DIRECTOR_SPOTS[di++] : takeSpot(areaOf(member.role)) || takeSpot("generic");
+    const spot = isDirector ? DIRECTOR_SPOTS[di++] : spotOf.get(index);
     if (!spot) return;
     if (!isDirector) ii++;
     const shirts = isDirector ? pal.shirtsDirectors : pal.shirtsInterns;
@@ -647,14 +696,23 @@ export function createVila(host, options) {
     fig.position.copy(tileToWorld(spot.x, spot.y));
     fig.rotation.y = DIRS[spot.dir].rot;
     const leader = leaders.has(index);
+    const boneco = leader && modelUrl && WALKER_IDS.has(member.retrato) ? member.retrato : null;
+    if (boneco) {
+      fig.traverse((o) => {
+        if (o.isMesh) o.visible = false; // continua no raycast do clique
+      });
+      anchors.set(boneco, fig);
+    }
     const marker = makeMarker({ leader });
-    marker.position.y = MARKER_Y;
+    // O 3D é mais baixo que o chibi: balão um pouco mais perto da cabeça.
+    const markerY = boneco ? MARKER_Y - 0.12 : MARKER_Y;
+    marker.position.y = markerY;
     // Balão sempre de frente para a câmera, qualquer que seja a direção do NPC.
     marker.rotation.set(MARKER_TILT, -fig.rotation.y, 0);
     fig.add(marker);
     fig.traverse((o) => (o.userData.npcIndex = npcs.length));
     scene.add(fig);
-    const npc = { index, member, x: spot.x, y: spot.y, dir: spot.dir, fig, marker, talked: false, leader, beaten: false, phase: rand() * 6 };
+    const npc = { index, member, x: spot.x, y: spot.y, dir: spot.dir, fig, marker, markerY, boneco, talked: false, leader, beaten: false, phase: rand() * 6 };
     npcs.push(npc);
     occupied.set(`${spot.x},${spot.y}`, npc);
   });
@@ -716,6 +774,56 @@ export function createVila(host, options) {
 
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
+
+  // Pedro: NPC 3D parado na frente da SEMEC com a quest da ocarina
+  // (scene/pedro.js); a ocarina fica escondida no mato (scene/quest.js).
+  let questEtapa = "nova";
+  let questNear = false;
+  const questMarker = createQuestMarker({ pal, track, reducedMotion });
+  const pedro =
+    modelUrl && questIndex >= 0
+      ? createPedro({
+          scene,
+          loader,
+          url: modelUrl.replace(/gava\.glb$/, "pedro.glb"),
+          tileToWorld,
+          spot: { ...QUEST_SPOT, rot: DIRS[QUEST_SPOT.dir].rot },
+          index: questIndex,
+          marker: questMarker.object,
+          occupied,
+          shadowColor: pal.black,
+          reducedMotion,
+          isPaused: () => paused || cutscene.active,
+        })
+      : null;
+  const ocarina = pedro
+    ? createOcarinaHideout({
+        scene,
+        loader,
+        url: modelUrl.replace(/gava\.glb$/, "ocarina.glb"),
+        pos: tileToWorld(OCARINA_SPOT.x, OCARINA_SPOT.y),
+        pal,
+        track,
+        reducedMotion,
+      })
+    : null;
+  // Duplas dono + mascote passeando (Leo + samurai, Tiago + coelho): scene/walkers.js.
+  const walkers = modelUrl
+    ? createWalkers({
+        scene,
+        loader,
+        baseUrl: modelUrl.replace(/gava\.glb$/, ""),
+        tileToWorld,
+        isFree: (x, y) => passable(x, y) && !(player.x === x && player.y === y),
+        occupied,
+        shadowColor: pal.black,
+        slashColor: pal.white,
+        bubble: { bg: pal.white, fg: pal.eye, font: pal.font },
+        anchors,
+        reducedMotion,
+        isPaused: () => paused || cutscene.active,
+      })
+    : [];
   if (modelUrl) {
     loader
       .loadAsync(modelUrl)
@@ -849,7 +957,7 @@ export function createVila(host, options) {
 
   function targetAt(x, y) {
     const npc = occupied.get(`${x},${y}`);
-    if (npc) return { type: "npc", npc };
+    if (npc) return { type: npc.isWalker ? "pedro" : "npc", npc };
     const sign = SIGNS.find((sg) => sg.x === x && sg.y === y);
     if (sign) return { type: "sign", sign };
     return null;
@@ -859,12 +967,18 @@ export function createVila(host, options) {
   function reportFacing() {
     const f = frontOf();
     const t = targetAt(f.x, f.y);
-    const key = t ? (t.type === "npc" ? `npc:${t.npc.index}` : `sign:${t.sign.id}`) : "";
+    // Personagem 3D ou mascote (Pedro, duplas): Espaço abre a ficha dele.
+    const inspectId = t?.type === "pedro" ? (t.npc.inspectId ?? t.npc.id ?? null) : null;
+    let key = "";
+    if (inspectId) key = `inspect:${inspectId}`;
+    else if (t?.type === "npc") key = `npc:${t.npc.index}`;
+    else if (t?.type === "sign") key = `sign:${t.sign.id}`;
     if (key === lastFacingKey) return;
     lastFacingKey = key;
-    if (!t) onFacing(null);
-    else if (t.type === "npc") onFacing({ type: "npc", index: t.npc.index });
-    else onFacing({ type: "sign", id: t.sign.id });
+    if (inspectId) onFacing({ type: "inspect", id: inspectId });
+    else if (t?.type === "npc") onFacing({ type: "npc", index: t.npc.index });
+    else if (t?.type === "sign") onFacing({ type: "sign", id: t.sign.id });
+    else onFacing(null);
   }
 
   function face(dir) {
@@ -898,14 +1012,43 @@ export function createVila(host, options) {
     npc.marker.material.emissive.copy(color);
   }
 
+  // Ocarina: achada ao pisar no tile (ou de frente para ele, com Espaço).
+  function tryFindOcarina(x, y) {
+    if (questEtapa !== "procurando" || x !== OCARINA_SPOT.x || y !== OCARINA_SPOT.y) return false;
+    questEtapa = "achou";
+    ocarina?.pop(player.root.position);
+    ocarina?.setEtapa("achou");
+    questMarker.setEtapa("achou");
+    onQuestFind();
+    return true;
+  }
+
   function interact() {
     const f = frontOf();
     const t = targetAt(f.x, f.y);
-    if (!t) return;
+    if (!t) {
+      tryFindOcarina(f.x, f.y);
+      return;
+    }
+    if (t.type === "pedro") {
+      t.npc.talk(DIRS[OPPOSITE[player.dir]].rot);
+      // Ficha de quem está no tile: marca do dono/mascote (companion.js
+      // `inspectId`) ou o próprio Pedro (`id`).
+      const id = t.npc.inspectId ?? t.npc.id ?? t.npc.group?.id;
+      if (id) onInspect({ id });
+      return;
+    }
+    if (t.type === "npc" && t.npc.isQuestNpc) {
+      t.npc.talk(DIRS[OPPOSITE[player.dir]].rot);
+      onInteract({ type: "npc", index: t.npc.index });
+      return;
+    }
     if (t.type === "npc") {
       const npc = t.npc;
       npc.dir = OPPOSITE[player.dir];
       npc.fig.rotation.y = DIRS[npc.dir].rot;
+      // Chefe 3D: o mascote se exibe para o jogador.
+      if (npc.boneco) walkers.find((w) => w.id === npc.boneco)?.cheer();
       if (!npc.talked) {
         npc.talked = true;
         // Líder só ganha o "✓" quando o ginásio é vencido (setLeadersDone).
@@ -949,6 +1092,161 @@ export function createVila(host, options) {
     return null;
   }
 
+  // ---- Cenas (scene/cutscene.js) ----------------------------------------------
+  // Atores por "player" ou índice em members.
+  const npcByIndex = new Map(npcs.map((n) => [n.index, n]));
+  const actors = {
+    get(who) {
+      if (who === "player") {
+        return {
+          get x() {
+            return player.x;
+          },
+          get y() {
+            return player.y;
+          },
+          object: player.root,
+          face,
+          moveTo(x, y, snap = true) {
+            player.x = x;
+            player.y = y;
+            if (snap) player.root.position.copy(tileToWorld(x, y));
+          },
+        };
+      }
+      // O Pedro (3D, quest) é ator de câmera: posição e objeto; ele mesmo
+      // cuida de para onde olha (scene/pedro.js).
+      if (pedro && who === pedro.index) {
+        return { x: pedro.x, y: pedro.y, object: pedro.root, face() {}, moveTo() {} };
+      }
+      const n = npcByIndex.get(who);
+      if (!n) return null;
+      return {
+        get x() {
+          return n.x;
+        },
+        get y() {
+          return n.y;
+        },
+        object: n.fig,
+        face(dir) {
+          n.dir = dir;
+          n.fig.rotation.y = DIRS[dir].rot;
+        },
+        moveTo(x, y, snap = true) {
+          occupied.delete(`${n.x},${n.y}`);
+          n.x = x;
+          n.y = y;
+          occupied.set(`${x},${y}`, n);
+          if (snap) n.fig.position.copy(tileToWorld(x, y));
+        },
+      };
+    },
+  };
+  // ---- Mundo nas cenas (passo { mundo } de scene/cutscene.js) -----------------
+  // Épocas da cena da ocarina (scene/epocas.js), tempo acelerado, time reunido
+  // na praça e efeitos de tela. instant = pular a cena (ou o passo): aplica o
+  // estado final sem animar. Devolve quantos segundos o passo deve esperar.
+  const epocas = createEpocas({
+    scene,
+    pal,
+    track,
+    tileToWorld,
+    buildings: buildingGroups,
+    makeLabel: (text, bg, fg) => makeLabelTexture(text, bg, fg, pal.font),
+    reducedMotion,
+  });
+  let tempoAnim = null; // { from, to, t, dur, cmd }
+  let tempoAplicado = 0; // horas somadas pela cena (o "voltar" desfaz)
+  const reuniao = new Map(); // npc → { x, y, dir } de antes da festa
+  function reunir(on) {
+    if (on && !reuniao.size) {
+      for (const n of npcs.slice(0, FESTA_SPOTS.length)) {
+        reuniao.set(n, { x: n.x, y: n.y, dir: n.dir });
+        occupied.delete(`${n.x},${n.y}`);
+      }
+      [...reuniao.keys()].forEach((n, i) => {
+        const [x, y] = FESTA_SPOTS[i];
+        n.x = x;
+        n.y = y;
+        n.dir = "down";
+        occupied.set(`${x},${y}`, n);
+        n.fig.position.copy(tileToWorld(x, y));
+        n.fig.rotation.y = DIRS.down.rot;
+      });
+    } else if (!on && reuniao.size) {
+      for (const n of reuniao.keys()) occupied.delete(`${n.x},${n.y}`);
+      for (const [n, o] of reuniao) {
+        n.x = o.x;
+        n.y = o.y;
+        n.dir = o.dir;
+        occupied.set(`${o.x},${o.y}`, n);
+        n.fig.position.copy(tileToWorld(o.x, o.y));
+        n.fig.rotation.y = DIRS[o.dir].rot;
+      }
+      reuniao.clear();
+    }
+  }
+  function mundo(cmd, instant) {
+    const rapido = instant || reducedMotion;
+    if (cmd.tocar !== undefined) {
+      pedro?.tocar(cmd.tocar);
+      return 0;
+    }
+    // Época: a construção (ou a volta) roda em `dur` segundos SEM segurar a
+    // cena, para acontecer junto com o relógio do passo seguinte.
+    if (cmd.epoca !== undefined) {
+      epocas.set(cmd.epoca, { dur: rapido ? 0 : (cmd.dur ?? 0) });
+      return 0;
+    }
+    if (cmd.reunir !== undefined) {
+      reunir(cmd.reunir);
+      return 0;
+    }
+    if (cmd.efeito !== undefined) {
+      onCutsceneEfeito(cmd);
+      return 0;
+    }
+    if (cmd.tempo !== undefined) {
+      // O passo em andamento terminando de uma vez (pular): só fecha a animação.
+      if (tempoAnim) {
+        dayNight.setHours(tempoAnim.to);
+        const mesmo = tempoAnim.cmd === cmd;
+        tempoAnim = null;
+        if (mesmo) return 0;
+      }
+      const h0 = dayNight.state.hours;
+      let delta;
+      if (cmd.tempo === "voltar") delta = -tempoAplicado;
+      else {
+        // Avança (1) ou volta (-1) `dias` dias inteiros e para na hora `ate`.
+        const dias = cmd.dias ?? 2;
+        delta =
+          cmd.tempo > 0 ? dias * 24 + ((((cmd.ate - h0) % 24) + 24) % 24) : -(dias * 24 + ((((h0 - cmd.ate) % 24) + 24) % 24));
+      }
+      tempoAplicado = cmd.tempo === "voltar" ? 0 : tempoAplicado + delta;
+      if (rapido) {
+        dayNight.setHours(h0 + delta);
+        return 0;
+      }
+      tempoAnim = { from: h0, to: h0 + delta, t: 0, dur: cmd.dur ?? 3, cmd };
+      return tempoAnim.dur;
+    }
+    return 0;
+  }
+
+  const cutscene = createCutscene({
+    mundo,
+    scene,
+    track,
+    pal,
+    tileToWorld,
+    DIRS,
+    reducedMotion,
+    actors,
+    onSay: (fala) => onCutsceneSay(fala),
+  });
+
   // ---- Entrada ------------------------------------------------------------------
   const held = []; // direções seguradas, a última tem prioridade
   let paused = false;
@@ -980,11 +1278,22 @@ export function createVila(host, options) {
       player.run = on;
     },
     interact() {
-      if (!paused && !player.move) interact();
+      if (!paused && !player.move && !cutscene.active) interact();
     },
     setPaused(p) {
       paused = p;
       if (p) held.length = 0;
+    },
+    // Etapa da quest da ocarina (quest.js): símbolo, esconderijo e o Pedro.
+    // celebrar: acabou de devolver (o Pedro dança na hora).
+    setQuest(etapa, { celebrar = false } = {}) {
+      questEtapa = etapa;
+      questMarker.setEtapa(etapa);
+      ocarina?.setEtapa(etapa);
+      if (etapa === "concluida") {
+        if (celebrar) pedro?.celebrate();
+        else pedro?.setHasOcarina(true);
+      } else pedro?.setHasOcarina(false);
     },
     // Líderes já vencidos (Set/array de índices em members): estrela → "✓".
     setLeadersDone(indices) {
@@ -995,6 +1304,25 @@ export function createVila(host, options) {
         paintMarker(n, n.beaten ? pal.markerDone : pal.markerLeader);
       }
     },
+    // Aproxima (fator < 1) ou afasta (fator > 1) a câmera do personagem.
+    zoomBy(fator) {
+      userZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, userZoom * fator));
+    },
+    // Cena: devolve uma Promise que resolve quando ela termina (ou é pulada).
+    playCutscene(steps) {
+      held.length = 0;
+      player.path = [];
+      player.pending = null;
+      player.idle = 0;
+      if (coding) stopCoding();
+      return cutscene.play(steps).then(reportFacing);
+    },
+    continueCutscene() {
+      cutscene.continuar();
+    },
+    skipCutscene() {
+      cutscene.pular();
+    },
     // Modo vitrine (tela de título): câmera afastada sobrevoando a vila.
     setAttract(on) {
       attract = on;
@@ -1003,16 +1331,28 @@ export function createVila(host, options) {
   };
 
   // ---- Mouse / toque: clique no chão para andar, em alguém para conversar ----
+  // Personagens 3D e mascotes (Pedro, duplas) abrem a ficha: onInspect({ id }).
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const npcFigs = npcs.map((n) => n.fig);
+  // Malhas invisíveis dos personagens 3D e mascotes (userData.inspectId).
+  const inspectProxies = () => [pedro, ...walkers].flatMap((c) => c?.hitProxies ?? []);
 
+  // { inspect: id } quando o ponteiro está sobre um personagem 3D ou mascote
+  // (abre a ficha); { x, y, npc? } para um tile ou boneco chibi.
   function pick(ev) {
     const r = renderer.domElement.getBoundingClientRect();
     pointer.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
     raycaster.setFromCamera(pointer, camera);
     const hit = raycaster.intersectObjects(npcFigs, true)[0];
+    const proxyHit = raycaster.intersectObjects(inspectProxies(), true)[0];
+    // Proxy na frente (ou sem boneco chibi na linha): ficha do personagem.
+    if (proxyHit && (!hit || proxyHit.distance <= hit.distance)) {
+      // O Pedro conversa (quest) em vez de abrir a ficha: vira alvo de tile.
+      if (pedro && proxyHit.object.userData.inspectId === pedro.id) return { x: pedro.x, y: pedro.y };
+      return { inspect: proxyHit.object.userData.inspectId };
+    }
     if (hit) {
       const npc = npcs[hit.object.userData.npcIndex];
       return { x: npc.x, y: npc.y, npc };
@@ -1027,6 +1367,11 @@ export function createVila(host, options) {
   function onPointerMove(ev) {
     if (ev.pointerType !== "mouse") return;
     const t = pick(ev);
+    if (t?.inspect) {
+      renderer.domElement.classList.add("is-pointer");
+      hover.visible = false;
+      return;
+    }
     const target = t && targetAt(t.x, t.y);
     renderer.domElement.classList.toggle("is-pointer", Boolean(target));
     if (t && passable(t.x, t.y)) {
@@ -1040,9 +1385,14 @@ export function createVila(host, options) {
   }
 
   function onClick(ev) {
-    if (paused) return;
+    if (paused || cutscene.active) return;
     const t = pick(ev);
     if (!t) return;
+    // Personagem 3D ou mascote: abre a ficha sem andar até ele.
+    if (t.inspect) {
+      onInspect({ id: t.inspect });
+      return;
+    }
     const target = targetAt(t.x, t.y);
     const path = findPath(t.x, t.y);
     if (!path) return;
@@ -1085,6 +1435,7 @@ export function createVila(host, options) {
   let attract = false;
   let attractT = 0;
   let zoom = 1;
+  let userZoom = 1;
   const attractGoal = new THREE.Vector3();
   camTarget.copy(player.root.position);
 
@@ -1107,6 +1458,7 @@ export function createVila(host, options) {
       }
       if (m.t >= 1) {
         player.move = null;
+        tryFindOcarina(player.x, player.y);
         if (player.body) {
           player.body.position.y = 0;
           player.body.rotation.z = 0;
@@ -1114,7 +1466,7 @@ export function createVila(host, options) {
         reportFacing();
       }
     }
-    if (!player.move && !paused) {
+    if (!player.move && !paused && !cutscene.active) {
       const want = held[held.length - 1];
       if (want && player.turnLock <= 0) tryStep(want);
       else if (!want && player.path.length) {
@@ -1134,12 +1486,27 @@ export function createVila(host, options) {
     }
     if (!player.move && !held.length && !player.path.length) {
       player.idle += dt;
-      if (!coding && player.idle > IDLE_BEFORE_CODING) startCoding();
+      if (!coding && !cutscene.active && player.idle > IDLE_BEFORE_CODING) startCoding();
     }
     if (player.move && !walking) startWalk();
     else if (!player.move && walking) stopWalk();
     if (walking && actions?.andando) actions.andando.timeScale = walkTimeScale();
     if (mixer) mixer.update(dt);
+    pedro?.update(dt);
+    questMarker.update(t, dt);
+    ocarina?.update(t, dt);
+    // Perto do Pedro: o painel da quest aparece no canto da tela.
+    if (pedro) {
+      const near = Math.max(Math.abs(player.x - pedro.x), Math.abs(player.y - pedro.y)) <= QUEST_NEAR;
+      if (near !== questNear) {
+        questNear = near;
+        onQuestNear(near);
+      }
+    }
+    for (const w of walkers) w.update(dt);
+    // Pedro e as duplas andam sozinhos: a dica "Espaço: …" acompanha quem
+    // entra ou sai da frente do jogador (barato: uma consulta na grade).
+    if (!player.move) reportFacing();
     if (coding && laptopPose) {
       for (const p of laptopPose) {
         p.o.scale.copy(p.s);
@@ -1151,6 +1518,20 @@ export function createVila(host, options) {
 
     // Ciclo dia/noite: luz (em lighting.update), postes/janelas e relógio do HUD.
     dayNight.update(dt);
+    // Cena da ocarina: o relógio corre (para frente ou para trás), acelerando
+    // no começo e freando no fim.
+    if (tempoAnim) {
+      tempoAnim.t += dt;
+      const k = Math.min(tempoAnim.t / tempoAnim.dur, 1);
+      const e = k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
+      dayNight.setHours(tempoAnim.from + (tempoAnim.to - tempoAnim.from) * e);
+      if (k >= 1) tempoAnim = null;
+    }
+    epocas.update(t, dt);
+    // Festa: o time pula de alegria em volta da estátua.
+    if (reuniao.size && !reducedMotion) {
+      for (const n of reuniao.keys()) n.fig.position.y = Math.abs(Math.sin(t * 5 + n.phase)) * 0.12;
+    }
     nightLights.update(dayNight.state.night, t);
     const clock = formatClock(dayNight.state.hours);
     if (clock !== lastClock) {
@@ -1171,7 +1552,7 @@ export function createVila(host, options) {
         const b = n.fig.userData.body;
         b.scale.y = 1 + Math.sin(t * 2.2 + n.phase) * 0.015;
         n.fig.userData.head.rotation.z = Math.sin(t * 0.9 + n.phase) * 0.05;
-        n.marker.position.y = MARKER_Y + Math.sin(t * 2.4 + n.phase) * 0.045;
+        n.marker.position.y = n.markerY + Math.sin(t * 2.4 + n.phase) * 0.045;
         n.marker.rotation.y = -n.fig.rotation.y + Math.sin(t * 1.3 + n.phase) * 0.12;
       }
 
@@ -1182,9 +1563,18 @@ export function createVila(host, options) {
     // Mato alto balançando e brisa na vegetação.
     veg.update(t, dt);
 
-    // Câmera segue o jogador; no modo vitrine, afasta e passeia pelo mapa.
-    zoom += ((attract ? ATTRACT_ZOOM : 1) - zoom) * (reducedMotion ? 1 : 1 - Math.exp(-dt * 2.2));
-    if (attract) {
+    // Câmera segue o jogador; no modo vitrine, afasta e passeia pelo mapa;
+    // numa cena, vai até o alvo da cena (com reduced motion, corta direto).
+    cutscene.update(dt);
+    const cutCam = cutscene.camera();
+    // Numa cena, o zoom é o da cena; fora dela, o que o jogador escolheu.
+    const zoomGoal = attract ? ATTRACT_ZOOM : cutCam ? cutCam.zoom : userZoom;
+    // O zoom do jogador responde rápido; o da vitrine e o das cenas, devagar.
+    const zoomRate = attract || cutCam ? 2.2 : 9;
+    zoom += (zoomGoal - zoom) * (reducedMotion ? 1 : 1 - Math.exp(-dt * zoomRate));
+    if (cutCam) {
+      camTarget.lerp(cutCam.target, reducedMotion ? 1 : 1 - Math.exp(-dt * 2.6));
+    } else if (attract) {
       if (!reducedMotion) attractT += dt;
       attractGoal.set(Math.sin(attractT * 0.07) * 6, 0, Math.cos(attractT * 0.05) * 3 - 1);
       camTarget.lerp(attractGoal, reducedMotion ? 1 : 1 - Math.exp(-dt * 1.2));
@@ -1201,11 +1591,15 @@ export function createVila(host, options) {
   }
 
   renderer.setAnimationLoop(tick);
+  window.__vilaDbg = { player, occupied, passable, pedro, walkers, map, epocas, get paused() { return paused; }, get cut() { return cutscene.active; } }; // TEMP-HOOK
   reportFacing();
   onReady();
 
   function dispose() {
     disposed = true;
+    pedro?.dispose();
+    ocarina?.dispose();
+    for (const w of walkers) w.dispose();
     renderer.setAnimationLoop(null);
     ro.disconnect();
     io.disconnect();

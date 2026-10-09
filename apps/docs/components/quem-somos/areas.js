@@ -17,12 +17,21 @@ export const areaOf = (role = "") => AREA_BY_ROLE.find(([re]) => re.test(role))?
 // Ginásio (id do chefe em batalha/dados.js) de cada área.
 export const CHEFE_POR_AREA = { frontend: "frontend", backend: "backend", database: "database" };
 
-// Map<índice em members, id do chefe>: o PRIMEIRO estagiário de cada área
-// lidera o ginásio dela; todos os diretores representam a Diretoria.
+// Map<índice em members, id do chefe>: quem tem `chefe` explícito lidera
+// aquele ginásio; nos demais, o PRIMEIRO estagiário de cada área lidera o
+// ginásio dela. Todos os diretores representam a Diretoria. Quem tem `quest`
+// (o Pedro, da ocarina) é avulso: não lidera nada.
 export function mapaDeLideres(members = []) {
   const lideres = new Map();
   const areasComLider = new Set();
   members.forEach((m, i) => {
+    if (m.group === "interns" && m.chefe && !areasComLider.has(m.chefe)) {
+      areasComLider.add(m.chefe);
+      lideres.set(i, m.chefe);
+    }
+  });
+  members.forEach((m, i) => {
+    if (lideres.has(i) || m.quest) return;
     if (m.group === "directors") {
       lideres.set(i, "diretoria");
       return;
