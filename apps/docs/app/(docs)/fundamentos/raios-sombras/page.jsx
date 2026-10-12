@@ -1,4 +1,5 @@
 import Shape from "@/components/ui/Shape";
+import Note from "@/components/ui/Note";
 
 export const metadata = { title: "Raios, bordas e sombras" };
 
@@ -39,12 +40,12 @@ export default function RaiosSombrasPage() {
           />
         </div>
       </div>
-      <p className="note">
+      <Note>
         Cards (ServiceCard) usam a família de sombra neutra da Uber{" "}
         <code>rgba(0,0,0,…)</code> (whisper-soft). Demais superfícies
         continuam na família <code>rgba(15,35,56,…)</code> (azul institucional
         escuro).
-      </p>
+      </Note>
     </>
   );
 }

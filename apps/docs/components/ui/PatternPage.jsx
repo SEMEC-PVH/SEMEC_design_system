@@ -14,6 +14,8 @@
  * - children: ReactNode (opcional) — <PatternDemo> com a demo do padrão
  * - note: string (opcional) — nota final em destaque
  */
+import Note from "./Note";
+
 export default function PatternPage({ title, subtitle, sections, children, note }) {
   return (
     <>
@@ -33,7 +35,8 @@ export default function PatternPage({ title, subtitle, sections, children, note 
 
       {children}
 
-      {note && <p className="note">{note}</p>}
+      {note && <Note>{note}</Note>}
     </>
   );
 }
+

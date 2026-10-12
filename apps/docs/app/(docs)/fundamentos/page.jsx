@@ -3,6 +3,7 @@ import Swatch from "@/components/ui/Swatch";
 import Shape from "@/components/ui/Shape";
 import DemoCard from "@/components/demos/DemoCard";
 import Card from "@/components/ui/Card";
+import Note from "@/components/ui/Note";
 
 export const metadata = { title: "Fundamentos" };
 
@@ -166,12 +167,12 @@ export default function FundamentosPage() {
           centralizado <code>mx-auto</code>. Grid de cards:{" "}
           <code>grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3</code>.
         </p>
-        <p className="note">
+        <Note>
           O limite de <code>1200px</code> vale para as páginas de serviço. O
           guia de documentação usa a coluna mais estreita de{" "}
           <code>48rem</code> — leitura confortável de manuais não pede o mesmo
           teto de um portal — e limita o texto corrido a <code>72ch</code>.
-        </p>
+        </Note>
         <div className="demo-cards">
           <DemoCard
             tag="IPTU"
@@ -229,12 +230,12 @@ export default function FundamentosPage() {
           />
         </div>
       </div>
-      <p className="note">
+      <Note>
         Cards (ServiceCard) usam a família de sombra neutra da Uber{" "}
         <code>rgba(0,0,0,…)</code> (whisper-soft). Demais superfícies
         continuam na família <code>rgba(15,35,56,…)</code> (azul institucional
         escuro).
-      </p>
+      </Note>
 
       {/* ------------------------------------------------------------------ */}
       {/* Animações                                                           */}
@@ -257,10 +258,10 @@ export default function FundamentosPage() {
           <div className="tile">Slide up</div>
         </div>
       </div>
-      <p className="note">
+      <Note>
         Respeite <code>prefers-reduced-motion</code>. Não crie animações novas
         sem usar o mesmo easing.
-      </p>
+      </Note>
     </>
   );
 }

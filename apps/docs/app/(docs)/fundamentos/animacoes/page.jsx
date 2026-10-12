@@ -1,3 +1,5 @@
+import Note from "@/components/ui/Note";
+
 export const metadata = { title: "Animações" };
 
 export default function AnimacoesPage() {
@@ -21,10 +23,10 @@ export default function AnimacoesPage() {
           <div className="tile">Slide up</div>
         </div>
       </div>
-      <p className="note">
+      <Note>
         Respeite <code>prefers-reduced-motion</code>. Não crie animações novas
         sem usar o mesmo easing.
-      </p>
+      </Note>
     </>
   );
 }

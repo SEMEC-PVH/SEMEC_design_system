@@ -55,14 +55,14 @@
     "**/*.css"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsup && tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/build-artifacts.mjs",
+    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsup && tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/build-artifacts.mjs",
     "build:react": "tsup",
     "build:types": "tsc --emitDeclarationOnly --rootDir src --outDir dist/react",
     "build:skills": "node scripts/build-artifacts.mjs",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build",
-    "clean": "rm -rf dist"
+    "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\""
   },
   "peerDependencies": {
     "react": "^19.0.0",
