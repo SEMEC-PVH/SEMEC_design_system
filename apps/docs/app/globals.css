@@ -918,10 +918,8 @@ h3[id] {
     white-space: normal;
   }
   .doc-nav a {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 45%;
+    max-width: 48%;
+    padding: 0.45rem 0.75rem;
   }
   .section-cards {
     gap: var(--space-4);
@@ -1036,13 +1034,33 @@ h1 {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
 }
 .doc-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 45%;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  font-size: var(--font-size-sm);
+  color: var(--fg);
+  text-decoration: none;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.doc-nav a:hover {
+  border-color: var(--pv-blue-400);
+  background: var(--tint);
+}
+.doc-nav a:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 h2 {
