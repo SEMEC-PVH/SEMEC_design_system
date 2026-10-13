@@ -1155,6 +1155,7 @@ export function createVila(host, options) {
     buildings: buildingGroups,
     makeLabel: (text, bg, fg) => makeLabelTexture(text, bg, fg, pal.font),
     reducedMotion,
+    dayNight,
   });
   let tempoAnim = null; // { from, to, t, dur, cmd }
   let tempoAplicado = 0; // horas somadas pela cena (o "voltar" desfaz)

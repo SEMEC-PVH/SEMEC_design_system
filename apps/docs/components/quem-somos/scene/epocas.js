@@ -3,7 +3,7 @@
 // (ver o cabeçalho de qualquer um deles):
 //
 //   "festa"   futuro: estátua do Design System e fogos (epocas/festa.js)
-//   "futuro"  futuro: Vila 2030 — neon, drones, carros voadores (epocas/futuro.js)
+//   "futuro"  futuro: Vila 2030 cyberpunk — neon, hologramas, drones (epocas/futuro/)
 //   "passado" antes da tecnologia: os prédios de tecnologia se desmontam e
 //             viram obras (epocas/passado.js); o tom sépia é CSS
 //   null      a Vila de hoje.

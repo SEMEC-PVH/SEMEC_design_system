@@ -91,7 +91,7 @@ const VIAGEM = {
   futuro: {
     cancao: "Esta é a Canção do Amanhã. Segura firme, que o tempo vai correr!",
     ate: 20.5,
-    obra: { cam: [14, 9], zoom: 1.75, dur: 1.6 },
+    obra: { cam: [22, 5], zoom: 1.75, dur: 1.6 },
     foco: [
       { cam: [10, 9], zoom: 1.55, dur: 1.8 },
       { wait: 1.5 },
@@ -103,7 +103,7 @@ const VIAGEM = {
   passado: {
     cancao: "Esta é a Canção do Ontem. Vamos ver como a Vila começou?",
     ate: 9,
-    obra: { cam: [19, 9], zoom: 1.55, dur: 1.6 },
+    obra: { cam: [19, 10], zoom: 1.55, dur: 1.6 },
     foco: [{ cam: [19, 10], zoom: 1.35, dur: 1.4 }],
     chegada:
       "Muito tempo atrás, só existia a sede da SEMEC. Front-End, Back-End e Banco de Dados ainda eram obra... e o Design System era só uma ideia.",
