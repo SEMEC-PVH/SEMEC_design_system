@@ -96,7 +96,7 @@ O template de PR (`.github/pull_request_template.md`) repete esta lista.
 
 Para rodar o mesmo localmente, na ordem: `npm run build:ds`, `npm run typecheck`, `npm run build`, `npm run lint`, `npm run changeset:check`, `npm run check:artifacts`.
 
-**Deriva dos artefatos.** `build:ds` e o `prebuild` do site regeneram `llms.txt`, `llms-full.txt`, `manifest.json`, `components/*.md` e `skills/` em `apps/docs/public` a partir de `packages/react/manifest.js`. A CI regenera tudo e falha se o resultado for diferente do commitado. As linhas de carimbo de data (`"generatedAt"` e `> Gerado <data>`) mudam a cada build e são ignoradas na comparação.
+**Deriva dos artefatos.** `build:ds` e o `prebuild` do site regeneram `llms.txt`, `llms-full.txt`, `manifest.json`, `components/*.md` e `skills/` em `apps/docs/public` a partir de `packages/react/manifest.js`. A CI regenera tudo e falha se o resultado for diferente do commitado. O carimbo de data (`"generatedAt"` e `> Gerado <data>`) é determinístico — `SOURCE_DATE_EPOCH`, se definido, senão a data do último commit em `packages/react` — então dois builds do mesmo commit geram arquivos idênticos. Mesmo assim essas duas linhas ficam fora da comparação: o commit que muda o pacote ganha data nova depois que os artefatos foram gerados, e a CI usa checkout raso.
 
 ### Changeset obrigatório
 

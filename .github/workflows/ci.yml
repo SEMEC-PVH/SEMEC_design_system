@@ -113,8 +113,10 @@ jobs:
           # build:ds e o prebuild do site regeneram llms.txt, llms-full.txt,
           # manifest.json, components/*.md e skills/ em apps/docs/public a partir de
           # packages/react/manifest.js. Se algo mudou, o commit esqueceu de regenerar.
-          # As linhas de carimbo de data ("generatedAt" e "> Gerado <data>") mudam a
-          # cada build e são ignoradas; qualquer outra diferença é deriva.
+          # O carimbo de data ("generatedAt" e "> Gerado <data>") é determinístico
+          # (último commit em packages/react), mas o commit que muda o pacote recebe
+          # data nova depois que os artefatos foram gerados, e o checkout raso da CI
+          # vê outra data; por isso essas duas linhas ficam fora da comparação.
           untracked=$(git ls-files --others --exclude-standard -- apps/docs/public)
           if ! git --no-pager diff --exit-code --stat \
                -I '"generatedAt":' -I '^> Gerado ' -- apps/docs/public || [ -n "$untracked" ]; then

@@ -16,6 +16,7 @@
  *   node scripts/build-artifacts.mjs
  *   node scripts/build-artifacts.mjs --target=docs-public
  */
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -79,7 +80,31 @@ const { dsComponents, dsCategories, dsPrompt } = await import(manifestUrl);
 
 const pkgJson = JSON.parse(readPkgRootBase("package.json") || '{"version":"0.0.0"}');
 const version = pkgJson.version || "0.0.0";
-const generatedAt = new Date().toISOString();
+const generatedAt = resolveGeneratedAt();
+
+/**
+ * Carimbo determinístico: dois builds do mesmo commit geram arquivos idênticos.
+ * Ordem: SOURCE_DATE_EPOCH (padrão reproducible-builds) → data do último commit que
+ * mexeu em packages/react (fonte dos artefatos) → data atual (sem git, ex.: tarball).
+ */
+function resolveGeneratedAt() {
+  const epoch = process.env.SOURCE_DATE_EPOCH;
+  if (epoch && /^\d+$/.test(epoch)) {
+    return new Date(Number(epoch) * 1000).toISOString();
+  }
+  try {
+    const out = execFileSync("git", ["log", "-1", "--format=%cI", "--", "."], {
+      cwd: pkgRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    const date = new Date(out);
+    if (out && !Number.isNaN(date.getTime())) return date.toISOString();
+  } catch {
+    // sem git disponível: cai na data atual
+  }
+  return new Date().toISOString();
+}
 
 const fullSkillSrc = path.join(skillsSrcDir, "semec-ds", "SKILL.md");
 const liteSkillSrc = path.join(skillsSrcDir, "semec-ds-lite", "SKILL.md");
