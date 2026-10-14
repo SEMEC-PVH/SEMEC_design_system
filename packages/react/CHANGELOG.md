@@ -2,10 +2,17 @@
 
 ## 3.0.0
 
+> **Errata (registrada em 14/10/2026, auditoria AUD-11, #25).** O item "Build com `splitting: true` (ESM por módulo) para poda de árvore" desta versão **não corresponde ao que foi publicado**. O texto original foi mantido, riscado, logo abaixo. Estado real da 3.0.0 (e da 3.0.x):
+>
+> - O `dist/react/index.js` é **um bundle único** (sem chunks por módulo). Importar uma só peça, como `maskCPF`, carrega o kit inteiro. Não há poda de árvore por componente.
+> - O `dist` **não tem a diretiva `"use client"`**: importar `@semec/ds/react` num Server Component (Next.js App Router) falha.
+> - **O que fazer:** no Next App Router, importe o kit só em arquivos `"use client"` (componentes e providers, como `<Toaster />`). Em Vite/SPA nada muda.
+> - **Correção técnica:** saída por módulo e `"use client"` por componente estão planejados para a 3.1 (AUD-20).
+
 ### Major Changes
 
 - Schemas Zod saem do entry principal: use `@semec/ds/react/validacao` (`cpfSchema`, `cnpjSchema`, `cpfCnpjSchema`, `emailSchema`, `cepSchema`). O main (`@semec/ds/react`) não importa mais `zod`; o peer opcional passa a ser verdadeiro (SEM-782).
-- Build com `splitting: true` (ESM por módulo) para poda de árvore em apps que importam poucas peças.
+- ~~Build com `splitting: true` (ESM por módulo) para poda de árvore em apps que importam poucas peças.~~ **Não entregue na 3.0.0 — ver errata acima.**
 - `tokens.css`: cor padrão de borda (`border-color: var(--color-border)` na camada base) — tabela e `Badge outline` deixam de sair com borda `currentColor` (SEM-781).
 - `tokens.css`: `@media (prefers-reduced-motion: reduce)` global (SEM-784).
 - `tokens.css`: token `--color-border-strong` (classes `border-border-strong` em Header/FileUpload) e utilitários `slide-in-from-*`/`slide-out-to-*` com fração e percentual arbitrário (SEM-786).
