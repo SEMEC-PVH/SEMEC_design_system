@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { cn } from "../lib/utils";
+import { useFormFieldControl } from "./form-field";
 
 interface InputOTPContextValue {
   slots: string[];
@@ -10,7 +11,21 @@ interface InputOTPContextValue {
   registerSlot: (index: number, el: HTMLInputElement | null) => void;
   maxLength: number;
   disabled?: boolean;
+  invalid?: boolean;
+  labels: InputOTPLabels;
 }
+
+export interface InputOTPLabels {
+  /** Nome do grupo quando não há `aria-label`/`aria-labelledby`. Padrão: "Código de verificação". */
+  group: string;
+  /** Nome de cada dígito. Padrão: `Dígito ${index + 1} de ${total}`. */
+  slot: (index: number, total: number) => string;
+}
+
+const defaultLabels: InputOTPLabels = {
+  group: "Código de verificação",
+  slot: (index, total) => `Dígito ${index + 1} de ${total}`,
+};
 
 const InputOTPContext = React.createContext<InputOTPContextValue | null>(null);
 
@@ -20,7 +35,7 @@ function useInputOTP() {
   return ctx;
 }
 
-interface InputOTPProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
+export interface InputOTPProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
   /** Valor controlado. Sem ele, o componente guarda o estado sozinho. */
   value?: string;
   /**
@@ -30,6 +45,8 @@ interface InputOTPProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onCh
   onChange?: (value: string) => void;
   maxLength?: number;
   disabled?: boolean;
+  /** Textos fixos (PT-BR por padrão). */
+  labels?: Partial<InputOTPLabels>;
 }
 
 // Array de tamanho fixo: cada posição é um slot, mesmo vazio.
@@ -38,7 +55,7 @@ const toSlots = (str: string, length: number) =>
   Array.from({ length }, (_, i) => str[i] ?? "");
 
 const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
-  ({ className, value, onChange, maxLength = 6, disabled, children, ...props }, ref) => {
+  ({ className, value, onChange, maxLength = 6, disabled, labels, children, ...props }, ref) => {
     const isControlled = value !== undefined;
     const slotsRef = React.useRef<(HTMLInputElement | null)[]>([]);
     const [internalSlots, setSlots] = React.useState<string[]>(() =>
@@ -155,6 +172,12 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
       slotsRef.current[index] = el;
     }, []);
 
+    // Dentro de um FormField: o grupo (div) não é rotulável por <label for>,
+    // então recebe aria-labelledby do rótulo, mais describedby/invalid.
+    const field = useFormFieldControl(props, { labelable: false });
+    const text = { ...defaultLabels, ...labels };
+    const invalid = field["aria-invalid"] ?? props["aria-invalid"];
+
     const contextValue: InputOTPContextValue = {
       slots,
       handleSlotChange,
@@ -163,19 +186,24 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
       registerSlot,
       maxLength,
       disabled,
+      invalid: invalid === true || invalid === "true",
+      labels: text,
     };
 
     // Grupo rotulado: o consumidor pode passar aria-label/aria-labelledby.
-    const hasLabel = props["aria-label"] !== undefined || props["aria-labelledby"] !== undefined;
+    const hasLabel =
+      props["aria-label"] !== undefined ||
+      (field["aria-labelledby"] ?? props["aria-labelledby"]) !== undefined;
 
     return (
       <InputOTPContext.Provider value={contextValue}>
         <div
           ref={ref}
           role="group"
-          aria-label={hasLabel ? undefined : "Código de verificação"}
+          aria-label={hasLabel ? undefined : text.group}
           className={cn("flex items-center gap-2", className)}
           {...props}
+          {...field}
         >
           {children}
         </div>
@@ -197,14 +225,23 @@ const InputOTPGroup = React.forwardRef<
 ));
 InputOTPGroup.displayName = "InputOTPGroup";
 
-interface InputOTPSlotProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface InputOTPSlotProps extends React.HTMLAttributes<HTMLDivElement> {
   index: number;
 }
 
 const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
   ({ className, index, ...props }, ref) => {
-    const { slots, handleSlotChange, handleKeyDown, handlePaste, registerSlot, maxLength, disabled } =
-      useInputOTP();
+    const {
+      slots,
+      handleSlotChange,
+      handleKeyDown,
+      handlePaste,
+      registerSlot,
+      maxLength,
+      disabled,
+      invalid,
+      labels,
+    } = useInputOTP();
     const value = slots[index] || "";
     const inputRef = React.useCallback(
       (el: HTMLInputElement | null) => registerSlot(index, el),
@@ -215,8 +252,9 @@ const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
       <div
         ref={ref}
         className={cn(
-          "relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-md border border-input bg-background text-lg font-medium text-foreground shadow-sm transition-colors duration-fast ease-standard focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
+          "relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-md border border-input bg-background text-lg font-medium text-foreground shadow-elevation-1 transition-colors duration-fast ease-standard focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
           disabled && "opacity-50 cursor-not-allowed",
+          invalid && "border-destructive",
           className
         )}
         {...props}
@@ -233,7 +271,8 @@ const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
           onPaste={(e) => handlePaste(index, e)}
           onFocus={(e) => e.currentTarget.select()}
           className="absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-[inherit] border-0 bg-transparent text-center text-lg font-medium text-foreground caret-transparent outline-none"
-          aria-label={`Dígito ${index + 1} de ${maxLength}`}
+          aria-label={labels.slot(index, maxLength)}
+          aria-invalid={invalid || undefined}
         />
         <span aria-hidden="true" className="pointer-events-none">
           {value || ""}
