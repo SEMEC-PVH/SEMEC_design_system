@@ -20,6 +20,7 @@ const SIGN_STYLE = {
   "front-end": { title: "FRONT-END", sub: "Front-end · UI/UX", bg: "blue-900", accent: "blue-300" },
   "back-end": { title: "BACK-END", sub: "APIs e serviços", bg: "gray-800", accent: "green-500" },
   "banco-de-dados": { title: "BANCO DE DADOS", sub: "Dados · DevOps", bg: "yellow-800", accent: "yellow-400" },
+  "machine-learning": { title: "MACHINE LEARNING", sub: "Ginásio bônus · IA", bg: "blue-800", accent: "blue-300" },
 };
 
 const _e = new THREE.Euler();

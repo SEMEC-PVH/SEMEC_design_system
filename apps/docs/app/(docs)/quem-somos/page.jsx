@@ -55,7 +55,9 @@ const interns = [
   {
     name: "Mariana Feitoza Barros",
     role: "Machine Learning e Dados",
-    bio: "Estudante de Ciência da Computação, desenvolvedora back-end e de machine learning. Programa em C, C++, Java, JavaScript/TypeScript e SQL.",
+    // Líder do ginásio bônus: o Laboratório de Machine Learning.
+    chefe: "ml",
+    bio: "Desenvolvedora de machine learning e software. Estuda Ciência da Computação na UNIR e começou no back-end pela Cubos Academy. Programa em C, C++, Java, JavaScript/TypeScript e SQL.",
     fala: "Curso Ciência da Computação e trabalho com back-end e machine learning. C, C++, Java, SQL... Ah, e eu adoro gatos!",
     linkedin: "https://www.linkedin.com/in/mariana-feitoza-barros-21ab58245/",
     github: "https://github.com/MariMeng",

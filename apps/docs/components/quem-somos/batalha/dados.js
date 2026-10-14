@@ -288,6 +288,61 @@ export const GOLPES = {
     descricao: "Guarda os dados como documentos flexíveis, sem tabela fixa.",
   },
 
+  // Laboratório de Machine Learning (ginásio bônus)
+  dropna: {
+    nome: "dropna()",
+    tipo: "dados",
+    poder: 60,
+    precisao: 100,
+    descricao: "Joga fora as linhas vazias da tabela. Dado sujo vira modelo ruim.",
+  },
+  groupby: {
+    nome: "groupby()",
+    tipo: "dados",
+    poder: 0,
+    precisao: 100,
+    efeito: { alvo: "eu", stat: "atk", estagios: 1 },
+    descricao: "Agrupa os dados por categoria e resume tudo de uma vez. Aumenta o ataque.",
+  },
+  arvoreDecisao: {
+    nome: "Árvore de Decisão",
+    tipo: "dados",
+    poder: 75,
+    precisao: 95,
+    descricao: "Faz uma pergunta por galho até chegar na resposta. Fácil de explicar para qualquer um.",
+  },
+  validacaoCruzada: {
+    nome: "Validação Cruzada",
+    tipo: "basico",
+    poder: 0,
+    precisao: 100,
+    efeito: { alvo: "eu", stat: "def", estagios: 1 },
+    descricao: "Testa o modelo em pedaços diferentes dos dados para não se enganar. Aumenta a defesa.",
+  },
+  gradiente: {
+    nome: "Descida do Gradiente",
+    tipo: "back",
+    poder: 85,
+    precisao: 90,
+    descricao: "Ajusta os pesos da rede passo a passo, sempre na direção que diminui o erro.",
+  },
+  treinoGpu: {
+    nome: "Treino na GPU",
+    tipo: "back",
+    poder: 60,
+    precisao: 100,
+    prioridade: 1,
+    descricao: "A placa de vídeo faz milhares de contas ao mesmo tempo. Tão rápido que age primeiro.",
+  },
+  overfitting: {
+    nome: "Overfitting",
+    tipo: "basico",
+    poder: 0,
+    precisao: 100,
+    efeito: { alvo: "oponente", stat: "atk", estagios: -1 },
+    descricao: "Decorou as respostas do treino e erra no mundo real. Diminui o ataque do oponente.",
+  },
+
   // Diretoria (final)
   prototipo: {
     nome: "Protótipo",
@@ -426,6 +481,30 @@ export const LINGUAGENS = {
     golpes: [["documento", 1], ["select", 1], ["indice", 1]],
     bio: "Banco de dados de documentos: guarda tudo sem tabela fixa.",
   },
+  pandas: {
+    nome: "Pandas",
+    sigla: "Pd",
+    tipo: "dados",
+    base: { hp: 62, atk: 58, def: 60, spd: 50 },
+    golpes: [["dropna", 1], ["groupby", 1], ["dataFrame", 1]],
+    bio: "Biblioteca de Python que transforma planilhas em tabelas que o código entende. Limpa tudo antes do treino.",
+  },
+  sklearn: {
+    nome: "Scikit-learn",
+    sigla: "Sk",
+    tipo: "dados",
+    base: { hp: 64, atk: 62, def: 60, spd: 56 },
+    golpes: [["arvoreDecisao", 1], ["validacaoCruzada", 1], ["machineLearning", 1]],
+    bio: "A caixa de ferramentas do Machine Learning clássico: árvores, regressões e agrupamentos.",
+  },
+  pytorch: {
+    nome: "PyTorch",
+    sigla: "PT",
+    tipo: "back",
+    base: { hp: 70, atk: 68, def: 62, spd: 58 },
+    golpes: [["gradiente", 1], ["treinoGpu", 1], ["overfitting", 1]],
+    bio: "Monta e treina redes neurais — a base de quase toda IA moderna.",
+  },
   figma: {
     nome: "Figma",
     sigla: "Fg",
@@ -471,8 +550,9 @@ export const ITENS = {
 export const ITENS_POR_BATALHA = { cafe: 3, stackOverflow: 1 };
 
 // ---- Chefes (ginásios e Diretoria) ----------------------------------------------
-// area: casa com AREA_SPOTS da vila (frontend, backend, database, diretoria).
+// area: casa com AREA_SPOTS da vila (frontend, backend, database, ml, diretoria).
 // stack: insígnia ganha ao vencer. requer: chefe que precisa estar vencido.
+// bonus: ginásio opcional, fora da trilha do Full Stack.
 export const CHEFES = [
   {
     id: "frontend",
@@ -508,6 +588,21 @@ export const CHEFES = [
     falaInicio: "Os dados da rede municipal são guardados aqui — com segurança e LGPD. Prepare a sua consulta!",
     falaDerrota: "Consulta otimizada! Leve a Data Stack. Agora você está pronto(a) para a Diretoria.",
     dica: "Dados é forte contra Front-End e fraco contra Back-End.",
+  },
+  {
+    // Ginásio BÔNUS: opcional, não conta para o Full Stack (a Diretoria
+    // continua exigindo só o de Dados). Dá a Stack de IA.
+    id: "ml",
+    area: "ml",
+    bonus: true,
+    ginasio: "Laboratório de Machine Learning",
+    titulo: "Líder do Laboratório de Machine Learning",
+    requer: "database",
+    stack: { id: "ia", nome: "IA Stack" },
+    time: [["pandas", 10], ["sklearn", 11], ["pytorch", 12]],
+    falaInicio: "Aqui os dados viram previsões! Primeiro a gente limpa, depois treina, depois testa. Vamos ver se o seu modelo aprende rápido!",
+    falaDerrota: "Acurácia lá em cima e sem overfitting! A IA Stack é sua.",
+    dica: "Pandas e Scikit-learn são Dados (fracos contra Back-End); o PyTorch é Back-End (fraco contra Front-End).",
   },
   {
     id: "diretoria",

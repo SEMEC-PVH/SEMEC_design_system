@@ -14,6 +14,7 @@ import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { std } from "./buildings/shared";
 import { buildBackEnd } from "./buildings/backend";
 import { buildDatabase } from "./buildings/database";
+import { buildML } from "./buildings/ml";
 import { createChibiKit } from "./scene/chibi";
 import { buildSemec } from "./buildings/semec";
 import { createLighting } from "./scene/lighting";
@@ -75,6 +76,9 @@ const BUILDINGS = [
   { id: "frontend", kind: "frontend", x: 16, y: 11, w: 5, h: 4, label: "FRONT-END" },
   { id: "backend", kind: "backend", x: 22, y: 11, w: 5, h: 4, label: "BACK-END" },
   { id: "database", kind: "database", x: 11, y: 2, w: 4, h: 4, label: "BANCO DE DADOS" },
+  // Laboratório de Machine Learning (ginásio bônus da Mariana), na beira do
+  // rio, ao lado do Banco de Dados; árvores atrás pelo mesmo motivo.
+  { id: "ml", kind: "ml", x: 16, y: 3, w: 4, h: 3, label: "MACHINE LEARNING" },
 ];
 
 const SIGNS = [
@@ -84,6 +88,7 @@ const SIGNS = [
   { id: "front-end", x: 20, y: 15 },
   { id: "back-end", x: 26, y: 15 },
   { id: "banco-de-dados", x: 15, y: 7 },
+  { id: "machine-learning", x: 16, y: 6 },
 ];
 
 // Mobiliário urbano (scene/props.js): cada item ocupa um tile PROP, não
@@ -145,6 +150,8 @@ const AREA_SPOTS = {
     { x: 15, y: 5, dir: "left" },
     { x: 10, y: 4, dir: "right" },
   ],
+  // Porta do laboratório de Machine Learning (ginásio bônus).
+  ml: [{ x: 18, y: 6, dir: "down" }],
   generic: [
     { x: 21, y: 7, dir: "up" },
     { x: 11, y: 20, dir: "right" },
@@ -172,12 +179,12 @@ function buildMap() {
   for (const [x, y] of [[20, 2], [20, 6], [27, 6], [21, 6]]) g[y][x] = GRASS;
 
   // Mato alto, flores e árvores soltas.
-  rect(16, 2, 17, 2, TALL);
+  rect(16, 2, 19, 2, TREE); // atrás do laboratório de ML (x16–19, y3–5)
   // Praça do Front-End (x 17–20, y 17–20): grama baixa para o Rafa e o waffle
   // passearem sem o capim esconder os dois (scene/walkers.js).
   for (const [x, y] of [[18, 18], [19, 19]]) g[y][x] = FLOWER;
   rect(2, 10, 4, 13, TALL);
-  for (const [x, y] of [[16, 3], [17, 3], [16, 4], [12, 18], [13, 19], [8, 10], [9, 11], [25, 9], [26, 9], [3, 20], [4, 20]]) g[y][x] = FLOWER;
+  for (const [x, y] of [[12, 18], [13, 19], [8, 10], [9, 11], [25, 9], [26, 9], [3, 20], [4, 20]]) g[y][x] = FLOWER;
   for (const [x, y] of [[11, 10], [12, 12], [25, 8], [27, 19], [2, 18], [2, 19], [27, 10], [8, 2], [9, 2], [16, 8]]) g[y][x] = TREE;
 
   // Jardim cercado com flores.
@@ -631,6 +638,7 @@ export function createVila(host, options) {
     frontend: (group, b) => buildFrontEnd(group, b, buildCtx),
     backend: (group, b) => buildBackEnd(group, b, buildCtx),
     database: (group, b) => buildDatabase(group, b, buildCtx),
+    ml: (group, b) => buildML(group, b, buildCtx),
     semec: (group, b) => buildSemec(group, b, buildCtx),
   };
 
@@ -679,7 +687,9 @@ export function createVila(host, options) {
   for (const index of byLeaderFirst) {
     const member = members[index];
     if (member.group === "directors") continue;
-    spotOf.set(index, takeSpot(areaOf(member.role)) || takeSpot("generic"));
+    // Quem lidera um ginásio com área própria (o de ML) fica na porta dele.
+    const area = member.chefe && AREA_SPOTS[member.chefe] ? member.chefe : areaOf(member.role);
+    spotOf.set(index, takeSpot(area) || takeSpot("generic"));
   }
   // Líderes com boneco 3D (scene/walkers.js): o chibi vira âncora invisível
   // (tile, balão de líder, conversa e cenas) e o 3D fica no lugar dele.

@@ -4,7 +4,7 @@
 import { CHEFES } from "./batalha/dados";
 
 // Cor da insígnia de cada Stack (token pv-*).
-const COR_STACK = { front: "blue-500", back: "green-500", dados: "yellow-500", full: "red-500" };
+const COR_STACK = { front: "blue-500", back: "green-500", dados: "yellow-500", ia: "blue-800", full: "red-500" };
 
 // Cena depois da PRIMEIRA vitória num ginásio: o líder comemora, entrega a
 // Stack e a câmera mostra quem é o próximo desafio.
@@ -13,8 +13,9 @@ const COR_STACK = { front: "blue-500", back: "green-500", dados: "yellow-500", f
 export function cenaVitoria({ chefeId, lider, proximo, vencidos }) {
   const chefe = CHEFES.find((c) => c.id === chefeId);
   if (!chefe || !lider) return null;
-  const seguinte = CHEFES.find((c) => c.requer === chefeId);
-  const faltam = CHEFES.filter((c) => c.id !== "diretoria" && !vencidos.includes(c.id)).length;
+  const seguinte = CHEFES.find((c) => c.requer === chefeId && !c.bonus);
+  // O ginásio bônus (ML) não conta para o Full Stack.
+  const faltam = CHEFES.filter((c) => c.id !== "diretoria" && !c.bonus && !vencidos.includes(c.id)).length;
   const restante =
     faltam <= 0
       ? "Agora você tem as três Stacks. Só falta a Diretoria para virar Full Stack!"

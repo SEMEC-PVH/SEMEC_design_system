@@ -69,6 +69,10 @@ const SIGN_TEXT = {
     title: "Back-End",
     text: "Onde rodam as APIs e os serviços que conectam escolas, secretaria e população — rápidos, estáveis e documentados.",
   },
+  "machine-learning": {
+    title: "Laboratório de Machine Learning",
+    text: "Ginásio bônus: aqui os dados viram previsões. Limpar, treinar, testar — e nada de overfitting! Liberado depois da Data Stack.",
+  },
   "banco-de-dados": {
     title: "Banco de Dados",
     text: "Os dados da rede municipal de ensino, guardados com segurança e tratados conforme a LGPD.",
@@ -80,9 +84,10 @@ const SIGN_TEXT = {
 };
 
 const CHEFE_POR_ID = Object.fromEntries(CHEFES.map((c) => [c.id, c]));
-const GINASIOS = CHEFES.filter((c) => c.id !== "diretoria");
+// Ginásios da trilha do Full Stack (o bônus de ML fica de fora).
+const GINASIOS = CHEFES.filter((c) => c.id !== "diretoria" && !c.bonus);
 // Sigla visível de cada Stack no HUD (o nome completo vai para o leitor de tela).
-const SIGLA_STACK = { front: "FE", back: "BE", dados: "DB", full: "FS" };
+const SIGLA_STACK = { front: "FE", back: "BE", dados: "DB", ia: "IA", full: "FS" };
 // Canções da ocarina do Pedro (cenas.js, cenaOcarina): dois futuros para
 // comparar e o passado.
 const CANCOES = [
@@ -599,7 +604,7 @@ export default function VilaSemec({ members }) {
     (chefeId) => {
       const engine = engineRef.current;
       const liderIndex = liderDe(chefeId);
-      const seguinte = CHEFES.find((c) => c.requer === chefeId);
+      const seguinte = CHEFES.find((c) => c.requer === chefeId && !c.bonus);
       const proximoIndex = seguinte ? liderDe(seguinte.id) : -1;
       const passos = cenaVitoria({
         chefeId,

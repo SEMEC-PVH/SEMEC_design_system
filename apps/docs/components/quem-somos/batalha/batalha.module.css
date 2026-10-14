@@ -258,6 +258,11 @@
 .posto[data-especie="cobol"] {
   --escala: 1.35;
 }
+/* PyTorch: a grade nativa dele é mais fina e o sprite ocupa só ~73% do
+   quadro; compensa para ele ser o mais imponente do Laboratório de ML. */
+.posto[data-especie="pytorch"] {
+  --escala: 1.4;
+}
 .plataforma {
   position: absolute;
   left: 0;

@@ -124,12 +124,22 @@ describe("integridade dos dados", () => {
   });
 
   it("os requisitos formam a cadeia frontend → backend → database → diretoria", () => {
+    const trilha = CHEFES.filter((c) => !c.bonus);
     assert.deepEqual(
-      CHEFES.map((c) => c.id),
+      trilha.map((c) => c.id),
       ["frontend", "backend", "database", "diretoria"]
     );
-    assert.equal(CHEFES[0].requer, undefined);
-    for (let i = 1; i < CHEFES.length; i++) assert.equal(CHEFES[i].requer, CHEFES[i - 1].id);
+    assert.equal(trilha[0].requer, undefined);
+    for (let i = 1; i < trilha.length; i++) assert.equal(trilha[i].requer, trilha[i - 1].id);
+  });
+
+  it("ginásios bônus exigem um chefe da trilha e não são exigidos por ninguém", () => {
+    const bonus = CHEFES.filter((c) => c.bonus);
+    assert.ok(bonus.length > 0);
+    for (const c of bonus) {
+      assert.ok(CHEFES.some((o) => !o.bonus && o.id === c.requer), `${c.id} exige ${c.requer}`);
+      assert.ok(!CHEFES.some((o) => o.requer === c.id), `alguém exige o bônus ${c.id}`);
+    }
   });
 
   it("toda linguagem tem no máximo 4 golpes disponíveis no nível em que aparece", () => {

@@ -59,21 +59,26 @@ function simular(inicial) {
     let zerou = true;
 
     for (const chefe of CHEFES) {
+      // Ginásio bônus: simulado com uma CÓPIA do jogador no ponto em que ele
+      // libera (depois de Dados) — não bloqueia nem acelera a campanha.
+      let lutador = jogador;
       let venceu = false;
       for (let t = 0; t < TENTATIVAS_POR_CHEFE && !venceu; t++) {
         porChefe[chefe.id].tentativas += 1;
-        jogador = { ...jogador, hp: jogador.maxHp, estagios: { atk: 0, def: 0 } };
-        let estado = iniciarBatalha(jogador, chefe.id);
+        lutador = { ...lutador, hp: lutador.maxHp, estagios: { atk: 0, def: 0 } };
+        let estado = iniciarBatalha(lutador, chefe.id);
         for (let turno = 0; turno < TETO_TURNOS && !estado.resultado; turno++) {
           estado = jogarTurno(estado, escolherAcao(estado), rng).estado;
         }
         // O XP ganho (mesmo numa derrota) fica com o jogador, como na Vila.
-        jogador = estado.jogador;
+        lutador = estado.jogador;
         if (estado.resultado === "vitoria") {
           porChefe[chefe.id].vitorias += 1;
           venceu = true;
         }
       }
+      if (chefe.bonus) continue;
+      jogador = lutador;
       if (!venceu) {
         zerou = false;
         break;
