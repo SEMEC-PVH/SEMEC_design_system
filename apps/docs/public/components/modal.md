@@ -4,7 +4,7 @@ code: "dialog"
 slug: "modal"
 file: "src/components/dialog.tsx"
 category: "feedback"
-variants: "composição: Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose"
+variants: "composição: Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose · closeLabel: nome acessível do X de 44×44px (padrão 'Fechar')"
 ---
 
 # Modal — `dialog`
@@ -16,6 +16,7 @@ variants: "composição: Dialog · DialogTrigger · DialogContent · DialogHeade
 ## Variantes
 
 - **composição**: Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose
+- **closeLabel**: nome acessível do X de 44×44px (padrão "Fechar")
 
 ## Instalação (@semec/ds)
 
@@ -25,6 +26,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -34,22 +36,31 @@ npm install @semec/ds
 ```tsx
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "@semec/ds/react";
 
+// Para confirmação destrutiva use AlertDialog (role="alertdialog").
 <Dialog>
-  <DialogTrigger asChild><Button variant="destructive">Excluir</Button></DialogTrigger>
-  <DialogContent>
+  <DialogTrigger asChild><Button>Editar contato</Button></DialogTrigger>
+  <DialogContent closeLabel="Fechar edição">
     <DialogHeader>
-      <DialogTitle>Excluir requerimento?</DialogTitle>
-      <DialogDescription>Esta ação não pode ser desfeita.</DialogDescription>
+      <DialogTitle>Editar contato</DialogTitle>
+      <DialogDescription>Atualize o telefone do responsável.</DialogDescription>
     </DialogHeader>
     <DialogFooter><DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose></DialogFooter>
   </DialogContent>
+</Dialog>
+
+// Controlado SEM DialogTrigger: o Radix não sabe para onde devolver o foco.
+// Guarde o elemento de origem e devolva o foco em onCloseAutoFocus.
+const origemRef = React.useRef(null);
+<Button ref={origemRef} onClick={() => setAberto(true)}>Editar</Button>
+<Dialog open={aberto} onOpenChange={setAberto}>
+  <DialogContent onCloseAutoFocus={(e) => { e.preventDefault(); origemRef.current?.focus(); }}>…</DialogContent>
 </Dialog>
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um dialog (Modal) usando @semec/ds/react (`src/components/dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose. Diálogo modal acessível com overlay, header, título, descrição e footer.
+Use o componente `Dialog` (Modal) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Diálogo modal acessível com overlay, header, título, descrição e footer. API e variantes: composição: Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose · closeLabel: nome acessível do X de 44×44px (padrão "Fechar"). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -84,24 +95,30 @@ const DialogOverlay = React.forwardRef<
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
+export interface DialogContentProps
+  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
+  /** Nome acessível do botão X de fechar. Padrão: "Fechar". */
+  closeLabel?: string;
+}
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  DialogContentProps
+>(({ className, children, closeLabel = "Fechar", ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-elevation-3 ring-1 ring-foreground/5 duration-base ease-standard data-[state=open]:animate-in",
+        "fixed left-1/2 top-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-elevation-3 ring-1 ring-foreground/5 duration-base ease-standard data-[state=open]:animate-in",
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-lg text-muted-foreground transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+      <DialogPrimitive.Close className="absolute right-3 top-3 inline-flex size-11 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none">
         <X className="h-4 w-4" aria-hidden="true" />
-        <span className="sr-only">Fechar</span>
+        <span className="sr-only">{closeLabel}</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
@@ -113,7 +130,7 @@ const DialogHeader = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn("flex flex-col space-y-1.5 text-left", className)}
+    className={cn("flex flex-col space-y-1.5 pr-8 text-left", className)}
     {...props}
   />
 );

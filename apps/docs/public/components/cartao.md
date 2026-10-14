@@ -4,18 +4,19 @@ code: "card"
 slug: "cartao"
 file: "src/components/card.tsx"
 category: "conteudo-dados"
-variants: "composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader"
+variants: "composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader · títulos: CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2)"
 ---
 
 # Cartão — `card`
 
-> Superfície de conteúdo com header, corpo e footer.
+> Superfície de conteúdo com header, corpo e footer. Sombra pelo token `shadow-elevation-1`.
 
 **Arquivo:** `src/components/card.tsx` | **Categoria:** Conteúdo e dados | **Rota:** `/componentes/cartao`
 
 ## Variantes
 
 - **composição**: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader
+- **títulos**: CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2)
 
 ## Instalação (@semec/ds)
 
@@ -25,6 +26,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -34,8 +36,9 @@ npm install @semec/ds
 ```tsx
 import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@semec/ds/react";
 
+// "as" escolhe o nível do título conforme a hierarquia da página
 <Card>
-  <CardHeader><CardTitle>IPTU 2026</CardTitle></CardHeader>
+  <CardHeader><CardTitle as="h2">IPTU 2026</CardTitle></CardHeader>
   <CardContent>Parcela em dia.</CardContent>
   <CardFooter><Button>Emitir boleto</Button></CardFooter>
 </Card>
@@ -44,7 +47,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@s
 ## Prompt para IA
 
 ```text
-Crie um card (Cartão) usando @semec/ds/react (`src/components/card.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader. Superfície de conteúdo com header, corpo e footer.
+Use o componente `Card` (Cartão) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Superfície de conteúdo com header, corpo e footer. Sombra pelo token `shadow-elevation-1`. API e variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader · títulos: CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -53,6 +56,7 @@ Crie um card (Cartão) usando @semec/ds/react (`src/components/card.tsx`), estil
 import * as React from "react";
 
 import { cn } from "../lib/utils";
+import type { HeadingTag } from "./heading";
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -61,7 +65,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border border-border bg-card text-card-foreground shadow-md ring-1 ring-foreground/5",
+      "rounded-lg border border-border bg-card text-card-foreground shadow-elevation-1 ring-1 ring-foreground/5",
       className
     )}
     {...props}
@@ -81,16 +85,24 @@ const CardHeader = React.forwardRef<
 ));
 CardHeader.displayName = "CardHeader";
 
-const CardTitle = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("text-lg font-semibold leading-none tracking-tight", className)}
-    {...props}
-  />
-));
+export interface CardTitleProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Elemento do título. Padrão: `div` (mantém o comportamento anterior e não
+   * entra no sumário de títulos). Passe `h2`/`h3` conforme a hierarquia da
+   * página quando o cartão representar uma seção.
+   */
+  as?: HeadingTag;
+}
+
+const CardTitle = React.forwardRef<HTMLDivElement, CardTitleProps>(
+  ({ className, as: Tag = "div", ...props }, ref) => (
+    <Tag
+      ref={ref}
+      className={cn("text-lg font-semibold leading-none tracking-tight", className)}
+      {...props}
+    />
+  )
+);
 CardTitle.displayName = "CardTitle";
 
 const CardDescription = React.forwardRef<
@@ -144,19 +156,21 @@ export interface SectionHeaderProps extends React.HTMLAttributes<HTMLDivElement>
   title: string;
   description?: string;
   badge?: React.ReactNode;
+  /** Elemento do título. Padrão: `h2`. */
+  titleAs?: HeadingTag;
 }
 
 const SectionHeader = React.forwardRef<HTMLDivElement, SectionHeaderProps>(
-  ({ className, title, description, badge, children, ...props }, ref) => (
+  ({ className, title, description, badge, titleAs: TitleTag = "h2", children, ...props }, ref) => (
     <div
       ref={ref}
       className={cn("pb-2 border-b border-border mb-6", className)}
       {...props}
     >
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-xl font-bold text-pv-blue-900 uppercase tracking-wide">
+        <TitleTag className="text-xl font-bold text-pv-blue-900 uppercase tracking-wide">
           {title}
-        </h2>
+        </TitleTag>
         {badge}
       </div>
       {description ? (

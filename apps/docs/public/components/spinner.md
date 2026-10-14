@@ -4,18 +4,18 @@ code: "spinner"
 slug: "spinner"
 file: "src/components/spinner.tsx"
 category: "feedback"
-variants: "—"
+variants: "label: texto anunciado (padrão 'Carregando')"
 ---
 
 # Spinner — `spinner`
 
-> Indicador de carregamento inline.
+> Indicador de carregamento inline (role=status).
 
 **Arquivo:** `src/components/spinner.tsx` | **Categoria:** Feedback e estados | **Rota:** `/componentes/spinner`
 
 ## Variantes
 
-_Sem variantes_
+- **label**: texto anunciado (padrão "Carregando")
 
 ## Instalação (@semec/ds)
 
@@ -25,6 +25,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -34,14 +35,14 @@ npm install @semec/ds
 ```tsx
 import { Spinner } from "@semec/ds/react";
 
-<Spinner />
+<Spinner label="Carregando protocolos" />
 <p className="text-muted-foreground">Carregando dados…</p>
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um spinner (Spinner) usando @semec/ds/react (`src/components/spinner.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Indicador de carregamento inline.
+Use o componente `Spinner` (Spinner) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Indicador de carregamento inline (role=status). API e variantes: label: texto anunciado (padrão "Carregando"). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -51,41 +52,45 @@ import * as React from "react";
 
 import { cn } from "../lib/utils";
 
-const Spinner = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    role="status"
-    aria-label="Carregando"
-    className={cn("inline-flex items-center justify-center", className)}
-    {...props}
-  >
-    <svg
-      className="h-5 w-5 animate-spin text-current"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
+export interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Texto anunciado por leitor de tela. Padrão: "Carregando". */
+  label?: string;
+}
+
+const Spinner = React.forwardRef<HTMLDivElement, SpinnerProps>(
+  ({ className, label = "Carregando", ...props }, ref) => (
+    <div
+      ref={ref}
+      role="status"
+      aria-label={label}
+      className={cn("inline-flex items-center justify-center", className)}
+      {...props}
     >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-      />
-    </svg>
-    <span className="sr-only">Carregando</span>
-  </div>
-));
+      <svg
+        className="h-5 w-5 animate-spin text-current"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        />
+      </svg>
+      <span className="sr-only">{label}</span>
+    </div>
+  )
+);
 Spinner.displayName = "Spinner";
 
 export { Spinner };

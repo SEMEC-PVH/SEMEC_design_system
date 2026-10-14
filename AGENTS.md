@@ -14,7 +14,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 npm workspaces monorepo. Two main locations:
 
-- **`packages/react/`** — `@semec/ds` kit (47 React components, Tailwind v4, shadcn/Radix/CVA). This is the publishable package.
+- **`packages/react/`** — `@semec/ds` kit (React components listed in `manifest.js`, Tailwind v4, shadcn/Radix/CVA). This is the publishable package.
 - **`apps/docs/`** — `@semec/docs` documentation site (Next.js 16, static export via `output: 'export'`).
 
 Other dirs: `docs/` (ADRs, architecture decisions), `legacy/` (old content, ignore).

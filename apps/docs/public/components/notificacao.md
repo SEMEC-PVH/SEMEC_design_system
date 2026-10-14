@@ -4,7 +4,7 @@ code: "toast"
 slug: "notificacao"
 file: "src/components/toast.tsx"
 category: "feedback"
-variants: "variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos"
+variants: "variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos · Toaster: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis) · alvos: X e ToastAction com 44px"
 ---
 
 # Notificação — `toast`
@@ -17,6 +17,8 @@ variants: "variant: default · success (verde SEMEC #82C353, texto #26325B, 12px
 
 - **variant**: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive
 - **uso**: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos
+- **Toaster**: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis)
+- **alvos**: X e ToastAction com 44px
 
 ## Instalação (@semec/ds)
 
@@ -26,6 +28,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -50,7 +53,7 @@ function Acao() {
 ## Prompt para IA
 
 ```text
-Crie um toast (Notificação) usando @semec/ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.
+Use o componente `Toaster` (Notificação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`. API e variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos · Toaster: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis) · alvos: X e ToastAction com 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -102,7 +105,7 @@ const toastVariants = cva(
       variant: {
         default: "border-border bg-card text-card-foreground",
         success:
-          "border-none bg-pv-green-500 text-pv-blue-900 px-5 py-4 [&_[toast-close]]:text-pv-blue-900 [&_[toast-close]]:opacity-80 [&_[toast-close]]:hover:opacity-100",
+          "border-none bg-pv-green-500 text-pv-blue-900 px-5 py-4 [&_[toast-close]]:text-pv-blue-900 [&_[toast-close]]:hover:bg-pv-blue-900/10",
         warning: "border-warning/40 bg-warning-surface text-foreground",
         destructive: "border-destructive/40 bg-destructive-surface text-destructive",
       },
@@ -133,7 +136,7 @@ const ToastAction = React.forwardRef<
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      "inline-flex h-9 shrink-0 items-center justify-center rounded-full border border-border bg-transparent px-4 text-sm font-medium transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+      "inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-border bg-transparent px-4 text-sm font-medium transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
       className
     )}
     {...props}
@@ -148,7 +151,7 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      "shrink-0 rounded-lg p-1.5 text-muted-foreground opacity-60 transition-opacity duration-fast ease-standard hover:text-foreground hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      "-m-2 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
       className
     )}
     toast-close=""
@@ -305,7 +308,7 @@ function useToast() {
   };
 }
 
-interface ToasterProps {
+export interface ToasterProps {
   /** Prefixo anunciado pelo leitor de tela em cada aviso. Padrão: "Notificação". */
   label?: string;
   /** Nome da região de avisos; `{hotkey}` vira o atalho (F8). Padrão: "Notificações ({hotkey})". */
@@ -350,7 +353,6 @@ export {
   ToastAction,
   Toaster,
   useToast,
-  type ToasterProps,
 };
 ```
 

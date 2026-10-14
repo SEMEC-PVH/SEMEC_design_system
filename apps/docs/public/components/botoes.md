@@ -4,19 +4,19 @@ code: "button"
 slug: "botoes"
 file: "src/components/button.tsx"
 category: "acoes"
-variants: "variant: primary · secondary · outline · ghost · destructive · success · link · size: sm · md · lg · icon"
+variants: "variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px)"
 ---
 
 # Botões — `button`
 
-> Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.
+> Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida.
 
 **Arquivo:** `src/components/button.tsx` | **Categoria:** Ações e links | **Rota:** `/componentes/botoes`
 
 ## Variantes
 
 - **variant**: primary · secondary · outline · ghost · destructive · success · link
-- **size**: sm · md · lg · icon
+- **size**: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px)
 
 ## Instalação (@semec/ds)
 
@@ -26,6 +26,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -53,7 +54,7 @@ import { Plus } from "lucide-react";
 ## Prompt para IA
 
 ```text
-Crie um button (Botões) usando @semec/ds/react (`src/components/button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm · md · lg · icon. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.
+Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -84,7 +85,9 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        sm: "h-9 px-4 text-sm",
+        // AUD-10: o visual compacto (36px) é mantido, mas a área clicável é
+        // estendida a 44×44px por um pseudo-elemento centralizado.
+        sm: "h-9 px-4 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2",
         md: "h-11 px-5 text-sm",
         lg: "h-12 px-6 text-base",
         icon: "h-11 w-11",

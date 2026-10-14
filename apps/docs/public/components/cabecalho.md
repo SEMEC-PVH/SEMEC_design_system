@@ -4,7 +4,7 @@ code: "header"
 slug: "cabecalho"
 file: "src/components/header.tsx"
 category: "navegacao"
-variants: "composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href · HeaderNavLink: current"
+variants: "composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ('' = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional)"
 ---
 
 # Cabeçalho — `header`
@@ -16,7 +16,8 @@ variants: "composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · 
 ## Variantes
 
 - **composição**: Header · HeaderBrand · HeaderNav · HeaderNavLink
-- **props**: HeaderBrand: orgName · serviceName · logo · href · HeaderNavLink: current
+- **props**: HeaderBrand: orgName · serviceName · logo · href ("" = sem link) · truncate · homeLabel · HeaderNavLink: current
+- **a11y**: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional)
 
 ## Instalação (@semec/ds)
 
@@ -26,6 +27,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -37,7 +39,11 @@ import { Header, HeaderBrand, HeaderNav, HeaderNavLink } from "@semec/ds/react";
 import { Button } from "@semec/ds/react";
 
 <Header>
-  <HeaderBrand orgName="SEMEC" serviceName="Nome do serviço" />
+  <HeaderBrand
+    orgName="SEMEC"
+    serviceName="Nome do serviço"
+    logo={<img src="/logo-prefeitura.svg" alt="Prefeitura de Porto Velho" className="h-9 w-auto" />}
+  />
   <div className="flex items-center gap-2">
     <HeaderNav>
       <HeaderNavLink href="/prefeitura" current>Prefeitura</HeaderNavLink>
@@ -53,7 +59,7 @@ import { Button } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Crie um header (Cabeçalho) usando @semec/ds/react (`src/components/header.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href · HeaderNavLink: current. Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.
+Use o componente `Header` (Cabeçalho) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav. API e variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ("" = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -68,7 +74,7 @@ const Header = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
     <header
       ref={ref}
       className={cn(
-        "flex w-full max-w-full items-center justify-between gap-4 border-b border-border bg-surface px-4 py-3 sm:px-6",
+        "flex w-full max-w-full flex-wrap items-center justify-between gap-4 border-b border-border bg-surface px-4 py-3 sm:px-6",
         className
       )}
       {...props}
@@ -80,10 +86,26 @@ const Header = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(
 Header.displayName = "Header";
 
 export interface HeaderBrandProps extends React.HTMLAttributes<HTMLElement> {
-  href?: string;
+  /**
+   * Destino do link da marca. Padrão: `/`. Passe `""` (ou `null`) para
+   * renderizar a marca sem link (ex.: já na página inicial).
+   */
+  href?: string | null;
   orgName?: string;
   serviceName?: string;
+  /**
+   * Logo do órgão (ex.: `<img src="/logo.svg" alt="Prefeitura de Porto Velho" />`).
+   * Sem logo, aparece um placeholder decorativo e um aviso no console em
+   * desenvolvimento.
+   */
   logo?: React.ReactNode;
+  /**
+   * Corta o nome em uma linha com reticências. Padrão: `false` — o nome quebra
+   * linha no mobile para não esconder o serviço.
+   */
+  truncate?: boolean;
+  /** Texto para leitor de tela anexado ao link. Padrão: "ir para o início". */
+  homeLabel?: string;
 }
 
 const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
@@ -94,17 +116,39 @@ const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
       orgName = "SEMEC",
       serviceName = "Nome do serviço",
       logo,
+      truncate = false,
+      homeLabel = "ir para o início",
       children,
       ...props
     },
     ref
   ) => {
+    const hasLogo = logo !== undefined && logo !== null;
+
+    React.useEffect(() => {
+      if (hasLogo) return;
+      let isDev = false;
+      try {
+        // Bundlers substituem `process.env.NODE_ENV` estaticamente; sem
+        // bundler (e sem `process`), o acesso lança e o aviso é omitido.
+        isDev = process.env.NODE_ENV !== "production";
+      } catch {
+        isDev = false;
+      }
+      if (isDev) {
+        console.warn(
+          "[@semec/ds] HeaderBrand sem `logo`: exibindo placeholder decorativo. Passe o logo do órgão com texto alternativo (ex.: <img alt=\"Prefeitura de Porto Velho\" />)."
+        );
+      }
+    }, [hasLogo]);
+
     const content = (
       <>
-        {logo ?? (
+        {hasLogo ? (
+          logo
+        ) : (
           <span
-            role="img"
-            aria-label="Logo do órgão"
+            aria-hidden="true"
             className="inline-flex h-9 w-[90px] shrink-0 items-center justify-center rounded-md border border-dashed border-border-strong bg-surface-alt text-xs font-medium text-muted-foreground"
           >
             Logo
@@ -112,7 +156,12 @@ const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
         )}
         <span aria-hidden="true" className="h-7 w-px shrink-0 bg-border" />
         {children ?? (
-          <span className="truncate text-base font-bold leading-normal text-brand-hero">
+          <span
+            className={cn(
+              "min-w-0 text-base font-bold leading-snug text-brand-hero",
+              truncate ? "truncate" : "break-words"
+            )}
+          >
             {orgName}
             <span
               aria-hidden="true"
@@ -135,7 +184,7 @@ const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
       return (
         <a ref={ref as React.Ref<HTMLAnchorElement>} href={href} className={rootClass} {...props}>
           {content}
-          <span className="sr-only">— ir para o início</span>
+          <span className="sr-only">— {homeLabel}</span>
         </a>
       );
     }

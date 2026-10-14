@@ -4,7 +4,7 @@ code: "data-table"
 slug: "tabela-de-dados"
 file: "src/components/data-table.tsx"
 category: "conteudo-dados"
-variants: "props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px"
+variants: "props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · labels (sortBy · pageOf · previous · next) · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px"
 ---
 
 # Tabela de dados — `data-table`
@@ -15,7 +15,7 @@ variants: "props: columns · data · sortKey · sortDir · onSort · page · pag
 
 ## Variantes
 
-- **props**: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption
+- **props**: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · labels (sortBy · pageOf · previous · next)
 - **a11y**: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px
 
 ## Instalação (@semec/ds)
@@ -26,6 +26,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -62,7 +63,7 @@ import { DataTable, Button } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Crie um data-table (Tabela de dados) usando @semec/ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px. Tabela com ordenação, paginação e estados vazios.
+Use o componente `DataTable` (Tabela de dados) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Tabela com ordenação, paginação e estados vazios. API e variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · labels (sortBy · pageOf · previous · next) · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -74,6 +75,24 @@ import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "luci
 import { cn } from "../lib/utils";
 
 type SortDirection = "asc" | "desc" | null;
+
+export interface DataTableLabels {
+  /** Rótulo do botão de ordenação. Padrão: `Ordenar por ${header}`. */
+  sortBy: (header: string) => string;
+  /** Texto da paginação. Padrão: `Página ${page} de ${pageCount}`. */
+  pageOf: (page: number, pageCount: number) => string;
+  /** Padrão: "Anterior". */
+  previous: string;
+  /** Padrão: "Próximo". */
+  next: string;
+}
+
+const defaultDataTableLabels: DataTableLabels = {
+  sortBy: (header) => `Ordenar por ${header}`,
+  pageOf: (page, pageCount) => `Página ${page} de ${pageCount}`,
+  previous: "Anterior",
+  next: "Próximo",
+};
 
 interface Column<T> {
   key: string;
@@ -101,6 +120,8 @@ interface DataTableProps<T> extends React.HTMLAttributes<HTMLDivElement> {
    */
   onRowClick?: (row: T, index: number) => void;
   caption?: string;
+  /** Textos embutidos (PT-BR por padrão), sobrescrevíveis um a um. */
+  labels?: Partial<DataTableLabels>;
 }
 
 function DataTableInner<T extends Record<string, unknown>>(
@@ -117,11 +138,14 @@ function DataTableInner<T extends Record<string, unknown>>(
     rowKey,
     onRowClick,
     caption,
+    labels: labelsProp,
     className,
     ...props
   }: DataTableProps<T>,
   _ref: React.Ref<HTMLDivElement>
 ) {
+  const labels = { ...defaultDataTableLabels, ...labelsProp };
+
   const handleSort = (key: string) => {
     onSort?.(key);
   };
@@ -181,7 +205,7 @@ function DataTableInner<T extends Record<string, unknown>>(
                     <button
                       type="button"
                       onClick={() => handleSort(col.key)}
-                      aria-label={`Ordenar por ${col.header}`}
+                      aria-label={labels.sortBy(col.header)}
                       className="inline-flex items-center gap-2 rounded-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     >
                       {col.header}
@@ -244,7 +268,7 @@ function DataTableInner<T extends Record<string, unknown>>(
       {page !== undefined && pageCount !== undefined && pageCount > 1 && (
         <div className="flex items-center justify-between px-2 py-4">
           <div className="text-sm text-muted-foreground">
-            Página {page} de {pageCount}
+            {labels.pageOf(page, pageCount)}
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -254,7 +278,7 @@ function DataTableInner<T extends Record<string, unknown>>(
               className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-              Anterior
+              {labels.previous}
             </button>
             <button
               type="button"
@@ -262,7 +286,7 @@ function DataTableInner<T extends Record<string, unknown>>(
               disabled={page >= pageCount}
               className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              Próximo
+              {labels.next}
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>

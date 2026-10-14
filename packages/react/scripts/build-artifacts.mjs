@@ -305,6 +305,7 @@ npm install @semec/ds
 
 \`\`\`css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 \`\`\`
@@ -433,6 +434,7 @@ function llmsIndex({ site = false, lite = false } = {}) {
     "",
     "```css",
     '@import "tailwindcss";',
+    '@import "@semec/ds/react/fonts.css";',
     '@import "@semec/ds/react/tokens.css";',
     '@source "../node_modules/@semec/ds/dist/react";',
     "```",

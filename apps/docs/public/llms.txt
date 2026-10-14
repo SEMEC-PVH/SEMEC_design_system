@@ -10,6 +10,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -22,23 +23,23 @@ npm install @semec/ds
 - **Navegação** (`navegacao`) — Trilhas, abas e deslocamento entre páginas.
 - **Feedback e estados** (`feedback-e-estados`) — Mensagens de estado, carregamento e camadas sobre a página.
 
-## Componentes (49)
+## Componentes (52)
 
-- [Botões (`button`) — Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.](/componentes/botoes) — `src/components/button.tsx` — md: `/components/botoes.md`
+- [Botões (`button`) — Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida.](/componentes/botoes) — `src/components/button.tsx` — md: `/components/botoes.md`
   Uso: `import { Button } from "@semec/ds/react";`
 - [Botão de ícone (`icon-button`) — Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).](/componentes/botao-de-icone) — `src/components/icon-button.tsx` — md: `/components/botao-de-icone.md`
   Uso: `import { IconButton } from "@semec/ds/react";`
-- [Link (`link`) — Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.](/componentes/link) — `src/components/link.tsx` — md: `/components/link.md`
+- [Link (`link`) — Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas.](/componentes/link) — `src/components/link.tsx` — md: `/components/link.md`
   Uso: `import { Link } from "@semec/ds/react";`
-- [Caixa de texto (`input`) — Campo de texto. Estado de erro via `aria-invalid`.](/componentes/caixa-de-texto) — `src/components/input.tsx` — md: `/components/caixa-de-texto.md`
-  Uso: `import { FormField } from "@semec/ds/react";`
+- [Caixa de texto (`input`) — Campo de texto. Estado de erro via `aria-invalid`. Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente.](/componentes/caixa-de-texto) — `src/components/input.tsx` — md: `/components/caixa-de-texto.md`
+  Uso: `import { Input } from "@semec/ds/react";`
 - [Área de texto (`textarea`) — Campo multilinha com as mesmas variantes visuais do campo de texto.](/componentes/area-de-texto) — `src/components/textarea.tsx` — md: `/components/area-de-texto.md`
-  Uso: `import { FormField } from "@semec/ds/react";`
+  Uso: `import { Textarea } from "@semec/ds/react";`
 - [Menu de seleção (`select`) — Seleção fechada com gatilho, conteúdo e itens compostos.](/componentes/menu-de-selecao) — `src/components/select.tsx` — md: `/components/menu-de-selecao.md`
   Uso: `import { Select } from "@semec/ds/react";`
-- [Combobox (`combobox`) — Campo com busca e lista filtrada. Opções via `options`.](/componentes/combobox) — `src/components/combobox.tsx` — md: `/components/combobox.md`
+- [Combobox (`combobox`) — Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.](/componentes/combobox) — `src/components/combobox.tsx` — md: `/components/combobox.md`
   Uso: `import { Combobox } from "@semec/ds/react";`
-- [Seletor de data (`date-picker`) — Data com `<input type="date">` nativo — sem biblioteca de calendário.](/componentes/seletor-de-data) — `src/components/date-picker.tsx` — md: `/components/seletor-de-data.md`
+- [Seletor de data (`date-picker`) — Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).](/componentes/seletor-de-data) — `src/components/date-picker.tsx` — md: `/components/seletor-de-data.md`
   Uso: `import { DatePicker } from "@semec/ds/react";`
 - [Envio de arquivos (`file-upload`) — Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.](/componentes/envio-de-arquivos) — `src/components/file-upload.tsx` — md: `/components/envio-de-arquivos.md`
   Uso: `import { FileUpload } from "@semec/ds/react";`
@@ -50,17 +51,19 @@ npm install @semec/ds
   Uso: `import { Switch } from "@semec/ds/react";`
 - [Rótulo (`label`) — Rótulo acessível vinculado ao campo.](/componentes/rotulo) — `src/components/label.tsx` — md: `/components/rotulo.md`
   Uso: `import { Label } from "@semec/ds/react";`
-- [Campo de formulário (`form-field`) — Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Para feedback de sucesso após envio, use Toast; para erros de validação, mantenha no FormField com aria-invalid e ErrorSummary.](/componentes/campo-de-formulario) — `src/components/form-field.tsx` — md: `/components/campo-de-formulario.md`
+- [Campo de formulário (`form-field`) — Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role="alert"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast.](/componentes/campo-de-formulario) — `src/components/form-field.tsx` — md: `/components/campo-de-formulario.md`
   Uso: `import { FormField } from "@semec/ds/react";`
-- [ErrorSummary (`error-summary`) — Resumo de erros de validação no topo do formulário, com links para cada campo. A11y: `role="alert"`, foco automático.](/componentes/error-summary) — `src/components/error-summary.tsx` — md: `/components/error-summary.md`
+- [ErrorSummary (`error-summary`) — Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático, título ligado por id gerado. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`).](/componentes/error-summary) — `src/components/error-summary.tsx` — md: `/components/error-summary.md`
   Uso: `import { ErrorSummary } from "@semec/ds/react";`
-- [Cartão (`card`) — Superfície de conteúdo com header, corpo e footer.](/componentes/cartao) — `src/components/card.tsx` — md: `/components/cartao.md`
+- [Cartão (`card`) — Superfície de conteúdo com header, corpo e footer. Sombra pelo token `shadow-elevation-1`.](/componentes/cartao) — `src/components/card.tsx` — md: `/components/cartao.md`
   Uso: `import { Card } from "@semec/ds/react";`
+- [Título (`heading`) — Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual.](/componentes/titulo) — `src/components/heading.tsx` — md: `/components/titulo.md`
+  Uso: `import { Heading } from "@semec/ds/react";`
 - [Etiqueta (`badge`) — Etiqueta curta de status ou contagem.](/componentes/etiqueta) — `src/components/badge.tsx` — md: `/components/etiqueta.md`
   Uso: `import { Badge } from "@semec/ds/react";`
 - [Tabela (`table`) — Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.](/componentes/tabela) — `src/components/table.tsx` — md: `/components/tabela.md`
   Uso: `import { Table } from "@semec/ds/react";`
-- [Esqueleto (`skeleton`) — Placeholder pulsante de carregamento.](/componentes/esqueleto) — `src/components/skeleton.tsx` — md: `/components/esqueleto.md`
+- [Esqueleto (`skeleton`) — Placeholder pulsante de carregamento, decorativo (aria-hidden). Fundo `surface-sunken`. Anuncie o carregamento no contêiner com aria-busy e um texto ou Spinner.](/componentes/esqueleto) — `src/components/skeleton.tsx` — md: `/components/esqueleto.md`
   Uso: `import { Skeleton } from "@semec/ds/react";`
 - [Estado vazio (`empty-state`) — Estado vazio com ícone, título, descrição e ação opcional.](/componentes/estado-vazio) — `src/components/empty-state.tsx` — md: `/components/estado-vazio.md`
   Uso: `import { EmptyState } from "@semec/ds/react";`
@@ -70,9 +73,13 @@ npm install @semec/ds
   Uso: `import { Breadcrumb } from "@semec/ds/react";`
 - [Cabeçalho (`header`) — Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.](/componentes/cabecalho) — `src/components/header.tsx` — md: `/components/cabecalho.md`
   Uso: `import { Header } from "@semec/ds/react";`
-- [Abas (`tabs`) — Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.](/componentes/abas) — `src/components/tabs.tsx` — md: `/components/abas.md`
+- [Link para o conteúdo (`skip-link`) — Link "Pular para o conteúdo principal" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo).](/componentes/link-para-o-conteudo) — `src/components/skip-link.tsx` — md: `/components/link-para-o-conteudo.md`
+  Uso: `import { SkipLink } from "@semec/ds/react";`
+- [Rodapé (`footer`) — Rodapé institucional (<footer>, landmark contentinfo) com seções de links e faixa final. Use um por página, fora do <main>.](/componentes/rodape) — `src/components/footer.tsx` — md: `/components/rodape.md`
+  Uso: `import { Footer } from "@semec/ds/react";`
+- [Abas (`tabs`) — Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix. A aba ativa tem barra inferior de 3px em `primary` (≥4,97:1) e peso semibold, além do fundo: não depende só de cor. Alvo de 44px.](/componentes/abas) — `src/components/tabs.tsx` — md: `/components/abas.md`
   Uso: `import { Tabs } from "@semec/ds/react";`
-- [Paginação (`pagination`) — Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.](/componentes/paginacao) — `src/components/pagination.tsx` — md: `/components/paginacao.md`
+- [Paginação (`pagination`) — Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px. Textos em PT-BR, sobrescrevíveis por `labels`.](/componentes/paginacao) — `src/components/pagination.tsx` — md: `/components/paginacao.md`
   Uso: `import { Pagination } from "@semec/ds/react";`
 - [Gatilho da barra lateral (`sidebar-trigger`) — `SidebarToggleButton`: botão controlado (`open` + `onToggle`) para colapsar/expandir uma sidebar cujo estado vive no seu layout (ex.: Header). Alterna entre ícones PanelLeftOpen e PanelLeftClose. Dentro de `SidebarProvider`, use `SidebarTrigger` (ver Barra lateral), que não recebe `open`/`onToggle`.](/componentes/gatilho-da-barra-lateral) — `src/components/sidebar-trigger.tsx` — md: `/components/gatilho-da-barra-lateral.md`
   Uso: `import { SidebarToggleButton } from "@semec/ds/react";`
@@ -82,11 +89,11 @@ npm install @semec/ds
   Uso: `import { Toaster } from "@semec/ds/react";`
 - [Dica (`tooltip`) — Dica curta ao passar o ponteiro ou focar o elemento.](/componentes/dica) — `src/components/tooltip.tsx` — md: `/components/dica.md`
   Uso: `import { Tooltip } from "@semec/ds/react";`
-- [Aviso (`alert`) — Mensagem de feedback em linha, com ícone automático por variante.](/componentes/aviso) — `src/components/alert.tsx` — md: `/components/aviso.md`
+- [Aviso (`alert`) — Mensagem de feedback em linha, com ícone automático por variante. Só destructive interrompe o leitor de tela (role=alert); as demais usam role=status.](/componentes/aviso) — `src/components/alert.tsx` — md: `/components/aviso.md`
   Uso: `import { Alert } from "@semec/ds/react";`
 - [Acordeão (`accordion`) — Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`).](/componentes/acordeao) — `src/components/accordion.tsx` — md: `/components/acordeao.md`
   Uso: `import { Accordion } from "@semec/ds/react";`
-- [Diálogo de alerta (`alert-dialog`) — Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.](/componentes/dialogo-de-alerta) — `src/components/alert-dialog.tsx` — md: `/components/dialogo-de-alerta.md`
+- [Diálogo de alerta (`alert-dialog`) — Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role="alertdialog", sempre modal, não fecha por clique fora e abre com o foco no Cancelar.](/componentes/dialogo-de-alerta) — `src/components/alert-dialog.tsx` — md: `/components/dialogo-de-alerta.md`
   Uso: `import { AlertDialog } from "@semec/ds/react";`
 - [Popover (`popover`) — Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.](/componentes/popover) — `src/components/popover.tsx` — md: `/components/popover.md`
   Uso: `import { Popover } from "@semec/ds/react";`
@@ -94,17 +101,17 @@ npm install @semec/ds
   Uso: `import { Separator } from "@semec/ds/react";`
 - [Avatar (`avatar`) — Foto de perfil com fallback automático (iniciais).](/componentes/avatar) — `src/components/avatar.tsx` — md: `/components/avatar.md`
   Uso: `import { Avatar } from "@semec/ds/react";`
-- [Toggle (`toggle`) — Botão binário para estados on/off em toolbars.](/componentes/toggle) — `src/components/toggle.tsx` — md: `/components/toggle.md`
+- [Toggle (`toggle`) — Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos.](/componentes/toggle) — `src/components/toggle.tsx` — md: `/components/toggle.md`
   Uso: `import { Toggle } from "@semec/ds/react";`
-- [Spinner (`spinner`) — Indicador de carregamento inline.](/componentes/spinner) — `src/components/spinner.tsx` — md: `/components/spinner.md`
+- [Spinner (`spinner`) — Indicador de carregamento inline (role=status).](/componentes/spinner) — `src/components/spinner.tsx` — md: `/components/spinner.md`
   Uso: `import { Spinner } from "@semec/ds/react";`
-- [Progresso (`progress`) — Barra de progresso determinada.](/componentes/progress) — `src/components/progress.tsx` — md: `/components/progress.md`
+- [Progresso (`progress`) — Barra de progresso determinada. Trilha com contorno border-strong (3,77:1 sobre surface) e indicador primary.](/componentes/progress) — `src/components/progress.tsx` — md: `/components/progress.md`
   Uso: `import { Progress } from "@semec/ds/react";`
 - [Slider (`slider`) — Controle deslizante para faixas de valor.](/componentes/slider) — `src/components/slider.tsx` — md: `/components/slider.md`
   Uso: `import { Slider } from "@semec/ds/react";`
 - [Input OTP (`input-otp`) — Campo de código OTP com foco automático entre dígitos.](/componentes/input-otp) — `src/components/input-otp.tsx` — md: `/components/input-otp.md`
   Uso: `import { InputOTP } from "@semec/ds/react";`
-- [Calendário (`calendar`) — Calendário visual para seleção de data.](/componentes/calendario) — `src/components/calendar.tsx` — md: `/components/calendario.md`
+- [Calendário (`calendar`) — Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px.](/componentes/calendario) — `src/components/calendar.tsx` — md: `/components/calendario.md`
   Uso: `import { Calendar } from "@semec/ds/react";`
 - [Área de scroll (`scroll-area`) — Scroll customizado e consistente entre navegadores.](/componentes/scroll-area) — `src/components/scroll-area.tsx` — md: `/components/scroll-area.md`
   Uso: `import { ScrollArea } from "@semec/ds/react";`
@@ -116,12 +123,12 @@ npm install @semec/ds
   Uso: `import { Sheet } from "@semec/ds/react";`
 - [Tabela de dados (`data-table`) — Tabela com ordenação, paginação e estados vazios.](/componentes/tabela-de-dados) — `src/components/data-table.tsx` — md: `/components/tabela-de-dados.md`
   Uso: `import { DataTable } from "@semec/ds/react";`
-- [Linha do tempo (`timeline`) — Sequência temporal com dots, conectores e conteúdo.](/componentes/timeline) — `src/components/timeline.tsx` — md: `/components/timeline.md`
+- [Linha do tempo (`timeline`) — Sequência temporal em lista ordenada (ol/li), com pontos, conectores visíveis e conteúdo. O status vai em texto (srLabel), não só na cor.](/componentes/timeline) — `src/components/timeline.tsx` — md: `/components/timeline.md`
   Uso: `import { Timeline } from "@semec/ds/react";`
-- [Menu de navegação (`navigation-menu`) — Navegação principal com mega-menu e viewport animado.](/componentes/menu-de-navegacao) — `src/components/navigation-menu.tsx` — md: `/components/menu-de-navegacao.md`
+- [Menu de navegação (`navigation-menu`) — Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px.](/componentes/menu-de-navegacao) — `src/components/navigation-menu.tsx` — md: `/components/menu-de-navegacao.md`
   Uso: `import { NavigationMenu } from "@semec/ds/react";`
-- [Barra lateral (`sidebar`) — Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile.](/componentes/sidebar) — `src/components/sidebar.tsx` — md: `/components/sidebar.md`
-  Uso: `import { SidebarProvider } from "@semec/ds/react";`
+- [Barra lateral (`sidebar`) — Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile. Abaixo de 768px (48rem, via `matchMedia`) a Sidebar vira gaveta modal (Radix Dialog): foco preso, Esc fecha, conteúdo de trás inerte, foco volta a quem abriu e botão visível "Fechar menu" (44×44). No desktop renderiza um landmark `<nav aria-label="Menu lateral">`. `SidebarMenuButton isActive` gera `aria-current="page"`; `tooltip` aparece só no modo recolhido (`collapsible="icon"`). `SidebarTrigger` (44×44) expõe `aria-expanded` e `aria-controls`.](/componentes/sidebar) — `src/components/sidebar.tsx` — md: `/components/sidebar.md`
+  Uso: `import { Sidebar } from "@semec/ds/react";`
 
 ## Padrões
 
@@ -149,4 +156,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--action-primary` etc.), nunca hex solto
 
-> Gerado 2026-10-14T18:06:14.000Z a partir de packages/react/manifest.js. Versão 3.0.0.
+> Gerado 2026-10-14T18:58:49.000Z a partir de packages/react/manifest.js. Versão 3.0.0.
