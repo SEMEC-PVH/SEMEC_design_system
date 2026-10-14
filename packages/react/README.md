@@ -110,7 +110,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
 ### 5. Next.js App Router: importe o kit só em arquivos `"use client"`
 
-Na 3.0.x o `dist` é **um bundle único, sem a diretiva `"use client"`**. Importar `@semec/ds/react` num Server Component quebra (hooks como `useLayoutEffect` não existem no ambiente `react-server`). Até a correção (planejada para a 3.1, AUD-20):
+Na 3.0 e na 3.1 o `dist` é **um bundle único, sem a diretiva `"use client"`**. Importar `@semec/ds/react` num Server Component quebra (hooks como `useLayoutEffect` não existem no ambiente `react-server`). Até a correção (planejada para uma versão futura, AUD-20):
 
 - use os componentes em arquivos que começam com `"use client"`;
 - monte os providers do passo 4 num componente `"use client"` (ex.: `app/providers.tsx`) e use-o no `layout`;
@@ -198,7 +198,7 @@ import { cn } from "@semec/ds/react";
 <div className={cn("p-4 bg-surface", ativo && "ring-2 ring-ring")} />
 ```
 
-`cn` = `clsx` + `tailwind-merge`, o mesmo helper usado dentro dos componentes (exportado a partir da 3.0.1).
+`cn` = `clsx` + `tailwind-merge`, o mesmo helper usado dentro dos componentes (exportado a partir da 3.1.0).
 
 ## Subpath exports
 
@@ -284,9 +284,9 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 - **Tailwind CSS**: v4+ no app (com `@source` apontando para `node_modules/@semec/ds/dist/react`, caminho relativo ao CSS)
 - **Instaladas automaticamente**: todos os `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, `get-nonce`
 
-## Limitações conhecidas (3.0.x)
+## Limitações conhecidas (3.0 e 3.1)
 
-- **Bundle único**: importar uma peça carrega o kit inteiro (sem poda de árvore por módulo). Saída por módulo planejada para a 3.1 (AUD-20).
+- **Bundle único**: importar uma peça carrega o kit inteiro (sem poda de árvore por módulo). Saída por módulo planejada para uma versão futura (AUD-20).
 - **Sem fronteira RSC**: ver o passo 5 de [Comece aqui](#comece-aqui).
 
 ## Documentação
