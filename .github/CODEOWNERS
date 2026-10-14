@@ -1,3 +1,16 @@
-# Mantenedores do design system (Departamento de Tecnologia da SEMEC).
-# Ajuste o nome do time/usuário GitHub para o que existir na organização SEMEC-PVH.
-* @SEMEC-PVH/design-system
+# Code owners do Design System SEMEC (Departamento de Tecnologia da SEMEC).
+#
+# A organização SEMEC-PVH não tem times (GET /orgs/SEMEC-PVH/teams == []), então
+# os donos são usuários nominais com permissão de push no repositório. Com a regra
+# "Require review from Code Owners" ligada no main, todo PR precisa de aprovação de
+# UM dos donos abaixo que não seja o autor (o GitHub não aceita autoaprovação).
+# Quando existir um time (ex.: @SEMEC-PVH/design-system), troque as linhas por ele.
+# Ver CONTRIBUTING.md, "Proteção do main".
+
+*                       @Rug-gieri @VgavaBR123
+
+# Pacote publicado no npm, release e CI: mesma dupla, explícita para não sumir
+# se a regra geral mudar.
+/packages/react/        @Rug-gieri @VgavaBR123
+/.changeset/            @Rug-gieri @VgavaBR123
+/.github/               @Rug-gieri @VgavaBR123
