@@ -2,12 +2,12 @@
 
 ## 3.0.0
 
-> **Errata (registrada em 14/10/2026, auditoria AUD-11, #25).** O item "Build com `splitting: true` (ESM por módulo) para poda de árvore" desta versão **não corresponde ao que foi publicado**. O texto original foi mantido, riscado, logo abaixo. Estado real da 3.0.0 (e da 3.0.x):
+> **Errata (registrada em 14/10/2026, auditoria AUD-11, #25).** O item "Build com `splitting: true` (ESM por módulo) para poda de árvore" desta versão **não corresponde ao que foi publicado**. O texto original foi mantido, riscado, logo abaixo. Estado real da 3.0.0 (que continua valendo na 3.1.0):
 >
 > - O `dist/react/index.js` é **um bundle único** (sem chunks por módulo). Importar uma só peça, como `maskCPF`, carrega o kit inteiro. Não há poda de árvore por componente.
 > - O `dist` **não tem a diretiva `"use client"`**: importar `@semec/ds/react` num Server Component (Next.js App Router) falha.
 > - **O que fazer:** no Next App Router, importe o kit só em arquivos `"use client"` (componentes e providers, como `<Toaster />`). Em Vite/SPA nada muda.
-> - **Correção técnica:** saída por módulo e `"use client"` por componente estão planejados para a 3.1 (AUD-20).
+> - **Correção técnica:** saída por módulo e `"use client"` por componente estão planejados para uma versão futura (AUD-20).
 
 ### Major Changes
 

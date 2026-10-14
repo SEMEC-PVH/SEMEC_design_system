@@ -12,7 +12,7 @@ O repositório do **Design System da SEMEC** (Secretaria Municipal de Economia d
 
 ## Fase atual
 
-O kit é **publicado no npm público** desde 17/09/2026 ([ADR-022](adr/0022-publicacao-npm-publico.md)), sob o nome `@semec/ds`; a versão publicada hoje é a **3.0.0** (3.0.1 em preparação, correções da auditoria de 14/10/2026). A versão vigente está sempre em `packages/react/package.json` e no [CHANGELOG](../packages/react/CHANGELOG.md). O consumo é via `npm install @semec/ds` (subpath exports: `/react`, `/react/validacao`, `/skills`, `/lite/skills`, tokens CSS e preset Tailwind).
+O kit é **publicado no npm público** desde 17/09/2026 ([ADR-022](adr/0022-publicacao-npm-publico.md)), sob o nome `@semec/ds`; a versão publicada hoje é a **3.0.0** (3.1.0 em preparação: features já no `main` e correções da auditoria de 14/10/2026). A versão vigente está sempre em `packages/react/package.json` e no [CHANGELOG](../packages/react/CHANGELOG.md). O consumo é via `npm install @semec/ds` (subpath exports: `/react`, `/react/validacao`, `/skills`, `/lite/skills`, tokens CSS e preset Tailwind).
 
 Não há Storybook, suíte de testes automatizados nem CI de acessibilidade. O site é export estático e a publicação é via GitHub Pages ([workflow](../.github/workflows/deploy-pages.yml)).
 
