@@ -23,7 +23,7 @@ export default {
         "surface-alt": "var(--surface-alt)",
         border: "var(--border)",
         "border-strong": "var(--border-strong)",
-        input: "var(--border)",
+        input: "var(--border-strong)",
         ring: "var(--focus-ring)",
         muted: "var(--surface-alt)",
         "muted-foreground": "var(--text-muted)",
