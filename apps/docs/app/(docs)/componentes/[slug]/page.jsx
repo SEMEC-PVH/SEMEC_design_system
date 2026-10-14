@@ -8,6 +8,7 @@ import {
   DataTableExtras,
   DrawerExtras,
   DropdownMenuExtras,
+  ErrorStateExtras,
   ErrorSummaryExtras,
   FileUploadExtras,
   SheetExtras,
@@ -31,6 +32,7 @@ const EXTRAS = {
   "gatilho-da-barra-lateral": <SidebarTriggerExtras />,
   "menu-suspenso": <DropdownMenuExtras />,
   "error-summary": <ErrorSummaryExtras />,
+  "estado-de-erro": <ErrorStateExtras />,
 };
 
 export async function generateMetadata({ params }) {

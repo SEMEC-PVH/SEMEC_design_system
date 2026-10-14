@@ -14,6 +14,7 @@ export * from "./components/date-picker";
 export * from "./components/dialog";
 export * from "./components/drawer";
 export * from "./components/dropdown-menu";
+export * from "./components/error-state";
 export * from "./components/error-summary";
 export * from "./components/empty-state";
 export * from "./components/file-upload";

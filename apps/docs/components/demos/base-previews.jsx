@@ -56,6 +56,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   EmptyState,
+  ErrorState,
   ErrorSummary,
   FileUpload,
   FormField,
@@ -451,6 +452,39 @@ function EmptyStatePreview() {
       description="Ajuste os filtros ou abra um novo requerimento."
       action={<Button>Abrir requerimento</Button>}
     />
+  );
+}
+
+function ErrorStatePreview() {
+  const [tentando, setTentando] = useState(false);
+
+  const handleRetry = () => {
+    setTentando(true);
+    setTimeout(() => setTentando(false), 1000);
+  };
+
+  return (
+    <div className="flex w-full flex-col gap-6">
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Variante Padrão (com onRetry)</p>
+        <ErrorState
+          title="Não foi possível carregar os protocolos"
+          description={tentando ? "Tentando restabelecer conexão com o servidor..." : "O servidor demorou muito para responder (timeout). Verifique sua conexão e tente novamente."}
+          onRetry={handleRetry}
+          retryLabel={tentando ? "Reconectando..." : "Tentar novamente"}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Variante Inline</p>
+        <ErrorState
+          variant="inline"
+          title="Falha ao sincronizar dados da certidão"
+          description="Os dados exibidos podem estar desatualizados."
+          onRetry={handleRetry}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -1147,6 +1181,7 @@ const PREVIEWS = {
   table: TablePreview,
   skeleton: SkeletonPreview,
   "empty-state": EmptyStatePreview,
+  "error-state": ErrorStatePreview,
   breadcrumb: BreadcrumbPreview,
   tabs: TabsPreview,
   pagination: PaginationPreview,

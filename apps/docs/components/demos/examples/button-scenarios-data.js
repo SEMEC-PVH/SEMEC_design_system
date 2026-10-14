@@ -49,7 +49,7 @@ export const iconToolbarUsage = `import { IconButton, Tooltip, TooltipContent, T
 import { Download, Pencil, Trash2 } from "lucide-react";
 
 <TooltipProvider>
-  <div className="flex gap-2">
+  <div className="flex items-center justify-center gap-2">
     <Tooltip>
       <TooltipTrigger asChild>
         <IconButton label="Editar requerimento"><Pencil /></IconButton>

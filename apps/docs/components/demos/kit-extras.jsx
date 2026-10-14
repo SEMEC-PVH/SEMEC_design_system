@@ -230,3 +230,69 @@ export function ErrorSummaryExtras() {
     </Prose>
   );
 }
+
+export function ErrorStateExtras() {
+  return (
+    <Prose
+      quandoUsar="Quando uma seção ou página inteira falhar ao carregar dados remotos (erro 500, timeout 504, erro de rede ou falha de sincronização) e existir uma possibilidade de recuperação pelo próprio usuário (ex.: tentar novamente)."
+      quandoNaoUsar="Para validação de campos de formulário (use FormField e ErrorSummary). Para avisos flutuantes temporários (use Toast). Para estados normais em que a busca simplesmente não retornou registros (use EmptyState)."
+      a11y={[
+        "Usa role=\"alert\" e aria-live=\"assertive\" para anunciar imediatamente a falha aos leitores de tela.",
+        "O ícone decorativo possui aria-hidden=\"true\" para não poluir a leitura.",
+        "Não depende apenas de cor: conta com título explícito, ícone de alerta e mensagem textual clara com instrução de como proceder.",
+        "Ação de recuperação (onRetry ou action) é sempre um botão ou elemento focável e acionável por teclado (Enter/Espaço).",
+      ]}
+    >
+      <h3>Props</h3>
+      <div className="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Prop</th>
+              <th>Tipo</th>
+              <th>Descrição</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>title</code></td>
+              <td><code>string</code></td>
+              <td>Título principal descrevendo a falha de forma clara e direta.</td>
+            </tr>
+            <tr>
+              <td><code>description</code></td>
+              <td><code>string</code></td>
+              <td>Explicação complementar da causa e orientação de ação para o usuário.</td>
+            </tr>
+            <tr>
+              <td><code>onRetry</code></td>
+              <td><code>() =&gt; void</code></td>
+              <td>Callback disparado ao clicar no botão de tentar novamente.</td>
+            </tr>
+            <tr>
+              <td><code>retryLabel</code></td>
+              <td><code>string</code></td>
+              <td>Texto do botão de tentar novamente (padrão: &quot;Tentar novamente&quot;).</td>
+            </tr>
+            <tr>
+              <td><code>variant</code></td>
+              <td><code>&quot;default&quot; | &quot;inline&quot;</code></td>
+              <td><code>default</code> para páginas ou blocos principais; <code>inline</code> para cards e tabelas.</td>
+            </tr>
+            <tr>
+              <td><code>icon</code></td>
+              <td><code>ReactNode</code></td>
+              <td>Ícone customizado opcional. Por padrão exibe AlertCircle.</td>
+            </tr>
+            <tr>
+              <td><code>action</code></td>
+              <td><code>ReactNode</code></td>
+              <td>Elemento ou botão de ação customizado em substituição ao botão padrão de retry.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </Prose>
+  );
+}
+

@@ -356,6 +356,35 @@ import { Inbox } from "lucide-react";
 />`,
   },
   {
+    code: "error-state",
+    slug: "estado-de-erro",
+    label: "Estado de erro",
+    file: "src/components/error-state.tsx",
+    category: "feedback",
+    desc: "Estado de erro com anúncio acessível (role=alert), mensagem explicativa e ação de recuperação (onRetry ou ação personalizada).",
+    variants: [
+      { prop: "variant", values: "default · inline" },
+      { prop: "props", values: "title · description · icon · action · onRetry · retryLabel · variant" },
+      { prop: "a11y", values: "role=alert · aria-live=assertive · ícones com aria-hidden" },
+    ],
+    usage: `import { ErrorState, Button } from "@semec/ds/react";
+
+// Variante padrão com atalho onRetry
+<ErrorState
+  title="Não foi possível carregar os protocolos"
+  description="Houve uma falha na conexão com o servidor. Verifique sua rede e tente novamente."
+  onRetry={() => recarregarDados()}
+/>
+
+// Variante inline para seções menores
+<ErrorState
+  variant="inline"
+  title="Falha ao atualizar indicador"
+  description="Serviço temporariamente indisponível."
+  onRetry={() => atualizar()}
+/>`,
+  },
+  {
     code: "breadcrumb",
     slug: "trilha-de-navegacao",
     label: "Trilha de navegação",
