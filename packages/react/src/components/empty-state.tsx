@@ -1,16 +1,22 @@
 import * as React from "react";
 
 import { cn } from "../lib/utils";
+import type { HeadingTag } from "./heading";
 
-interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: React.ReactNode;
   title: string;
   description?: string;
   action?: React.ReactNode;
+  /**
+   * Elemento do título. Padrão: `h3` (comportamento anterior). Ajuste ao
+   * nível da página para não pular níveis (ex.: `h2` logo abaixo do `h1`).
+   */
+  titleAs?: HeadingTag;
 }
 
 const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
-  ({ className, icon, title, description, action, ...props }, ref) => (
+  ({ className, icon, title, description, action, titleAs: TitleTag = "h3", ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
@@ -20,12 +26,15 @@ const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
       {...props}
     >
       {icon ? (
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground [&>svg]:h-6 [&>svg]:w-6">
+        <div
+          aria-hidden="true"
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground [&>svg]:h-6 [&>svg]:w-6"
+        >
           {icon}
         </div>
       ) : null}
       <div className="space-y-1">
-        <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+        <TitleTag className="text-lg font-semibold text-foreground">{title}</TitleTag>
         {description ? (
           <p className="text-sm text-muted-foreground">{description}</p>
         ) : null}
