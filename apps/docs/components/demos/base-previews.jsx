@@ -131,7 +131,6 @@ import {
   TimelineItem,
   TimelineSeparator,
   TimelineTitle,
-  Toaster,
   Toggle,
   Tooltip,
   TooltipContent,
@@ -141,6 +140,7 @@ import {
 } from "semec-ds/react";
 import { Bell, Download, HelpCircle, Inbox, MoreHorizontal, Plus, Printer, Search, Trash2 } from "lucide-react";
 import PreviewFrame, { usePreviewPortalContainer } from "@/components/docs/PreviewFrame";
+import PreviewToaster from "@/components/demos/PreviewToaster";
 
 const ROW = "flex flex-wrap items-center gap-3";
 
@@ -566,12 +566,13 @@ function ToastDemo() {
   );
 }
 
-// Padrão oficial: <Toaster /> uma vez (aqui, no preview isolado) + useToast() para disparar.
+// Padrão oficial: <Toaster /> uma vez + useToast() para disparar.
+// PreviewToaster garante um só Toaster por página do site.
 function ToastPreview() {
   return (
     <>
       <ToastDemo />
-      <Toaster />
+      <PreviewToaster />
     </>
   );
 }
