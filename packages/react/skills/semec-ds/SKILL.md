@@ -1,6 +1,6 @@
 ---
 name: semec-ds
-description: Use SEMEC Design System (@semec/ds) para construir UI em React. Tokens pv-*, 47 componentes Radix+CVA, a11y WCAG 2.1 AA e padrões responsive. Use quando criar ou editar UI com o kit, migrar portal ou copiar snippets.
+description: Use SEMEC Design System (@semec/ds) para construir UI em React. Tokens pv-*, 49 componentes Radix+CVA, a11y WCAG 2.1 AA e padrões responsive. Use quando criar ou editar UI com o kit, migrar portal ou copiar snippets.
 author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 ---
 
@@ -12,15 +12,15 @@ Fonte de dados: `packages/react/manifest.js`. Artefatos gerados: `llms.txt`, `ll
 
 ## Instalação
 
-Peer deps: `react ^19.0.0`, `react-dom ^19.0.0`. Peer **opcional**: `zod ^3.23.0` (só se usar schemas em `@semec/ds/react/validacao`).
+Peer deps: `react ^19.0.0`, `react-dom ^19.0.0` e Tailwind CSS v4 no app. Peer **opcional**: `zod ^3.23.0` (só se usar schemas em `@semec/ds/react/validacao`).
 
 ```bash
-npm install @semec/ds class-variance-authority clsx tailwind-merge lucide-react \
-  @radix-ui/react-slot @radix-ui/react-label @radix-ui/react-checkbox \
-  @radix-ui/react-radio-group @radix-ui/react-select @radix-ui/react-switch \
-  @radix-ui/react-popover @radix-ui/react-tabs @radix-ui/react-dialog \
-  @radix-ui/react-toast @radix-ui/react-tooltip @radix-ui/react-accordion
+npm install @semec/ds
 ```
+
+Os pacotes `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react` e `get-nonce` são dependências do `@semec/ds` e vêm automaticamente. **Não** instale lista de Radix à mão.
+
+No CSS global do app (não via `import` em JS):
 
 ```css
 @import "tailwindcss";
@@ -28,9 +28,16 @@ npm install @semec/ds class-variance-authority clsx tailwind-merge lucide-react 
 @source "../node_modules/@semec/ds/dist/react";
 ```
 
-O `@source` é obrigatório no Tailwind v4: sem ele o CSS não gera as classes das peças (`bg-card`, `shadow-elevation-*`, `animate-in`…).
+O `@source` é obrigatório no Tailwind v4: sem ele o CSS não gera as classes das peças (`bg-card`, `shadow-elevation-*`, `animate-in`…). O caminho é **relativo ao arquivo CSS**: `src/index.css` e `app/globals.css` usam `../node_modules/...`; `src/app/globals.css` usa `../../node_modules/...`. Se o Tailwind varrer pastas demais (monorepo), limite com `@import "tailwindcss" source("../src");` (também relativo ao CSS) e mantenha o `@source` do pacote.
 
-Carregue Poppins 400–700 (self-hosted woff2 ou `next/font`).
+**Fonte:** o pacote **não traz** a Poppins; sem carregá-la, o texto cai em `system-ui` (fallback do token `--font-family-sans`). Carregue 400/500/600/700:
+
+- Next.js: `next/font/local` (ou `next/font/google`) com `variable: "--font-poppins"` na `<html>`, e no CSS global, depois do `tokens.css`: `:root { --font-family-sans: var(--font-poppins), system-ui, -apple-system, sans-serif; }` (o `next/font` gera nome de família com hash).
+- Vite/outros: `@font-face` self-hosted com `font-family: "Poppins"` (woff2 em `apps/docs/app/fonts/` do repositório) ou Google Fonts `family=Poppins:wght@400;500;600;700`. Nesses casos o token já funciona sem ajuste.
+
+**Providers no root (quando usar):** `<Toaster />` se usar `useToast()`; `<TooltipProvider>` em volta do app se usar `Tooltip`; `<SemecProvider nonce>` só para CSP estrita. O `SemecProvider` não inclui os outros dois.
+
+**Next.js App Router:** na 3.0.x o `dist` é bundle único **sem `"use client"`**. Importe o kit só em arquivos `"use client"` (inclusive o componente de providers); importar num Server Component quebra. Não use `export *` do kit num arquivo `"use client"`. Saída por módulo e fronteira RSC: planejadas para a 3.1.
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0). Use só `tokens.css` (+ `@source`). Preset JS opcional: `@config "@semec/ds/react/pv-preset"`.
 
@@ -50,8 +57,10 @@ Valores brutos. Nunca use direto em componente.
 | `--pv-blue-600` | `#3a6ca6` | Ação primária |
 | `--pv-blue-700` | `#2f5a8a` | Hover de ação |
 | `--pv-blue-800` | `#26476f` | Active de ação |
+| `--pv-blue-900` | `#26325B` | Azul institucional escuro (texto do toast de sucesso) |
 | `--pv-blue-hero` | `#223f99` | Anel de foco (9,38:1) |
 | `--pv-green-50` | `#eef7e6` | Superfície sucesso |
+| `--pv-green-500` | `#82C353` | Fundo do toast de sucesso — **nunca como cor de texto** |
 | `--pv-green-800` | `#3a6420` | Sucesso |
 | `--pv-yellow-800` | `#8a5a00` | Aviso |
 | `--pv-red-50` | `#fef2f2` | Superfície erro |
@@ -74,7 +83,7 @@ Camada do dia a dia. Diz o papel, não a cor. Use estes, nunca os L0.
 
 **Feedback:** `--feedback-success`, `--feedback-warning`, `--feedback-danger`, `--feedback-info` (+ `-surface`)
 
-**Tipografia:** `--font-family-sans`, `--text-xs/2xl`, `--leading-xs/2xl`, `--font-regular/bold`
+**Tipografia:** `--font-family-sans`, `--text-xs/sm/base/lg/xl/2xl`, `--leading-xs/sm/base/lg/xl/2xl`, `--font-regular/medium/semibold/bold`
 
 **Espaçamento:** `--space-0/1/2/3/4/6/8/12/16`
 
@@ -89,13 +98,13 @@ Camada do dia a dia. Diz o papel, não a cor. Use estes, nunca os L0.
 ## Lib utilities
 
 ```tsx
-import { cn } from "@semec/ds/react";
+import { cn } from "@semec/ds/react"; // a partir da 3.0.1 (na 3.0.0 não era exportado)
 import { maskCPF, maskCNPJ, maskCEP, maskCurrency } from "@semec/ds/react";
 import { validateCPF, validateCNPJ, validateEmail } from "@semec/ds/react";
 import { cpfSchema, cnpjSchema, cpfCnpjSchema, emailSchema, cepSchema } from "@semec/ds/react/validacao";
 ```
 
-## Componentes (47)
+## Componentes (49)
 
 ### Ações e links
 
@@ -138,6 +147,7 @@ import { cpfSchema, cnpjSchema, cpfCnpjSchema, emailSchema, cepSchema } from "@s
 ### Navegação
 
 - **breadcrumb** — `aria-current=page`, separadores ocultos
+- **header** — Header/HeaderBrand/HeaderNav/HeaderNavLink (`current` → `aria-current=page`)
 - **tabs** — roving tabindex via Radix
 - **pagination** — elipses, siblingCount
 - **sidebar-trigger** — colapsa/expand sidebar
@@ -148,8 +158,9 @@ import { cpfSchema, cnpjSchema, cpfCnpjSchema, emailSchema, cepSchema } from "@s
 
 ### Feedback e estados
 
+- **error-state** — falha ao carregar, com `onRetry`/`retryLabel`
 - **dialog** — modal acessível com overlay
-- **toast** — `useToast()` + ToastProvider + ToastViewport
+- **toast** — `<Toaster />` uma vez no root + `useToast()`
 - **tooltip** — TooltipProvider + Tooltip + Trigger + Content
 - **alert** — 4 variantes (default/success/warning/destructive)
 - **alert-dialog** — confirmação perigosa
@@ -202,7 +213,7 @@ Nunca `outline: none` sem alternativa.
 
 ### Áreas clicáveis
 
-- Mínimo **44×44px** (`--control-height-md: 44px`)
+- Mínimo **44×44px**: utilitários Tailwind `min-h-11 min-w-11` (o pacote não define `--control-height-*`)
 - Espaçamento mínimo entre alvos: 8px
 
 ### prefers-reduced-motion
@@ -231,6 +242,7 @@ Nos formulários do SEMEC DS, o ciclo de feedback segue uma regra estrita de UX 
 
 2. **Sucesso na Submissão (Notificação via Toast)**:
    - Notificações de confirmação pós-envio devem usar `toast({ variant: "success", title: "...", description: "..." })`.
+   - Pré-requisito: `<Toaster />` montado **uma vez** no root do app. Sem ele, `toast()` não mostra nada e não dá erro.
    - O toast de sucesso aplica automaticamente a identidade SEMEC: fundo verde (`--pv-green-500: #82C353`), tipografia Poppins (`--pv-blue-900: #26325B`), padding `16px 20px`, raio `12px`, título 16px/bold e descrição 14px/regular.
 
 ```tsx
@@ -288,17 +300,18 @@ export function ExemploFormulario() {
 | `xl:` | 1280px | Desktop largo |
 | `2xl:` | 1536px | Full HD |
 
-- Touch targets: `--control-height-md: 44px` (compacto: 32px via `data-density="compact"`)
+- Touch targets: 44px com `min-h-11 min-w-11`
 - Sidebar mobile (`< 900px`): drawer off-canvas + `inert` quando fechado
-- Containers: `--container-max` 1200px, `--container-docs` 48rem, `--measure` 65ch
-- Density compact: `<div data-density="compact">` para admin
+- Container de página: `mx-auto w-full max-w-[75rem] px-4` (1200px, igual ao site de docs); texto corrido: `max-w-prose` (65ch); coluna de leitura: `max-w-3xl` (48rem)
+- O pacote **não** tem `--container-max`, `--container-docs`, `--measure`, `--control-height-*` nem modo `data-density="compact"`: esses nomes existem só no CSS do site de documentação. `var()` com eles resolve para vazio, sem erro
 
 ## Regras
 
 - PT-BR rótulos, EN código (ADR-016): `<Button>Salvar</Button>` não `<Button>Save</Button>`
 - Semântica > aparência: `variant="destructive"` não `color="vermelho"`
 - `className` escapatória sempre permitida
-- Toast: requer `<ToastProvider><ToastViewport/>` + `useToast()`
+- Toast: `<Toaster />` uma vez no root + `useToast()`. Não monte `ToastProvider` + `ToastViewport` à mão (são as peças cruas do Radix e não leem o estado do `useToast`)
+- Tooltip: exige `<TooltipProvider>` acima na árvore
 - DatePicker: nativo `type="date"` (ISO YYYY-MM-DD); período = 2 campos
 - Sem hex solto — use tokens L1
 - CSP: Dialog/Drawer/Sheet/DropdownMenu usam `SemecProvider` com nonce. Medido (SEM-752/780): Popover 0 violações; ScrollArea e Select 1 cada, mesmo com nonce (CSS estático de scrollbar no `tokens.css`).
