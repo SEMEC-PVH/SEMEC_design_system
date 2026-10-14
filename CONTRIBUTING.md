@@ -342,6 +342,27 @@ npm install @semec/ds@^2.0.0
 
 **Depreciação**: propriedade ou componente marcado como obsoleto continua funcionando por **duas versões menores**, com aviso, antes de sair em uma versão maior — conforme o [ADR-013](docs/adr/0013-politica-de-depreciacao-duas-minors.md). Toda versão maior traz guia de migração.
 
+A 2.0.0 e a 3.0.0 removeram coisas sem esse aviso (AUD-43; errata da 2.0.0 no [CHANGELOG](packages/react/CHANGELOG.md)). Para não repetir, toda remoção ou mudança incompatível segue estes passos:
+
+1. **Anunciar numa minor.** O PR que deprecia traz changeset `minor` com uma linha que começa por `Depreciação:` dizendo o que sai, em que major, e o que usar no lugar. Em código: `@deprecated` no JSDoc (com o substituto) e, quando for uso em tempo de execução, um `console.warn` único em desenvolvimento (`process.env.NODE_ENV !== "production"`). Token CSS deprecado ganha comentário `/* @deprecated … */` no `tokens.css`.
+2. **Registrar na tabela abaixo**, com a versão em que o aviso começou.
+3. **Esperar duas minors.** Anunciado na 3.1.0, só pode sair a partir da 4.0.0 e depois de uma 3.2.0 publicada.
+4. **Remover só na major**, com guia de migração no CHANGELOG (o que saiu, o que usar, exemplo `diff`).
+
+### Depreciações anunciadas
+
+Anúncio na **3.1.0** (onda 2 da auditoria de 14/10/2026), remoção ou mudança prevista para a **4.0.0** (onda 3). Até lá, tudo continua funcionando como hoje.
+
+| O que muda na 4.0 | O que fazer desde já | Achado |
+|---|---|---|
+| **Saída por módulo e subpaths por componente.** O `dist/react` deixa de ser um bundle único; os componentes ganham `"use client"` e subpaths `@semec/ds/react/*`. O caminho interno de arquivos em `dist/` muda (e, com ele, possivelmente o `@source` do Tailwind, que vai constar no guia de migração). | Importe só pelos subpaths do `exports` (`@semec/ds/react`, `@semec/ds/react/validacao`, `@semec/ds/react/tokens.css`…), nunca por caminho de arquivo (`@semec/ds/dist/react/index.js`). | AUD-20 |
+| **Contrato único de formulário** (ADR-015): `value` / `onValueChange` / `name` / `id` / `invalid`. Os `onChange(value)` de `Calendar`, `Combobox`, `DatePicker` e `InputOTP` e o `onChange(files)` de `FileUpload` saem; `onChange` passa a significar só o evento nativo. | Onde o componente já tiver `onValueChange`, use-o. Onde ainda não tiver, o `onChange(value)` continua valendo até a 4.0. | AUD-35 |
+| **Primitivos L0 fora do `@theme`.** Os utilitários `bg-pv-*`, `text-pv-*`, `border-pv-*` (gerados de `--color-pv-*`) deixam de existir; as variáveis `--pv-*` continuam no `:root`. | Use os utilitários semânticos (`bg-primary`, `bg-brand-hero`, `text-foreground`, `bg-success-surface`…). Primitivo não é para uso direto. | AUD-55 |
+| **Escala de raio decidida.** Os valores de `rounded-sm` (hoje 2px) e `rounded-lg` (hoje 12px, igual ao `rounded-xl` do Tailwind) podem mudar, e os nomes L1 deixam de ser autorreferentes. | Escolha o raio pelo papel (`rounded-md` em controles, `rounded-lg` em cartões, `rounded-full` em pílulas), não pelo valor em px, e não fixe `rounded-[12px]`. | AUD-57 |
+| **Button `loading` e estado desabilitado.** O `Button` ganha `loading` (`aria-busy`) e o desabilitado pode passar de `disabled` nativo para `aria-disabled` (o botão continua focável e o componente bloqueia o clique). | Não dependa de `:disabled` em CSS nem de `button.disabled` em testes para o `Button` do kit; teste pelo papel e pelo nome acessível. | AUD-63 |
+
+Se você mantém um desses pontos no código, o `@deprecated` (JSDoc) e o aviso em desenvolvimento entram no PR que fizer a mudança aditiva correspondente; esta tabela é o registro oficial do aviso até lá.
+
 ---
 
 ## Decisões estruturais

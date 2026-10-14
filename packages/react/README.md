@@ -291,6 +291,18 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 - **Bundle único**: importar uma peça carrega o kit inteiro (sem poda de árvore por módulo). Saída por módulo planejada para uma versão futura (AUD-20).
 - **Sem fronteira RSC**: ver o passo 5 de [Comece aqui](#comece-aqui).
 
+## Depreciações anunciadas (saem na 4.0)
+
+Avisadas a partir da 3.1.0 e válidas até a 4.0 (política de duas minors, ADR-013). Lista completa, com o que usar no lugar: [CONTRIBUTING.md § Depreciações anunciadas](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/CONTRIBUTING.md#depreciações-anunciadas).
+
+- Importar por caminho de arquivo em `dist/` (o bundle único vira saída por módulo e subpaths `@semec/ds/react/*`).
+- `onChange(value)` / `onChange(files)` nos campos não nativos (contrato passa a ser `value` / `onValueChange` / `name` / `id` / `invalid`).
+- Utilitários de primitivo `bg-pv-*` / `text-pv-*` (use os semânticos).
+- Valores atuais de `rounded-sm` e `rounded-lg` (escolha o raio pelo papel, não pelo px).
+- `Button` desabilitado por `disabled` nativo (pode virar `aria-disabled`; não dependa de `:disabled`).
+
+O que a 2.0.0 removeu sem aviso está na errata do [CHANGELOG](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/CHANGELOG.md).
+
 ## Documentação
 
 - [Site de documentação](https://semec-pvh.github.io/SEMEC_design_system/)
