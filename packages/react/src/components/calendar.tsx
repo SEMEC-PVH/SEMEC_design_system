@@ -3,146 +3,288 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { cn } from "../lib/utils";
 
-const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-const MONTHS = [
-  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+const LOCALE = "pt-BR";
+
+const WEEKDAYS = [
+  { short: "Dom", long: "domingo" },
+  { short: "Seg", long: "segunda-feira" },
+  { short: "Ter", long: "terça-feira" },
+  { short: "Qua", long: "quarta-feira" },
+  { short: "Qui", long: "quinta-feira" },
+  { short: "Sex", long: "sexta-feira" },
+  { short: "Sáb", long: "sábado" },
 ];
 
-interface CalendarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
+const dayFormatter = new Intl.DateTimeFormat(LOCALE, {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+const monthFormatter = new Intl.DateTimeFormat(LOCALE, {
+  month: "long",
+  year: "numeric",
+});
+
+/** Textos anunciados pelo Calendar. Todos têm padrão em PT-BR. */
+export interface CalendarLabels {
+  /** Nome do botão que volta um mês. Padrão: "Mês anterior". */
+  previousMonth: string;
+  /** Nome do botão que avança um mês. Padrão: "Próximo mês". */
+  nextMonth: string;
+}
+
+const DEFAULT_LABELS: CalendarLabels = {
+  previousMonth: "Mês anterior",
+  nextMonth: "Próximo mês",
+};
+
+export interface CalendarProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
   value?: Date | null;
   onChange?: (date: Date) => void;
   disabled?: boolean;
+  /** Data mínima selecionável (`AAAA-MM-DD`). */
   min?: string;
+  /** Data máxima selecionável (`AAAA-MM-DD`). */
   max?: string;
+  /** Sobrescreve os textos anunciados (AUD-31). */
+  labels?: Partial<CalendarLabels>;
 }
 
-function getDaysInMonth(year: number, month: number) {
-  return new Date(year, month + 1, 0).getDate();
+/** Lê `AAAA-MM-DD` como data local (o `new Date("AAAA-MM-DD")` usa UTC e erra um dia no Brasil). */
+function parseDateString(input?: string): Date | undefined {
+  if (!input) return undefined;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input);
+  if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  const d = new Date(input);
+  if (Number.isNaN(d.getTime())) return undefined;
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
-function getFirstDayOfMonth(year: number, month: number) {
-  return new Date(year, month, 1).getDay();
+function startOfDay(d: Date) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
+function isSameDay(a?: Date | null, b?: Date | null) {
+  return (
+    !!a &&
+    !!b &&
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+function addDays(d: Date, n: number) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+}
+
+/** Soma meses mantendo o dia, limitado ao último dia do mês de destino. */
+function addMonths(d: Date, n: number) {
+  const target = new Date(d.getFullYear(), d.getMonth() + n, 1);
+  const last = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+  return new Date(target.getFullYear(), target.getMonth(), Math.min(d.getDate(), last));
+}
+
+function capitalize(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+const navButtonClass =
+  "inline-flex h-11 w-11 items-center justify-center rounded-md text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+
+/**
+ * Calendário mensal no padrão APG "date picker grid": uma única parada de
+ * `Tab` na grade (roving tabindex), setas movem por dia/semana, `Home`/`End`
+ * vão ao início/fim da semana, `PageUp`/`PageDown` trocam o mês
+ * (`Shift` + `PageUp`/`PageDown` trocam o ano) e `Enter`/`Espaço` selecionam.
+ */
 const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
-  ({ className, value, onChange, disabled, min, max, ...props }, ref) => {
-    const today = new Date();
-    const [viewDate, setViewDate] = React.useState(
-      value ? new Date(value.getFullYear(), value.getMonth(), 1) : new Date(today.getFullYear(), today.getMonth(), 1)
+  ({ className, value, onChange, disabled, min, max, labels, ...props }, ref) => {
+    const text = { ...DEFAULT_LABELS, ...labels };
+    const headingId = React.useId();
+    const today = startOfDay(new Date());
+
+    const minDate = parseDateString(min);
+    const maxDate = parseDateString(max);
+
+    const [focusedDate, setFocusedDate] = React.useState<Date>(() =>
+      value ? startOfDay(value) : today
     );
+    const gridRef = React.useRef<HTMLTableElement>(null);
+    const shouldFocusRef = React.useRef(false);
 
-    const year = viewDate.getFullYear();
-    const month = viewDate.getMonth();
-    const daysInMonth = getDaysInMonth(year, month);
-    const firstDay = getFirstDayOfMonth(year, month);
+    // Valor controlado de fora: leva a grade até a data escolhida.
+    const valueKey = value ? startOfDay(value).getTime() : null;
+    React.useEffect(() => {
+      if (valueKey !== null) setFocusedDate(new Date(valueKey));
+    }, [valueKey]);
 
-    const minDate = min ? new Date(min) : undefined;
-    const maxDate = max ? new Date(max) : undefined;
+    const year = focusedDate.getFullYear();
+    const month = focusedDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
 
-    const isSelected = (day: number) => {
-      if (!value) return false;
-      return value.getFullYear() === year && value.getMonth() === month && value.getDate() === day;
-    };
+    React.useEffect(() => {
+      if (!shouldFocusRef.current) return;
+      shouldFocusRef.current = false;
+      const cell = gridRef.current?.querySelector<HTMLElement>('[tabindex="0"]');
+      cell?.focus();
+    }, [focusedDate]);
 
-    const isToday = (day: number) => {
-      return (
-        today.getFullYear() === year &&
-        today.getMonth() === month &&
-        today.getDate() === day
-      );
-    };
-
-    const isDisabled = (day: number) => {
+    const isDisabled = (date: Date) => {
       if (disabled) return true;
-      const date = new Date(year, month, day);
       if (minDate && date < minDate) return true;
       if (maxDate && date > maxDate) return true;
       return false;
     };
 
-    const handleSelect = (day: number) => {
-      if (isDisabled(day)) return;
-      onChange?.(new Date(year, month, day));
+    const select = (date: Date) => {
+      if (isDisabled(date)) return;
+      onChange?.(date);
     };
 
-    const prevMonth = () => {
-      setViewDate(new Date(year, month - 1, 1));
+    const moveFocus = (date: Date) => {
+      shouldFocusRef.current = true;
+      setFocusedDate(date);
     };
 
-    const nextMonth = () => {
-      setViewDate(new Date(year, month + 1, 1));
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLTableElement>) => {
+      let next: Date | null = null;
+      switch (event.key) {
+        case "ArrowLeft":
+          next = addDays(focusedDate, -1);
+          break;
+        case "ArrowRight":
+          next = addDays(focusedDate, 1);
+          break;
+        case "ArrowUp":
+          next = addDays(focusedDate, -7);
+          break;
+        case "ArrowDown":
+          next = addDays(focusedDate, 7);
+          break;
+        case "Home":
+          next = addDays(focusedDate, -focusedDate.getDay());
+          break;
+        case "End":
+          next = addDays(focusedDate, 6 - focusedDate.getDay());
+          break;
+        case "PageUp":
+          next = addMonths(focusedDate, event.shiftKey ? -12 : -1);
+          break;
+        case "PageDown":
+          next = addMonths(focusedDate, event.shiftKey ? 12 : 1);
+          break;
+        case "Enter":
+        case " ":
+          event.preventDefault();
+          select(focusedDate);
+          return;
+        default:
+          return;
+      }
+      event.preventDefault();
+      moveFocus(next);
     };
 
-    const cells: (number | null)[] = [];
+    const cells: (Date | null)[] = [];
     for (let i = 0; i < firstDay; i++) cells.push(null);
-    for (let i = 1; i <= daysInMonth; i++) cells.push(i);
+    for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
+    while (cells.length % 7 !== 0) cells.push(null);
+    const weeks: (Date | null)[][] = [];
+    for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
 
     return (
-      <div
-        ref={ref}
-        className={cn("p-3", className)}
-        {...props}
-      >
-        <div className="flex items-center justify-between mb-4">
+      <div ref={ref} className={cn("p-3", className)} {...props}>
+        <div className="mb-2 flex items-center justify-between">
           <button
             type="button"
-            onClick={prevMonth}
-            className="inline-flex items-center justify-center rounded-md h-8 w-8 text-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            aria-label="Mês anterior"
+            onClick={() => setFocusedDate(addMonths(focusedDate, -1))}
+            className={navButtonClass}
+            aria-label={text.previousMonth}
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
           </button>
-          <div className="text-sm font-medium text-foreground">
-            {MONTHS[month]} {year}
+          <div
+            id={headingId}
+            aria-live="polite"
+            aria-atomic="true"
+            className="text-sm font-medium text-foreground"
+          >
+            {capitalize(monthFormatter.format(new Date(year, month, 1)))}
           </div>
           <button
             type="button"
-            onClick={nextMonth}
-            className="inline-flex items-center justify-center rounded-md h-8 w-8 text-foreground hover:bg-accent hover:text-accent-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            aria-label="Próximo mês"
+            onClick={() => setFocusedDate(addMonths(focusedDate, 1))}
+            className={navButtonClass}
+            aria-label={text.nextMonth}
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
 
-        <div className="grid grid-cols-7 gap-1 mb-1">
-          {WEEKDAYS.map((day) => (
-            <div
-              key={day}
-              className="flex h-8 items-center justify-center text-xs font-medium text-muted-foreground"
-            >
-              {day}
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-7 gap-1">
-          {cells.map((day, i) => {
-            if (day === null) {
-              return <div key={`empty-${i}`} />;
-            }
-            return (
-              <button
-                key={day}
-                type="button"
-                onClick={() => handleSelect(day)}
-                disabled={isDisabled(day)}
-                className={cn(
-                  "inline-flex h-9 w-9 items-center justify-center rounded-md text-sm transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                  isSelected(day)
-                    ? "bg-primary text-primary-foreground"
-                    : isToday(day)
-                      ? "bg-accent text-accent-foreground"
-                      : "text-foreground hover:bg-accent hover:text-accent-foreground",
-                  isDisabled(day) && "pointer-events-none opacity-50"
-                )}
-              >
-                {day}
-              </button>
-            );
-          })}
-        </div>
+        <table
+          ref={gridRef}
+          role="grid"
+          aria-labelledby={headingId}
+          aria-disabled={disabled || undefined}
+          onKeyDown={handleKeyDown}
+          className="border-separate border-spacing-0"
+        >
+          <thead>
+            <tr>
+              {WEEKDAYS.map((day) => (
+                <th
+                  key={day.short}
+                  scope="col"
+                  abbr={day.long}
+                  className="h-8 w-11 p-0 text-xs font-medium text-muted-foreground"
+                >
+                  {day.short}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {weeks.map((week, w) => (
+              <tr key={w}>
+                {week.map((date, i) => {
+                  if (!date) return <td key={`empty-${w}-${i}`} className="p-0" />;
+                  const selected = isSameDay(date, value);
+                  const isToday = isSameDay(date, today);
+                  const off = isDisabled(date);
+                  const focusable = isSameDay(date, focusedDate);
+                  return (
+                    <td
+                      key={date.getDate()}
+                      tabIndex={focusable ? 0 : -1}
+                      aria-selected={selected}
+                      aria-current={isToday ? "date" : undefined}
+                      aria-disabled={off || undefined}
+                      aria-label={dayFormatter.format(date)}
+                      onClick={() => {
+                        setFocusedDate(date);
+                        select(date);
+                      }}
+                      className={cn(
+                        "h-11 w-11 cursor-pointer select-none rounded-md p-0 text-center align-middle text-sm transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                        selected
+                          ? "bg-primary font-semibold text-primary-foreground"
+                          : isToday
+                            ? "bg-accent font-semibold text-accent-foreground underline underline-offset-4"
+                            : "text-foreground hover:bg-accent hover:text-accent-foreground",
+                        off && "cursor-default opacity-50 hover:bg-transparent"
+                      )}
+                    >
+                      {date.getDate()}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   }
