@@ -37,7 +37,7 @@ O `@source` é obrigatório no Tailwind v4: sem ele o CSS não gera as classes d
 
 **Providers no root (quando usar):** `<Toaster />` se usar `useToast()`; `<TooltipProvider>` em volta do app se usar `Tooltip`; `<SemecProvider nonce>` só para CSP estrita. O `SemecProvider` não inclui os outros dois.
 
-**Next.js App Router:** na 3.0.x o `dist` é bundle único **sem `"use client"`**. Importe o kit só em arquivos `"use client"` (inclusive o componente de providers); importar num Server Component quebra. Não use `export *` do kit num arquivo `"use client"`. Saída por módulo e fronteira RSC: planejadas para a 3.1.
+**Next.js App Router:** na 3.0 e na 3.1 o `dist` é bundle único **sem `"use client"`**. Importe o kit só em arquivos `"use client"` (inclusive o componente de providers); importar num Server Component quebra. Não use `export *` do kit num arquivo `"use client"`. Saída por módulo e fronteira RSC: planejadas para uma versão futura (AUD-20).
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0). Use só `tokens.css` (+ `@source`). Preset JS opcional: `@config "@semec/ds/react/pv-preset"`.
 
@@ -98,7 +98,7 @@ Camada do dia a dia. Diz o papel, não a cor. Use estes, nunca os L0.
 ## Lib utilities
 
 ```tsx
-import { cn } from "@semec/ds/react"; // a partir da 3.0.1 (na 3.0.0 não era exportado)
+import { cn } from "@semec/ds/react"; // a partir da 3.1.0 (na 3.0.0 não era exportado)
 import { maskCPF, maskCNPJ, maskCEP, maskCurrency } from "@semec/ds/react";
 import { validateCPF, validateCNPJ, validateEmail } from "@semec/ds/react";
 import { cpfSchema, cnpjSchema, cpfCnpjSchema, emailSchema, cepSchema } from "@semec/ds/react/validacao";
@@ -202,6 +202,10 @@ import { cpfSchema, cnpjSchema, cpfCnpjSchema, emailSchema, cepSchema } from "@s
 ```
 
 Nunca `outline: none` sem alternativa.
+
+### Exceção conhecida (não corrigir)
+
+- `aria-hidden-focus` (axe) com `Select` ou `DropdownMenu` **abertos** é exceção aceita (EXC-01, `docs/excecoes-acessibilidade.md`): vem do `hideOthers` do Radix sem `inert`, e o foco fica preso na camada, então o impacto é nulo. Não remova `aria-hidden`, não aplique `inert` por fora e não desative a regra globalmente.
 
 ### Labels e semântica
 
