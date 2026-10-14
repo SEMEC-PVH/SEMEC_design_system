@@ -194,15 +194,17 @@ Metadados de componente (o que versões anteriores deste README chamavam de `get
 
 ## Componentes
 
-**49 componentes** (um por módulo em `src/components`, exceto o `SemecProvider`, que é provider), pelos nomes exportados:
+<!-- ds:component-list:start -->
+**49 componentes** no manifest (`manifest.js`), pelo export principal de cada um. Lista e contagem geradas por `scripts/build-artifacts.mjs`; não edite à mão.
 
 | Categoria | Componentes |
 |---|---|
 | **Ações e links** (3) | Button, IconButton, Link |
 | **Formulários** (16) | Input, Textarea, Select, Combobox, DatePicker, FileUpload, Checkbox, RadioGroup, Switch, Label, FormField, ErrorSummary, Toggle, Slider, InputOTP, Calendar |
 | **Conteúdo e dados** (8) | Card, Badge, Table, Accordion, Separator, Avatar, DataTable, Timeline |
-| **Feedback e estados** (13) | Skeleton, EmptyState, ErrorState, Dialog, Toast, Tooltip, Alert, AlertDialog, Popover, Spinner, Progress, Drawer, Sheet |
-| **Navegação** (9) | Breadcrumb, Header, Tabs, Pagination, SidebarTrigger, ScrollArea, DropdownMenu, NavigationMenu, Sidebar |
+| **Navegação** (9) | Breadcrumb, Header, Tabs, Pagination, SidebarToggleButton, ScrollArea, DropdownMenu, NavigationMenu, Sidebar |
+| **Feedback e estados** (13) | Skeleton, EmptyState, ErrorState, Dialog, Toaster, Tooltip, Alert, AlertDialog, Popover, Spinner, Progress, Drawer, Sheet |
+<!-- ds:component-list:end -->
 
 Mais: `SemecProvider`, `cn`, masks (`maskCPF`, `maskCNPJ`, `maskCEP`, `maskCurrency`) e validadores puros (`validateCPF`, `validateCNPJ`, `validateEmail`).
 
@@ -271,6 +273,18 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 
 - **Bundle único**: importar uma peça carrega o kit inteiro (sem poda de árvore por módulo). Saída por módulo planejada para uma versão futura (AUD-20).
 - **Sem fronteira RSC**: ver o passo 5 de [Comece aqui](#comece-aqui).
+
+## Depreciações anunciadas (saem na 4.0)
+
+Avisadas a partir da 3.1.0 e válidas até a 4.0 (política de duas minors, ADR-013). Lista completa, com o que usar no lugar: [CONTRIBUTING.md § Depreciações anunciadas](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/CONTRIBUTING.md#depreciações-anunciadas).
+
+- Importar por caminho de arquivo em `dist/` (o bundle único vira saída por módulo e subpaths `@semec/ds/react/*`).
+- `onChange(value)` / `onChange(files)` nos campos não nativos (contrato passa a ser `value` / `onValueChange` / `name` / `id` / `invalid`).
+- Utilitários de primitivo `bg-pv-*` / `text-pv-*` (use os semânticos).
+- Valores atuais de `rounded-sm` e `rounded-lg` (escolha o raio pelo papel, não pelo px).
+- `Button` desabilitado por `disabled` nativo (pode virar `aria-disabled`; não dependa de `:disabled`).
+
+O que a 2.0.0 removeu sem aviso está na errata do [CHANGELOG](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/CHANGELOG.md).
 
 ## Documentação
 
