@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
   "version": "3.0.0",
-  "generatedAt": "2026-10-13T15:21:24.512Z",
+  "generatedAt": "2026-10-14T13:30:36.910Z",
   "categories": [
     {
       "key": "acoes",
@@ -392,6 +392,32 @@
       "prompt": "Crie um empty-state (Estado vazio) usando @semec/ds/react (`src/components/empty-state.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: icon · title · description · action. Estado vazio com ícone, título, descrição e ação opcional.",
       "url": "/componentes/estado-vazio",
       "md": "/components/estado-vazio.md"
+    },
+    {
+      "code": "error-state",
+      "slug": "estado-de-erro",
+      "label": "Estado de erro",
+      "file": "src/components/error-state.tsx",
+      "category": "feedback",
+      "desc": "Estado de erro com anúncio acessível (role=alert), mensagem explicativa e ação de recuperação (onRetry ou ação personalizada).",
+      "variants": [
+        {
+          "prop": "variant",
+          "values": "default · inline"
+        },
+        {
+          "prop": "props",
+          "values": "title · description · icon · action · onRetry · retryLabel · variant"
+        },
+        {
+          "prop": "a11y",
+          "values": "role=alert · aria-live=assertive · ícones com aria-hidden"
+        }
+      ],
+      "usage": "import { ErrorState, Button } from \"@semec/ds/react\";\n\n// Variante padrão com atalho onRetry\n<ErrorState\n  title=\"Não foi possível carregar os protocolos\"\n  description=\"Houve uma falha na conexão com o servidor. Verifique sua rede e tente novamente.\"\n  onRetry={() => recarregarDados()}\n/>\n\n// Variante inline para seções menores\n<ErrorState\n  variant=\"inline\"\n  title=\"Falha ao atualizar indicador\"\n  description=\"Serviço temporariamente indisponível.\"\n  onRetry={() => atualizar()}\n/>",
+      "prompt": "Crie um error-state (Estado de erro) usando @semec/ds/react (`src/components/error-state.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · inline · props: title · description · icon · action · onRetry · retryLabel · variant · a11y: role=alert · aria-live=assertive · ícones com aria-hidden. Estado de erro com anúncio acessível (role=alert), mensagem explicativa e ação de recuperação (onRetry ou ação personalizada).",
+      "url": "/componentes/estado-de-erro",
+      "md": "/components/estado-de-erro.md"
     },
     {
       "code": "breadcrumb",

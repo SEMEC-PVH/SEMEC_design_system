@@ -22,7 +22,7 @@ npm install @semec/ds
 - **Navegação** (`navegacao`) — Trilhas, abas e deslocamento entre páginas.
 - **Feedback e estados** (`feedback-e-estados`) — Mensagens de estado, carregamento e camadas sobre a página.
 
-## Componentes (48)
+## Componentes (49)
 
 - [Botões (`button`) — Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.](/componentes/botoes) — `src/components/button.tsx` — md: `/components/botoes.md`
   Uso: `import { Button } from "@semec/ds/react";`
@@ -64,6 +64,8 @@ npm install @semec/ds
   Uso: `import { Skeleton } from "@semec/ds/react";`
 - [Estado vazio (`empty-state`) — Estado vazio com ícone, título, descrição e ação opcional.](/componentes/estado-vazio) — `src/components/empty-state.tsx` — md: `/components/estado-vazio.md`
   Uso: `import { EmptyState } from "@semec/ds/react";`
+- [Estado de erro (`error-state`) — Estado de erro com anúncio acessível (role=alert), mensagem explicativa e ação de recuperação (onRetry ou ação personalizada).](/componentes/estado-de-erro) — `src/components/error-state.tsx` — md: `/components/estado-de-erro.md`
+  Uso: `import { ErrorState } from "@semec/ds/react";`
 - [Trilha de navegação (`breadcrumb`) — Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.](/componentes/trilha-de-navegacao) — `src/components/breadcrumb.tsx` — md: `/components/trilha-de-navegacao.md`
   Uso: `import { Breadcrumb } from "@semec/ds/react";`
 - [Cabeçalho (`header`) — Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.](/componentes/cabecalho) — `src/components/header.tsx` — md: `/components/cabecalho.md`
@@ -147,4 +149,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--action-primary` etc.), nunca hex solto
 
-> Gerado 2026-10-13T15:21:24.512Z a partir de packages/react/manifest.js. Versão 3.0.0.
+> Gerado 2026-10-14T13:30:36.910Z a partir de packages/react/manifest.js. Versão 3.0.0.
