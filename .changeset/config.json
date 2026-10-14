@@ -7,5 +7,21 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": []
+  "ignore": [],
+  "privatePackages": {
+    "version": false,
+    "tag": false
+  },
+  "changedFilePatterns": [
+    "src/**",
+    "skills/**",
+    "scripts/**",
+    "manifest.js",
+    "tokens.css",
+    "pv-preset.ts",
+    "server.js",
+    "tsup.config.ts",
+    "tsconfig.json",
+    "package.json"
+  ]
 }

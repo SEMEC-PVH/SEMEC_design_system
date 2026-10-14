@@ -23,7 +23,9 @@
     "clean": "npm run clean --workspace @semec/ds",
     "gate": "npm run build:ds && node scripts/gate/gate.mjs",
     "changeset": "changeset",
-    "version-packages": "changeset version",
+    "changeset:check": "changeset status --since=origin/main",
+    "check:artifacts": "npm run generate:llms && git diff --exit-code --stat -I generatedAt -I \"^> Gerado \" -- apps/docs/public",
+    "version-packages": "changeset version && npm install --package-lock-only --ignore-scripts",
     "release": "npm run build:ds && changeset publish"
   },
   "devDependencies": {

@@ -1,24 +1,46 @@
 name: Release
 
+# Fluxo Changesets (ver CONTRIBUTING.md, "Publicação e versionamento"):
+# 1. PRs com mudança publicada trazem um arquivo em .changeset/ (a CI exige).
+# 2. Depois que a CI fica verde num push ao main, este workflow roda:
+#    - se ainda há changesets pendentes, abre/atualiza o PR "chore(release): versiona pacotes"
+#      (changeset version + package-lock), que um mantenedor revisa e mergeia;
+#    - se não há changesets pendentes e a versão do package.json ainda não está no npm,
+#      publica (changeset publish), cria a tag @semec/ds@x.y.z e confere o registry.
+# Só roda a partir de CI verde: não há gatilho por push direto nem workflow_dispatch.
+
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
-  workflow_dispatch:
 
 concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: true
+  group: release-main
+  cancel-in-progress: false
 
 permissions:
   contents: read
 
 jobs:
-  publish:
+  release:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # O commit exato que a CI aprovou.
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -29,26 +51,29 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Build package
-        run: npm run build:ds
-
-      - name: Diagnóstico npm
+      - name: Changesets pendentes?
+        id: pending
         run: |
+          count=$(find .changeset -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l)
+          echo "count=$count" >> "$GITHUB_OUTPUT"
           {
             echo "## Release @semec/ds"
             echo ""
+            echo "- commit: \`${{ github.event.workflow_run.head_sha }}\`"
             echo "- version local: \`$(node -p "require('./packages/react/package.json').version")\`"
-            echo "- npm whoami: \`$(npm whoami 2>&1 || echo '(não autenticado)')\`"
-            echo "- NODE_AUTH_TOKEN set: \`${NODE_AUTH_TOKEN:+yes}${NODE_AUTH_TOKEN:-no}\`"
+            echo "- changesets pendentes: \`$count\`"
             echo ""
             echo "### Publish plan"
             echo '```'
-            npx changeset publish-plan
+            npx changeset publish-plan || true
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Diagnóstico npm
+        # Só exige o token quando o passo seguinte vai publicar (sem changesets pendentes).
+        if: steps.pending.outputs.count == '0'
+        run: |
+          echo "- npm whoami: \`$(npm whoami 2>&1 || echo '(não autenticado)')\`" | tee -a "$GITHUB_STEP_SUMMARY"
           if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
             echo "::error::Secret NPM_TOKEN vazio ou ausente no repo."
             exit 1
@@ -58,10 +83,23 @@ jobs:
             exit 1
           fi
 
-      - name: Publish to npm
-        run: npx changeset publish
+      - name: Versionar (PR) ou publicar
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: npm run version-packages
+          publish: npm run release
+          title: "chore(release): versiona pacotes"
+          commit: "chore(release): versiona pacotes"
+          createGithubReleases: true
+        env:
+          # PRs abertos com o GITHUB_TOKEN não disparam a CI. Se o secret RELEASE_PR_TOKEN
+          # (PAT fine-grained ou token de GitHub App com contents+pull-requests: write)
+          # existir, ele é usado e a CI roda no PR de versão. Ver CONTRIBUTING.md.
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PR_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Verify version on npm
+        if: steps.changesets.outputs.published == 'true'
         run: |
           expected=$(node -p "require('./packages/react/package.json').version")
           published=$(npm view @semec/ds version)
