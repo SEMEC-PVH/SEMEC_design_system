@@ -526,18 +526,30 @@ import { Button } from "@semec/ds/react";
     file: "src/components/dialog.tsx",
     category: "feedback",
     desc: "Diálogo modal acessível com overlay, header, título, descrição e footer.",
-    variants: [{ prop: "composição", values: "Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose" }],
+    variants: [
+      { prop: "composição", values: "Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose" },
+      { prop: "closeLabel", values: "nome acessível do X de 44×44px (padrão \"Fechar\")" },
+    ],
     usage: `import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "@semec/ds/react";
 
+// Para confirmação destrutiva use AlertDialog (role="alertdialog").
 <Dialog>
-  <DialogTrigger asChild><Button variant="destructive">Excluir</Button></DialogTrigger>
-  <DialogContent>
+  <DialogTrigger asChild><Button>Editar contato</Button></DialogTrigger>
+  <DialogContent closeLabel="Fechar edição">
     <DialogHeader>
-      <DialogTitle>Excluir requerimento?</DialogTitle>
-      <DialogDescription>Esta ação não pode ser desfeita.</DialogDescription>
+      <DialogTitle>Editar contato</DialogTitle>
+      <DialogDescription>Atualize o telefone do responsável.</DialogDescription>
     </DialogHeader>
     <DialogFooter><DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose></DialogFooter>
   </DialogContent>
+</Dialog>
+
+// Controlado SEM DialogTrigger: o Radix não sabe para onde devolver o foco.
+// Guarde o elemento de origem e devolva o foco em onCloseAutoFocus.
+const origemRef = React.useRef(null);
+<Button ref={origemRef} onClick={() => setAberto(true)}>Editar</Button>
+<Dialog open={aberto} onOpenChange={setAberto}>
+  <DialogContent onCloseAutoFocus={(e) => { e.preventDefault(); origemRef.current?.focus(); }}>…</DialogContent>
 </Dialog>`,
   },
   {
@@ -550,6 +562,8 @@ import { Button } from "@semec/ds/react";
     variants: [
       { prop: "variant", values: "default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive" },
       { prop: "uso", values: "<Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos" },
+      { prop: "Toaster", values: "label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis)" },
+      { prop: "alvos", values: "X e ToastAction com 44px" },
     ],
     usage: `import { Toaster, useToast, Button } from "@semec/ds/react";
 
@@ -623,9 +637,11 @@ import { HelpCircle } from "lucide-react";
     label: "Diálogo de alerta",
     file: "src/components/alert-dialog.tsx",
     category: "feedback",
-    desc: "Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.",
+    desc: "Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role=\"alertdialog\", sempre modal, não fecha por clique fora e abre com o foco no Cancelar.",
     variants: [
       { prop: "composição", values: "AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel" },
+      { prop: "variant (Action/Cancel)", values: "as do Button; padrão primary (Action) e outline (Cancel), 44px" },
+      { prop: "regras", values: "inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action" },
     ],
     usage: `import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from "@semec/ds/react";
 
@@ -640,8 +656,19 @@ import { HelpCircle } from "lucide-react";
     </AlertDialogHeader>
     <AlertDialogFooter>
       <AlertDialogCancel>Cancelar</AlertDialogCancel>
-      <AlertDialogAction>Excluir</AlertDialogAction>
+      <AlertDialogAction variant="destructive">Excluir</AlertDialogAction>
     </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+
+// Validar antes de fechar (ação assíncrona): controle open e impeça o fechamento automático
+<AlertDialog open={aberto} onOpenChange={setAberto}>
+  <AlertDialogContent>
+    …
+    <AlertDialogAction
+      variant="destructive"
+      onClick={async (e) => { e.preventDefault(); await excluir(); setAberto(false); }}
+    >Excluir</AlertDialogAction>
   </AlertDialogContent>
 </AlertDialog>`,
   },
@@ -857,6 +884,8 @@ import { MoreHorizontal } from "lucide-react";
     variants: [
       { prop: "side", values: "bottom (padrão) · top · left · right" },
       { prop: "composição", values: "Drawer · Trigger · Content · Header · Footer · Title · Description · Close" },
+      { prop: "closeLabel", values: "nome acessível do X de 44×44px (padrão \"Fechar\")" },
+      { prop: "rolagem", values: "overflow-y-auto; top/bottom com max-h 85dvh" },
     ],
     usage: `import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, Button } from "@semec/ds/react";
 
@@ -884,6 +913,8 @@ import { MoreHorizontal } from "lucide-react";
     variants: [
       { prop: "side", values: "left · right · top · bottom" },
       { prop: "composição", values: "Sheet · Trigger · Content · Header · Footer · Title · Description · Close" },
+      { prop: "closeLabel", values: "nome acessível do X de 44×44px (padrão \"Fechar\")" },
+      { prop: "rolagem", values: "overflow-y-auto; top/bottom com max-h 85dvh" },
     ],
     usage: `import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "@semec/ds/react";
 
@@ -899,7 +930,28 @@ import { MoreHorizontal } from "lucide-react";
       <SheetClose asChild><Button>Aplicar</Button></SheetClose>
     </SheetFooter>
   </SheetContent>
-</Sheet>`,
+</Sheet>
+
+// Controlado SEM SheetTrigger (ex.: aberto por um item de tabela): o Radix
+// não sabe para onde devolver o foco. Guarde a origem e devolva em onCloseAutoFocus.
+function FiltrosControlados() {
+  const [aberto, setAberto] = React.useState(false);
+  const origemRef = React.useRef(null);
+  return (
+    <>
+      <Button ref={origemRef} onClick={() => setAberto(true)}>Filtros</Button>
+      <Sheet open={aberto} onOpenChange={setAberto}>
+        <SheetContent
+          closeLabel="Fechar filtros"
+          onCloseAutoFocus={(e) => { e.preventDefault(); origemRef.current?.focus(); }}
+        >
+          <SheetHeader><SheetTitle>Filtros</SheetTitle></SheetHeader>
+          {/* conteúdo longo rola dentro do painel (overflow-y-auto) */}
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+}`,
   },
   {
     code: "data-table",
