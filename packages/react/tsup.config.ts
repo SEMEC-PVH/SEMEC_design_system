@@ -20,7 +20,7 @@ export default defineConfig([
       "clsx",
       "tailwind-merge",
       "zod",
-      "get-nce",
+      "get-nonce",
     ],
   },
   {
