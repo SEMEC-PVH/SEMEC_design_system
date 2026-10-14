@@ -79,6 +79,27 @@ export const FICHAS = {
     alt: "Boneco do Waffle, mascote do Rafa",
     dono: "rafa",
   },
+  mariana: {
+    tipo: "personagem",
+    nome: "Mariana",
+    nomeCompleto: "Mariana Feitoza Barros",
+    subtitulo: "Machine Learning e Dados",
+    descricao:
+      "Estuda Ciência da Computação e trabalha com back-end e machine learning. Programa em C, C++, Java, TypeScript e SQL, e adora gatos.",
+    imagem: "mariana.webp",
+    alt: "Boneco da Mariana",
+    mascote: "rena",
+  },
+  rena: {
+    tipo: "mascote",
+    nome: "Rena",
+    subtitulo: "Mascote da Mariana",
+    descricao:
+      "Uma renazinha tímida de chapéu cor-de-rosa. Quando fica feliz, sai pulando de um lado para o outro; quando fica sem graça, vira de costas e se encolhe.",
+    imagem: "rena.webp",
+    alt: "Boneco da Rena de chapéu cor-de-rosa, mascote da Mariana",
+    dono: "mariana",
+  },
   ocarina: {
     tipo: "mascote",
     nome: "Ocarina",
@@ -88,6 +109,49 @@ export const FICHAS = {
     imagem: "ocarina.webp",
     alt: "Boneco da Ocarina azul do Pedro",
     dono: "pedro",
+  },
+  // TODO: confirmar nome completo, cargo e bio do Zé Carlos e da Emily
+  "ze-carlos": {
+    tipo: "personagem",
+    nome: "Zé Carlos",
+    nomeCompleto: "Zé Carlos",
+    subtitulo: "Equipe SEMEC",
+    descricao:
+      "Cabelo grisalho, sorriso de canto e camiseta azul-marinho. Passeia pelo gramado ao sul da SEMEC sem pressa, sempre com o livro de estimação ao lado.",
+    imagem: "ze-carlos.webp",
+    alt: "Boneco do Zé Carlos",
+    mascote: "livro",
+  },
+  emily: {
+    tipo: "personagem",
+    nome: "Emily",
+    nomeCompleto: "Emily",
+    subtitulo: "Equipe SEMEC",
+    descricao:
+      "Dos cachos castanhos e da blusa de bolinhas, anima a praça do Front-End. Onde ela passa, o microfone vai atrás, pronto para cantar.",
+    imagem: "emily.webp",
+    alt: "Boneco da Emily",
+    mascote: "microfone",
+  },
+  livro: {
+    tipo: "mascote",
+    nome: "Livro Sábio",
+    subtitulo: "Mascote do Zé Carlos",
+    descricao:
+      "Um livro antigo de capa de couro e sobrancelhas grisalhas. Concorda com a cabeça como quem já leu de tudo e, quando se empolga, dá uma cambalhota.",
+    imagem: "livro.webp",
+    alt: "Boneco do Livro Sábio de capa de couro marrom, mascote do Zé Carlos",
+    dono: "ze-carlos",
+  },
+  microfone: {
+    tipo: "mascote",
+    nome: "Microfone",
+    subtitulo: "Mascote da Emily",
+    descricao:
+      "Um microfone retrô cor de coral que nunca sai do ritmo. Balança cantando, estica nas notas altas e fecha o show com um giro de estrela do rock.",
+    imagem: "microfone.webp",
+    alt: "Boneco do Microfone retrô cor de coral, mascote da Emily",
+    dono: "emily",
   },
 };
 

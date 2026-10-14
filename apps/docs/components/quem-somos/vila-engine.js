@@ -691,9 +691,9 @@ export function createVila(host, options) {
     const area = member.chefe && AREA_SPOTS[member.chefe] ? member.chefe : areaOf(member.role);
     spotOf.set(index, takeSpot(area) || takeSpot("generic"));
   }
-  // Líderes com boneco 3D (scene/walkers.js): o chibi vira âncora invisível
-  // (tile, balão de líder, conversa e cenas) e o 3D fica no lugar dele.
-  const anchors = new Map(); // id do boneco 3D → fig do líder
+  // Quem tem boneco 3D (scene/walkers.js), líder ou não: o chibi vira âncora
+  // invisível (tile, balão, conversa e cenas) e o 3D fica no lugar dele.
+  const anchors = new Map(); // id do boneco 3D → fig do chibi
   // Quem dá quest (o Pedro) não vira chibi: é o NPC 3D de scene/pedro.js.
   const questIndex = members.findIndex((m) => m.quest);
   members.forEach((member, index) => {
@@ -708,7 +708,7 @@ export function createVila(host, options) {
     fig.position.copy(tileToWorld(spot.x, spot.y));
     fig.rotation.y = DIRS[spot.dir].rot;
     const leader = leaders.has(index);
-    const boneco = leader && modelUrl && WALKER_IDS.has(member.retrato) ? member.retrato : null;
+    const boneco = modelUrl && WALKER_IDS.has(member.retrato) ? member.retrato : null;
     if (boneco) {
       fig.traverse((o) => {
         if (o.isMesh) o.visible = false; // continua no raycast do clique

@@ -1,7 +1,7 @@
 // Dono + mascote: NPC 3D que passeia em circuito com o mascote colado nele.
 //
-// O dono (GLB do Hunyuan com os clipes `parado` e `andando`) anda de tile em
-// tile e para nos pontos de descanso. O mascote não anda na grade: segue o
+// O dono (GLB do Hunyuan com os clipes `parado` e `andando`; sem clipes, anda
+// gingando por código) anda de tile em tile e para nos pontos de descanso. O mascote não anda na grade: segue o
 // dono de perto (um pouco atrás e ao lado) e, quando ele para, encosta do
 // lado dele. Na grade, o mascote reserva o tile que o dono acabou de deixar,
 // então o jogador não atravessa nenhum dos dois. Falar com qualquer um faz os
@@ -44,6 +44,32 @@ const SHOW_GAP = [8, 14];
 
 const angleTo = (from, to) => Math.atan2(to[0] - from[0], to[1] - from[1]);
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+
+// Dono sem esqueleto (GLB sem clipes): anda gingando como boneco de vinil,
+// de pé em pé com um pulinho e o corpo inclinado para a frente; parado,
+// respira. Tudo a partir dos pés, num grupo entre `root` e o modelo.
+const TOY_STEPS_PER_SECOND = 3.6;
+
+function createToyWalk(model) {
+  const body = new THREE.Group();
+  model.parent.add(body);
+  body.add(model);
+  let amp = 0; // 0 parado … 1 andando
+  let phase = 0;
+  let time = Math.random() * 10;
+  return {
+    update(dt, walking) {
+      time += dt;
+      amp += ((walking ? 1 : 0) - amp) * (1 - Math.exp(-dt * 8));
+      phase += dt * TOY_STEPS_PER_SECOND * (amp > 0.05 ? 1 : 0);
+      const step = Math.sin(Math.PI * phase);
+      const sy = THREE.MathUtils.lerp(1 + 0.012 * Math.sin(time * 2.2), 1 - 0.03 * (1 - Math.abs(step)), amp);
+      body.position.y = 0.035 * Math.abs(step) * amp;
+      body.scale.set(1 / Math.sqrt(sy), sy, 1 / Math.sqrt(sy));
+      body.rotation.set(0.07 * amp, 0, 0.1 * step * amp);
+    },
+  };
+}
 
 // Prepara um GLB: sombras, sem corte de frustum e altura normalizada.
 // Devolve o modelo já escalado e apoiado no chão.
@@ -282,6 +308,7 @@ export function createCompanion({
       owner.root.add(model);
       owner.clips = createClips(model, gOwner.animations);
       if (owner.clips.acts.andando) owner.clips.acts.andando.timeScale = ownerWalkScale;
+      if (!gOwner.animations.length) owner.toy = createToyWalk(model);
       pet.attach(mascot.root, gPet);
       if (reducedMotion) {
         state = "still";
@@ -409,6 +436,7 @@ export function createCompanion({
       }
       return;
     }
+    owner.toy?.update(dt, !!move && !isPaused());
     if (anchor) {
       owner.clips?.mixer.update(dt);
       updateAnchored(dt);

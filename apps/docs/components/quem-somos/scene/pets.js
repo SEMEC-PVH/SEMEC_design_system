@@ -7,7 +7,13 @@
 //   procedural — anda aos pulinhos com achatamento ao tocar o chão, respira
 //   parado, dá pulinhos e mortal para trás;
 // - waffle (Rafa): também procedural — anda gingando de pé em pé, respira
-//   parado, dança twist e dá um pulo com rodopio.
+//   parado, dança twist e dá um pulo com rodopio;
+// - rena (Mariana): procedural — trotinho saltitado, pulinhos de alegria de
+//   um lado para o outro e o jeito tímido de virar de costas e se encolher;
+// - livro (Zé Carlos): procedural — anda gingando devagar, concorda com a
+//   cabeça como quem sabe das coisas e dá uma cambalhota para a frente;
+// - microfone (Emily): procedural — balança no ritmo cantando, esticando nas
+//   notas altas, e dá um giro de estrela do rock.
 
 import * as THREE from "three";
 import { createClips, fitModel } from "./companion";
@@ -306,4 +312,251 @@ export function wafflePet({ height = 0.46 }) {
       body.rotation.set(0, 0, 0);
     },
   };
+}
+
+// ---- Rena -------------------------------------------------------------------
+
+const TROT_STEPS_PER_SECOND = 4.4; // passinhos curtos e rápidos
+const RENA_SHOWS = {
+  // Alegria: pulinhos de um lado para o outro, inclinando a cada pulo.
+  alegria: { dur: 2.4 },
+  // Tímida: vira de costas, se encolhe balançando e volta de frente.
+  timida: { dur: 2.6 },
+};
+
+export function renaPet({ height = 0.5 }) {
+  // root → body (tudo a partir dos pés: altura, deslocamento, inclinação, giro) → modelo
+  const body = new THREE.Group();
+  let ready = false;
+  let show = null;
+  let phase = 0;
+  let amp = 0; // 0 parado … 1 andando
+  let time = Math.random() * 10;
+
+  function showPose(s) {
+    const p = Math.min(s.t / RENA_SHOWS[s.name].dur, 1);
+    if (s.name === "alegria") {
+      // Seis pulinhos alternando o lado; entra e sai suave.
+      const q = (p * 6) % 1;
+      const side = Math.floor(p * 6) % 2 ? -1 : 1;
+      const fade = Math.min(p * 8, 1, (1 - p) * 8);
+      const air = Math.sin(Math.PI * q);
+      return {
+        y: 0.16 * air * fade,
+        x: 0.07 * side * Math.sin(Math.PI * q) * fade,
+        sy: 1 - 0.14 * (1 - air) * fade,
+        tilt: 0.28 * side * air * fade,
+        yaw: 0,
+      };
+    }
+    // timida: vira (0–0,2), encolhe balançando (0,2–0,8), volta (0,8–1)
+    const turn = p < 0.2 ? easeInOut(p / 0.2) : p > 0.8 ? 1 - easeInOut((p - 0.8) / 0.2) : 1;
+    const shy = smooth(0.15, 0.3, p) * (1 - smooth(0.75, 0.85, p));
+    return {
+      y: 0,
+      x: 0,
+      sy: 1 - 0.1 * shy,
+      tilt: 0.12 * Math.sin(s.t * 9) * shy,
+      yaw: Math.PI * turn,
+    };
+  }
+
+  return {
+    shadowSize: 0.18,
+    get busy() {
+      return !!show;
+    },
+    attach(root, gltf) {
+      body.add(fitModel(gltf, height));
+      root.add(body);
+      ready = true;
+    },
+    perform(name) {
+      if (!ready || !RENA_SHOWS[name]) return false;
+      show = { name, t: 0 };
+      return true;
+    },
+    update(dt, { speed }) {
+      if (!ready) return;
+      time += dt;
+      let pose;
+      if (show) {
+        show.t += dt;
+        pose = showPose(show);
+        if (show.t >= RENA_SHOWS[show.name].dur) show = null;
+        amp = 0;
+      } else {
+        // Trotinho saltitado; parada, respira e mexe a cabeça de leve.
+        amp += ((speed > 0 ? 1 : 0) - amp) * (1 - Math.exp(-dt * 8));
+        phase += dt * TROT_STEPS_PER_SECOND * Math.max(speed / OWNER_SPEED, amp > 0.05 ? 0.6 : 0);
+        const step = Math.sin(Math.PI * phase);
+        const breath = 1 + 0.022 * Math.sin(time * 2.6);
+        pose = {
+          y: 0.05 * Math.abs(step) * amp,
+          x: 0,
+          sy: THREE.MathUtils.lerp(breath, 1 + 0.04 * Math.abs(step), amp),
+          tilt: 0.09 * step * amp + 0.04 * Math.sin(time * 0.9) * (1 - amp),
+          yaw: 0,
+        };
+      }
+      body.position.set(pose.x, pose.y, 0);
+      body.scale.set(1 / Math.sqrt(pose.sy), pose.sy, 1 / Math.sqrt(pose.sy));
+      body.rotation.set(0, pose.yaw, pose.tilt);
+    },
+    freeze() {
+      show = null;
+      body.position.set(0, 0, 0);
+      body.scale.setScalar(1);
+      body.rotation.set(0, 0, 0);
+    },
+  };
+}
+
+// ---- Livro e microfone --------------------------------------------------------
+
+// Mascote de corpo único sem esqueleto: root → body (altura, achatamento e
+// giro a partir dos pés) → pivot (no meio do corpo, para tombar e dar
+// cambalhota sem sair do lugar) → modelo. `walk(phase, amp, time)` e
+// `shows[nome](t, p)` devolvem a pose { y, sy, rock, pitch, twist }.
+function toyPet({ height, shadowSize, stepsPerSecond, walk, shows }) {
+  const body = new THREE.Group();
+  const pivot = new THREE.Group();
+  pivot.position.y = height / 2;
+  body.add(pivot);
+  let ready = false;
+  let show = null;
+  let phase = 0;
+  let amp = 0; // 0 parado … 1 andando
+  let time = Math.random() * 10;
+
+  function apply(pose) {
+    body.position.y = pose.y ?? 0;
+    const sy = pose.sy ?? 1;
+    body.scale.set(1 / Math.sqrt(sy), sy, 1 / Math.sqrt(sy));
+    body.rotation.set(0, pose.twist ?? 0, 0);
+    pivot.rotation.set(pose.pitch ?? 0, 0, pose.rock ?? 0);
+  }
+
+  return {
+    shadowSize,
+    get busy() {
+      return !!show;
+    },
+    attach(root, gltf) {
+      const model = fitModel(gltf, height);
+      model.position.y -= height / 2;
+      pivot.add(model);
+      root.add(body);
+      ready = true;
+    },
+    perform(name) {
+      if (!ready || !shows[name]) return false;
+      show = { name, t: 0 };
+      return true;
+    },
+    update(dt, { speed }) {
+      if (!ready) return;
+      time += dt;
+      if (show) {
+        show.t += dt;
+        const { dur, pose } = shows[show.name];
+        apply(pose(show.t, Math.min(show.t / dur, 1)));
+        if (show.t >= dur) show = null;
+        amp = 0;
+        return;
+      }
+      amp += ((speed > 0 ? 1 : 0) - amp) * (1 - Math.exp(-dt * 8));
+      phase += dt * stepsPerSecond * Math.max(speed / OWNER_SPEED, amp > 0.05 ? 0.6 : 0);
+      apply(walk(phase, amp, time));
+    },
+    freeze() {
+      show = null;
+      apply({});
+    },
+  };
+}
+
+export function livroPet({ height = 0.5 }) {
+  return toyPet({
+    height,
+    shadowSize: 0.2,
+    stepsPerSecond: 3.2,
+    // Ginga de pé em pé, meio pesado (livro de capa dura); parado, respira.
+    walk: (phase, amp, time) => {
+      const step = Math.sin(Math.PI * phase);
+      return {
+        y: 0.03 * Math.abs(step) * amp,
+        sy: THREE.MathUtils.lerp(1 + 0.018 * Math.sin(time * 1.8), 1 - 0.04 * (1 - Math.abs(step)), amp),
+        rock: 0.14 * step * amp,
+        pitch: 0.06 * amp,
+      };
+    },
+    shows: {
+      // Sábio: concorda com a cabeça três vezes, balançando de leve.
+      sabio: {
+        dur: 2.4,
+        pose: (t, p) => {
+          const fade = Math.min(p * 6, 1, (1 - p) * 6);
+          return {
+            pitch: 0.22 * Math.max(0, Math.sin(t * Math.PI * 2.5)) * fade,
+            rock: 0.06 * Math.sin(t * Math.PI * 1.25) * fade,
+            sy: 1 - 0.04 * Math.abs(Math.sin(t * Math.PI * 2.5)) * fade,
+          };
+        },
+      },
+      // Cambalhota para a frente: agacha, pula girando e aterrissa achatado.
+      cambalhota: {
+        dur: 1.2,
+        pose: (t, p) => {
+          const air = smooth(0.15, 0.3, p) * (1 - smooth(0.75, 0.88, p));
+          const flip = easeInOut(Math.min(Math.max((p - 0.18) / 0.62, 0), 1));
+          const squash = 0.16 * (Math.exp(-((p - 0.1) ** 2) / 0.004) + Math.exp(-((p - 0.9) ** 2) / 0.004));
+          return { y: 0.3 * Math.sin(Math.PI * Math.min(Math.max((p - 0.15) / 0.73, 0), 1)) * air, sy: 1 - squash, pitch: Math.PI * 2 * flip };
+        },
+      },
+    },
+  });
+}
+
+export function microfonePet({ height = 0.52 }) {
+  return toyPet({
+    height,
+    shadowSize: 0.18,
+    stepsPerSecond: 4,
+    // Passinhos saltitados de quem está sempre no ritmo.
+    walk: (phase, amp, time) => {
+      const step = Math.sin(Math.PI * phase);
+      return {
+        y: 0.045 * Math.abs(step) * amp,
+        sy: THREE.MathUtils.lerp(1 + 0.02 * Math.sin(time * 2.4), 1 + 0.035 * Math.abs(step), amp),
+        rock: 0.1 * step * amp + 0.035 * Math.sin(time * 1.1) * (1 - amp),
+      };
+    },
+    shows: {
+      // Cantar: balança de um lado para o outro no compasso e estica nas
+      // notas altas (duas vezes no refrão).
+      cantar: {
+        dur: 3.2,
+        pose: (t, p) => {
+          const fade = Math.min(p * 6, 1, (1 - p) * 6);
+          const beat = t * 2.2;
+          const belt = Math.exp(-((p - 0.45) ** 2) / 0.006) + Math.exp(-((p - 0.8) ** 2) / 0.006);
+          return {
+            y: 0.03 * Math.abs(Math.sin(Math.PI * beat)) * fade,
+            sy: 1 + 0.12 * belt - 0.05 * Math.abs(Math.cos(Math.PI * beat)) * fade,
+            rock: 0.2 * Math.sin(Math.PI * beat) * fade * (1 - belt),
+            pitch: -0.15 * belt,
+          };
+        },
+      },
+      // Giro de estrela do rock: pula rodopiando duas vezes e cai inclinado.
+      giro: {
+        dur: 1.1,
+        pose: (t, p) => {
+          const air = Math.sin(Math.PI * p);
+          return { y: 0.28 * air, sy: 1 - 0.15 * Math.cos(Math.PI * 2 * p) * (1 - air), twist: Math.PI * 4 * easeInOut(p), rock: 0.2 * smooth(0.85, 1, p) * (1 - smooth(0.97, 1, p)) };
+        },
+      },
+    },
+  });
 }

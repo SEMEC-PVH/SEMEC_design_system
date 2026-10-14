@@ -5,12 +5,12 @@
 // public/quem-somos/ ao lado do gava.glb. `id` e `petId` são as fichas que o
 // clique abre (onInspect do motor).
 //
-// Quem é chefe de ginásio não passeia: `anchors` (Map id → boneco do líder no
-// motor) põe o dono parado na porta do ginásio, no lugar do boneco, com o
-// mascote ao lado. A rota só vale para quem não é chefe.
+// Quem tem chibi no motor não passeia: `anchors` (Map id → chibi invisível)
+// põe o dono parado no ponto dele (porta do ginásio, para os chefes), com o
+// mascote ao lado. A rota só vale para quem não tem chibi.
 
 import { createCompanion } from "./companion";
-import { bunnyPet, samuraiPet, wafflePet } from "./pets";
+import { bunnyPet, livroPet, microfonePet, renaPet, samuraiPet, wafflePet } from "./pets";
 
 const WALKERS = [
   {
@@ -64,6 +64,55 @@ const WALKERS = [
     talkShow: "danca",
     ownerWalkScale: 1.2,
     pet: () => wafflePet({}),
+  },
+  {
+    // Mariana + rena. Fica no ponto dela na área de Dados (ao lado do Banco
+    // de Dados); a rota, na beira do rio (x 16–19, y 4–6), só vale sem chibi.
+    id: "mariana",
+    petId: "rena",
+    owner: "mariana.glb",
+    petFile: "mariana-rena.glb",
+    route: [
+      [16, 4], [17, 4], [18, 4], [19, 4], [19, 5], [19, 6],
+      [18, 6], [17, 6], [16, 6], [16, 5],
+    ],
+    restAt: new Map([[2, "alegria"], [7, "timida"]]),
+    restSeconds: 3.0, // cobre a timidez de 2,6 s
+    talkShow: "alegria",
+    ownerWalkScale: 1.2,
+    pet: () => renaPet({}),
+  },
+  {
+    // Zé Carlos + livro, no gramado ao sul da SEMEC que era do Leo antes de
+    // ele virar chefe (x 7–10, y 10–13). Sem esqueleto: anda gingando.
+    id: "ze-carlos",
+    petId: "livro",
+    owner: "ze-carlos.glb",
+    petFile: "ze-carlos-livro.glb",
+    route: [
+      [7, 10], [8, 10], [9, 10], [10, 10], [10, 11], [10, 12],
+      [10, 13], [9, 13], [8, 13], [7, 13], [7, 12], [7, 11],
+    ],
+    restAt: new Map([[2, "sabio"], [8, "cambalhota"]]),
+    restSeconds: 3.0, // cobre o "sábio" de 2,4 s
+    talkShow: "sabio",
+    pet: () => livroPet({}),
+  },
+  {
+    // Emily + microfone, na praça do Front-End (x 17–20, y 17–20), livre
+    // desde que o Rafa virou chefe. Sem esqueleto: anda gingando.
+    id: "emily",
+    petId: "microfone",
+    owner: "emily.glb",
+    petFile: "emily-microfone.glb",
+    route: [
+      [17, 17], [18, 17], [19, 17], [20, 17], [20, 18], [20, 19],
+      [20, 20], [19, 20], [18, 20], [17, 20], [17, 19], [17, 18],
+    ],
+    restAt: new Map([[2, "cantar"], [8, "giro"]]),
+    restSeconds: 3.6, // cobre o canto de 3,2 s
+    talkShow: "cantar",
+    pet: () => microfonePet({}),
   },
 ];
 
