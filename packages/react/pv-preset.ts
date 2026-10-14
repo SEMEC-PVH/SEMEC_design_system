@@ -23,7 +23,7 @@ export default {
         "surface-alt": "var(--surface-alt)",
         border: "var(--border)",
         "border-strong": "var(--border-strong)",
-        input: "var(--border-strong)",
+        input: "var(--border)",
         ring: "var(--focus-ring)",
         muted: "var(--surface-alt)",
         "muted-foreground": "var(--text-muted)",
@@ -57,10 +57,12 @@ export default {
           600: "var(--pv-blue-600)",
           700: "var(--pv-blue-700)",
           800: "var(--pv-blue-800)",
+          900: "var(--pv-blue-900)",
           hero: "var(--pv-blue-hero)",
         },
         "pv-green": {
           50: "var(--pv-green-50)",
+          500: "var(--pv-green-500)",
           800: "var(--pv-green-800)",
         },
         "pv-yellow": {

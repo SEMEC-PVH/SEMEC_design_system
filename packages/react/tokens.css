@@ -90,7 +90,11 @@
 
   /* ---- Verde — feedback ------------------------------------------------ */
   --pv-green-50:  #eef7e6;
+  --pv-green-500: #82C353;
   --pv-green-800: #3a6420;
+
+  /* ---- Azul institucional escuro --------------------------------------- */
+  --pv-blue-900:  #26325B;
 
   /* ---- Amarelo — feedback ---------------------------------------------- */
   --pv-yellow-800: #8a5a00;
@@ -226,7 +230,9 @@
   --color-pv-blue-hero: var(--pv-blue-hero);
 
   --color-pv-green-50:  var(--pv-green-50);
+  --color-pv-green-500: var(--pv-green-500);
   --color-pv-green-800: var(--pv-green-800);
+  --color-pv-blue-900:  var(--pv-blue-900);
 
   --color-pv-yellow-800: var(--pv-yellow-800);
 
@@ -261,7 +267,7 @@
   --color-muted-foreground:     var(--text-muted);
   --color-border:               var(--border);
   --color-border-strong:        var(--border-strong);
-  --color-input:                var(--border-strong);
+  --color-input:                var(--border);
   --color-ring:                 var(--focus-ring);
   --color-brand-hero:           var(--brand-hero);
   --color-primary:              var(--action-primary);

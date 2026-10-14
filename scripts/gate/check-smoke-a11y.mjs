@@ -152,6 +152,13 @@ function getComponentElement(code) {
         description: "Tente ajustar os filtros de busca.",
       });
 
+    case "error-state":
+      return React.createElement(ds.ErrorState, {
+        title: "Falha ao carregar dados",
+        description: "Ocorreu um erro ao comunicar com o servidor.",
+        onRetry: () => {},
+      });
+
     case "error-summary":
       return React.createElement(ds.ErrorSummary, {
         title: "Erros encontrados no formulário",

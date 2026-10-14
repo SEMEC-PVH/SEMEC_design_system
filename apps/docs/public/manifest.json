@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
   "version": "3.0.0",
-  "generatedAt": "2026-10-14T14:51:24.163Z",
+  "generatedAt": "2026-10-14T16:52:12.780Z",
   "categories": [
     {
       "key": "acoes",
@@ -45,7 +45,7 @@
       "variants": [
         {
           "prop": "variant",
-          "values": "primary · secondary · outline · ghost · destructive · link"
+          "values": "primary · secondary · outline · ghost · destructive · success · link"
         },
         {
           "prop": "size",
@@ -53,7 +53,7 @@
         }
       ],
       "usage": "import { Button } from \"@semec/ds/react\";\nimport Link from \"next/link\";\nimport { Plus } from \"lucide-react\";\n\n<Button variant=\"primary\">Emitir boleto</Button>\n<Button variant=\"outline\">Salvar rascunho</Button>\n<Button variant=\"ghost\">Cancelar</Button>\n\n<Button variant=\"destructive\">Excluir requerimento</Button>\n\n<Button><Plus /> Adicionar serviço</Button>\n\n<Button asChild>\n  <Link href=\"/iptu\">Ver meu IPTU</Link>\n</Button>",
-      "prompt": "Crie um button (Botões) usando @semec/ds/react (`src/components/button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link · size: sm · md · lg · icon. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.",
+      "prompt": "Crie um button (Botões) usando @semec/ds/react (`src/components/button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm · md · lg · icon. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.",
       "url": "/componentes/botoes",
       "md": "/components/botoes.md"
     },
@@ -314,11 +314,11 @@
       "variants": [
         {
           "prop": "composição",
-          "values": "Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter"
+          "values": "Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader"
         }
       ],
       "usage": "import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from \"@semec/ds/react\";\n\n<Card>\n  <CardHeader><CardTitle>IPTU 2026</CardTitle></CardHeader>\n  <CardContent>Parcela em dia.</CardContent>\n  <CardFooter><Button>Emitir boleto</Button></CardFooter>\n</Card>",
-      "prompt": "Crie um card (Cartão) usando @semec/ds/react (`src/components/card.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter. Superfície de conteúdo com header, corpo e footer.",
+      "prompt": "Crie um card (Cartão) usando @semec/ds/react (`src/components/card.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader. Superfície de conteúdo com header, corpo e footer.",
       "url": "/componentes/cartao",
       "md": "/components/cartao.md"
     },

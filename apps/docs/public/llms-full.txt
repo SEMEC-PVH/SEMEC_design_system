@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-14T14:51:24.163Z — packages/react/manifest.js + packages/react/* — versão 3.0.0
+> Gerado 2026-10-14T16:52:12.780Z — packages/react/manifest.js + packages/react/* — versão 3.0.0
 
 ## Instalação
 
@@ -161,7 +161,11 @@ export * from "./lib/validators";
 
   /* ---- Verde — feedback ------------------------------------------------ */
   --pv-green-50:  #eef7e6;
+  --pv-green-500: #82C353;
   --pv-green-800: #3a6420;
+
+  /* ---- Azul institucional escuro --------------------------------------- */
+  --pv-blue-900:  #26325B;
 
   /* ---- Amarelo — feedback ---------------------------------------------- */
   --pv-yellow-800: #8a5a00;
@@ -297,7 +301,9 @@ export * from "./lib/validators";
   --color-pv-blue-hero: var(--pv-blue-hero);
 
   --color-pv-green-50:  var(--pv-green-50);
+  --color-pv-green-500: var(--pv-green-500);
   --color-pv-green-800: var(--pv-green-800);
+  --color-pv-blue-900:  var(--pv-blue-900);
 
   --color-pv-yellow-800: var(--pv-yellow-800);
 
@@ -332,7 +338,7 @@ export * from "./lib/validators";
   --color-muted-foreground:     var(--text-muted);
   --color-border:               var(--border);
   --color-border-strong:        var(--border-strong);
-  --color-input:                var(--border-strong);
+  --color-input:                var(--border);
   --color-ring:                 var(--focus-ring);
   --color-brand-hero:           var(--brand-hero);
   --color-primary:              var(--action-primary);
@@ -627,7 +633,7 @@ export default {
         "surface-alt": "var(--surface-alt)",
         border: "var(--border)",
         "border-strong": "var(--border-strong)",
-        input: "var(--border-strong)",
+        input: "var(--border)",
         ring: "var(--focus-ring)",
         muted: "var(--surface-alt)",
         "muted-foreground": "var(--text-muted)",
@@ -661,10 +667,12 @@ export default {
           600: "var(--pv-blue-600)",
           700: "var(--pv-blue-700)",
           800: "var(--pv-blue-800)",
+          900: "var(--pv-blue-900)",
           hero: "var(--pv-blue-hero)",
         },
         "pv-green": {
           50: "var(--pv-green-50)",
+          500: "var(--pv-green-500)",
           800: "var(--pv-green-800)",
         },
         "pv-yellow": {
@@ -777,7 +785,7 @@ export default {
 
 Desc: Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.
 
-Variantes: variant: primary · secondary · outline · ghost · destructive · link · size: sm · md · lg · icon
+Variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm · md · lg · icon
 
 Uso:
 ```tsx
@@ -800,7 +808,7 @@ import { Plus } from "lucide-react";
 
 Prompt:
 ```text
-Crie um button (Botões) usando @semec/ds/react (`src/components/button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link · size: sm · md · lg · icon. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.
+Crie um button (Botões) usando @semec/ds/react (`src/components/button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm · md · lg · icon. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.
 ```
 
 Fonte:
@@ -825,6 +833,8 @@ const buttonVariants = cva(
         ghost: "text-foreground hover:bg-accent hover:text-accent-foreground",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        success:
+          "bg-success text-white hover:bg-success/90 focus-visible:ring-success/30",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
@@ -1032,7 +1042,7 @@ const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLI
     <input
       type={type}
       className={cn(
-        "flex h-11 w-full rounded-md border border-input bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/30",
+        "flex h-11 w-full rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/30",
         className
       )}
       ref={ref}
@@ -1077,7 +1087,7 @@ const Textarea = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <textarea
     className={cn(
-      "flex min-h-[80px] w-full rounded-md border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/30",
+      "flex min-h-[80px] w-full rounded-md border border-input bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/30",
       className
     )}
     ref={ref}
@@ -1136,7 +1146,7 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm text-foreground shadow-sm placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left",
+      "flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground shadow-sm placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left",
       className
     )}
     {...props}
@@ -1187,7 +1197,7 @@ const SelectContent = React.forwardRef<
       className={cn(
         "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 data-[state=open]:animate-in data-[state=closed]:animate-out",
         position === "popper" &&
-          "data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
+          "w-[var(--radix-select-trigger-width)] max-w-[var(--radix-select-trigger-width)] data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
         className
       )}
       position={position}
@@ -1228,7 +1238,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-lg py-2 pl-3 pr-8 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex w-full cursor-default select-none items-center rounded-lg py-2 pl-3 pr-8 text-sm outline-none whitespace-normal leading-relaxed focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     {...props}
@@ -2057,7 +2067,7 @@ export { ErrorSummary };
 
 Desc: Superfície de conteúdo com header, corpo e footer.
 
-Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter
+Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader
 
 Uso:
 ```tsx
@@ -2072,7 +2082,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@s
 
 Prompt:
 ```text
-Crie um card (Cartão) usando @semec/ds/react (`src/components/card.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter. Superfície de conteúdo com header, corpo e footer.
+Crie um card (Cartão) usando @semec/ds/react (`src/components/card.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader. Superfície de conteúdo com header, corpo e footer.
 ```
 
 Fonte:
@@ -2152,7 +2162,59 @@ const CardFooter = React.forwardRef<
 ));
 CardFooter.displayName = "CardFooter";
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+const FormHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "border-b border-border bg-surface-alt px-6 py-4 rounded-t-lg",
+      className
+    )}
+    {...props}
+  />
+));
+FormHeader.displayName = "FormHeader";
+
+export interface SectionHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  title: string;
+  description?: string;
+  badge?: React.ReactNode;
+}
+
+const SectionHeader = React.forwardRef<HTMLDivElement, SectionHeaderProps>(
+  ({ className, title, description, badge, children, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn("pb-2 border-b border-border mb-6", className)}
+      {...props}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-xl font-bold text-pv-blue-900 uppercase tracking-wide">
+          {title}
+        </h2>
+        {badge}
+      </div>
+      {description ? (
+        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+      ) : null}
+      {children}
+    </div>
+  )
+);
+SectionHeader.displayName = "SectionHeader";
+
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  FormHeader,
+  SectionHeader,
+};
 ```
 
 ---
@@ -3388,7 +3450,7 @@ const ToastViewport = React.forwardRef<
   <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse gap-2 p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
+      "fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col gap-2 p-4 sm:top-4 sm:right-4 md:max-w-[420px]",
       className
     )}
     {...props}
@@ -3397,12 +3459,13 @@ const ToastViewport = React.forwardRef<
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-lg border border-border bg-card p-4 text-card-foreground shadow-elevation-2 transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out",
+  "group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-[12px] border border-border bg-card p-4 text-card-foreground shadow-elevation-2 font-sans transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out",
   {
     variants: {
       variant: {
         default: "border-border bg-card text-card-foreground",
-        success: "border-success/40 bg-success-surface text-foreground",
+        success:
+          "border-none bg-pv-green-500 text-pv-blue-900 px-5 py-4 [&_[toast-close]]:text-pv-blue-900 [&_[toast-close]]:opacity-80 [&_[toast-close]]:hover:opacity-100",
         warning: "border-warning/40 bg-warning-surface text-foreground",
         destructive: "border-destructive/40 bg-destructive-surface text-destructive",
       },
@@ -3465,7 +3528,7 @@ const ToastTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Title
     ref={ref}
-    className={cn("text-sm font-semibold", className)}
+    className={cn("text-base font-bold leading-tight", className)}
     {...props}
   />
 ));
@@ -3477,7 +3540,7 @@ const ToastDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Description
     ref={ref}
-    className={cn("text-sm opacity-90", className)}
+    className={cn("text-sm font-normal leading-[1.4] opacity-95", className)}
     {...props}
   />
 ));
@@ -3796,7 +3859,10 @@ const AlertDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm [&_p]:leading-relaxed", className)}
+    className={cn(
+      "text-sm [&_p]:leading-relaxed [&_ul]:mt-2 [&_ul]:list-disc [&_ul]:list-inside [&_ul]:space-y-1.5 [&_ol]:mt-2 [&_ol]:list-decimal [&_ol]:list-inside [&_ol]:space-y-1.5",
+      className
+    )}
     {...props}
   />
 ));

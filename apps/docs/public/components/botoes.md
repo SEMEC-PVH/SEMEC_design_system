@@ -4,7 +4,7 @@ code: "button"
 slug: "botoes"
 file: "src/components/button.tsx"
 category: "acoes"
-variants: "variant: primary · secondary · outline · ghost · destructive · link · size: sm · md · lg · icon"
+variants: "variant: primary · secondary · outline · ghost · destructive · success · link · size: sm · md · lg · icon"
 ---
 
 # Botões — `button`
@@ -15,7 +15,7 @@ variants: "variant: primary · secondary · outline · ghost · destructive · l
 
 ## Variantes
 
-- **variant**: primary · secondary · outline · ghost · destructive · link
+- **variant**: primary · secondary · outline · ghost · destructive · success · link
 - **size**: sm · md · lg · icon
 
 ## Instalação (@semec/ds)
@@ -53,7 +53,7 @@ import { Plus } from "lucide-react";
 ## Prompt para IA
 
 ```text
-Crie um button (Botões) usando @semec/ds/react (`src/components/button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link · size: sm · md · lg · icon. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.
+Crie um button (Botões) usando @semec/ds/react (`src/components/button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm · md · lg · icon. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.
 ```
 
 ## Fonte
@@ -79,6 +79,8 @@ const buttonVariants = cva(
         ghost: "text-foreground hover:bg-accent hover:text-accent-foreground",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        success:
+          "bg-success text-white hover:bg-success/90 focus-visible:ring-success/30",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

@@ -548,26 +548,46 @@ function ToastDemo() {
   return (
     <>
       <div className="flex flex-wrap gap-3">
-        <Button variant="outline" onClick={() => toast({ title: "Salvo com sucesso" })}>
-          default
+        <Button
+          variant="outline"
+          onClick={() =>
+            toast({
+              variant: "success",
+              title: "Protocolo enviado com sucesso",
+              description: "Suas alterações e comprovantes foram salvos com êxito.",
+            })
+          }
+        >
+          Disparar Toast de Sucesso
         </Button>
-        <Button variant="outline" onClick={() => toast({ variant: "success", title: "Protocolo enviado", description: "Guarde o número 2026.123." })}>
-          success
+        <Button variant="outline" onClick={() => toast({ title: "Notificação padrão", description: "Mensagem informativa geral." })}>
+          Padrão
         </Button>
         <Button variant="outline" onClick={() => toast({ variant: "warning", title: "Sessão expira em 2 min" })}>
-          warning
+          Aviso
         </Button>
         <Button variant="outline" onClick={() => toast({ variant: "destructive", title: "Falha ao anexar arquivo" })}>
-          destructive
+          Erro
         </Button>
       </div>
+
+      {/* Renderização estática inline do Toast de sucesso como preview visual imediato */}
+      <div className="mt-6 w-full max-w-md">
+        <Toast variant="success" className="relative inset-auto transform-none transition-none shadow-elevation-2">
+          <div className="grid gap-1">
+            <ToastTitle>Protocolo enviado com sucesso</ToastTitle>
+            <ToastDescription>Suas alterações e comprovantes foram salvos com êxito.</ToastDescription>
+          </div>
+          <ToastClose />
+        </Toast>
+      </div>
+
       {toasts.map(({ id, title, description, variant, ...rest }) => (
         <Toast key={id} variant={variant} {...rest}>
           <div className="grid gap-1">
             {title && <ToastTitle>{title}</ToastTitle>}
             {description && <ToastDescription>{description}</ToastDescription>}
           </div>
-          <ToastAction altText="Desfazer">Desfazer</ToastAction>
           <ToastClose />
         </Toast>
       ))}

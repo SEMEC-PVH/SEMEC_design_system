@@ -82,10 +82,12 @@
 
   --color-border: var(--border);
   --color-border-strong: var(--color-border-strong);
-  --color-input: var(--color-border-strong);
+  --color-input: var(--border);
   --color-ring: var(--color-focus-ring);
   --color-tint: var(--tint);
   --color-brand-hero: var(--brand-hero);
+  --color-pv-green-500: var(--pv-green-500);
+  --color-pv-blue-900: var(--pv-blue-900);
 
   /* Sidebar (kit usa bg-sidebar / text-sidebar-foreground / ring-sidebar-ring) */
   --color-sidebar: var(--surface);

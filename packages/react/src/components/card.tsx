@@ -73,4 +73,56 @@ const CardFooter = React.forwardRef<
 ));
 CardFooter.displayName = "CardFooter";
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+const FormHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "border-b border-border bg-surface-alt px-6 py-4 rounded-t-lg",
+      className
+    )}
+    {...props}
+  />
+));
+FormHeader.displayName = "FormHeader";
+
+export interface SectionHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  title: string;
+  description?: string;
+  badge?: React.ReactNode;
+}
+
+const SectionHeader = React.forwardRef<HTMLDivElement, SectionHeaderProps>(
+  ({ className, title, description, badge, children, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn("pb-2 border-b border-border mb-6", className)}
+      {...props}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-xl font-bold text-pv-blue-900 uppercase tracking-wide">
+          {title}
+        </h2>
+        {badge}
+      </div>
+      {description ? (
+        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+      ) : null}
+      {children}
+    </div>
+  )
+);
+SectionHeader.displayName = "SectionHeader";
+
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  FormHeader,
+  SectionHeader,
+};

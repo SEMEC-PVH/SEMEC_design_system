@@ -56,6 +56,7 @@ export default function PreviewFrame({ children }) {
       --bg:#f4f6f9;--fg:#14233a;--surface:#fff;--surface-alt:#f5f5f5;--border:#e5e7eb;
       --text-muted:#4b5563;--tint:#eef4fa;--text-strong:#14233a;--text-on-brand:#fff;
       --brand-hero:#223f99;--color-brand-hero:#223f99;
+      --pv-green-500:#82C353;--pv-blue-900:#26325B;
       --radius-sm:12px;--radius-md:16px;--radius-lg:24px;--radius-xl:32px;--radius-full:9999px;
     }
     [data-theme="dark"]{

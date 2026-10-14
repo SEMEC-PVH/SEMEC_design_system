@@ -49,7 +49,7 @@ export const dsComponents = [
     category: "acoes",
     desc: "Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.",
     variants: [
-      { prop: "variant", values: "primary · secondary · outline · ghost · destructive · link" },
+      { prop: "variant", values: "primary · secondary · outline · ghost · destructive · success · link" },
       { prop: "size", values: "sm · md · lg · icon" },
     ],
     usage: `import { Button } from "@semec/ds/react";
@@ -279,7 +279,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     file: "src/components/card.tsx",
     category: "conteudo-dados",
     desc: "Superfície de conteúdo com header, corpo e footer.",
-    variants: [{ prop: "composição", values: "Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter" }],
+    variants: [{ prop: "composição", values: "Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader" }],
     usage: `import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@semec/ds/react";
 
 <Card>
