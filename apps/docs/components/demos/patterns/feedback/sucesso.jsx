@@ -5,9 +5,9 @@ import {
   AlertDescription,
   AlertTitle,
   Button,
-  Toaster,
   useToast,
 } from "semec-ds/react";
+import PreviewToaster from "@/components/demos/PreviewToaster";
 
 function ConteudoSucesso() {
   const { toast } = useToast();
@@ -44,11 +44,12 @@ function ConteudoSucesso() {
 }
 
 // Padrão oficial: <Toaster /> uma vez (no app, fica no layout raiz) + useToast() para disparar.
+// PreviewToaster garante um só Toaster por página do site.
 export function SucessoDemo() {
   return (
     <>
       <ConteudoSucesso />
-      <Toaster />
+      <PreviewToaster />
     </>
   );
 }
