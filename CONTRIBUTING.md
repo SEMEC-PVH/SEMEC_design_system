@@ -57,24 +57,114 @@ Sem `axe` configurado, a verificação de acessibilidade **é manual** — e pre
 - **calcular o contraste** de qualquer par de cores novo (4.5:1 para texto normal, 3:1 para texto grande e para elemento de interface);
 - conferir que imagem tem texto alternativo e que a hierarquia de títulos não pula nível.
 
+Quem revisa é um **code owner** (`.github/CODEOWNERS`) diferente do autor. Com a proteção do `main` aplicada (ver "Proteção do main" abaixo), o GitHub só libera o merge com essa aprovação e com a CI verde.
+
 ## 5. Merge
 
-Aprovado, o pull request entra por merge na branch de destino. Se o `package.json` do pacote tiver versão **superior** à do npm (houver changeset aplicado), a CI publica o `@semec/ds` (ver seção "Publicação e versionamento" abaixo).
+Aprovado e com a CI verde, o pull request entra por merge no `main`. Nada entra no `main` por push direto. O que acontece depois com o pacote está em "Publicação e versionamento", abaixo: o merge de um PR com changeset **não publica sozinho** — ele alimenta o PR de versão, e a publicação acontece quando esse PR é mergeado.
 
 ## O que um pull request precisa ter hoje
 
+O template de PR (`.github/pull_request_template.md`) repete esta lista.
+
 - [ ] Issue de proposta vinculada (exceto correção pontual)
-- [ ] Changeset criado (se houver mudança relevante)
+- [ ] Changeset criado se o PR muda arquivo publicado do `@semec/ds` — **a CI falha sem ele** (ver "Changeset obrigatório")
 - [ ] `npm run build:ds` passando — roda tsup + build-artifacts, verifica se o pacote compila sem erros
 - [ ] `npm run typecheck` passando — verifica tipos
 - [ ] `npm run build` passando — roda next build com output: 'export' e verifica se o site compila
+- [ ] `npm run lint` passando
+- [ ] Artefatos de agentes (`apps/docs/public`) regenerados e commitados quando `packages/react/manifest.js` mudar — **a CI falha se estiverem desatualizados** (`npm run check:artifacts` confere localmente)
 - [ ] Página conferida com teclado, foco visível ponta a ponta
 - [ ] Contraste calculado para qualquer cor nova
 - [ ] Nenhum hex, `rgba()` ou `style` inline novo fora das variáveis existentes
 - [ ] Revisão de outra pessoa
 - [ ] Mensagens de commit na convenção abaixo
 
-**Scripts que existem hoje** (na raiz, delegando para `apps/docs` e `packages/react`): `dev`, `build`, `build:ds`, `start`, `lint`, `typecheck`, `generate:llms`, `proto:css`, `changeset`, `version-packages`, `release`.
+**Scripts que existem hoje** (na raiz, delegando para `apps/docs` e `packages/react`): `dev`, `build`, `build:ds`, `start`, `lint`, `typecheck`, `generate:llms`, `check:artifacts`, `proto:css`, `gate`, `changeset`, `changeset:check`, `version-packages`, `release`.
+
+## O que a CI verifica
+
+`.github/workflows/ci.yml` roda em todo PR para o `main` e em todo push no `main`. Cada job é um check com o nome abaixo — são esses nomes que a proteção do `main` exige.
+
+| Check | O que roda | Falha quando |
+|---|---|---|
+| `changeset` | `changeset status --since=origin/main` (só em PR) | o PR muda arquivo publicado do `@semec/ds` sem changeset |
+| `lint` | `npm run lint` | eslint (`eslint-config-next` + `jsx-a11y`) acusa erro em `apps/docs` |
+| `typecheck` | `npm run typecheck` | `tsc --noEmit` do kit falha |
+| `build` | `npm run build:ds`, build do site (`next build`, export estático) e conferência de `apps/docs/public` | o pacote ou o site não compilam, ou os artefatos de agentes estão desatualizados |
+| `gate` | `npm run gate` | o gate de qualidade e regressão reprova |
+
+Para rodar o mesmo localmente, na ordem: `npm run build:ds`, `npm run typecheck`, `npm run build`, `npm run lint`, `npm run changeset:check`, `npm run check:artifacts`.
+
+**Deriva dos artefatos.** `build:ds` e o `prebuild` do site regeneram `llms.txt`, `llms-full.txt`, `manifest.json`, `components/*.md` e `skills/` em `apps/docs/public` a partir de `packages/react/manifest.js`. A CI regenera tudo e falha se o resultado for diferente do commitado. O carimbo de data (`"generatedAt"` e `> Gerado <data>`) é determinístico — `SOURCE_DATE_EPOCH`, se definido, senão a data do último commit em `packages/react` — então dois builds do mesmo commit geram arquivos idênticos. Mesmo assim essas duas linhas ficam fora da comparação: o commit que muda o pacote ganha data nova depois que os artefatos foram gerados, e a CI usa checkout raso.
+
+### Changeset obrigatório
+
+Um PR precisa de changeset quando muda algo que vai para o npm dentro de `packages/react/`: `src/**`, `skills/**`, `scripts/**`, `manifest.js`, `tokens.css`, `pv-preset.ts`, `server.js`, `tsup.config.ts`, `tsconfig.json` ou `package.json` (lista em `changedFilePatterns`, `.changeset/config.json`). Mudança só no site (`apps/docs`) ou só no `README` do pacote não exige.
+
+```bash
+npm run changeset            # escolhe @semec/ds, o tipo (patch/minor/major) e descreve em PT-BR
+git add .changeset/*.md
+```
+
+Se a mudança em arquivo publicado realmente não precisa de versão nova (ex.: comentário), registre isso explicitamente com `npx changeset add --empty` — o arquivo vazio passa na CI e não gera bump.
+
+## Proteção do main
+
+O `CODEOWNERS` e os checks da CI só obrigam alguma coisa quando o `main` está protegido. Isso é **configuração do repositório no GitHub**, não arquivo — um admin precisa aplicar uma vez. Até lá, a regra da seção 4 ("revisão por pessoa diferente") depende só de disciplina.
+
+**Code owners.** A organização `SEMEC-PVH` não tem times (`gh api orgs/SEMEC-PVH/teams` devolve `[]`), então `.github/CODEOWNERS` lista usuários: `@Rug-gieri` e `@VgavaBR123`, os dois admins que mais contribuem. Como o GitHub não aceita que o autor aprove o próprio PR, o PR de um precisa da aprovação do outro. Para não depender de duas pessoas só, inclua mais gente com permissão de escrita (hoje: `pdrokbott`, `RomuloMaltez`, `LeonardoSeijiNakayama`, `MariMeng`, `ThiagoACNascimento`) ou crie o time `design-system` na organização e troque as linhas por `@SEMEC-PVH/design-system`.
+
+**O que a proteção exige:**
+
+- PR obrigatório para entrar no `main` (sem push direto, inclusive para admins);
+- 1 aprovação, de code owner, descartada se chegarem commits novos, e a aprovação precisa vir de alguém que não fez o último push;
+- checks obrigatórios e branch atualizada: `changeset`, `lint`, `typecheck`, `build`, `gate`;
+- conversas resolvidas antes do merge;
+- sem force push e sem apagar o `main`.
+
+**Passo a passo (Settings).** Settings → Branches → Add branch protection rule → Branch name pattern `main` → marcar "Require a pull request before merging" (Required approvals: 1; "Dismiss stale pull request approvals when new commits are pushed"; "Require review from Code Owners"; "Require approval of the most recent reviewable push") → "Require status checks to pass before merging" ("Require branches to be up to date"; adicionar `changeset`, `lint`, `typecheck`, `build`, `gate` — eles só aparecem na busca depois de rodarem uma vez) → "Require conversation resolution before merging" → "Do not allow bypassing the above settings" → Create.
+
+**O mesmo pela API** (admin autenticado no `gh`):
+
+```bash
+gh api -X PUT repos/SEMEC-PVH/SEMEC_design_system/branches/main/protection \
+  -H "Accept: application/vnd.github+json" --input - <<'EOF'
+{
+  "required_status_checks": {
+    "strict": true,
+    "checks": [
+      { "context": "changeset" },
+      { "context": "lint" },
+      { "context": "typecheck" },
+      { "context": "build" },
+      { "context": "gate" }
+    ]
+  },
+  "enforce_admins": true,
+  "required_pull_request_reviews": {
+    "required_approving_review_count": 1,
+    "require_code_owner_reviews": true,
+    "dismiss_stale_reviews": true,
+    "require_last_push_approval": true
+  },
+  "required_conversation_resolution": true,
+  "restrictions": null,
+  "allow_force_pushes": false,
+  "allow_deletions": false
+}
+EOF
+```
+
+Conferir depois:
+
+```bash
+gh api repos/SEMEC-PVH/SEMEC_design_system/branches/main/protection \
+  --jq '{checks: [.required_status_checks.checks[].context], reviews: .required_pull_request_reviews.required_approving_review_count, codeowners: .required_pull_request_reviews.require_code_owner_reviews, admins: .enforce_admins.enabled}'
+gh api repos/SEMEC-PVH/SEMEC_design_system/codeowners/errors   # deve devolver {"errors":[]}
+```
+
+O job `changeset` só roda em PR; em push no `main` e no PR de versão (`changeset-release/main`) ele aparece como *skipped*, o que conta como aprovado para a proteção.
 
 > **Sobre o `lint`.** O script `lint` (`eslint .`, com `eslint-config-next` e `eslint-plugin-jsx-a11y`) já existe e roda em `apps/docs`. Ainda há uma violação conhecida de `react-hooks/set-state-in-effect` em `apps/docs/components/docs/Sidebar.jsx`, herdada antes da migração.
 
@@ -99,7 +189,7 @@ Todo arquivo de texto usa **LF**. O `.gitattributes` da raiz (`* text=auto eol=l
 
 # Parte 2 — O processo previsto, para quando a biblioteca existir
 
-Nesta parte, apenas a **publicação e versionamento** já está ativa (ver Parte 1). Os demais itens dependem de infraestrutura que ainda não foi construída: o Storybook, a suíte de testes e a integração contínua descritos na [arquitetura](docs/arquitetura.md). Esta parte existe para que, quando a infraestrutura chegar, a régua já esteja escrita — e para deixar explícito o que **não** está sendo cobrado enquanto isso.
+Nesta parte, apenas a **publicação e versionamento** já está ativa (ver Parte 1). Os demais itens dependem de infraestrutura que ainda não foi construída: o Storybook, a suíte de testes e a parte da integração contínua que roda testes, descritos na [arquitetura](docs/arquitetura.md). Esta parte existe para que, quando a infraestrutura chegar, a régua já esteja escrita — e para deixar explícito o que **não** está sendo cobrado enquanto isso.
 
 ## Fluxo completo de entrada de um componente
 
@@ -128,11 +218,17 @@ Nesta parte, apenas a **publicação e versionamento** já está ativa (ver Part
 | Tema claro e escuro | Camada L0 de tokens e a resposta de [QA-01](docs/questoes-abertas.md) |
 | `axe` sem violações | Vitest + Testing Library + axe, do [ADR-009](docs/adr/0009-testes-vitest-testing-library-axe-regressao-visual.md); nada disso está instalado |
 | Story no Storybook | Storybook, do [ADR-008](docs/adr/0008-storybook-documentacao-viva.md); não existe no repositório |
-| Regressão visual | Suíte de snapshot e um CI para rodá-la; não há CI |
+| Regressão visual | Suíte de snapshot e um job na CI para rodá-la; a CI existe, a suíte não |
 
 ## Publicação e versionamento
 
-O pacote `@semec/ds` é publicado no **npm público** ([ADR-022](docs/adr/0022-publicacao-npm-publico.md)). A CI (`.github/workflows/release.yml`) publica em todo push para `main` — **mas só se** a versão local for maior que a do registry. Sem changeset + `version-packages`, o publish é um no-op (não sobe nada).
+O pacote `@semec/ds` é publicado no **npm público** ([ADR-022](docs/adr/0022-publicacao-npm-publico.md)) pelo fluxo do [Changesets](https://github.com/changesets/changesets) com a action `changesets/action`, em `.github/workflows/release.yml`.
+
+Regras do fluxo:
+
+- **Nenhuma versão sai por bump manual.** A versão de `packages/react/package.json` só muda pelo PR de versão que o workflow abre (`changeset version`). Bump manual foi o que fez três conteúdos diferentes circularem como "3.0.0" (AUD-12).
+- **O Release só roda depois da CI verde.** O gatilho é `workflow_run` do workflow `CI`, só para push no `main` e só com `conclusion == success`; ele faz checkout do commit exato que a CI aprovou. Não há gatilho manual que pule a CI.
+- **Toda correção no pacote chega ao npm.** Como a CI exige changeset, cada mudança publicada vira entrada de CHANGELOG e entra na próxima versão.
 
 ### Pré-requisito da CI (mantenedores)
 
@@ -146,32 +242,33 @@ O workflow usa o secret do GitHub **`NPM_TOKEN`** (Settings → Secrets and vari
 | Packages and scopes | `@semec` → **Read and write** |
 | Bypass 2FA | **Sim**, se a conta tiver 2FA (senão o publish falha com E403) |
 
-Sem esse secret (ou com token inválido), o job falha no passo de diagnóstico (`npm whoami`). O workflow também roda `typecheck` + `build:ds` antes de `changeset publish` e **verifica** ao final se `npm view @semec/ds version` bate com o `package.json`.
+Sem esse secret (ou com token inválido), o job falha no passo de diagnóstico (`npm whoami`) — mas só quando vai publicar; abrir o PR de versão não precisa do token. Depois de publicar, o workflow **verifica** se `npm view @semec/ds version` bate com o `package.json`.
+
+Outros ajustes de repositório que o fluxo precisa (uma vez, por um admin):
+
+1. **Permitir que o workflow abra PR.** Settings → Actions → General → Workflow permissions → marcar "Allow GitHub Actions to create and approve pull requests". Pela API:
+   ```bash
+   gh api -X PUT repos/SEMEC-PVH/SEMEC_design_system/actions/permissions/workflow \
+     -f default_workflow_permissions=read -F can_approve_pull_request_reviews=true
+   ```
+2. **(Recomendado) secret `RELEASE_PR_TOKEN`.** PR aberto com o `GITHUB_TOKEN` padrão **não dispara a CI**, e com checks obrigatórios o PR de versão fica travado. Com um PAT fine-grained (ou token de GitHub App) com `Contents: write` e `Pull requests: write` neste repositório salvo como `RELEASE_PR_TOKEN`, o workflow usa esse token e a CI roda normalmente no PR de versão. Sem ele, um mantenedor fecha e reabre o PR de versão (o evento `reopened`, feito por pessoa, dispara a CI).
 
 ### Fluxo de release
 
-1. **Crie um changeset** descrevendo sua mudança:
-   ```bash
-   npm run changeset
-   ```
-   Escolha o tipo:
-   - **patch** (2.1.0 → 2.1.1) — bugfix, correção de typo, ajuste de estilo
-   - **minor** (2.1.0 → 2.2.0) — componente novo, propriedade nova, funcionalidade
-   - **major** (2.x → 3.0.0) — quebra de API, remoção de componente, mudança de export
+1. **Cada PR traz seu changeset.** Quem muda o pacote roda `npm run changeset`, escolhe `@semec/ds` e o tipo, e descreve a mudança em PT-BR citando a issue:
+   - **patch** (3.0.0 → 3.0.1) — correção de bug, a11y, contrato, ajuste de estilo
+   - **minor** (3.0.0 → 3.1.0) — componente, propriedade ou export novo
+   - **major** (3.x → 4.0.0) — quebra de API, remoção de componente, mudança de export
 
-2. **Aplique o versionamento** (bump em `packages/react/package.json` + CHANGELOG):
-   ```bash
-   npm run version-packages
-   ```
+   O arquivo (`.changeset/<nome>.md`) entra no mesmo PR. A CI (`changeset`) recusa o PR sem ele.
 
-3. **Commit e push** para a branch `main` (só os arquivos de release + o conteúdo do changeset):
-   ```bash
-   git add packages/react/package.json packages/react/CHANGELOG.md package-lock.json
-   git commit -m "chore(release): @semec/ds x.y.z"
-   git push
-   ```
+2. **Merge no `main` → PR de versão.** Com a CI verde no `main`, o Release vê changesets pendentes e abre (ou atualiza) o PR **"chore(release): versiona pacotes"** na branch `changeset-release/main`. Esse PR roda `npm run version-packages` (`changeset version` + `npm install --package-lock-only`): consome os arquivos de `.changeset/`, faz o bump em `packages/react/package.json`, escreve o `packages/react/CHANGELOG.md` e atualiza o `package-lock.json`. Vários PRs acumulam no mesmo PR de versão.
 
-4. **A CI publica** (`changeset publish` → npm) e **confirma** a versão no registry. O Changesets cria a tag git `@semec/ds@x.y.z`.
+3. **Revisão e merge do PR de versão.** Um mantenedor confere a versão e o CHANGELOG, aprova e mergeia — como qualquer PR, com CI verde e aprovação de code owner. Ninguém roda `version-packages` à mão no `main`.
+
+4. **Publicação.** Com a CI verde no commit do merge, o Release não encontra changesets pendentes e roda `npm run release` (`build:ds` + `changeset publish`): publica no npm só o que ainda não está lá, cria a tag `@semec/ds@x.y.z`, a GitHub Release, e confere a versão no registry.
+
+Se a publicação falhar (token expirado, npm fora do ar), corrija a causa e use **Re-run jobs** na execução do Release em Actions; ele refaz o checkout do mesmo commit aprovado.
 
 ### Como conferir o que está no npm
 
@@ -183,7 +280,7 @@ npx changeset publish-plan        # o que a próxima release publicaria
 
 ### Fallback local (sem CI)
 
-Se o `NPM_TOKEN` estiver indisponível, um mantenedor autenticado no npm pode publicar da raiz do monorepo:
+Se o `NPM_TOKEN` estiver indisponível, um mantenedor autenticado no npm pode publicar da raiz do monorepo — **só** a partir do `main` atualizado, com a CI verde e depois de mergeado o PR de versão (nunca com bump manual):
 
 ```bash
 npm login                          # conta com publish em @semec
