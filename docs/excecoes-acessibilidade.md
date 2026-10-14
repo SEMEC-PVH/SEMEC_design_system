@@ -9,7 +9,7 @@ Cada exceção tem data, quem decidiu, evidência e um critério de revisão. Ex
 | Campo | Valor |
 |---|---|
 | Regra do axe | `aria-hidden-focus` (serious) |
-| Componentes | `Select` e `DropdownMenu`, **só enquanto abertos**. `Dialog` e `AlertDialog` não disparam |
+| Componentes | `Select` e `DropdownMenu`, **só enquanto abertos**. `Dialog` e `AlertDialog` não disparam. **`NavigationMenu` não está coberto:** ele também dispara a regra quando aberto, mas não prende o foco, então o impacto pode ser real; está em análise na onda 2 (#34) |
 | Origem | Auditoria de 14/10/2026, achado AUD-19 (A11Y-06), em [auditoria/2026-10-14-auditoria-prototipos-antes-depois.md](auditoria/2026-10-14-auditoria-prototipos-antes-depois.md) |
 | Decisão | **Aceita como exceção conhecida**, por decisão do usuário (mantenedor), em 14/10/2026. Issue: #33 |
 | Revisão | Rever **a cada atualização de `@radix-ui/react-select` ou `@radix-ui/react-dropdown-menu`**: refazer a medição abaixo e retirar a exceção se a regra deixar de disparar ou se o Radix passar a usar `inert` |

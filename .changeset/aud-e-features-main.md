@@ -24,4 +24,3 @@ Publica o que já estava no `main` e não saiu no npm 3.0.0 (diff `fb7d782..main
 
 - `Toast`: a pilha passa para o canto superior direito; a variante `success` ganha fundo verde `--pv-green-500` com texto `--pv-blue-900`; o título fica 16px/bold.
 - `Input`, `Textarea` e `Select` passam a usar fundo `bg-surface` (branco) em vez de `bg-background`.
-- A cor `--color-input` (borda dos campos, classe `border-input`) passa de `--border-strong` para `--border`, que é mais clara. Quem precisa da borda anterior pode usar `border-border-strong`.
