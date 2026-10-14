@@ -21,7 +21,12 @@ function useInputOTP() {
 }
 
 interface InputOTPProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
+  /** Valor controlado. Sem ele, o componente guarda o estado sozinho. */
   value?: string;
+  /**
+   * Recebe os dígitos preenchidos concatenados, sem lacunas: com "1" no slot 1
+   * e "6" no slot 6, o valor emitido é "16" (a tela mantém as posições).
+   */
   onChange?: (value: string) => void;
   maxLength?: number;
   disabled?: boolean;
@@ -36,21 +41,21 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
   ({ className, value, onChange, maxLength = 6, disabled, children, ...props }, ref) => {
     const isControlled = value !== undefined;
     const slotsRef = React.useRef<(HTMLInputElement | null)[]>([]);
-    const [slots, setSlots] = React.useState<string[]>(() => toSlots(value ?? "", maxLength));
+    const [internalSlots, setSlots] = React.useState<string[]>(() =>
+      toSlots(value ?? "", maxLength)
+    );
 
-    // Sincroniza mudanças externas de `value` (ex.: reset do formulário) sem
-    // perder a posição dos dígitos digitados fora de ordem.
-    const [prevValue, setPrevValue] = React.useState(value);
-    const [prevLength, setPrevLength] = React.useState(maxLength);
-    if (value !== prevValue || maxLength !== prevLength) {
-      setPrevValue(value);
-      setPrevLength(maxLength);
-      if (isControlled && value !== slots.join("")) {
-        setSlots(toSlots(value, maxLength));
-      } else if (maxLength !== prevLength) {
-        setSlots(toSlots(slots.join(""), maxLength));
-      }
-    }
+    // Modo controlado: a tela reflete sempre o `value` do pai. O array interno
+    // só é usado enquanto o pai aceitar o que foi emitido (value === join), o
+    // que preserva a posição de dígitos digitados fora de ordem na tela.
+    // Se o pai recusar, truncar ou resetar o valor, vale o `value`.
+    const internalValue = internalSlots.join("");
+    const slots =
+      isControlled && value !== internalValue
+        ? toSlots(value, maxLength)
+        : internalSlots.length === maxLength
+          ? internalSlots
+          : toSlots(internalValue, maxLength);
 
     const focusSlot = React.useCallback((index: number) => {
       const el = slotsRef.current[index];
