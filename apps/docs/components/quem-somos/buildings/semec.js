@@ -1,10 +1,15 @@
-// Sede da SEMEC (Secretaria Municipal de Educação): prédio institucional
-// moderno de dois pavimentos. Térreo de vidro recuado com hall iluminado,
-// pavimento superior branco em balanço com faixa de janelas e brises,
-// pórtico azul (pv-blue-700) marcando a entrada, letreiro na fachada,
-// placas solares na cobertura e praça na frente com mastros de bandeira,
-// totem, jardineiras e banco. Ver contrato em ./shared.js.
+// Sede da SEMEC (Secretaria Municipal de Educação), inspirada no prédio real
+// da Av. Sete de Setembro, 744 (Porto Velho): marquise branca larga em
+// balanço com o letreiro por extenso, térreo de vidro escuro recuado com
+// escada central entre dois blocos brancos e acesso à garagem à direita. Sobre
+// a laje da marquise (terraço com guarda-corpo de vidro e mastros de bandeira),
+// recuada, a torre de pele de vidro azul espelhado em dois volumes: o da
+// esquerda mais alto e com a quina chanfrada, o da direita mais baixo, apoiado
+// numa faixa branca. Ipê-amarelo na calçada. Ver contrato em ./shared.js.
 // Coordenadas locais: centro do footprint na origem, fachada em +z.
+//
+// A torre passa de 3 m: a fileira atrás do prédio (y = 2) é floresta no mapa
+// (vila-engine.js, buildMap), senão o jogador sumiria atrás dela na câmera alta.
 
 import * as THREE from "three";
 import { std } from "./shared";
@@ -27,7 +32,7 @@ function canvasTexture(canvas, repeat) {
   return tex;
 }
 
-// Piso da praça: placas de pedra clara com juntas finas.
+// Calçada: placas de concreto claro com juntas finas.
 function makePavingTexture(pal) {
   const canvas = makeCanvas(128, 128);
   const g = canvas.getContext("2d");
@@ -45,78 +50,83 @@ function makePavingTexture(pal) {
   return canvasTexture(canvas, true);
 }
 
-// Painel solar: células azuis com grade clara.
-function makeSolarTexture(pal) {
-  const canvas = makeCanvas(64, 64);
+// Pele de vidro: 2×2 painéis por ladrilho (0,5 m), cada um com o céu
+// refletido em gradiente e tons levemente diferentes, caixilhos claros.
+function makeCurtainWallTexture(pal) {
+  const canvas = makeCanvas(128, 128);
   const g = canvas.getContext("2d");
   const pv = pal.pv;
-  g.fillStyle = pal.mix(pv("blue-900"), pv("blue-700"), 0.35).getStyle();
-  g.fillRect(0, 0, 64, 64);
-  g.fillStyle = pal.mix(pv("blue-400"), pv("blue-700"), 0.5).getStyle();
-  for (let i = 0; i <= 64; i += 16) {
-    g.fillRect(i - 1, 0, 1, 64);
-    g.fillRect(0, i - 1, 64, 1);
+  const tones = [
+    [pv("blue-200"), pv("blue-500")],
+    [pv("blue-300"), pv("blue-600")],
+    [pv("blue-300"), pv("blue-500")],
+    [pv("blue-100"), pv("blue-400")],
+  ];
+  tones.forEach(([top, bottom], i) => {
+    const x = (i % 2) * 64;
+    const y = (i >> 1) * 64;
+    const grad = g.createLinearGradient(x, y, x + 24, y + 64);
+    grad.addColorStop(0, top.getStyle());
+    grad.addColorStop(1, bottom.getStyle());
+    g.fillStyle = grad;
+    g.fillRect(x, y, 64, 64);
+    // Reflexo diagonal claro.
+    g.fillStyle = pal.mix(pv("white"), top, 0.4).getStyle();
+    g.globalAlpha = 0.35;
+    g.beginPath();
+    g.moveTo(x + 10, y + 64);
+    g.lineTo(x + 26, y + 64);
+    g.lineTo(x + 58, y);
+    g.lineTo(x + 42, y);
+    g.closePath();
+    g.fill();
+    g.globalAlpha = 1;
+  });
+  // Caixilhos: linhas nas bordas e no meio (bordas com metade da largura,
+  // para o ladrilho emendar sem costura).
+  g.fillStyle = pal.mix(pv("gray-200"), pv("blue-100"), 0.4).getStyle();
+  for (const [x, w] of [[0, 2], [62, 4], [126, 2]]) {
+    g.fillRect(x, 0, w, 128);
+    g.fillRect(0, x, 128, w);
   }
-  g.fillStyle = pal.mix(pv("gray-300"), pv("white"), 0.4).getStyle();
-  g.fillRect(0, 0, 64, 2);
-  g.fillRect(0, 62, 64, 2);
-  g.fillRect(0, 0, 2, 64);
-  g.fillRect(62, 0, 2, 64);
-  return canvasTexture(canvas, false);
+  return canvasTexture(canvas, true);
 }
 
-// Letreiro da fachada: nome por extenso em azul, fundo transparente.
+// Letreiro da marquise: brasão redondo + nome por extenso, fundo transparente.
 function makeLetteringTexture(pal) {
-  const canvas = makeCanvas(1024, 384);
+  const W = 2048;
+  const H = 110;
+  const canvas = makeCanvas(W, H);
   const g = canvas.getContext("2d");
   const font = pal.font;
-  g.textAlign = "left";
-  g.textBaseline = "alphabetic";
-  // Marca: quadrado azul com "S" branco.
-  g.fillStyle = pal.pv("blue-700").getStyle();
-  g.beginPath();
-  g.roundRect(24, 72, 240, 240, 36);
-  g.fill();
-  g.fillStyle = pal.pv("white").getStyle();
-  g.textAlign = "center";
-  g.font = `700 200px ${font}`;
-  g.fillText("S", 144, 262);
-  g.textAlign = "left";
-  g.fillStyle = pal.pv("blue-800").getStyle();
-  g.font = `700 92px ${font}`;
-  g.fillText("SECRETARIA", 300, 160);
-  g.font = `600 64px ${font}`;
-  g.fillText("MUNICIPAL DE", 302, 236);
-  g.fillText("EDUCAÇÃO", 302, 306);
-  return canvasTexture(canvas, false);
-}
-
-// Totem institucional: faixa vertical com marca e nome.
-function makeTotemTexture(pal) {
-  const canvas = makeCanvas(128, 384);
-  const g = canvas.getContext("2d");
-  const font = pal.font;
-  g.fillStyle = pal.pv("blue-700").getStyle();
-  g.fillRect(0, 0, 128, 384);
-  g.fillStyle = pal.pv("white").getStyle();
-  g.beginPath();
-  g.roundRect(24, 28, 80, 80, 14);
-  g.fill();
-  g.fillStyle = pal.pv("blue-700").getStyle();
-  g.textAlign = "center";
-  g.font = `700 64px ${font}`;
-  g.fillText("S", 64, 92);
-  g.fillStyle = pal.pv("white").getStyle();
-  g.save();
-  g.translate(74, 140);
-  g.rotate(Math.PI / 2);
-  g.textAlign = "left";
-  g.font = `700 52px ${font}`;
-  g.fillText("SEMEC", 0, 0);
-  g.restore();
+  // Brasão: anel dourado, miolo azul com "S" branco.
   g.fillStyle = pal.pv("yellow-500").getStyle();
-  g.fillRect(0, 366, 128, 18);
-  return canvasTexture(canvas, false);
+  g.beginPath();
+  g.arc(56, H / 2, 48, 0, Math.PI * 2);
+  g.fill();
+  g.fillStyle = pal.pv("blue-700").getStyle();
+  g.beginPath();
+  g.arc(56, H / 2, 36, 0, Math.PI * 2);
+  g.fill();
+  g.fillStyle = pal.pv("white").getStyle();
+  g.textAlign = "center";
+  g.textBaseline = "middle";
+  g.font = `700 48px ${font}`;
+  g.fillText("S", 56, H / 2 + 2);
+  // Nome em letras caixa-alta grafite (reduz a fonte até caber).
+  const text = "SECRETARIA MUNICIPAL DE EDUCAÇÃO - SEMEC";
+  const x0 = 130;
+  const maxW = W - x0 - 16;
+  let size = 76;
+  g.font = `600 ${size}px ${font}`;
+  while (g.measureText(text).width > maxW && size > 30) {
+    size -= 2;
+    g.font = `600 ${size}px ${font}`;
+  }
+  g.textAlign = "left";
+  g.fillStyle = pal.pv("gray-600").getStyle();
+  g.fillText(text, x0, H / 2 + 4);
+  return { tex: canvasTexture(canvas, false), aspect: W / H };
 }
 
 // Bandeira do Brasil simplificada (verde, losango amarelo, círculo azul).
@@ -201,60 +211,64 @@ export function buildSemec(group, b, ctx) {
   const hd = b.h / 2 - 0.05;
 
   const pavingTex = track(makePavingTexture(pal));
-  const solarTex = track(makeSolarTexture(pal));
-  const letterTex = track(makeLetteringTexture(pal));
-  const totemTex = track(makeTotemTexture(pal));
+  const curtainTex = track(makeCurtainWallTexture(pal));
+  // UV das paredes da torre em metros (ExtrudeGeometry): 1 ladrilho = 0,5 m.
+  curtainTex.repeat.set(2, 2);
+  const lettering = makeLetteringTexture(pal);
+  track(lettering.tex);
 
   const warmLight = pal.mix(pv("yellow-400"), white, 0.55);
   const mats = {
     paving: track(std(white, { map: pavingTex })),
     curb: track(std(pal.mix(pv("gray-300"), pv("gray-200"), 0.4))),
     white: track(std(pal.mix(pv("gray-50"), white, 0.5), { roughness: 0.7 })),
-    slab: track(std(pv("gray-100"), { roughness: 0.75 })),
+    slab: track(std(pv("gray-200"), { roughness: 0.75 })),
     roof: track(std(pal.mix(pv("gray-300"), pv("gray-200"), 0.5))),
-    stone: track(std(pal.mix(pv("gray-300"), pv("yellow-400"), 0.1), { roughness: 0.9 })),
-    blue: track(std(blue, { roughness: 0.55 })),
-    blueDark: track(std(pv("blue-900"), { roughness: 0.6 })),
     metal: track(std(pv("gray-400"), { roughness: 0.4, metalness: 0.5 })),
     dark: track(std(pv("gray-800"), { roughness: 0.6 })),
-    glass: track(
-      std(pal.mix(pv("blue-200"), white, 0.25), {
-        roughness: 0.06,
-        metalness: 0.1,
+    garage: track(std(pv("gray-900"), { roughness: 0.9 })),
+    // Vidro fumê do térreo: escuro, mas deixa ver o hall iluminado.
+    shopGlass: track(
+      std(pv("gray-700"), {
+        roughness: 0.08,
+        metalness: 0.2,
         transparent: true,
-        opacity: 0.22,
+        opacity: 0.45,
         depthWrite: false,
       })
     ),
+    railGlass: track(
+      std(pal.mix(pv("blue-200"), white, 0.4), {
+        roughness: 0.06,
+        transparent: true,
+        opacity: 0.3,
+        depthWrite: false,
+      })
+    ),
+    curtain: track(
+      std(white, {
+        map: curtainTex,
+        roughness: 0.18,
+        metalness: 0.35,
+        emissive: pv("blue-300"),
+        emissiveIntensity: 0.12,
+      })
+    ),
     interior: track(std(warmLight, { emissive: warmLight, emissiveIntensity: 0.65 })),
-    // Fundo do escritório do superior: mais claro, para ler bem sob a verga.
-    officeWall: track(std(warmLight, { emissive: warmLight, emissiveIntensity: 0.85 })),
     interiorFloor: track(
       std(pal.mix(pv("gray-200"), pv("yellow-400"), 0.2), {
         emissive: pal.mix(pv("gray-200"), pv("yellow-400"), 0.2),
         emissiveIntensity: 0.3,
       })
     ),
-    lobbyWall: track(std(pal.mix(blue, white, 0.15), { emissive: blue, emissiveIntensity: 0.25 })),
     wood: track(std(pal.mix(pv("yellow-800"), pv("yellow-400"), 0.4), { roughness: 0.7 })),
     lamp: track(new THREE.MeshBasicMaterial({ color: pal.mix(pv("yellow-400"), white, 0.8) })),
-    glow: track(
-      new THREE.MeshBasicMaterial({
-        color: pal.mix(pv("yellow-400"), white, 0.6),
-        transparent: true,
-        opacity: 0.3,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-      })
-    ),
     screen: track(new THREE.MeshBasicMaterial({ color: pal.mix(pv("blue-400"), white, 0.25) })),
-    solar: track(std(white, { map: solarTex, roughness: 0.25, metalness: 0.35 })),
     soil: track(std(pal.mix(pv("yellow-800"), pv("gray-800"), 0.5))),
-    leaves: track(std(pv("green-700"), { flatShading: true })),
-    leavesLight: track(std(pal.mix(pv("green-600"), pv("green-500"), 0.4), { flatShading: true })),
-    trunk: track(std(pv("yellow-800"))),
-    lettering: track(std(white, { map: letterTex, transparent: true, roughness: 0.6 })),
-    totem: track(std(white, { map: totemTex, roughness: 0.5 })),
+    ipe: track(std(pv("yellow-400"), { flatShading: true })),
+    ipeDeep: track(std(pv("yellow-500"), { flatShading: true })),
+    trunk: track(std(pal.mix(pv("yellow-800"), pv("gray-700"), 0.4))),
+    lettering: track(std(white, { map: lettering.tex, transparent: true, roughness: 0.6 })),
   };
 
   const m4 = new THREE.Matrix4();
@@ -288,297 +302,181 @@ export function buildSemec(group, b, ctx) {
     for (const { mat, noShadow, list } of boxQueue.values()) instanced(mat, list, { noShadow });
     boxQueue.clear();
   };
+  // Prisma vertical a partir da planta [[x, z], ...] (y0..y1): laterais com a
+  // pele de vidro (UV em metros), topo e fundo com `capMat`.
+  const prism = (plan, y0, y1, sideMat, capMat) => {
+    const shape = new THREE.Shape(plan.map(([x, z]) => new THREE.Vector2(x, -z)));
+    const geo = track(new THREE.ExtrudeGeometry(shape, { depth: y1 - y0, bevelEnabled: false }));
+    geo.rotateX(-Math.PI / 2);
+    geo.translate(0, y0, 0);
+    const mesh = new THREE.Mesh(geo, [capMat, sideMat]);
+    group.add(mesh);
+    return mesh;
+  };
 
   // ---- Dimensões principais -----------------------------------------------------
-  const base = 0.05; // topo da praça
-  const bx0 = -hw + 0.15;
-  const bx1 = hw - 0.15;
+  const base = 0.05; // topo da calçada
+  const bx0 = -hw + 0.1;
+  const bx1 = hw - 0.1;
   const bz0 = -hd + 0.2;
-  const gz = 0.35; // vidro do térreo (recuado)
-  const uz = 0.62; // fachada do pavimento superior (em balanço)
-  const g1 = 1.02; // fundo da laje do pavimento superior
-  const s1 = 1.18; // topo da laje (piso do superior)
-  const winY0 = 1.28; // faixa de janelas do superior
-  const winY1 = 1.78;
-  const R = 1.92; // topo da cobertura
-  const parTop = 2.02;
+  const gz = 0.5; // vidro do térreo (recuado sob a marquise)
+  const fz = 0.85; // face da marquise
+  const cb = 1.1; // fundo da marquise
+  const ct = 1.45; // topo da marquise = piso do terraço
+  const hallZ = gz - 0.35; // fundo do hall visível pelo vidro
   const doorX0 = 0.02; // tile da porta: x local 0..1
   const doorX1 = 0.98;
   const doorMid = (doorX0 + doorX1) / 2;
+  const steps = 4;
+  const stepH = 0.05;
+  const stepD = 0.12;
+  const hallFloor = base + steps * stepH; // hall elevado: a escada sobe até ele
+  const wallL1 = bx0 + 0.12; // pilar fino à esquerda
+  const wallR0 = bx1 - 0.32; // pilar largo à direita
+  const garageX0 = wallR0 - 0.75; // portão da garagem
+  // Torre: planta em x/z.
+  const tM = 0.15; // divisa entre os dois volumes
+  const tL0 = -2.15;
+  const tChamfer = -0.55; // início do chanfro na face do volume alto
+  const zL = 0.3; // face do volume alto (esquerda)
+  const zR = -0.25; // face do volume baixo (direita)
+  const tR1 = wallR0 - 0.05;
+  const bandTop = 1.8; // faixa branca sob o volume baixo
+  const topL = 3.45;
+  const topR = 2.9;
 
-  // ---- Praça e calçada --------------------------------------------------------------
+  // ---- Calçada ------------------------------------------------------------------
   box(mats.paving, -hw, hw, 0, base, -hd, hd);
   pavingTex.repeat.set((2 * hw) / 0.8, (2 * hd) / 0.8);
-  // Meio-fio na borda da praça, interrompido na saída para o caminho.
+  // Meio-fio na borda, interrompido na saída para o caminho.
   box(mats.curb, -hw, doorX0 - 0.15, base, base + 0.025, hd - 0.06, hd);
   box(mats.curb, doorX1 + 0.15, hw, base, base + 0.025, hd - 0.06, hd);
 
-  // ---- Térreo: embasamento em pedra nas pontas, vidro no meio ------------------
-  // Núcleo dos fundos (atrás do hall).
-  box(mats.white, bx0, bx1, base, g1, bz0, gz - 0.62);
-  // Paredes de pedra nas extremidades, avançando até a linha do balanço.
-  const stoneL1 = bx0 + 0.95;
-  const stoneR0 = bx1 - 0.7;
-  box(mats.stone, bx0, stoneL1, base, g1, gz - 0.62, uz);
-  box(mats.stone, stoneR0, bx1, base, g1, gz - 0.62, uz);
-  // Juntas horizontais na pedra (frisos escuros finos, à frente da face).
-  const joints = [];
-  for (const y of [0.3, 0.55, 0.8]) {
-    joints.push([bx0, stoneL1, y, y + 0.012, uz, uz + 0.004]);
-    joints.push([stoneR0, bx1, y, y + 0.012, uz, uz + 0.004]);
-  }
-  instanced(mats.curb, joints, { noShadow: true });
+  // ---- Térreo -------------------------------------------------------------------
+  // Núcleo dos fundos e pilares das pontas, até a face da marquise.
+  box(mats.white, bx0, bx1, base, cb, bz0, hallZ - 0.02);
+  box(mats.white, bx0, wallL1, base, cb, hallZ - 0.02, fz);
+  box(mats.white, wallR0, bx1, base, cb, hallZ - 0.02, fz);
 
-  // Hall iluminado (visível pelo vidro: só ~0,4 m de profundidade aparece).
-  box(mats.interiorFloor, stoneL1, stoneR0, base, base + 0.012, gz - 0.62, gz, { noShadow: true });
-  box(mats.interior, stoneL1, stoneR0, base, g1, gz - 0.64, gz - 0.6, { noShadow: true });
-  // Painel azul atrás da recepção com a marca.
-  box(mats.lobbyWall, -1.25, -0.2, 0.3, 0.9, gz - 0.6, gz - 0.57, { noShadow: true });
-  const brand = new THREE.Mesh(track(new THREE.PlaneGeometry(0.62, 0.23)), mats.lettering);
-  brand.position.set(-0.72, 0.62, gz - 0.565);
-  brand.userData.noShadow = true;
-  group.add(brand);
-  // Balcão de recepção (madeira com tampo branco) colado ao vidro.
-  box(mats.wood, -1.3, -0.25, base, 0.38, gz - 0.32, gz - 0.14);
-  box(mats.white, -1.33, -0.22, 0.38, 0.41, gz - 0.34, gz - 0.12);
-  box(mats.dark, -0.95, -0.7, 0.41, 0.55, gz - 0.28, gz - 0.26);
-  box(mats.screen, -0.94, -0.71, 0.42, 0.54, gz - 0.258, gz - 0.255, { noShadow: true });
-  // Vaso com planta no hall, à direita da porta.
-  box(mats.dark, 1.3, 1.46, base, 0.28, gz - 0.3, gz - 0.14);
-  const potPlant = new THREE.Mesh(track(new THREE.IcosahedronGeometry(0.15, 0)), mats.leavesLight);
-  potPlant.position.set(1.38, 0.42, gz - 0.22);
-  potPlant.scale.set(1, 1.3, 1);
-  group.add(potPlant);
-  // Painel de avisos / TV no hall à direita.
-  box(mats.dark, 1.6, 2.05, 0.5, 0.78, gz - 0.58, gz - 0.55);
-  box(mats.screen, 1.62, 2.03, 0.52, 0.76, gz - 0.55, gz - 0.545, { noShadow: true });
-  // Luminárias pendentes.
-  const pendants = [];
-  const pendantLamps = [];
-  for (const px of [-1.5, -0.6, 1.4, 2.0]) {
-    pendants.push([px - 0.006, px + 0.006, 0.78, g1, gz - 0.22, gz - 0.21]);
-    pendantLamps.push([px - 0.05, px + 0.05, 0.72, 0.78, gz - 0.26, gz - 0.17]);
-  }
-  instanced(mats.dark, pendants, { noShadow: true });
-  instanced(mats.lamp, pendantLamps, { noShadow: true });
+  // Hall elevado e iluminado atrás do vidro.
+  box(mats.interiorFloor, wallL1, garageX0, base, hallFloor, hallZ, gz, { noShadow: true });
+  box(mats.interior, wallL1, garageX0, hallFloor, cb, hallZ - 0.02, hallZ, { noShadow: true });
+  // Balcão de atendimento com monitor, à esquerda da porta.
+  box(mats.wood, -1.55, -0.55, hallFloor, hallFloor + 0.3, hallZ + 0.08, hallZ + 0.22);
+  box(mats.white, -1.58, -0.52, hallFloor + 0.3, hallFloor + 0.33, hallZ + 0.06, hallZ + 0.24);
+  box(mats.dark, -1.2, -0.95, hallFloor + 0.33, hallFloor + 0.47, hallZ + 0.12, hallZ + 0.14);
+  box(mats.screen, -1.19, -0.96, hallFloor + 0.34, hallFloor + 0.46, hallZ + 0.14, hallZ + 0.145, { noShadow: true });
+  // Painel de senhas / TV no hall à direita.
+  box(mats.dark, 1.2, 1.6, 0.5, 0.75, hallZ, hallZ + 0.03);
+  box(mats.screen, 1.22, 1.58, 0.52, 0.73, hallZ + 0.03, hallZ + 0.035, { noShadow: true });
 
-  // Vidro do térreo com caixilhos escuros finos.
-  box(mats.glass, stoneL1, stoneR0, base, g1, gz - 0.02, gz, { noShadow: true });
+  // Vidro fumê do térreo com caixilhos escuros.
+  box(mats.shopGlass, wallL1, garageX0, base, cb, gz - 0.02, gz, { noShadow: true });
   const mullions = [];
-  for (const mx of [stoneL1 + 0.02, -0.75, doorX0 - 0.03, doorMid, doorX1 + 0.03, 1.7, stoneR0 - 0.02]) {
-    mullions.push([mx - 0.018, mx + 0.018, base, g1, gz - 0.03, gz + 0.01]);
+  for (const mx of [wallL1 + 0.5, -1.6, -1.0, -0.45, doorX0 - 0.03, doorMid, doorX1 + 0.03, 1.55, garageX0 - 0.02]) {
+    mullions.push([mx - 0.016, mx + 0.016, base, cb, gz - 0.03, gz + 0.01]);
   }
-  mullions.push([stoneL1, stoneR0, 0.86, 0.885, gz - 0.03, gz + 0.01]); // travessa (bandeira)
+  mullions.push([wallL1, garageX0, 0.88, 0.9, gz - 0.03, gz + 0.01]); // travessa
   instanced(mats.dark, mullions);
+  // Portas de vidro com puxadores, no alto da escada.
+  box(mats.metal, doorMid - 0.09, doorMid - 0.07, hallFloor + 0.2, hallFloor + 0.45, gz + 0.01, gz + 0.025);
+  box(mats.metal, doorMid + 0.07, doorMid + 0.09, hallFloor + 0.2, hallFloor + 0.45, gz + 0.01, gz + 0.025);
 
-  // Teto do balanço (sob o pavimento superior) com spots embutidos.
-  const soffitSpots = [];
-  for (let sx = stoneL1 + 0.3; sx < stoneR0 - 0.1; sx += 0.55) {
-    if (sx > doorX0 - 0.25 && sx < doorX1 + 0.25) continue;
-    soffitSpots.push([sx - 0.04, sx + 0.04, g1 - 0.006, g1 - 0.001, (gz + uz) / 2 - 0.04, (gz + uz) / 2 + 0.04]);
+  // Garagem à direita: vão escuro com rampa descendo e portão aberto.
+  box(mats.garage, garageX0, wallR0, base, cb, hallZ - 0.02, gz - 0.1);
+  box(mats.dark, garageX0, wallR0, cb - 0.12, cb, gz - 0.1, gz);
+  box(mats.curb, garageX0 + 0.04, wallR0, 0, base + 0.004, gz - 0.1, hd - 0.06, { noShadow: true });
+  const gateBars = [];
+  for (let gx = garageX0 + 0.08; gx < wallR0 - 0.02; gx += 0.1) {
+    gateBars.push([gx - 0.008, gx + 0.008, cb - 0.12, cb - 0.04, gz - 0.02, gz - 0.005]);
   }
-  instanced(mats.lamp, soffitSpots, { noShadow: true });
+  instanced(mats.metal, gateBars, { noShadow: true });
+  // Guarda-corpo metálico na lateral da rampa.
+  box(mats.metal, garageX0 - 0.02, garageX0 + 0.02, base, base + 0.32, gz, fz + 0.3);
+  box(mats.metal, garageX0 - 0.02, garageX0 + 0.02, base + 0.3, base + 0.33, gz, fz + 0.3);
 
-  // ---- Pavimento superior em balanço ----------------------------------------------
-  // Laje inferior (faixa branca) e volume dos fundos.
-  box(mats.white, bx0 - 0.05, bx1 + 0.05, g1, s1, bz0, uz + 0.02);
-  box(mats.white, bx0, bx1, s1, R, bz0, uz - 0.5);
-  // Bloco cego à esquerda (letreiro) e moldura da faixa de janelas.
-  const blindX1 = bx0 + 1.7;
-  box(mats.white, bx0 - 0.05, blindX1, s1, R, uz - 0.5, uz + 0.02);
-  box(mats.white, blindX1, bx1 + 0.05, s1, winY0, uz - 0.5, uz + 0.02); // peitoril
-  box(mats.white, blindX1, bx1 + 0.05, winY1, R, uz - 0.5, uz + 0.02); // verga
-  box(mats.white, bx1 - 0.1, bx1 + 0.05, winY0, winY1, uz - 0.5, uz + 0.02); // lateral direita
-  // Letreiro "SECRETARIA MUNICIPAL DE EDUCAÇÃO" no bloco cego.
-  const sign = new THREE.Mesh(track(new THREE.PlaneGeometry(1.5, 0.5625)), mats.lettering);
-  sign.position.set((bx0 + blindX1) / 2 - 0.04, (s1 + 2.05) / 2 + 0.02, uz + 0.024);
+  // Escada central de granito, saindo da linha da marquise até o hall.
+  for (let i = 0; i < steps; i++) {
+    box(mats.slab, doorX0 - 0.05, doorX1 + 0.05, base, base + stepH * (i + 1), gz, gz + stepD * (steps - i));
+  }
+  // Corrimãos metálicos nas bordas da escada.
+  for (const rx of [doorX0 - 0.02, doorX1 + 0.02]) {
+    box(mats.metal, rx - 0.01, rx + 0.01, base, base + 0.42, gz + stepD * steps - 0.03, gz + stepD * steps - 0.01);
+    box(mats.metal, rx - 0.012, rx + 0.012, base + 0.4, base + 0.43, gz, gz + stepD * steps - 0.01);
+  }
+  // Blocos brancos ladeando a escada (mureta/floreira na calçada).
+  box(mats.white, doorX0 - 0.7, doorX0 - 0.08, base, 0.52, gz + 0.25, fz + 0.12);
+  box(mats.white, doorX1 + 0.08, doorX1 + 0.7, base, 0.52, gz + 0.25, fz + 0.12);
+
+  // ---- Marquise ------------------------------------------------------------------
+  box(mats.white, bx0 - 0.05, bx1 + 0.05, cb, ct, bz0, fz);
+  // Spots embutidos no forro.
+  const spots = [];
+  for (let sx = wallL1 + 0.25; sx < wallR0 - 0.1; sx += 0.5) {
+    spots.push([sx - 0.035, sx + 0.035, cb - 0.006, cb - 0.001, (gz + fz) / 2 - 0.035, (gz + fz) / 2 + 0.035]);
+  }
+  instanced(mats.lamp, spots, { noShadow: true });
+  // Letreiro por extenso na face da marquise (à direita do ipê).
+  const signX0 = -2.15;
+  const signX1 = bx1 - 0.05;
+  const signW = signX1 - signX0;
+  const sign = new THREE.Mesh(track(new THREE.PlaneGeometry(signW, signW / lettering.aspect)), mats.lettering);
+  sign.position.set((signX0 + signX1) / 2, (cb + ct) / 2, fz + 0.004);
   sign.userData.noShadow = true;
   group.add(sign);
 
-  // Faixa de janelas: interior do escritório colado ao vidro.
-  const winX0 = blindX1;
-  const winX1 = bx1 - 0.1;
-  const glassZ = uz - 0.1;
-  // O volume dos fundos termina em uz - 0,5 (= glassZ - 0,4): todo o interior
-  // precisa ficar à frente dele, senão some dentro da parede. Piso fino 4 mm
-  // acima do peitoril (sem z-fighting).
-  box(mats.interiorFloor, winX0, winX1, winY0, winY0 + 0.004, glassZ - 0.4, glassZ - 0.016, { noShadow: true });
-  box(mats.officeWall, winX0, winX1, winY0, winY1, glassZ - 0.396, glassZ - 0.37, { noShadow: true });
-  // Estantes com livros e mesas com monitores (instanciados).
-  const shelves = [];
-  const books = [];
-  const desks = [];
-  const monitors = [];
-  const screens = [];
-  let k = 0;
-  for (let x = winX0 + 0.15; x < winX1 - 0.3; x += 0.62, k++) {
-    if (k % 2 === 0) {
-      // Estante encostada no fundo.
-      shelves.push([x, x + 0.42, winY0, winY0 + 0.36, glassZ - 0.37, glassZ - 0.27]);
-      for (let row = 0; row < 2; row++) {
-        let bx = x + 0.03;
-        let n = 0;
-        while (bx < x + 0.38) {
-          const bw = 0.03 + ((n * 7 + row * 3 + k) % 3) * 0.008;
-          const bh = 0.09 + ((n * 5 + row + k) % 4) * 0.012;
-          const y0 = winY0 + 0.03 + row * 0.17;
-          books.push([bx, bx + bw - 0.004, y0, y0 + bh, glassZ - 0.35, glassZ - 0.262]);
-          bx += bw;
-          n++;
-        }
-      }
-    } else {
-      // Mesa com monitor virado para fora.
-      desks.push([x - 0.05, x + 0.47, winY0 + 0.1, winY0 + 0.13, glassZ - 0.3, glassZ - 0.08]);
-      monitors.push([x + 0.1, x + 0.32, winY0 + 0.15, winY0 + 0.3, glassZ - 0.13, glassZ - 0.11]);
-      screens.push([x + 0.11, x + 0.31, winY0 + 0.16, winY0 + 0.29, glassZ - 0.11, glassZ - 0.105]);
-    }
-  }
-  instanced(mats.slab, shelves);
-  const bookInst = instanced(mats.white, books, { noShadow: true });
-  const bookColors = [pv("blue-700"), pv("red-500"), pv("yellow-500"), pv("green-600"), pv("blue-400"), pv("gray-100")];
-  for (let i = 0; i < books.length; i++) bookInst.setColorAt(i, bookColors[(i * 5 + (i >> 2)) % bookColors.length]);
-  if (bookInst.instanceColor) bookInst.instanceColor.needsUpdate = true;
-  instanced(mats.white, desks);
-  instanced(mats.dark, monitors, { noShadow: true });
-  instanced(mats.screen, screens, { noShadow: true });
-  // Luminária linear no teto, perto do vidro.
-  box(mats.lamp, winX0 + 0.1, winX1 - 0.1, winY1 - 0.012, winY1, glassZ - 0.2, glassZ - 0.15, { noShadow: true });
-  // Vidro e brises verticais brancos.
-  box(mats.glass, winX0, winX1, winY0, winY1, glassZ - 0.015, glassZ, { noShadow: true });
-  const fins = [];
-  const finCount = Math.round((winX1 - winX0) / 0.34);
-  for (let i = 1; i < finCount; i++) {
-    const fx = winX0 + ((winX1 - winX0) * i) / finCount;
-    fins.push([fx - 0.022, fx + 0.022, winY0, winY1, glassZ, uz + 0.015]);
-  }
-  instanced(mats.white, fins);
+  // Terraço sobre a marquise, com guarda-corpo de vidro na frente e nas pontas.
+  box(mats.roof, bx0, bx1, ct, ct + 0.006, bz0, fz - 0.04, { noShadow: true });
+  const railH = 0.15;
+  const railZ = fz - 0.04;
+  box(mats.railGlass, bx0 - 0.03, bx1 + 0.03, ct, ct + railH, railZ, railZ + 0.015, { noShadow: true });
+  box(mats.railGlass, bx0 - 0.03, bx0 - 0.015, ct, ct + railH, zL, railZ, { noShadow: true });
+  box(mats.railGlass, bx1 + 0.015, bx1 + 0.03, ct, ct + railH, zR, railZ, { noShadow: true });
+  box(mats.metal, bx0 - 0.04, bx1 + 0.04, ct + railH, ct + railH + 0.018, railZ - 0.005, railZ + 0.02);
+  box(mats.metal, bx0 - 0.04, bx0 - 0.01, ct + railH, ct + railH + 0.018, zL, railZ);
+  box(mats.metal, bx1 + 0.01, bx1 + 0.04, ct + railH, ct + railH + 0.018, zR, railZ);
 
-  // ---- Cobertura -----------------------------------------------------------------
-  // Bloco do letreiro sobe um pouco acima do resto: quebra a caixa única e dá
-  // hierarquia à fachada (teto ~2,2 por causa da fileira andável atrás).
-  const tallTop = 2.12;
-  const tallPar = 2.2;
-  box(mats.white, bx0 - 0.05, blindX1, R, tallTop, bz0, uz + 0.02);
-  const pt = 0.07;
-  const rimL = [
-    [bx0 - 0.05, blindX1, tallTop, tallPar, uz - pt + 0.02, uz + 0.02],
-    [bx0 - 0.05, blindX1, tallTop, tallPar, bz0, bz0 + pt],
-    [bx0 - 0.05, bx0 - 0.05 + pt, tallTop, tallPar, bz0, uz + 0.02],
-    [blindX1 - pt, blindX1, tallTop, tallPar, bz0, uz + 0.02],
-    // Platibanda do volume mais baixo (à direita).
-    [blindX1, bx1 + 0.05, R, parTop, uz - pt + 0.02, uz + 0.02],
-    [blindX1, bx1 + 0.05, R, parTop, bz0, bz0 + pt],
-    [bx1 + 0.05 - pt, bx1 + 0.05, R, parTop, bz0, uz + 0.02],
+  // ---- Torre de vidro ------------------------------------------------------------
+  // Volume alto à esquerda: quina frontal direita chanfrada até a face do baixo.
+  prism(
+    [[tL0, bz0], [tL0, zL], [tChamfer, zL], [tM, zR], [tM, bz0]],
+    ct,
+    topL,
+    mats.curtain,
+    mats.roof
+  );
+  // Volume baixo à direita, sobre a faixa branca que avança um pouco.
+  box(mats.white, tM, tR1 + 0.03, ct, bandTop, bz0, zR + 0.05);
+  prism([[tM, bz0], [tM, zR], [tR1, zR], [tR1, bz0]], bandTop, topR, mats.curtain, mats.roof);
+  // Arremate branco no topo dos dois volumes.
+  const copings = [
+    [tL0 - 0.02, tChamfer, topL, topL + 0.05, zL - 0.04, zL + 0.02],
+    [tL0 - 0.02, tL0 + 0.04, topL, topL + 0.05, bz0, zL + 0.02],
+    [tM - 0.02, tR1 + 0.02, topR, topR + 0.05, zR - 0.04, zR + 0.02],
+    [tR1 - 0.04, tR1 + 0.02, topR, topR + 0.05, bz0, zR + 0.02],
   ];
-  instanced(mats.white, rimL);
-  box(mats.roof, bx0 + 0.02, blindX1 - pt, tallTop, tallTop + 0.008, bz0 + pt, uz - pt + 0.02, { noShadow: true });
-  box(mats.roof, blindX1, bx1 + 0.05 - pt, R, R + 0.008, bz0 + pt, uz - pt + 0.02, { noShadow: true });
-  // Claraboia e casa de máquinas no bloco alto.
-  box(mats.slab, bx0 + 0.25, bx0 + 0.85, tallTop, tallTop + 0.06, bz0 + 0.3, bz0 + 0.95);
-  box(mats.glass, bx0 + 0.3, bx0 + 0.8, tallTop + 0.06, tallTop + 0.075, bz0 + 0.35, bz0 + 0.9, { noShadow: true });
-  box(mats.interior, bx0 + 0.3, bx0 + 0.8, tallTop + 0.055, tallTop + 0.06, bz0 + 0.35, bz0 + 0.9, { noShadow: true });
-  box(mats.slab, bx0 + 1.05, blindX1 - 0.2, tallTop, tallTop + 0.08, bz0 + 0.2, bz0 + 0.6);
-  // Friso azul institucional no topo da fachada (4 mm à frente: sem z-fighting).
-  box(mats.blue, blindX1, bx1 + 0.05, R - 0.07, R - 0.01, uz + 0.024, uz + 0.05);
-  box(mats.blue, bx0 - 0.05, blindX1, tallTop - 0.07, tallTop - 0.01, uz + 0.024, uz + 0.05);
-  // Lâmina azul vertical na junção dos dois volumes, do térreo ao topo.
-  box(mats.blue, blindX1 - 0.04, blindX1 + 0.08, s1 - 0.16, tallPar + 0.04, uz - 0.3, uz + 0.12);
+  instanced(mats.white, copings);
+  // Casa de máquinas no volume baixo.
+  box(mats.white, tR1 - 0.9, tR1 - 0.2, topR, topR + 0.22, bz0 + 0.15, bz0 + 0.75);
+  box(mats.dark, tR1 - 0.75, tR1 - 0.35, topR + 0.06, topR + 0.18, bz0 + 0.75, bz0 + 0.76, { noShadow: true });
 
-  // Placas solares inclinadas para o sul (face para a câmera) no volume baixo.
-  const solarRows = [bz0 + 0.42, bz0 + 1.02, bz0 + 1.62];
-  const solarCols = [];
-  for (let px = blindX1 + 0.45; px < bx1 - 0.3; px += 0.7) solarCols.push(px);
-  const solar = new THREE.InstancedMesh(unitBox, mats.solar, solarRows.length * solarCols.length);
-  const tilt = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -0.36);
-  const solarLegs = [];
-  let si = 0;
-  for (const rz of solarRows) {
-    for (const px of solarCols) {
-      pos.set(px, R + 0.11, rz);
-      scl.set(0.64, 0.025, 0.44);
-      solar.setMatrixAt(si++, m4.compose(pos, tilt, scl));
-      solarLegs.push([px - 0.24, px - 0.21, R, R + 0.15, rz - 0.14, rz - 0.11]);
-      solarLegs.push([px + 0.21, px + 0.24, R, R + 0.15, rz - 0.14, rz - 0.11]);
-    }
-  }
-  solar.instanceMatrix.needsUpdate = true;
-  solar.computeBoundingBox();
-  solar.computeBoundingSphere();
-  group.add(solar);
-  instanced(mats.metal, solarLegs);
-
-  // ---- Pórtico azul da entrada --------------------------------------------------
-  const pz0 = gz - 0.05;
-  const pz1 = hd - 0.85; // avanço do pórtico sobre a praça
-  const pTop = 1.34;
-  const pBeam = 1.04;
-  const pw = 0.13;
-  box(mats.blue, doorX0 - 0.2 - pw, doorX0 - 0.2, base, pTop, pz0, pz1);
-  box(mats.blue, doorX1 + 0.2, doorX1 + 0.2 + pw, base, pTop, pz0, pz1);
-  box(mats.blue, doorX0 - 0.2 - pw, doorX1 + 0.2 + pw, pBeam, pTop, pz0, pz1);
-  // Forro claro sob o pórtico, com spots.
-  box(mats.slab, doorX0 - 0.2, doorX1 + 0.2, pBeam - 0.01, pBeam, pz0, pz1 - 0.02, { noShadow: true });
-  const porchSpots = [];
-  for (const sz of [uz + 0.15, pz1 - 0.15]) {
-    for (const sx of [doorX0 + 0.12, doorX1 - 0.12]) {
-      porchSpots.push([sx - 0.04, sx + 0.04, pBeam - 0.016, pBeam - 0.01, sz - 0.04, sz + 0.04]);
-    }
-  }
-  instanced(mats.lamp, porchSpots, { noShadow: true });
-  // Piso de granito escuro e degrau sob o pórtico.
-  box(mats.slab, doorX0 - 0.2, doorX1 + 0.2, base, base + 0.02, gz, pz1, { noShadow: true });
-  box(mats.curb, doorX0 - 0.2, doorX1 + 0.2, base, base + 0.015, pz1, pz1 + 0.18);
-  // Portas de vidro automáticas com puxadores.
-  box(mats.dark, doorMid - 0.02, doorMid + 0.02, base, 0.86, gz + 0.005, gz + 0.03);
-  box(mats.metal, doorMid - 0.09, doorMid - 0.07, 0.36, 0.6, gz + 0.03, gz + 0.045);
-  box(mats.metal, doorMid + 0.07, doorMid + 0.09, 0.36, 0.6, gz + 0.03, gz + 0.045);
-
-  // ---- Praça: mastros, totem, jardineiras, banco e balizadores -----------------
-  // Jardineira longa à esquerda (rente à pedra), com arbustos facetados.
-  const shrubGeo = track(new THREE.IcosahedronGeometry(0.12, 0));
-  const coneGeo = track(new THREE.OctahedronGeometry(0.12, 0));
-  const planter = (x0, x1, z0, z1) => {
-    box(mats.white, x0, x1, base, base + 0.14, z0, z1);
-    box(mats.soil, x0 + 0.035, x1 - 0.035, base + 0.14, base + 0.145, z0 + 0.035, z1 - 0.035, { noShadow: true });
-  };
-  const shrub = (geo, mat, x, z, sx, sy) => {
-    const m = new THREE.Mesh(geo, mat);
-    m.position.set(x, base + 0.15 + 0.1 * sy, z);
-    m.scale.set(sx, sy, sx);
-    m.rotation.y = x * 3.1 + z;
-    group.add(m);
-  };
-  planter(bx0, stoneL1 - 0.05, uz + 0.06, uz + 0.36);
-  for (let i = 0; i < 4; i++) {
-    const x = bx0 + 0.13 + i * 0.22;
-    shrub(i % 2 ? shrubGeo : coneGeo, i % 2 ? mats.leaves : mats.leavesLight, x, uz + 0.21, 1, i % 2 ? 1 : 1.6);
-  }
-  planter(stoneR0 + 0.05, bx1, uz + 0.06, uz + 0.36);
-  for (let i = 0; i < 3; i++) {
-    const x = stoneR0 + 0.17 + i * 0.2;
-    shrub(i % 2 ? coneGeo : shrubGeo, i % 2 ? mats.leavesLight : mats.leaves, x, uz + 0.21, 0.95, i % 2 ? 1.5 : 1);
-  }
-
-  // Mastros com bandeiras (Brasil, Rondônia, SEMEC) à esquerda da praça.
-  const poleGeo = track(new THREE.CylinderGeometry(0.018, 0.024, 1, 8));
-  const knobGeo = track(new THREE.SphereGeometry(0.03, 8, 6));
-  const poleTop = 1.85;
-  const flagW = 0.42;
-  const flagH = 0.28;
+  // ---- Mastros com bandeiras no terraço, à frente do volume alto ------------------
+  const poleGeo = track(new THREE.CylinderGeometry(0.016, 0.022, 1, 8));
+  const knobGeo = track(new THREE.SphereGeometry(0.028, 8, 6));
+  const poleTop = ct + 1.2;
+  const flagW = 0.38;
+  const flagH = 0.25;
   const flagTexMakers = [makeBrazilFlag, makeRondoniaFlag, makeSemecFlag];
   const flags = [];
-  const poleZ = hd - 0.55;
-  const poleXs = [-hw + 0.35, -hw + 0.8, -hw + 1.25];
-  // Base de granito para os três mastros.
-  box(mats.curb, poleXs[0] - 0.16, poleXs[2] + 0.16, base, base + 0.035, poleZ - 0.16, poleZ + 0.16);
+  const poleZ = (zL + railZ) / 2;
+  const poleXs = [-2.0, -1.62, -1.24];
   poleXs.forEach((px, i) => {
     const pole = new THREE.Mesh(poleGeo, mats.metal);
-    pole.scale.y = poleTop - base - (i === 1 ? 0 : 0.12);
-    pole.position.set(px, base + pole.scale.y / 2, poleZ);
+    pole.scale.y = poleTop - ct - (i === 1 ? 0 : 0.1);
+    pole.position.set(px, ct + pole.scale.y / 2, poleZ);
     group.add(pole);
     const knob = new THREE.Mesh(knobGeo, mats.metal);
-    knob.position.set(px, base + pole.scale.y + 0.02, poleZ);
+    knob.position.set(px, ct + pole.scale.y + 0.02, poleZ);
     group.add(knob);
     const geo = track(new THREE.PlaneGeometry(flagW, flagH, 10, 3));
     geo.translate(flagW / 2, 0, 0);
@@ -590,7 +488,7 @@ export function buildSemec(group, b, ctx) {
       })
     );
     const flag = new THREE.Mesh(geo, mat);
-    flag.position.set(px + 0.02, base + pole.scale.y - flagH / 2 - 0.02, poleZ);
+    flag.position.set(px + 0.02, ct + pole.scale.y - flagH / 2 - 0.02, poleZ);
     group.add(flag);
     const p = geo.attributes.position;
     flags.push({ attr: p, base: Float32Array.from(p.array), phase: i * 1.7 });
@@ -602,7 +500,7 @@ export function buildSemec(group, b, ctx) {
       for (let v = 0; v < arr.length; v += 3) {
         const x = f.base[v];
         const s = x / flagW;
-        arr[v + 2] = Math.sin(x * 14 - t * 4 + f.phase) * 0.035 * s;
+        arr[v + 2] = Math.sin(x * 14 - t * 4 + f.phase) * 0.03 * s;
         arr[v + 1] = f.base[v + 1] - s * s * 0.03;
       }
       f.attr.needsUpdate = true;
@@ -610,68 +508,36 @@ export function buildSemec(group, b, ctx) {
   };
   waveFlags(0.6); // pose estática (prefers-reduced-motion)
 
-  // Totem institucional à direita da praça.
-  const totemX = hw - 0.42;
-  const totemZ = hd - 0.4;
-  box(mats.blueDark, totemX - 0.2, totemX + 0.2, base, base + 0.04, totemZ - 0.08, totemZ + 0.08);
-  box(mats.blue, totemX - 0.16, totemX + 0.16, base + 0.04, base + 0.98, totemZ - 0.05, totemZ + 0.05);
-  const totemFace = new THREE.Mesh(track(new THREE.PlaneGeometry(0.3, 0.9)), mats.totem);
-  totemFace.position.set(totemX, base + 0.51, totemZ + 0.054);
-  group.add(totemFace);
-
-  // Árvore em canteiro redondo e banco de madeira à direita do caminho.
-  const treeX = doorX1 + 0.85;
-  const treeZ = hd - 0.48;
-  const ring = new THREE.Mesh(track(new THREE.CylinderGeometry(0.24, 0.24, 0.1, 16)), mats.white);
-  ring.position.set(treeX, base + 0.05, treeZ);
-  group.add(ring);
-  const ringSoil = new THREE.Mesh(track(new THREE.CylinderGeometry(0.205, 0.205, 0.01, 16)), mats.soil);
-  ringSoil.position.set(treeX, base + 0.102, treeZ);
-  ringSoil.userData.noShadow = true;
-  group.add(ringSoil);
-  const trunk = new THREE.Mesh(track(new THREE.CylinderGeometry(0.03, 0.045, 0.7, 6)), mats.trunk);
-  trunk.position.set(treeX, base + 0.45, treeZ);
+  // ---- Ipê-amarelo em floreira de madeira, na calçada à esquerda -----------------
+  const ipeX = bx0 + 0.32;
+  const ipeZ = hd - 0.42;
+  box(mats.wood, ipeX - 0.22, ipeX + 0.22, base, base + 0.26, ipeZ - 0.22, ipeZ + 0.22);
+  box(mats.soil, ipeX - 0.18, ipeX + 0.18, base + 0.26, base + 0.265, ipeZ - 0.18, ipeZ + 0.18, { noShadow: true });
+  const trunk = new THREE.Mesh(track(new THREE.CylinderGeometry(0.025, 0.04, 0.8, 6)), mats.trunk);
+  trunk.position.set(ipeX, base + 0.6, ipeZ);
+  trunk.rotation.z = 0.08;
   group.add(trunk);
-  const crownGeo = track(new THREE.IcosahedronGeometry(0.3, 0));
+  const crownGeo = track(new THREE.IcosahedronGeometry(0.22, 0));
   for (const [dx, dy, dz, s, mat] of [
-    [0, 0.98, 0, 1, mats.leaves],
-    [0.14, 1.12, 0.05, 0.7, mats.leavesLight],
-    [-0.12, 1.1, -0.04, 0.65, mats.leavesLight],
+    [0, 1.2, 0, 1, mats.ipe],
+    [0.18, 1.08, 0.06, 0.75, mats.ipeDeep],
+    [-0.16, 1.1, -0.05, 0.7, mats.ipe],
+    [0.04, 1.36, -0.04, 0.6, mats.ipeDeep],
   ]) {
     const crown = new THREE.Mesh(crownGeo, mat);
-    crown.position.set(treeX + dx, base + dy, treeZ + dz);
+    crown.position.set(ipeX + dx, base + dy, ipeZ + dz);
     crown.scale.setScalar(s);
     crown.rotation.set(dx * 4, dy * 2, dz * 3);
     group.add(crown);
   }
-  // Banco: tampo de madeira sobre dois pés de concreto.
-  const benchX0 = doorX1 + 0.32;
-  const benchX1 = benchX0 + 0.5;
-  const benchZ = hd - 0.14;
-  box(mats.curb, benchX0 + 0.04, benchX0 + 0.1, base, base + 0.13, benchZ - 0.08, benchZ + 0.04);
-  box(mats.curb, benchX1 - 0.1, benchX1 - 0.04, base, base + 0.13, benchZ - 0.08, benchZ + 0.04);
-  box(mats.wood, benchX0, benchX1, base + 0.13, base + 0.165, benchZ - 0.1, benchZ + 0.06);
-
-  // Balizadores de luz ladeando a saída do caminho.
-  const bollardGeo = track(new THREE.CylinderGeometry(0.035, 0.035, 0.22, 10));
-  const bollardCapGeo = track(new THREE.CylinderGeometry(0.038, 0.038, 0.03, 10));
-  for (const bx of [doorX0 - 0.12, doorX1 + 0.12]) {
-    const bz = hd - 0.15;
-    const post = new THREE.Mesh(bollardGeo, mats.dark);
-    post.position.set(bx, base + 0.11, bz);
-    group.add(post);
-    const cap = new THREE.Mesh(bollardCapGeo, mats.lamp);
-    cap.position.set(bx, base + 0.18, bz);
-    cap.userData.noShadow = true;
-    group.add(cap);
-  }
-  // Brilho suave dos spots no pé da pedra (planos aditivos, sem sombra).
-  const glowGeo = track(new THREE.PlaneGeometry(0.2, 0.55));
-  for (const gx of [bx0 + 0.3, stoneL1 - 0.25, stoneR0 + 0.25, bx1 - 0.25]) {
-    const gl = new THREE.Mesh(glowGeo, mats.glow);
-    gl.position.set(gx, base + 0.3, uz + 0.006);
-    gl.userData.noShadow = true;
-    group.add(gl);
+  // Flores caídas na terra da floreira.
+  const petalGeo = track(new THREE.IcosahedronGeometry(0.03, 0));
+  for (const [dx, dz] of [[-0.1, 0.08], [0.09, -0.06], [0.12, 0.11], [-0.05, -0.12]]) {
+    const petal = new THREE.Mesh(petalGeo, mats.ipe);
+    petal.position.set(ipeX + dx, base + 0.275, ipeZ + dz);
+    petal.scale.y = 0.4;
+    petal.userData.noShadow = true;
+    group.add(petal);
   }
 
   flushBoxes();
@@ -679,8 +545,9 @@ export function buildSemec(group, b, ctx) {
   // ---- Animação: bandeiras tremulando ------------------------------------------
   onFrame((t) => waveFlags(t));
 
+  // Placa "SEMEC" do motor na faixa branca sob o volume baixo.
   return {
-    labelPos: new THREE.Vector3(doorMid, (pBeam + pTop) / 2, pz1 + 0.006),
+    labelPos: new THREE.Vector3((tM + tR1) / 2, (ct + bandTop) / 2, zR + 0.056),
     labelBg: blue,
   };
 }

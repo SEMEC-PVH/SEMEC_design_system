@@ -204,6 +204,8 @@ function buildMap() {
   // Árvores atrás do Front-End e do Back-End: ali o jogador sumiria atrás
   // dos prédios na câmera alta.
   rect(16, 9, 27, 10, TREE);
+  // Idem atrás da torre de vidro da SEMEC (buildings/semec.js).
+  rect(3, 2, 7, 2, TREE);
 
   for (const b of BUILDINGS) rect(b.x, b.y, b.x + b.w - 1, b.y + b.h - 1, BUILDING);
   for (const s of SIGNS) g[s.y][s.x] = SIGN;
