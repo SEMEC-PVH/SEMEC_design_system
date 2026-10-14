@@ -1,6 +1,6 @@
 ---
 name: semec-ds
-description: Use SEMEC Design System (@semec/ds) para construir UI em React. Tokens pv-*, 49 componentes Radix+CVA, a11y WCAG 2.1 AA e padrões responsive. Use quando criar ou editar UI com o kit, migrar portal ou copiar snippets.
+description: Use SEMEC Design System (@semec/ds) para construir UI em React. Tokens pv-*, {{ds:component-count}} componentes Radix+CVA, a11y WCAG 2.1 AA e padrões de tela. Use quando criar ou editar UI com o kit, migrar portal ou montar telas a partir dos exemplos.
 author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 ---
 
@@ -8,7 +8,11 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
-Fonte de dados: `packages/react/manifest.js`. Artefatos gerados: `llms.txt`, `llms-full.txt`, `manifest.json`, `components/<slug>.md`.
+**Regra número 1: use os componentes do kit, não os reimplemente.** Importe de `@semec/ds/react`. Não copie o código-fonte de um componente para o app, não recrie um componente existente com `div` + classes e não troque o estilo dele por outro. Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+
+<!-- ds:maintainer:start -->
+> **Mantenedores (só na cópia do repositório).** Fonte de dados: `packages/react/manifest.js`. Esta SKILL é gerada de `packages/react/skills/semec-ds/SKILL.md` por `packages/react/scripts/build-artifacts.mjs`, que preenche a contagem e a lista de componentes e tira estes blocos de mantenedor da versão publicada no npm e no site.
+<!-- ds:maintainer:end -->
 
 ## Instalação
 
@@ -30,26 +34,32 @@ No CSS global do app (não via `import` em JS):
 
 O `@source` é obrigatório no Tailwind v4: sem ele o CSS não gera as classes das peças (`bg-card`, `shadow-elevation-*`, `animate-in`…). O caminho é **relativo ao arquivo CSS**: `src/index.css` e `app/globals.css` usam `../node_modules/...`; `src/app/globals.css` usa `../../node_modules/...`. Se o Tailwind varrer pastas demais (monorepo), limite com `@import "tailwindcss" source("../src");` (também relativo ao CSS) e mantenha o `@source` do pacote.
 
-**Fonte:** o pacote **não traz** a Poppins; sem carregá-la, o texto cai em `system-ui` (fallback do token `--font-family-sans`). Carregue 400/500/600/700:
+**Fonte:** o pacote publica a Poppins (400/500/600/700, licença SIL OFL). Importe **antes** do `tokens.css`:
 
-- Next.js: `next/font/local` (ou `next/font/google`) com `variable: "--font-poppins"` na `<html>`, e no CSS global, depois do `tokens.css`: `:root { --font-family-sans: var(--font-poppins), system-ui, -apple-system, sans-serif; }` (o `next/font` gera nome de família com hash).
-- Vite/outros: `@font-face` self-hosted com `font-family: "Poppins"` (woff2 em `apps/docs/app/fonts/` do repositório) ou Google Fonts `family=Poppins:wght@400;500;600;700`. Nesses casos o token já funciona sem ajuste.
+```css
+@import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
+@import "@semec/ds/react/tokens.css";
+@source "../node_modules/@semec/ds/dist/react";
+```
+
+Sem a fonte, o texto cai em `system-ui` (fallback do token `--font-family-sans`). Alternativa no Next.js: `next/font/local` com `variable: "--font-poppins"` na `<html>` e, no CSS global depois do `tokens.css`, `:root { --font-family-sans: var(--font-poppins), system-ui, -apple-system, sans-serif; }` (o `next/font` gera nome de família com hash). Não existem pesos 800/900.
 
 **Providers no root (quando usar):** `<Toaster />` se usar `useToast()`; `<TooltipProvider>` em volta do app se usar `Tooltip`; `<SemecProvider nonce>` só para CSP estrita. O `SemecProvider` não inclui os outros dois.
 
-**Next.js App Router:** na 3.0 e na 3.1 o `dist` é bundle único **sem `"use client"`**. Importe o kit só em arquivos `"use client"` (inclusive o componente de providers); importar num Server Component quebra. Não use `export *` do kit num arquivo `"use client"`. Saída por módulo e fronteira RSC: planejadas para uma versão futura (AUD-20).
+**Next.js App Router:** na 3.x o `dist` é bundle único **sem `"use client"`**. Importe o kit só em arquivos `"use client"` (inclusive o componente de providers); importar num Server Component quebra. Não use `export *` do kit num arquivo `"use client"`. Saída por módulo e fronteira RSC: planejadas para a 4.0 (AUD-20).
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0). Use só `tokens.css` (+ `@source`). Preset JS opcional: `@config "@semec/ds/react/pv-preset"`.
 
 ## Tema
 
-`tokens.css` define o tema **claro** (camadas L0/L1). Use sempre tokens L1 — nunca hex solto em `className` ou CSS.
+`tokens.css` define só o tema **claro** (camadas L0/L1). Não há tema escuro no pacote: `data-theme="dark"` não tem efeito. Use sempre tokens L1 — nunca hex solto em `className` ou CSS.
 
 ## Tokens
 
 ### L0 — Primitivos (`--pv-*`)
 
-Valores brutos. Nunca use direto em componente.
+Valores brutos. Nunca use direto em componente ou tela (nem como utilitário `bg-pv-*`, que sai na 4.0).
 
 | Token | Valor | Uso |
 |-------|-------|-----|
@@ -58,7 +68,7 @@ Valores brutos. Nunca use direto em componente.
 | `--pv-blue-700` | `#2f5a8a` | Hover de ação |
 | `--pv-blue-800` | `#26476f` | Active de ação |
 | `--pv-blue-900` | `#26325B` | Azul institucional escuro (texto do toast de sucesso) |
-| `--pv-blue-hero` | `#223f99` | Anel de foco (9,38:1) |
+| `--pv-blue-hero` | `#223f99` | Marca e anel de foco (9,38:1 sobre branco) |
 | `--pv-green-50` | `#eef7e6` | Superfície sucesso |
 | `--pv-green-500` | `#82C353` | Fundo do toast de sucesso — **nunca como cor de texto** |
 | `--pv-green-800` | `#3a6420` | Sucesso |
@@ -77,13 +87,13 @@ Valores brutos. Nunca use direto em componente.
 
 Camada do dia a dia. Diz o papel, não a cor. Use estes, nunca os L0.
 
-**Cor:** `--bg`, `--fg`, `--surface`, `--surface-alt`, `--border`, `--border-strong`, `--focus-ring`, `--text-muted`, `--text-secondary`, `--text-strong`, `--text-on-brand`, `--tint`
+**Cor:** `--bg`, `--fg`, `--surface`, `--surface-alt`, `--surface-sunken`, `--border`, `--border-strong`, `--focus-ring`, `--focus-ring-inverse`, `--text-muted`, `--text-secondary`, `--text-strong`, `--text-on-brand`, `--tint`, `--brand-hero`
 
 **Ação:** `--action-primary`, `--action-primary-hover`, `--action-primary-active`
 
 **Feedback:** `--feedback-success`, `--feedback-warning`, `--feedback-danger`, `--feedback-info` (+ `-surface`)
 
-**Tipografia:** `--font-family-sans`, `--text-xs/sm/base/lg/xl/2xl`, `--leading-xs/sm/base/lg/xl/2xl`, `--font-regular/medium/semibold/bold`
+**Tipografia:** `--font-family-sans`, `--text-xs/sm/base/lg/xl/2xl/3xl` e `--text-display`, `--leading-*`, `--font-regular/medium/semibold/bold`
 
 **Espaçamento:** `--space-0/1/2/3/4/6/8/12/16`
 
@@ -93,7 +103,56 @@ Camada do dia a dia. Diz o papel, não a cor. Use estes, nunca os L0.
 
 **Movimento:** `--pv-duration-fast/base/slow`, `--easing-standard`
 
-`@theme inline` expõe tokens como utilitários Tailwind (`bg-surface`, `text-foreground`, `ring-ring`, `bg-primary`, etc.).
+### Do token ao utilitário Tailwind
+
+O `@theme inline` do `tokens.css` gera utilitários para cor, espaçamento (`p-space-N`), tipografia (`text-*` com line-height, `font-*`), raio, sombra e duração/easing. O nome do utilitário nem sempre é o nome do token: use a tabela.
+
+**Cor** (o nome do utilitário nem sempre é o nome do token):
+
+| Papel | Token L1 | Utilitário |
+|---|---|---|
+| Fundo da página | `--bg` | `bg-background` |
+| Texto principal | `--fg` | `text-foreground` |
+| Cartão, modal, popover | `--surface` | `bg-card` / `bg-surface` / `bg-popover` |
+| Superfície alternativa | `--surface-alt` | `bg-surface-alt` (também `bg-muted`, `bg-secondary`, `bg-accent`) |
+| Superfície rebaixada (Skeleton, trilhas) | `--surface-sunken` | `bg-surface-sunken` |
+| Borda leve / forte / campo | `--border` / `--border-strong` | `border-border` / `border-border-strong` / `border-input` |
+| Texto de apoio (7,56:1) | `--text-muted` | `text-text-muted` (ou `text-muted-foreground`) |
+| Texto secundário forte (10,31:1) | `--text-secondary` | `text-text-secondary` |
+| Texto em destaque (15,77:1) | `--text-strong` | `text-text-strong` (ou `text-foreground`) |
+| Texto sobre marca/ação | `--text-on-brand` | `text-text-on-brand` (ou `text-primary-foreground`) |
+| Marca | `--brand-hero` | `bg-brand-hero`, `text-brand-hero` |
+| Ação primária | `--action-primary` (+ hover/active) | `bg-primary`, `hover:bg-primary-hover`, `active:bg-primary-active`, `text-primary` |
+| Anel de foco | `--focus-ring` | `ring-ring`, `outline-ring` |
+| Anel de foco sobre marca | `--focus-ring-inverse` | `ring-ring-inverse` |
+| Perigo | `--feedback-danger` (+ surface) | `bg-destructive`, `text-destructive`, `bg-destructive-surface` |
+| Sucesso / aviso / info | `--feedback-*` (+ surface) | `text-success`, `bg-success-surface`, `text-warning`, `bg-warning-surface`, `text-info`, `bg-info-surface` |
+| Superfície colorida leve | `--tint` | `bg-tint` |
+
+**Armadilha (AUD-30):** **nunca** use `text-muted` nem `text-secondary` para texto: eles **compilam para a cor de fundo** `--surface-alt` (1,09:1, texto invisível), porque `--color-muted` e `--color-secondary` são cores de superfície no estilo shadcn. Use `text-text-muted`, `text-text-secondary` e `text-text-strong`.
+
+**Espaçamento:** `--space-N` → `p-space-N`, `gap-space-N`, `mt-space-N` etc. (degraus 0, 1, 2, 3, 4, 6, 8, 12, 16). A escala do Tailwind continua valendo e tem os mesmos valores (`p-4` = `p-space-4` = 16px); fique nos degraus do DS (nada de `px-5`, `py-1.5`).
+
+**Texto:** cada degrau já inclui a altura de linha do DS. Papel de cada um:
+
+| Utilitário | Tamanho | Papel |
+|---|---|---|
+| `text-display` | 40px | Página inicial / hero |
+| `text-3xl` | 32px | `h1` da página |
+| `text-2xl` | 24px | `h2` |
+| `text-xl` | 20px | Subtítulo (`h3`) |
+| `text-lg` | 18px | Destaque |
+| `text-base` | 16px | Corpo |
+| `text-sm` | 14px | Apoio |
+| `text-xs` | 12px | Rótulo |
+
+Pesos: `font-regular` 400, `font-medium` 500, `font-semibold` 600, `font-bold` 700 (não existem 800/900).
+
+**Raio:** `rounded-sm` 2px · `rounded-md` 8px · `rounded-lg` 12px · `rounded-full`. Escolha pelo papel (controle `rounded-md`, cartão `rounded-lg`, pílula `rounded-full`), não pelo px: a escala pode mudar na 4.0 (AUD-57).
+
+**Sombra:** `shadow-elevation-1/2/3` (nunca `shadow-md` e afins do Tailwind, que usam preto puro).
+
+**Movimento:** `duration-fast/base/slow`, `ease-standard`.
 
 ## Lib utilities
 
@@ -104,95 +163,139 @@ import { validateCPF, validateCNPJ, validateEmail } from "@semec/ds/react";
 import { cpfSchema, cnpjSchema, cpfCnpjSchema, emailSchema, cepSchema } from "@semec/ds/react/validacao";
 ```
 
-## Componentes (49)
+## Componentes ({{ds:component-count}})
 
-### Ações e links
+Lista gerada do manifest (export principal, `code` e descrição). Detalhes, variantes e exemplo de uso de cada um: `components/<slug>.md` ou `manifest.json`.
 
-- **button** — 6 variantes (primary/secondary/outline/ghost/destructive/link), 4 tamanhos (sm/md/lg/icon), `asChild`
-- **icon-button** — quadrado, exige `label` (aria-label + title)
-- **link** — 3 variantes (primary/onSurface/muted)
+<!-- ds:component-list -->
 
-### Formulários
+## Comportamentos fixos do kit
 
-- **input** — estado via `aria-invalid`
-- **textarea** — multilinha
-- **select** — Select/Trigger/Value/Content/Item
-- **combobox** — busca + lista filtrada via `options`
-- **date-picker** — nativo `type="date"` (ISO YYYY-MM-DD)
-- **file-upload** — drag-and-drop, accept, maxSize
-- **checkbox** — indeterminado
-- **radio-group** — RadioGroup + RadioGroupItem + Label
-- **switch** — on/off
-- **label** — vinculado ao campo
-- **form-field** — label + required + hint + error
-- **error-summary** — `role="alert"`, links para campos, foco automático
-- **toggle** — binário on/off para toolbars
-- **slider** — faixa de valor
-- **input-otp** — código OTP, foco entre dígitos
-- **calendar** — seleção visual de data
+Coisas que o componente faz sozinho e que mudam como você monta a tela. Leve em conta antes de acrescentar `role`, títulos ou landmarks por fora.
 
-### Conteúdo e dados
+<!-- INTEGRADOR: AUD-62 / AUD-31. Os dois itens de HeaderBrand e NavigationMenu descrevem o código antes da onda 2: confira no código final (aviso/logo do HeaderBrand; `aria-label` padrão PT-BR no NavigationMenu e prop `labels`) e atualize ou remova. -->
+- **Anúncios:** o `Alert` usa `role="alert"` (assertivo) só em `variant="destructive"`; as demais variantes usam `role="status"` (educado). A prop `announce` controla isso quando o padrão não serve (ex.: alerta estático que não deve ser anunciado). A mensagem de erro do `FormField` e do `FileUpload`, o `ErrorSummary` e o `ErrorState` são anunciados; não acrescente outro `role="alert"` em volta.
+- **Níveis de título:** os títulos internos (`AlertTitle`, `CardTitle`, `EmptyState`, `ErrorState`, `ErrorSummary`) aceitam `as`/`titleAs` para escolher o nível. Ajuste o nível à hierarquia da página (ex.: `EmptyState titleAs="h2"` logo abaixo do `h1`) em vez de deixar o padrão pular nível.
+- **`SidebarInset` é `<main>` por padrão** (aceita `as`): não aninhe outro `<main>` dentro dele; se a página já tem `<main>`, use `as="div"`.
+- **`Sidebar`** é `<nav aria-label="Menu lateral">`; `SidebarMenuButton isActive` vira `aria-current="page"`.
+- **`HeaderBrand` sem `logo`** mostra um placeholder "Logo" anunciado como imagem ("Logo do órgão"). Passe sempre `logo` com o asset real (`<img alt="Prefeitura de Porto Velho">`).
+- **`NavigationMenu` sem `aria-label`** é anunciado com o rótulo padrão do Radix, em inglês. Passe `aria-label="Menu principal"`.
+- **`FormField`** só gera `id` de dica e erro quando recebe `id`; o vínculo com o campo (`aria-describedby`, `aria-invalid`) é feito no controle.
 
-- **card** — Card/Header/Title/Description/Content/Footer
-- **badge** — 7 variantes (default/secondary/outline/success/warning/danger/info)
-- **table** — semântica, caption, header, body, footer
-- **skeleton** — placeholder pulsante
-- **empty-state** — ícone + título + descrição + ação
-- **accordion** — single/multiple
-- **separator** — horizontal/vertical
-- **avatar** — Image + Fallback
-- **data-table** — ordenação + paginação + empty state
-- **timeline** — dots + conectores + conteúdo
+<!-- INTEGRADOR: AUD-21. Se o FormField passou a ter contexto (`useId()`) e a injetar `aria-describedby`/`aria-invalid`/`aria-required` no controle, troque o último item por "o FormField liga dica e erro ao controle sozinho; não monte `aria-describedby` à mão" e ajuste o exemplo de formulário abaixo. -->
 
-### Navegação
+## Padrões de tela
 
-- **breadcrumb** — `aria-current=page`, separadores ocultos
-- **header** — Header/HeaderBrand/HeaderNav/HeaderNavLink (`current` → `aria-current=page`)
-- **tabs** — roving tabindex via Radix
-- **pagination** — elipses, siblingCount
-- **sidebar-trigger** — colapsa/expand sidebar
-- **scroll-area** — customizado
-- **dropdown-menu** — itens, checkbox, radio, sub-menus
-- **navigation-menu** — mega-menu + viewport
-- **sidebar** — shell completo com provider, grupos, mobile
+Toda tela de serviço segue o mesmo esqueleto, para que as telas da Prefeitura pareçam um só sistema (AUD-51, AUD-58).
 
-### Feedback e estados
+### Esqueleto da página
 
-- **error-state** — falha ao carregar, com `onRetry`/`retryLabel`
-- **dialog** — modal acessível com overlay
-- **toast** — `<Toaster />` uma vez no root + `useToast()`
-- **tooltip** — TooltipProvider + Tooltip + Trigger + Content
-- **alert** — 4 variantes (default/success/warning/destructive)
-- **alert-dialog** — confirmação perigosa
-- **popover** — camada flutuante
-- **drawer** — painel deslizante (top/bottom/left/right)
-- **sheet** — painel lateral modal
-- **spinner** — carregamento inline
-- **progress** — barra determinada
+1. **Link de pular** (`SkipLink`) como primeiro elemento focável: leva ao `#conteudo`.
+2. **Cabeçalho** (`Header` + `HeaderBrand` + `HeaderNav`), que é o landmark `banner`.
+3. **Navegação** com nome: `<nav aria-label="Menu principal">` (ou `NavigationMenu aria-label="Menu principal"`), trilha com `Breadcrumb`.
+4. **Um único `<main id="conteudo">`** com o container de página e **um** `h1` (`Heading level={1}`).
+5. **Rodapé institucional** (`Footer`), que é o landmark `contentinfo`.
+
+```tsx
+import {
+  SkipLink, Header, HeaderBrand, HeaderNav, HeaderNavLink, Heading,
+  Footer, FooterContent, FooterSection, FooterLinks, FooterLink, FooterBottom,
+} from "@semec/ds/react";
+
+export function PaginaDeServico() {
+  return (
+    <>
+      {/* padrão: "Pular para o conteúdo principal", href="#conteudo" */}
+      <SkipLink />
+      <Header>
+        <HeaderBrand logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Emissão de certidões" />
+        <HeaderNav aria-label="Menu principal">
+          <HeaderNavLink href="/certidoes" current>Certidões</HeaderNavLink>
+        </HeaderNav>
+      </Header>
+      <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-[75rem] px-4 py-8">
+        <Heading level={1}>Emitir certidão negativa</Heading>
+        {/* conteúdo */}
+      </main>
+      <Footer>
+        <FooterContent>
+          <FooterSection title="Atendimento">
+            <FooterLinks>
+              <FooterLink href="/contato">Fale conosco</FooterLink>
+            </FooterLinks>
+          </FooterSection>
+        </FooterContent>
+        <FooterBottom>Prefeitura de Porto Velho · Secretaria Municipal de Economia</FooterBottom>
+      </Footer>
+    </>
+  );
+}
+```
+
+<!-- INTEGRADOR: AUD-36. API de SkipLink/Heading/Footer passada pelo coordenador (SkipLink com padrão "Pular para o conteúdo principal" e href "#conteudo"; Heading com `level` 1–6 e `size`; Footer com FooterContent/FooterSection/FooterLinks/FooterLink/FooterBottom). Confira no código final o nome da prop de título do FooterSection (aqui `title`) e se o build-artifacts listou os três na seção Componentes. -->
+
+- **Landmarks:** um `banner`, um `main`, um `contentinfo`; cada `<nav>` com `aria-label` distinto ("Menu principal", "Menu lateral", "Trilha de navegação", "Paginação"). O `tabIndex={-1}` no `<main>` deixa o link de pular mover o foco de fato.
+- **Com `Sidebar`:** o `SidebarInset` faz o papel do `<main>` (dê a ele `id="conteudo"` e `tabIndex={-1}`); o `SkipLink` e o `Header` ficam antes do `SidebarProvider` ou no topo do `SidebarInset`.
+
+### Container e largura de leitura
+
+- Container de página: `mx-auto w-full max-w-[75rem] px-4` (1200px, igual ao site de docs). Use **sempre** este; não invente `max-w-6xl`, `max-w-7xl` ou `container`.
+- Texto corrido: `max-w-prose` (65ch). Coluna de formulário ou leitura: `max-w-3xl` (48rem).
+- O pacote **não** tem `--container-max`, `--container-docs`, `--measure`, `--control-height-*` nem modo `data-density="compact"`: esses nomes existem só no CSS do site de documentação. `var()` com eles resolve para vazio, sem erro.
+
+### Título da página
+
+- Um `h1` por página, com o nome da tarefa ("Emitir certidão negativa"), não o nome do sistema. Depois `h2` para seções, sem pular nível.
+- Use `Heading level={1}` (h1, 32px/`text-3xl`), `level={2}` (`text-2xl`), `level={3}` (`text-xl`); a prop `size` muda só o tamanho visual, sem mudar o nível. Sem o componente: `h1` em `text-3xl font-bold text-foreground`. `text-display` (40px) só no hero da página inicial.
+
+### Marca e ação
+
+- **Marca = `brand-hero`.** Faixas institucionais, hero e selo usam `bg-brand-hero text-primary-foreground` (ou `text-brand-hero` sobre fundo claro). Não use `bg-primary` para marca.
+- **Ação = `primary`.** O botão principal de cada tela é `<Button variant="primary">` (`bg-primary`), **um** por grupo de ações; os demais são `outline` ou `ghost`. Não use `brand-hero` em botão.
+- **Foco sobre a marca:** o anel padrão (`--focus-ring` = `--pv-blue-hero`) some sobre a marca (1,00:1). Áreas com `bg-brand-hero` ou `data-surface="brand"` trocam o anel automaticamente para branco (9,38:1); fora disso, use `ring-ring-inverse` (`--focus-ring-inverse`) em controles sobre fundo de marca.
+
+### Tabelas
+
+- Use `Table` (ou `DataTable` para ordenar e paginar) com `TableCaption` ou `caption` descrevendo o conteúdo; cabeçalhos em `TableHead`.
+- A `Table` já rola na horizontal (wrapper `overflow-auto`), mas esse wrapper não recebe foco: se a tabela não tiver nenhum elemento focável, quem usa só teclado não consegue rolar. Em telas estreitas, prefira **menos colunas** (as secundárias vão para uma tela de detalhe) ou uma **lista de `Card`** abaixo de `md:`, mantendo a `Table` a partir de `md:`.
+- Quando a linha tem várias ações, use uma coluna "Ações" com `Button`, não a linha inteira clicável.
+
+### Sidebar (painéis administrativos)
+
+- `SidebarProvider` > `Sidebar` + `SidebarInset`. Abaixo de 768px (48rem, `matchMedia`; o complemento exato do `md:`) a barra vira gaveta: um diálogo modal com foco preso, Esc para fechar e botão "Fechar menu". O `SidebarTrigger` tem 44px e `aria-expanded`.
+- Com conteúdo largo (tabelas, gráficos), garanta `min-w-0` no `SidebarInset` para o conteúdo não empurrar a largura da página.
+
+<!-- INTEGRADOR: AUD-33. Confira em `sidebar.tsx` final se o `SidebarInset` já traz `min-w-0` de fábrica; se trouxer, retire o segundo item. -->
 
 ## Workflow IA
 
-1. Leia `llms.txt` → escolha componente por `code`
-2. Leia `components/<slug>.md` → copie snippet de `usage`
-3. Aplique tokens L1 (`--bg`, `--fg`, `--surface`, `--action-primary` etc.) — nunca hex solto
-4. Valide variantes em `manifest.js` / `manifest.json`
+1. Leia `llms.txt` → escolha o componente pelo `code` (lista em "Componentes", acima)
+2. Leia `components/<slug>.md` → parta do exemplo de `usage` e **importe** o componente; nunca o reimplemente
+3. Monte a tela pelo esqueleto de "Padrões de tela"
+4. Aplique tokens L1 pelos utilitários da tabela "Do token ao utilitário" — nunca hex solto
+5. Valide variantes em `manifest.json` e confira teclado e contraste (seção abaixo)
 
 ## Acessibilidade (WCAG 2.1 AA — ADR-014)
 
 ### Contraste
 
-- Texto normal: **4.5:1** mínimo
-- Texto grande (≥18px bold ou ≥24px): **3:1**
-- Componentes UI (bordas, ícones): **3:1**
-- Anel de foco `--focus-ring` (`--pv-blue-hero`): **9,38:1** sobre branco
+- Texto normal: **4,5:1** mínimo (1.4.3)
+- Texto grande: **3:1**. Texto grande é **≥ 24px (18pt) regular** ou **≥ 18,66px (14pt) bold**. `text-lg font-bold` (18px) **não** é texto grande: precisa de 4,5:1.
+- Componentes de interface e gráficos (bordas de campo, ícones informativos, anel de foco): **3:1** (1.4.11)
+- Anel de foco `--focus-ring` (`--pv-blue-hero`): **9,38:1** sobre branco e 8,66:1 sobre `--bg`; sobre a marca, o anel inverso (branco, 9,38:1) entra sozinho em `bg-brand-hero`/`data-surface="brand"` (ver "Marca e ação")
 
 ### Teclado
 
-- Tab / Shift+Tab navega; Enter/Space ativa; Escape fecha camadas; setas em menus/tabs/radio
-- Focus trap só em modais (dialog, alert-dialog)
-- Ordem de tabulação lógica
+- Tab / Shift+Tab navega; Enter/Space ativa; Escape fecha camadas; setas em menus, abas, radio e listas
+- Camadas modais prendem o foco e o devolvem ao gatilho ao fechar: `Dialog`, `AlertDialog`, `Sheet`, `Drawer` e a gaveta mobile da `Sidebar`. Menus e popovers fecham com Esc e devolvem o foco ao gatilho
+- `AlertDialog` é `role="alertdialog"`: não fecha por clique fora e o foco inicial vai para "Cancelar". Use-o para confirmação destrutiva; valide antes de fechar
+- `Calendar` é grade (padrão APG): setas movem o dia, PageUp/PageDown trocam o mês; um único Tab entra na grade
+- `Dialog`/`Sheet` controlados sem `Trigger` não devolvem o foco sozinhos: use `onCloseAutoFocus` para focar o elemento de origem
+- Ordem de tabulação = ordem visual
 
 ### Foco visível
+
+O `tokens.css` já aplica, na camada base:
 
 ```css
 :focus-visible {
@@ -201,39 +304,35 @@ import { cpfSchema, cnpjSchema, cpfCnpjSchema, emailSchema, cepSchema } from "@s
 }
 ```
 
-Nunca `outline: none` sem alternativa.
+Nunca `outline: none` sem alternativa visível com 3:1.
 
 ### Exceção conhecida (não corrigir)
 
-- `aria-hidden-focus` (axe) com `Select` ou `DropdownMenu` **abertos** é exceção aceita (EXC-01, `docs/excecoes-acessibilidade.md`): vem do `hideOthers` do Radix sem `inert`, e o foco fica preso na camada, então o impacto é nulo. Não remova `aria-hidden`, não aplique `inert` por fora e não desative a regra globalmente.
+- `aria-hidden-focus` (axe) com `Select` ou `DropdownMenu` **abertos** é exceção aceita (EXC-01, `docs/excecoes-acessibilidade.md` no repositório do DS): vem do `hideOthers` do Radix sem `inert`, e o foco fica preso na camada, então o impacto é nulo. Não remova `aria-hidden`, não aplique `inert` por fora e não desative a regra globalmente.
 
 ### Labels e semântica
 
-- Todo campo precisa de `<label>` associado (`htmlFor`/`id`)
-- Botões de ícone: `aria-label` + `title`
+- Todo campo precisa de `<label>` associado (`htmlFor`/`id`); placeholder não é rótulo
+- Botões só de ícone: `IconButton` com `label` (vira `aria-label` e `title`)
 - Ícones decorativos: `aria-hidden="true"`
 - Estados: `aria-invalid`, `aria-expanded`, `aria-selected`, `aria-current="page"`
 - Textos auxiliares: classe `sr-only`
+- Idioma: `<html lang="pt-BR">`
 
 ### Áreas clicáveis
 
-- Mínimo **44×44px**: utilitários Tailwind `min-h-11 min-w-11` (o pacote não define `--control-height-*`)
-- Espaçamento mínimo entre alvos: 8px
+- **Régua do DS: 44×44px** nos controles interativos (`min-h-11 min-w-11`, `h-11`, `size-11`). É **decisão do projeto**, mais exigente que o AA: o WCAG 2.1 AA não tem critério de tamanho de alvo; o critério de 44px (2.5.5 Target Size) é **AAA**. (No WCAG 2.2, o 2.5.8, AA, pede 24×24px.)
+- Os padrões do kit já seguem a régua: Pagination, Tabs, Toggle, NavigationMenuTrigger e o X dos overlays têm 44px; o `Button size="sm"` mantém 36px visuais com área de toque de 44px
+- Espaçamento entre alvos: 8px (regra do DS)
+- O pacote não define `--control-height-*`; use os utilitários acima
 
 ### prefers-reduced-motion
 
-```css
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-```
+O `tokens.css` já reduz animações e transições globalmente com `@media (prefers-reduced-motion: reduce)`. Não reative animação dentro desse media query.
 
 ### Não uso exclusivo de cores
 
-Complementar cor com ícone, texto ou padrão.
+Complementar cor com ícone, texto ou padrão (erro com mensagem, status com rótulo). O `Link` é sublinhado por padrão; `underline={false}` só em navegação (menus, cabeçalho), nunca em texto corrido. A aba ativa do `Tabs` tem barra de 3px, além da cor.
 
 ## Padrão de formulários e feedback (Validação + Toast)
 
@@ -241,13 +340,13 @@ Nos formulários do SEMEC DS, o ciclo de feedback segue uma regra estrita de UX 
 
 1. **Erros de Validação (Inline + Resumo)**:
    - Nunca use `Toast` para erros de preenchimento ou campos inválidos.
-   - Use `<ErrorSummary>` no topo com `autoFocus` para anunciar os erros (`role="alert"`).
-   - Use `<FormField>` com `error={...}` e o controle com `aria-invalid={true}` para vínculo direto.
+   - Use `<ErrorSummary>` no topo (foco automático por padrão) para listar os erros com link para cada campo.
+   - Use `<FormField>` com `error={...}` e o controle com `aria-invalid` para vínculo direto.
 
 2. **Sucesso na Submissão (Notificação via Toast)**:
-   - Notificações de confirmação pós-envio devem usar `toast({ variant: "success", title: "...", description: "..." })`.
+   - Notificações de confirmação pós-envio usam `toast({ variant: "success", title: "...", description: "..." })`.
    - Pré-requisito: `<Toaster />` montado **uma vez** no root do app. Sem ele, `toast()` não mostra nada e não dá erro.
-   - O toast de sucesso aplica automaticamente a identidade SEMEC: fundo verde (`--pv-green-500: #82C353`), tipografia Poppins (`--pv-blue-900: #26325B`), padding `16px 20px`, raio `12px`, título 16px/bold e descrição 14px/regular.
+   - O toast de sucesso já aplica a identidade SEMEC (fundo `--pv-green-500`, texto `--pv-blue-900`, Poppins, título 16px bold e descrição 14px regular). Não sobrescreva as cores.
 
 ```tsx
 import { FormField, Input, ErrorSummary, Button, useToast } from "@semec/ds/react";
@@ -255,20 +354,20 @@ import { useState } from "react";
 
 export function ExemploFormulario() {
   const { toast } = useToast();
+  const [cpf, setCpf] = useState("");
   const [errors, setErrors] = useState<{ id: string; message: string }[]>([]);
+  const erroCpf = errors.find((e) => e.id === "cpf")?.message;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // Exemplo de validação
     const novosErros = [];
-    if (!cpfValido) novosErros.push({ id: "cpf", message: "CPF inválido." });
+    if (cpf.replace(/\D/g, "").length !== 11) novosErros.push({ id: "cpf", message: "Informe um CPF com 11 dígitos." });
 
     if (novosErros.length > 0) {
       setErrors(novosErros);
       return;
     }
 
-    // Sucesso na submissão: Feedback via Toast Success padronizado
     setErrors([]);
     toast({
       variant: "success",
@@ -278,14 +377,20 @@ export function ExemploFormulario() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {errors.length > 0 && <ErrorSummary errors={errors} autoFocus />}
-      
-      <FormField label="CPF" htmlFor="cpf" required error={errors.find(e => e.id === "cpf")?.message}>
-        <Input id="cpf" aria-invalid={errors.some(e => e.id === "cpf")} />
+    <form onSubmit={handleSubmit} noValidate className="max-w-3xl space-y-4">
+      {errors.length > 0 && <ErrorSummary errors={errors} />}
+
+      <FormField id="cpf-campo" label="CPF" htmlFor="cpf" required error={erroCpf}>
+        <Input
+          id="cpf"
+          value={cpf}
+          onChange={(e) => setCpf(e.target.value)}
+          aria-invalid={erroCpf ? true : undefined}
+          aria-describedby={erroCpf ? "cpf-campo-error" : undefined}
+        />
       </FormField>
 
-      <Button type="submit">Enviar requerimento</Button>
+      <Button type="submit" variant="primary">Enviar requerimento</Button>
     </form>
   );
 }
@@ -304,23 +409,39 @@ export function ExemploFormulario() {
 | `xl:` | 1280px | Desktop largo |
 | `2xl:` | 1536px | Full HD |
 
-- Touch targets: 44px com `min-h-11 min-w-11`
-- Sidebar mobile (`< 900px`): drawer off-canvas + `inert` quando fechado
-- Container de página: `mx-auto w-full max-w-[75rem] px-4` (1200px, igual ao site de docs); texto corrido: `max-w-prose` (65ch); coluna de leitura: `max-w-3xl` (48rem)
-- O pacote **não** tem `--container-max`, `--container-docs`, `--measure`, `--control-height-*` nem modo `data-density="compact"`: esses nomes existem só no CSS do site de documentação. `var()` com eles resolve para vazio, sem erro
+- Alvos de toque: 44px com `min-h-11 min-w-11` (régua do DS)
+- Sidebar mobile (< 768px / 48rem): gaveta modal (foco preso, Esc, botão "Fechar menu")
+- Reflow: a tela tem de funcionar em 320px de largura sem rolagem horizontal da página (1.4.10)
+- Container, largura de leitura e tabelas: ver "Padrões de tela"
 
 ## Regras
 
+- Use os componentes do kit; não os reimplemente nem copie o fonte
 - PT-BR rótulos, EN código (ADR-016): `<Button>Salvar</Button>` não `<Button>Save</Button>`
 - Semântica > aparência: `variant="destructive"` não `color="vermelho"`
-- `className` escapatória sempre permitida
+- `className` escapatória sempre permitida, com tokens
 - Toast: `<Toaster />` uma vez no root + `useToast()`. Não monte `ToastProvider` + `ToastViewport` à mão (são as peças cruas do Radix e não leem o estado do `useToast`)
 - Tooltip: exige `<TooltipProvider>` acima na árvore
 - DatePicker: nativo `type="date"` (ISO YYYY-MM-DD); período = 2 campos
-- Sem hex solto — use tokens L1
+- Sem hex solto, sem `rgba()`, sem `style` inline — use tokens L1
 - CSP: Dialog/Drawer/Sheet/DropdownMenu usam `SemecProvider` com nonce. Medido (SEM-752/780): Popover 0 violações; ScrollArea e Select 1 cada, mesmo com nonce (CSS estático de scrollbar no `tokens.css`).
 
-## Protótipo isolado
+## Depreciações anunciadas (saem na 4.0)
+
+Avisadas a partir da 3.1.0, conforme o ADR-013 (duas minors antes de remover). Não gere código novo que dependa disto:
+
+- Importar por caminho de arquivo em `dist/` (`@semec/ds/dist/react/...`): use só os subpaths do `exports` (AUD-20).
+- `onChange(value)` / `onChange(files)` em `Calendar`, `Combobox`, `DatePicker`, `InputOTP` e `FileUpload`: o contrato passa a ser `value` / `onValueChange` / `name` / `id` / `invalid`; use `onValueChange` onde já existir (AUD-35).
+- Utilitários de primitivo `bg-pv-*` / `text-pv-*` / `border-pv-*`: use os semânticos (AUD-55).
+- Valores atuais de `rounded-sm` (2px) e `rounded-lg` (12px): escolha o raio pelo papel (AUD-57).
+- `disabled` nativo no `Button` como seletor (`:disabled`) ou em testes: o estado pode passar a `aria-disabled`, e o `Button` ganha `loading` (AUD-63).
+
+<!-- INTEGRADOR: AUD-35 / AUD-63. Se a onda 2 já adicionou `onValueChange` em algum desses campos, ou `loading` no Button, ou `decorative` no Spinner, cite aqui o que já existe ("use `onValueChange` no Combobox", "use `loading` em vez de colocar `Spinner` dentro do Button"). -->
+
+<!-- ds:maintainer:start -->
+## Manutenção (só no repositório)
+
+### Protótipo isolado
 
 ```bash
 npm run proto:css
@@ -328,7 +449,7 @@ npm run proto:css
 
 Gera `public/proto/proto.css` — CSS isolado para prototipagem rápida.
 
-## Arquivos para IA
+### Arquivos para IA
 
 | Arquivo | Conteúdo |
 |---------|----------|
@@ -340,12 +461,19 @@ Gera `public/proto/proto.css` — CSS isolado para prototipagem rápida.
 | `skills/semec-ds/SKILL.md` | Esta skill (full) |
 | `skills/semec-ds-lite/SKILL.md` | Skill lite (só tokens + a11y + responsive) |
 
-## Referências
+Regenerar: `npm run generate:llms`. Contagem e lista de componentes vêm do manifest; não escreva número fixo nesta SKILL nem no README (use os placeholders `ds:component-count` e `ds:component-list`, descritos no cabeçalho de `build-artifacts.mjs`).
+
+### Referências
 
 - Tokens: `packages/react/tokens.css` + `pv-preset.ts`
 - Barrel: `packages/react/src/index.ts`
 - Manifest: `packages/react/manifest.js`
 - Docs: `apps/docs/app/(docs)/componentes/[slug]/page.jsx`
+<!-- ds:maintainer:end -->
+
+## Arquivos para IA
+
+Publicados com o pacote: `@semec/ds/skills/llms.txt` (índice), `@semec/ds/skills/llms-full.txt` (dump completo), `@semec/ds/skills/manifest.json` (JSON), `@semec/ds/skills/components/<slug>.md` (um por componente) e esta skill (`@semec/ds/skills/semec-ds`). Site de documentação: {{ds:homepage}}.
 
 ## Crédito obrigatório
 
