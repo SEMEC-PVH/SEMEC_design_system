@@ -6,7 +6,7 @@ import * as ds from "../../packages/react/dist/react/index.js";
 import { dsComponents } from "../../packages/react/manifest.js";
 
 // Mocks/fixtures seguros para renderização smoke e a11y de cada componente do design system
-function getComponentElement(code) {
+export function getComponentElement(code) {
   switch (code) {
     case "accordion":
       return React.createElement(
@@ -298,7 +298,7 @@ function getComponentElement(code) {
         ds.Popover,
         { open: true },
         React.createElement(ds.PopoverTrigger, { asChild: true }, React.createElement("button", null, "Abrir")),
-        React.createElement(ds.PopoverContent, null, "Conteúdo do popover")
+        React.createElement(ds.PopoverContent, { "aria-label": "Filtros" }, "Conteúdo do popover")
       );
 
     case "progress":
@@ -386,7 +386,7 @@ function getComponentElement(code) {
       return React.createElement(ds.Skeleton, { className: "h-5 w-24" });
 
     case "slider":
-      return React.createElement(ds.Slider, { defaultValue: [50], max: 100, step: 1 });
+      return React.createElement(ds.Slider, { defaultValue: [50], max: 100, step: 1, "aria-label": "Raio de busca em km" });
 
     case "spinner":
       return React.createElement(ds.Spinner, { label: "Carregando protocolos" });
