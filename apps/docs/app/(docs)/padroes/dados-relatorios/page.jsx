@@ -36,7 +36,7 @@ export default function DadosRelatoriosPage() {
             {itens.map((c) => (
               <tr key={c.href}>
                 <td>
-                  <Link href={c.href} style={{ color: "var(--pv-green-500)", fontWeight: 600 }}>
+                  <Link href={c.href}>
                     {c.title}
                   </Link>
                 </td>

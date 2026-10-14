@@ -1,25 +1,34 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Bot, Check, ChevronDown, ChevronRight, Code2 } from "lucide-react";
 import { copyText } from "@/lib/clipboard";
 
-function CopyButton({ text, label }) {
+function ActionIconButton({ text, title, icon: Icon, successTitle = "Copiado!" }) {
   const [state, setState] = useState("idle");
 
-  async function handleCopy() {
+  async function handleCopy(e) {
+    e.stopPropagation();
     const ok = await copyText(text);
     setState(ok ? "ok" : "fail");
     setTimeout(() => setState("idle"), 1600);
   }
 
+  const isCopied = state === "ok";
+
   return (
     <button
       type="button"
       onClick={handleCopy}
-      className="proto-copy"
-      aria-live="polite"
+      className={`proto-icon-btn ${isCopied ? "is-copied" : ""}`}
+      title={isCopied ? successTitle : title}
+      aria-label={isCopied ? successTitle : title}
     >
-      {state === "ok" ? "Copiado!" : state === "fail" ? "Falhou" : label}
+      {isCopied ? (
+        <Check className="proto-btn-icon" aria-hidden="true" />
+      ) : (
+        <Icon className="proto-btn-icon" aria-hidden="true" />
+      )}
     </button>
   );
 }
@@ -33,9 +42,10 @@ function getTheme() {
    (#6a737d) dá 3,68:1 sobre o fundo do codeblock e reprovava no AA. */
 const SHIKI_THEMES = { light: "github-light", dark: "github-dark-default" };
 
-export default function CodeBlock({ code, filename, prompt }) {
+export default function CodeBlock({ code, filename, prompt, defaultExpanded = false }) {
   const safeCode = typeof code === "string" ? code : "";
   const safePrompt = typeof prompt === "string" ? prompt : "";
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [highlighted, setHighlighted] = useState("");
 
   if (code !== undefined && !safeCode) {
@@ -76,26 +86,57 @@ export default function CodeBlock({ code, filename, prompt }) {
   }, [safeCode]);
 
   return (
-    <div className="proto-codeblock">
+    <div className={`proto-codeblock ${isExpanded ? "is-expanded" : "is-collapsed"}`}>
       <div className="proto-codeblock-head">
-        {filename && <span className="proto-codeblock-file">{filename}</span>}
-        <span className="proto-codeblock-actions">
-          <CopyButton text={safeCode} label="Copiar código" />
-          {safePrompt && <CopyButton text={safePrompt} label="Copiar prompt" />}
-        </span>
+        <button
+          type="button"
+          className="proto-codeblock-toggle"
+          onClick={() => setIsExpanded((prev) => !prev)}
+          aria-expanded={isExpanded}
+          title={isExpanded ? "Recolher código" : "Expandir código"}
+        >
+          <span className="proto-expand-btn">
+            {isExpanded ? (
+              <ChevronDown className="proto-btn-icon" aria-hidden="true" />
+            ) : (
+              <ChevronRight className="proto-btn-icon" aria-hidden="true" />
+            )}
+          </span>
+          {filename && <span className="proto-codeblock-file">{filename}</span>}
+        </button>
+
+        <div className="proto-codeblock-actions">
+          <ActionIconButton
+            text={safeCode}
+            title="Copiar código"
+            icon={Code2}
+          />
+          {safePrompt && (
+            <ActionIconButton
+              text={safePrompt}
+              title="Copiar prompt do agente"
+              icon={Bot}
+            />
+          )}
+        </div>
       </div>
-      {safeCode ? (
-        highlighted ? (
-          <div dangerouslySetInnerHTML={{ __html: highlighted }} />
-        ) : (
-          <pre>
-            <code>{safeCode}</code>
-          </pre>
-        )
-      ) : (
-        <pre>
-          <code className="proto-codeblock-empty">Snippet indisponível.</code>
-        </pre>
+
+      {isExpanded && (
+        <div className="proto-codeblock-content">
+          {safeCode ? (
+            highlighted ? (
+              <div dangerouslySetInnerHTML={{ __html: highlighted }} />
+            ) : (
+              <pre>
+                <code>{safeCode}</code>
+              </pre>
+            )
+          ) : (
+            <pre>
+              <code className="proto-codeblock-empty">Snippet indisponível.</code>
+            </pre>
+          )}
+        </div>
       )}
     </div>
   );

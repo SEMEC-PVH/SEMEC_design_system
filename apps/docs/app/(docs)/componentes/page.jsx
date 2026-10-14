@@ -46,10 +46,7 @@ export default function ComponentesPage() {
               {s.items.map((c) => (
                 <tr key={c.slug}>
                   <td>
-                    <Link
-                      href={`/componentes/${c.slug}`}
-                      style={{ color: "var(--pv-green-500)", fontWeight: 600 }}
-                    >
+                    <Link href={`/componentes/${c.slug}`}>
                       {c.label}
                     </Link>
                   </td>

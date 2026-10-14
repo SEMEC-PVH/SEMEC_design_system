@@ -1091,7 +1091,7 @@ h3 {
 /* ---- Note callout (componente <Note> e classe .note legada) ---- */
 .note-callout {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.625rem;
   background: var(--tint);
   border: 1px solid var(--pv-blue-200);
@@ -1106,7 +1106,7 @@ h3 {
   flex-shrink: 0;
   width: 1rem;
   height: 1rem;
-  margin-top: 0.15rem;
+  margin-top: 0;
   color: var(--pv-blue-500);
 }
 .note-callout__text {
@@ -1118,7 +1118,7 @@ h3 {
 /* Alias legado para <p className="note"> em MDX e páginas antigas */
 .note {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.625rem;
   background: var(--tint);
   border: 1px solid var(--pv-blue-200);
@@ -1169,6 +1169,14 @@ td {
   border-bottom: 1px solid var(--border);
   border-right: 1px solid var(--border);
   vertical-align: top;
+}
+td a {
+  color: var(--nav-accent);
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+td a:hover {
+  text-decoration: underline;
 }
 th:last-child,
 td:last-child {
@@ -1464,23 +1472,88 @@ li {
   border-radius: 0.5rem;
   overflow: hidden;
   background: var(--color-gray-900);
+  margin: 0.75rem 0;
+  transition: border-color 0.15s ease;
 }
 .proto-codeblock-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.45rem 0.75rem;
   background: var(--color-gray-800);
+}
+.proto-codeblock-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.proto-codeblock-toggle:hover .proto-codeblock-file {
+  color: var(--color-gray-100);
+}
+.proto-codeblock-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+.proto-expand-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--color-gray-300);
+  cursor: pointer;
+}
+.proto-btn-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
 }
 .proto-codeblock-file {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.75rem;
   color: var(--color-gray-300);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .proto-codeblock-actions {
   display: inline-flex;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.35rem;
+}
+.proto-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--color-gray-600);
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--color-gray-300);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.proto-icon-btn:hover {
+  background: var(--color-gray-700);
+  color: var(--color-gray-100);
+  border-color: var(--color-gray-500);
+}
+.proto-icon-btn.is-copied {
+  color: var(--pv-green-500);
+  border-color: var(--pv-green-500);
 }
 .proto-copy {
   border: 1px solid var(--color-gray-600);
@@ -1493,6 +1566,9 @@ li {
 }
 .proto-copy:hover {
   background: var(--color-gray-700);
+}
+.proto-codeblock-content {
+  border-top: 1px solid var(--border);
 }
 .proto-codeblock pre {
   margin: 0;
@@ -1529,8 +1605,26 @@ li {
 [data-theme="light"] .proto-codeblock-head {
   background: var(--color-gray-100, #f3f4f6);
 }
+[data-theme="light"] .proto-codeblock-head:hover {
+  background: var(--color-gray-200, #e5e7eb);
+}
+[data-theme="light"] .proto-expand-btn {
+  color: var(--color-gray-600, #4b5563);
+}
 [data-theme="light"] .proto-codeblock-file {
   color: var(--color-gray-600, #4b5563);
+}
+[data-theme="light"] .proto-icon-btn {
+  border-color: var(--color-gray-300, #d1d5db);
+  color: var(--color-gray-600, #4b5563);
+}
+[data-theme="light"] .proto-icon-btn:hover {
+  background: var(--color-gray-200, #e5e7eb);
+  color: var(--color-gray-900, #111827);
+}
+[data-theme="light"] .proto-icon-btn.is-copied {
+  color: var(--pv-green-800);
+  border-color: var(--pv-green-800);
 }
 [data-theme="light"] .proto-copy {
   border-color: var(--color-gray-300, #d1d5db);

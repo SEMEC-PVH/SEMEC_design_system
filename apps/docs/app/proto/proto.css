@@ -329,6 +329,8 @@ body {
     border-radius: 0.5rem;
     overflow: hidden;
     background: var(--color-gray-900);
+    margin: 0.75rem 0;
+    transition: border-color 0.15s ease;
   }
 
   .proto-codeblock-head {
@@ -336,19 +338,90 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    padding: 0.5rem 0.75rem;
+    padding: 0.45rem 0.75rem;
     background: var(--color-gray-800);
+  }
+
+  .proto-codeblock-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .proto-codeblock-toggle:hover .proto-codeblock-file {
+    color: var(--color-gray-100);
+  }
+
+  .proto-codeblock-title-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
+  }
+
+  .proto-expand-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--color-gray-300);
+    cursor: pointer;
+  }
+
+  .proto-btn-icon {
+    width: 0.95rem;
+    height: 0.95rem;
+    flex-shrink: 0;
   }
 
   .proto-codeblock-file {
     font-family: var(--font-mono, ui-monospace, monospace);
     font-size: 0.75rem;
     color: var(--color-gray-300);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .proto-codeblock-actions {
     display: inline-flex;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .proto-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 1px solid var(--color-gray-600);
+    border-radius: 0.375rem;
+    background: transparent;
+    color: var(--color-gray-300);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .proto-icon-btn:hover {
+    background: var(--color-gray-700);
+    color: var(--color-gray-100);
+    border-color: var(--color-gray-500);
+  }
+
+  .proto-icon-btn.is-copied {
+    color: var(--pv-green-500);
+    border-color: var(--pv-green-500);
   }
 
   .proto-copy {
@@ -363,6 +436,10 @@ body {
 
   .proto-copy:hover {
     background: var(--color-gray-700);
+  }
+
+  .proto-codeblock-content {
+    border-top: 1px solid var(--color-border);
   }
 
   .proto-codeblock pre {
@@ -403,8 +480,26 @@ body {
   [data-theme="light"] .proto-codeblock-head {
     background: var(--color-gray-100, #f3f4f6);
   }
+  [data-theme="light"] .proto-codeblock-head:hover {
+    background: var(--color-gray-200, #e5e7eb);
+  }
+  [data-theme="light"] .proto-expand-btn {
+    color: var(--color-gray-600, #4b5563);
+  }
   [data-theme="light"] .proto-codeblock-file {
     color: var(--color-gray-600, #4b5563);
+  }
+  [data-theme="light"] .proto-icon-btn {
+    border-color: var(--color-gray-300, #d1d5db);
+    color: var(--color-gray-600, #4b5563);
+  }
+  [data-theme="light"] .proto-icon-btn:hover {
+    background: var(--color-gray-200, #e5e7eb);
+    color: var(--color-gray-900, #111827);
+  }
+  [data-theme="light"] .proto-icon-btn.is-copied {
+    color: var(--pv-green-800);
+    border-color: var(--pv-green-800);
   }
   [data-theme="light"] .proto-copy {
     border-color: var(--color-gray-300, #d1d5db);
