@@ -232,7 +232,9 @@ Regras do fluxo:
 
 ### Pré-requisito da CI (mantenedores)
 
-O workflow usa o secret do GitHub **`NPM_TOKEN`** (Settings → Secrets and variables → Actions), exposto como `NODE_AUTH_TOKEN` no job:
+O workflow usa dois secrets do GitHub (Settings → Secrets and variables → Actions). Nenhum deles fica no `env` do job: o `npm ci` roda sem token, e cada secret só entra no passo que precisa dele.
+
+**`NPM_TOKEN`** — só nos passos de autenticação npm e de publicação, e só quando não há changesets pendentes (modo publicação):
 
 | Campo | Valor |
 |--------|--------|
@@ -242,16 +244,30 @@ O workflow usa o secret do GitHub **`NPM_TOKEN`** (Settings → Secrets and vari
 | Packages and scopes | `@semec` → **Read and write** |
 | Bypass 2FA | **Sim**, se a conta tiver 2FA (senão o publish falha com E403) |
 
-Sem esse secret (ou com token inválido), o job falha no passo de diagnóstico (`npm whoami`) — mas só quando vai publicar; abrir o PR de versão não precisa do token. Depois de publicar, o workflow **verifica** se `npm view @semec/ds version` bate com o `package.json`.
+Sem esse secret (ou com token inválido), o job falha no passo de autenticação (`npm whoami`) — mas só quando vai publicar; abrir o PR de versão não precisa do token. Depois de publicar, o workflow **verifica** se `npm view @semec/ds version` bate com o `package.json`.
 
-Outros ajustes de repositório que o fluxo precisa (uma vez, por um admin):
+**`RELEASE_TOKEN`** — token usado para fazer push da branch `changeset-release/main`, abrir o PR de versão e enviar as tags. O secret já existe no repositório (cadastrado em 29/09/2026 como PAT para abrir os PRs de versão). Ele precisa de, no mínimo:
 
-1. **Permitir que o workflow abra PR.** Settings → Actions → General → Workflow permissions → marcar "Allow GitHub Actions to create and approve pull requests". Pela API:
-   ```bash
-   gh api -X PUT repos/SEMEC-PVH/SEMEC_design_system/actions/permissions/workflow \
-     -f default_workflow_permissions=read -F can_approve_pull_request_reviews=true
-   ```
-2. **(Recomendado) secret `RELEASE_PR_TOKEN`.** PR aberto com o `GITHUB_TOKEN` padrão **não dispara a CI**, e com checks obrigatórios o PR de versão fica travado. Com um PAT fine-grained (ou token de GitHub App) com `Contents: write` e `Pull requests: write` neste repositório salvo como `RELEASE_PR_TOKEN`, o workflow usa esse token e a CI roda normalmente no PR de versão. Sem ele, um mantenedor fecha e reabre o PR de versão (o evento `reopened`, feito por pessoa, dispara a CI).
+| Tipo | Permissões |
+|------|------------|
+| PAT fine-grained (recomendado) | repositório `SEMEC-PVH/SEMEC_design_system`; `Contents: Read and write`, `Pull requests: Read and write` |
+| PAT clássico | escopo `repo` |
+
+Ninguém consegue ler um secret depois de salvo, então quem criou o token confere tipo, escopo e validade. Se ele vencer, gere outro com as permissões acima e salve com o mesmo nome:
+
+```bash
+gh secret set RELEASE_TOKEN -R SEMEC-PVH/SEMEC_design_system   # cola o token quando pedir
+```
+
+Push feito com PAT dispara a CI no PR de versão, então os checks obrigatórios rodam normalmente. É por isso que o workflow prefere o PAT ao `GITHUB_TOKEN`.
+
+**Alternativa sem `RELEASE_TOKEN`.** Se o secret for apagado, o workflow cai no `GITHUB_TOKEN` padrão. Hoje isso **não funciona**, porque o repositório está com `can_approve_pull_request_reviews: false`. Para usar essa via, um admin liga Settings → Actions → General → Workflow permissions → "Allow GitHub Actions to create and approve pull requests":
+
+```bash
+gh api -X PUT repos/SEMEC-PVH/SEMEC_design_system/actions/permissions/workflow   -f default_workflow_permissions=read -F can_approve_pull_request_reviews=true
+```
+
+Nesse modo, o PR aberto com `GITHUB_TOKEN` **não dispara a CI**, e os checks obrigatórios ficam pendentes. Para destravar, um mantenedor fecha e reabre o PR de versão: o evento `reopened`, feito por uma pessoa, dispara a CI. Também funciona fazer um push qualquer na branch `changeset-release/main`.
 
 ### Fluxo de release
 
