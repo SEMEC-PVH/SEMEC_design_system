@@ -53,11 +53,47 @@ export async function checkTokens() {
     "--shadow-elevation-2",
     "--shadow-elevation-3",
     "--radius-md",
+    // Onda 2 da auditoria 2026-10 (AUD-27, AUD-28, AUD-30, AUD-53, AUD-60)
+    "--spacing-space-4",
+    "--text-3xl--line-height",
+    "--text-display",
+    "--font-weight-regular",
+    "--color-text-muted",
+    "--color-surface-sunken",
+    "--focus-ring-inverse",
   ];
 
   for (const prop of requiredThemeProps) {
     if (!tokensCss.includes(prop)) {
       errors.push(`@theme em tokens.css está faltando a declaração obrigatória: ${prop}`);
+    }
+  }
+
+  // AUD-30: --color-muted/--color-secondary são fundo; texto precisa de
+  // --color-text-* apontando para os tokens de texto.
+  for (const name of ["muted", "secondary", "strong"]) {
+    if (!new RegExp(`--color-text-${name}:\\s*var\\(--text-${name}\\)`).test(tokensCss)) {
+      errors.push(`@theme deve mapear --color-text-${name} para var(--text-${name}) (AUD-30)`);
+    }
+  }
+
+  // AUD-26: fonts.css com Poppins 400–700 e sem 800/900 (especificação-alvo).
+  const fontsPath = path.resolve("packages/react/fonts.css");
+  if (!fs.existsSync(fontsPath)) {
+    errors.push("packages/react/fonts.css não encontrado (AUD-26)");
+  } else {
+    const fontsCss = fs.readFileSync(fontsPath, "utf8");
+    for (const w of [400, 500, 600, 700]) {
+      const file = path.resolve(`packages/react/fonts/Poppins-${w}.woff2`);
+      if (!fontsCss.includes(`font-weight: ${w};`) || !fs.existsSync(file)) {
+        errors.push(`Poppins ${w}: falta @font-face em fonts.css ou o arquivo fonts/Poppins-${w}.woff2`);
+      }
+    }
+    if (/font-weight:\s*[89]00/.test(fontsCss)) {
+      errors.push("fonts.css declara peso 800/900, que não existe no sistema");
+    }
+    if (!fs.existsSync(path.resolve("packages/react/fonts/OFL.txt"))) {
+      errors.push("packages/react/fonts/OFL.txt (licença da Poppins) não encontrado");
     }
   }
 

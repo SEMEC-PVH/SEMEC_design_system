@@ -14,8 +14,16 @@
 
    Uso no globals.css do site novo:
      @import "tailwindcss";
+     @import "@semec/ds/react/fonts.css";   (Poppins 400–700 auto-hospedada)
      @import "@semec/ds/react/tokens.css";
      @source "../node_modules/@semec/ds/dist/react";
+
+   Dialeto de utilitários (AUD-27/28/30):
+     espaçamento  p-space-4, gap-space-2, mt-space-12   (escala --space-*)
+     tipografia   text-xs … text-3xl, text-display       (tamanho + entrelinha)
+                  font-regular|medium|semibold|bold        (400–700; não há 800/900)
+     cor de texto text-text-muted, text-text-secondary, text-text-strong
+                  (NÃO use text-muted / text-secondary: ver aviso em L1 · Cor)
    ========================================================================= */
 
 /* =========================================================================
@@ -107,6 +115,7 @@
   --pv-gray-50:  #f4f6f9;
   --pv-gray-100: #f5f5f5;
   --pv-gray-200: #e5e7eb;
+  --pv-gray-300: #d1d5db;
   --pv-gray-400: #78849a;
   --pv-gray-600: #4b5563;
   --pv-gray-700: #374151;
@@ -123,9 +132,30 @@
   --fg:                var(--pv-gray-900);
   --surface:           var(--pv-white);
   --surface-alt:       var(--pv-gray-100);
+  /* Superfície rebaixada (AUD-53): placeholder de Skeleton, trilha de
+     Progress/Slider. 1,47:1 sobre --surface e 1,36:1 sobre --bg —
+     perceptível, ao contrário de --surface-alt (1,09:1). Preenchimento
+     --action-primary sobre ela: 3,68:1 (WCAG 1.4.11). Para delimitar a
+     extensão da trilha, contorne com --border-strong (3,77:1 sobre
+     --surface). Texto --text-muted sobre ela: 5,13:1. */
+  --surface-sunken:    var(--pv-gray-300);
   --border:            var(--pv-gray-200);
   --border-strong:     var(--pv-gray-400);
   --focus-ring:        var(--pv-blue-hero);
+  /* Anel de foco sobre superfícies de marca (AUD-60). --focus-ring é a
+     própria cor de marca (1,00:1 sobre --brand-hero); o inverso dá 9,38:1
+     sobre --brand-hero. Aplicado automaticamente dentro de
+     [data-surface="brand"] e .bg-brand-hero (ver @layer base). */
+  --focus-ring-inverse: var(--pv-white);
+
+  /* ATENÇÃO (AUD-30): estes três NÃO viram `text-muted`/`text-secondary`.
+     No Tailwind, `text-muted` lê --color-muted e `text-secondary` lê
+     --color-secondary, que são cores de FUNDO (--surface-alt): 1,09:1,
+     texto invisível. `bg-muted`/`bg-secondary` continuam valendo.
+       --text-muted      → text-text-muted  (ou text-muted-foreground)  7,56:1
+       --text-secondary  → text-text-secondary                          10,31:1
+       --text-strong     → text-text-strong (ou text-foreground)        15,77:1
+     (contrastes sobre --surface; sobre --bg: 6,98 / 9,52 / 14,57:1) */
   --text-muted:        var(--pv-gray-600);
   --text-secondary:    var(--pv-gray-700);
   --text-strong:       var(--pv-gray-900);
@@ -154,21 +184,31 @@
   /* =======================================================================
      L1 — SEMÂNTICOS · Tipografia
      ======================================================================= */
+  /* Poppins vem de `@semec/ds/react/fonts.css` (400–700, AUD-26). Sem ele,
+     o navegador cai no system-ui. Não existem 800/900 no sistema. */
   --font-family-sans: "Poppins", system-ui, -apple-system, sans-serif;
 
-  --text-xs:   0.75rem;
-  --text-sm:   0.875rem;
-  --text-base: 1rem;
-  --text-lg:   1.125rem;
-  --text-xl:   1.25rem;
-  --text-2xl:  1.5rem;
+  /* Escala (especificação-alvo): oito degraus, nada abaixo de 12px.
+     Papel: display = título da página inicial · 3xl = título de página (h1)
+     · 2xl = seção (h2) · xl = subtítulo · lg = destaque de corpo
+     · base = corpo (padrão) · sm = apoio/tabela densa · xs = rótulo/legenda */
+  --text-xs:      0.75rem;  /* 12px */
+  --text-sm:      0.875rem; /* 14px */
+  --text-base:    1rem;     /* 16px */
+  --text-lg:      1.125rem; /* 18px */
+  --text-xl:      1.25rem;  /* 20px */
+  --text-2xl:     1.5rem;   /* 24px */
+  --text-3xl:     2rem;     /* 32px (o default do Tailwind é 30px) */
+  --text-display: 2.5rem;   /* 40px */
 
-  --leading-xs:   1.4;
-  --leading-sm:   1.5;
-  --leading-base: 1.5;
-  --leading-lg:   1.4;
-  --leading-xl:   1.3;
-  --leading-2xl:  1.25;
+  --leading-xs:      1.4;
+  --leading-sm:      1.5;
+  --leading-base:    1.5;
+  --leading-lg:      1.4;
+  --leading-xl:      1.3;
+  --leading-2xl:     1.25;
+  --leading-3xl:     1.2;
+  --leading-display: 1.1;
 
   --font-regular:  400;
   --font-medium:   500;
@@ -177,6 +217,9 @@
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Espaçamento
+     Utilitário: p-space-4, gap-space-2, mx-space-6… (AUD-27). Os números
+     p-1…p-16 do Tailwind dão o mesmo valor nos degraus da escala (4px × N),
+     mas só os nove degraus abaixo fazem parte do sistema (p-5, py-1.5 não).
      ======================================================================= */
   --space-0:  0;
   --space-1:  4px;
@@ -242,6 +285,7 @@
   --color-pv-gray-50:  var(--pv-gray-50);
   --color-pv-gray-100: var(--pv-gray-100);
   --color-pv-gray-200: var(--pv-gray-200);
+  --color-pv-gray-300: var(--pv-gray-300);
   --color-pv-gray-400: var(--pv-gray-400);
   --color-pv-gray-600: var(--pv-gray-600);
   --color-pv-gray-700: var(--pv-gray-700);
@@ -259,6 +303,7 @@
   --color-popover-foreground:   var(--fg);
   --color-surface:              var(--surface);
   --color-surface-alt:          var(--surface-alt);
+  --color-surface-sunken:       var(--surface-sunken);
   --color-secondary:            var(--surface-alt);
   --color-secondary-foreground: var(--fg);
   --color-accent:               var(--surface-alt);
@@ -269,12 +314,20 @@
   --color-border-strong:        var(--border-strong);
   --color-input:                var(--border-strong);
   --color-ring:                 var(--focus-ring);
+  --color-ring-inverse:         var(--focus-ring-inverse);
   --color-brand-hero:           var(--brand-hero);
   --color-primary:              var(--action-primary);
   --color-primary-foreground:   var(--text-on-brand);
   --color-destructive:          var(--feedback-danger);
   --color-destructive-foreground: var(--text-on-brand);
   --color-tint:                 var(--tint);
+
+  /* Cor de texto (AUD-30): text-text-muted, text-text-secondary…
+     `text-muted`/`text-secondary` são cor de fundo — não use para texto. */
+  --color-text-muted:           var(--text-muted);
+  --color-text-secondary:       var(--text-secondary);
+  --color-text-strong:          var(--text-strong);
+  --color-text-on-brand:        var(--text-on-brand);
 
   --color-destructive-surface: var(--feedback-danger-surface);
   --color-primary-hover:      var(--action-primary-hover);
@@ -291,8 +344,53 @@
   --color-sidebar-foreground:  var(--fg);
   --color-sidebar-ring:        var(--focus-ring);
 
-  /* -- Tipografia -- */
+  /* -- Tipografia (AUD-28) -- */
   --font-sans: var(--font-family-sans);
+
+  /* text-* aplica tamanho + entrelinha do degrau (leading-* sobrescreve). */
+  --text-xs:                    var(--text-xs);
+  --text-xs--line-height:       var(--leading-xs);
+  --text-sm:                    var(--text-sm);
+  --text-sm--line-height:       var(--leading-sm);
+  --text-base:                  var(--text-base);
+  --text-base--line-height:     var(--leading-base);
+  --text-lg:                    var(--text-lg);
+  --text-lg--line-height:       var(--leading-lg);
+  --text-xl:                    var(--text-xl);
+  --text-xl--line-height:       var(--leading-xl);
+  --text-2xl:                   var(--text-2xl);
+  --text-2xl--line-height:      var(--leading-2xl);
+  --text-3xl:                   var(--text-3xl);
+  --text-3xl--line-height:      var(--leading-3xl);
+  --text-display:               var(--text-display);
+  --text-display--line-height:  var(--leading-display);
+
+  /* leading-xs … leading-display (as nomeadas do Tailwind seguem valendo). */
+  --leading-xs:      var(--leading-xs);
+  --leading-sm:      var(--leading-sm);
+  --leading-base:    var(--leading-base);
+  --leading-lg:      var(--leading-lg);
+  --leading-xl:      var(--leading-xl);
+  --leading-2xl:     var(--leading-2xl);
+  --leading-3xl:     var(--leading-3xl);
+  --leading-display: var(--leading-display);
+
+  /* font-regular (400) + font-medium/semibold/bold do Tailwind, nos tokens. */
+  --font-weight-regular:  var(--font-regular);
+  --font-weight-medium:   var(--font-medium);
+  --font-weight-semibold: var(--font-semibold);
+  --font-weight-bold:     var(--font-bold);
+
+  /* -- Espaçamento (AUD-27): p-space-4, gap-space-2, my-space-12… -- */
+  --spacing-space-0:  var(--space-0);
+  --spacing-space-1:  var(--space-1);
+  --spacing-space-2:  var(--space-2);
+  --spacing-space-3:  var(--space-3);
+  --spacing-space-4:  var(--space-4);
+  --spacing-space-6:  var(--space-6);
+  --spacing-space-8:  var(--space-8);
+  --spacing-space-12: var(--space-12);
+  --spacing-space-16: var(--space-16);
 
   /* -- Forma -- */
   --radius-sm:   var(--radius-sm);
@@ -496,14 +594,40 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Links (AUD-25): o reset fica em @layer base, então a classe `underline`
+     (camada utilities, usada pelo componente Link) sempre vence. Link solto
+     no texto, sem classe nenhuma, ganha sublinhado (WCAG 1.4.1). */
   a {
     color: inherit;
     text-decoration: none;
   }
 
+  a:not([class]) {
+    text-decoration-line: underline;
+    text-underline-offset: 0.2em;
+  }
+
   :focus-visible {
     outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
+  }
+
+  /* Superfícies de marca (AUD-60): dentro delas o anel de foco passa a
+     --focus-ring-inverse (branco, 9,38:1 sobre --brand-hero). Vale para o
+     outline global e para ring-ring/ring-sidebar-ring dos componentes.
+     Marque a área com data-surface="brand" (ou use bg-brand-hero).
+     Uma superfície clara aninhada volta ao anel padrão com
+     data-surface="default". */
+  [data-surface="brand"],
+  .bg-brand-hero {
+    --focus-ring: var(--focus-ring-inverse);
+  }
+
+  /* O próprio elemento bg-brand-hero focado desenha o anel por fora, sobre
+     o fundo da página: mantém o anel padrão (9,38:1 sobre --surface). */
+  .bg-brand-hero:focus-visible,
+  [data-surface="default"] {
+    --focus-ring: var(--pv-blue-hero);
   }
 }
 
