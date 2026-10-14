@@ -44,46 +44,18 @@ Alternativa com preset JS (opcional): acrescente `@config "@semec/ds/react/pv-pr
 
 ### 3. Fonte Poppins
 
-O pacote **não traz arquivos de fonte**. O `tokens.css` declara `--font-family-sans: "Poppins", system-ui, -apple-system, sans-serif`; sem carregar a Poppins, o texto cai na fonte do sistema (Segoe UI no Windows). Carregue os pesos 400, 500, 600 e 700 de uma destas formas:
-
-**Next.js (`next/font/local`, self-hosted, recomendado)** — o `next/font` gera um nome de família com hash, então aponte o token para a variável:
-
-```tsx
-// app/layout.tsx
-import localFont from "next/font/local";
-
-const poppins = localFont({
-  src: [
-    { path: "./fonts/Poppins-400.woff2", weight: "400", style: "normal" },
-    { path: "./fonts/Poppins-500.woff2", weight: "500", style: "normal" },
-    { path: "./fonts/Poppins-600.woff2", weight: "600", style: "normal" },
-    { path: "./fonts/Poppins-700.woff2", weight: "700", style: "normal" },
-  ],
-  variable: "--font-poppins",
-  display: "swap",
-});
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="pt-BR" className={poppins.variable}>
-      <body>{children}</body>
-    </html>
-  );
-}
-```
+O pacote traz a Poppins auto-hospedada (pesos 400, 500, 600 e 700, `font-display: swap`, subconjunto latino que cobre o PT-BR; licença SIL OFL 1.1 em `dist/react/fonts/OFL.txt`). Não existem 800/900 no sistema. Importe `fonts.css` **antes** do `tokens.css`, no mesmo CSS global:
 
 ```css
-/* no CSS global, depois do @import do tokens.css */
-:root {
-  --font-family-sans: var(--font-poppins), system-ui, -apple-system, sans-serif;
-}
+@import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
+@import "@semec/ds/react/tokens.css";
+@source "../node_modules/@semec/ds/dist/react";
 ```
 
-(`next/font/google` com `Poppins({ weight: ["400", "500", "600", "700"], subsets: ["latin"], variable: "--font-poppins" })` funciona igual.)
+O `@font-face` usa a família `"Poppins"`, que é o nome que `--font-family-sans` já espera; não é preciso ajustar token. As URLs são relativas (`./fonts/Poppins-*.woff2`): `@tailwindcss/postcss` (Next.js) e `@tailwindcss/vite` reescrevem o caminho e o bundler copia os arquivos para o build. Com o `@tailwindcss/cli`, que não reescreve URL de CSS importado, importe `fonts.css` pelo JS (`import "@semec/ds/react/fonts.css";`) ou copie `dist/react/fonts/` para junto do CSS gerado.
 
-**Vite / outros (self-hosted)** — copie os `.woff2` para o app e declare `@font-face` com `font-family: "Poppins"` (o nome que o token já usa), `font-display: swap`, um bloco por peso. Os arquivos estão no repositório em [`apps/docs/app/fonts/`](https://github.com/SEMEC-PVH/SEMEC_design_system/tree/main/apps/docs/app/fonts) (Poppins, licença SIL OFL).
-
-**Google Fonts** — `<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">`. Funciona sem ajuste no token, mas depende de rede externa; prefira self-host em sistemas da Prefeitura.
+Sem carregar a fonte, o texto cai no `system-ui` (Segoe UI no Windows) e o layout varia entre máquinas. Quem já usa `next/font/local` pode continuar: aponte o token para a variável gerada (`:root { --font-family-sans: var(--font-poppins), system-ui, -apple-system, sans-serif; }`, depois do `tokens.css`) e não importe `fonts.css`. Evite Google Fonts em sistemas da Prefeitura (rede externa).
 
 ### 4. Providers no root (quando necessários)
 
@@ -236,7 +208,18 @@ Mais: `SemecProvider`, `cn`, masks (`maskCPF`, `maskCNPJ`, `maskCEP`, `maskCurre
 
 ## Tokens
 
-O que existe no pacote está em `tokens.css` (camadas L0 `--pv-*` e L1 semânticas). Tokens de layout que aparecem no site de documentação (`--container-max`, `--measure`, `--control-height-*`, `data-density`) **não fazem parte do pacote**; use os utilitários do Tailwind indicados na skill `semec-ds` (seção "Responsive / Mobile").
+O que existe no pacote está em `tokens.css` (camadas L0 `--pv-*` e L1 semânticas). O `@theme inline` expõe os tokens como utilitários (o preset JS gera os mesmos nomes):
+
+| Token | Utilitário | Observação |
+|---|---|---|
+| `--space-0` … `--space-16` | `p-space-4`, `gap-space-2`, `mt-space-12`… | Dialeto do sistema. `p-4` dá o mesmo valor, mas só os nove degraus (0, 1, 2, 3, 4, 6, 8, 12, 16) fazem parte da escala |
+| `--text-xs` … `--text-2xl`, `--text-3xl` (32px), `--text-display` (40px) | `text-xs` … `text-3xl`, `text-display` | Tamanho **e** entrelinha do degrau (`--leading-*`); `leading-*` sobrescreve |
+| `--font-regular` … `--font-bold` | `font-regular`, `font-medium`, `font-semibold`, `font-bold` | 400–700 |
+| `--text-muted`, `--text-secondary`, `--text-strong` | `text-text-muted`, `text-text-secondary`, `text-text-strong` | **Não** use `text-muted`/`text-secondary`: são a cor de fundo `--surface-alt` (1,09:1). `bg-muted`/`bg-secondary` seguem valendo |
+| `--surface-sunken` | `bg-surface-sunken` | Skeleton, trilha de Progress/Slider (1,47:1 sobre `--surface`) |
+| `--focus-ring-inverse` | `ring-ring-inverse` | Automático dentro de `data-surface="brand"` ou `bg-brand-hero` (9,38:1); `data-surface="default"` volta ao anel padrão |
+
+Link solto no texto (`<a>` sem `class`) é sublinhado pelo `tokens.css`; com classe, o sublinhado é do componente/utilitário (`underline`). Tokens de layout que aparecem no site de documentação (`--container-max`, `--measure`, `--control-height-*`, `data-density`) **não fazem parte do pacote**; use os utilitários do Tailwind indicados na skill `semec-ds` (seção "Responsive / Mobile").
 
 ## Tema
 
