@@ -311,15 +311,38 @@ function Formulario() {
     label: "Cartão",
     file: "src/components/card.tsx",
     category: "conteudo-dados",
-    desc: "Superfície de conteúdo com header, corpo e footer.",
-    variants: [{ prop: "composição", values: "Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader" }],
+    desc: "Superfície de conteúdo com header, corpo e footer. Sombra pelo token `shadow-elevation-1`.",
+    variants: [
+      { prop: "composição", values: "Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader" },
+      { prop: "títulos", values: "CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2)" },
+    ],
     usage: `import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@semec/ds/react";
 
+// "as" escolhe o nível do título conforme a hierarquia da página
 <Card>
-  <CardHeader><CardTitle>IPTU 2026</CardTitle></CardHeader>
+  <CardHeader><CardTitle as="h2">IPTU 2026</CardTitle></CardHeader>
   <CardContent>Parcela em dia.</CardContent>
   <CardFooter><Button>Emitir boleto</Button></CardFooter>
 </Card>`,
+  },
+  {
+    code: "heading",
+    slug: "titulo",
+    label: "Título",
+    file: "src/components/heading.tsx",
+    category: "conteudo-dados",
+    desc: "Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual.",
+    variants: [
+      { prop: "level", values: "1 · 2 (padrão) · 3 · 4 · 5 · 6" },
+      { prop: "size", values: "1–6 (padrão: igual ao level)" },
+    ],
+    usage: `import { Heading } from "@semec/ds/react";
+
+<Heading level={1}>Requerimento de matrícula</Heading>
+<Heading level={2}>Dados do estudante</Heading>
+
+// Nível semântico 3 com visual de nível 2
+<Heading level={3} size={2}>Documentos</Heading>`,
   },
   {
     code: "badge",
@@ -364,12 +387,15 @@ function Formulario() {
     label: "Esqueleto",
     file: "src/components/skeleton.tsx",
     category: "feedback",
-    desc: "Placeholder pulsante de carregamento.",
-    variants: [],
+    desc: "Placeholder pulsante de carregamento, decorativo (aria-hidden). Fundo `surface-sunken`. Anuncie o carregamento no contêiner com aria-busy e um texto ou Spinner.",
+    variants: [{ prop: "a11y", values: "aria-hidden=true (padrão) · aria-busy no contêiner" }],
     usage: `import { Skeleton } from "@semec/ds/react";
 
-<Skeleton className="h-4 w-3/4" />
-<Skeleton className="h-4 w-1/2" />`,
+<div aria-busy="true">
+  <p className="sr-only">Carregando protocolos…</p>
+  <Skeleton className="h-4 w-3/4" />
+  <Skeleton className="h-4 w-1/2" />
+</div>`,
   },
   {
     code: "empty-state",
@@ -378,13 +404,14 @@ function Formulario() {
     file: "src/components/empty-state.tsx",
     category: "feedback",
     desc: "Estado vazio com ícone, título, descrição e ação opcional.",
-    variants: [{ prop: "props", values: "icon · title · description · action" }],
+    variants: [{ prop: "props", values: "icon · title · description · action · titleAs (padrão h3)" }],
     usage: `import { EmptyState, Button } from "@semec/ds/react";
 import { Inbox } from "lucide-react";
 
 <EmptyState
   icon={<Inbox />}
   title="Nenhum protocolo encontrado"
+  titleAs="h2"
   description="Ajuste os filtros ou abra um novo requerimento."
   action={<Button>Abrir requerimento</Button>}
 />`,
@@ -398,7 +425,7 @@ import { Inbox } from "lucide-react";
     desc: "Estado de erro com anúncio acessível (role=alert), mensagem explicativa e ação de recuperação (onRetry ou ação personalizada).",
     variants: [
       { prop: "variant", values: "default · inline" },
-      { prop: "props", values: "title · description · icon · action · onRetry · retryLabel · variant" },
+      { prop: "props", values: "title · description · icon · action · onRetry · retryLabel · variant · titleAs (padrão h3; p no inline)" },
       { prop: "a11y", values: "role=alert · aria-live=assertive · ícones com aria-hidden" },
     ],
     usage: `import { ErrorState, Button } from "@semec/ds/react";
@@ -446,13 +473,18 @@ import { Inbox } from "lucide-react";
     desc: "Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.",
     variants: [
       { prop: "composição", values: "Header · HeaderBrand · HeaderNav · HeaderNavLink" },
-      { prop: "props", values: "HeaderBrand: orgName · serviceName · logo · href · HeaderNavLink: current" },
+      { prop: "props", values: "HeaderBrand: orgName · serviceName · logo · href (\"\" = sem link) · truncate · homeLabel · HeaderNavLink: current" },
+      { prop: "a11y", values: "sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional)" },
     ],
     usage: `import { Header, HeaderBrand, HeaderNav, HeaderNavLink } from "@semec/ds/react";
 import { Button } from "@semec/ds/react";
 
 <Header>
-  <HeaderBrand orgName="SEMEC" serviceName="Nome do serviço" />
+  <HeaderBrand
+    orgName="SEMEC"
+    serviceName="Nome do serviço"
+    logo={<img src="/logo-prefeitura.svg" alt="Prefeitura de Porto Velho" className="h-9 w-auto" />}
+  />
   <div className="flex items-center gap-2">
     <HeaderNav>
       <HeaderNavLink href="/prefeitura" current>Prefeitura</HeaderNavLink>
@@ -463,6 +495,56 @@ import { Button } from "@semec/ds/react";
     </Button>
   </div>
 </Header>`,
+  },
+  {
+    code: "skip-link",
+    slug: "link-para-o-conteudo",
+    label: "Link para o conteúdo",
+    file: "src/components/skip-link.tsx",
+    category: "navegacao",
+    desc: "Link \"Pular para o conteúdo principal\" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo).",
+    variants: [
+      { prop: "props", values: "href (padrão #conteudo) · children (padrão \"Pular para o conteúdo principal\")" },
+      { prop: "a11y", values: "visível no foco · foco movido ao alvo (tabindex=-1 aplicado se preciso) · alvo de 44px" },
+    ],
+    usage: `import { SkipLink, Header } from "@semec/ds/react";
+
+<body>
+  <SkipLink />
+  <Header>…</Header>
+  <main id="conteudo">…</main>
+</body>`,
+  },
+  {
+    code: "footer",
+    slug: "rodape",
+    label: "Rodapé",
+    file: "src/components/footer.tsx",
+    category: "navegacao",
+    desc: "Rodapé institucional (<footer>, landmark contentinfo) com seções de links e faixa final. Use um por página, fora do <main>.",
+    variants: [
+      { prop: "composição", values: "Footer · FooterContent · FooterSection · FooterLinks · FooterLink · FooterBottom" },
+      { prop: "props", values: "FooterSection: title · titleAs (padrão h2)" },
+      { prop: "a11y", values: "landmark contentinfo · FooterLinks envolve cada filho em <li> · links com alvo de 44px e sublinhado" },
+    ],
+    usage: `import { Footer, FooterContent, FooterSection, FooterLinks, FooterLink, FooterBottom } from "@semec/ds/react";
+
+<Footer>
+  <FooterContent>
+    <FooterSection title="Atendimento">
+      <p>Rua Exemplo, 100 · Centro · Porto Velho/RO</p>
+    </FooterSection>
+    <FooterSection title="Serviços">
+      <FooterLinks>
+        <FooterLink href="/matricula">Matrícula</FooterLink>
+        <FooterLink href="/transporte">Transporte escolar</FooterLink>
+      </FooterLinks>
+    </FooterSection>
+  </FooterContent>
+  <FooterBottom>
+    <p>© 2026 Prefeitura de Porto Velho · SEMEC</p>
+  </FooterBottom>
+</Footer>`,
   },
   {
     code: "tabs",
@@ -588,13 +670,29 @@ import { HelpCircle } from "lucide-react";
     label: "Aviso",
     file: "src/components/alert.tsx",
     category: "feedback",
-    desc: "Mensagem de feedback em linha, com ícone automático por variante.",
-    variants: [{ prop: "variant", values: "default · success · warning · destructive" }],
+    desc: "Mensagem de feedback em linha, com ícone automático por variante. Só destructive interrompe o leitor de tela (role=alert); as demais usam role=status.",
+    variants: [
+      { prop: "variant", values: "default · success · warning · destructive" },
+      { prop: "announce", values: "assertive (role=alert) · polite (role=status) · off (sem região viva) — padrão: destructive → assertive, demais → polite; role explícito tem precedência" },
+      { prop: "AlertTitle as", values: "div (padrão) · p · h1–h6" },
+    ],
     usage: `import { Alert, AlertTitle, AlertDescription } from "@semec/ds/react";
 
 <Alert variant="warning">
   <AlertTitle>Carnê indisponível</AlertTitle>
   <AlertDescription>O sistema volta às 14h.</AlertDescription>
+</Alert>
+
+// Erro que pede ação imediata: role=alert automático
+<Alert variant="destructive">
+  <AlertTitle>Pagamento recusado</AlertTitle>
+  <AlertDescription>Confira os dados do cartão.</AlertDescription>
+</Alert>
+
+// Aviso estático, presente desde o carregamento: sem região viva
+<Alert announce="off">
+  <AlertTitle as="h2">Como funciona</AlertTitle>
+  <AlertDescription>O protocolo é analisado em até 5 dias úteis.</AlertDescription>
 </Alert>`,
   },
   {
@@ -726,11 +824,11 @@ import { Bold } from "lucide-react";
     label: "Spinner",
     file: "src/components/spinner.tsx",
     category: "feedback",
-    desc: "Indicador de carregamento inline.",
-    variants: [],
+    desc: "Indicador de carregamento inline (role=status).",
+    variants: [{ prop: "label", values: "texto anunciado (padrão \"Carregando\")" }],
     usage: `import { Spinner } from "@semec/ds/react";
 
-<Spinner />
+<Spinner label="Carregando protocolos" />
 <p className="text-muted-foreground">Carregando dados…</p>`,
   },
   {
@@ -739,7 +837,7 @@ import { Bold } from "lucide-react";
     label: "Progresso",
     file: "src/components/progress.tsx",
     category: "feedback",
-    desc: "Barra de progresso determinada.",
+    desc: "Barra de progresso determinada. Trilha com contorno border-strong (3,77:1 sobre surface) e indicador primary.",
     variants: [],
     usage: `import { Progress } from "@semec/ds/react";
 
@@ -909,7 +1007,7 @@ import { MoreHorizontal } from "lucide-react";
     category: "conteudo-dados",
     desc: "Tabela com ordenação, paginação e estados vazios.",
     variants: [
-      { prop: "props", values: "columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption" },
+      { prop: "props", values: "columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · labels (sortBy · pageOf · previous · next)" },
       { prop: "a11y", values: "ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px" },
     ],
     usage: `import { DataTable, Button } from "@semec/ds/react";
@@ -943,17 +1041,19 @@ import { MoreHorizontal } from "lucide-react";
     label: "Linha do tempo",
     file: "src/components/timeline.tsx",
     category: "conteudo-dados",
-    desc: "Sequência temporal com dots, conectores e conteúdo.",
+    desc: "Sequência temporal em lista ordenada (ol/li), com pontos, conectores visíveis e conteúdo. O status vai em texto (srLabel), não só na cor.",
     variants: [
       { prop: "composição", values: "Timeline · TimelineItem · TimelineSeparator · TimelineDot · TimelineConnector · TimelineContent · TimelineTitle · TimelineDescription" },
       { prop: "dot variant", values: "default · success · warning · destructive · info" },
+      { prop: "props", values: "TimelineDot srLabel · TimelineTitle as (padrão div)" },
+      { prop: "a11y", values: "ol/li · srLabel com o status por item · conector border-strong (3,77:1)" },
     ],
     usage: `import { Timeline, TimelineItem, TimelineSeparator, TimelineDot, TimelineConnector, TimelineContent, TimelineTitle, TimelineDescription } from "@semec/ds/react";
 
 <Timeline>
   <TimelineItem>
     <TimelineSeparator>
-      <TimelineDot variant="success" />
+      <TimelineDot variant="success" srLabel="Concluído" />
       <TimelineConnector />
     </TimelineSeparator>
     <TimelineContent>
@@ -963,7 +1063,7 @@ import { MoreHorizontal } from "lucide-react";
   </TimelineItem>
   <TimelineItem>
     <TimelineSeparator>
-      <TimelineDot />
+      <TimelineDot srLabel="Em andamento" />
     </TimelineSeparator>
     <TimelineContent>
       <TimelineTitle>Em análise</TimelineTitle>
