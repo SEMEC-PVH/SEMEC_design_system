@@ -6,13 +6,13 @@
 
 O repositório do **Design System da SEMEC** (Secretaria Municipal de Economia de Porto Velho). Ele reúne, num só lugar:
 
-1. **O kit de componentes** `@semec/ds` (`packages/react/`) — 47 componentes React + Tailwind CSS v4 + shadcn (Radix + CVA), tokens `pv-*` e tema claro (o dark theme do site de documentação vive no CSS do app, não nos tokens do pacote — removido em 2.0.0).
+1. **O kit de componentes** `@semec/ds` (`packages/react/`) — 49 componentes React (mais o `SemecProvider`) + Tailwind CSS v4 + shadcn (Radix + CVA), tokens `pv-*` e tema claro (o dark theme do site de documentação vive no CSS do app, não nos tokens do pacote — removido em 2.0.0).
 2. **O site de documentação** (`apps/docs/`) — Next.js 16 com export estático, que publica os fundamentos, componentes e padrões e serve os artefatos para agentes.
 3. **Os artefatos para agentes de IA** (`apps/docs/public/`) — `llms.txt`, `llms-full.txt`, `manifest.json`, skills e um `.md` por componente, gerados a partir de uma fonte única (`packages/react/manifest.js`) pelo pipeline `build-artifacts.mjs` ([ADR-023](adr/0023-pipeline-unico-artefatos-ia.md)).
 
 ## Fase atual
 
-O kit é **publicado no npm público** desde 17/09/2026 ([ADR-022](adr/0022-publicacao-npm-publico.md)), na versão **2.1.0**, sob o nome `@semec/ds`. O consumo é via `npm install @semec/ds` (subpath exports: `/react`, `/skills`, `/lite/skills`, tokens CSS e preset Tailwind).
+O kit é **publicado no npm público** desde 17/09/2026 ([ADR-022](adr/0022-publicacao-npm-publico.md)), sob o nome `@semec/ds`; a versão publicada hoje é a **3.0.0** (3.0.1 em preparação, correções da auditoria de 14/10/2026). A versão vigente está sempre em `packages/react/package.json` e no [CHANGELOG](../packages/react/CHANGELOG.md). O consumo é via `npm install @semec/ds` (subpath exports: `/react`, `/react/validacao`, `/skills`, `/lite/skills`, tokens CSS e preset Tailwind).
 
 Não há Storybook, suíte de testes automatizados nem CI de acessibilidade. O site é export estático e a publicação é via GitHub Pages ([workflow](../.github/workflows/deploy-pages.yml)).
 
