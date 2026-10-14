@@ -8,7 +8,7 @@ export interface BreadcrumbItem {
   href?: string;
 }
 
-interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {
+export interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {
   items: BreadcrumbItem[];
 }
 
