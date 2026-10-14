@@ -173,16 +173,14 @@ Lista gerada do manifest (export principal, `code` e descrição). Detalhes, var
 
 Coisas que o componente faz sozinho e que mudam como você monta a tela. Leve em conta antes de acrescentar `role`, títulos ou landmarks por fora.
 
-<!-- INTEGRADOR: AUD-62 / AUD-31. Os dois itens de HeaderBrand e NavigationMenu descrevem o código antes da onda 2: confira no código final (aviso/logo do HeaderBrand; `aria-label` padrão PT-BR no NavigationMenu e prop `labels`) e atualize ou remova. -->
-- **Anúncios:** o `Alert` usa `role="alert"` (assertivo) só em `variant="destructive"`; as demais variantes usam `role="status"` (educado). A prop `announce` controla isso quando o padrão não serve (ex.: alerta estático que não deve ser anunciado). A mensagem de erro do `FormField` e do `FileUpload`, o `ErrorSummary` e o `ErrorState` são anunciados; não acrescente outro `role="alert"` em volta.
-- **Níveis de título:** os títulos internos (`AlertTitle`, `CardTitle`, `EmptyState`, `ErrorState`, `ErrorSummary`) aceitam `as`/`titleAs` para escolher o nível. Ajuste o nível à hierarquia da página (ex.: `EmptyState titleAs="h2"` logo abaixo do `h1`) em vez de deixar o padrão pular nível.
+- **Anúncios:** o `Alert` usa `role="alert"` (assertivo) só em `variant="destructive"`; as demais variantes usam `role="status"` (educado). A prop `announce` controla isso quando o padrão não serve (ex.: alerta estático que não deve ser anunciado). O `ErrorSummary` e o `ErrorState` são anunciados; o erro do `FormField` é lido ao focar o campo (via `aria-describedby`) e o erro de validação local do `FileUpload` usa `aria-live="polite"`. Não acrescente outro `role="alert"` em volta.
+- **Níveis de título:** os títulos internos (`AlertTitle`, `CardTitle`, `TimelineTitle`, `EmptyState`, `ErrorState`, `SectionHeader`, `FooterSection`) aceitam `as`/`titleAs` para escolher o nível. Ajuste o nível à hierarquia da página (ex.: `EmptyState titleAs="h2"` logo abaixo do `h1`) em vez de deixar o padrão pular nível.
 - **`SidebarInset` é `<main>` por padrão** (aceita `as`): não aninhe outro `<main>` dentro dele; se a página já tem `<main>`, use `as="div"`.
 - **`Sidebar`** é `<nav aria-label="Menu lateral">`; `SidebarMenuButton isActive` vira `aria-current="page"`.
-- **`HeaderBrand` sem `logo`** mostra um placeholder "Logo" anunciado como imagem ("Logo do órgão"). Passe sempre `logo` com o asset real (`<img alt="Prefeitura de Porto Velho">`).
-- **`NavigationMenu` sem `aria-label`** é anunciado com o rótulo padrão do Radix, em inglês. Passe `aria-label="Menu principal"`.
-- **`FormField`** só gera `id` de dica e erro quando recebe `id`; o vínculo com o campo (`aria-describedby`, `aria-invalid`) é feito no controle.
+- **`HeaderBrand` sem `logo`** mostra um placeholder decorativo (`aria-hidden`) e avisa no console em desenvolvimento. Passe sempre `logo` com o asset real (`<img alt="Prefeitura de Porto Velho">`). O nome quebra linha no mobile (use `truncate` para cortar).
+- **`NavigationMenu`** é `<nav aria-label="Menu principal">` por padrão; passe outro `aria-label` se houver mais de um menu na página.
+- **`FormField`** liga dica e erro ao controle sozinho (contexto com `useId`): o controle filho recebe `id`, `aria-describedby`, `aria-invalid` e `aria-required`. Não monte `aria-describedby` à mão; o que você passar explicitamente vence.
 
-<!-- INTEGRADOR: AUD-21. Se o FormField passou a ter contexto (`useId()`) e a injetar `aria-describedby`/`aria-invalid`/`aria-required` no controle, troque o último item por "o FormField liga dica e erro ao controle sozinho; não monte `aria-describedby` à mão" e ajuste o exemplo de formulário abaixo. -->
 
 ## Padrões de tela
 
@@ -232,7 +230,6 @@ export function PaginaDeServico() {
 }
 ```
 
-<!-- INTEGRADOR: AUD-36. API de SkipLink/Heading/Footer passada pelo coordenador (SkipLink com padrão "Pular para o conteúdo principal" e href "#conteudo"; Heading com `level` 1–6 e `size`; Footer com FooterContent/FooterSection/FooterLinks/FooterLink/FooterBottom). Confira no código final o nome da prop de título do FooterSection (aqui `title`) e se o build-artifacts listou os três na seção Componentes. -->
 
 - **Landmarks:** um `banner`, um `main`, um `contentinfo`; cada `<nav>` com `aria-label` distinto ("Menu principal", "Menu lateral", "Trilha de navegação", "Paginação"). O `tabIndex={-1}` no `<main>` deixa o link de pular mover o foco de fato.
 - **Com `Sidebar`:** o `SidebarInset` faz o papel do `<main>` (dê a ele `id="conteudo"` e `tabIndex={-1}`); o `SkipLink` e o `Header` ficam antes do `SidebarProvider` ou no topo do `SidebarInset`.
@@ -263,9 +260,8 @@ export function PaginaDeServico() {
 ### Sidebar (painéis administrativos)
 
 - `SidebarProvider` > `Sidebar` + `SidebarInset`. Abaixo de 768px (48rem, `matchMedia`; o complemento exato do `md:`) a barra vira gaveta: um diálogo modal com foco preso, Esc para fechar e botão "Fechar menu". O `SidebarTrigger` tem 44px e `aria-expanded`.
-- Com conteúdo largo (tabelas, gráficos), garanta `min-w-0` no `SidebarInset` para o conteúdo não empurrar a largura da página.
+- O `SidebarInset` já traz `min-w-0`: conteúdo largo (tabelas, gráficos) rola dentro dele em vez de empurrar a largura da página.
 
-<!-- INTEGRADOR: AUD-33. Confira em `sidebar.tsx` final se o `SidebarInset` já traz `min-w-0` de fábrica; se trouxer, retire o segundo item. -->
 
 ## Workflow IA
 
@@ -341,7 +337,7 @@ Nos formulários do SEMEC DS, o ciclo de feedback segue uma regra estrita de UX 
 1. **Erros de Validação (Inline + Resumo)**:
    - Nunca use `Toast` para erros de preenchimento ou campos inválidos.
    - Use `<ErrorSummary>` no topo (foco automático por padrão) para listar os erros com link para cada campo.
-   - Use `<FormField>` com `error={...}` e o controle com `aria-invalid` para vínculo direto.
+   - Use `<FormField>` com `error={...}`: ele aplica `aria-invalid` e `aria-describedby` no controle filho.
 
 2. **Sucesso na Submissão (Notificação via Toast)**:
    - Notificações de confirmação pós-envio usam `toast({ variant: "success", title: "...", description: "..." })`.
@@ -380,13 +376,11 @@ export function ExemploFormulario() {
     <form onSubmit={handleSubmit} noValidate className="max-w-3xl space-y-4">
       {errors.length > 0 && <ErrorSummary errors={errors} />}
 
-      <FormField id="cpf-campo" label="CPF" htmlFor="cpf" required error={erroCpf}>
+      <FormField label="CPF" htmlFor="cpf" required error={erroCpf}>
         <Input
           id="cpf"
           value={cpf}
           onChange={(e) => setCpf(e.target.value)}
-          aria-invalid={erroCpf ? true : undefined}
-          aria-describedby={erroCpf ? "cpf-campo-error" : undefined}
         />
       </FormField>
 
@@ -436,7 +430,6 @@ Avisadas a partir da 3.1.0, conforme o ADR-013 (duas minors antes de remover). N
 - Valores atuais de `rounded-sm` (2px) e `rounded-lg` (12px): escolha o raio pelo papel (AUD-57).
 - `disabled` nativo no `Button` como seletor (`:disabled`) ou em testes: o estado pode passar a `aria-disabled`, e o `Button` ganha `loading` (AUD-63).
 
-<!-- INTEGRADOR: AUD-35 / AUD-63. Se a onda 2 já adicionou `onValueChange` em algum desses campos, ou `loading` no Button, ou `decorative` no Spinner, cite aqui o que já existe ("use `onValueChange` no Combobox", "use `loading` em vez de colocar `Spinner` dentro do Button"). -->
 
 <!-- ds:maintainer:start -->
 ## Manutenção (só no repositório)
