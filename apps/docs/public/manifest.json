@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
   "version": "3.0.0",
-  "generatedAt": "2026-10-14T16:52:12.780Z",
+  "generatedAt": "2026-10-14T17:34:38.075Z",
   "categories": [
     {
       "key": "acoes",
@@ -274,15 +274,15 @@
       "label": "Campo de formulário",
       "file": "src/components/form-field.tsx",
       "category": "formularios",
-      "desc": "Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.",
+      "desc": "Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Para feedback de sucesso após envio, use Toast; para erros de validação, mantenha no FormField com aria-invalid e ErrorSummary.",
       "variants": [
         {
           "prop": "props",
           "values": "label · htmlFor · required · hint · error"
         }
       ],
-      "usage": "import { FormField, Input } from \"@semec/ds/react\";\n\n<FormField label=\"E-mail\" htmlFor=\"email\" required hint=\"Usado para o comprovante\" error=\"Informe um e-mail válido\">\n  <Input id=\"email\" aria-invalid />\n</FormField>",
-      "prompt": "Crie um form-field (Campo de formulário) usando @semec/ds/react (`src/components/form-field.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: label · htmlFor · required · hint · error. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.",
+      "usage": "import { FormField, Input, Button, useToast } from \"@semec/ds/react\";\n\n// Em formulários: erros ficam inline no FormField (+ ErrorSummary no topo).\n// Sucesso na submissão dispara notificação via toast:\nfunction Formulario() {\n  const { toast } = useToast();\n  return (\n    <form onSubmit={(e) => {\n      e.preventDefault();\n      toast({ variant: \"success\", title: \"Salvo com sucesso\", description: \"Alterações registradas.\" });\n    }}>\n      <FormField label=\"E-mail\" htmlFor=\"email\" required hint=\"Usado para o comprovante\" error={erro}>\n        <Input id=\"email\" aria-invalid={!!erro} />\n      </FormField>\n      <Button type=\"submit\">Salvar</Button>\n    </form>\n  );\n}",
+      "prompt": "Crie um form-field (Campo de formulário) usando @semec/ds/react (`src/components/form-field.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: label · htmlFor · required · hint · error. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Para feedback de sucesso após envio, use Toast; para erros de validação, mantenha no FormField com aria-invalid e ErrorSummary.",
       "url": "/componentes/campo-de-formulario",
       "md": "/components/campo-de-formulario.md"
     },
@@ -553,15 +553,19 @@
       "label": "Notificação",
       "file": "src/components/toast.tsx",
       "category": "feedback",
-      "desc": "Mensagem temporária com `useToast()` e viewport empilhável.",
+      "desc": "Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.",
       "variants": [
         {
           "prop": "variant",
-          "values": "default · success · warning · destructive"
+          "values": "default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive"
+        },
+        {
+          "prop": "uso",
+          "values": "useToast() em formulários, botões de ação e fluxos assíncronos"
         }
       ],
       "usage": "import { ToastProvider, ToastViewport, useToast } from \"@semec/ds/react\";\n\nfunction Acao() {\n  const { toast } = useToast();\n  return <Button onClick={() => toast({ variant: \"success\", title: \"Protocolo enviado\" })}>Enviar</Button>;\n}\n\n// no app: <ToastProvider><App /><ToastViewport /></ToastProvider>",
-      "prompt": "Crie um toast (Notificação) usando @semec/ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem temporária com `useToast()` e viewport empilhável.",
+      "prompt": "Crie um toast (Notificação) usando @semec/ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: useToast() em formulários, botões de ação e fluxos assíncronos. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.",
       "url": "/componentes/notificacao",
       "md": "/components/notificacao.md"
     },

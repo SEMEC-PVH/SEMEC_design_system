@@ -246,13 +246,26 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Campo de formulário",
     file: "src/components/form-field.tsx",
     category: "formularios",
-    desc: "Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.",
+    desc: "Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Para feedback de sucesso após envio, use Toast; para erros de validação, mantenha no FormField com aria-invalid e ErrorSummary.",
     variants: [{ prop: "props", values: "label · htmlFor · required · hint · error" }],
-    usage: `import { FormField, Input } from "@semec/ds/react";
+    usage: `import { FormField, Input, Button, useToast } from "@semec/ds/react";
 
-<FormField label="E-mail" htmlFor="email" required hint="Usado para o comprovante" error="Informe um e-mail válido">
-  <Input id="email" aria-invalid />
-</FormField>`,
+// Em formulários: erros ficam inline no FormField (+ ErrorSummary no topo).
+// Sucesso na submissão dispara notificação via toast:
+function Formulario() {
+  const { toast } = useToast();
+  return (
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      toast({ variant: "success", title: "Salvo com sucesso", description: "Alterações registradas." });
+    }}>
+      <FormField label="E-mail" htmlFor="email" required hint="Usado para o comprovante" error={erro}>
+        <Input id="email" aria-invalid={!!erro} />
+      </FormField>
+      <Button type="submit">Salvar</Button>
+    </form>
+  );
+}`,
   },
   {
     code: "error-summary",
@@ -509,8 +522,11 @@ import { Button } from "@semec/ds/react";
     label: "Notificação",
     file: "src/components/toast.tsx",
     category: "feedback",
-    desc: "Mensagem temporária com `useToast()` e viewport empilhável.",
-    variants: [{ prop: "variant", values: "default · success · warning · destructive" }],
+    desc: "Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.",
+    variants: [
+      { prop: "variant", values: "default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive" },
+      { prop: "uso", values: "useToast() em formulários, botões de ação e fluxos assíncronos" },
+    ],
     usage: `import { ToastProvider, ToastViewport, useToast } from "@semec/ds/react";
 
 function Acao() {

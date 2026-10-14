@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-14T16:52:12.780Z — packages/react/manifest.js + packages/react/* — versão 3.0.0
+> Gerado 2026-10-14T17:34:38.075Z — packages/react/manifest.js + packages/react/* — versão 3.0.0
 
 ## Instalação
 
@@ -1872,22 +1872,35 @@ export { Label };
 
 ### Campo de formulário (`form-field`) — `src/components/form-field.tsx` — slug: campo-de-formulario
 
-Desc: Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.
+Desc: Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Para feedback de sucesso após envio, use Toast; para erros de validação, mantenha no FormField com aria-invalid e ErrorSummary.
 
 Variantes: props: label · htmlFor · required · hint · error
 
 Uso:
 ```tsx
-import { FormField, Input } from "@semec/ds/react";
+import { FormField, Input, Button, useToast } from "@semec/ds/react";
 
-<FormField label="E-mail" htmlFor="email" required hint="Usado para o comprovante" error="Informe um e-mail válido">
-  <Input id="email" aria-invalid />
-</FormField>
+// Em formulários: erros ficam inline no FormField (+ ErrorSummary no topo).
+// Sucesso na submissão dispara notificação via toast:
+function Formulario() {
+  const { toast } = useToast();
+  return (
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      toast({ variant: "success", title: "Salvo com sucesso", description: "Alterações registradas." });
+    }}>
+      <FormField label="E-mail" htmlFor="email" required hint="Usado para o comprovante" error={erro}>
+        <Input id="email" aria-invalid={!!erro} />
+      </FormField>
+      <Button type="submit">Salvar</Button>
+    </form>
+  );
+}
 ```
 
 Prompt:
 ```text
-Crie um form-field (Campo de formulário) usando @semec/ds/react (`src/components/form-field.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: label · htmlFor · required · hint · error. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.
+Crie um form-field (Campo de formulário) usando @semec/ds/react (`src/components/form-field.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: label · htmlFor · required · hint · error. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Para feedback de sucesso após envio, use Toast; para erros de validação, mantenha no FormField com aria-invalid e ErrorSummary.
 ```
 
 Fonte:
@@ -3409,9 +3422,9 @@ export {
 
 ### Notificação (`toast`) — `src/components/toast.tsx` — slug: notificacao
 
-Desc: Mensagem temporária com `useToast()` e viewport empilhável.
+Desc: Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.
 
-Variantes: variant: default · success · warning · destructive
+Variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: useToast() em formulários, botões de ação e fluxos assíncronos
 
 Uso:
 ```tsx
@@ -3427,7 +3440,7 @@ function Acao() {
 
 Prompt:
 ```text
-Crie um toast (Notificação) usando @semec/ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem temporária com `useToast()` e viewport empilhável.
+Crie um toast (Notificação) usando @semec/ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: useToast() em formulários, botões de ação e fluxos assíncronos. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.
 ```
 
 Fonte:

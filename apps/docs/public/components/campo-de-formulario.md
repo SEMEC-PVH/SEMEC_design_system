@@ -9,7 +9,7 @@ variants: "props: label · htmlFor · required · hint · error"
 
 # Campo de formulário — `form-field`
 
-> Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.
+> Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Para feedback de sucesso após envio, use Toast; para erros de validação, mantenha no FormField com aria-invalid e ErrorSummary.
 
 **Arquivo:** `src/components/form-field.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/campo-de-formulario`
 
@@ -32,17 +32,30 @@ npm install @semec/ds
 ## Uso
 
 ```tsx
-import { FormField, Input } from "@semec/ds/react";
+import { FormField, Input, Button, useToast } from "@semec/ds/react";
 
-<FormField label="E-mail" htmlFor="email" required hint="Usado para o comprovante" error="Informe um e-mail válido">
-  <Input id="email" aria-invalid />
-</FormField>
+// Em formulários: erros ficam inline no FormField (+ ErrorSummary no topo).
+// Sucesso na submissão dispara notificação via toast:
+function Formulario() {
+  const { toast } = useToast();
+  return (
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      toast({ variant: "success", title: "Salvo com sucesso", description: "Alterações registradas." });
+    }}>
+      <FormField label="E-mail" htmlFor="email" required hint="Usado para o comprovante" error={erro}>
+        <Input id="email" aria-invalid={!!erro} />
+      </FormField>
+      <Button type="submit">Salvar</Button>
+    </form>
+  );
+}
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um form-field (Campo de formulário) usando @semec/ds/react (`src/components/form-field.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: label · htmlFor · required · hint · error. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.
+Crie um form-field (Campo de formulário) usando @semec/ds/react (`src/components/form-field.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: label · htmlFor · required · hint · error. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Para feedback de sucesso após envio, use Toast; para erros de validação, mantenha no FormField com aria-invalid e ErrorSummary.
 ```
 
 ## Fonte

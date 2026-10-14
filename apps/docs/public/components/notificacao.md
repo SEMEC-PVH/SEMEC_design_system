@@ -4,18 +4,19 @@ code: "toast"
 slug: "notificacao"
 file: "src/components/toast.tsx"
 category: "feedback"
-variants: "variant: default · success · warning · destructive"
+variants: "variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: useToast() em formulários, botões de ação e fluxos assíncronos"
 ---
 
 # Notificação — `toast`
 
-> Mensagem temporária com `useToast()` e viewport empilhável.
+> Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.
 
 **Arquivo:** `src/components/toast.tsx` | **Categoria:** Feedback e estados | **Rota:** `/componentes/notificacao`
 
 ## Variantes
 
-- **variant**: default · success · warning · destructive
+- **variant**: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive
+- **uso**: useToast() em formulários, botões de ação e fluxos assíncronos
 
 ## Instalação (@semec/ds)
 
@@ -45,7 +46,7 @@ function Acao() {
 ## Prompt para IA
 
 ```text
-Crie um toast (Notificação) usando @semec/ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem temporária com `useToast()` e viewport empilhável.
+Crie um toast (Notificação) usando @semec/ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: useToast() em formulários, botões de ação e fluxos assíncronos. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.
 ```
 
 ## Fonte

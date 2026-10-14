@@ -50,7 +50,7 @@ npm install @semec/ds
   Uso: `import { Switch } from "@semec/ds/react";`
 - [Rótulo (`label`) — Rótulo acessível vinculado ao campo.](/componentes/rotulo) — `src/components/label.tsx` — md: `/components/rotulo.md`
   Uso: `import { Label } from "@semec/ds/react";`
-- [Campo de formulário (`form-field`) — Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa.](/componentes/campo-de-formulario) — `src/components/form-field.tsx` — md: `/components/campo-de-formulario.md`
+- [Campo de formulário (`form-field`) — Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Para feedback de sucesso após envio, use Toast; para erros de validação, mantenha no FormField com aria-invalid e ErrorSummary.](/componentes/campo-de-formulario) — `src/components/form-field.tsx` — md: `/components/campo-de-formulario.md`
   Uso: `import { FormField } from "@semec/ds/react";`
 - [ErrorSummary (`error-summary`) — Resumo de erros de validação no topo do formulário, com links para cada campo. A11y: `role="alert"`, foco automático.](/componentes/error-summary) — `src/components/error-summary.tsx` — md: `/components/error-summary.md`
   Uso: `import { ErrorSummary } from "@semec/ds/react";`
@@ -78,7 +78,7 @@ npm install @semec/ds
   Uso: `import { SidebarToggleButton } from "@semec/ds/react";`
 - [Modal (`dialog`) — Diálogo modal acessível com overlay, header, título, descrição e footer.](/componentes/modal) — `src/components/dialog.tsx` — md: `/components/modal.md`
   Uso: `import { Dialog } from "@semec/ds/react";`
-- [Notificação (`toast`) — Mensagem temporária com `useToast()` e viewport empilhável.](/componentes/notificacao) — `src/components/toast.tsx` — md: `/components/notificacao.md`
+- [Notificação (`toast`) — Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.](/componentes/notificacao) — `src/components/toast.tsx` — md: `/components/notificacao.md`
   Uso: `import { ToastProvider } from "@semec/ds/react";`
 - [Dica (`tooltip`) — Dica curta ao passar o ponteiro ou focar o elemento.](/componentes/dica) — `src/components/tooltip.tsx` — md: `/components/dica.md`
   Uso: `import { Tooltip } from "@semec/ds/react";`
@@ -149,4 +149,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--action-primary` etc.), nunca hex solto
 
-> Gerado 2026-10-14T16:52:12.780Z a partir de packages/react/manifest.js. Versão 3.0.0.
+> Gerado 2026-10-14T17:34:38.075Z a partir de packages/react/manifest.js. Versão 3.0.0.

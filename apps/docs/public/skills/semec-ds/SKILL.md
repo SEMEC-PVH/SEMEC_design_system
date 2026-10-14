@@ -220,28 +220,62 @@ Nunca `outline: none` sem alternativa.
 
 Complementar cor com ícone, texto ou padrão.
 
-## Padrão de validação
+## Padrão de formulários e feedback (Validação + Toast)
+
+Nos formulários do SEMEC DS, o ciclo de feedback segue uma regra estrita de UX e Acessibilidade (WCAG 2.1 AA):
+
+1. **Erros de Validação (Inline + Resumo)**:
+   - Nunca use `Toast` para erros de preenchimento ou campos inválidos.
+   - Use `<ErrorSummary>` no topo com `autoFocus` para anunciar os erros (`role="alert"`).
+   - Use `<FormField>` com `error={...}` e o controle com `aria-invalid={true}` para vínculo direto.
+
+2. **Sucesso na Submissão (Notificação via Toast)**:
+   - Notificações de confirmação pós-envio devem usar `toast({ variant: "success", title: "...", description: "..." })`.
+   - O toast de sucesso aplica automaticamente a identidade SEMEC: fundo verde (`--pv-green-500: #82C353`), tipografia Poppins (`--pv-blue-900: #26325B`), padding `16px 20px`, raio `12px`, título 16px/bold e descrição 14px/regular.
 
 ```tsx
-import { FormField, Input, ErrorSummary } from "@semec/ds/react";
+import { FormField, Input, ErrorSummary, Button, useToast } from "@semec/ds/react";
+import { useState } from "react";
 
-const errors = [
-  { id: "cpf", message: "CPF inválido" },
-  { id: "email", message: "E-mail inválido" },
-];
+export function ExemploFormulario() {
+  const { toast } = useToast();
+  const [errors, setErrors] = useState<{ id: string; message: string }[]>([]);
 
-<ErrorSummary errors={errors} autoFocus />
-<FormField label="CPF" htmlFor="cpf" error={errors[0]?.message}>
-  <Input id="cpf" aria-invalid={true} />
-</FormField>
-<FormField label="E-mail" htmlFor="email" required error={errors[1]?.message}>
-  <Input id="email" type="email" aria-invalid={true} />
-</FormField>
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    // Exemplo de validação
+    const novosErros = [];
+    if (!cpfValido) novosErros.push({ id: "cpf", message: "CPF inválido." });
+
+    if (novosErros.length > 0) {
+      setErrors(novosErros);
+      return;
+    }
+
+    // Sucesso na submissão: Feedback via Toast Success padronizado
+    setErrors([]);
+    toast({
+      variant: "success",
+      title: "Requerimento enviado com sucesso!",
+      description: "O protocolo foi gerado e enviado para análise.",
+    });
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {errors.length > 0 && <ErrorSummary errors={errors} autoFocus />}
+      
+      <FormField label="CPF" htmlFor="cpf" required error={errors.find(e => e.id === "cpf")?.message}>
+        <Input id="cpf" aria-invalid={errors.some(e => e.id === "cpf")} />
+      </FormField>
+
+      <Button type="submit">Enviar requerimento</Button>
+    </form>
+  );
+}
 ```
 
-- Labels sempre associados
-- Erros via `aria-invalid` + `role="alert"` no FormField
-- ErrorSummary no topo com links para cada campo
+- Labels sempre associados via `htmlFor`/`id`
 - Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`
 
 ## Responsive / Mobile
