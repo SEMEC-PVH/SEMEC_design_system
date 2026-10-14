@@ -1002,14 +1002,21 @@ import { MoreHorizontal } from "lucide-react";
     label: "Barra lateral",
     file: "src/components/sidebar.tsx",
     category: "navegacao",
-    desc: "Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile.",
+    desc: "Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile. Abaixo de 768px (48rem, via `matchMedia`) a Sidebar vira gaveta modal (Radix Dialog): foco preso, Esc fecha, conteúdo de trás inerte, foco volta a quem abriu e botão visível \"Fechar menu\" (44×44). No desktop renderiza um landmark `<nav aria-label=\"Menu lateral\">`. `SidebarMenuButton isActive` gera `aria-current=\"page\"`; `tooltip` aparece só no modo recolhido (`collapsible=\"icon\"`). `SidebarTrigger` (44×44) expõe `aria-expanded` e `aria-controls`.",
     variants: [
       { prop: "side", values: "left · right" },
       { prop: "variant", values: "sidebar · floating · inset" },
       { prop: "collapsible", values: "offcanvas · icon · none" },
+      { prop: "as (Sidebar)", values: "nav (padrão) · aside · div" },
+      { prop: "labels (Sidebar)", values: "navigation (\"Menu lateral\") · mobileTitle (\"Menu de navegação\") · close (\"Fechar menu\")" },
+      { prop: "as (SidebarInset)", values: "main (padrão) · div · section" },
+      { prop: "label (SidebarTrigger)", values: "padrão \"Alternar barra lateral\"" },
+      { prop: "SidebarMenuButton", values: "isActive (aria-current=page) · tooltip (string ou props do TooltipContent) · asChild" },
+      { prop: "a11y", values: "landmark nav/aside com aria-label · gaveta mobile com focus trap, Esc e retorno de foco · aria-expanded/aria-controls no gatilho · aria-current=page no item ativo · alvos de 44px · barra offcanvas recolhida fica inert" },
       { prop: "composição", values: "SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail" },
     ],
     usage: `import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@semec/ds/react";
+import { LayoutDashboard } from "lucide-react";
 
 <SidebarProvider>
   <Sidebar>
@@ -1031,12 +1038,26 @@ import { MoreHorizontal } from "lucide-react";
     </SidebarContent>
     <SidebarFooter>Footer</SidebarFooter>
   </Sidebar>
-  {/* SidebarInset já renderiza <main>: não aninhe outro <main> dentro dele */}
+  {/* SidebarInset renderiza <main> por padrão: não aninhe outro <main> dentro dele.
+      Se o layout já tem o próprio <main>, use <SidebarInset as="div">. */}
   <SidebarInset>
     <SidebarTrigger />
     <div className="p-4">Conteúdo</div>
   </SidebarInset>
-</SidebarProvider>`,
+</SidebarProvider>
+
+// Item ativo com link (aria-current="page" vem de isActive) e tooltip no modo recolhido
+<Sidebar collapsible="icon" labels={{ navigation: "Menu do servidor" }}>
+  <SidebarContent>
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild isActive tooltip="Painel">
+          <a href="/painel"><LayoutDashboard aria-hidden="true" /><span>Painel</span></a>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  </SidebarContent>
+</Sidebar>`,
   },
 ];
 
