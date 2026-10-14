@@ -47,10 +47,10 @@ export const dsComponents = [
     label: "Botões",
     file: "src/components/button.tsx",
     category: "acoes",
-    desc: "Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.",
+    desc: "Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida.",
     variants: [
       { prop: "variant", values: "primary · secondary · outline · ghost · destructive · success · link" },
-      { prop: "size", values: "sm · md · lg · icon" },
+      { prop: "size", values: "sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px)" },
     ],
     usage: `import { Button } from "@semec/ds/react";
 import Link from "next/link";
@@ -89,13 +89,19 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Link",
     file: "src/components/link.tsx",
     category: "acoes",
-    desc: "Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.",
-    variants: [{ prop: "variant", values: "primary · onSurface · muted" }],
+    desc: "Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas.",
+    variants: [
+      { prop: "variant", values: "primary · onSurface · muted" },
+      { prop: "underline", values: "true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido)" },
+    ],
     usage: `import { Link } from "@semec/ds/react";
 
-<Link href="/iptu">Acessar guia do IPTU 2026</Link>
+<p>Consulte o <Link href="/iptu">guia do IPTU 2026</Link> antes de emitir a guia.</p>
 <Link href="/protocolo" variant="onSurface">Acompanhar protocolo</Link>
-<Link href="/ajuda" variant="muted">Saiba mais sobre prazos</Link>`,
+<Link href="/ajuda" variant="muted">Saiba mais sobre prazos</Link>
+
+// Só em contexto de navegação, em que a posição já identifica o link:
+<Link href="/servicos" underline={false}>Serviços</Link>`,
   },
   {
     code: "input",
@@ -470,10 +476,10 @@ import { Button } from "@semec/ds/react";
     label: "Abas",
     file: "src/components/tabs.tsx",
     category: "navegacao",
-    desc: "Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.",
+    desc: "Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix. A aba ativa tem barra inferior de 3px em `primary` (≥4,97:1) e peso semibold, além do fundo: não depende só de cor. Alvo de 44px.",
     variants: [
       { prop: "composição", values: "Tabs · TabsList · TabsTrigger · TabsContent" },
-      { prop: "a11y", values: "role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas)" },
+      { prop: "a11y", values: "role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas, Home/End) · indicador não cromático da aba ativa" },
     ],
     usage: `import { Tabs, TabsList, TabsTrigger, TabsContent } from "@semec/ds/react";
 
@@ -492,14 +498,21 @@ import { Button } from "@semec/ds/react";
     label: "Paginação",
     file: "src/components/pagination.tsx",
     category: "navegacao",
-    desc: "Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.",
+    desc: "Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px. Textos em PT-BR, sobrescrevíveis por `labels`.",
     variants: [
-      { prop: "props", values: "page · pageCount · onPageChange · siblingCount" },
-      { prop: "a11y", values: "role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses" },
+      { prop: "props", values: "page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }>" },
+      { prop: "a11y", values: "role=navigation · aria-label=Paginação · aria-current=page · aria-label \"Página N\" nos números · aria-label nos botões prev/next · aria-hidden nos elipses" },
     ],
     usage: `import { Pagination } from "@semec/ds/react";
 
-<Pagination page={pagina} pageCount={42} onPageChange={setPagina} />`,
+<Pagination page={pagina} pageCount={42} onPageChange={setPagina} />
+
+<Pagination
+  page={pagina}
+  pageCount={42}
+  onPageChange={setPagina}
+  labels={{ navigation: "Paginação dos protocolos" }}
+/>`,
   },
   {
     code: "sidebar-trigger",
@@ -735,10 +748,10 @@ import { HelpCircle } from "lucide-react";
     label: "Toggle",
     file: "src/components/toggle.tsx",
     category: "formularios",
-    desc: "Botão binário para estados on/off em toolbars.",
+    desc: "Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos.",
     variants: [
       { prop: "variant", values: "default · outline" },
-      { prop: "size", values: "sm · md · lg" },
+      { prop: "size", values: "sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)" },
     ],
     usage: `import { Toggle } from "@semec/ds/react";
 import { Bold } from "lucide-react";
@@ -823,13 +836,17 @@ import { Bold } from "lucide-react";
     label: "Calendário",
     file: "src/components/calendar.tsx",
     category: "formularios",
-    desc: "Calendário visual para seleção de data.",
+    desc: "Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px.",
     variants: [
-      { prop: "props", values: "value · onChange · min · max · disabled" },
+      { prop: "props", values: "value · onChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }>" },
+      { prop: "a11y", values: "role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome \"14 de outubro de 2026\"" },
+      { prop: "teclado", values: "←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona" },
     ],
     usage: `import { Calendar } from "@semec/ds/react";
 
-<Calendar value={data} onChange={setData} />`,
+<Calendar value={data} onChange={setData} />
+
+<Calendar value={data} onChange={setData} min="2026-01-01" max="2026-12-31" />`,
   },
   {
     code: "scroll-area",
@@ -1030,9 +1047,10 @@ function FiltrosControlados() {
     label: "Menu de navegação",
     file: "src/components/navigation-menu.tsx",
     category: "navegacao",
-    desc: "Navegação principal com mega-menu e viewport animado.",
+    desc: "Navegação principal com mega-menu e viewport animado. O `<nav>` se chama \"Menu principal\" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px.",
     variants: [
       { prop: "composição", values: "NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator" },
+      { prop: "a11y", values: "aria-label padrão \"Menu principal\" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix)" },
     ],
     usage: `import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@semec/ds/react";
 
