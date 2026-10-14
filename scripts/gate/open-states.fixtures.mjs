@@ -9,7 +9,8 @@
  * (clique, teclado ou foco), confere que abriu e então roda o axe.
  *
  * Exceções: só a EXC-01 (docs/excecoes-acessibilidade.md) — `aria-hidden-focus`
- * desligada APENAS em Select e DropdownMenu abertos. Nenhum outro caso tem
+ * desligada APENAS em Select, DropdownMenu e NavigationMenu abertos (este último
+ * pelo sentinela de foco do Radix, analisado na onda 2). Nenhum outro caso tem
  * regra desligada além de `color-contrast` (a página de teste não carrega o
  * CSS compilado; no jsdom nem há CSS calculado).
  */
@@ -17,7 +18,7 @@ import React from "react";
 
 const h = React.createElement;
 
-/** EXC-01: aria-hidden-focus com Select/DropdownMenu abertos (AUD-19). */
+/** EXC-01: aria-hidden-focus com Select/DropdownMenu (AUD-19) e NavigationMenu (#34) abertos. */
 export const EXC_01_RULES = ["aria-hidden-focus"];
 
 /** Regras sempre desligadas: dependem do CSS compilado, ausente nos testes. */
@@ -116,9 +117,8 @@ export function openStateCases(ds) {
         )
       ),
       open: ({ screen, user }) => clickByRole(screen, user, "button", "Excluir registro"),
-      // Aceita os dois papéis: hoje o AlertDialog usa o Dialog do Radix
-      // (role="dialog"); o padrão APG é role="alertdialog".
-      findOpen: ({ screen }) => screen.queryByRole("alertdialog") ?? screen.queryByRole("dialog"),
+      // Padrão APG: role="alertdialog" (AUD-34).
+      findOpen: ({ screen }) => screen.queryByRole("alertdialog"),
     },
     {
       code: "popover",
@@ -174,6 +174,7 @@ export function openStateCases(ds) {
     },
     {
       code: "navigation-menu",
+      disableRules: EXC_01_RULES,
       element: h(
         ds.NavigationMenu,
         { "aria-label": "Principal" },
@@ -203,21 +204,25 @@ export function openStateCases(ds) {
     },
     {
       code: "combobox",
-      element: h(ds.Combobox, {
-        ariaLabel: "Município",
-        placeholder: "Selecione o município",
-        options: [
-          { value: "pvh", label: "Porto Velho" },
-          { value: "jpr", label: "Ji-Paraná" },
-        ],
-      }),
-      // O gatilho hoje é um <button>; o padrão APG é role="combobox". Aceita os dois.
+      element: h(
+        React.Fragment,
+        null,
+        h("span", { id: "combobox-rotulo" }, "Município"),
+        h(ds.Combobox, {
+          "aria-labelledby": "combobox-rotulo",
+          placeholder: "Selecione o município",
+          options: [
+            { value: "pvh", label: "Porto Velho" },
+            { value: "jpr", label: "Ji-Paraná" },
+          ],
+        })
+      ),
+      // AUD-03: o gatilho é um <button> nomeado pelo rótulo + texto visível;
+      // aberto, o campo de busca tem role="combobox" e controla o listbox.
       open: async ({ screen, user }) => {
-        const trigger =
-          screen.queryAllByRole("combobox")[0] ?? screen.getByRole("button", { name: "Município" });
-        await user.click(trigger);
+        await user.click(screen.getByRole("button", { name: /^Município/ }));
       },
-      findOpen: ({ screen }) => screen.queryByRole("listbox"),
+      findOpen: ({ screen }) => screen.queryByRole("combobox") && screen.queryByRole("listbox"),
     },
     {
       code: "tooltip",

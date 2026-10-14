@@ -15,12 +15,12 @@ interface OpenStateCase {
 /**
  * Mesmos casos do gate (check-open-states.mjs), rodando contra src/.
  * Cada camada é aberta pelo caminho do usuário e auditada com o axe aberta.
- * Única exceção: EXC-01 em Select e DropdownMenu (aria-hidden-focus).
+ * Única exceção: EXC-01 em Select, DropdownMenu e NavigationMenu (aria-hidden-focus).
  */
 describe("a11y nos estados abertos (issue #34)", () => {
   const cases = openStateCases(ds) as OpenStateCase[];
 
-  it("cobre as 10 camadas pedidas e só aplica a EXC-01 em Select e DropdownMenu", () => {
+  it("cobre as 10 camadas pedidas e só aplica a EXC-01 em Select, DropdownMenu e NavigationMenu", () => {
     expect(cases.map((c) => c.code).sort()).toEqual(
       [
         "alert-dialog",
@@ -36,7 +36,7 @@ describe("a11y nos estados abertos (issue #34)", () => {
       ].sort()
     );
     const withException = cases.filter((c) => (c.disableRules ?? []).length > 0).map((c) => c.code);
-    expect(withException.sort()).toEqual(["dropdown-menu", "select"]);
+    expect(withException.sort()).toEqual(["dropdown-menu", "navigation-menu", "select"]);
   });
 
   it.each(cases.map((c) => [c.code, c] as const))("%s aberto: zero serious/critical", async (_code, testCase) => {

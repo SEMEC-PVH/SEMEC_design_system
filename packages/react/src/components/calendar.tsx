@@ -258,6 +258,9 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
                   return (
                     <td
                       key={date.getDate()}
+                      // Explícito: nem toda árvore de acessibilidade deriva gridcell do
+                      // <td> dentro de role="grid", e aria-selected só vale em gridcell.
+                      role="gridcell"
                       tabIndex={focusable ? 0 : -1}
                       aria-selected={selected}
                       aria-current={isToday ? "date" : undefined}

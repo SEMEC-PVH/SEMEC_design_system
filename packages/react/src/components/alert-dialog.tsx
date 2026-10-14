@@ -73,8 +73,12 @@ const AlertDialogContent = React.forwardRef<
   ) => (
     <AlertDialogPortal>
       <AlertDialogOverlay />
+      {/* aria-modal: o AlertDialog é sempre modal (foco preso e fundo inerte).
+          Sem o atributo, leitores de tela e o axe não reconhecem o role="alertdialog"
+          como modal e tratam o fundo aria-hidden como focável (aria-hidden-focus). */}
       <AlertDialogPrimitive.Content
         ref={ref}
+        aria-modal="true"
         className={cn(
           "fixed left-1/2 top-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-lg border border-border bg-card p-6 text-card-foreground shadow-elevation-3 ring-1 ring-foreground/5 duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
           className
