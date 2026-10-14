@@ -22,9 +22,14 @@ npm install @semec/ds
 @source "../node_modules/@semec/ds/dist/react";
 ```
 
-O `@source` é obrigatório no Tailwind v4 para gerar utilitários a partir das classes do pacote.
+Só `npm install @semec/ds`: as dependências do pacote vêm automaticamente (não há lista de Radix para instalar à mão). Tailwind CSS v4 precisa estar no app.
 
-Poppins 400–700 (self-hosted woff2 ou `next/font`).
+O `@source` é obrigatório no Tailwind v4 para gerar utilitários a partir das classes do pacote. O caminho é **relativo ao arquivo CSS**: `src/index.css` e `app/globals.css` usam `../node_modules/...`; `src/app/globals.css` usa `../../node_modules/...`. Para o Tailwind não varrer pastas demais, `@import "tailwindcss" source("../src");` (também relativo ao CSS).
+
+**Fonte:** o pacote **não traz** a Poppins; sem carregá-la, o texto cai em `system-ui` (fallback do token `--font-family-sans`). Carregue 400/500/600/700:
+
+- `@font-face` self-hosted com `font-family: "Poppins"` (woff2 em `apps/docs/app/fonts/` do repositório) ou Google Fonts `family=Poppins:wght@400;500;600;700` — o token já funciona sem ajuste.
+- Next.js com `next/font`: use `variable: "--font-poppins"` na `<html>` e, no CSS global depois do `tokens.css`, `:root { --font-family-sans: var(--font-poppins), system-ui, -apple-system, sans-serif; }` (o `next/font` gera nome de família com hash).
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0).
 
@@ -40,9 +45,10 @@ Valores brutos. Invariantes de tema. Nunca use primitivo direto em componente.
 | `--pv-blue-600` | `#3a6ca6` | Ação primária |
 | `--pv-blue-700` | `#2f5a8a` | Hover de ação |
 | `--pv-blue-800` | `#26476f` | Active de ação |
-| `--pv-blue-900` | `#1e3a5f` | Contraste alto |
+| `--pv-blue-900` | `#26325B` | Azul institucional escuro (texto do toast de sucesso) |
 | `--pv-blue-hero` | `#223f99` | Anel de foco (9,38:1) |
 | `--pv-green-50` | `#eef7e6` | Superfície sucesso |
+| `--pv-green-500` | `#82C353` | Fundo do toast de sucesso — **nunca como cor de texto** |
 | `--pv-green-800` | `#3a6420` | Sucesso |
 | `--pv-yellow-800` | `#8a5a00` | Aviso |
 | `--pv-red-50` | `#fef2f2` | Superfície erro |
@@ -98,7 +104,7 @@ Camada do dia a dia. Diz o papel, não a cor. Use estes, nunca os L0.
 
 | Token | Valor |
 |-------|-------|
-| `--font-family-sans` | `"Poppins", system-ui, sans-serif` |
+| `--font-family-sans` | `"Poppins", system-ui, -apple-system, sans-serif` |
 | `--text-xs` | `0.75rem` |
 | `--text-sm` | `0.875rem` |
 | `--text-base` | `1rem` |
@@ -106,7 +112,11 @@ Camada do dia a dia. Diz o papel, não a cor. Use estes, nunca os L0.
 | `--text-xl` | `1.25rem` |
 | `--text-2xl` | `1.5rem` |
 | `--font-regular` | `400` |
+| `--font-medium` | `500` |
+| `--font-semibold` | `600` |
 | `--font-bold` | `700` |
+
+Line-height por degrau: `--leading-xs/sm/base/lg/xl/2xl`.
 
 **Espaçamento:** `--space-0` 0 · `--space-1` 4px · `--space-2` 8px · `--space-3` 12px · `--space-4` 16px · `--space-6` 24px · `--space-8` 32px · `--space-12` 48px · `--space-16` 64px
 
@@ -173,7 +183,7 @@ Nunca `outline: none` sem alternativa.
 
 ### Áreas clicáveis
 
-- Mínimo **44×44px** (WCAG 2.5.5); espaçamento ≥ 8px entre alvos
+- Mínimo **44×44px** (`min-h-11 min-w-11`), meta do DS; espaçamento ≥ 8px entre alvos. O critério WCAG que pede 44px (2.5.5) é AAA
 
 ### prefers-reduced-motion
 
@@ -196,7 +206,6 @@ Complementar com ícone, texto ou padrão.
 - **Navegação:** página atual com `aria-current="page"`; sidebar vira drawer em mobile
 - **Feedback:** avisos com ícone + título + texto; erros no contexto do campo e resumo no topo
 - **Dados:** tabelas semânticas; empty state com título, descrição e ação
-- **Densidade:** `data-density="compact"` reduz alturas de controles (admin)
 
 Para padrões com componentes do kit, veja a skill `semec-ds`.
 
@@ -210,14 +219,10 @@ Para padrões com componentes do kit, veja a skill `semec-ds`.
 | `xl:` | 1280px | Desktop largo |
 | `2xl:` | 1536px | Full HD |
 
-- Touch targets: `--control-height-md: 44px` (compacto: 32px)
+- Touch targets: 44px com `min-h-11 min-w-11`
 - Sidebar mobile: drawer off-canvas + `inert` quando fechado
-- Containers: `--container-max` 1200px · `--container-docs` 48rem · `--measure` 65ch
-- Density compact:
-
-```html
-<div data-density="compact">...</div>
-```
+- Container de página: `mx-auto w-full max-w-[75rem] px-4` (1200px, igual ao site de docs) · texto corrido: `max-w-prose` (65ch) · coluna de leitura: `max-w-3xl` (48rem)
+- O pacote **não** tem `--container-max`, `--container-docs`, `--measure`, `--control-height-*` nem modo `data-density="compact"`: esses nomes existem só no CSS do site de documentação. `var()` com eles resolve para vazio, sem erro
 
 ## Regras
 

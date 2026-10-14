@@ -10,10 +10,9 @@ export { dsCategories, dsPortal } from "../../manifest.js";
 
 export const dsTokens = {
   colors: [
-    "--pv-blue-900",
+    "--pv-blue-*",
     "--pv-blue-hero",
-    "--pv-green-600",
-    "--pv-green-500",
+    "--pv-green-*",
     "--pv-yellow-*",
     "--pv-red-*",
     "--pv-gray-*",
@@ -29,6 +28,7 @@ export const dsTokens = {
     "--text-muted",
     "--text-secondary",
     "--text-strong",
+    "--text-on-brand",
     "--action-primary",
     "--action-primary-hover",
     "--action-primary-active",
@@ -39,8 +39,6 @@ export const dsTokens = {
   ],
   typography: [
     "--font-family-sans",
-    "--font-poppins",
-    "--font-mono",
     "--text-xs",
     "--text-sm",
     "--text-base",
@@ -48,6 +46,8 @@ export const dsTokens = {
     "--text-xl",
     "--text-2xl",
     "--font-regular",
+    "--font-medium",
+    "--font-semibold",
     "--font-bold",
   ],
   spacing: [
