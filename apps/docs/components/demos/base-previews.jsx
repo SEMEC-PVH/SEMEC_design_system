@@ -131,13 +131,7 @@ import {
   TimelineItem,
   TimelineSeparator,
   TimelineTitle,
-  Toast,
-  ToastAction,
-  ToastClose,
-  ToastDescription,
-  ToastProvider,
-  ToastTitle,
-  ToastViewport,
+  Toaster,
   Toggle,
   Tooltip,
   TooltipContent,
@@ -544,63 +538,41 @@ function DialogPreview() {
 }
 
 function ToastDemo() {
-  const { toasts, toast } = useToast();
+  const { toast } = useToast();
   return (
-    <>
-      <div className="flex flex-wrap gap-3">
-        <Button
-          variant="outline"
-          onClick={() =>
-            toast({
-              variant: "success",
-              title: "Protocolo enviado com sucesso",
-              description: "Suas alterações e comprovantes foram salvos com êxito.",
-            })
-          }
-        >
-          Disparar Toast de Sucesso
-        </Button>
-        <Button variant="outline" onClick={() => toast({ title: "Notificação padrão", description: "Mensagem informativa geral." })}>
-          Padrão
-        </Button>
-        <Button variant="outline" onClick={() => toast({ variant: "warning", title: "Sessão expira em 2 min" })}>
-          Aviso
-        </Button>
-        <Button variant="outline" onClick={() => toast({ variant: "destructive", title: "Falha ao anexar arquivo" })}>
-          Erro
-        </Button>
-      </div>
-
-      {/* Renderização estática inline do Toast de sucesso como preview visual imediato */}
-      <div className="mt-6 w-full max-w-md">
-        <Toast variant="success" className="relative inset-auto transform-none transition-none shadow-elevation-2">
-          <div className="grid gap-1">
-            <ToastTitle>Protocolo enviado com sucesso</ToastTitle>
-            <ToastDescription>Suas alterações e comprovantes foram salvos com êxito.</ToastDescription>
-          </div>
-          <ToastClose />
-        </Toast>
-      </div>
-
-      {toasts.map(({ id, title, description, variant, ...rest }) => (
-        <Toast key={id} variant={variant} {...rest}>
-          <div className="grid gap-1">
-            {title && <ToastTitle>{title}</ToastTitle>}
-            {description && <ToastDescription>{description}</ToastDescription>}
-          </div>
-          <ToastClose />
-        </Toast>
-      ))}
-    </>
+    <div className="flex flex-wrap gap-3">
+      <Button
+        variant="outline"
+        onClick={() =>
+          toast({
+            variant: "success",
+            title: "Protocolo enviado com sucesso",
+            description: "Suas alterações e comprovantes foram salvos com êxito.",
+          })
+        }
+      >
+        Disparar Toast de Sucesso
+      </Button>
+      <Button variant="outline" onClick={() => toast({ title: "Notificação padrão", description: "Mensagem informativa geral." })}>
+        Padrão
+      </Button>
+      <Button variant="outline" onClick={() => toast({ variant: "warning", title: "Sessão expira em 2 min" })}>
+        Aviso
+      </Button>
+      <Button variant="outline" onClick={() => toast({ variant: "destructive", title: "Falha ao anexar arquivo" })}>
+        Erro
+      </Button>
+    </div>
   );
 }
 
+// Padrão oficial: <Toaster /> uma vez (aqui, no preview isolado) + useToast() para disparar.
 function ToastPreview() {
   return (
-    <ToastProvider>
+    <>
       <ToastDemo />
-      <ToastViewport />
-    </ToastProvider>
+      <Toaster />
+    </>
   );
 }
 
@@ -609,7 +581,7 @@ function TooltipPreview() {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <IconButton aria-label="Ajuda" variant="outline"><HelpCircle /></IconButton>
+          <IconButton label="Ajuda" variant="outline"><HelpCircle /></IconButton>
         </TooltipTrigger>
         <TooltipContent>Explica o campo ao lado.</TooltipContent>
       </Tooltip>
