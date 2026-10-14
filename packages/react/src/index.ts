@@ -50,3 +50,4 @@ export * from "./components/toggle";
 export * from "./components/tooltip";
 export * from "./lib/masks";
 export * from "./lib/validators";
+export { cn } from "./lib/utils";
