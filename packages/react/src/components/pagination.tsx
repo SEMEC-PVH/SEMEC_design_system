@@ -57,7 +57,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
           onClick={() => go(page - 1)}
           disabled={page <= 1}
           aria-label="Página anterior"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
         >
           <ChevronLeft className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -66,7 +66,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
             <span
               key={`gap-${i}`}
               aria-hidden="true"
-              className="flex h-9 w-9 items-center justify-center text-sm text-muted-foreground"
+              className="flex h-11 w-11 items-center justify-center text-sm text-muted-foreground"
             >
               …
             </span>
@@ -77,7 +77,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
               onClick={() => go(p)}
               aria-current={p === page ? "page" : undefined}
               className={cn(
-                "inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-input px-2 text-sm text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                "inline-flex h-11 min-w-11 items-center justify-center rounded-md border border-input px-2 text-sm text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 p === page && "border-transparent bg-primary text-primary-foreground hover:bg-primary"
               )}
             >
@@ -90,7 +90,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
           onClick={() => go(page + 1)}
           disabled={page >= pageCount}
           aria-label="Próxima página"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
         >
           <ChevronRight className="h-4 w-4" aria-hidden="true" />
         </button>

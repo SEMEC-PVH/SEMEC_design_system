@@ -24,6 +24,11 @@ interface DataTableProps<T> extends React.HTMLAttributes<HTMLDivElement> {
   onPageChange?: (page: number) => void;
   emptyMessage?: string;
   rowKey?: (row: T, index: number) => string | number;
+  /**
+   * Ativação da linha inteira. A linha fica focável (Tab) e responde a
+   * Enter/Espaço, além do clique. Para várias ações por linha, prefira uma
+   * coluna de ações com botões (`render`) — ver manifest/usage.
+   */
   onRowClick?: (row: T, index: number) => void;
   caption?: string;
 }
@@ -52,9 +57,24 @@ function DataTableInner<T extends Record<string, unknown>>(
   };
 
   const getSortIcon = (key: string) => {
-    if (sortKey !== key) return <ArrowUpDown className="h-3 w-3 opacity-50" />;
-    if (sortDir === "asc") return <ArrowUp className="h-3 w-3" />;
-    return <ArrowDown className="h-3 w-3" />;
+    if (sortKey !== key || !sortDir)
+      return <ArrowUpDown className="h-3 w-3 opacity-50" aria-hidden="true" />;
+    if (sortDir === "asc") return <ArrowUp className="h-3 w-3" aria-hidden="true" />;
+    return <ArrowDown className="h-3 w-3" aria-hidden="true" />;
+  };
+
+  // Enter/Espaço ativam a linha só quando o foco está nela mesma, para não
+  // sequestrar teclas de botões/links dentro das células.
+  const handleRowKeyDown = (
+    event: React.KeyboardEvent<HTMLTableRowElement>,
+    row: T,
+    index: number
+  ) => {
+    if (!onRowClick || event.target !== event.currentTarget) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onRowClick(row, index);
+    }
   };
 
   return (
@@ -74,7 +94,7 @@ function DataTableInner<T extends Record<string, unknown>>(
                   scope="col"
                   aria-sort={
                     col.sortable
-                      ? sortKey === col.key
+                      ? sortKey === col.key && sortDir
                         ? sortDir === "asc"
                           ? "ascending"
                           : "descending"
@@ -120,9 +140,16 @@ function DataTableInner<T extends Record<string, unknown>>(
                   key={rowKey ? rowKey(row, index) : index}
                   className={cn(
                     "border-b border-border transition-colors duration-fast ease-standard hover:bg-muted/50 data-[state=selected]:bg-muted",
-                    onRowClick && "cursor-pointer"
+                    onRowClick &&
+                      "cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
                   )}
+                  tabIndex={onRowClick ? 0 : undefined}
                   onClick={onRowClick ? () => onRowClick(row, index) : undefined}
+                  onKeyDown={
+                    onRowClick
+                      ? (event) => handleRowKeyDown(event, row, index)
+                      : undefined
+                  }
                 >
                   {columns.map((col) => (
                     <td
@@ -154,19 +181,19 @@ function DataTableInner<T extends Record<string, unknown>>(
               type="button"
               onClick={() => onPageChange?.(page - 1)}
               disabled={page <= 1}
-              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               Anterior
             </button>
             <button
               type="button"
               onClick={() => onPageChange?.(page + 1)}
               disabled={page >= pageCount}
-              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               Próximo
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>
