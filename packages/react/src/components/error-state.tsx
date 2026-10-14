@@ -3,6 +3,7 @@ import { AlertCircle, RotateCcw } from "lucide-react";
 
 import { cn } from "../lib/utils";
 import { Button } from "./button";
+import type { HeadingTag } from "./heading";
 
 export interface ErrorStateProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -12,6 +13,11 @@ export interface ErrorStateProps extends React.HTMLAttributes<HTMLDivElement> {
   onRetry?: () => void;
   retryLabel?: string;
   variant?: "default" | "inline";
+  /**
+   * Elemento do título. Padrão: `h3` na variante `default` e `p` na `inline`
+   * (comportamento anterior). Ajuste ao nível da página.
+   */
+  titleAs?: HeadingTag;
 }
 
 const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
@@ -25,6 +31,7 @@ const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
       onRetry,
       retryLabel = "Tentar novamente",
       variant = "default",
+      titleAs,
       ...props
     },
     ref
@@ -67,11 +74,15 @@ const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
           {...props}
         >
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 shrink-0">
+            <div className="mt-0.5 shrink-0" aria-hidden="true">
               {icon ?? defaultIcon}
             </div>
             <div className="space-y-0.5 text-left">
-              <p className="text-sm font-semibold text-foreground leading-tight">{title}</p>
+              {React.createElement(
+                titleAs ?? "p",
+                { className: "text-sm font-semibold text-foreground leading-tight" },
+                title
+              )}
               {description ? (
                 <p className="text-xs text-muted-foreground">{description}</p>
               ) : null}
@@ -95,11 +106,18 @@ const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
         )}
         {...props}
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive-surface text-destructive [&>svg]:h-6 [&>svg]:w-6">
+        <div
+          aria-hidden="true"
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive-surface text-destructive [&>svg]:h-6 [&>svg]:w-6"
+        >
           {icon ?? <AlertCircle aria-hidden="true" />}
         </div>
         <div className="space-y-1 max-w-md">
-          <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+          {React.createElement(
+            titleAs ?? "h3",
+            { className: "text-lg font-semibold text-foreground" },
+            title
+          )}
           {description ? (
             <p className="text-sm text-muted-foreground">{description}</p>
           ) : null}
