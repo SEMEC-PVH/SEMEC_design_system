@@ -483,6 +483,12 @@ body {
   [data-theme="light"] .proto-codeblock-head:hover {
     background: var(--color-gray-200, #e5e7eb);
   }
+  [data-theme="light"] .proto-codeblock-toggle:hover .proto-codeblock-file {
+    color: var(--color-gray-900, #111827);
+  }
+  [data-theme="light"] .proto-codeblock-toggle:hover .proto-expand-btn {
+    color: var(--color-gray-900, #111827);
+  }
   [data-theme="light"] .proto-expand-btn {
     color: var(--color-gray-600, #4b5563);
   }
