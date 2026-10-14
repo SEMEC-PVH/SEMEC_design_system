@@ -103,19 +103,21 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Caixa de texto",
     file: "src/components/input.tsx",
     category: "formularios",
-    desc: "Campo de texto. Estado de erro via `aria-invalid`.",
+    desc: "Campo de texto. Estado de erro via `aria-invalid`. Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente.",
     variants: [{ prop: "estados", values: "padrão · inválido (aria-invalid) · disabled" }],
     usage: `import { FormField, Input } from "@semec/ds/react";
 
-// Todo campo precisa de rótulo visível (placeholder não substitui o rótulo)
-<FormField label="Nome completo" htmlFor="nome-completo">
-  <Input id="nome-completo" autoComplete="name" />
+// Todo campo precisa de rótulo visível (placeholder não substitui o rótulo).
+// Dentro do FormField, id, aria-describedby e aria-invalid são ligados sozinhos.
+<FormField label="Nome completo" hint="Como no documento">
+  <Input autoComplete="name" />
 </FormField>
 
-// Estado inválido: aria-invalid + mensagem ligada por aria-describedby (\`<id do FormField>-error\`)
-<FormField id="cpf-campo" label="CPF" htmlFor="cpf" error="Informe os 11 dígitos do CPF.">
-  <Input id="cpf" inputMode="numeric" aria-invalid="true" aria-describedby="cpf-campo-error" />
-</FormField>`,
+// Com id próprio (ex.: alvo do ErrorSummary): o rótulo e a mensagem seguem o id
+<FormField label="CPF" error="Informe os 11 dígitos do CPF.">
+  <Input id="cpf" inputMode="numeric" />
+</FormField>
+// → <label for="cpf">, aria-invalid="true", aria-describedby="cpf-error"`,
   },
   {
     code: "textarea",
@@ -127,7 +129,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     variants: [{ prop: "estados", values: "padrão · inválido · disabled" }],
     usage: `import { FormField, Textarea } from "@semec/ds/react";
 
-<FormField label="Descreva a demanda" htmlFor="demanda">
+<FormField label="Descreva a demanda" hint="Até 500 caracteres">
   <Textarea id="demanda" rows={4} />
 </FormField>`,
   },
@@ -147,7 +149,17 @@ import { Download, Search, Trash2 } from "lucide-react";
     <SelectItem value="pbh">Porto Velho</SelectItem>
     <SelectItem value="riob">Rio Branco</SelectItem>
   </SelectContent>
-</Select>`,
+</Select>
+
+// Dentro de FormField, o SelectTrigger recebe id, aria-describedby e aria-invalid
+<FormField label="Município" error={erro}>
+  <Select>
+    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+    <SelectContent>
+      <SelectItem value="pbh">Porto Velho</SelectItem>
+    </SelectContent>
+  </Select>
+</FormField>`,
   },
   {
     code: "combobox",
@@ -155,18 +167,29 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Combobox",
     file: "src/components/combobox.tsx",
     category: "formularios",
-    desc: "Campo com busca e lista filtrada. Opções via `options`.",
-    variants: [{ prop: "props", values: "options · value · onChange · placeholder · emptyMessage · disabled · ariaLabel" }],
-    usage: `import { Combobox } from "@semec/ds/react";
+    desc: "Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.",
+    variants: [
+      { prop: "props", values: "options · value · defaultValue · onChange · placeholder · searchPlaceholder · emptyText · name · required · disabled · labels · portalContainer" },
+      { prop: "deprecadas", values: "ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)" },
+    ],
+    usage: `import { Combobox, FormField, Label } from "@semec/ds/react";
 
-// ariaLabel dá o nome acessível do campo (o padrão genérico "Selecionar" não diz o que se escolhe)
-<Combobox
-  ariaLabel="Tipo de documento"
-  placeholder="Selecione o tipo de documento"
-  options={[{ value: "cnpj", label: "CNPJ" }, { value: "cpf", label: "CPF" }]}
-  value={valor}
-  onChange={setValor}
-/>`,
+// Rótulo visível pelo FormField: nome acessível = rótulo + texto do gatilho (WCAG 2.5.3)
+<FormField label="Tipo de documento" error={erro}>
+  <Combobox
+    name="tipoDocumento"
+    placeholder="Selecione o tipo de documento"
+    searchPlaceholder="Buscar tipo…"
+    emptyText="Nenhum tipo encontrado."
+    options={[{ value: "cnpj", label: "CNPJ" }, { value: "cpf", label: "CPF" }]}
+    value={valor}
+    onChange={setValor}
+  />
+</FormField>
+
+// Ou com <Label htmlFor> + id (também aceita aria-labelledby)
+<Label htmlFor="orgao">Órgão emissor</Label>
+<Combobox id="orgao" options={orgaos} />`,
   },
   {
     code: "date-picker",
@@ -174,11 +197,11 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Seletor de data",
     file: "src/components/date-picker.tsx",
     category: "formularios",
-    desc: 'Data com `<input type="date">` nativo — sem biblioteca de calendário.',
-    variants: [{ prop: "props", values: "nativo HTML (min · max · disabled) + variantes visuais do campo" }],
+    desc: 'Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).',
+    variants: [{ prop: "props", values: "nativo HTML (min · max · disabled) + labels.openCalendar + variantes visuais do campo" }],
     usage: `import { DatePicker, FormField } from "@semec/ds/react";
 
-<FormField label="Data de vencimento" htmlFor="vencimento">
+<FormField label="Data de vencimento" hint="dd/mm/aaaa">
   <DatePicker id="vencimento" defaultValue="2026-08-31" />
 </FormField>`,
   },
@@ -189,7 +212,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     file: "src/components/file-upload.tsx",
     category: "formularios",
     desc: "Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.",
-    variants: [{ prop: "props", values: "accept · maxSize · label · hint · error · onChange" }],
+    variants: [{ prop: "props", values: "accept · maxSize · label · hint · error · onChange · value · multiple · id · inputProps · labels" }],
     usage: `import { FileUpload } from "@semec/ds/react";
 
 // \`label\` é o rótulo do campo de arquivo — não omita
@@ -198,7 +221,10 @@ import { Download, Search, Trash2 } from "lucide-react";
   accept=".pdf,image/*"
   maxSize={5 * 1024 * 1024}
   hint="PDF ou imagem, até 5 MB"
-/>`,
+/>
+
+// Textos fixos sobrescrevíveis (padrão PT-BR)
+<FileUpload label="Anexo" labels={{ invalidType: "Envie só PDF.", tooLarge: (max) => \`Máximo de \${max}.\` }} />`,
   },
   {
     code: "checkbox",
@@ -266,8 +292,11 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Campo de formulário",
     file: "src/components/form-field.tsx",
     category: "formularios",
-    desc: "Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Para feedback de sucesso após envio, use Toast; para erros de validação, mantenha no FormField com aria-invalid e ErrorSummary.",
-    variants: [{ prop: "props", values: "label · htmlFor · required · hint · error" }],
+    desc: "Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role=\"alert\"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast.",
+    variants: [
+      { prop: "props", values: "label · htmlFor · required · hint · error · id (base dos ids <id>-hint/<id>-error)" },
+      { prop: "hooks", values: "useFormField · useFormFieldControl (para campos próprios)" },
+    ],
     usage: `import { FormField, Input, Button, useToast } from "@semec/ds/react";
 
 // Em formulários: erros ficam inline no FormField (+ ErrorSummary no topo).
@@ -279,8 +308,9 @@ function Formulario() {
       e.preventDefault();
       toast({ variant: "success", title: "Salvo com sucesso", description: "Alterações registradas." });
     }}>
-      <FormField label="E-mail" htmlFor="email" required hint="Usado para o comprovante" error={erro}>
-        <Input id="email" aria-invalid={!!erro} />
+      {/* id, aria-describedby (dica/erro) e aria-invalid chegam ao Input pelo contexto */}
+      <FormField label="E-mail" required hint="Usado para o comprovante" error={erro}>
+        <Input id="email" type="email" />
       </FormField>
       <Button type="submit">Salvar</Button>
     </form>
@@ -293,7 +323,7 @@ function Formulario() {
     label: "ErrorSummary",
     file: "src/components/error-summary.tsx",
     category: "formularios",
-    desc: "Resumo de erros de validação no topo do formulário, com links para cada campo. A11y: `role=\"alert\"`, foco automático.",
+    desc: "Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role=\"alert\"`, foco automático, título ligado por id gerado. Sem margem externa: espace pelo layout (ex.: `className=\"mb-6\"`).",
     variants: [{ prop: "props", values: "title · errors [{ id, message }] · autoFocus · focusKey" }],
     usage: `import { ErrorSummary } from "@semec/ds/react";
 
@@ -772,7 +802,7 @@ import { Bold } from "lucide-react";
     desc: "Campo de código OTP com foco automático entre dígitos.",
     variants: [
       { prop: "composição", values: "InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator" },
-      { prop: "props", values: "maxLength · disabled" },
+      { prop: "props", values: "maxLength · disabled · labels (group · slot(index, total))" },
     ],
     usage: `import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec/ds/react";
 
