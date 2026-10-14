@@ -222,15 +222,17 @@ Metadados de componente (o que versões anteriores deste README chamavam de `get
 
 ## Componentes
 
-**49 componentes** (um por módulo em `src/components`, exceto o `SemecProvider`, que é provider), pelos nomes exportados:
+<!-- ds:component-list:start -->
+**49 componentes** no manifest (`manifest.js`), pelo export principal de cada um. Lista e contagem geradas por `scripts/build-artifacts.mjs`; não edite à mão.
 
 | Categoria | Componentes |
 |---|---|
 | **Ações e links** (3) | Button, IconButton, Link |
 | **Formulários** (16) | Input, Textarea, Select, Combobox, DatePicker, FileUpload, Checkbox, RadioGroup, Switch, Label, FormField, ErrorSummary, Toggle, Slider, InputOTP, Calendar |
 | **Conteúdo e dados** (8) | Card, Badge, Table, Accordion, Separator, Avatar, DataTable, Timeline |
-| **Feedback e estados** (13) | Skeleton, EmptyState, ErrorState, Dialog, Toast, Tooltip, Alert, AlertDialog, Popover, Spinner, Progress, Drawer, Sheet |
-| **Navegação** (9) | Breadcrumb, Header, Tabs, Pagination, SidebarTrigger, ScrollArea, DropdownMenu, NavigationMenu, Sidebar |
+| **Navegação** (9) | Breadcrumb, Header, Tabs, Pagination, SidebarToggleButton, ScrollArea, DropdownMenu, NavigationMenu, Sidebar |
+| **Feedback e estados** (13) | Skeleton, EmptyState, ErrorState, Dialog, Toaster, Tooltip, Alert, AlertDialog, Popover, Spinner, Progress, Drawer, Sheet |
+<!-- ds:component-list:end -->
 
 Mais: `SemecProvider`, `cn`, masks (`maskCPF`, `maskCNPJ`, `maskCEP`, `maskCurrency`) e validadores puros (`validateCPF`, `validateCNPJ`, `validateEmail`).
 

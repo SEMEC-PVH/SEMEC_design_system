@@ -1043,9 +1043,39 @@ import { MoreHorizontal } from "lucide-react";
 export const dsBySlug = Object.fromEntries(dsComponents.map((c) => [c.slug, c]));
 export const dsByCategory = (key) => dsComponents.filter((c) => c.category === key);
 
+/** Nomes importados de `@semec/ds/react` no snippet `usage` (ordem do snippet). */
+export function dsImportNames(c) {
+  const names = [];
+  const re = /import\s*\{([^}]*)\}\s*from\s*["']@semec\/ds\/react["']/g;
+  for (const m of (c.usage ?? "").matchAll(re)) {
+    for (const raw of m[1].split(",")) {
+      const name = raw.trim().replace(/^type\s+/, "").split(/\s+as\s+/)[0].trim();
+      if (name && !names.includes(name)) names.push(name);
+    }
+  }
+  return names;
+}
+
+/**
+ * Export principal do componente: `exportName` explícito na entrada, senão o nome
+ * importado no `usage` que corresponde ao `code` (`input-otp` → `InputOTP`), senão
+ * o primeiro importado, senão o `code` em PascalCase.
+ */
+export function dsExportName(c) {
+  if (c.exportName) return c.exportName;
+  const pascal = c.code.replace(/(^|-)([a-z0-9])/g, (_, __, l) => l.toUpperCase());
+  const names = dsImportNames(c);
+  return names.find((n) => n.toLowerCase() === pascal.toLowerCase()) ?? names[0] ?? pascal;
+}
+
+/**
+ * Prompt curto por componente (site, manifest.json e components/<slug>.md).
+ * Manda USAR o componente publicado, nunca recriá-lo (AUD-67).
+ */
 export function dsPrompt(c) {
   const v = c.variants.map((x) => `${x.prop}: ${x.values}`).join(" · ");
-  return `Crie um ${c.code} (${c.label}) usando @semec/ds/react (\`${c.file}\`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4.${v ? ` Variantes: ${v}.` : ""} ${c.desc}`;
+  const name = dsExportName(c);
+  return `Use o componente \`${name}\` (${c.label}) importado de \`@semec/ds/react\`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. ${c.desc}${v ? ` API e variantes: ${v}.` : ""} Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.`;
 }
 
 /**
