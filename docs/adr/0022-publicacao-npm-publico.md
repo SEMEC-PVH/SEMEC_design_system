@@ -45,7 +45,13 @@ Build via tsup (ESM + dts), CI/CD via GitHub Actions, versionamento via Changese
 - Publicações acidentais de código sensível são mitigadas por CI com lint + typecheck + build antes de publish.
 - O ADR-007 e o ADR-021 passam a `Substituído`.
 
-**Operação (como isso roda hoje).**
+**Operação (atualizada em 14/10/2026, AUD-12 / AUD-46, #26).** A decisão (npm público, pacote unificado, Changesets com SemVer estrito) não muda; muda só como ela é operada. O texto de 17/09/2026 está mais abaixo, como registro histórico.
+- **Versionamento por mantenedor, num PR.** Quem lança roda `npm run version-packages` (`changeset version` + lockfile) numa branch `changeset-release/<versão>` e abre o PR de versão, revisado e mergeado como qualquer outro. O workflow não cria branch, commit nem PR: a organização bloqueia PR criado por workflow, e o push da branch de versão com PAT (`RELEASE_TOKEN`) deu 403 no run [38615303248](https://github.com/SEMEC-PVH/SEMEC_design_system/actions/runs/38615303248).
+- **Workflow só publica.** `.github/workflows/release.yml` roda por `workflow_run` depois da CI verde, só para push no `main` do próprio repositório, com o commit conferido como ancestral de `origin/main`. Com changesets pendentes, só resume o plano (`changeset status`) e termina com sucesso. Sem changesets pendentes e com a versão do `package.json` ainda não publicada, roda `changeset publish`, confere o registry, envia a tag `@semec/ds@x.y.z` e cria a GitHub Release.
+- **Segredos.** `NPM_TOKEN` só no passo de autenticação npm, e só quando vai publicar; o `npm ci` roda sem token. A tag e a Release usam o `GITHUB_TOKEN` com `contents: write` (tag não é bloqueada como PR); falha nelas depois do publish é aviso, não erro. O `RELEASE_TOKEN` deixa de ser usado.
+- Runbook: [CONTRIBUTING.md](../../CONTRIBUTING.md) § *Publicação e versionamento*.
+
+**Operação em 17/09/2026 (histórico, não vale mais).**
 - Workflow: `.github/workflows/release.yml` em push para `main` (e `workflow_dispatch`).
 - Auth da CI: secret **`NPM_TOKEN`** → `NODE_AUTH_TOKEN` no job inteiro (token granular com publish em `@semec` e bypass 2FA se a conta tiver 2FA).
 - Publish: `npx changeset publish` **somente se** a versão local for maior que a do registry; em seguida o job verifica `npm view @semec/ds version`.
