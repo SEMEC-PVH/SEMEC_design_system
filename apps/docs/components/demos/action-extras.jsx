@@ -21,13 +21,19 @@ import {
   linkListUsage,
 } from "@/components/demos/examples/button-scenarios-data";
 
-function Scenario({ title, desc, code, filename, prompt, children }) {
+function Scenario({ title, desc, code, filename, prompt, centered, children }) {
   return (
     <>
       <h4>{title}</h4>
       <p>{desc}</p>
       <PreviewFrame>
-        <div style={{ padding: "1rem" }}>{children}</div>
+        {centered ? (
+          <div className="box-border flex min-h-[96px] w-full items-center justify-center overflow-x-clip p-4">
+            {children}
+          </div>
+        ) : (
+          <div style={{ padding: "1rem" }}>{children}</div>
+        )}
       </PreviewFrame>
       <CodeBlock code={code} filename={filename} prompt={prompt} />
     </>
@@ -92,6 +98,7 @@ export function BotaoDeIconeExtras() {
     <>
       <h3>Exemplos em contexto</h3>
       <Scenario
+        centered
         title="Toolbar com tooltip"
         desc="Ícones agrupados na mesma ação de linha; o `label` nomeia cada botão e o tooltip reforça no hover."
         code={iconToolbarUsage}

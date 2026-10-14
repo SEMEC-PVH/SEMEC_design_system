@@ -102,7 +102,7 @@ export function ButtonToolbar() {
 export function IconToolbar() {
   return (
     <TooltipProvider>
-      <div className="flex gap-2">
+      <div className="flex items-center justify-center gap-2">
         <Tooltip>
           <TooltipTrigger asChild><IconButton label="Editar requerimento"><Pencil /></IconButton></TooltipTrigger>
           <TooltipContent>Editar</TooltipContent>
