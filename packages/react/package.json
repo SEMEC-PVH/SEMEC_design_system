@@ -112,12 +112,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/SEMEC/design-system.git",
+    "url": "git+https://github.com/SEMEC-PVH/SEMEC_design_system.git",
     "directory": "packages/react"
   },
-  "homepage": "https://semec.github.io/design-system",
+  "homepage": "https://semec-pvh.github.io/SEMEC_design_system/",
   "bugs": {
-    "url": "https://github.com/SEMEC/design-system/issues"
+    "url": "https://github.com/SEMEC-PVH/SEMEC_design_system/issues"
   },
   "license": "MIT",
   "keywords": [

@@ -5,17 +5,12 @@ import {
   AlertDescription,
   AlertTitle,
   Button,
-  Toast,
-  ToastClose,
-  ToastDescription,
-  ToastProvider,
-  ToastTitle,
-  ToastViewport,
   useToast,
 } from "semec-ds/react";
+import PreviewToaster from "@/components/demos/PreviewToaster";
 
 function ConteudoSucesso() {
-  const { toasts, toast } = useToast();
+  const { toast } = useToast();
 
   return (
     <div className="w-full max-w-xl space-y-4 p-4 text-left">
@@ -44,24 +39,17 @@ function ConteudoSucesso() {
         </span>
       </div>
 
-      {toasts.map(({ id, title, description, variant, ...rest }) => (
-        <Toast key={id} variant={variant} {...rest}>
-          <div className="grid gap-1">
-            {title && <ToastTitle>{title}</ToastTitle>}
-            {description && <ToastDescription>{description}</ToastDescription>}
-          </div>
-          <ToastClose />
-        </Toast>
-      ))}
     </div>
   );
 }
 
+// Padrão oficial: <Toaster /> uma vez (no app, fica no layout raiz) + useToast() para disparar.
+// PreviewToaster garante um só Toaster por página do site.
 export function SucessoDemo() {
   return (
-    <ToastProvider>
+    <>
       <ConteudoSucesso />
-      <ToastViewport />
-    </ToastProvider>
+      <PreviewToaster />
+    </>
   );
 }

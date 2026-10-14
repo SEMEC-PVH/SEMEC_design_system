@@ -82,7 +82,7 @@
 
   --color-border: var(--border);
   --color-border-strong: var(--color-border-strong);
-  --color-input: var(--border);
+  --color-input: var(--color-border-strong);
   --color-ring: var(--color-focus-ring);
   --color-tint: var(--tint);
   --color-brand-hero: var(--brand-hero);

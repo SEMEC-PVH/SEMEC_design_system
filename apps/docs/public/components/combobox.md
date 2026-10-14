@@ -4,7 +4,7 @@ code: "combobox"
 slug: "combobox"
 file: "src/components/combobox.tsx"
 category: "formularios"
-variants: "props: options · value · onChange · placeholder · emptyMessage · disabled"
+variants: "props: options · value · onChange · placeholder · emptyMessage · disabled · ariaLabel"
 ---
 
 # Combobox — `combobox`
@@ -15,7 +15,7 @@ variants: "props: options · value · onChange · placeholder · emptyMessage ·
 
 ## Variantes
 
-- **props**: options · value · onChange · placeholder · emptyMessage · disabled
+- **props**: options · value · onChange · placeholder · emptyMessage · disabled · ariaLabel
 
 ## Instalação (@semec/ds)
 
@@ -34,7 +34,10 @@ npm install @semec/ds
 ```tsx
 import { Combobox } from "@semec/ds/react";
 
+// ariaLabel dá o nome acessível do campo (o padrão genérico "Selecionar" não diz o que se escolhe)
 <Combobox
+  ariaLabel="Tipo de documento"
+  placeholder="Selecione o tipo de documento"
   options={[{ value: "cnpj", label: "CNPJ" }, { value: "cpf", label: "CPF" }]}
   value={valor}
   onChange={setValor}
@@ -44,7 +47,7 @@ import { Combobox } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Crie um combobox (Combobox) usando @semec/ds/react (`src/components/combobox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: options · value · onChange · placeholder · emptyMessage · disabled. Campo com busca e lista filtrada. Opções via `options`.
+Crie um combobox (Combobox) usando @semec/ds/react (`src/components/combobox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: options · value · onChange · placeholder · emptyMessage · disabled · ariaLabel. Campo com busca e lista filtrada. Opções via `options`.
 ```
 
 ## Fonte

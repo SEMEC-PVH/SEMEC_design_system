@@ -32,9 +32,11 @@ npm install @semec/ds
 ## Uso
 
 ```tsx
-import { Textarea } from "@semec/ds/react";
+import { FormField, Textarea } from "@semec/ds/react";
 
-<Textarea rows={4} placeholder="Descreva a demanda" />
+<FormField label="Descreva a demanda" htmlFor="demanda">
+  <Textarea id="demanda" rows={4} />
+</FormField>
 ```
 
 ## Prompt para IA
@@ -56,7 +58,7 @@ const Textarea = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <textarea
     className={cn(
-      "flex min-h-[80px] w-full rounded-md border border-input bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/30",
+      "flex min-h-[80px] w-full rounded-md border border-input bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
       className
     )}
     ref={ref}

@@ -267,7 +267,7 @@
   --color-muted-foreground:     var(--text-muted);
   --color-border:               var(--border);
   --color-border-strong:        var(--border-strong);
-  --color-input:                var(--border);
+  --color-input:                var(--border-strong);
   --color-ring:                 var(--focus-ring);
   --color-brand-hero:           var(--brand-hero);
   --color-primary:              var(--action-primary);

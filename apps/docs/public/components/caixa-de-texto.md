@@ -32,10 +32,17 @@ npm install @semec/ds
 ## Uso
 
 ```tsx
-import { Input } from "@semec/ds/react";
+import { FormField, Input } from "@semec/ds/react";
 
-<Input placeholder="Nome completo" />
-<Input aria-invalid="true" />
+// Todo campo precisa de rótulo visível (placeholder não substitui o rótulo)
+<FormField label="Nome completo" htmlFor="nome-completo">
+  <Input id="nome-completo" autoComplete="name" />
+</FormField>
+
+// Estado inválido: aria-invalid + mensagem ligada por aria-describedby (`<id do FormField>-error`)
+<FormField id="cpf-campo" label="CPF" htmlFor="cpf" error="Informe os 11 dígitos do CPF.">
+  <Input id="cpf" inputMode="numeric" aria-invalid="true" aria-describedby="cpf-campo-error" />
+</FormField>
 ```
 
 ## Prompt para IA
@@ -56,7 +63,7 @@ const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLI
     <input
       type={type}
       className={cn(
-        "flex h-11 w-full rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/30",
+        "flex h-11 w-full rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
         className
       )}
       ref={ref}

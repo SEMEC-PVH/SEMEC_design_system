@@ -71,13 +71,12 @@ import { Button, Card, CardHeader, CardTitle, CardContent } from "@semec/ds/reac
 
 ## Publicação
 
-O `@semec/ds` vai para o npm público via Changesets + GitHub Actions. A CI só publica se a versão em `packages/react/package.json` for **maior** que a do registry (precisa de changeset + `npm run version-packages`).
+O `@semec/ds` vai para o npm público via Changesets + GitHub Actions. Nenhuma versão sai por bump manual, e o workflow de release só roda depois da CI verde no `main`.
 
-1. Crie um changeset: `npm run changeset`
-2. Escolha patch/minor/major e descreva a mudança
-3. Aplique o versionamento: `npm run version-packages`
-4. Faça commit e push para `main`
-5. A CI publica (`changeset publish`) e confere `npm view @semec/ds version`
+1. Todo PR que muda arquivo publicado do pacote traz um changeset (`npm run changeset`: patch/minor/major + descrição). A CI falha sem ele.
+2. Depois do merge, com a CI verde, o workflow de release abre (ou atualiza) o PR **"chore(release): versiona pacotes"**, que roda `npm run version-packages` (bump + CHANGELOG + lockfile).
+3. Um mantenedor revisa e mergeia o PR de versão.
+4. Com a CI verde nesse merge, o workflow publica (`changeset publish`), cria a tag `@semec/ds@x.y.z` e confere `npm view @semec/ds version`.
 
 A CI depende do secret **`NPM_TOKEN`** no repo (token npm com publish em `@semec`). Detalhes, conferência no registry e fallback local: [CONTRIBUTING.md](CONTRIBUTING.md).
 

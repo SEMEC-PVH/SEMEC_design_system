@@ -8,11 +8,14 @@ import { IconButton, type IconButtonProps } from "./icon-button";
  *
  * **Props herdadas de IconButton:** `open` controla qual ícone exibir
  * (PanelLeftClose quando aberto, PanelLeftOpen quando fechado). `onToggle`
- * é chamado ao clicar. `label` pode ser sobrescrito para rótulos
- * específicos.
+ * é chamado ao clicar. `label` é opcional: sem ele, o nome acessível
+ * alterna entre `labelOpen` e `labelClosed`; com ele, vira um rótulo fixo
+ * (o estado continua anunciado por `aria-expanded`).
  */
 export interface SidebarToggleButtonProps
-  extends Omit<IconButtonProps, "icon"> {
+  extends Omit<IconButtonProps, "icon" | "label"> {
+  /** Rótulo acessível fixo. Opcional; padrão: `labelOpen`/`labelClosed` conforme o estado. */
+  label?: string;
   /** Estado atual da sidebar (aberta = true). */
   open?: boolean;
   /** Callback chamado ao clicar no gatilho. */
@@ -70,7 +73,7 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
       labelOpen = "Fechar menu",
       labelClosed = "Abrir menu",
       variant = "ghost",
-      label: _label,
+      label,
       ...props
     },
     ref
@@ -78,7 +81,7 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
     <IconButton
       ref={ref}
       variant={variant}
-      label={open ? labelOpen : labelClosed}
+      label={label ?? (open ? labelOpen : labelClosed)}
       aria-expanded={open}
       onClick={onToggle}
       {...props}

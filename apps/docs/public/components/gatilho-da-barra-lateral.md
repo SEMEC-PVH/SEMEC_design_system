@@ -9,7 +9,7 @@ variants: "props: open · onToggle · labelOpen · labelClosed · a11y: aria-exp
 
 # Gatilho da barra lateral — `sidebar-trigger`
 
-> Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
+> `SidebarToggleButton`: botão controlado (`open` + `onToggle`) para colapsar/expandir uma sidebar cujo estado vive no seu layout (ex.: Header). Alterna entre ícones PanelLeftOpen e PanelLeftClose. Dentro de `SidebarProvider`, use `SidebarTrigger` (ver Barra lateral), que não recebe `open`/`onToggle`.
 
 **Arquivo:** `src/components/sidebar-trigger.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/gatilho-da-barra-lateral`
 
@@ -35,13 +35,16 @@ npm install @semec/ds
 ```tsx
 import { SidebarToggleButton } from "@semec/ds/react";
 
-<SidebarToggleButton open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />
+// Estado no seu layout; o rótulo acessível vem de labelOpen/labelClosed
+<SidebarToggleButton open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+
+// Com SidebarProvider (componente Barra lateral), use <SidebarTrigger /> — sem open/onToggle
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um sidebar-trigger (Gatilho da barra lateral) usando @semec/ds/react (`src/components/sidebar-trigger.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
+Crie um sidebar-trigger (Gatilho da barra lateral) usando @semec/ds/react (`src/components/sidebar-trigger.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). `SidebarToggleButton`: botão controlado (`open` + `onToggle`) para colapsar/expandir uma sidebar cujo estado vive no seu layout (ex.: Header). Alterna entre ícones PanelLeftOpen e PanelLeftClose. Dentro de `SidebarProvider`, use `SidebarTrigger` (ver Barra lateral), que não recebe `open`/`onToggle`.
 ```
 
 ## Fonte
@@ -57,11 +60,14 @@ import { IconButton, type IconButtonProps } from "./icon-button";
  *
  * **Props herdadas de IconButton:** `open` controla qual ícone exibir
  * (PanelLeftClose quando aberto, PanelLeftOpen quando fechado). `onToggle`
- * é chamado ao clicar. `label` pode ser sobrescrito para rótulos
- * específicos.
+ * é chamado ao clicar. `label` é opcional: sem ele, o nome acessível
+ * alterna entre `labelOpen` e `labelClosed`; com ele, vira um rótulo fixo
+ * (o estado continua anunciado por `aria-expanded`).
  */
 export interface SidebarToggleButtonProps
-  extends Omit<IconButtonProps, "icon"> {
+  extends Omit<IconButtonProps, "icon" | "label"> {
+  /** Rótulo acessível fixo. Opcional; padrão: `labelOpen`/`labelClosed` conforme o estado. */
+  label?: string;
   /** Estado atual da sidebar (aberta = true). */
   open?: boolean;
   /** Callback chamado ao clicar no gatilho. */
@@ -119,7 +125,7 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
       labelOpen = "Fechar menu",
       labelClosed = "Abrir menu",
       variant = "ghost",
-      label: _label,
+      label,
       ...props
     },
     ref
@@ -127,7 +133,7 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
     <IconButton
       ref={ref}
       variant={variant}
-      label={open ? labelOpen : labelClosed}
+      label={label ?? (open ? labelOpen : labelClosed)}
       aria-expanded={open}
       onClick={onToggle}
       {...props}

@@ -34,7 +34,13 @@ npm install @semec/ds
 ```tsx
 import { FileUpload } from "@semec/ds/react";
 
-<FileUpload accept=".pdf,image/*" maxSize={5 * 1024 * 1024} hint="PDF ou imagem, até 5 MB" />
+// `label` é o rótulo do campo de arquivo — não omita
+<FileUpload
+  label="Documento de identidade"
+  accept=".pdf,image/*"
+  maxSize={5 * 1024 * 1024}
+  hint="PDF ou imagem, até 5 MB"
+/>
 ```
 
 ## Prompt para IA
@@ -59,6 +65,17 @@ export interface FileUploadProps
   hint?: string;
   error?: string;
   onChange?: (files: File[]) => void;
+  /** Arquivos selecionados (modo controlado). Mantém a seleção ao voltar de etapa. */
+  value?: File[];
+  /** Permite selecionar mais de um arquivo. Padrão: `true`. */
+  multiple?: boolean;
+  /** `id` do `<input type="file">` (alvo de `<label htmlFor>` e de links do ErrorSummary). */
+  id?: string;
+  /** Props extras repassadas ao `<input type="file">` (ex.: `name`, `required`). */
+  inputProps?: Omit<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    "type" | "id" | "accept" | "multiple" | "onChange" | "value"
+  >;
 }
 
 const formatBytes = (bytes: number) => {
@@ -67,17 +84,61 @@ const formatBytes = (bytes: number) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
+// Mesma regra do atributo `accept`: extensões (".pdf"), MIME exato ou curinga ("image/*").
+const matchesAccept = (file: File, accept?: string) => {
+  if (!accept) return true;
+  const tokens = accept
+    .split(",")
+    .map((t) => t.trim().toLowerCase())
+    .filter(Boolean);
+  if (tokens.length === 0) return true;
+  const name = file.name.toLowerCase();
+  const type = (file.type || "").toLowerCase();
+  return tokens.some((token) => {
+    if (token.startsWith(".")) return name.endsWith(token);
+    if (token.endsWith("/*")) return type.startsWith(token.slice(0, -1));
+    return type === token;
+  });
+};
+
 const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
-  ({ className, accept, maxSize, label, hint, error, onChange, ...props }, ref) => {
-    const [files, setFiles] = React.useState<File[]>([]);
+  (
+    {
+      className,
+      accept,
+      maxSize,
+      label,
+      hint,
+      error,
+      onChange,
+      value,
+      multiple = true,
+      id: idProp,
+      inputProps,
+      ...props
+    },
+    ref
+  ) => {
+    const [internalFiles, setInternalFiles] = React.useState<File[]>([]);
+    const files = value ?? internalFiles;
     const [drag, setDrag] = React.useState(false);
     const [localError, setLocalError] = React.useState<string | undefined>(undefined);
     const inputRef = React.useRef<HTMLInputElement>(null);
-    const id = React.useId();
+    const generatedId = React.useId();
+    const id = idProp ?? generatedId;
+    const hintId = `${id}-hint`;
+    const errorId = `${id}-error`;
+    const message = localError ?? error;
 
     const acceptFiles = (list: FileList | null) => {
       if (!list) return;
-      const next = Array.from(list);
+      let next = Array.from(list);
+      if (next.length === 0) return;
+      if (!multiple) next = next.slice(0, 1);
+      if (next.some((f) => !matchesAccept(f, accept))) {
+        setLocalError("Tipo de arquivo não permitido.");
+        return;
+      }
       if (maxSize) {
         const oversized = next.filter((f) => f.size > maxSize);
         if (oversized.length > 0) {
@@ -88,9 +149,14 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
         }
       }
       setLocalError(undefined);
-      setFiles(next);
+      if (value === undefined) setInternalFiles(next);
       onChange?.(next);
     };
+
+    const describedBy =
+      [inputProps?.["aria-describedby"], hint ? hintId : null, message ? errorId : null]
+        .filter(Boolean)
+        .join(" ") || undefined;
 
     return (
       <div
@@ -116,19 +182,27 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
           }}
           onClick={() => inputRef.current?.click()}
           className={cn(
-            "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background px-6 py-8 text-center transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:border-border-strong",
+            "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background px-6 py-8 text-center transition-colors duration-fast ease-standard has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background hover:border-border-strong",
             drag && "border-ring bg-tint",
-            (localError ?? error) && "border-destructive",
-            className
+            message && "border-destructive"
           )}
         >
           <input
+            aria-label={label ? undefined : "Escolher arquivo"}
+            {...inputProps}
             ref={inputRef}
             id={id}
             type="file"
             accept={accept}
-            multiple
-            className="sr-only"
+            multiple={multiple}
+            aria-describedby={describedBy}
+            aria-invalid={message ? true : inputProps?.["aria-invalid"]}
+            className={cn("sr-only", inputProps?.className)}
+            onClick={(e) => {
+              // O clique na zona já abre o seletor; evita reabrir pela propagação.
+              e.stopPropagation();
+              inputProps?.onClick?.(e);
+            }}
             onChange={(e) => {
               acceptFiles(e.target.files);
               e.currentTarget.value = "";
@@ -139,7 +213,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             Arraste um arquivo ou <span className="font-medium text-primary">clique para escolher</span>
           </p>
           {hint ? (
-            <p className="text-xs text-muted-foreground">{hint}</p>
+            <p id={hintId} className="text-xs text-muted-foreground">{hint}</p>
           ) : null}
         </div>
         {files.length > 0 ? (
@@ -157,9 +231,9 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             ))}
           </ul>
         ) : null}
-        {localError ?? error ? (
-          <p role="alert" className="text-xs text-destructive">
-            {localError ?? error}
+        {message ? (
+          <p id={errorId} role="alert" className="text-xs text-destructive">
+            {message}
           </p>
         ) : null}
       </div>
@@ -169,6 +243,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
 FileUpload.displayName = "FileUpload";
 
 export { FileUpload };
+
 ```
 
 ## Tokens relacionados

@@ -57,9 +57,10 @@ import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, 
     </SidebarContent>
     <SidebarFooter>Footer</SidebarFooter>
   </Sidebar>
+  {/* SidebarInset já renderiza <main>: não aninhe outro <main> dentro dele */}
   <SidebarInset>
     <SidebarTrigger />
-    <main>Conteúdo</main>
+    <div className="p-4">Conteúdo</div>
   </SidebarInset>
 </SidebarProvider>
 ```

@@ -31,9 +31,9 @@ npm install @semec/ds
 - [Link (`link`) — Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.](/componentes/link) — `src/components/link.tsx` — md: `/components/link.md`
   Uso: `import { Link } from "@semec/ds/react";`
 - [Caixa de texto (`input`) — Campo de texto. Estado de erro via `aria-invalid`.](/componentes/caixa-de-texto) — `src/components/input.tsx` — md: `/components/caixa-de-texto.md`
-  Uso: `import { Input } from "@semec/ds/react";`
+  Uso: `import { FormField } from "@semec/ds/react";`
 - [Área de texto (`textarea`) — Campo multilinha com as mesmas variantes visuais do campo de texto.](/componentes/area-de-texto) — `src/components/textarea.tsx` — md: `/components/area-de-texto.md`
-  Uso: `import { Textarea } from "@semec/ds/react";`
+  Uso: `import { FormField } from "@semec/ds/react";`
 - [Menu de seleção (`select`) — Seleção fechada com gatilho, conteúdo e itens compostos.](/componentes/menu-de-selecao) — `src/components/select.tsx` — md: `/components/menu-de-selecao.md`
   Uso: `import { Select } from "@semec/ds/react";`
 - [Combobox (`combobox`) — Campo com busca e lista filtrada. Opções via `options`.](/componentes/combobox) — `src/components/combobox.tsx` — md: `/components/combobox.md`
@@ -74,12 +74,12 @@ npm install @semec/ds
   Uso: `import { Tabs } from "@semec/ds/react";`
 - [Paginação (`pagination`) — Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.](/componentes/paginacao) — `src/components/pagination.tsx` — md: `/components/paginacao.md`
   Uso: `import { Pagination } from "@semec/ds/react";`
-- [Gatilho da barra lateral (`sidebar-trigger`) — Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.](/componentes/gatilho-da-barra-lateral) — `src/components/sidebar-trigger.tsx` — md: `/components/gatilho-da-barra-lateral.md`
+- [Gatilho da barra lateral (`sidebar-trigger`) — `SidebarToggleButton`: botão controlado (`open` + `onToggle`) para colapsar/expandir uma sidebar cujo estado vive no seu layout (ex.: Header). Alterna entre ícones PanelLeftOpen e PanelLeftClose. Dentro de `SidebarProvider`, use `SidebarTrigger` (ver Barra lateral), que não recebe `open`/`onToggle`.](/componentes/gatilho-da-barra-lateral) — `src/components/sidebar-trigger.tsx` — md: `/components/gatilho-da-barra-lateral.md`
   Uso: `import { SidebarToggleButton } from "@semec/ds/react";`
 - [Modal (`dialog`) — Diálogo modal acessível com overlay, header, título, descrição e footer.](/componentes/modal) — `src/components/dialog.tsx` — md: `/components/modal.md`
   Uso: `import { Dialog } from "@semec/ds/react";`
 - [Notificação (`toast`) — Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.](/componentes/notificacao) — `src/components/toast.tsx` — md: `/components/notificacao.md`
-  Uso: `import { ToastProvider } from "@semec/ds/react";`
+  Uso: `import { Toaster } from "@semec/ds/react";`
 - [Dica (`tooltip`) — Dica curta ao passar o ponteiro ou focar o elemento.](/componentes/dica) — `src/components/tooltip.tsx` — md: `/components/dica.md`
   Uso: `import { Tooltip } from "@semec/ds/react";`
 - [Aviso (`alert`) — Mensagem de feedback em linha, com ícone automático por variante.](/componentes/aviso) — `src/components/alert.tsx` — md: `/components/aviso.md`
@@ -114,7 +114,7 @@ npm install @semec/ds
   Uso: `import { Drawer } from "@semec/ds/react";`
 - [Sheet (`sheet`) — Painel lateral modal com overlay. Variantes left/right/top/bottom.](/componentes/sheet) — `src/components/sheet.tsx` — md: `/components/sheet.md`
   Uso: `import { Sheet } from "@semec/ds/react";`
-- [Tabela de dados (`data-table`) — Tabela com ordenação visual, paginação e empty states.](/componentes/tabela-de-dados) — `src/components/data-table.tsx` — md: `/components/tabela-de-dados.md`
+- [Tabela de dados (`data-table`) — Tabela com ordenação, paginação e estados vazios.](/componentes/tabela-de-dados) — `src/components/data-table.tsx` — md: `/components/tabela-de-dados.md`
   Uso: `import { DataTable } from "@semec/ds/react";`
 - [Linha do tempo (`timeline`) — Sequência temporal com dots, conectores e conteúdo.](/componentes/timeline) — `src/components/timeline.tsx` — md: `/components/timeline.md`
   Uso: `import { Timeline } from "@semec/ds/react";`
@@ -149,4 +149,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--action-primary` etc.), nunca hex solto
 
-> Gerado 2026-10-14T17:34:38.075Z a partir de packages/react/manifest.js. Versão 3.0.0.
+> Gerado 2026-10-14T18:06:14.000Z a partir de packages/react/manifest.js. Versão 3.0.0.

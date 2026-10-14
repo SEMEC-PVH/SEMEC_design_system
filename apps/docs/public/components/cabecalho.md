@@ -43,7 +43,7 @@ import { Button } from "@semec/ds/react";
       <HeaderNavLink href="/prefeitura" current>Prefeitura</HeaderNavLink>
       <HeaderNavLink href="/servicos">Serviços</HeaderNavLink>
     </HeaderNav>
-    <Button asChild size="sm">
+    <Button asChild>
       <a href="/contato">Fale Conosco</a>
     </Button>
   </div>

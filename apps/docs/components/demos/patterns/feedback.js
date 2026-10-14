@@ -10,19 +10,16 @@ export const feedbackPatterns = {
     filename: "SucessoDemo.jsx",
     prompt:
       "Crie feedback de sucesso usando @semec/ds/react: Alert variant success em linha e Toast temporário disparado pela ação, com anúncio em aria-live.",
-    usage: `import { Alert, AlertDescription, AlertTitle, Button, Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport, useToast } from "@semec/ds/react";
+    usage: `import { Alert, AlertDescription, AlertTitle, Button, Toaster, useToast } from "@semec/ds/react";
 
+// <Toaster /> vai UMA vez no layout raiz do app (ex.: app/layout.tsx)
 function Sucesso() {
-  const { toasts, toast } = useToast();
+  const { toast } = useToast();
   return (
-    <ToastProvider>
+    <>
       <Alert variant="success"><AlertTitle>Requerimento protocolado</AlertTitle><AlertDescription>Protocolo 2026.042 gerado com sucesso.</AlertDescription></Alert>
-      <Button onClick={() => toast({ variant: "success", title: "Rascunho salvo" })}>Salvar alterações</Button>
-      {toasts.map(({ id, title, description, variant, ...rest }) => (
-        <Toast key={id} variant={variant} {...rest}><ToastTitle>{title}</ToastTitle><ToastDescription>{description}</ToastDescription><ToastClose /></Toast>
-      ))}
-      <ToastViewport />
-    </ToastProvider>
+      <Button onClick={() => toast({ variant: "success", title: "Rascunho salvo", description: "As alterações foram guardadas agora." })}>Salvar alterações</Button>
+    </>
   );
 }`,
   },
