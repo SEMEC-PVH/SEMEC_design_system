@@ -105,10 +105,17 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Campo de texto. Estado de erro via `aria-invalid`.",
     variants: [{ prop: "estados", values: "padrão · inválido (aria-invalid) · disabled" }],
-    usage: `import { Input } from "@semec/ds/react";
+    usage: `import { FormField, Input } from "@semec/ds/react";
 
-<Input placeholder="Nome completo" />
-<Input aria-invalid="true" />`,
+// Todo campo precisa de rótulo visível (placeholder não substitui o rótulo)
+<FormField label="Nome completo" htmlFor="nome-completo">
+  <Input id="nome-completo" autoComplete="name" />
+</FormField>
+
+// Estado inválido: aria-invalid + mensagem ligada por aria-describedby (\`<id do FormField>-error\`)
+<FormField id="cpf-campo" label="CPF" htmlFor="cpf" error="Informe os 11 dígitos do CPF.">
+  <Input id="cpf" inputMode="numeric" aria-invalid="true" aria-describedby="cpf-campo-error" />
+</FormField>`,
   },
   {
     code: "textarea",
@@ -118,9 +125,11 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Campo multilinha com as mesmas variantes visuais do campo de texto.",
     variants: [{ prop: "estados", values: "padrão · inválido · disabled" }],
-    usage: `import { Textarea } from "@semec/ds/react";
+    usage: `import { FormField, Textarea } from "@semec/ds/react";
 
-<Textarea rows={4} placeholder="Descreva a demanda" />`,
+<FormField label="Descreva a demanda" htmlFor="demanda">
+  <Textarea id="demanda" rows={4} />
+</FormField>`,
   },
   {
     code: "select",
@@ -147,10 +156,13 @@ import { Download, Search, Trash2 } from "lucide-react";
     file: "src/components/combobox.tsx",
     category: "formularios",
     desc: "Campo com busca e lista filtrada. Opções via `options`.",
-    variants: [{ prop: "props", values: "options · value · onChange · placeholder · emptyMessage · disabled" }],
+    variants: [{ prop: "props", values: "options · value · onChange · placeholder · emptyMessage · disabled · ariaLabel" }],
     usage: `import { Combobox } from "@semec/ds/react";
 
+// ariaLabel dá o nome acessível do campo (o padrão genérico "Selecionar" não diz o que se escolhe)
 <Combobox
+  ariaLabel="Tipo de documento"
+  placeholder="Selecione o tipo de documento"
   options={[{ value: "cnpj", label: "CNPJ" }, { value: "cpf", label: "CPF" }]}
   value={valor}
   onChange={setValor}
@@ -164,9 +176,11 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: 'Data com `<input type="date">` nativo — sem biblioteca de calendário.',
     variants: [{ prop: "props", values: "nativo HTML (min · max · disabled) + variantes visuais do campo" }],
-    usage: `import { DatePicker } from "@semec/ds/react";
+    usage: `import { DatePicker, FormField } from "@semec/ds/react";
 
-<DatePicker defaultValue="2026-08-31" />`,
+<FormField label="Data de vencimento" htmlFor="vencimento">
+  <DatePicker id="vencimento" defaultValue="2026-08-31" />
+</FormField>`,
   },
   {
     code: "file-upload",
@@ -178,7 +192,13 @@ import { Download, Search, Trash2 } from "lucide-react";
     variants: [{ prop: "props", values: "accept · maxSize · label · hint · error · onChange" }],
     usage: `import { FileUpload } from "@semec/ds/react";
 
-<FileUpload accept=".pdf,image/*" maxSize={5 * 1024 * 1024} hint="PDF ou imagem, até 5 MB" />`,
+// \`label\` é o rótulo do campo de arquivo — não omita
+<FileUpload
+  label="Documento de identidade"
+  accept=".pdf,image/*"
+  maxSize={5 * 1024 * 1024}
+  hint="PDF ou imagem, até 5 MB"
+/>`,
   },
   {
     code: "checkbox",
@@ -324,12 +344,13 @@ function Formulario() {
     desc: "Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.",
     variants: [
       { prop: "composição", values: "Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption" },
-      { prop: "a11y", values: "role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount" },
+      { prop: "a11y", values: "scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome" },
     ],
-    usage: `import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/ds/react";
+    usage: `import { Table, TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/ds/react";
 
 // Básico
 <Table>
+  <TableCaption>Serviços solicitados</TableCaption>
   <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
   <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>
 </Table>
@@ -347,8 +368,8 @@ function Formulario() {
     variants: [],
     usage: `import { Skeleton } from "@semec/ds/react";
 
-<Skeleton className="h-4 w-[250px]" />
-<Skeleton className="h-4 w-[180px]" />`,
+<Skeleton className="h-4 w-3/4" />
+<Skeleton className="h-4 w-1/2" />`,
   },
   {
     code: "empty-state",
@@ -437,7 +458,7 @@ import { Button } from "@semec/ds/react";
       <HeaderNavLink href="/prefeitura" current>Prefeitura</HeaderNavLink>
       <HeaderNavLink href="/servicos">Serviços</HeaderNavLink>
     </HeaderNav>
-    <Button asChild size="sm">
+    <Button asChild>
       <a href="/contato">Fale Conosco</a>
     </Button>
   </div>
@@ -486,14 +507,17 @@ import { Button } from "@semec/ds/react";
     label: "Gatilho da barra lateral",
     file: "src/components/sidebar-trigger.tsx",
     category: "navegacao",
-    desc: "Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.",
+    desc: "`SidebarToggleButton`: botão controlado (`open` + `onToggle`) para colapsar/expandir uma sidebar cujo estado vive no seu layout (ex.: Header). Alterna entre ícones PanelLeftOpen e PanelLeftClose. Dentro de `SidebarProvider`, use `SidebarTrigger` (ver Barra lateral), que não recebe `open`/`onToggle`.",
     variants: [
       { prop: "props", values: "open · onToggle · labelOpen · labelClosed" },
       { prop: "a11y", values: "aria-expanded · aria-label dinâmico (Abrir/Fechar menu)" },
     ],
     usage: `import { SidebarToggleButton } from "@semec/ds/react";
 
-<SidebarToggleButton open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />`,
+// Estado no seu layout; o rótulo acessível vem de labelOpen/labelClosed
+<SidebarToggleButton open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+
+// Com SidebarProvider (componente Barra lateral), use <SidebarTrigger /> — sem open/onToggle`,
   },
   {
     code: "dialog",
@@ -525,16 +549,20 @@ import { Button } from "@semec/ds/react";
     desc: "Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.",
     variants: [
       { prop: "variant", values: "default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive" },
-      { prop: "uso", values: "useToast() em formulários, botões de ação e fluxos assíncronos" },
+      { prop: "uso", values: "<Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos" },
     ],
-    usage: `import { ToastProvider, ToastViewport, useToast } from "@semec/ds/react";
+    usage: `import { Toaster, useToast, Button } from "@semec/ds/react";
 
+// Dispare de qualquer componente com useToast():
 function Acao() {
   const { toast } = useToast();
   return <Button onClick={() => toast({ variant: "success", title: "Protocolo enviado" })}>Enviar</Button>;
 }
 
-// no app: <ToastProvider><App /><ToastViewport /></ToastProvider>`,
+// Monte <Toaster /> UMA vez no root do app (ex.: app/layout.tsx).
+// Não use ToastProvider/ToastViewport soltos: sem o Toaster nenhum toast aparece.
+<Acao />
+<Toaster />`,
   },
   {
     code: "tooltip",
@@ -545,10 +573,11 @@ function Acao() {
     desc: "Dica curta ao passar o ponteiro ou focar o elemento.",
     variants: [{ prop: "composição", values: "TooltipProvider · Tooltip · TooltipTrigger · TooltipContent" }],
     usage: `import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } from "@semec/ds/react";
+import { HelpCircle } from "lucide-react";
 
 <TooltipProvider>
   <Tooltip>
-    <TooltipTrigger asChild><IconButton aria-label="Ajuda"><HelpCircle /></IconButton></TooltipTrigger>
+    <TooltipTrigger asChild><IconButton label="Ajuda"><HelpCircle /></IconButton></TooltipTrigger>
     <TooltipContent>Explica o campo ao lado</TooltipContent>
   </Tooltip>
 </TooltipProvider>`,
@@ -633,7 +662,8 @@ function Acao() {
   <PopoverTrigger asChild>
     <Button variant="outline">Filtros</Button>
   </PopoverTrigger>
-  <PopoverContent>
+  {/* PopoverContent é role=dialog: dê um nome com aria-label ou aria-labelledby */}
+  <PopoverContent aria-label="Filtros">
     <p>Opções de filtro aqui.</p>
   </PopoverContent>
 </Popover>`,
@@ -713,8 +743,9 @@ import { Bold } from "lucide-react";
     variants: [],
     usage: `import { Progress } from "@semec/ds/react";
 
-<Progress value={60} />
-<p className="text-sm text-muted-foreground">60% concluído</p>`,
+// Nome acessível obrigatório: aria-label ou aria-labelledby
+<p id="envio-progresso" className="text-sm text-muted-foreground">Envio dos documentos: 60% concluído</p>
+<Progress value={60} aria-labelledby="envio-progresso" />`,
   },
   {
     code: "slider",
@@ -726,7 +757,11 @@ import { Bold } from "lucide-react";
     variants: [],
     usage: `import { Slider } from "@semec/ds/react";
 
-<Slider defaultValue={[50]} max={100} step={1} />`,
+// Nome acessível obrigatório: aria-label (ou aria-labelledby) vai para o polegar
+<Slider defaultValue={[50]} max={100} step={1} aria-label="Raio de busca em km" />
+
+// Faixa com 2 polegares: anunciados como "Faixa de preço (1 de 2)" e "(2 de 2)"; use getAriaLabel(i) para nomes próprios
+<Slider defaultValue={[100, 500]} max={1000} step={10} aria-label="Faixa de preço" />`,
   },
   {
     code: "input-otp",
@@ -796,13 +831,13 @@ import { Bold } from "lucide-react";
     variants: [
       { prop: "composição", values: "DropdownMenu · Trigger · Content · Item · CheckboxItem · RadioItem · Label · Separator · Sub · SubTrigger · SubContent" },
     ],
-    usage: `import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@semec/ds/react";
-import { Button } from "@semec/ds/react";
+    usage: `import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, IconButton } from "@semec/ds/react";
 import { MoreHorizontal } from "lucide-react";
 
+// Gatilho só com ícone: use IconButton (label obrigatório vira o nome acessível)
 <DropdownMenu>
   <DropdownMenuTrigger asChild>
-    <Button variant="ghost" size="icon"><MoreHorizontal /></Button>
+    <IconButton variant="ghost" label="Mais ações do protocolo"><MoreHorizontal /></IconButton>
   </DropdownMenuTrigger>
   <DropdownMenuContent>
     <DropdownMenuItem>Editar</DropdownMenuItem>
@@ -872,19 +907,27 @@ import { MoreHorizontal } from "lucide-react";
     label: "Tabela de dados",
     file: "src/components/data-table.tsx",
     category: "conteudo-dados",
-    desc: "Tabela com ordenação visual, paginação e empty states.",
+    desc: "Tabela com ordenação, paginação e estados vazios.",
     variants: [
       { prop: "props", values: "columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption" },
+      { prop: "a11y", values: "ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px" },
     ],
-    usage: `import { DataTable } from "@semec/ds/react";
+    usage: `import { DataTable, Button } from "@semec/ds/react";
 
-const columns = [
-  { key: "nome", header: "Nome", sortable: true },
-  { key: "status", header: "Status" },
-];
-
+// Quando a linha tem várias ações, prefira uma coluna de ações com render + Button a onRowClick
 <DataTable
-  columns={columns}
+  caption="Protocolos do contribuinte"
+  columns={[
+    { key: "nome", header: "Nome", sortable: true },
+    { key: "status", header: "Status" },
+    {
+      key: "acoes",
+      header: "Ações",
+      render: (row) => (
+        <Button variant="outline" onClick={() => abrirProtocolo(row)}>Ver detalhes</Button>
+      ),
+    },
+  ]}
   data={registros}
   sortKey={sortField}
   sortDir={sortDir}
@@ -988,9 +1031,10 @@ const columns = [
     </SidebarContent>
     <SidebarFooter>Footer</SidebarFooter>
   </Sidebar>
+  {/* SidebarInset já renderiza <main>: não aninhe outro <main> dentro dele */}
   <SidebarInset>
     <SidebarTrigger />
-    <main>Conteúdo</main>
+    <div className="p-4">Conteúdo</div>
   </SidebarInset>
 </SidebarProvider>`,
   },
