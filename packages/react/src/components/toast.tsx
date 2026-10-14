@@ -7,14 +7,27 @@ import { X } from "lucide-react";
 
 import { cn } from "../lib/utils";
 
-const ToastProvider = ToastPrimitives.Provider;
+// Rótulos PT-BR padrão (ADR-016). Os padrões do Radix são em inglês
+// ("Notification", "Notifications ({hotkey})") e seriam lidos pelo leitor de tela.
+const TOAST_LABEL = "Notificação";
+const TOAST_VIEWPORT_LABEL = "Notificações ({hotkey})";
+const TOAST_CLOSE_LABEL = "Fechar notificação";
+
+const ToastProvider = ({
+  label = TOAST_LABEL,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof ToastPrimitives.Provider>) => (
+  <ToastPrimitives.Provider label={label} {...props} />
+);
+ToastProvider.displayName = ToastPrimitives.Provider.displayName;
 
 const ToastViewport = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Viewport>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport>
->(({ className, ...props }, ref) => (
+>(({ className, label = TOAST_VIEWPORT_LABEL, ...props }, ref) => (
   <ToastPrimitives.Viewport
     ref={ref}
+    label={label}
     className={cn(
       "fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col gap-2 p-4 sm:top-4 sm:right-4 md:max-w-[420px]",
       className
@@ -81,6 +94,7 @@ const ToastClose = React.forwardRef<
       className
     )}
     toast-close=""
+    aria-label={TOAST_CLOSE_LABEL}
     {...props}
   >
     <X className="h-4 w-4" aria-hidden="true" />
@@ -233,11 +247,24 @@ function useToast() {
   };
 }
 
-function Toaster() {
+interface ToasterProps {
+  /** Prefixo anunciado pelo leitor de tela em cada aviso. Padrão: "Notificação". */
+  label?: string;
+  /** Nome da região de avisos; `{hotkey}` vira o atalho (F8). Padrão: "Notificações ({hotkey})". */
+  viewportLabel?: string;
+  /** Nome acessível do botão de fechar. Padrão: "Fechar notificação". */
+  closeLabel?: string;
+}
+
+function Toaster({
+  label = TOAST_LABEL,
+  viewportLabel = TOAST_VIEWPORT_LABEL,
+  closeLabel = TOAST_CLOSE_LABEL,
+}: ToasterProps = {}) {
   const { toasts } = useToast();
 
   return (
-    <ToastProvider>
+    <ToastProvider label={label}>
       {toasts.map(({ id, title, description, action, ...props }) => (
         <Toast key={id} {...props}>
           <div className="grid gap-1">
@@ -247,10 +274,10 @@ function Toaster() {
             )}
           </div>
           {action}
-          <ToastClose />
+          <ToastClose aria-label={closeLabel} />
         </Toast>
       ))}
-      <ToastViewport />
+      <ToastViewport label={viewportLabel} />
     </ToastProvider>
   );
 }
@@ -265,4 +292,5 @@ export {
   ToastAction,
   Toaster,
   useToast,
+  type ToasterProps,
 };
