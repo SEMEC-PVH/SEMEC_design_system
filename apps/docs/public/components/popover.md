@@ -39,7 +39,8 @@ import { Popover, PopoverTrigger, PopoverContent, Button } from "@semec/ds/react
   <PopoverTrigger asChild>
     <Button variant="outline">Filtros</Button>
   </PopoverTrigger>
-  <PopoverContent>
+  {/* PopoverContent é role=dialog: dê um nome com aria-label ou aria-labelledby */}
+  <PopoverContent aria-label="Filtros">
     <p>Opções de filtro aqui.</p>
   </PopoverContent>
 </Popover>

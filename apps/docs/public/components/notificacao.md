@@ -4,7 +4,7 @@ code: "toast"
 slug: "notificacao"
 file: "src/components/toast.tsx"
 category: "feedback"
-variants: "variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: useToast() em formulários, botões de ação e fluxos assíncronos"
+variants: "variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos"
 ---
 
 # Notificação — `toast`
@@ -16,7 +16,7 @@ variants: "variant: default · success (verde SEMEC #82C353, texto #26325B, 12px
 ## Variantes
 
 - **variant**: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive
-- **uso**: useToast() em formulários, botões de ação e fluxos assíncronos
+- **uso**: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos
 
 ## Instalação (@semec/ds)
 
@@ -33,20 +33,24 @@ npm install @semec/ds
 ## Uso
 
 ```tsx
-import { ToastProvider, ToastViewport, useToast } from "@semec/ds/react";
+import { Toaster, useToast, Button } from "@semec/ds/react";
 
+// Dispare de qualquer componente com useToast():
 function Acao() {
   const { toast } = useToast();
   return <Button onClick={() => toast({ variant: "success", title: "Protocolo enviado" })}>Enviar</Button>;
 }
 
-// no app: <ToastProvider><App /><ToastViewport /></ToastProvider>
+// Monte <Toaster /> UMA vez no root do app (ex.: app/layout.tsx).
+// Não use ToastProvider/ToastViewport soltos: sem o Toaster nenhum toast aparece.
+<Acao />
+<Toaster />
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um toast (Notificação) usando @semec/ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: useToast() em formulários, botões de ação e fluxos assíncronos. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.
+Crie um toast (Notificação) usando @semec/ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.
 ```
 
 ## Fonte
@@ -61,14 +65,27 @@ import { X } from "lucide-react";
 
 import { cn } from "../lib/utils";
 
-const ToastProvider = ToastPrimitives.Provider;
+// Rótulos PT-BR padrão (ADR-016). Os padrões do Radix são em inglês
+// ("Notification", "Notifications ({hotkey})") e seriam lidos pelo leitor de tela.
+const TOAST_LABEL = "Notificação";
+const TOAST_VIEWPORT_LABEL = "Notificações ({hotkey})";
+const TOAST_CLOSE_LABEL = "Fechar notificação";
+
+const ToastProvider = ({
+  label = TOAST_LABEL,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof ToastPrimitives.Provider>) => (
+  <ToastPrimitives.Provider label={label} {...props} />
+);
+ToastProvider.displayName = ToastPrimitives.Provider.displayName;
 
 const ToastViewport = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Viewport>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport>
->(({ className, ...props }, ref) => (
+>(({ className, label = TOAST_VIEWPORT_LABEL, ...props }, ref) => (
   <ToastPrimitives.Viewport
     ref={ref}
+    label={label}
     className={cn(
       "fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col gap-2 p-4 sm:top-4 sm:right-4 md:max-w-[420px]",
       className
@@ -135,6 +152,7 @@ const ToastClose = React.forwardRef<
       className
     )}
     toast-close=""
+    aria-label={TOAST_CLOSE_LABEL}
     {...props}
   >
     <X className="h-4 w-4" aria-hidden="true" />
@@ -287,11 +305,24 @@ function useToast() {
   };
 }
 
-function Toaster() {
+interface ToasterProps {
+  /** Prefixo anunciado pelo leitor de tela em cada aviso. Padrão: "Notificação". */
+  label?: string;
+  /** Nome da região de avisos; `{hotkey}` vira o atalho (F8). Padrão: "Notificações ({hotkey})". */
+  viewportLabel?: string;
+  /** Nome acessível do botão de fechar. Padrão: "Fechar notificação". */
+  closeLabel?: string;
+}
+
+function Toaster({
+  label = TOAST_LABEL,
+  viewportLabel = TOAST_VIEWPORT_LABEL,
+  closeLabel = TOAST_CLOSE_LABEL,
+}: ToasterProps = {}) {
   const { toasts } = useToast();
 
   return (
-    <ToastProvider>
+    <ToastProvider label={label}>
       {toasts.map(({ id, title, description, action, ...props }) => (
         <Toast key={id} {...props}>
           <div className="grid gap-1">
@@ -301,10 +332,10 @@ function Toaster() {
             )}
           </div>
           {action}
-          <ToastClose />
+          <ToastClose aria-label={closeLabel} />
         </Toast>
       ))}
-      <ToastViewport />
+      <ToastViewport label={viewportLabel} />
     </ToastProvider>
   );
 }
@@ -319,6 +350,7 @@ export {
   ToastAction,
   Toaster,
   useToast,
+  type ToasterProps,
 };
 ```
 

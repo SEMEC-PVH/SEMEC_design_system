@@ -33,10 +33,11 @@ npm install @semec/ds
 
 ```tsx
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } from "@semec/ds/react";
+import { HelpCircle } from "lucide-react";
 
 <TooltipProvider>
   <Tooltip>
-    <TooltipTrigger asChild><IconButton aria-label="Ajuda"><HelpCircle /></IconButton></TooltipTrigger>
+    <TooltipTrigger asChild><IconButton label="Ajuda"><HelpCircle /></IconButton></TooltipTrigger>
     <TooltipContent>Explica o campo ao lado</TooltipContent>
   </Tooltip>
 </TooltipProvider>

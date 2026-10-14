@@ -34,8 +34,9 @@ npm install @semec/ds
 ```tsx
 import { Progress } from "@semec/ds/react";
 
-<Progress value={60} />
-<p className="text-sm text-muted-foreground">60% concluído</p>
+// Nome acessível obrigatório: aria-label ou aria-labelledby
+<p id="envio-progresso" className="text-sm text-muted-foreground">Envio dos documentos: 60% concluído</p>
+<Progress value={60} aria-labelledby="envio-progresso" />
 ```
 
 ## Prompt para IA

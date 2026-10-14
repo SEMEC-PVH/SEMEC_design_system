@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-14T17:34:38.075Z — packages/react/manifest.js + packages/react/* — versão 3.0.0
+> Gerado 2026-10-14T17:33:36.000Z — packages/react/manifest.js + packages/react/* — versão 3.0.0
 
 ## Instalação
 
@@ -63,6 +63,7 @@ export * from "./components/toggle";
 export * from "./components/tooltip";
 export * from "./lib/masks";
 export * from "./lib/validators";
+export { cn } from "./lib/utils";
 
 ```
 
@@ -1020,10 +1021,17 @@ Variantes: estados: padrão · inválido (aria-invalid) · disabled
 
 Uso:
 ```tsx
-import { Input } from "@semec/ds/react";
+import { FormField, Input } from "@semec/ds/react";
 
-<Input placeholder="Nome completo" />
-<Input aria-invalid="true" />
+// Todo campo precisa de rótulo visível (placeholder não substitui o rótulo)
+<FormField label="Nome completo" htmlFor="nome-completo">
+  <Input id="nome-completo" autoComplete="name" />
+</FormField>
+
+// Estado inválido: aria-invalid + mensagem ligada por aria-describedby (`<id do FormField>-error`)
+<FormField id="cpf-campo" label="CPF" htmlFor="cpf" error="Informe os 11 dígitos do CPF.">
+  <Input id="cpf" inputMode="numeric" aria-invalid="true" aria-describedby="cpf-campo-error" />
+</FormField>
 ```
 
 Prompt:
@@ -1042,7 +1050,7 @@ const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLI
     <input
       type={type}
       className={cn(
-        "flex h-11 w-full rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/30",
+        "flex h-11 w-full rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
         className
       )}
       ref={ref}
@@ -1065,9 +1073,11 @@ Variantes: estados: padrão · inválido · disabled
 
 Uso:
 ```tsx
-import { Textarea } from "@semec/ds/react";
+import { FormField, Textarea } from "@semec/ds/react";
 
-<Textarea rows={4} placeholder="Descreva a demanda" />
+<FormField label="Descreva a demanda" htmlFor="demanda">
+  <Textarea id="demanda" rows={4} />
+</FormField>
 ```
 
 Prompt:
@@ -1087,7 +1097,7 @@ const Textarea = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <textarea
     className={cn(
-      "flex min-h-[80px] w-full rounded-md border border-input bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/30",
+      "flex min-h-[80px] w-full rounded-md border border-input bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
       className
     )}
     ref={ref}
@@ -1238,7 +1248,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-lg py-2 pl-3 pr-8 text-sm outline-none whitespace-normal leading-relaxed focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex w-full cursor-default select-none items-center rounded-lg py-2 pl-3 pr-8 text-sm outline-none whitespace-normal leading-relaxed focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     {...props}
@@ -1285,13 +1295,16 @@ export {
 
 Desc: Campo com busca e lista filtrada. Opções via `options`.
 
-Variantes: props: options · value · onChange · placeholder · emptyMessage · disabled
+Variantes: props: options · value · onChange · placeholder · emptyMessage · disabled · ariaLabel
 
 Uso:
 ```tsx
 import { Combobox } from "@semec/ds/react";
 
+// ariaLabel dá o nome acessível do campo (o padrão genérico "Selecionar" não diz o que se escolhe)
 <Combobox
+  ariaLabel="Tipo de documento"
+  placeholder="Selecione o tipo de documento"
   options={[{ value: "cnpj", label: "CNPJ" }, { value: "cpf", label: "CPF" }]}
   value={valor}
   onChange={setValor}
@@ -1300,7 +1313,7 @@ import { Combobox } from "@semec/ds/react";
 
 Prompt:
 ```text
-Crie um combobox (Combobox) usando @semec/ds/react (`src/components/combobox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: options · value · onChange · placeholder · emptyMessage · disabled. Campo com busca e lista filtrada. Opções via `options`.
+Crie um combobox (Combobox) usando @semec/ds/react (`src/components/combobox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: options · value · onChange · placeholder · emptyMessage · disabled · ariaLabel. Campo com busca e lista filtrada. Opções via `options`.
 ```
 
 Fonte:
@@ -1443,9 +1456,11 @@ Variantes: props: nativo HTML (min · max · disabled) + variantes visuais do ca
 
 Uso:
 ```tsx
-import { DatePicker } from "@semec/ds/react";
+import { DatePicker, FormField } from "@semec/ds/react";
 
-<DatePicker defaultValue="2026-08-31" />
+<FormField label="Data de vencimento" htmlFor="vencimento">
+  <DatePicker id="vencimento" defaultValue="2026-08-31" />
+</FormField>
 ```
 
 Prompt:
@@ -1509,7 +1524,13 @@ Uso:
 ```tsx
 import { FileUpload } from "@semec/ds/react";
 
-<FileUpload accept=".pdf,image/*" maxSize={5 * 1024 * 1024} hint="PDF ou imagem, até 5 MB" />
+// `label` é o rótulo do campo de arquivo — não omita
+<FileUpload
+  label="Documento de identidade"
+  accept=".pdf,image/*"
+  maxSize={5 * 1024 * 1024}
+  hint="PDF ou imagem, até 5 MB"
+/>
 ```
 
 Prompt:
@@ -1532,6 +1553,17 @@ export interface FileUploadProps
   hint?: string;
   error?: string;
   onChange?: (files: File[]) => void;
+  /** Arquivos selecionados (modo controlado). Mantém a seleção ao voltar de etapa. */
+  value?: File[];
+  /** Permite selecionar mais de um arquivo. Padrão: `true`. */
+  multiple?: boolean;
+  /** `id` do `<input type="file">` (alvo de `<label htmlFor>` e de links do ErrorSummary). */
+  id?: string;
+  /** Props extras repassadas ao `<input type="file">` (ex.: `name`, `required`). */
+  inputProps?: Omit<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    "type" | "id" | "accept" | "multiple" | "onChange" | "value"
+  >;
 }
 
 const formatBytes = (bytes: number) => {
@@ -1540,17 +1572,61 @@ const formatBytes = (bytes: number) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
+// Mesma regra do atributo `accept`: extensões (".pdf"), MIME exato ou curinga ("image/*").
+const matchesAccept = (file: File, accept?: string) => {
+  if (!accept) return true;
+  const tokens = accept
+    .split(",")
+    .map((t) => t.trim().toLowerCase())
+    .filter(Boolean);
+  if (tokens.length === 0) return true;
+  const name = file.name.toLowerCase();
+  const type = (file.type || "").toLowerCase();
+  return tokens.some((token) => {
+    if (token.startsWith(".")) return name.endsWith(token);
+    if (token.endsWith("/*")) return type.startsWith(token.slice(0, -1));
+    return type === token;
+  });
+};
+
 const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
-  ({ className, accept, maxSize, label, hint, error, onChange, ...props }, ref) => {
-    const [files, setFiles] = React.useState<File[]>([]);
+  (
+    {
+      className,
+      accept,
+      maxSize,
+      label,
+      hint,
+      error,
+      onChange,
+      value,
+      multiple = true,
+      id: idProp,
+      inputProps,
+      ...props
+    },
+    ref
+  ) => {
+    const [internalFiles, setInternalFiles] = React.useState<File[]>([]);
+    const files = value ?? internalFiles;
     const [drag, setDrag] = React.useState(false);
     const [localError, setLocalError] = React.useState<string | undefined>(undefined);
     const inputRef = React.useRef<HTMLInputElement>(null);
-    const id = React.useId();
+    const generatedId = React.useId();
+    const id = idProp ?? generatedId;
+    const hintId = `${id}-hint`;
+    const errorId = `${id}-error`;
+    const message = localError ?? error;
 
     const acceptFiles = (list: FileList | null) => {
       if (!list) return;
-      const next = Array.from(list);
+      let next = Array.from(list);
+      if (next.length === 0) return;
+      if (!multiple) next = next.slice(0, 1);
+      if (next.some((f) => !matchesAccept(f, accept))) {
+        setLocalError("Tipo de arquivo não permitido.");
+        return;
+      }
       if (maxSize) {
         const oversized = next.filter((f) => f.size > maxSize);
         if (oversized.length > 0) {
@@ -1561,9 +1637,14 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
         }
       }
       setLocalError(undefined);
-      setFiles(next);
+      if (value === undefined) setInternalFiles(next);
       onChange?.(next);
     };
+
+    const describedBy =
+      [inputProps?.["aria-describedby"], hint ? hintId : null, message ? errorId : null]
+        .filter(Boolean)
+        .join(" ") || undefined;
 
     return (
       <div
@@ -1589,19 +1670,27 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
           }}
           onClick={() => inputRef.current?.click()}
           className={cn(
-            "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background px-6 py-8 text-center transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:border-border-strong",
+            "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background px-6 py-8 text-center transition-colors duration-fast ease-standard has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background hover:border-border-strong",
             drag && "border-ring bg-tint",
-            (localError ?? error) && "border-destructive",
-            className
+            message && "border-destructive"
           )}
         >
           <input
+            aria-label={label ? undefined : "Escolher arquivo"}
+            {...inputProps}
             ref={inputRef}
             id={id}
             type="file"
             accept={accept}
-            multiple
-            className="sr-only"
+            multiple={multiple}
+            aria-describedby={describedBy}
+            aria-invalid={message ? true : inputProps?.["aria-invalid"]}
+            className={cn("sr-only", inputProps?.className)}
+            onClick={(e) => {
+              // O clique na zona já abre o seletor; evita reabrir pela propagação.
+              e.stopPropagation();
+              inputProps?.onClick?.(e);
+            }}
             onChange={(e) => {
               acceptFiles(e.target.files);
               e.currentTarget.value = "";
@@ -1612,7 +1701,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             Arraste um arquivo ou <span className="font-medium text-primary">clique para escolher</span>
           </p>
           {hint ? (
-            <p className="text-xs text-muted-foreground">{hint}</p>
+            <p id={hintId} className="text-xs text-muted-foreground">{hint}</p>
           ) : null}
         </div>
         {files.length > 0 ? (
@@ -1630,9 +1719,9 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             ))}
           </ul>
         ) : null}
-        {localError ?? error ? (
-          <p role="alert" className="text-xs text-destructive">
-            {localError ?? error}
+        {message ? (
+          <p id={errorId} role="alert" className="text-xs text-destructive">
+            {message}
           </p>
         ) : null}
       </div>
@@ -1642,6 +1731,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
 FileUpload.displayName = "FileUpload";
 
 export { FileUpload };
+
 ```
 
 ---
@@ -2267,10 +2357,10 @@ const badgeVariants = cva(
         default: "border-transparent bg-primary text-primary-foreground",
         secondary: "border-transparent bg-secondary text-secondary-foreground",
         outline: "text-foreground",
-        success: "border-transparent bg-success/15 text-success",
-        warning: "border-transparent bg-warning/15 text-warning",
-        danger: "border-transparent bg-destructive/15 text-destructive",
-        info: "border-transparent bg-info/15 text-info",
+        success: "border-transparent bg-success-surface text-success",
+        warning: "border-transparent bg-warning-surface text-warning",
+        danger: "border-transparent bg-destructive-surface text-destructive",
+        info: "border-transparent bg-info-surface text-info",
       },
     },
     defaultVariants: {
@@ -2298,14 +2388,15 @@ export { Badge, badgeVariants };
 
 Desc: Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
 
-Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount
+Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome
 
 Uso:
 ```tsx
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/ds/react";
+import { Table, TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/ds/react";
 
 // Básico
 <Table>
+  <TableCaption>Serviços solicitados</TableCaption>
   <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
   <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>
 </Table>
@@ -2316,7 +2407,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 
 Prompt:
 ```text
-Crie um table (Tabela) usando @semec/ds/react (`src/components/table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
+Crie um table (Tabela) usando @semec/ds/react (`src/components/table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
 ```
 
 Fonte:
@@ -2456,8 +2547,8 @@ Uso:
 ```tsx
 import { Skeleton } from "@semec/ds/react";
 
-<Skeleton className="h-4 w-[250px]" />
-<Skeleton className="h-4 w-[180px]" />
+<Skeleton className="h-4 w-3/4" />
+<Skeleton className="h-4 w-1/2" />
 ```
 
 Prompt:
@@ -2803,7 +2894,7 @@ import { Button } from "@semec/ds/react";
       <HeaderNavLink href="/prefeitura" current>Prefeitura</HeaderNavLink>
       <HeaderNavLink href="/servicos">Serviços</HeaderNavLink>
     </HeaderNav>
-    <Button asChild size="sm">
+    <Button asChild>
       <a href="/contato">Fale Conosco</a>
     </Button>
   </div>
@@ -3111,7 +3202,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
           onClick={() => go(page - 1)}
           disabled={page <= 1}
           aria-label="Página anterior"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
         >
           <ChevronLeft className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -3120,7 +3211,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
             <span
               key={`gap-${i}`}
               aria-hidden="true"
-              className="flex h-9 w-9 items-center justify-center text-sm text-muted-foreground"
+              className="flex h-11 w-11 items-center justify-center text-sm text-muted-foreground"
             >
               …
             </span>
@@ -3131,7 +3222,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
               onClick={() => go(p)}
               aria-current={p === page ? "page" : undefined}
               className={cn(
-                "inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-input px-2 text-sm text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                "inline-flex h-11 min-w-11 items-center justify-center rounded-md border border-input px-2 text-sm text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 p === page && "border-transparent bg-primary text-primary-foreground hover:bg-primary"
               )}
             >
@@ -3144,7 +3235,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
           onClick={() => go(page + 1)}
           disabled={page >= pageCount}
           aria-label="Próxima página"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
         >
           <ChevronRight className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -3161,7 +3252,7 @@ export { Pagination };
 
 ### Gatilho da barra lateral (`sidebar-trigger`) — `src/components/sidebar-trigger.tsx` — slug: gatilho-da-barra-lateral
 
-Desc: Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
+Desc: `SidebarToggleButton`: botão controlado (`open` + `onToggle`) para colapsar/expandir uma sidebar cujo estado vive no seu layout (ex.: Header). Alterna entre ícones PanelLeftOpen e PanelLeftClose. Dentro de `SidebarProvider`, use `SidebarTrigger` (ver Barra lateral), que não recebe `open`/`onToggle`.
 
 Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu)
 
@@ -3169,12 +3260,15 @@ Uso:
 ```tsx
 import { SidebarToggleButton } from "@semec/ds/react";
 
-<SidebarToggleButton open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />
+// Estado no seu layout; o rótulo acessível vem de labelOpen/labelClosed
+<SidebarToggleButton open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+
+// Com SidebarProvider (componente Barra lateral), use <SidebarTrigger /> — sem open/onToggle
 ```
 
 Prompt:
 ```text
-Crie um sidebar-trigger (Gatilho da barra lateral) usando @semec/ds/react (`src/components/sidebar-trigger.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
+Crie um sidebar-trigger (Gatilho da barra lateral) usando @semec/ds/react (`src/components/sidebar-trigger.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). `SidebarToggleButton`: botão controlado (`open` + `onToggle`) para colapsar/expandir uma sidebar cujo estado vive no seu layout (ex.: Header). Alterna entre ícones PanelLeftOpen e PanelLeftClose. Dentro de `SidebarProvider`, use `SidebarTrigger` (ver Barra lateral), que não recebe `open`/`onToggle`.
 ```
 
 Fonte:
@@ -3189,11 +3283,14 @@ import { IconButton, type IconButtonProps } from "./icon-button";
  *
  * **Props herdadas de IconButton:** `open` controla qual ícone exibir
  * (PanelLeftClose quando aberto, PanelLeftOpen quando fechado). `onToggle`
- * é chamado ao clicar. `label` pode ser sobrescrito para rótulos
- * específicos.
+ * é chamado ao clicar. `label` é opcional: sem ele, o nome acessível
+ * alterna entre `labelOpen` e `labelClosed`; com ele, vira um rótulo fixo
+ * (o estado continua anunciado por `aria-expanded`).
  */
 export interface SidebarToggleButtonProps
-  extends Omit<IconButtonProps, "icon"> {
+  extends Omit<IconButtonProps, "icon" | "label"> {
+  /** Rótulo acessível fixo. Opcional; padrão: `labelOpen`/`labelClosed` conforme o estado. */
+  label?: string;
   /** Estado atual da sidebar (aberta = true). */
   open?: boolean;
   /** Callback chamado ao clicar no gatilho. */
@@ -3251,7 +3348,7 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
       labelOpen = "Fechar menu",
       labelClosed = "Abrir menu",
       variant = "ghost",
-      label: _label,
+      label,
       ...props
     },
     ref
@@ -3259,7 +3356,7 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
     <IconButton
       ref={ref}
       variant={variant}
-      label={open ? labelOpen : labelClosed}
+      label={label ?? (open ? labelOpen : labelClosed)}
       aria-expanded={open}
       onClick={onToggle}
       {...props}
@@ -3424,23 +3521,27 @@ export {
 
 Desc: Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.
 
-Variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: useToast() em formulários, botões de ação e fluxos assíncronos
+Variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos
 
 Uso:
 ```tsx
-import { ToastProvider, ToastViewport, useToast } from "@semec/ds/react";
+import { Toaster, useToast, Button } from "@semec/ds/react";
 
+// Dispare de qualquer componente com useToast():
 function Acao() {
   const { toast } = useToast();
   return <Button onClick={() => toast({ variant: "success", title: "Protocolo enviado" })}>Enviar</Button>;
 }
 
-// no app: <ToastProvider><App /><ToastViewport /></ToastProvider>
+// Monte <Toaster /> UMA vez no root do app (ex.: app/layout.tsx).
+// Não use ToastProvider/ToastViewport soltos: sem o Toaster nenhum toast aparece.
+<Acao />
+<Toaster />
 ```
 
 Prompt:
 ```text
-Crie um toast (Notificação) usando @semec/ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: useToast() em formulários, botões de ação e fluxos assíncronos. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.
+Crie um toast (Notificação) usando @semec/ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.
 ```
 
 Fonte:
@@ -3454,14 +3555,27 @@ import { X } from "lucide-react";
 
 import { cn } from "../lib/utils";
 
-const ToastProvider = ToastPrimitives.Provider;
+// Rótulos PT-BR padrão (ADR-016). Os padrões do Radix são em inglês
+// ("Notification", "Notifications ({hotkey})") e seriam lidos pelo leitor de tela.
+const TOAST_LABEL = "Notificação";
+const TOAST_VIEWPORT_LABEL = "Notificações ({hotkey})";
+const TOAST_CLOSE_LABEL = "Fechar notificação";
+
+const ToastProvider = ({
+  label = TOAST_LABEL,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof ToastPrimitives.Provider>) => (
+  <ToastPrimitives.Provider label={label} {...props} />
+);
+ToastProvider.displayName = ToastPrimitives.Provider.displayName;
 
 const ToastViewport = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Viewport>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport>
->(({ className, ...props }, ref) => (
+>(({ className, label = TOAST_VIEWPORT_LABEL, ...props }, ref) => (
   <ToastPrimitives.Viewport
     ref={ref}
+    label={label}
     className={cn(
       "fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col gap-2 p-4 sm:top-4 sm:right-4 md:max-w-[420px]",
       className
@@ -3528,6 +3642,7 @@ const ToastClose = React.forwardRef<
       className
     )}
     toast-close=""
+    aria-label={TOAST_CLOSE_LABEL}
     {...props}
   >
     <X className="h-4 w-4" aria-hidden="true" />
@@ -3680,11 +3795,24 @@ function useToast() {
   };
 }
 
-function Toaster() {
+interface ToasterProps {
+  /** Prefixo anunciado pelo leitor de tela em cada aviso. Padrão: "Notificação". */
+  label?: string;
+  /** Nome da região de avisos; `{hotkey}` vira o atalho (F8). Padrão: "Notificações ({hotkey})". */
+  viewportLabel?: string;
+  /** Nome acessível do botão de fechar. Padrão: "Fechar notificação". */
+  closeLabel?: string;
+}
+
+function Toaster({
+  label = TOAST_LABEL,
+  viewportLabel = TOAST_VIEWPORT_LABEL,
+  closeLabel = TOAST_CLOSE_LABEL,
+}: ToasterProps = {}) {
   const { toasts } = useToast();
 
   return (
-    <ToastProvider>
+    <ToastProvider label={label}>
       {toasts.map(({ id, title, description, action, ...props }) => (
         <Toast key={id} {...props}>
           <div className="grid gap-1">
@@ -3694,10 +3822,10 @@ function Toaster() {
             )}
           </div>
           {action}
-          <ToastClose />
+          <ToastClose aria-label={closeLabel} />
         </Toast>
       ))}
-      <ToastViewport />
+      <ToastViewport label={viewportLabel} />
     </ToastProvider>
   );
 }
@@ -3712,6 +3840,7 @@ export {
   ToastAction,
   Toaster,
   useToast,
+  type ToasterProps,
 };
 ```
 
@@ -3726,10 +3855,11 @@ Variantes: composição: TooltipProvider · Tooltip · TooltipTrigger · Tooltip
 Uso:
 ```tsx
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } from "@semec/ds/react";
+import { HelpCircle } from "lucide-react";
 
 <TooltipProvider>
   <Tooltip>
-    <TooltipTrigger asChild><IconButton aria-label="Ajuda"><HelpCircle /></IconButton></TooltipTrigger>
+    <TooltipTrigger asChild><IconButton label="Ajuda"><HelpCircle /></IconButton></TooltipTrigger>
     <TooltipContent>Explica o campo ao lado</TooltipContent>
   </Tooltip>
 </TooltipProvider>
@@ -4159,7 +4289,8 @@ import { Popover, PopoverTrigger, PopoverContent, Button } from "@semec/ds/react
   <PopoverTrigger asChild>
     <Button variant="outline">Filtros</Button>
   </PopoverTrigger>
-  <PopoverContent>
+  {/* PopoverContent é role=dialog: dê um nome com aria-label ou aria-labelledby */}
+  <PopoverContent aria-label="Filtros">
     <p>Opções de filtro aqui.</p>
   </PopoverContent>
 </Popover>
@@ -4484,8 +4615,9 @@ Uso:
 ```tsx
 import { Progress } from "@semec/ds/react";
 
-<Progress value={60} />
-<p className="text-sm text-muted-foreground">60% concluído</p>
+// Nome acessível obrigatório: aria-label ou aria-labelledby
+<p id="envio-progresso" className="text-sm text-muted-foreground">Envio dos documentos: 60% concluído</p>
+<Progress value={60} aria-labelledby="envio-progresso" />
 ```
 
 Prompt:
@@ -4536,7 +4668,11 @@ Uso:
 ```tsx
 import { Slider } from "@semec/ds/react";
 
-<Slider defaultValue={[50]} max={100} step={1} />
+// Nome acessível obrigatório: aria-label (ou aria-labelledby) vai para o polegar
+<Slider defaultValue={[50]} max={100} step={1} aria-label="Raio de busca em km" />
+
+// Faixa com 2 polegares: anunciados como "Faixa de preço (1 de 2)" e "(2 de 2)"; use getAriaLabel(i) para nomes próprios
+<Slider defaultValue={[100, 500]} max={1000} step={10} aria-label="Faixa de preço" />
 ```
 
 Prompt:
@@ -4551,24 +4687,63 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 
 import { cn } from "../lib/utils";
 
+export interface SliderProps
+  extends React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> {
+  /**
+   * Nome acessível de cada polegar (`role="slider"`). Útil com vários polegares,
+   * ex.: `(i) => (i === 0 ? "Valor mínimo" : "Valor máximo")`.
+   * Sem ela, `aria-label`/`aria-labelledby` do Slider vão para os polegares.
+   */
+  getAriaLabel?: (index: number) => string;
+}
+
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
->(({ className, ...props }, ref) => (
-  <SliderPrimitive.Root
-    ref={ref}
-    className={cn(
-      "relative flex w-full touch-none select-none items-center",
-      className
-    )}
-    {...props}
-  >
-    <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
-      <SliderPrimitive.Range className="absolute h-full bg-primary" />
-    </SliderPrimitive.Track>
-    <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-primary bg-background shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50" />
-  </SliderPrimitive.Root>
-));
+  SliderProps
+>(
+  (
+    {
+      className,
+      "aria-label": ariaLabel,
+      "aria-labelledby": ariaLabelledBy,
+      getAriaLabel,
+      ...props
+    },
+    ref
+  ) => {
+    // Um polegar por valor (range com 2 valores = 2 polegares).
+    const count = Math.max((props.value ?? props.defaultValue ?? [0]).length, 1);
+
+    const thumbLabel = (index: number) => {
+      if (getAriaLabel) return getAriaLabel(index);
+      if (ariaLabelledBy || !ariaLabel) return undefined;
+      return count > 1 ? `${ariaLabel} (${index + 1} de ${count})` : ariaLabel;
+    };
+
+    return (
+      <SliderPrimitive.Root
+        ref={ref}
+        className={cn(
+          "relative flex w-full touch-none select-none items-center",
+          className
+        )}
+        {...props}
+      >
+        <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
+          <SliderPrimitive.Range className="absolute h-full bg-primary" />
+        </SliderPrimitive.Track>
+        {Array.from({ length: count }, (_, index) => (
+          <SliderPrimitive.Thumb
+            key={index}
+            aria-label={thumbLabel(index)}
+            aria-labelledby={getAriaLabel ? undefined : ariaLabelledBy}
+            className="block h-5 w-5 rounded-full border-2 border-primary bg-background shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50"
+          />
+        ))}
+      </SliderPrimitive.Root>
+    );
+  }
+);
 Slider.displayName = SliderPrimitive.Root.displayName;
 
 export { Slider };
@@ -4615,11 +4790,10 @@ import { cn } from "../lib/utils";
 
 interface InputOTPContextValue {
   slots: string[];
-  activeSlot: number;
   handleSlotChange: (index: number, value: string) => void;
   handleKeyDown: (index: number, e: React.KeyboardEvent<HTMLInputElement>) => void;
-  handlePaste: (e: React.ClipboardEvent<HTMLInputElement>) => void;
-  focusSlot: (index: number) => void;
+  handlePaste: (index: number, e: React.ClipboardEvent<HTMLInputElement>) => void;
+  registerSlot: (index: number, el: HTMLInputElement | null) => void;
   maxLength: number;
   disabled?: boolean;
 }
@@ -4639,90 +4813,148 @@ interface InputOTPProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onCh
   disabled?: boolean;
 }
 
+// Array de tamanho fixo: cada posição é um slot, mesmo vazio.
+// Evita que "1" no slot 1 e "6" no slot 6 virem "16" ao reconstruir o valor.
+const toSlots = (str: string, length: number) =>
+  Array.from({ length }, (_, i) => str[i] ?? "");
+
 const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
-  ({ className, value = "", onChange, maxLength = 6, disabled, children, ...props }, ref) => {
-    const [activeSlot, setActiveSlot] = React.useState(0);
+  ({ className, value, onChange, maxLength = 6, disabled, children, ...props }, ref) => {
+    const isControlled = value !== undefined;
     const slotsRef = React.useRef<(HTMLInputElement | null)[]>([]);
-    const otpValue = value ?? "";
+    const [slots, setSlots] = React.useState<string[]>(() => toSlots(value ?? "", maxLength));
+
+    // Sincroniza mudanças externas de `value` (ex.: reset do formulário) sem
+    // perder a posição dos dígitos digitados fora de ordem.
+    const [prevValue, setPrevValue] = React.useState(value);
+    const [prevLength, setPrevLength] = React.useState(maxLength);
+    if (value !== prevValue || maxLength !== prevLength) {
+      setPrevValue(value);
+      setPrevLength(maxLength);
+      if (isControlled && value !== slots.join("")) {
+        setSlots(toSlots(value, maxLength));
+      } else if (maxLength !== prevLength) {
+        setSlots(toSlots(slots.join(""), maxLength));
+      }
+    }
+
+    const focusSlot = React.useCallback((index: number) => {
+      const el = slotsRef.current[index];
+      el?.focus();
+      el?.select();
+    }, []);
+
+    const commit = React.useCallback(
+      (next: string[]) => {
+        setSlots(next);
+        onChange?.(next.join(""));
+      },
+      [onChange]
+    );
+
+    const fillFrom = React.useCallback(
+      (start: number, digits: string) => {
+        const next = [...slots];
+        const chars = digits.slice(0, maxLength - start).split("");
+        chars.forEach((char, i) => {
+          next[start + i] = char;
+        });
+        commit(next);
+        focusSlot(Math.min(start + chars.length, maxLength - 1));
+      },
+      [slots, maxLength, commit, focusSlot]
+    );
 
     const handleSlotChange = React.useCallback(
-      (index: number, char: string) => {
-        if (disabled || !onChange) return;
-        const digits = otpValue.split("");
-        digits[index] = char;
-        const next = digits.join("").slice(0, maxLength);
-        onChange(next);
-        if (char && index < maxLength - 1) {
-          setActiveSlot(index + 1);
-          slotsRef.current[index + 1]?.focus();
+      (index: number, raw: string) => {
+        if (disabled) return;
+        const digits = raw.replace(/\D/g, "");
+        if (digits.length > 1) {
+          // Dígito digitado sobre um slot já preenchido sem seleção: fica o novo.
+          const current = slots[index];
+          if (digits.length === 2 && current && digits.includes(current)) {
+            fillFrom(index, digits.replace(current, ""));
+            return;
+          }
+          // Autopreenchimento (autocomplete="one-time-code"): distribui pelos slots.
+          fillFrom(digits.length >= maxLength ? 0 : index, digits);
+          return;
         }
+        const next = [...slots];
+        next[index] = digits;
+        commit(next);
+        if (digits && index < maxLength - 1) focusSlot(index + 1);
       },
-      [otpValue, onChange, maxLength, disabled]
+      [disabled, slots, maxLength, commit, fillFrom, focusSlot]
     );
 
     const handleKeyDown = React.useCallback(
       (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (disabled || !onChange) return;
+        if (disabled) return;
         if (e.key === "Backspace") {
           e.preventDefault();
-          const digits = otpValue.split("");
-          if (digits[index]) {
-            digits[index] = "";
-            onChange(digits.join(""));
+          const next = [...slots];
+          if (next[index]) {
+            next[index] = "";
+            commit(next);
           } else if (index > 0) {
-            digits[index - 1] = "";
-            onChange(digits.join(""));
-            setActiveSlot(index - 1);
-            slotsRef.current[index - 1]?.focus();
+            next[index - 1] = "";
+            commit(next);
+            focusSlot(index - 1);
+          }
+        } else if (e.key === "Delete") {
+          e.preventDefault();
+          if (slots[index]) {
+            const next = [...slots];
+            next[index] = "";
+            commit(next);
           }
         } else if (e.key === "ArrowLeft" && index > 0) {
           e.preventDefault();
-          setActiveSlot(index - 1);
-          slotsRef.current[index - 1]?.focus();
+          focusSlot(index - 1);
         } else if (e.key === "ArrowRight" && index < maxLength - 1) {
           e.preventDefault();
-          setActiveSlot(index + 1);
-          slotsRef.current[index + 1]?.focus();
+          focusSlot(index + 1);
         }
       },
-      [otpValue, onChange, maxLength, disabled]
+      [disabled, slots, maxLength, commit, focusSlot]
     );
 
     const handlePaste = React.useCallback(
-      (e: React.ClipboardEvent<HTMLInputElement>) => {
-        if (disabled || !onChange) return;
+      (index: number, e: React.ClipboardEvent<HTMLInputElement>) => {
+        if (disabled) return;
         e.preventDefault();
-        const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, maxLength);
-        if (pasted) {
-          onChange(pasted);
-          const nextIndex = Math.min(pasted.length, maxLength - 1);
-          setActiveSlot(nextIndex);
-          slotsRef.current[nextIndex]?.focus();
-        }
+        const pasted = e.clipboardData.getData("text").replace(/\D/g, "");
+        if (!pasted) return;
+        // Código completo começa no primeiro slot; trecho parcial, no slot focado.
+        fillFrom(pasted.length >= maxLength ? 0 : index, pasted);
       },
-      [onChange, maxLength, disabled]
+      [disabled, maxLength, fillFrom]
     );
 
-    const focusSlot = React.useCallback((index: number) => {
-      setActiveSlot(index);
-      slotsRef.current[index]?.focus();
+    const registerSlot = React.useCallback((index: number, el: HTMLInputElement | null) => {
+      slotsRef.current[index] = el;
     }, []);
 
     const contextValue: InputOTPContextValue = {
-      slots: otpValue.split(""),
-      activeSlot,
+      slots,
       handleSlotChange,
       handleKeyDown,
       handlePaste,
-      focusSlot,
+      registerSlot,
       maxLength,
       disabled,
     };
+
+    // Grupo rotulado: o consumidor pode passar aria-label/aria-labelledby.
+    const hasLabel = props["aria-label"] !== undefined || props["aria-labelledby"] !== undefined;
 
     return (
       <InputOTPContext.Provider value={contextValue}>
         <div
           ref={ref}
+          role="group"
+          aria-label={hasLabel ? undefined : "Código de verificação"}
           className={cn("flex items-center gap-2", className)}
           {...props}
         >
@@ -4752,33 +4984,37 @@ interface InputOTPSlotProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
   ({ className, index, ...props }, ref) => {
-    const { slots, activeSlot, handleSlotChange, handleKeyDown, handlePaste, focusSlot, disabled } =
+    const { slots, handleSlotChange, handleKeyDown, handlePaste, registerSlot, maxLength, disabled } =
       useInputOTP();
     const value = slots[index] || "";
+    const inputRef = React.useCallback(
+      (el: HTMLInputElement | null) => registerSlot(index, el),
+      [registerSlot, index]
+    );
 
     return (
       <div
         ref={ref}
         className={cn(
-          "relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-md border border-input bg-background text-lg font-medium text-foreground shadow-sm transition-colors duration-fast ease-standard",
-          activeSlot === index && "ring-2 ring-ring ring-offset-2 ring-offset-background",
+          "relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-md border border-input bg-background text-lg font-medium text-foreground shadow-sm transition-colors duration-fast ease-standard focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
           disabled && "opacity-50 cursor-not-allowed",
           className
         )}
         {...props}
       >
         <input
+          ref={inputRef}
           type="text"
           inputMode="numeric"
-          maxLength={1}
+          autoComplete={index === 0 ? "one-time-code" : "off"}
           value={value}
           disabled={disabled}
-          onChange={(e) => handleSlotChange(index, e.target.value.replace(/\D/g, ""))}
+          onChange={(e) => handleSlotChange(index, e.target.value)}
           onKeyDown={(e) => handleKeyDown(index, e)}
-          onPaste={handlePaste}
-          onFocus={() => focusSlot(index)}
+          onPaste={(e) => handlePaste(index, e)}
+          onFocus={(e) => e.currentTarget.select()}
           className="absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-[inherit] border-0 bg-transparent text-center text-lg font-medium text-foreground caret-transparent outline-none"
-          aria-label={`Dígito ${index + 1}`}
+          aria-label={`Dígito ${index + 1} de ${maxLength}`}
         />
         <span aria-hidden="true" className="pointer-events-none">
           {value || ""}
@@ -5069,13 +5305,13 @@ Variantes: composição: DropdownMenu · Trigger · Content · Item · CheckboxI
 
 Uso:
 ```tsx
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@semec/ds/react";
-import { Button } from "@semec/ds/react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, IconButton } from "@semec/ds/react";
 import { MoreHorizontal } from "lucide-react";
 
+// Gatilho só com ícone: use IconButton (label obrigatório vira o nome acessível)
 <DropdownMenu>
   <DropdownMenuTrigger asChild>
-    <Button variant="ghost" size="icon"><MoreHorizontal /></Button>
+    <IconButton variant="ghost" label="Mais ações do protocolo"><MoreHorizontal /></IconButton>
   </DropdownMenuTrigger>
   <DropdownMenuContent>
     <DropdownMenuItem>Editar</DropdownMenuItem>
@@ -5120,7 +5356,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent",
+      "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-tint focus:ring-2 focus:ring-inset focus:ring-ring data-[state=open]:bg-accent",
       inset && "pl-8",
       className
     )}
@@ -5179,7 +5415,7 @@ const DropdownMenuItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       inset && "pl-8",
       className
     )}
@@ -5195,7 +5431,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     checked={checked}
@@ -5219,7 +5455,7 @@ const DropdownMenuRadioItem = React.forwardRef<
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     {...props}
@@ -5623,21 +5859,28 @@ export {
 
 ### Tabela de dados (`data-table`) — `src/components/data-table.tsx` — slug: tabela-de-dados
 
-Desc: Tabela com ordenação visual, paginação e empty states.
+Desc: Tabela com ordenação, paginação e estados vazios.
 
-Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption
+Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px
 
 Uso:
 ```tsx
-import { DataTable } from "@semec/ds/react";
+import { DataTable, Button } from "@semec/ds/react";
 
-const columns = [
-  { key: "nome", header: "Nome", sortable: true },
-  { key: "status", header: "Status" },
-];
-
+// Quando a linha tem várias ações, prefira uma coluna de ações com render + Button a onRowClick
 <DataTable
-  columns={columns}
+  caption="Protocolos do contribuinte"
+  columns={[
+    { key: "nome", header: "Nome", sortable: true },
+    { key: "status", header: "Status" },
+    {
+      key: "acoes",
+      header: "Ações",
+      render: (row) => (
+        <Button variant="outline" onClick={() => abrirProtocolo(row)}>Ver detalhes</Button>
+      ),
+    },
+  ]}
   data={registros}
   sortKey={sortField}
   sortDir={sortDir}
@@ -5650,7 +5893,7 @@ const columns = [
 
 Prompt:
 ```text
-Crie um data-table (Tabela de dados) usando @semec/ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption. Tabela com ordenação visual, paginação e empty states.
+Crie um data-table (Tabela de dados) usando @semec/ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px. Tabela com ordenação, paginação e estados vazios.
 ```
 
 Fonte:
@@ -5681,6 +5924,11 @@ interface DataTableProps<T> extends React.HTMLAttributes<HTMLDivElement> {
   onPageChange?: (page: number) => void;
   emptyMessage?: string;
   rowKey?: (row: T, index: number) => string | number;
+  /**
+   * Ativação da linha inteira. A linha fica focável (Tab) e responde a
+   * Enter/Espaço, além do clique. Para várias ações por linha, prefira uma
+   * coluna de ações com botões (`render`) — ver manifest/usage.
+   */
   onRowClick?: (row: T, index: number) => void;
   caption?: string;
 }
@@ -5709,9 +5957,24 @@ function DataTableInner<T extends Record<string, unknown>>(
   };
 
   const getSortIcon = (key: string) => {
-    if (sortKey !== key) return <ArrowUpDown className="h-3 w-3 opacity-50" />;
-    if (sortDir === "asc") return <ArrowUp className="h-3 w-3" />;
-    return <ArrowDown className="h-3 w-3" />;
+    if (sortKey !== key || !sortDir)
+      return <ArrowUpDown className="h-3 w-3 opacity-50" aria-hidden="true" />;
+    if (sortDir === "asc") return <ArrowUp className="h-3 w-3" aria-hidden="true" />;
+    return <ArrowDown className="h-3 w-3" aria-hidden="true" />;
+  };
+
+  // Enter/Espaço ativam a linha só quando o foco está nela mesma, para não
+  // sequestrar teclas de botões/links dentro das células.
+  const handleRowKeyDown = (
+    event: React.KeyboardEvent<HTMLTableRowElement>,
+    row: T,
+    index: number
+  ) => {
+    if (!onRowClick || event.target !== event.currentTarget) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onRowClick(row, index);
+    }
   };
 
   return (
@@ -5731,7 +5994,7 @@ function DataTableInner<T extends Record<string, unknown>>(
                   scope="col"
                   aria-sort={
                     col.sortable
-                      ? sortKey === col.key
+                      ? sortKey === col.key && sortDir
                         ? sortDir === "asc"
                           ? "ascending"
                           : "descending"
@@ -5777,9 +6040,16 @@ function DataTableInner<T extends Record<string, unknown>>(
                   key={rowKey ? rowKey(row, index) : index}
                   className={cn(
                     "border-b border-border transition-colors duration-fast ease-standard hover:bg-muted/50 data-[state=selected]:bg-muted",
-                    onRowClick && "cursor-pointer"
+                    onRowClick &&
+                      "cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
                   )}
+                  tabIndex={onRowClick ? 0 : undefined}
                   onClick={onRowClick ? () => onRowClick(row, index) : undefined}
+                  onKeyDown={
+                    onRowClick
+                      ? (event) => handleRowKeyDown(event, row, index)
+                      : undefined
+                  }
                 >
                   {columns.map((col) => (
                     <td
@@ -5811,19 +6081,19 @@ function DataTableInner<T extends Record<string, unknown>>(
               type="button"
               onClick={() => onPageChange?.(page - 1)}
               disabled={page <= 1}
-              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               Anterior
             </button>
             <button
               type="button"
               onClick={() => onPageChange?.(page + 1)}
               disabled={page >= pageCount}
-              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               Próximo
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -6201,9 +6471,10 @@ import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, 
     </SidebarContent>
     <SidebarFooter>Footer</SidebarFooter>
   </Sidebar>
+  {/* SidebarInset já renderiza <main>: não aninhe outro <main> dentro dele */}
   <SidebarInset>
     <SidebarTrigger />
-    <main>Conteúdo</main>
+    <div className="p-4">Conteúdo</div>
   </SidebarInset>
 </SidebarProvider>
 ```
@@ -6864,29 +7135,136 @@ Design System SEMEC — componentes React + tokens CSS + artefatos para agentes 
 
 React 19 + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Tokens `pv-*` (tema claro).
 
-## Instalação
+## Comece aqui
+
+São 5 passos. Pular qualquer um deles faz os componentes saírem sem estilo, sem fonte ou sem funcionar.
+
+### 1. Instalar
 
 ```bash
 npm install @semec/ds
 ```
 
+Só isso. As dependências Radix UI, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react` e `get-nonce` são **dependências do pacote** e vêm automaticamente — não instale a lista de `@radix-ui/*` à mão.
+
+Peers: `react` e `react-dom` 19+, e Tailwind CSS v4 no seu app. Peer opcional: `zod` ^3.23, só se usar `@semec/ds/react/validacao`.
+
+### 2. CSS global (Tailwind v4)
+
+No arquivo CSS global do app (não via `import` em JS):
+
+```css
+@import "tailwindcss";
+@import "@semec/ds/react/tokens.css";
+@source "../node_modules/@semec/ds/dist/react";
+```
+
+- O `@source` é **obrigatório**: sem ele o Tailwind não gera as classes usadas dentro do pacote (`bg-card`, `shadow-elevation-*`, `animate-in`…) e os componentes saem sem estilo.
+- O caminho do `@source` é **relativo ao arquivo CSS**, não à raiz do projeto. Ajuste a quantidade de `../` até chegar em `node_modules`:
+
+| Onde está o CSS | `@source` |
+|---|---|
+| `src/index.css` (Vite) | `"../node_modules/@semec/ds/dist/react"` |
+| `app/globals.css` (Next) | `"../node_modules/@semec/ds/dist/react"` |
+| `src/app/globals.css` (Next com `src/`) | `"../../node_modules/@semec/ds/dist/react"` |
+| monorepo com `node_modules` na raiz | suba até a pasta que contém o `node_modules` com `@semec/ds` |
+
+- Se o Tailwind estiver varrendo pastas demais (build lento, recarga cruzada em monorepo), limite a detecção automática ao código do app com `source()`, também relativo ao CSS: `@import "tailwindcss" source("../src");`. O `@source` do pacote continua necessário.
+
+Alternativa com preset JS (opcional): acrescente `@config "@semec/ds/react/pv-preset";` depois das linhas acima.
+
+### 3. Fonte Poppins
+
+O pacote **não traz arquivos de fonte**. O `tokens.css` declara `--font-family-sans: "Poppins", system-ui, -apple-system, sans-serif`; sem carregar a Poppins, o texto cai na fonte do sistema (Segoe UI no Windows). Carregue os pesos 400, 500, 600 e 700 de uma destas formas:
+
+**Next.js (`next/font/local`, self-hosted, recomendado)** — o `next/font` gera um nome de família com hash, então aponte o token para a variável:
+
+```tsx
+// app/layout.tsx
+import localFont from "next/font/local";
+
+const poppins = localFont({
+  src: [
+    { path: "./fonts/Poppins-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/Poppins-500.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/Poppins-600.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/Poppins-700.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-poppins",
+  display: "swap",
+});
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="pt-BR" className={poppins.variable}>
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+```css
+/* no CSS global, depois do @import do tokens.css */
+:root {
+  --font-family-sans: var(--font-poppins), system-ui, -apple-system, sans-serif;
+}
+```
+
+(`next/font/google` com `Poppins({ weight: ["400", "500", "600", "700"], subsets: ["latin"], variable: "--font-poppins" })` funciona igual.)
+
+**Vite / outros (self-hosted)** — copie os `.woff2` para o app e declare `@font-face` com `font-family: "Poppins"` (o nome que o token já usa), `font-display: swap`, um bloco por peso. Os arquivos estão no repositório em [`apps/docs/app/fonts/`](https://github.com/SEMEC-PVH/SEMEC_design_system/tree/main/apps/docs/app/fonts) (Poppins, licença SIL OFL).
+
+**Google Fonts** — `<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">`. Funciona sem ajuste no token, mas depende de rede externa; prefira self-host em sistemas da Prefeitura.
+
+### 4. Providers no root (quando necessários)
+
+| Se usar… | Coloque uma vez no root |
+|---|---|
+| `useToast()` / `toast()` | `<Toaster />` |
+| `Tooltip` | `<TooltipProvider>` em volta do app (o Radix exige o provider) |
+| CSP estrita com nonce | `<SemecProvider nonce={nonce}>` (ver [Segurança](#segurança-csp)) |
+
+O `SemecProvider` **não** inclui `Toaster` nem `TooltipProvider`; monte-os à parte.
+
+```tsx
+import { Toaster, TooltipProvider } from "@semec/ds/react";
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <TooltipProvider>
+      {children}
+      <Toaster />
+    </TooltipProvider>
+  );
+}
+```
+
+### 5. Next.js App Router: importe o kit só em arquivos `"use client"`
+
+Na 3.0.x o `dist` é **um bundle único, sem a diretiva `"use client"`**. Importar `@semec/ds/react` num Server Component quebra (hooks como `useLayoutEffect` não existem no ambiente `react-server`). Até a correção (planejada para a 3.1, AUD-20):
+
+- use os componentes em arquivos que começam com `"use client"`;
+- monte os providers do passo 4 num componente `"use client"` (ex.: `app/providers.tsx`) e use-o no `layout`;
+- não use `export *` para reexportar o kit num arquivo `"use client"`; reexporte por nome ou importe direto.
+
+Em Vite/SPA nada disso se aplica.
+
 ## Uso rápido
 
 ```tsx
-// 1. Importar tokens no seu CSS global
-import "@semec/ds/react/tokens.css";
+"use client"; // só necessário no Next App Router
 
-// 2. Usar componentes
-import { Button, Input, Card, CardHeader, CardTitle, CardContent } from "@semec/ds/react";
+import { Button, Input, Card, CardHeader, CardTitle, CardContent, Label } from "@semec/ds/react";
 
-function App() {
+export function Exemplo() {
   return (
     <Card>
       <CardHeader>
         <CardTitle>Formulário</CardTitle>
       </CardHeader>
       <CardContent>
-        <Input placeholder="Nome" />
+        <Label htmlFor="nome">Nome</Label>
+        <Input id="nome" />
         <Button variant="primary">Salvar</Button>
       </CardContent>
     </Card>
@@ -6897,9 +7275,9 @@ function App() {
 ### Toast
 
 ```tsx
-import { Toaster, useToast } from "@semec/ds/react";
+import { Button, Toaster, useToast } from "@semec/ds/react";
 
-// Adicionar Toaster no root do app
+// Adicionar Toaster no root do app (uma vez)
 function App() {
   return (
     <>
@@ -6921,6 +7299,8 @@ function MeuComponente() {
 }
 ```
 
+Não monte `ToastProvider` + `ToastViewport` à mão: eles são as peças cruas do Radix e não leem o estado de `useToast()` — nada aparece. Use `<Toaster />`.
+
 ### Sheet (modal lateral)
 
 ```tsx
@@ -6941,16 +7321,27 @@ function Exemplo() {
 }
 ```
 
+### `cn()`
+
+```tsx
+import { cn } from "@semec/ds/react";
+
+<div className={cn("p-4 bg-surface", ativo && "ring-2 ring-ring")} />
+```
+
+`cn` = `clsx` + `tailwind-merge`, o mesmo helper usado dentro dos componentes (exportado a partir da 3.0.1).
+
 ## Subpath exports
 
 | Import | O que é |
 |---|---|
-| `@semec/ds/react` | Todos os componentes + `cn()` |
-| `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) + utilitários animação |
+| `@semec/ds/react` | Todos os componentes, `cn()`, masks e validadores puros |
+| `@semec/ds/react/validacao` | Schemas Zod (exige o peer `zod`) |
+| `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) + utilitários de animação |
 | `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS config) |
 | `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 (arquivo TS original) |
-| `@semec/ds/react/server` | Helpers Node.js (ex: `getComponentMetadata()`) |
-| `@semec/ds/skills` | Manifest + componentes para agentes IA |
+| `@semec/ds/react/server` | **Uso interno do monorepo.** Só tem `dsPackageRootResolve()`, que procura `packages/react` a partir do `cwd` e lança erro fora do repositório. Não use em apps consumidores |
+| `@semec/ds/skills` | Metadados dos componentes para agentes IA (`dsComponents`, `dsBySlug`, `dsCategories`…) |
 | `@semec/ds/skills/llms.txt` | Índice para IA |
 | `@semec/ds/skills/llms-full.txt` | Dump completo |
 | `@semec/ds/skills/manifest.json` | JSON para consumo por máquinas |
@@ -6958,36 +7349,25 @@ function Exemplo() {
 | `@semec/ds/skills/semec-ds` | Skill full do agente |
 | `@semec/ds/lite/skills/semec-ds-lite` | Skill lite (tokens + a11y + responsive) |
 
+Metadados de componente (o que versões anteriores deste README chamavam de `getComponentMetadata()`, função que nunca existiu) vêm de `@semec/ds/skills`: `dsBySlug["botoes"]`, `dsComponents`.
+
 ## Componentes
 
-46 componentes organizados por categoria:
+**49 componentes** (um por módulo em `src/components`, exceto o `SemecProvider`, que é provider), pelos nomes exportados:
 
 | Categoria | Componentes |
 |---|---|
-| **Navegação** | Abas, Breadcrumb, Link, Menu de Navegação, Paginação, Sidebar, Trilha de Navegação |
-| **Formulários** | Botão, Botão de Ícone, Caixa de Marcação, Caixa de Texto, Campo de Formulário, Combobox, DatePicker, Envio de Arquivos, Interruptor, Menu de Seleção, Menu Suspenso, RadioGroup, Select, Slider, OTP Input, Toggle |
-| **Dados** | Avatar, Cartão, Etiqueta, Tabela, Tabela de Dados |
-| **Feedback** | Aviso, Dialogo de Alerta, Dica, Drawer, ErrorSummary, Modal, Notificação, Popover, Progress, Toast |
-| **Layout** | Acordeão, Área de Texto, Calendário, Esqueleto, Separador, Sheet, Timeline |
+| **Ações e links** (3) | Button, IconButton, Link |
+| **Formulários** (16) | Input, Textarea, Select, Combobox, DatePicker, FileUpload, Checkbox, RadioGroup, Switch, Label, FormField, ErrorSummary, Toggle, Slider, InputOTP, Calendar |
+| **Conteúdo e dados** (8) | Card, Badge, Table, Accordion, Separator, Avatar, DataTable, Timeline |
+| **Feedback e estados** (13) | Skeleton, EmptyState, ErrorState, Dialog, Toast, Tooltip, Alert, AlertDialog, Popover, Spinner, Progress, Drawer, Sheet |
+| **Navegação** (9) | Breadcrumb, Header, Tabs, Pagination, SidebarTrigger, ScrollArea, DropdownMenu, NavigationMenu, Sidebar |
+
+Mais: `SemecProvider`, `cn`, masks (`maskCPF`, `maskCNPJ`, `maskCEP`, `maskCurrency`) e validadores puros (`validateCPF`, `validateCNPJ`, `validateEmail`).
 
 ## Tokens
 
-Config CSS recomendada (Tailwind v4 — o `@source` faz o Tailwind varrer as classes do pacote):
-
-```css
-@import "tailwindcss";
-@import "@semec/ds/react/tokens.css";
-@source "../node_modules/@semec/ds/dist/react";
-```
-
-O caminho CSS-first acima é o que o Tailwind v4 espera. Alternativa com preset JS (opcional):
-
-```css
-@import "tailwindcss";
-@import "@semec/ds/react/tokens.css";
-@source "../node_modules/@semec/ds/dist/react";
-@config "@semec/ds/react/pv-preset";
-```
+O que existe no pacote está em `tokens.css` (camadas L0 `--pv-*` e L1 semânticas). Tokens de layout que aparecem no site de documentação (`--container-max`, `--measure`, `--control-height-*`, `data-density`) **não fazem parte do pacote**; use os utilitários do Tailwind indicados na skill `semec-ds` (seção "Responsive / Mobile").
 
 ## Tema
 
@@ -7032,16 +7412,21 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 
 - **Peer**: React 19+, React DOM 19+
 - **Peer opcional**: `zod` ^3.23 — só se usar `@semec/ds/react/validacao`
-- **Tailwind CSS**: v4+ (com `@source` apontando para `node_modules/@semec/ds/dist/react`)
-- **Ícones**: `lucide-react`
+- **Tailwind CSS**: v4+ no app (com `@source` apontando para `node_modules/@semec/ds/dist/react`, caminho relativo ao CSS)
+- **Instaladas automaticamente**: todos os `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, `get-nonce`
 
-Todas as dependências Radix UI são instaladas automaticamente.
+## Limitações conhecidas (3.0.x)
+
+- **Bundle único**: importar uma peça carrega o kit inteiro (sem poda de árvore por módulo). Saída por módulo planejada para a 3.1 (AUD-20).
+- **Sem fronteira RSC**: ver o passo 5 de [Comece aqui](#comece-aqui).
 
 ## Documentação
 
-- [Site de documentação](https://semec.github.io/design-system)
-- [Guia de contribuição](../../CONTRIBUTING.md)
-- [ADRs](../../docs/adr/README.md)
+- [Site de documentação](https://semec-pvh.github.io/SEMEC_design_system/)
+- [Repositório](https://github.com/SEMEC-PVH/SEMEC_design_system)
+- [Guia de contribuição](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/CONTRIBUTING.md)
+- [ADRs](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/adr/README.md)
+- [Issues](https://github.com/SEMEC-PVH/SEMEC_design_system/issues)
 
 ## Licença
 

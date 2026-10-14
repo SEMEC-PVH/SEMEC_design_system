@@ -4,7 +4,7 @@ code: "table"
 slug: "tabela"
 file: "src/components/table.tsx"
 category: "conteudo-dados"
-variants: "composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount"
+variants: "composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome"
 ---
 
 # Tabela — `table`
@@ -16,7 +16,7 @@ variants: "composição: Table · TableHeader · TableRow · TableHead · TableB
 ## Variantes
 
 - **composição**: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption
-- **a11y**: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount
+- **a11y**: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome
 
 ## Instalação (@semec/ds)
 
@@ -33,10 +33,11 @@ npm install @semec/ds
 ## Uso
 
 ```tsx
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/ds/react";
+import { Table, TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/ds/react";
 
 // Básico
 <Table>
+  <TableCaption>Serviços solicitados</TableCaption>
   <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
   <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>
 </Table>
@@ -48,7 +49,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 ## Prompt para IA
 
 ```text
-Crie um table (Tabela) usando @semec/ds/react (`src/components/table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
+Crie um table (Tabela) usando @semec/ds/react (`src/components/table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
 ```
 
 ## Fonte

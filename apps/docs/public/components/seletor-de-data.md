@@ -32,9 +32,11 @@ npm install @semec/ds
 ## Uso
 
 ```tsx
-import { DatePicker } from "@semec/ds/react";
+import { DatePicker, FormField } from "@semec/ds/react";
 
-<DatePicker defaultValue="2026-08-31" />
+<FormField label="Data de vencimento" htmlFor="vencimento">
+  <DatePicker id="vencimento" defaultValue="2026-08-31" />
+</FormField>
 ```
 
 ## Prompt para IA

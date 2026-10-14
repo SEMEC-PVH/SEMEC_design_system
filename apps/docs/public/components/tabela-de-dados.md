@@ -4,18 +4,19 @@ code: "data-table"
 slug: "tabela-de-dados"
 file: "src/components/data-table.tsx"
 category: "conteudo-dados"
-variants: "props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption"
+variants: "props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px"
 ---
 
 # Tabela de dados — `data-table`
 
-> Tabela com ordenação visual, paginação e empty states.
+> Tabela com ordenação, paginação e estados vazios.
 
 **Arquivo:** `src/components/data-table.tsx` | **Categoria:** Conteúdo e dados | **Rota:** `/componentes/tabela-de-dados`
 
 ## Variantes
 
 - **props**: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption
+- **a11y**: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px
 
 ## Instalação (@semec/ds)
 
@@ -32,15 +33,22 @@ npm install @semec/ds
 ## Uso
 
 ```tsx
-import { DataTable } from "@semec/ds/react";
+import { DataTable, Button } from "@semec/ds/react";
 
-const columns = [
-  { key: "nome", header: "Nome", sortable: true },
-  { key: "status", header: "Status" },
-];
-
+// Quando a linha tem várias ações, prefira uma coluna de ações com render + Button a onRowClick
 <DataTable
-  columns={columns}
+  caption="Protocolos do contribuinte"
+  columns={[
+    { key: "nome", header: "Nome", sortable: true },
+    { key: "status", header: "Status" },
+    {
+      key: "acoes",
+      header: "Ações",
+      render: (row) => (
+        <Button variant="outline" onClick={() => abrirProtocolo(row)}>Ver detalhes</Button>
+      ),
+    },
+  ]}
   data={registros}
   sortKey={sortField}
   sortDir={sortDir}
@@ -54,7 +62,7 @@ const columns = [
 ## Prompt para IA
 
 ```text
-Crie um data-table (Tabela de dados) usando @semec/ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption. Tabela com ordenação visual, paginação e empty states.
+Crie um data-table (Tabela de dados) usando @semec/ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px. Tabela com ordenação, paginação e estados vazios.
 ```
 
 ## Fonte
@@ -86,6 +94,11 @@ interface DataTableProps<T> extends React.HTMLAttributes<HTMLDivElement> {
   onPageChange?: (page: number) => void;
   emptyMessage?: string;
   rowKey?: (row: T, index: number) => string | number;
+  /**
+   * Ativação da linha inteira. A linha fica focável (Tab) e responde a
+   * Enter/Espaço, além do clique. Para várias ações por linha, prefira uma
+   * coluna de ações com botões (`render`) — ver manifest/usage.
+   */
   onRowClick?: (row: T, index: number) => void;
   caption?: string;
 }
@@ -114,9 +127,24 @@ function DataTableInner<T extends Record<string, unknown>>(
   };
 
   const getSortIcon = (key: string) => {
-    if (sortKey !== key) return <ArrowUpDown className="h-3 w-3 opacity-50" />;
-    if (sortDir === "asc") return <ArrowUp className="h-3 w-3" />;
-    return <ArrowDown className="h-3 w-3" />;
+    if (sortKey !== key || !sortDir)
+      return <ArrowUpDown className="h-3 w-3 opacity-50" aria-hidden="true" />;
+    if (sortDir === "asc") return <ArrowUp className="h-3 w-3" aria-hidden="true" />;
+    return <ArrowDown className="h-3 w-3" aria-hidden="true" />;
+  };
+
+  // Enter/Espaço ativam a linha só quando o foco está nela mesma, para não
+  // sequestrar teclas de botões/links dentro das células.
+  const handleRowKeyDown = (
+    event: React.KeyboardEvent<HTMLTableRowElement>,
+    row: T,
+    index: number
+  ) => {
+    if (!onRowClick || event.target !== event.currentTarget) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onRowClick(row, index);
+    }
   };
 
   return (
@@ -136,7 +164,7 @@ function DataTableInner<T extends Record<string, unknown>>(
                   scope="col"
                   aria-sort={
                     col.sortable
-                      ? sortKey === col.key
+                      ? sortKey === col.key && sortDir
                         ? sortDir === "asc"
                           ? "ascending"
                           : "descending"
@@ -182,9 +210,16 @@ function DataTableInner<T extends Record<string, unknown>>(
                   key={rowKey ? rowKey(row, index) : index}
                   className={cn(
                     "border-b border-border transition-colors duration-fast ease-standard hover:bg-muted/50 data-[state=selected]:bg-muted",
-                    onRowClick && "cursor-pointer"
+                    onRowClick &&
+                      "cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
                   )}
+                  tabIndex={onRowClick ? 0 : undefined}
                   onClick={onRowClick ? () => onRowClick(row, index) : undefined}
+                  onKeyDown={
+                    onRowClick
+                      ? (event) => handleRowKeyDown(event, row, index)
+                      : undefined
+                  }
                 >
                   {columns.map((col) => (
                     <td
@@ -216,19 +251,19 @@ function DataTableInner<T extends Record<string, unknown>>(
               type="button"
               onClick={() => onPageChange?.(page - 1)}
               disabled={page <= 1}
-              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               Anterior
             </button>
             <button
               type="button"
               onClick={() => onPageChange?.(page + 1)}
               disabled={page >= pageCount}
-              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               Próximo
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>

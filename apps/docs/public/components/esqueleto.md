@@ -34,8 +34,8 @@ npm install @semec/ds
 ```tsx
 import { Skeleton } from "@semec/ds/react";
 
-<Skeleton className="h-4 w-[250px]" />
-<Skeleton className="h-4 w-[180px]" />
+<Skeleton className="h-4 w-3/4" />
+<Skeleton className="h-4 w-1/2" />
 ```
 
 ## Prompt para IA
