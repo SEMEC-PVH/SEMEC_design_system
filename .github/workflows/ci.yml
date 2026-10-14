@@ -2,7 +2,7 @@ name: CI
 
 # Cobre o checklist de PR do AGENTS.md/CONTRIBUTING.md:
 # build:ds, typecheck, lint, build do site, deriva dos artefatos de agentes,
-# changeset obrigatório para mudança publicada do @semec/ds e o gate de qualidade.
+# changeset obrigatório para mudança publicada do @semec/ds, testes do kit e o gate de qualidade.
 # O workflow "Release" só roda depois que este termina verde no main.
 
 on:
@@ -84,6 +84,23 @@ jobs:
       - name: Typecheck package
         run: npm run typecheck
 
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Testes do @semec/ds (Vitest + Testing Library + axe, zod 3 e 4)
+        run: npm test
+
   build:
     name: build
     runs-on: ubuntu-latest
@@ -139,6 +156,9 @@ jobs:
 
       - name: Install
         run: npm ci
+
+      - name: Instalar Chromium (estados abertos do gate)
+        run: npx playwright install --with-deps chromium
 
       - name: Run Quality and Regression Gate
         run: npm run gate
