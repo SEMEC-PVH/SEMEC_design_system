@@ -4,7 +4,7 @@
 // de EVENTOS do turno (textos, dano, desmaio, nível, evolução…), que a UI
 // apresenta um a um. O sorteio vem de fora (rng), para testes reprodutíveis.
 
-import { CHEFES, GOLPES, ITENS, ITENS_POR_BATALHA, LINGUAGENS, TIPOS, multiplicadorTipo } from "./dados.js";
+import { GOLPES, ITENS, ITENS_POR_BATALHA, LINGUAGENS, TIPOS, multiplicadorTipo, oponentePorId } from "./dados.js";
 
 const ESTAGIO_MAX = 4;
 const CHANCE_CRITICO = 1 / 16;
@@ -76,7 +76,8 @@ export function calcularDano(atacante, defensor, golpe, rng) {
 
 // ---- Batalha --------------------------------------------------------------------
 export function iniciarBatalha(jogador, chefeId) {
-  const chefe = CHEFES.find((c) => c.id === chefeId);
+  // Ginásio ou treinador (dados.js, oponentePorId).
+  const chefe = oponentePorId(chefeId);
   return {
     chefeId,
     jogador: structuredClone(jogador),

@@ -10,7 +10,7 @@ import s from "./batalha.module.css";
 export const TITULO_FULL_STACK = "Você é FULL STACK!";
 
 export function tituloResultado(chefe, resultado) {
-  if (resultado === "vitoria") return `Você conquistou a ${chefe.stack.nome}!`;
+  if (resultado === "vitoria") return chefe.stack ? `Você conquistou a ${chefe.stack.nome}!` : `Você venceu ${chefe.titulo}!`;
   if (resultado === "desistiu") return "Você saiu da batalha";
   return "Não foi dessa vez…";
 }
@@ -32,7 +32,7 @@ export function TelaResultado({ chefe, resultado, onVoltar, rotuloVoltar = "Volt
         <p className={s.falaQuem}>{chefe.titulo}</p>
         <p>{falaResultado(chefe, resultado)}</p>
       </div>
-      {venceu && (
+      {venceu && chefe.stack && (
         <div className={s.stackGanha} data-stack={chefe.stack.id} aria-hidden="true">
           {chefe.stack.nome}
         </div>
@@ -44,13 +44,13 @@ export function TelaResultado({ chefe, resultado, onVoltar, rotuloVoltar = "Volt
   );
 }
 
-// Fim da jornada: venceu a Diretoria com as três stacks.
+// Fim da jornada: venceu a Diretoria com as quatro stacks.
 export function TelaFullStack({ onVoltar, rotuloVoltar = "Voltar ao mapa" }) {
   return (
     <>
       <div className={s.fala}>
         <p>
-          Front-End, Back-End e Dados: você venceu todos os ginásios e a Diretoria da SEMEC.
+          Front-End, Back-End, Dados e Machine Learning: você venceu todos os ginásios e a Diretoria da SEMEC.
           Agora conhece o caminho que cada clique da população percorre — da tela ao banco de dados.
         </p>
       </div>

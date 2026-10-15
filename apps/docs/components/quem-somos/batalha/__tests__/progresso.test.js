@@ -187,9 +187,11 @@ describe("chefeLiberado", () => {
     assert.equal(chefeLiberado(CHEFES.map((c) => c.id), "hacker"), false);
   });
 
-  it("a diretoria exige o ginásio de dados", () => {
-    assert.equal(chefeLiberado(["frontend", "backend"], "diretoria"), false);
-    assert.equal(chefeLiberado(["frontend", "backend", "database"], "diretoria"), true);
+  it("o ML exige o ginásio de dados, e a diretoria exige o ML", () => {
+    assert.equal(chefeLiberado(["frontend", "backend"], "ml"), false);
+    assert.equal(chefeLiberado(["frontend", "backend", "database"], "ml"), true);
+    assert.equal(chefeLiberado(["frontend", "backend", "database"], "diretoria"), false);
+    assert.equal(chefeLiberado(["frontend", "backend", "database", "ml"], "diretoria"), true);
   });
 });
 

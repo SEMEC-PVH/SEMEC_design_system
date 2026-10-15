@@ -49,7 +49,7 @@ export default function BatalhaOverlay({ chefe, jogador, onFim, onFechar }) {
 
   if (fim.zerou) {
     return (
-      <ModalJornada ref={modalRef} variante="tela" ginasio={chefe.id} titulo={TITULO_FULL_STACK} onFechar={onFechar}>
+      <ModalJornada ref={modalRef} variante="tela" ginasio={chefe.cenario ?? chefe.id} titulo={TITULO_FULL_STACK} onFechar={onFechar}>
         <TelaFullStack onVoltar={voltar} rotuloVoltar="Voltar à vila" />
       </ModalJornada>
     );
@@ -59,7 +59,7 @@ export default function BatalhaOverlay({ chefe, jogador, onFim, onFechar }) {
     <ModalJornada
       ref={modalRef}
       variante="tela"
-      ginasio={chefe.id}
+      ginasio={chefe.cenario ?? chefe.id}
       titulo={tituloResultado(chefe, fim.resultado)}
       onFechar={onFechar}
     >

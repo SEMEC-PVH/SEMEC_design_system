@@ -7,7 +7,7 @@
 // Vila 3D; os componentes que o usam são client-only.
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CHEFES, INICIAIS, LINGUAGENS } from "./dados.js";
+import { CHEFES, INICIAIS, LINGUAGENS, TREINADORES } from "./dados.js";
 import { criarLutador, xpParaProximo } from "./motor.js";
 
 export const CHAVE = "vila-semec-jornada-v1";
@@ -24,7 +24,8 @@ export function normalizarProgresso(p) {
   if (!j || typeof j !== "object" || !Object.hasOwn(LINGUAGENS, j.especieId)) return null;
   const nivel = Number.isInteger(j.nivel) && j.nivel >= 1 && j.nivel <= 100 ? j.nivel : NIVEL_INICIAL;
   const xp = Number.isFinite(j.xp) && j.xp >= 0 && j.xp < xpParaProximo(nivel) ? j.xp : 0;
-  const ids = CHEFES.map((c) => c.id);
+  // Ginásios e treinadores vencidos (os treinadores não dão Stack).
+  const ids = [...CHEFES, ...TREINADORES].map((c) => c.id);
   const vencidos = Array.isArray(p.vencidos) ? ids.filter((id) => p.vencidos.includes(id)) : [];
   const inicial = INICIAIS.includes(p.inicial) ? p.inicial : null;
   return { inicial, jogador: criarLutador(j.especieId, nivel, xp), vencidos };

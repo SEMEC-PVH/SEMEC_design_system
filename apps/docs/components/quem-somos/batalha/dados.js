@@ -2,7 +2,7 @@
 //
 // Inspirado em RPGs de monstrinhos, mas com termos próprios: o jogador
 // escolhe uma LINGUAGEM inicial, enfrenta os GINÁSIOS (os prédios da vila) e
-// ganha uma STACK em cada um. Com as três stacks vira Full Stack e enfrenta a
+// ganha uma STACK em cada um. Com as quatro stacks vira Full Stack e enfrenta a
 // Diretoria. Cada golpe tem uma linha que ensina o conceito — quem joga não
 // precisa saber programar.
 
@@ -288,7 +288,7 @@ export const GOLPES = {
     descricao: "Guarda os dados como documentos flexíveis, sem tabela fixa.",
   },
 
-  // Laboratório de Machine Learning (ginásio bônus)
+  // Laboratório de Machine Learning (4º ginásio)
   dropna: {
     nome: "dropna()",
     tipo: "dados",
@@ -333,6 +333,59 @@ export const GOLPES = {
     precisao: 100,
     prioridade: 1,
     descricao: "A placa de vídeo faz milhares de contas ao mesmo tempo. Tão rápido que age primeiro.",
+  },
+  // Aprendizes do Laboratório de ML: NumPy, Matplotlib e Seaborn
+  vetorizar: {
+    nome: "Vetorizar",
+    tipo: "dados",
+    poder: 55,
+    precisao: 100,
+    descricao: "Faz a conta na tabela inteira de uma vez, sem laço for. Mil vezes mais rápido.",
+  },
+  broadcasting: {
+    nome: "Broadcasting",
+    tipo: "basico",
+    poder: 0,
+    precisao: 100,
+    efeito: { alvo: "eu", stat: "atk", estagios: 1 },
+    descricao: "Estica o vetor pequeno para caber na matriz grande e calcula tudo junto. Aumenta o ataque.",
+  },
+  plot: {
+    nome: "plt.plot()",
+    tipo: "front",
+    poder: 55,
+    precisao: 100,
+    descricao: "Desenha os números como uma linha no gráfico: a tendência aparece na hora.",
+  },
+  subplots: {
+    nome: "Subplots",
+    tipo: "basico",
+    poder: 0,
+    precisao: 100,
+    efeito: { alvo: "eu", stat: "def", estagios: 1 },
+    descricao: "Divide a figura em vários gráficos lado a lado, tudo organizado. Aumenta a defesa.",
+  },
+  heatmap: {
+    nome: "Mapa de Calor",
+    tipo: "front",
+    poder: 70,
+    precisao: 95,
+    descricao: "Pinta cada número com uma cor: o que está \"quente\" salta aos olhos.",
+  },
+  boxplot: {
+    nome: "Boxplot",
+    tipo: "dados",
+    poder: 50,
+    precisao: 100,
+    descricao: "Mostra a mediana numa caixa e denuncia os pontos fora da curva (outliers).",
+  },
+  pairplot: {
+    nome: "Pairplot",
+    tipo: "basico",
+    poder: 0,
+    precisao: 100,
+    efeito: { alvo: "oponente", stat: "def", estagios: -1 },
+    descricao: "Cruza todas as variáveis em pares e acha a relação escondida — e o ponto fraco do oponente.",
   },
   overfitting: {
     nome: "Overfitting",
@@ -505,6 +558,30 @@ export const LINGUAGENS = {
     golpes: [["gradiente", 1], ["treinoGpu", 1], ["overfitting", 1]],
     bio: "Monta e treina redes neurais — a base de quase toda IA moderna.",
   },
+  numpy: {
+    nome: "NumPy",
+    sigla: "Np",
+    tipo: "dados",
+    base: { hp: 58, atk: 54, def: 62, spd: 46 },
+    golpes: [["vetorizar", 1], ["broadcasting", 1], ["dataFrame", 1]],
+    bio: "Matrizes de números super rápidas. Pandas, Scikit-learn e PyTorch são construídos em cima dele.",
+  },
+  matplotlib: {
+    nome: "Matplotlib",
+    sigla: "Mp",
+    tipo: "front",
+    base: { hp: 54, atk: 58, def: 50, spd: 56 },
+    golpes: [["plot", 1], ["subplots", 1], ["boxplot", 1]],
+    bio: "O pintor dos dados: transforma qualquer tabela em gráfico de linha, barra ou pizza.",
+  },
+  seaborn: {
+    nome: "Seaborn",
+    sigla: "Sb",
+    tipo: "front",
+    base: { hp: 60, atk: 62, def: 54, spd: 58 },
+    golpes: [["heatmap", 1], ["pairplot", 1], ["boxplot", 1]],
+    bio: "Gráficos estatísticos bonitos com uma linha de código. Primo elegante do Matplotlib.",
+  },
   figma: {
     nome: "Figma",
     sigla: "Fg",
@@ -552,7 +629,7 @@ export const ITENS_POR_BATALHA = { cafe: 3, stackOverflow: 1 };
 // ---- Chefes (ginásios e Diretoria) ----------------------------------------------
 // area: casa com AREA_SPOTS da vila (frontend, backend, database, ml, diretoria).
 // stack: insígnia ganha ao vencer. requer: chefe que precisa estar vencido.
-// bonus: ginásio opcional, fora da trilha do Full Stack.
+// bonus: ginásio opcional, fora da trilha do Full Stack (hoje nenhum).
 export const CHEFES = [
   {
     id: "frontend",
@@ -586,34 +663,70 @@ export const CHEFES = [
     stack: { id: "dados", nome: "Data Stack" },
     time: [["sql", 8], ["mongodb", 9]],
     falaInicio: "Os dados da rede municipal são guardados aqui — com segurança e LGPD. Prepare a sua consulta!",
-    falaDerrota: "Consulta otimizada! Leve a Data Stack. Agora você está pronto(a) para a Diretoria.",
+    falaDerrota: "Consulta otimizada! Leve a Data Stack. Agora o Laboratório de Machine Learning quer te conhecer.",
     dica: "Dados é forte contra Front-End e fraco contra Back-End.",
   },
   {
-    // Ginásio BÔNUS: opcional, não conta para o Full Stack (a Diretoria
-    // continua exigindo só o de Dados). Dá a Stack de IA.
+    // 4º ginásio (depois do de Dados, antes da Diretoria). Dá a IA Stack.
     id: "ml",
     area: "ml",
-    bonus: true,
     ginasio: "Laboratório de Machine Learning",
     titulo: "Líder do Laboratório de Machine Learning",
     requer: "database",
     stack: { id: "ia", nome: "IA Stack" },
-    time: [["pandas", 10], ["sklearn", 11], ["pytorch", 12]],
+    time: [["pandas", 10], ["sklearn", 11]],
     falaInicio: "Aqui os dados viram previsões! Primeiro a gente limpa, depois treina, depois testa. Vamos ver se o seu modelo aprende rápido!",
-    falaDerrota: "Acurácia lá em cima e sem overfitting! A IA Stack é sua.",
-    dica: "Pandas e Scikit-learn são Dados (fracos contra Back-End); o PyTorch é Back-End (fraco contra Front-End).",
+    falaDerrota: "Acurácia lá em cima e sem overfitting! A IA Stack é sua. Agora sim: a Diretoria te espera.",
+    dica: "Pandas e Scikit-learn são Dados: fortes contra Front-End e fracos contra Back-End.",
   },
   {
     id: "diretoria",
     area: "diretoria",
     ginasio: "Diretoria da SEMEC",
     titulo: "Diretoria",
-    requer: "database",
+    requer: "ml",
     stack: { id: "full", nome: "Full Stack" },
     time: [["figma", 10], ["excel", 11], ["cobol", 12]],
-    falaInicio: "Três stacks! Poucos chegam até aqui. A Diretoria aceita o seu desafio — com uma reunião de alinhamento.",
-    falaDerrota: "Front, Back e Dados: agora você é FULL STACK! Bem-vindo(a) ao time da SEMEC.",
+    falaInicio: "Quatro stacks! Poucos chegam até aqui. A Diretoria aceita o seu desafio — com uma reunião de alinhamento.",
+    falaDerrota: "Front, Back, Dados e IA: agora você é FULL STACK! Bem-vindo(a) ao time da SEMEC.",
     dica: "A Diretoria usa os três tipos. Troque de golpe conforme o adversário.",
   },
 ];
+
+// ---- Treinadores ------------------------------------------------------------------
+// Aprendizes na frente do Laboratório de Machine Learning (vila-engine.js,
+// TREINADORES_VILA): batalhas opcionais, sem Stack, que dão experiência antes
+// da Mariana. `cenario` é o fundo da batalha (cenarios/<cenario>.webp).
+export const TREINADORES = [
+  {
+    id: "aprendiz-numpy",
+    treinador: true,
+    cenario: "ml",
+    ginasio: "Laboratório de Machine Learning",
+    titulo: "Bia, estagiária de Dados",
+    time: [["numpy", 6], ["matplotlib", 7]],
+    falaApresentacao:
+      "Oi! Sou a Bia, estagiária aqui do Laboratório. Antes de qualquer modelo, a gente aprende a base: matriz de números e gráfico.",
+    falaInicio: "Quer treinar antes de enfrentar a Mariana? Meu NumPy faz conta na tabela inteira de uma vez!",
+    falaDerrota: "Vetorizou bonito! Agora você está pronto para os gráficos do Caio.",
+    falaRevanche: "De novo? Bora! Treino é treino.",
+    dica: "NumPy é Dados (fraco contra Back-End); Matplotlib é Front-End (fraco contra Dados).",
+  },
+  {
+    id: "aprendiz-seaborn",
+    treinador: true,
+    cenario: "ml",
+    ginasio: "Laboratório de Machine Learning",
+    titulo: "Caio, estagiário de Visualização",
+    time: [["matplotlib", 7], ["seaborn", 8]],
+    falaApresentacao:
+      "E aí! Sou o Caio. Eu cuido dos gráficos do Laboratório: se o dado não vira imagem, ninguém entende o modelo.",
+    falaInicio: "Meus gráficos são lindos E perigosos. Mapa de calor neles!",
+    falaDerrota: "Boa! Você leu meus gráficos melhor que eu. A Mariana está te esperando na porta.",
+    falaRevanche: "Mais uma rodada de visualização? Sempre!",
+    dica: "Matplotlib e Seaborn são Front-End: fortes contra Back-End, fracos contra Dados.",
+  },
+];
+
+// Ginásio (CHEFES) ou treinador (TREINADORES) pelo id.
+export const oponentePorId = (id) => CHEFES.find((c) => c.id === id) ?? TREINADORES.find((t) => t.id === id) ?? null;

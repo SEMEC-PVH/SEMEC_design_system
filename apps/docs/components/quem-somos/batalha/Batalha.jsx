@@ -319,8 +319,8 @@ export default function Batalha({ jogador, chefe, onFim }) {
       <h2 id="batalha-titulo" className="sr-only">
         Batalha contra {chefe.titulo}
       </h2>
-      <div className={`${s.arena} ${s.cenario}`} data-ginasio={chefe.id}>
-        <Cenario chefeId={chefe.id} />
+      <div className={`${s.arena} ${s.cenario}`} data-ginasio={chefe.cenario ?? chefe.id}>
+        <Cenario chefeId={chefe.cenario ?? chefe.id} />
         <Posto lutador={op} lado="oponente" anim={anim} />
         <Posto lutador={j} lado="jogador" anim={anim} />
         <Painel lutador={op} hp={opHp} rotulo="Adversário" lado="oponente" />
