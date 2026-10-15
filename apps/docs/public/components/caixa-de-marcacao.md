@@ -50,6 +50,8 @@ Use o componente `Checkbox` (Caixa de marcação) importado de `@semec/ds/react`
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { Check } from "lucide-react";

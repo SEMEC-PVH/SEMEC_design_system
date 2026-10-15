@@ -58,6 +58,8 @@ Use o componente `NavigationMenu` (Menu de navegação) importado de `@semec/ds/
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { cva } from "class-variance-authority";

@@ -56,6 +56,8 @@ Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import { UploadCloud } from "lucide-react";
 

@@ -43,7 +43,7 @@ Sem a fonte, o texto cai em `system-ui` (fallback do token `--font-family-sans`)
 
 **Providers no root (quando usar):** `<Toaster />` se usar `useToast()`; `<TooltipProvider>` em volta do app se usar `Tooltip`; `<SemecProvider nonce>` só para CSP estrita. O `SemecProvider` não inclui os outros dois.
 
-**Next.js App Router:** na 3.x o `dist` é bundle único **sem `"use client"`**. Importe o kit só em arquivos `"use client"` (inclusive o componente de providers); importar num Server Component quebra. Não use `export *` do kit num arquivo `"use client"`. Saída por módulo e fronteira RSC: planejadas para a 4.0 (AUD-20).
+**Next.js App Router:** desde a 3.2 o `dist` sai por módulo e cada componente interativo já traz `"use client"`; importar `@semec/ds/react` num Server Component funciona (apresentacionais como `Heading`, `Card`, `Badge`, `Button`, `Link`, `Table` renderizam no servidor). Passar handler (`onClick`, `onValueChange`…) ou usar hook continua exigindo um arquivo `"use client"` seu. Não use `export *` do kit num arquivo `"use client"`. Um componente só: `@semec/ds/react/<arquivo>` (ex.: `@semec/ds/react/button`). Na 3.0/3.1 (bundle único, sem `"use client"`) o kit só funcionava em arquivos `"use client"`.
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0). Use só `tokens.css` (+ `@source`). Preset JS opcional: `@config "@semec/ds/react/pv-preset"`.
 

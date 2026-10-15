@@ -48,6 +48,8 @@ Use o componente `Label` (Rótulo) importado de `@semec/ds/react`; não reimplem
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as LabelPrimitive from "@radix-ui/react-label";
 

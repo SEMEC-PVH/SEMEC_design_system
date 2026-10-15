@@ -51,6 +51,8 @@ Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não r
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 

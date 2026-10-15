@@ -50,6 +50,8 @@ Use o componente `ScrollArea` (Área de scroll) importado de `@semec/ds/react`; 
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 

@@ -56,6 +56,8 @@ Use o componente `Popover` (Popover) importado de `@semec/ds/react`; não reimpl
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 

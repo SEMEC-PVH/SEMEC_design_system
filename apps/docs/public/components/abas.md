@@ -55,6 +55,8 @@ Use o componente `Tabs` (Abas) importado de `@semec/ds/react`; não reimplemente
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 

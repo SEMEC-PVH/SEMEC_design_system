@@ -74,6 +74,8 @@ Use o componente `AlertDialog` (Diálogo de alerta) importado de `@semec/ds/reac
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import type * as DialogPrimitive from "@radix-ui/react-dialog";

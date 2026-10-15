@@ -50,6 +50,8 @@ Use o componente `Switch` (Interruptor) importado de `@semec/ds/react`; não rei
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as SwitchPrimitives from "@radix-ui/react-switch";
 
