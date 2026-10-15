@@ -278,7 +278,10 @@ function InputMaskPreview() {
           <InputMask mask="cep" autoComplete="postal-code" />
         </FormField>
         <FormField label="Data de nascimento" hint="dd/mm/aaaa">
-          <InputMask mask="data" autoComplete="bday" />
+          <InputMask mask="data" autoComplete="bday" placeholder="DD/MM/AAAA" />
+        </FormField>
+        <FormField label="Competência do exercício" hint="mm/aaaa">
+          <InputMask mask="data-mes-ano" placeholder="MM/AAAA" />
         </FormField>
       </div>
     </div>

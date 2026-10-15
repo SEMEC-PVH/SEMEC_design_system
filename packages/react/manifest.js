@@ -171,16 +171,24 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Campo com máscara",
     file: "src/components/input-mask.tsx",
     category: "formularios",
-    desc: "Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.",
+    desc: "Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data (DD/MM/AAAA, MM/AAAA, DD/MM/AAAA HH:MM ou HH:MM), telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.",
     variants: [
-      { prop: "mask", values: "cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: \"AAA-9*99\")" },
+      { prop: "mask", values: "cpf · cnpj · cep · data (DD/MM/AAAA) · data-mes-ano (MM/AAAA) · data-hora (DD/MM/AAAA HH:MM) · hora (HH:MM) · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: \"AAA-9*99\")" },
       { prop: "valor", values: "defaultValue · value + onValueChange(masked, raw)" },
-      { prop: "inputMode", values: "numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível" },
+      { prop: "inputMode", values: "numeric (CPF, CNPJ, CEP, data, data-mes-ano, data-hora, hora) · tel (telefones) · sobrescrevível" },
     ],
     usage: `import { FormField, InputMask } from "@semec/ds/react";
 
 <FormField label="CPF" hint="Somente números">
   <InputMask mask="cpf" onValueChange={(masked, raw) => setCpf(raw)} />
+</FormField>
+
+<FormField label="Data de nascimento" hint="DD/MM/AAAA">
+  <InputMask mask="data" placeholder="DD/MM/AAAA" />
+</FormField>
+
+<FormField label="Competência" hint="MM/AAAA">
+  <InputMask mask="data-mes-ano" placeholder="MM/AAAA" />
 </FormField>
 
 <FormField label="Telefone">

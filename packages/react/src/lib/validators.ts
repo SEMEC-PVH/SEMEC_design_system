@@ -54,4 +54,36 @@ export function validateEmail(v: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 }
 
+/** Valida se uma data no formato DD/MM/AAAA é válida no calendário gregoriano. */
+export function validateDateBR(v: string): boolean {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v);
+  if (!match) return false;
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
+  if (month < 1 || month > 12) return false;
+  if (year < 1000 || year > 9999) return false;
+  const daysInMonth = new Date(year, month, 0).getDate();
+  return day >= 1 && day <= daysInMonth;
+}
+
+/** Valida se uma competência no formato MM/AAAA é válida. */
+export function validateDateMonthYear(v: string): boolean {
+  const match = /^(\d{2})\/(\d{4})$/.exec(v);
+  if (!match) return false;
+  const month = Number(match[1]);
+  const year = Number(match[2]);
+  if (month < 1 || month > 12) return false;
+  return year >= 1000 && year <= 9999;
+}
+
+/** Valida horário no formato HH:MM (00:00 a 23:59). */
+export function validateTime(v: string): boolean {
+  const match = /^(\d{2}):(\d{2})$/.exec(v);
+  if (!match) return false;
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  return hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59;
+}
+
 export { digits };

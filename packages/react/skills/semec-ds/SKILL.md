@@ -427,16 +427,6 @@ export function FormularioRequerimento() {
   };
 
   return (
-<<<<<<< HEAD
-    <form onSubmit={handleSubmit} noValidate className="max-w-3xl space-y-4">
-      {errors.length > 0 && <ErrorSummary errors={errors} />}
-
-      <FormField label="CPF" htmlFor="cpf" required error={erroCpf}>
-        <Input
-          id="cpf"
-          value={cpf}
-          onValueChange={setCpf}
-=======
     <form
       onSubmit={(e) => {
         setTentativa((t) => t + 1);
@@ -451,7 +441,6 @@ export function FormularioRequerimento() {
           title="Há pendências a corrigir antes de prosseguir"
           errors={errorSummaryItems}
           focusKey={tentativa}
->>>>>>> rafaelruggieriti-sem-817-featds-padrao-de-formulario-form-field-mensagem-de-erro-e
         />
       )}
 
@@ -538,8 +527,9 @@ Todo controle de formulário do kit fala a mesma língua: `value` / `defaultValu
     </InputOTPGroup>
   </InputOTP>
 </FormField>
-```
-- Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`, `cpfCnpjSchema`
+- Máscaras prontas (`InputMask`): `mask="cpf"`, `mask="cnpj"`, `mask="cep"`, `mask="data"` (DD/MM/AAAA), `mask="data-mes-ano"` (MM/AAAA), `mask="data-hora"` (DD/MM/AAAA HH:MM), `mask="hora"` (HH:MM), `mask="telefone"`
+- Funções utilitárias de máscara (`@semec/ds/react`): `maskCPF`, `maskCNPJ`, `maskCEP`, `maskDate`, `maskDateMonthYear`, `maskDateTime`, `maskTime`, `maskCurrency`, `applyInputMask`
+- Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`, `cpfCnpjSchema`, `dateBRSchema`, `dateMonthYearSchema`, `timeSchema`, `dateSchema`
 
 ## Responsive / Mobile
 
