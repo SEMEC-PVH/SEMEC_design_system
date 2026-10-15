@@ -66,6 +66,8 @@ Use o componente `Dialog` (Modal) importado de `@semec/ds/react`; não reimpleme
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";

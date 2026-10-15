@@ -4,18 +4,19 @@ code: "icon-button"
 slug: "botao-de-icone"
 file: "src/components/icon-button.tsx"
 category: "acoes"
-variants: "variant: primary · secondary · outline · ghost · destructive · link"
+variants: "variant: primary · secondary · outline · ghost · destructive · link · loading: false (padrão) · true (Spinner no lugar do ícone, aria-busy, aria-disabled, clique bloqueado)"
 ---
 
 # Botão de ícone — `icon-button`
 
-> Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).
+> Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome.
 
 **Arquivo:** `src/components/icon-button.tsx` | **Categoria:** Ações e links | **Rota:** `/componentes/botao-de-icone`
 
 ## Variantes
 
 - **variant**: primary · secondary · outline · ghost · destructive · link
+- **loading**: false (padrão) · true (Spinner no lugar do ícone, aria-busy, aria-disabled, clique bloqueado)
 
 ## Instalação (@semec/ds)
 
@@ -39,12 +40,13 @@ import { Download, Search, Trash2 } from "lucide-react";
 <IconButton label="Buscar requerimento"><Search /></IconButton>
 <IconButton label="Baixar carnê"><Download /></IconButton>
 <IconButton label="Excluir requerimento" variant="destructive"><Trash2 /></IconButton>
+<IconButton label="Baixar carnê" loading={baixando}><Download /></IconButton>
 ```
 
 ## Prompt para IA
 
 ```text
-Use o componente `IconButton` (Botão de ícone) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). API e variantes: variant: primary · secondary · outline · ghost · destructive · link. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `IconButton` (Botão de ícone) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome. API e variantes: variant: primary · secondary · outline · ghost · destructive · link · loading: false (padrão) · true (Spinner no lugar do ícone, aria-busy, aria-disabled, clique bloqueado). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -73,6 +75,12 @@ export interface IconButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof iconButtonVariants> {
   label: string;
+  /**
+   * Ação em andamento: troca o ícone por um Spinner decorativo e repassa
+   * `loading` ao `Button` (`aria-busy`, `aria-disabled`, clique bloqueado,
+   * foco mantido). O nome acessível continua sendo `label`.
+   */
+  loading?: boolean;
 }
 
 /**
@@ -80,7 +88,10 @@ export interface IconButtonProps
  * (`label`) — sem ele, leitores de tela anunciam um botão vazio.
  */
 const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ className, label, variant = "outline", type = "button", ...props }, ref) => (
+  (
+    { className, label, variant = "outline", type = "button", loading = false, children, ...props },
+    ref
+  ) => (
     <Button
       ref={ref}
       type={type}
@@ -89,8 +100,11 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       aria-label={label}
       title={label}
       className={className}
+      loading={loading}
       {...props}
-    />
+    >
+      {loading ? null : children}
+    </Button>
   )
 );
 IconButton.displayName = "IconButton";

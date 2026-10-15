@@ -65,6 +65,8 @@ Use o componente `Header` (Cabeçalho) importado de `@semec/ds/react`; não reim
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 
 import { cn } from "../lib/utils";

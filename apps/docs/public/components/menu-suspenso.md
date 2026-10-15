@@ -59,6 +59,8 @@ Use o componente `DropdownMenu` (Menu suspenso) importado de `@semec/ds/react`; 
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronRight, Circle } from "lucide-react";

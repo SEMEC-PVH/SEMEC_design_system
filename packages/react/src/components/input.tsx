@@ -1,14 +1,32 @@
+"use client";
+
 import * as React from "react";
 
 import { cn } from "../lib/utils";
 import { useFormFieldControl } from "./form-field";
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  /**
+   * Recebe o valor (string) a cada mudança, junto com o `onChange` nativo, que
+   * continua recebendo o evento (contrato de formulário, ADR-015).
+   */
+  onValueChange?: (value: string) => void;
+  /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
+  invalid?: boolean;
+}
 
 /** Campo de texto. Dentro de um `FormField`, recebe `id`, `aria-describedby` e `aria-invalid`. */
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
-    const field = useFormFieldControl(props, { supportsRequired: true });
+  ({ className, type, invalid, onValueChange, ...props }, ref) => {
+    const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
+    const { onChange } = props;
+    const handleChange =
+      onChange || onValueChange
+        ? (event: React.ChangeEvent<HTMLInputElement>) => {
+            onChange?.(event);
+            onValueChange?.(event.target.value);
+          }
+        : undefined;
     return (
       <input
         type={type}
@@ -19,6 +37,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         ref={ref}
         {...props}
         {...field}
+        onChange={handleChange}
       />
     );
   }

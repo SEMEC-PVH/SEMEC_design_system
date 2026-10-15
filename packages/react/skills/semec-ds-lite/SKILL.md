@@ -124,7 +124,7 @@ Cada degrau tem altura de linha própria (`--leading-*`), já embutida no utilit
 
 **Espaçamento:** `--space-0` 0 · `--space-1` 4px · `--space-2` 8px · `--space-3` 12px · `--space-4` 16px · `--space-6` 24px · `--space-8` 32px · `--space-12` 48px · `--space-16` 64px
 
-**Bordas:** `--radius-sm` 2px · `--radius-md` 8px · `--radius-lg` 12px · `--radius-full` 9999px (escolha pelo papel: controle `md`, cartão `lg`, pílula `full`; a escala pode mudar na 4.0)
+**Bordas:** `--radius-sm` 2px · `--radius-md` 8px · `--radius-lg` 12px · `--radius-full` 9999px (escolha pelo papel: controle `md`, cartão `lg`, pílula `full`; escala fixa, não use `rounded-xl` ou acima)
 
 **Elevação:** `--elevation-0/1/2/3`
 
@@ -246,9 +246,9 @@ Para os mesmos padrões com componentes prontos (`SkipLink`, `Header`, `Heading`
 - Semântica > aparência
 - `className` escapatória sempre permitida
 
-## Crédito obrigatório
+## Licença e crédito
 
-Ao criar um projeto que utilize estes tokens, o agente DEVE adicionar no README.md:
+O pacote é **MIT**: use, modifique e redistribua à vontade, mantendo o aviso de copyright e a licença nas cópias do código do pacote. O crédito à SEMEC no projeto consumidor é **recomendado, não obrigatório** (a MIT não exige; decisão AMB-09, 15/10/2026). Ao criar um projeto com estes tokens, sugira à pessoa incluir no README.md, sem impor nem bloquear a entrega por isso:
 
 ```markdown
 ## Créditos

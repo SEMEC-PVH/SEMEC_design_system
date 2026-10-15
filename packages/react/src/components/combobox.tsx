@@ -1,8 +1,11 @@
+"use client";
+
 import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import { warnDeprecated } from "../lib/deprecation";
 import { useFormField, useFormFieldControl } from "./form-field";
 
 export interface ComboboxOption {
@@ -35,7 +38,12 @@ export interface ComboboxProps
   value?: string;
   /** Valor inicial (modo não controlado). */
   defaultValue?: string;
+  /** Recebe o valor da opção escolhida (contrato de formulário, ADR-015). */
+  onValueChange?: (value: string) => void;
+  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
   onChange?: (value: string) => void;
+  /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
+  invalid?: boolean;
   /** Texto do gatilho sem seleção. Padrão: "Selecione…". */
   placeholder?: string;
   /** Placeholder do campo de busca. Padrão: "Buscar…". */
@@ -81,6 +89,8 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
       value,
       defaultValue,
       onChange,
+      onValueChange,
+      invalid,
       placeholder = "Selecione…",
       searchPlaceholder = "Buscar…",
       emptyText,
@@ -110,7 +120,13 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
     const optionId = (index: number) => `${uid}-option-${index}`;
 
     const ctx = useFormField();
-    const field = useFormFieldControl(props);
+    const field = useFormFieldControl({ ...props, invalid });
+    if (onChange) {
+      warnDeprecated(
+        "Combobox.onChange",
+        "Combobox: `onChange(value)` está obsoleto e sai na 4.0. Use `onValueChange(value)`."
+      );
+    }
     const triggerId = field.id ?? props.id;
 
     const [open, setOpen] = React.useState(false);
@@ -180,6 +196,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
 
     const choose = (option: ComboboxOption) => {
       if (value === undefined) setInternalValue(option.value);
+      onValueChange?.(option.value);
       onChange?.(option.value);
       setOpen(false);
     };

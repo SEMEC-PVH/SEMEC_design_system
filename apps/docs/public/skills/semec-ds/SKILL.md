@@ -1,6 +1,6 @@
 ---
 name: semec-ds
-description: Use SEMEC Design System (@semec/ds) para construir UI em React. Tokens pv-*, 52 componentes Radix+CVA, a11y WCAG 2.1 AA e padrões de tela. Use quando criar ou editar UI com o kit, migrar portal ou montar telas a partir dos exemplos.
+description: Use SEMEC Design System (@semec/ds) para construir UI em React. Tokens pv-*, 55 componentes Radix+CVA, a11y WCAG 2.1 AA e padrões de tela. Use quando criar ou editar UI com o kit, migrar portal ou montar telas a partir dos exemplos.
 author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 ---
 
@@ -43,7 +43,7 @@ Sem a fonte, o texto cai em `system-ui` (fallback do token `--font-family-sans`)
 
 **Providers no root (quando usar):** `<Toaster />` se usar `useToast()`; `<TooltipProvider>` em volta do app se usar `Tooltip`; `<SemecProvider nonce>` só para CSP estrita. O `SemecProvider` não inclui os outros dois.
 
-**Next.js App Router:** na 3.x o `dist` é bundle único **sem `"use client"`**. Importe o kit só em arquivos `"use client"` (inclusive o componente de providers); importar num Server Component quebra. Não use `export *` do kit num arquivo `"use client"`. Saída por módulo e fronteira RSC: planejadas para a 4.0 (AUD-20).
+**Next.js App Router:** desde a 3.2 o `dist` sai por módulo e cada componente interativo já traz `"use client"`; importar `@semec/ds/react` num Server Component funciona (apresentacionais como `Heading`, `Card`, `Badge`, `Button`, `Link`, `Table` renderizam no servidor). Passar handler (`onClick`, `onValueChange`…) ou usar hook continua exigindo um arquivo `"use client"` seu. Não use `export *` do kit num arquivo `"use client"`. Um componente só: `@semec/ds/react/<arquivo>` (ex.: `@semec/ds/react/button`). Na 3.0/3.1 (bundle único, sem `"use client"`) o kit só funcionava em arquivos `"use client"`.
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0). Use só `tokens.css` (+ `@source`). Preset JS opcional: `@config "@semec/ds/react/pv-preset"`.
 
@@ -144,7 +144,7 @@ O `@theme inline` do `tokens.css` gera utilitários para cor, espaçamento (`p-s
 
 Pesos: `font-regular` 400, `font-medium` 500, `font-semibold` 600, `font-bold` 700 (não existem 800/900).
 
-**Raio:** `rounded-sm` 2px · `rounded-md` 8px · `rounded-lg` 12px · `rounded-full`. Escolha pelo papel (controle `rounded-md`, cartão `rounded-lg`, pílula `rounded-full`), não pelo px: a escala pode mudar na 4.0 (AUD-57).
+**Raio:** `rounded-sm` 2px · `rounded-md` 8px · `rounded-lg` 12px · `rounded-full`. Escolha pelo papel (controle `rounded-md`, cartão `rounded-lg`, pílula `rounded-full`). A escala é fixa (decisão de 15/10/2026); não use `rounded-xl` ou acima, que ficam fora dela.
 
 **Sombra:** `shadow-elevation-1/2/3` (nunca `shadow-md` e afins do Tailwind, que usam preto puro).
 
@@ -159,32 +159,34 @@ import { validateCPF, validateCNPJ, validateEmail } from "@semec/ds/react";
 import { cpfSchema, cnpjSchema, cpfCnpjSchema, emailSchema, cepSchema } from "@semec/ds/react/validacao";
 ```
 
-## Componentes (52)
+## Componentes (55)
 
 Lista gerada do manifest (export principal, `code` e descrição). Detalhes, variantes e exemplo de uso de cada um: `components/<slug>.md` ou `manifest.json`.
 
 ### Ações e links (3)
 
-- `Button` (`button`) — Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida.
-- `IconButton` (`icon-button`) — Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).
+- `Button` (`button`) — Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.
+- `IconButton` (`icon-button`) — Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome.
 - `Link` (`link`) — Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas.
 
-### Formulários (16)
+### Formulários (18)
 
-- `Input` (`input`) — Campo de texto. Estado de erro via `aria-invalid`. Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente.
-- `Textarea` (`textarea`) — Campo multilinha com as mesmas variantes visuais do campo de texto.
-- `Select` (`select`) — Seleção fechada com gatilho, conteúdo e itens compostos.
+- `Input` (`input`) — Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string.
+- `PasswordInput` (`password-input`) — Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Desliga corretor e maiúscula automática (`spellCheck={false}`, `autoCapitalize="none"`, `autoCorrect="off"`, sobrescrevíveis), que alterariam a senha visível. Repassa todas as props do `Input`, inclusive `autoComplete`.
+- `InputMask` (`input-mask`) — Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
+- `Textarea` (`textarea`) — Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`).
+- `Select` (`select`) — Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`).
 - `Combobox` (`combobox`) — Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.
 - `DatePicker` (`date-picker`) — Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).
-- `FileUpload` (`file-upload`) — Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.
-- `Checkbox` (`checkbox`) — Caixa de marcação com estado indeterminado.
-- `RadioGroup` (`radio-group`) — Escolha única entre duas ou mais opções.
-- `Switch` (`switch`) — Interruptor on/off para ativação imediata.
+- `FileUpload` (`file-upload`) — Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio.
+- `Checkbox` (`checkbox`) — Caixa de marcação com estado indeterminado. Mantém a API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.
+- `RadioGroup` (`radio-group`) — Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`.
+- `Switch` (`switch`) — Interruptor on/off para ativação imediata. API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.
 - `Label` (`label`) — Rótulo acessível vinculado ao campo.
 - `FormField` (`form-field`) — Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role="alert"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast.
 - `ErrorSummary` (`error-summary`) — Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático, título ligado por id gerado. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`).
-- `Toggle` (`toggle`) — Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos.
-- `Slider` (`slider`) — Controle deslizante para faixas de valor.
+- `Toggle` (`toggle`) — Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos.
+- `Slider` (`slider`) — Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares.
 - `InputOTP` (`input-otp`) — Campo de código OTP com foco automático entre dígitos.
 - `Calendar` (`calendar`) — Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px.
 
@@ -200,10 +202,11 @@ Lista gerada do manifest (export principal, `code` e descrição). Detalhes, var
 - `DataTable` (`data-table`) — Tabela com ordenação, paginação e estados vazios.
 - `Timeline` (`timeline`) — Sequência temporal em lista ordenada (ol/li), com pontos, conectores visíveis e conteúdo. O status vai em texto (srLabel), não só na cor.
 
-### Navegação (11)
+### Navegação (12)
 
 - `Breadcrumb` (`breadcrumb`) — Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
 - `Header` (`header`) — Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.
+- `Stepper` (`stepper`) — Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.
 - `SkipLink` (`skip-link`) — Link "Pular para o conteúdo principal" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo).
 - `Footer` (`footer`) — Rodapé institucional (<footer>, landmark contentinfo) com seções de links e faixa final. Use um por página, fora do <main>.
 - `Tabs` (`tabs`) — Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix. A aba ativa tem barra inferior de 3px em `primary` (≥4,97:1) e peso semibold, além do fundo: não depende só de cor. Alvo de 44px.
@@ -225,7 +228,7 @@ Lista gerada do manifest (export principal, `code` e descrição). Detalhes, var
 - `Alert` (`alert`) — Mensagem de feedback em linha, com ícone automático por variante. Só destructive interrompe o leitor de tela (role=alert); as demais usam role=status.
 - `AlertDialog` (`alert-dialog`) — Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role="alertdialog", sempre modal, não fecha por clique fora e abre com o foco no Cancelar.
 - `Popover` (`popover`) — Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.
-- `Spinner` (`spinner`) — Indicador de carregamento inline (role=status).
+- `Spinner` (`spinner`) — Indicador de carregamento inline (role=status). Com `decorative`, é só visual (sem role, aria-label nem texto sr-only), para quando outro elemento já anuncia o carregamento; é o que o `Button` com `loading` usa.
 - `Progress` (`progress`) — Barra de progresso determinada. Trilha com contorno border-strong (3,77:1 sobre surface) e indicador primary.
 - `Drawer` (`drawer`) — Painel deslizante de qualquer lado da tela.
 - `Sheet` (`sheet`) — Painel lateral modal com overlay. Variantes left/right/top/bottom.
@@ -438,7 +441,7 @@ export function ExemploFormulario() {
         <Input
           id="cpf"
           value={cpf}
-          onChange={(e) => setCpf(e.target.value)}
+          onValueChange={setCpf}
         />
       </FormField>
 
@@ -449,6 +452,29 @@ export function ExemploFormulario() {
 ```
 
 - Labels sempre associados via `htmlFor`/`id`
+
+### Contrato dos controles de formulário (ADR-015, desde a 3.2.0)
+
+Todo controle de formulário do kit fala a mesma língua: `value` / `defaultValue` · `onValueChange(valor)` · `name` · `id` · `invalid` · `disabled` · `required`.
+
+- `onValueChange` recebe o **valor** (string, `File[]`, `Date`, `number[]`), nunca o evento. Use-o em `Input`, `Textarea`, `DatePicker`, `Combobox`, `InputOTP`, `FileUpload`, `Calendar`, `Select`, `RadioGroup` e `Slider`.
+- Em `Input`/`Textarea`, `onChange` continua sendo o evento nativo (não está obsoleto). Em `Combobox`, `InputOTP`, `DatePicker`, `FileUpload` e `Calendar`, o `onChange(valor)` está obsoleto: não gere código novo com ele.
+- `Checkbox` e `Switch` mantêm a API Radix: `checked` / `onCheckedChange` (equivalem a `value` / `onValueChange`; ali `value` é o valor enviado no form). `Toggle` (`pressed` / `onPressedChange`) não é controle de formulário.
+- `invalid` (boolean) vira `aria-invalid="true"` + borda de erro. Dentro do `FormField`, `error="mensagem"` já marca o filho; `invalid` explícito no controle vence. `error` é sempre texto (`FormField`, `FileUpload`); para marcar sem texto, use `invalid` (o `FormField` também aceita).
+- `name` envia em `<form>` nativo, inclusive em `Combobox` e `InputOTP` (input oculto). No `Select`, `name`/`value`/`onValueChange` vão na raiz e `invalid` no `SelectTrigger`.
+
+```tsx
+<FormField label="Município" error={erroMunicipio}>
+  <Combobox name="municipio" options={municipios} value={municipio} onValueChange={setMunicipio} />
+</FormField>
+<FormField label="Código recebido por SMS" required>
+  <InputOTP name="codigo" maxLength={6} value={codigo} onValueChange={setCodigo} invalid={codigoErrado}>
+    <InputOTPGroup>
+      {[0, 1, 2, 3, 4, 5].map((i) => <InputOTPSlot key={i} index={i} />)}
+    </InputOTPGroup>
+  </InputOTP>
+</FormField>
+```
 - Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`
 
 ## Responsive / Mobile
@@ -483,18 +509,16 @@ export function ExemploFormulario() {
 Avisadas a partir da 3.1.0, conforme o ADR-013 (duas minors antes de remover). Não gere código novo que dependa disto:
 
 - Importar por caminho de arquivo em `dist/` (`@semec/ds/dist/react/...`): use só os subpaths do `exports` (AUD-20).
-- `onChange(value)` / `onChange(files)` em `Calendar`, `Combobox`, `DatePicker`, `InputOTP` e `FileUpload`: o contrato passa a ser `value` / `onValueChange` / `name` / `id` / `invalid`; use `onValueChange` onde já existir (AUD-35).
+- `onChange(value)` / `onChange(files)` em `Calendar`, `Combobox`, `DatePicker`, `InputOTP` e `FileUpload`: use `onValueChange` (mesma assinatura, existe em todos desde a 3.2.0). No `DatePicker`, o `onChange` volta a ser o evento nativo na 4.0 (AUD-35).
 - Utilitários de primitivo `bg-pv-*` / `text-pv-*` / `border-pv-*`: use os semânticos (AUD-55).
-- Valores atuais de `rounded-sm` (2px) e `rounded-lg` (12px): escolha o raio pelo papel (AUD-57).
-- `disabled` nativo no `Button` como seletor (`:disabled`) ou em testes: o estado pode passar a `aria-disabled`, e o `Button` ganha `loading` (AUD-63).
 
 ## Arquivos para IA
 
 Publicados com o pacote: `@semec/ds/skills/llms.txt` (índice), `@semec/ds/skills/llms-full.txt` (dump completo), `@semec/ds/skills/manifest.json` (JSON), `@semec/ds/skills/components/<slug>.md` (um por componente) e esta skill (`@semec/ds/skills/semec-ds`). Site de documentação: https://semec-pvh.github.io/SEMEC_design_system/.
 
-## Crédito obrigatório
+## Licença e crédito
 
-Ao criar um projeto que utilize estes tokens, o agente DEVE adicionar no README.md:
+O pacote é **MIT**: use, modifique e redistribua à vontade, mantendo o aviso de copyright e a licença nas cópias do código do pacote. O crédito à SEMEC no projeto consumidor é **recomendado, não obrigatório** (a MIT não exige; decisão AMB-09, 15/10/2026). Ao criar um projeto com estes tokens, sugira à pessoa incluir no README.md, sem impor nem bloquear a entrega por isso:
 
 ```markdown
 ## Créditos

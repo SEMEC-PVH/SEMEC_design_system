@@ -47,10 +47,11 @@ export const dsComponents = [
     label: "Botões",
     file: "src/components/button.tsx",
     category: "acoes",
-    desc: "Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida.",
+    desc: "Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.",
     variants: [
       { prop: "variant", values: "primary · secondary · outline · ghost · destructive · success · link" },
       { prop: "size", values: "sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px)" },
+      { prop: "loading", values: "false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento) · com asChild, o spinner entra no link e o onClick do filho não dispara · o clique ainda sobe aos ancestrais (só envio e navegação são cancelados)" },
     ],
     usage: `import { Button } from "@semec/ds/react";
 import Link from "next/link";
@@ -66,6 +67,11 @@ import { Plus } from "lucide-react";
 
 <Button asChild>
   <Link href="/iptu">Ver meu IPTU</Link>
+</Button>
+
+// Envio em andamento: o foco fica no botão e o clique é ignorado
+<Button type="submit" loading={enviando} loadingText="Enviando…">
+  Enviar requerimento
 </Button>`,
   },
   {
@@ -74,14 +80,18 @@ import { Plus } from "lucide-react";
     label: "Botão de ícone",
     file: "src/components/icon-button.tsx",
     category: "acoes",
-    desc: "Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).",
-    variants: [{ prop: "variant", values: "primary · secondary · outline · ghost · destructive · link" }],
+    desc: "Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome.",
+    variants: [
+      { prop: "variant", values: "primary · secondary · outline · ghost · destructive · link" },
+      { prop: "loading", values: "false (padrão) · true (Spinner no lugar do ícone, aria-busy, aria-disabled, clique bloqueado)" },
+    ],
     usage: `import { IconButton } from "@semec/ds/react";
 import { Download, Search, Trash2 } from "lucide-react";
 
 <IconButton label="Buscar requerimento"><Search /></IconButton>
 <IconButton label="Baixar carnê"><Download /></IconButton>
-<IconButton label="Excluir requerimento" variant="destructive"><Trash2 /></IconButton>`,
+<IconButton label="Excluir requerimento" variant="destructive"><Trash2 /></IconButton>
+<IconButton label="Baixar carnê" loading={baixando}><Download /></IconButton>`,
   },
   {
     code: "link",
@@ -109,8 +119,11 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Caixa de texto",
     file: "src/components/input.tsx",
     category: "formularios",
-    desc: "Campo de texto. Estado de erro via `aria-invalid`. Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente.",
-    variants: [{ prop: "estados", values: "padrão · inválido (aria-invalid) · disabled" }],
+    desc: "Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string.",
+    variants: [
+      { prop: "estados", values: "padrão · inválido (invalid / aria-invalid) · disabled" },
+      { prop: "contrato", values: "value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required" },
+    ],
     usage: `import { FormField, Input } from "@semec/ds/react";
 
 // Todo campo precisa de rótulo visível (placeholder não substitui o rótulo).
@@ -123,7 +136,65 @@ import { Download, Search, Trash2 } from "lucide-react";
 <FormField label="CPF" error="Informe os 11 dígitos do CPF.">
   <Input id="cpf" inputMode="numeric" />
 </FormField>
-// → <label for="cpf">, aria-invalid="true", aria-describedby="cpf-error"`,
+// → <label for="cpf">, aria-invalid="true", aria-describedby="cpf-error"
+
+// Controlado: onValueChange recebe a string (onChange continua recebendo o evento)
+<FormField label="E-mail">
+  <Input type="email" name="email" value={email} onValueChange={setEmail} invalid={emailInvalido} />
+</FormField>`,
+  },
+  {
+    code: "password-input",
+    slug: "campo-de-senha",
+    label: "Campo de senha",
+    file: "src/components/password-input.tsx",
+    category: "formularios",
+    desc: "Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo (\"Mostrar senha\") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Desliga corretor e maiúscula automática (`spellCheck={false}`, `autoCapitalize=\"none\"`, `autoCorrect=\"off\"`, sobrescrevíveis), que alterariam a senha visível. Repassa todas as props do `Input`, inclusive `autoComplete`.",
+    variants: [
+      { prop: "visibilidade", values: "defaultVisible · visible + onVisibleChange (controlado)" },
+      { prop: "labels", values: "show (padrão \"Mostrar senha\")" },
+      { prop: "autoComplete", values: "current-password (login) · new-password (cadastro e troca de senha)" },
+    ],
+    usage: `import { FormField, PasswordInput } from "@semec/ds/react";
+
+<FormField label="Senha" hint="Mínimo de 8 caracteres">
+  <PasswordInput autoComplete="current-password" />
+</FormField>
+
+<FormField label="Nova senha">
+  <PasswordInput autoComplete="new-password" />
+</FormField>`,
+  },
+  {
+    code: "input-mask",
+    slug: "campo-com-mascara",
+    label: "Campo com máscara",
+    file: "src/components/input-mask.tsx",
+    category: "formularios",
+    desc: "Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.",
+    variants: [
+      { prop: "mask", values: "cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: \"AAA-9*99\")" },
+      { prop: "valor", values: "defaultValue · value + onValueChange(masked, raw)" },
+      { prop: "inputMode", values: "numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível" },
+    ],
+    usage: `import { FormField, InputMask } from "@semec/ds/react";
+
+<FormField label="CPF" hint="Somente números">
+  <InputMask mask="cpf" onValueChange={(masked, raw) => setCpf(raw)} />
+</FormField>
+
+<FormField label="Telefone">
+  <InputMask mask="telefone" autoComplete="tel-national" />
+</FormField>
+
+<FormField label="CEP">
+  <InputMask mask="cep" autoComplete="postal-code" />
+</FormField>
+
+// Padrão próprio: placa de veículo (9 dígito, A letra, * letra ou dígito)
+<FormField label="Placa do veículo">
+  <InputMask mask="AAA-9*99" />
+</FormField>`,
   },
   {
     code: "textarea",
@@ -131,12 +202,15 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Área de texto",
     file: "src/components/textarea.tsx",
     category: "formularios",
-    desc: "Campo multilinha com as mesmas variantes visuais do campo de texto.",
-    variants: [{ prop: "estados", values: "padrão · inválido · disabled" }],
+    desc: "Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`).",
+    variants: [
+      { prop: "estados", values: "padrão · inválido (invalid) · disabled" },
+      { prop: "contrato", values: "value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required" },
+    ],
     usage: `import { FormField, Textarea } from "@semec/ds/react";
 
 <FormField label="Descreva a demanda" hint="Até 500 caracteres">
-  <Textarea id="demanda" rows={4} />
+  <Textarea id="demanda" name="demanda" rows={4} value={demanda} onValueChange={setDemanda} />
 </FormField>`,
   },
   {
@@ -145,8 +219,11 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Menu de seleção",
     file: "src/components/select.tsx",
     category: "formularios",
-    desc: "Seleção fechada com gatilho, conteúdo e itens compostos.",
-    variants: [{ prop: "composição", values: "Select · SelectTrigger · SelectValue · SelectContent · SelectItem" }],
+    desc: "Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`).",
+    variants: [
+      { prop: "composição", values: "Select · SelectTrigger · SelectValue · SelectContent · SelectItem" },
+      { prop: "contrato", values: "Select: value · defaultValue · onValueChange · name · required · disabled — SelectTrigger: id · invalid" },
+    ],
     usage: `import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@semec/ds/react";
 
 <Select defaultValue="pbh">
@@ -159,7 +236,7 @@ import { Download, Search, Trash2 } from "lucide-react";
 
 // Dentro de FormField, o SelectTrigger recebe id, aria-describedby e aria-invalid
 <FormField label="Município" error={erro}>
-  <Select>
+  <Select name="municipio" value={municipio} onValueChange={setMunicipio}>
     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
     <SelectContent>
       <SelectItem value="pbh">Porto Velho</SelectItem>
@@ -175,8 +252,8 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.",
     variants: [
-      { prop: "props", values: "options · value · defaultValue · onChange · placeholder · searchPlaceholder · emptyText · name · required · disabled · labels · portalContainer" },
-      { prop: "deprecadas", values: "ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)" },
+      { prop: "props", values: "options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer" },
+      { prop: "deprecadas", values: "onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)" },
     ],
     usage: `import { Combobox, FormField, Label } from "@semec/ds/react";
 
@@ -189,9 +266,10 @@ import { Download, Search, Trash2 } from "lucide-react";
     emptyText="Nenhum tipo encontrado."
     options={[{ value: "cnpj", label: "CNPJ" }, { value: "cpf", label: "CPF" }]}
     value={valor}
-    onChange={setValor}
+    onValueChange={setValor}
   />
 </FormField>
+// name gera um <input type="hidden"> com o valor: vai no FormData de um <form> nativo
 
 // Ou com <Label htmlFor> + id (também aceita aria-labelledby)
 <Label htmlFor="orgao">Órgão emissor</Label>
@@ -204,11 +282,19 @@ import { Download, Search, Trash2 } from "lucide-react";
     file: "src/components/date-picker.tsx",
     category: "formularios",
     desc: 'Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).',
-    variants: [{ prop: "props", values: "nativo HTML (min · max · disabled) + labels.openCalendar + variantes visuais do campo" }],
+    variants: [
+      { prop: "props", values: "nativo HTML (min · max · disabled · name · required) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar" },
+      { prop: "deprecadas", values: "onChange(value) (use onValueChange; na 4.0 o onChange passa a receber o evento nativo)" },
+    ],
     usage: `import { DatePicker, FormField } from "@semec/ds/react";
 
 <FormField label="Data de vencimento" hint="dd/mm/aaaa">
-  <DatePicker id="vencimento" defaultValue="2026-08-31" />
+  <DatePicker id="vencimento" name="vencimento" defaultValue="2026-08-31" />
+</FormField>
+
+// Controlado: onValueChange recebe o ISO (AAAA-MM-DD)
+<FormField label="Data de início" error={erroData}>
+  <DatePicker value={inicio} onValueChange={setInicio} />
 </FormField>`,
   },
   {
@@ -217,8 +303,11 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Envio de arquivos",
     file: "src/components/file-upload.tsx",
     category: "formularios",
-    desc: "Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.",
-    variants: [{ prop: "props", values: "accept · maxSize · label · hint · error · onChange · value · multiple · id · inputProps · labels" }],
+    desc: "Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio.",
+    variants: [
+      { prop: "props", values: "accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels" },
+      { prop: "deprecadas", values: "onChange(files) (use onValueChange; sai na 4.0)" },
+    ],
     usage: `import { FileUpload } from "@semec/ds/react";
 
 // \`label\` é o rótulo do campo de arquivo — não omita
@@ -227,6 +316,8 @@ import { Download, Search, Trash2 } from "lucide-react";
   accept=".pdf,image/*"
   maxSize={5 * 1024 * 1024}
   hint="PDF ou imagem, até 5 MB"
+  value={arquivos}
+  onValueChange={setArquivos}
 />
 
 // Textos fixos sobrescrevíveis (padrão PT-BR)
@@ -238,13 +329,22 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Caixa de marcação",
     file: "src/components/checkbox.tsx",
     category: "formularios",
-    desc: "Caixa de marcação com estado indeterminado.",
-    variants: [{ prop: "estados", values: "desmarcado · marcado (checked) · indeterminado · disabled" }],
+    desc: "Caixa de marcação com estado indeterminado. Mantém a API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.",
+    variants: [
+      { prop: "estados", values: "desmarcado · marcado (checked) · indeterminado · disabled · inválido (invalid)" },
+      { prop: "contrato", values: "checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required" },
+    ],
     usage: `import { Checkbox, Label } from "@semec/ds/react";
 
 <div className="flex items-center gap-2">
   <Checkbox id="termos" />
   <Label htmlFor="termos">Aceito os termos</Label>
+</div>
+
+// Controlado, com envio em <form> e erro (checked/onCheckedChange = value/onValueChange)
+<div className="flex items-center gap-2">
+  <Checkbox id="aceite" name="aceite" checked={aceito} onCheckedChange={(v) => setAceito(v === true)} invalid={!aceito && enviado} />
+  <Label htmlFor="aceite">Li e aceito o regulamento</Label>
 </div>`,
   },
   {
@@ -253,11 +353,14 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Botão de opção",
     file: "src/components/radio-group.tsx",
     category: "formularios",
-    desc: "Escolha única entre duas ou mais opções.",
-    variants: [{ prop: "composição", values: "RadioGroup · RadioGroupItem + Label" }],
+    desc: "Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`.",
+    variants: [
+      { prop: "composição", values: "RadioGroup · RadioGroupItem + Label" },
+      { prop: "contrato", values: "value · defaultValue · onValueChange · name · id · invalid · disabled · required" },
+    ],
     usage: `import { RadioGroup, RadioGroupItem, Label } from "@semec/ds/react";
 
-<RadioGroup defaultValue="pessoa-fisica">
+<RadioGroup name="tipoPessoa" defaultValue="pessoa-fisica" onValueChange={setTipoPessoa}>
   <div className="flex items-center gap-2">
     <RadioGroupItem value="pessoa-fisica" id="pf" />
     <Label htmlFor="pf">Pessoa física</Label>
@@ -270,8 +373,11 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Interruptor",
     file: "src/components/switch.tsx",
     category: "formularios",
-    desc: "Interruptor on/off para ativação imediata.",
-    variants: [{ prop: "estados", values: "off · on (checked) · disabled · inválido" }],
+    desc: "Interruptor on/off para ativação imediata. API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.",
+    variants: [
+      { prop: "estados", values: "off · on (checked) · disabled · inválido (invalid)" },
+      { prop: "contrato", values: "checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required" },
+    ],
     usage: `import { Switch, Label } from "@semec/ds/react";
 
 <div className="flex items-center gap-2">
@@ -300,7 +406,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: "Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role=\"alert\"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast.",
     variants: [
-      { prop: "props", values: "label · htmlFor · required · hint · error · id (base dos ids <id>-hint/<id>-error)" },
+      { prop: "props", values: "label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · id (base dos ids <id>-hint/<id>-error)" },
       { prop: "hooks", values: "useFormField · useFormFieldControl (para campos próprios)" },
     ],
     usage: `import { FormField, Input, Button, useToast } from "@semec/ds/react";
@@ -531,6 +637,32 @@ import { Button } from "@semec/ds/react";
     </Button>
   </div>
 </Header>`,
+  },
+  {
+    code: "stepper",
+    slug: "etapas",
+    label: "Etapas",
+    file: "src/components/stepper.tsx",
+    category: "navegacao",
+    desc: "Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current=\"step\"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.",
+    variants: [
+      { prop: "orientation", values: "horizontal (padrão; empilha abaixo de 768px) · vertical" },
+      { prop: "estados", values: "concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only" },
+      { prop: "interação", values: "onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual)" },
+      { prop: "labels", values: "list · position(n, total) · complete · current · upcoming" },
+    ],
+    usage: `import { Stepper } from "@semec/ds/react";
+
+const etapas = [
+  { label: "Dados do estudante" },
+  { label: "Documentos", description: "RG, CPF e comprovante de residência" },
+  { label: "Revisão e envio" },
+];
+
+<Stepper steps={etapas} currentStep={1} />
+
+// Voltar a uma etapa já preenchida
+<Stepper steps={etapas} currentStep={2} onStepClick={(i) => setEtapa(i)} />`,
   },
   {
     code: "skip-link",
@@ -876,7 +1008,7 @@ import { HelpCircle } from "lucide-react";
     label: "Toggle",
     file: "src/components/toggle.tsx",
     category: "formularios",
-    desc: "Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos.",
+    desc: "Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos.",
     variants: [
       { prop: "variant", values: "default · outline" },
       { prop: "size", values: "sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)" },
@@ -894,12 +1026,18 @@ import { Bold } from "lucide-react";
     label: "Spinner",
     file: "src/components/spinner.tsx",
     category: "feedback",
-    desc: "Indicador de carregamento inline (role=status).",
-    variants: [{ prop: "label", values: "texto anunciado (padrão \"Carregando\")" }],
+    desc: "Indicador de carregamento inline (role=status). Com `decorative`, é só visual (sem role, aria-label nem texto sr-only), para quando outro elemento já anuncia o carregamento; é o que o `Button` com `loading` usa.",
+    variants: [
+      { prop: "label", values: "texto anunciado (padrão \"Carregando\")" },
+      { prop: "decorative", values: "false (padrão, role=status) · true (aria-hidden, sem nome; raiz <span>)" },
+    ],
     usage: `import { Spinner } from "@semec/ds/react";
 
 <Spinner label="Carregando protocolos" />
-<p className="text-muted-foreground">Carregando dados…</p>`,
+<p className="text-muted-foreground">Carregando dados…</p>
+
+// Só visual: o texto ao lado já diz o que está acontecendo
+<p className="flex items-center gap-2"><Spinner decorative /> Atualizando a lista…</p>`,
   },
   {
     code: "progress",
@@ -921,8 +1059,8 @@ import { Bold } from "lucide-react";
     label: "Slider",
     file: "src/components/slider.tsx",
     category: "formularios",
-    desc: "Controle deslizante para faixas de valor.",
-    variants: [],
+    desc: "Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares.",
+    variants: [{ prop: "contrato", values: "value · defaultValue · onValueChange(number[]) · name · id · invalid · disabled" }],
     usage: `import { Slider } from "@semec/ds/react";
 
 // Nome acessível obrigatório: aria-label (ou aria-labelledby) vai para o polegar
@@ -940,11 +1078,13 @@ import { Bold } from "lucide-react";
     desc: "Campo de código OTP com foco automático entre dígitos.",
     variants: [
       { prop: "composição", values: "InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator" },
-      { prop: "props", values: "maxLength · disabled · labels (group · slot(index, total))" },
+      { prop: "props", values: "value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total))" },
+      { prop: "deprecadas", values: "onChange(value) (use onValueChange; sai na 4.0)" },
     ],
     usage: `import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec/ds/react";
 
-<InputOTP value={code} onChange={setCode} maxLength={6}>
+// name gera um <input type="hidden"> com o código: vai no FormData de um <form> nativo
+<InputOTP name="codigo" value={code} onValueChange={setCode} maxLength={6}>
   <InputOTPGroup>
     <InputOTPSlot index={0} />
     <InputOTPSlot index={1} />
@@ -966,15 +1106,16 @@ import { Bold } from "lucide-react";
     category: "formularios",
     desc: "Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px.",
     variants: [
-      { prop: "props", values: "value · onChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }>" },
+      { prop: "props", values: "value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }>" },
+      { prop: "deprecadas", values: "onChange(date) (use onValueChange; sai na 4.0)" },
       { prop: "a11y", values: "role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome \"14 de outubro de 2026\"" },
       { prop: "teclado", values: "←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona" },
     ],
     usage: `import { Calendar } from "@semec/ds/react";
 
-<Calendar value={data} onChange={setData} />
+<Calendar value={data} onValueChange={setData} />
 
-<Calendar value={data} onChange={setData} min="2026-01-01" max="2026-12-31" />`,
+<Calendar value={data} onValueChange={setData} min="2026-01-01" max="2026-12-31" />`,
   },
   {
     code: "scroll-area",

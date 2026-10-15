@@ -23,31 +23,35 @@ npm install @semec/ds
 - **Navegação** (`navegacao`) — Trilhas, abas e deslocamento entre páginas.
 - **Feedback e estados** (`feedback-e-estados`) — Mensagens de estado, carregamento e camadas sobre a página.
 
-## Componentes (52)
+## Componentes (55)
 
-- [Botões (`button`) — Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida.](/componentes/botoes) — `src/components/button.tsx` — md: `/components/botoes.md`
+- [Botões (`button`) — Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.](/componentes/botoes) — `src/components/button.tsx` — md: `/components/botoes.md`
   Uso: `import { Button } from "@semec/ds/react";`
-- [Botão de ícone (`icon-button`) — Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).](/componentes/botao-de-icone) — `src/components/icon-button.tsx` — md: `/components/botao-de-icone.md`
+- [Botão de ícone (`icon-button`) — Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome.](/componentes/botao-de-icone) — `src/components/icon-button.tsx` — md: `/components/botao-de-icone.md`
   Uso: `import { IconButton } from "@semec/ds/react";`
 - [Link (`link`) — Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas.](/componentes/link) — `src/components/link.tsx` — md: `/components/link.md`
   Uso: `import { Link } from "@semec/ds/react";`
-- [Caixa de texto (`input`) — Campo de texto. Estado de erro via `aria-invalid`. Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente.](/componentes/caixa-de-texto) — `src/components/input.tsx` — md: `/components/caixa-de-texto.md`
+- [Caixa de texto (`input`) — Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string.](/componentes/caixa-de-texto) — `src/components/input.tsx` — md: `/components/caixa-de-texto.md`
   Uso: `import { Input } from "@semec/ds/react";`
-- [Área de texto (`textarea`) — Campo multilinha com as mesmas variantes visuais do campo de texto.](/componentes/area-de-texto) — `src/components/textarea.tsx` — md: `/components/area-de-texto.md`
+- [Campo de senha (`password-input`) — Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Desliga corretor e maiúscula automática (`spellCheck={false}`, `autoCapitalize="none"`, `autoCorrect="off"`, sobrescrevíveis), que alterariam a senha visível. Repassa todas as props do `Input`, inclusive `autoComplete`.](/componentes/campo-de-senha) — `src/components/password-input.tsx` — md: `/components/campo-de-senha.md`
+  Uso: `import { PasswordInput } from "@semec/ds/react";`
+- [Campo com máscara (`input-mask`) — Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.](/componentes/campo-com-mascara) — `src/components/input-mask.tsx` — md: `/components/campo-com-mascara.md`
+  Uso: `import { InputMask } from "@semec/ds/react";`
+- [Área de texto (`textarea`) — Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`).](/componentes/area-de-texto) — `src/components/textarea.tsx` — md: `/components/area-de-texto.md`
   Uso: `import { Textarea } from "@semec/ds/react";`
-- [Menu de seleção (`select`) — Seleção fechada com gatilho, conteúdo e itens compostos.](/componentes/menu-de-selecao) — `src/components/select.tsx` — md: `/components/menu-de-selecao.md`
+- [Menu de seleção (`select`) — Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`).](/componentes/menu-de-selecao) — `src/components/select.tsx` — md: `/components/menu-de-selecao.md`
   Uso: `import { Select } from "@semec/ds/react";`
 - [Combobox (`combobox`) — Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.](/componentes/combobox) — `src/components/combobox.tsx` — md: `/components/combobox.md`
   Uso: `import { Combobox } from "@semec/ds/react";`
 - [Seletor de data (`date-picker`) — Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).](/componentes/seletor-de-data) — `src/components/date-picker.tsx` — md: `/components/seletor-de-data.md`
   Uso: `import { DatePicker } from "@semec/ds/react";`
-- [Envio de arquivos (`file-upload`) — Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.](/componentes/envio-de-arquivos) — `src/components/file-upload.tsx` — md: `/components/envio-de-arquivos.md`
+- [Envio de arquivos (`file-upload`) — Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio.](/componentes/envio-de-arquivos) — `src/components/file-upload.tsx` — md: `/components/envio-de-arquivos.md`
   Uso: `import { FileUpload } from "@semec/ds/react";`
-- [Caixa de marcação (`checkbox`) — Caixa de marcação com estado indeterminado.](/componentes/caixa-de-marcacao) — `src/components/checkbox.tsx` — md: `/components/caixa-de-marcacao.md`
+- [Caixa de marcação (`checkbox`) — Caixa de marcação com estado indeterminado. Mantém a API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.](/componentes/caixa-de-marcacao) — `src/components/checkbox.tsx` — md: `/components/caixa-de-marcacao.md`
   Uso: `import { Checkbox } from "@semec/ds/react";`
-- [Botão de opção (`radio-group`) — Escolha única entre duas ou mais opções.](/componentes/botao-de-opcao) — `src/components/radio-group.tsx` — md: `/components/botao-de-opcao.md`
+- [Botão de opção (`radio-group`) — Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`.](/componentes/botao-de-opcao) — `src/components/radio-group.tsx` — md: `/components/botao-de-opcao.md`
   Uso: `import { RadioGroup } from "@semec/ds/react";`
-- [Interruptor (`switch`) — Interruptor on/off para ativação imediata.](/componentes/interruptor) — `src/components/switch.tsx` — md: `/components/interruptor.md`
+- [Interruptor (`switch`) — Interruptor on/off para ativação imediata. API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.](/componentes/interruptor) — `src/components/switch.tsx` — md: `/components/interruptor.md`
   Uso: `import { Switch } from "@semec/ds/react";`
 - [Rótulo (`label`) — Rótulo acessível vinculado ao campo.](/componentes/rotulo) — `src/components/label.tsx` — md: `/components/rotulo.md`
   Uso: `import { Label } from "@semec/ds/react";`
@@ -73,6 +77,8 @@ npm install @semec/ds
   Uso: `import { Breadcrumb } from "@semec/ds/react";`
 - [Cabeçalho (`header`) — Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.](/componentes/cabecalho) — `src/components/header.tsx` — md: `/components/cabecalho.md`
   Uso: `import { Header } from "@semec/ds/react";`
+- [Etapas (`stepper`) — Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.](/componentes/etapas) — `src/components/stepper.tsx` — md: `/components/etapas.md`
+  Uso: `import { Stepper } from "@semec/ds/react";`
 - [Link para o conteúdo (`skip-link`) — Link "Pular para o conteúdo principal" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo).](/componentes/link-para-o-conteudo) — `src/components/skip-link.tsx` — md: `/components/link-para-o-conteudo.md`
   Uso: `import { SkipLink } from "@semec/ds/react";`
 - [Rodapé (`footer`) — Rodapé institucional (<footer>, landmark contentinfo) com seções de links e faixa final. Use um por página, fora do <main>.](/componentes/rodape) — `src/components/footer.tsx` — md: `/components/rodape.md`
@@ -101,13 +107,13 @@ npm install @semec/ds
   Uso: `import { Separator } from "@semec/ds/react";`
 - [Avatar (`avatar`) — Foto de perfil com fallback automático (iniciais).](/componentes/avatar) — `src/components/avatar.tsx` — md: `/components/avatar.md`
   Uso: `import { Avatar } from "@semec/ds/react";`
-- [Toggle (`toggle`) — Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos.](/componentes/toggle) — `src/components/toggle.tsx` — md: `/components/toggle.md`
+- [Toggle (`toggle`) — Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos.](/componentes/toggle) — `src/components/toggle.tsx` — md: `/components/toggle.md`
   Uso: `import { Toggle } from "@semec/ds/react";`
-- [Spinner (`spinner`) — Indicador de carregamento inline (role=status).](/componentes/spinner) — `src/components/spinner.tsx` — md: `/components/spinner.md`
+- [Spinner (`spinner`) — Indicador de carregamento inline (role=status). Com `decorative`, é só visual (sem role, aria-label nem texto sr-only), para quando outro elemento já anuncia o carregamento; é o que o `Button` com `loading` usa.](/componentes/spinner) — `src/components/spinner.tsx` — md: `/components/spinner.md`
   Uso: `import { Spinner } from "@semec/ds/react";`
 - [Progresso (`progress`) — Barra de progresso determinada. Trilha com contorno border-strong (3,77:1 sobre surface) e indicador primary.](/componentes/progress) — `src/components/progress.tsx` — md: `/components/progress.md`
   Uso: `import { Progress } from "@semec/ds/react";`
-- [Slider (`slider`) — Controle deslizante para faixas de valor.](/componentes/slider) — `src/components/slider.tsx` — md: `/components/slider.md`
+- [Slider (`slider`) — Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares.](/componentes/slider) — `src/components/slider.tsx` — md: `/components/slider.md`
   Uso: `import { Slider } from "@semec/ds/react";`
 - [Input OTP (`input-otp`) — Campo de código OTP com foco automático entre dígitos.](/componentes/input-otp) — `src/components/input-otp.tsx` — md: `/components/input-otp.md`
   Uso: `import { InputOTP } from "@semec/ds/react";`
@@ -156,4 +162,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--action-primary` etc.), nunca hex solto
 
-> Gerado 2026-10-14T19:05:44.000Z a partir de packages/react/manifest.js. Versão 3.1.0.
+> Gerado 2026-10-15T13:07:01.000Z a partir de packages/react/manifest.js. Versão 3.1.0.

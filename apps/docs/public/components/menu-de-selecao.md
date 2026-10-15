@@ -4,18 +4,19 @@ code: "select"
 slug: "menu-de-selecao"
 file: "src/components/select.tsx"
 category: "formularios"
-variants: "composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem"
+variants: "composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem · contrato: Select: value · defaultValue · onValueChange · name · required · disabled — SelectTrigger: id · invalid"
 ---
 
 # Menu de seleção — `select`
 
-> Seleção fechada com gatilho, conteúdo e itens compostos.
+> Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`).
 
 **Arquivo:** `src/components/select.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/menu-de-selecao`
 
 ## Variantes
 
 - **composição**: Select · SelectTrigger · SelectValue · SelectContent · SelectItem
+- **contrato**: Select: value · defaultValue · onValueChange · name · required · disabled — SelectTrigger: id · invalid
 
 ## Instalação (@semec/ds)
 
@@ -45,7 +46,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 
 // Dentro de FormField, o SelectTrigger recebe id, aria-describedby e aria-invalid
 <FormField label="Município" error={erro}>
-  <Select>
+  <Select name="municipio" value={municipio} onValueChange={setMunicipio}>
     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
     <SelectContent>
       <SelectItem value="pbh">Porto Velho</SelectItem>
@@ -57,12 +58,14 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 ## Prompt para IA
 
 ```text
-Use o componente `Select` (Menu de seleção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção fechada com gatilho, conteúdo e itens compostos. API e variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Select` (Menu de seleção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`). API e variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem · contrato: Select: value · defaultValue · onValueChange · name · required · disabled — SelectTrigger: id · invalid. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
@@ -78,10 +81,17 @@ const SelectValue = SelectPrimitive.Value;
 
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+    /**
+     * Contrato de formulário (ADR-015): `true` vira `aria-invalid="true"` e o
+     * estilo de erro. Fica no gatilho; `value`/`onValueChange`/`name`/`required`
+     * ficam no `Select` (raiz Radix).
+     */
+    invalid?: boolean;
+  }
+>(({ className, children, invalid, ...props }, ref) => {
   // Dentro de um FormField: id, aria-describedby, aria-invalid e aria-required.
-  const field = useFormFieldControl(props, { supportsRequired: true });
+  const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
   return (
   <SelectPrimitive.Trigger
     ref={ref}

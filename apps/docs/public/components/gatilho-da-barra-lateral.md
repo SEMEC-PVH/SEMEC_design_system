@@ -51,6 +51,8 @@ Use o componente `SidebarToggleButton` (Gatilho da barra lateral) importado de `
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 
 import { IconButton, type IconButtonProps } from "./icon-button";

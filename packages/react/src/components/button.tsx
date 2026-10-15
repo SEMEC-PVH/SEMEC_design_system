@@ -1,8 +1,9 @@
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
+import { Slot, Slottable } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
+import { ButtonLoadingIndicator } from "./button-loading";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
@@ -42,17 +43,69 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  /**
+   * Ação em andamento (AUD-63): mostra um Spinner decorativo, aplica
+   * `aria-busy="true"` e `aria-disabled="true"` e ignora cliques (inclusive o
+   * envio do formulário). O botão continua focalizável: o foco não se perde
+   * durante o carregamento. O nome acessível segue sendo o texto do botão.
+   */
+  loading?: boolean;
+  /**
+   * Texto visível durante o `loading` (ex.: "Enviando…"), no lugar dos
+   * `children`. Sem ele, o texto original permanece.
+   */
+  loadingText?: React.ReactNode;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      loading = false,
+      loadingText,
+      onClick,
+      children,
+      ...props
+    },
+    ref
+  ) => {
     const Comp = asChild ? Slot : "button";
+    // O elemento é o mesmo com e sem loading (sem remontar: o foco fica).
+    // O bloqueio do clique mora no ButtonLoadingIndicator ("use client"),
+    // para o Button seguir renderizando no servidor; o onClick de quem usa
+    // não é repassado enquanto carrega.
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, className }), loading && "cursor-progress")}
         ref={ref}
+        onClick={loading ? undefined : onClick}
         {...props}
-      />
+        aria-busy={loading ? true : props["aria-busy"]}
+        aria-disabled={loading ? true : props["aria-disabled"]}
+      >
+        {!loading ? (
+          children
+        ) : asChild ? (
+          [
+            <ButtonLoadingIndicator key="loading" />,
+            // O Slot mesclaria o onClick do filho (ex.: <a onClick>): durante o
+            // loading ele também não é repassado.
+            <Slottable key="child">
+              {React.isValidElement<{ onClick?: unknown }>(children)
+                ? React.cloneElement(children, { onClick: undefined })
+                : children}
+            </Slottable>,
+          ]
+        ) : (
+          <>
+            <ButtonLoadingIndicator />
+            {loadingText ?? children}
+          </>
+        )}
+      </Comp>
     );
   }
 );

@@ -80,20 +80,23 @@ export function Providers({ children }: { children: React.ReactNode }) {
 }
 ```
 
-### 5. Next.js App Router: importe o kit só em arquivos `"use client"`
+### 5. Next.js App Router: Server Components e `"use client"`
 
-Na 3.0 e na 3.1 o `dist` é **um bundle único, sem a diretiva `"use client"`**. Importar `@semec/ds/react` num Server Component quebra (hooks como `useLayoutEffect` não existem no ambiente `react-server`). Até a correção (planejada para uma versão futura, AUD-20):
+A partir da 3.2 o `dist` sai **um arquivo por módulo**, e cada componente interativo (estado, efeitos, contexto, Radix ou handlers) começa com `"use client"`. Por isso:
 
-- use os componentes em arquivos que começam com `"use client"`;
-- monte os providers do passo 4 num componente `"use client"` (ex.: `app/providers.tsx`) e use-o no `layout`;
-- não use `export *` para reexportar o kit num arquivo `"use client"`; reexporte por nome ou importe direto.
+- **pode importar `@semec/ds/react` num Server Component.** Os componentes de apresentação (`Heading`, `Card`, `Badge`, `Button`, `Link`, `Table`, `Alert`, `Skeleton`, `Spinner`, `Separator`, `Breadcrumb`, `EmptyState`, `Footer`, `Timeline`, `IconButton`) renderizam no servidor; os interativos viram fronteira de cliente sozinhos;
+- props de função (`onClick`, `onValueChange`, `onOpenChange`…) continuam exigindo um arquivo `"use client"` seu, como em qualquer componente de cliente;
+- os providers do passo 4 já são de cliente e podem ir direto no `layout`;
+- não use `export *` para reexportar o kit num arquivo `"use client"` (o Next não aceita); reexporte por nome ou importe direto.
+
+Na 3.0 e na 3.1 o `dist` era um bundle único sem `"use client"` e importar o kit num Server Component quebrava; se estiver preso a essas versões, use o kit só em arquivos `"use client"`.
 
 Em Vite/SPA nada disso se aplica.
 
 ## Uso rápido
 
 ```tsx
-"use client"; // só necessário no Next App Router
+"use client"; // no Next App Router, só se este arquivo passar handlers ou usar hooks
 
 import { Button, Input, Card, CardHeader, CardTitle, CardContent, Label } from "@semec/ds/react";
 
@@ -177,6 +180,7 @@ import { cn } from "@semec/ds/react";
 | Import | O que é |
 |---|---|
 | `@semec/ds/react` | Todos os componentes, `cn()`, masks e validadores puros |
+| `@semec/ds/react/<componente>` | Um componente só, pelo nome do arquivo em `src/components` (ex.: `@semec/ds/react/button`, `@semec/ds/react/dialog`, `@semec/ds/react/form-field`). Desde a 3.2 |
 | `@semec/ds/react/validacao` | Schemas Zod (exige o peer `zod`) |
 | `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) + utilitários de animação |
 | `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS config) |
@@ -190,19 +194,21 @@ import { cn } from "@semec/ds/react";
 | `@semec/ds/skills/semec-ds` | Skill full do agente |
 | `@semec/ds/lite/skills/semec-ds-lite` | Skill lite (tokens + a11y + responsive) |
 
+**Poda (tree-shaking).** Desde a 3.2 cada componente é um módulo ESM próprio em `dist/react/components/` e o pacote declara `"sideEffects": ["**/*.css"]`, então o bundler do app descarta o que não é importado: `import { Button } from "@semec/ds/react"` custa cerca de 35 kB minificado com as dependências (quase tudo `tailwind-merge`); o código do kit fica em ~3 kB, em vez do kit inteiro (~340 kB na 3.1). Importar pela raiz ou pelo subpath dá o mesmo resultado num bundler com poda; o subpath ajuda ferramentas sem poda (ex.: `next dev` sem `optimizePackageImports`) e testes. A CI mede isso (`npm run test:dist`).
+
 Metadados de componente (o que versões anteriores deste README chamavam de `getComponentMetadata()`, função que nunca existiu) vêm de `@semec/ds/skills`: `dsBySlug["botoes"]`, `dsComponents`.
 
 ## Componentes
 
 <!-- ds:component-list:start -->
-**52 componentes** no manifest (`manifest.js`), pelo export principal de cada um. Lista e contagem geradas por `scripts/build-artifacts.mjs`; não edite à mão.
+**55 componentes** no manifest (`manifest.js`), pelo export principal de cada um. Lista e contagem geradas por `scripts/build-artifacts.mjs`; não edite à mão.
 
 | Categoria | Componentes |
 |---|---|
 | **Ações e links** (3) | Button, IconButton, Link |
-| **Formulários** (16) | Input, Textarea, Select, Combobox, DatePicker, FileUpload, Checkbox, RadioGroup, Switch, Label, FormField, ErrorSummary, Toggle, Slider, InputOTP, Calendar |
+| **Formulários** (18) | Input, PasswordInput, InputMask, Textarea, Select, Combobox, DatePicker, FileUpload, Checkbox, RadioGroup, Switch, Label, FormField, ErrorSummary, Toggle, Slider, InputOTP, Calendar |
 | **Conteúdo e dados** (9) | Card, Heading, Badge, Table, Accordion, Separator, Avatar, DataTable, Timeline |
-| **Navegação** (11) | Breadcrumb, Header, SkipLink, Footer, Tabs, Pagination, SidebarToggleButton, ScrollArea, DropdownMenu, NavigationMenu, Sidebar |
+| **Navegação** (12) | Breadcrumb, Header, Stepper, SkipLink, Footer, Tabs, Pagination, SidebarToggleButton, ScrollArea, DropdownMenu, NavigationMenu, Sidebar |
 | **Feedback e estados** (13) | Skeleton, EmptyState, ErrorState, Dialog, Toaster, Tooltip, Alert, AlertDialog, Popover, Spinner, Progress, Drawer, Sheet |
 <!-- ds:component-list:end -->
 
@@ -269,20 +275,17 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 - **Tailwind CSS**: v4+ no app (com `@source` apontando para `node_modules/@semec/ds/dist/react`, caminho relativo ao CSS)
 - **Instaladas automaticamente**: todos os `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, `get-nonce`
 
-## Limitações conhecidas (3.0 e 3.1)
+## Limitações conhecidas
 
-- **Bundle único**: importar uma peça carrega o kit inteiro (sem poda de árvore por módulo). Saída por módulo planejada para uma versão futura (AUD-20).
-- **Sem fronteira RSC**: ver o passo 5 de [Comece aqui](#comece-aqui).
+- **3.0 e 3.1: bundle único e sem fronteira RSC.** Importar uma peça carregava o kit inteiro e importar `@semec/ds/react` num Server Component quebrava. Corrigido na 3.2 (saída por módulo, `"use client"` por componente e subpaths `@semec/ds/react/*`; ver o passo 5 de [Comece aqui](#comece-aqui) e [Subpath exports](#subpath-exports)).
 
 ## Depreciações anunciadas (saem na 4.0)
 
 Avisadas a partir da 3.1.0 e válidas até a 4.0 (política de duas minors, ADR-013). Lista completa, com o que usar no lugar: [CONTRIBUTING.md § Depreciações anunciadas](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/CONTRIBUTING.md#depreciações-anunciadas).
 
-- Importar por caminho de arquivo em `dist/` (o bundle único vira saída por módulo e subpaths `@semec/ds/react/*`).
-- `onChange(value)` / `onChange(files)` nos campos não nativos (contrato passa a ser `value` / `onValueChange` / `name` / `id` / `invalid`).
+- Importar por caminho de arquivo em `dist/` (o layout interno do `dist` não é contrato; use `@semec/ds/react` ou os subpaths `@semec/ds/react/*`, disponíveis desde a 3.2).
+- `onChange(value)` / `onChange(files)` nos campos não nativos (`Combobox`, `InputOTP`, `DatePicker`, `FileUpload`, `Calendar`): use `onValueChange`, com a mesma assinatura, disponível em todos desde a 3.2.0 (contrato `value` / `onValueChange` / `name` / `id` / `invalid`, ADR-015).
 - Utilitários de primitivo `bg-pv-*` / `text-pv-*` (use os semânticos).
-- Valores atuais de `rounded-sm` e `rounded-lg` (escolha o raio pelo papel, não pelo px).
-- `Button` desabilitado por `disabled` nativo (pode virar `aria-disabled`; não dependa de `:disabled`).
 
 O que a 2.0.0 removeu sem aviso está na errata do [CHANGELOG](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/CHANGELOG.md).
 
@@ -294,6 +297,19 @@ O que a 2.0.0 removeu sem aviso está na errata do [CHANGELOG](https://github.co
 - [ADRs](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/adr/README.md)
 - [Issues](https://github.com/SEMEC-PVH/SEMEC_design_system/issues)
 
-## Licença
+## Licença e crédito
 
-MIT
+[MIT](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/LICENSE) — © 2026 Prefeitura de Porto Velho, Secretaria Municipal de Economia (SEMEC). Use, modifique e redistribua mantendo o aviso de copyright e a licença nas cópias do código do pacote.
+
+O crédito no seu projeto **não é obrigatório**, mas é apreciado. Se quiser, inclua no README:
+
+```markdown
+## Créditos
+
+Identidade visual e tokens fornecidos pelo
+[SEMEC Design System](https://github.com/SEMEC-PVH/SEMEC_design_system),
+desenvolvido pela equipe de desenvolvimento da Secretaria Municipal de
+Economia de Porto Velho (DevSemec).
+```
+
+A fonte Poppins (`@semec/ds/react/fonts.css`) tem licença própria, SIL OFL 1.1 (o `OFL.txt` acompanha os arquivos da fonte no pacote).

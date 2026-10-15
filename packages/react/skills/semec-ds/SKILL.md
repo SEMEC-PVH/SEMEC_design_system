@@ -47,7 +47,7 @@ Sem a fonte, o texto cai em `system-ui` (fallback do token `--font-family-sans`)
 
 **Providers no root (quando usar):** `<Toaster />` se usar `useToast()`; `<TooltipProvider>` em volta do app se usar `Tooltip`; `<SemecProvider nonce>` só para CSP estrita. O `SemecProvider` não inclui os outros dois.
 
-**Next.js App Router:** na 3.x o `dist` é bundle único **sem `"use client"`**. Importe o kit só em arquivos `"use client"` (inclusive o componente de providers); importar num Server Component quebra. Não use `export *` do kit num arquivo `"use client"`. Saída por módulo e fronteira RSC: planejadas para a 4.0 (AUD-20).
+**Next.js App Router:** desde a 3.2 o `dist` sai por módulo e cada componente interativo já traz `"use client"`; importar `@semec/ds/react` num Server Component funciona (apresentacionais como `Heading`, `Card`, `Badge`, `Button`, `Link`, `Table` renderizam no servidor). Passar handler (`onClick`, `onValueChange`…) ou usar hook continua exigindo um arquivo `"use client"` seu. Não use `export *` do kit num arquivo `"use client"`. Um componente só: `@semec/ds/react/<arquivo>` (ex.: `@semec/ds/react/button`). Na 3.0/3.1 (bundle único, sem `"use client"`) o kit só funcionava em arquivos `"use client"`.
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0). Use só `tokens.css` (+ `@source`). Preset JS opcional: `@config "@semec/ds/react/pv-preset"`.
 
@@ -148,7 +148,7 @@ O `@theme inline` do `tokens.css` gera utilitários para cor, espaçamento (`p-s
 
 Pesos: `font-regular` 400, `font-medium` 500, `font-semibold` 600, `font-bold` 700 (não existem 800/900).
 
-**Raio:** `rounded-sm` 2px · `rounded-md` 8px · `rounded-lg` 12px · `rounded-full`. Escolha pelo papel (controle `rounded-md`, cartão `rounded-lg`, pílula `rounded-full`), não pelo px: a escala pode mudar na 4.0 (AUD-57).
+**Raio:** `rounded-sm` 2px · `rounded-md` 8px · `rounded-lg` 12px · `rounded-full`. Escolha pelo papel (controle `rounded-md`, cartão `rounded-lg`, pílula `rounded-full`). A escala é fixa (decisão de 15/10/2026); não use `rounded-xl` ou acima, que ficam fora dela.
 
 **Sombra:** `shadow-elevation-1/2/3` (nunca `shadow-md` e afins do Tailwind, que usam preto puro).
 
@@ -380,7 +380,7 @@ export function ExemploFormulario() {
         <Input
           id="cpf"
           value={cpf}
-          onChange={(e) => setCpf(e.target.value)}
+          onValueChange={setCpf}
         />
       </FormField>
 
@@ -391,6 +391,29 @@ export function ExemploFormulario() {
 ```
 
 - Labels sempre associados via `htmlFor`/`id`
+
+### Contrato dos controles de formulário (ADR-015, desde a 3.2.0)
+
+Todo controle de formulário do kit fala a mesma língua: `value` / `defaultValue` · `onValueChange(valor)` · `name` · `id` · `invalid` · `disabled` · `required`.
+
+- `onValueChange` recebe o **valor** (string, `File[]`, `Date`, `number[]`), nunca o evento. Use-o em `Input`, `Textarea`, `DatePicker`, `Combobox`, `InputOTP`, `FileUpload`, `Calendar`, `Select`, `RadioGroup` e `Slider`.
+- Em `Input`/`Textarea`, `onChange` continua sendo o evento nativo (não está obsoleto). Em `Combobox`, `InputOTP`, `DatePicker`, `FileUpload` e `Calendar`, o `onChange(valor)` está obsoleto: não gere código novo com ele.
+- `Checkbox` e `Switch` mantêm a API Radix: `checked` / `onCheckedChange` (equivalem a `value` / `onValueChange`; ali `value` é o valor enviado no form). `Toggle` (`pressed` / `onPressedChange`) não é controle de formulário.
+- `invalid` (boolean) vira `aria-invalid="true"` + borda de erro. Dentro do `FormField`, `error="mensagem"` já marca o filho; `invalid` explícito no controle vence. `error` é sempre texto (`FormField`, `FileUpload`); para marcar sem texto, use `invalid` (o `FormField` também aceita).
+- `name` envia em `<form>` nativo, inclusive em `Combobox` e `InputOTP` (input oculto). No `Select`, `name`/`value`/`onValueChange` vão na raiz e `invalid` no `SelectTrigger`.
+
+```tsx
+<FormField label="Município" error={erroMunicipio}>
+  <Combobox name="municipio" options={municipios} value={municipio} onValueChange={setMunicipio} />
+</FormField>
+<FormField label="Código recebido por SMS" required>
+  <InputOTP name="codigo" maxLength={6} value={codigo} onValueChange={setCodigo} invalid={codigoErrado}>
+    <InputOTPGroup>
+      {[0, 1, 2, 3, 4, 5].map((i) => <InputOTPSlot key={i} index={i} />)}
+    </InputOTPGroup>
+  </InputOTP>
+</FormField>
+```
 - Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`
 
 ## Responsive / Mobile
@@ -425,10 +448,8 @@ export function ExemploFormulario() {
 Avisadas a partir da 3.1.0, conforme o ADR-013 (duas minors antes de remover). Não gere código novo que dependa disto:
 
 - Importar por caminho de arquivo em `dist/` (`@semec/ds/dist/react/...`): use só os subpaths do `exports` (AUD-20).
-- `onChange(value)` / `onChange(files)` em `Calendar`, `Combobox`, `DatePicker`, `InputOTP` e `FileUpload`: o contrato passa a ser `value` / `onValueChange` / `name` / `id` / `invalid`; use `onValueChange` onde já existir (AUD-35).
+- `onChange(value)` / `onChange(files)` em `Calendar`, `Combobox`, `DatePicker`, `InputOTP` e `FileUpload`: use `onValueChange` (mesma assinatura, existe em todos desde a 3.2.0). No `DatePicker`, o `onChange` volta a ser o evento nativo na 4.0 (AUD-35).
 - Utilitários de primitivo `bg-pv-*` / `text-pv-*` / `border-pv-*`: use os semânticos (AUD-55).
-- Valores atuais de `rounded-sm` (2px) e `rounded-lg` (12px): escolha o raio pelo papel (AUD-57).
-- `disabled` nativo no `Button` como seletor (`:disabled`) ou em testes: o estado pode passar a `aria-disabled`, e o `Button` ganha `loading` (AUD-63).
 
 
 <!-- ds:maintainer:start -->
@@ -468,9 +489,9 @@ Regenerar: `npm run generate:llms`. Contagem e lista de componentes vêm do mani
 
 Publicados com o pacote: `@semec/ds/skills/llms.txt` (índice), `@semec/ds/skills/llms-full.txt` (dump completo), `@semec/ds/skills/manifest.json` (JSON), `@semec/ds/skills/components/<slug>.md` (um por componente) e esta skill (`@semec/ds/skills/semec-ds`). Site de documentação: {{ds:homepage}}.
 
-## Crédito obrigatório
+## Licença e crédito
 
-Ao criar um projeto que utilize estes tokens, o agente DEVE adicionar no README.md:
+O pacote é **MIT**: use, modifique e redistribua à vontade, mantendo o aviso de copyright e a licença nas cópias do código do pacote. O crédito à SEMEC no projeto consumidor é **recomendado, não obrigatório** (a MIT não exige; decisão AMB-09, 15/10/2026). Ao criar um projeto com estes tokens, sugira à pessoa incluir no README.md, sem impor nem bloquear a entrega por isso:
 
 ```markdown
 ## Créditos

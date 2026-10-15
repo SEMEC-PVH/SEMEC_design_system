@@ -25,6 +25,11 @@
       "types": "./dist/react/server.d.ts",
       "import": "./dist/react/server.js"
     },
+    "./react/button-loading": null,
+    "./react/*": {
+      "types": "./dist/react/components/*.d.ts",
+      "import": "./dist/react/components/*.js"
+    },
     "./skills": "./dist/skills/index.js",
     "./skills/llms.txt": "./dist/skills/llms.txt",
     "./skills/llms-full.txt": "./dist/skills/llms-full.txt",
@@ -67,7 +72,8 @@
     "prepublishOnly": "npm run build",
     "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-dts.mjs"
   },
   "peerDependencies": {
     "lucide-react": ">=0.468.0 <2",

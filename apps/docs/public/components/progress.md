@@ -49,6 +49,8 @@ Use o componente `Progress` (Progresso) importado de `@semec/ds/react`; não rei
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as ProgressPrimitive from "@radix-ui/react-progress";
 

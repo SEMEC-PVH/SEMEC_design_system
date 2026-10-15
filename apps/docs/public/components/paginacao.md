@@ -55,6 +55,8 @@ Use o componente `Pagination` (Paginação) importado de `@semec/ds/react`; não
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 

@@ -66,6 +66,7 @@ import {
   HeaderNavLink,
   IconButton,
   Input,
+  InputMask,
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
@@ -79,6 +80,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   Pagination,
+  PasswordInput,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -112,6 +114,7 @@ import {
   SkipLink,
   Slider,
   Spinner,
+  Stepper,
   Switch,
   Table,
   TableBody,
@@ -182,7 +185,15 @@ function ButtonPreview() {
           <Button size="sm">Pequeno</Button>
           <Button size="md">Médio</Button>
           <Button size="lg">Grande</Button>
-          <Button disabled>Enviando…</Button>
+          <Button disabled>Desabilitado</Button>
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        <p className="text-xs font-medium text-muted-foreground">Carregando (loading)</p>
+        <div className={ROW}>
+          <Button loading loadingText="Enviando…">Enviar</Button>
+          <Button variant="outline" loading>Salvar rascunho</Button>
+          <IconButton label="Baixar carnê" loading><Download /></IconButton>
         </div>
       </div>
       <div className="space-y-1.5">
@@ -234,6 +245,41 @@ function InputPreview() {
           <p className="mt-1 text-xs text-destructive">Informe um e-mail válido.</p>
         </div>
         <Input placeholder="Disabled" disabled />
+      </div>
+    </div>
+  );
+}
+
+function PasswordInputPreview() {
+  return (
+    <div className="w-full max-w-sm rounded-lg border border-border bg-surface p-4 text-left">
+      <FormField label="Senha" hint="Mínimo de 8 caracteres">
+        <PasswordInput autoComplete="current-password" />
+      </FormField>
+    </div>
+  );
+}
+
+function InputMaskPreview() {
+  const [cpf, setCpf] = useState({ masked: "", raw: "" });
+  return (
+    <div className="w-full max-w-sm rounded-lg border border-border bg-surface p-4 text-left">
+      <div className="flex flex-col gap-3">
+        <FormField label="CPF" hint="Somente números">
+          <InputMask mask="cpf" onValueChange={(masked, raw) => setCpf({ masked, raw })} />
+        </FormField>
+        <p className="text-xs text-muted-foreground">
+          Valor sem máscara: <code>{cpf.raw || "—"}</code>
+        </p>
+        <FormField label="Telefone">
+          <InputMask mask="telefone" autoComplete="tel-national" />
+        </FormField>
+        <FormField label="CEP">
+          <InputMask mask="cep" autoComplete="postal-code" />
+        </FormField>
+        <FormField label="Data de nascimento" hint="dd/mm/aaaa">
+          <InputMask mask="data" autoComplete="bday" />
+        </FormField>
       </div>
     </div>
   );
@@ -696,10 +742,38 @@ function TogglePreview() {
 
 function SpinnerPreview() {
   return (
-    <div className={ROW}>
-      <Spinner />
-      <Spinner className="h-6 w-6" />
-      <Spinner className="h-8 w-8" />
+    <div className="flex flex-col items-center gap-3">
+      <div className={ROW}>
+        <Spinner />
+        <Spinner className="h-6 w-6" />
+        <Spinner className="h-8 w-8" />
+      </div>
+      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Spinner decorative /> Atualizando a lista…
+      </p>
+    </div>
+  );
+}
+
+const ETAPAS_REQUERIMENTO = [
+  { label: "Dados do estudante" },
+  { label: "Documentos", description: "RG, CPF e comprovante" },
+  { label: "Revisão e envio" },
+];
+
+function StepperPreview() {
+  const [etapa, setEtapa] = useState(1);
+  return (
+    <div className="w-full max-w-2xl space-y-4 text-left">
+      <Stepper steps={ETAPAS_REQUERIMENTO} currentStep={etapa} onStepClick={setEtapa} />
+      <div className="flex flex-wrap gap-3">
+        <Button variant="outline" size="sm" disabled={etapa === 0} onClick={() => setEtapa((e) => Math.max(0, e - 1))}>
+          Voltar
+        </Button>
+        <Button size="sm" disabled={etapa >= ETAPAS_REQUERIMENTO.length} onClick={() => setEtapa((e) => Math.min(ETAPAS_REQUERIMENTO.length, e + 1))}>
+          Avançar
+        </Button>
+      </div>
     </div>
   );
 }
@@ -734,7 +808,7 @@ function InputOTPPreview() {
     <div className="w-full max-w-sm space-y-4 text-left">
       <div className="space-y-2">
         <p className="text-xs font-medium text-muted-foreground">Código de verificação</p>
-        <InputOTP value={value} onChange={setValue} maxLength={6}>
+        <InputOTP value={value} onValueChange={setValue} maxLength={6}>
           <InputOTPGroup>
             <InputOTPSlot index={0} />
             <InputOTPSlot index={1} />
@@ -775,7 +849,7 @@ function CalendarPreview() {
   const [value, setValue] = useState(() => new Date());
   return (
     <div className="w-fit rounded-lg border border-border bg-surface p-2 text-left">
-      <Calendar value={value} onChange={setValue} />
+      <Calendar value={value} onValueChange={setValue} />
       <p className="mt-2 px-1 text-xs text-muted-foreground">
         Selecionado: {value.toLocaleDateString("pt-BR")}
       </p>
@@ -1205,6 +1279,8 @@ const PREVIEWS = {
   link: LinkPreview,
   input: InputPreview,
   textarea: TextareaPreview,
+  "password-input": PasswordInputPreview,
+  "input-mask": InputMaskPreview,
   select: SelectPreview,
   combobox: ComboboxPreview,
   "date-picker": DatePickerPreview,
@@ -1251,6 +1327,7 @@ const PREVIEWS = {
   "error-summary": ErrorSummaryPreview,
   heading: HeadingPreview,
   "skip-link": SkipLinkPreview,
+  stepper: StepperPreview,
   footer: FooterPreview,
 };
 

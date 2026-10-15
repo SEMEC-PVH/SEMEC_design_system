@@ -197,6 +197,8 @@ Uma paleta neutra. A arquitetura suporta os três casos — o tema é uma troca 
 
 Suporte previsto desde o início a **tema claro e escuro** e a **multi-tema por órgão** (`data-theme="semec"`), o que permite reaproveitar o DS em outras secretarias sem fork.
 
+> **Nota (15/10/2026, AUD-47).** Estado atual: o pacote `@semec/ds` tem **tema único claro** desde a 2.0.0, e a multi-tema por órgão não foi implementada ([ADR-025](adr/0025-tema-unico-claro.md), que substitui o ADR-012). O tema escuro por `data-theme` existe só no site de documentação.
+
 ## 11. Governança
 
 **Papéis**

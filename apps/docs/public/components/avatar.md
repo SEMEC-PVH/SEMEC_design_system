@@ -51,6 +51,8 @@ Use o componente `Avatar` (Avatar) importado de `@semec/ds/react`; não reimplem
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 

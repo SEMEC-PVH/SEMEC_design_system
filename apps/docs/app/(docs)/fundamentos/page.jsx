@@ -204,11 +204,9 @@ export default function FundamentosPage() {
       <h3>Raios</h3>
       <div className="preview preview--plain">
         <div className="shape-grid shape-grid--row">
-          <Shape caption="rounded-sm · 0.25rem" style={{ borderRadius: "0.25rem" }} />
-          <Shape caption="rounded-md · 0.375rem" style={{ borderRadius: "0.375rem" }} />
-          <Shape caption="rounded-lg · 0.5rem" style={{ borderRadius: "0.5rem" }} />
-          <Shape caption="rounded-xl · 0.75rem" style={{ borderRadius: "0.75rem" }} />
-          <Shape caption="rounded-2xl · 1rem" style={{ borderRadius: "1rem" }} />
+          <Shape caption="rounded-sm · 2px" style={{ borderRadius: "2px" }} />
+          <Shape caption="rounded-md · 8px" style={{ borderRadius: "8px" }} />
+          <Shape caption="rounded-lg · 12px" style={{ borderRadius: "12px" }} />
           <Shape caption="rounded-full" style={{ borderRadius: "9999px" }} />
         </div>
       </div>

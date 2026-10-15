@@ -53,6 +53,8 @@ Use o componente `Accordion` (Acordeão) importado de `@semec/ds/react`; não re
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import { ChevronDown } from "lucide-react";

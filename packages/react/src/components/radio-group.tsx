@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Circle } from "lucide-react";
@@ -7,11 +9,17 @@ import { useFormFieldControl } from "./form-field";
 
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root> & {
+  /** Contrato de formulário (ADR-015): `true` vira `aria-invalid="true"` e o estilo de erro. */
+  invalid?: boolean;
+  }
+>(({ className, invalid, ...props }, ref) => {
   // Dentro de um FormField: o grupo (div) não é rotulável por <label for>,
   // então recebe aria-labelledby do rótulo, além de describedby/invalid/required.
-  const field = useFormFieldControl(props, { labelable: false, supportsRequired: true });
+  const field = useFormFieldControl(
+    { ...props, invalid },
+    { labelable: false, supportsRequired: true }
+  );
   return (
     <RadioGroupPrimitive.Root
       className={cn("grid gap-2", className)}

@@ -83,6 +83,8 @@ Use o componente `Sheet` (Sheet) importado de `@semec/ds/react`; não reimplemen
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";

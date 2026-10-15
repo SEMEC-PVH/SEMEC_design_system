@@ -4,7 +4,7 @@ code: "input-otp"
 slug: "input-otp"
 file: "src/components/input-otp.tsx"
 category: "formularios"
-variants: "composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled · labels (group · slot(index, total))"
+variants: "composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · deprecadas: onChange(value) (use onValueChange; sai na 4.0)"
 ---
 
 # Input OTP — `input-otp`
@@ -16,7 +16,8 @@ variants: "composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSe
 ## Variantes
 
 - **composição**: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator
-- **props**: maxLength · disabled · labels (group · slot(index, total))
+- **props**: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total))
+- **deprecadas**: onChange(value) (use onValueChange; sai na 4.0)
 
 ## Instalação (@semec/ds)
 
@@ -36,7 +37,8 @@ npm install @semec/ds
 ```tsx
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec/ds/react";
 
-<InputOTP value={code} onChange={setCode} maxLength={6}>
+// name gera um <input type="hidden"> com o código: vai no FormData de um <form> nativo
+<InputOTP name="codigo" value={code} onValueChange={setCode} maxLength={6}>
   <InputOTPGroup>
     <InputOTPSlot index={0} />
     <InputOTPSlot index={1} />
@@ -54,16 +56,19 @@ import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec
 ## Prompt para IA
 
 ```text
-Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de código OTP com foco automático entre dígitos. API e variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled · labels (group · slot(index, total)). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de código OTP com foco automático entre dígitos. API e variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · deprecadas: onChange(value) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 
 import { cn } from "../lib/utils";
-import { useFormFieldControl } from "./form-field";
+import { warnDeprecated } from "../lib/deprecation";
+import { useFormField, useFormFieldControl } from "./form-field";
 
 interface InputOTPContextValue {
   slots: string[];
@@ -74,6 +79,7 @@ interface InputOTPContextValue {
   maxLength: number;
   disabled?: boolean;
   invalid?: boolean;
+  required?: boolean;
   labels: InputOTPLabels;
 }
 
@@ -97,14 +103,31 @@ function useInputOTP() {
   return ctx;
 }
 
-export interface InputOTPProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
+export interface InputOTPProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue"> {
   /** Valor controlado. Sem ele, o componente guarda o estado sozinho. */
   value?: string;
   /**
+   * Valor inicial (modo não controlado). Aceita o tipo herdado de
+   * `HTMLAttributes` (3.1.0) e normaliza para string.
+   */
+  defaultValue?: string | number | readonly string[];
+  /**
    * Recebe os dígitos preenchidos concatenados, sem lacunas: com "1" no slot 1
    * e "6" no slot 6, o valor emitido é "16" (a tela mantém as posições).
+   * Contrato de formulário (ADR-015).
    */
+  onValueChange?: (value: string) => void;
+  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
   onChange?: (value: string) => void;
+  /** Gera um `<input type="hidden" name>` com o código, para envio em `<form>`. */
+  name?: string;
+  /** `id` do `<form>` do input oculto, quando o InputOTP fica fora dele. */
+  form?: string;
+  /** Vira `aria-required` em cada dígito (o grupo não aceita `aria-required`). */
+  required?: boolean;
+  /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
+  invalid?: boolean;
   maxLength?: number;
   disabled?: boolean;
   /** Textos fixos (PT-BR por padrão). */
@@ -117,12 +140,44 @@ const toSlots = (str: string, length: number) =>
   Array.from({ length }, (_, i) => str[i] ?? "");
 
 const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
-  ({ className, value, onChange, maxLength = 6, disabled, labels, children, ...props }, ref) => {
+  (
+    {
+      className,
+      value,
+      defaultValue,
+      onChange,
+      onValueChange,
+      name,
+      form,
+      required,
+      invalid: invalidProp,
+      maxLength = 6,
+      disabled,
+      labels,
+      children,
+      ...props
+    },
+    ref
+  ) => {
     const isControlled = value !== undefined;
     const slotsRef = React.useRef<(HTMLInputElement | null)[]>([]);
     const [internalSlots, setSlots] = React.useState<string[]>(() =>
-      toSlots(value ?? "", maxLength)
+      toSlots(
+        value ??
+          (Array.isArray(defaultValue)
+            ? defaultValue.join("")
+            : defaultValue !== undefined
+              ? String(defaultValue)
+              : ""),
+        maxLength
+      )
     );
+    if (onChange) {
+      warnDeprecated(
+        "InputOTP.onChange",
+        "InputOTP: `onChange(value)` está obsoleto e sai na 4.0. Use `onValueChange(value)`."
+      );
+    }
 
     // Modo controlado: a tela reflete sempre o `value` do pai. O array interno
     // só é usado enquanto o pai aceitar o que foi emitido (value === join), o
@@ -145,9 +200,10 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
     const commit = React.useCallback(
       (next: string[]) => {
         setSlots(next);
+        onValueChange?.(next.join(""));
         onChange?.(next.join(""));
       },
-      [onChange]
+      [onChange, onValueChange]
     );
 
     const fillFrom = React.useCallback(
@@ -236,7 +292,8 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
 
     // Dentro de um FormField: o grupo (div) não é rotulável por <label for>,
     // então recebe aria-labelledby do rótulo, mais describedby/invalid.
-    const field = useFormFieldControl(props, { labelable: false });
+    const field = useFormFieldControl({ ...props, invalid: invalidProp }, { labelable: false });
+    const fieldCtx = useFormField();
     const text = { ...defaultLabels, ...labels };
     const invalid = field["aria-invalid"] ?? props["aria-invalid"];
 
@@ -249,6 +306,7 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
       maxLength,
       disabled,
       invalid: invalid === true || invalid === "true",
+      required: required ?? Boolean(fieldCtx?.required),
       labels: text,
     };
 
@@ -269,6 +327,9 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
         >
           {children}
         </div>
+        {name ? (
+          <input type="hidden" name={name} value={slots.join("")} form={form} />
+        ) : null}
       </InputOTPContext.Provider>
     );
   }
@@ -302,6 +363,7 @@ const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
       maxLength,
       disabled,
       invalid,
+      required,
       labels,
     } = useInputOTP();
     const value = slots[index] || "";
@@ -335,6 +397,7 @@ const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
           className="absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-[inherit] border-0 bg-transparent text-center text-lg font-medium text-foreground caret-transparent outline-none"
           aria-label={labels.slot(index, maxLength)}
           aria-invalid={invalid || undefined}
+          aria-required={required || undefined}
         />
         <span aria-hidden="true" className="pointer-events-none">
           {value || ""}

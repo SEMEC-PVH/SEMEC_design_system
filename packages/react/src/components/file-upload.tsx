@@ -1,7 +1,10 @@
+"use client";
+
 import * as React from "react";
 import { UploadCloud } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import { warnDeprecated } from "../lib/deprecation";
 import { useFormField } from "./form-field";
 
 export interface FileUploadLabels {
@@ -31,8 +34,20 @@ export interface FileUploadProps
   maxSize?: number;
   label?: string;
   hint?: string;
+  /** Mensagem de erro. Equivale a `invalid` + mensagem (ver ADR-015). */
   error?: string;
+  /** Marca o campo como inválido sem mensagem própria (ex.: erro no FormField). */
+  invalid?: boolean;
+  /** Recebe os arquivos aceitos (contrato de formulário, ADR-015). */
+  onValueChange?: (files: File[]) => void;
+  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
   onChange?: (files: File[]) => void;
+  /** `name` do `<input type="file">`. Atalho de `inputProps.name`. */
+  name?: string;
+  /** `required` do `<input type="file">`. Atalho de `inputProps.required`. */
+  required?: boolean;
+  /** Desabilita o campo e a zona de soltar. */
+  disabled?: boolean;
   /** Arquivos selecionados (modo controlado). Mantém a seleção ao voltar de etapa. */
   value?: File[];
   /** Permite selecionar mais de um arquivo. Padrão: `true`. */
@@ -71,6 +86,24 @@ const matchesAccept = (file: File, accept?: string) => {
   });
 };
 
+/**
+ * Põe `list` em `input.files` (via `DataTransfer`), para que o `<input>`
+ * nativo envie no `<form>` e valide `required` com o que a lista mostra.
+ * Devolve `false` quando o ambiente não permite (sem `DataTransfer`, ex.:
+ * jsdom ou navegador antigo); aí o input fica com a seleção nativa.
+ */
+const syncInputFiles = (input: HTMLInputElement | null, list: File[]) => {
+  if (!input || typeof DataTransfer === "undefined") return false;
+  try {
+    const transfer = new DataTransfer();
+    for (const file of list) transfer.items.add(file);
+    input.files = transfer.files;
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
   (
     {
@@ -80,7 +113,12 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       label,
       hint,
       error,
+      invalid: invalidProp,
       onChange,
+      onValueChange,
+      name,
+      required,
+      disabled,
       value,
       multiple = true,
       id: idProp,
@@ -111,26 +149,53 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
     const hintId = `${idBase}-hint`;
     const errorId = `${idBase}-error`;
     const message = localError ?? error;
+    if (onChange) {
+      warnDeprecated(
+        "FileUpload.onChange",
+        "FileUpload: `onChange(files)` está obsoleto e sai na 4.0. Use `onValueChange(files)`."
+      );
+    }
 
-    const acceptFiles = (list: FileList | null) => {
-      if (!list) return;
+    // `input.files` acompanha a lista mostrada (seleção, soltar, `value` do
+    // pai), para o envio nativo e o `required` funcionarem (D1).
+    React.useEffect(() => {
+      syncInputFiles(inputRef.current, files);
+    }, [files]);
+
+    // Cancelar o seletor depois do clique (que limpa o input, abaixo) devolve
+    // ao input a lista atual.
+    const filesRef = React.useRef(files);
+    filesRef.current = files;
+    React.useEffect(() => {
+      const input = inputRef.current;
+      if (!input) return;
+      const restore = () => syncInputFiles(input, filesRef.current);
+      input.addEventListener("cancel", restore);
+      return () => input.removeEventListener("cancel", restore);
+    }, []);
+
+    /** Devolve os arquivos aceitos, ou `null` se nada mudou ou foi recusado. */
+    const acceptFiles = (list: FileList | null): File[] | null => {
+      if (!list || disabled) return null;
       let next = Array.from(list);
-      if (next.length === 0) return;
+      if (next.length === 0) return null;
       if (!multiple) next = next.slice(0, 1);
       if (next.some((f) => !matchesAccept(f, accept))) {
         setLocalError(text.invalidType);
-        return;
+        return null;
       }
       if (maxSize) {
         const oversized = next.filter((f) => f.size > maxSize);
         if (oversized.length > 0) {
           setLocalError(text.tooLarge(formatBytes(maxSize)));
-          return;
+          return null;
         }
       }
       setLocalError(undefined);
       if (value === undefined) setInternalFiles(next);
+      onValueChange?.(next);
       onChange?.(next);
+      return next;
     };
 
     const describedBy =
@@ -140,7 +205,8 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             inputProps?.["aria-describedby"],
             hint ? hintId : null,
             message ? errorId : null,
-            field?.describedBy,
+            // `invalid={false}` explícito: o erro do FormField não descreve o campo.
+            invalidProp === false ? field?.hintId : field?.describedBy,
           ]
             .filter(Boolean)
             .join(" ")
@@ -148,7 +214,14 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             .filter(Boolean)
         )
       ).join(" ") || undefined;
-    const invalid = message ? true : inputProps?.["aria-invalid"] ?? (field?.invalid ? true : undefined);
+    const invalid = message
+      ? true
+      : inputProps?.["aria-invalid"] ??
+        (invalidProp !== undefined
+          ? invalidProp || undefined
+          : field?.invalid
+            ? true
+            : undefined);
 
     return (
       <div
@@ -172,16 +245,22 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             setDrag(false);
             acceptFiles(e.dataTransfer.files);
           }}
-          onClick={() => inputRef.current?.click()}
+          onClick={() => {
+            if (!disabled) inputRef.current?.click();
+          }}
           className={cn(
             "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background px-6 py-8 text-center transition-colors duration-fast ease-standard has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background hover:border-border-strong",
             drag && "border-ring bg-tint",
+            disabled && "cursor-not-allowed opacity-50",
             (message || invalid === true) && "border-destructive"
           )}
         >
           <input
             aria-label={label || field?.labelId ? undefined : text.chooseFile}
             {...inputProps}
+            name={name ?? inputProps?.name}
+            required={required ?? inputProps?.required}
+            disabled={disabled ?? inputProps?.disabled}
             ref={inputRef}
             id={id}
             type="file"
@@ -193,11 +272,22 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             onClick={(e) => {
               // O clique na zona já abre o seletor; evita reabrir pela propagação.
               e.stopPropagation();
+              // Limpa antes de abrir o seletor, para que escolher de novo o
+              // mesmo arquivo dispare `change`. Só onde dá para restaurar a
+              // lista depois (cancelar, recusa); sem DataTransfer, não mexe.
+              if (typeof DataTransfer !== "undefined") e.currentTarget.value = "";
               inputProps?.onClick?.(e);
             }}
             onChange={(e) => {
-              acceptFiles(e.target.files);
-              e.currentTarget.value = "";
+              const input = e.currentTarget;
+              const accepted = acceptFiles(input.files);
+              // Recusa ou modo controlado: o input volta à lista mostrada (se o
+              // pai aceitar o novo `value`, o efeito acima sincroniza de novo).
+              const shown = accepted && value === undefined ? accepted : files;
+              if (!syncInputFiles(input, shown) && !accepted) {
+                // Sem DataTransfer: não deixa no input um arquivo recusado.
+                input.value = "";
+              }
             }}
           />
           <UploadCloud className="h-8 w-8 text-muted-foreground" aria-hidden="true" />

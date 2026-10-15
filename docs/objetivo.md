@@ -6,15 +6,15 @@
 
 O repositório do **Design System da SEMEC** (Secretaria Municipal de Economia de Porto Velho). Ele reúne, num só lugar:
 
-1. **O kit de componentes** `@semec/ds` (`packages/react/`) — 49 componentes React (mais o `SemecProvider`) + Tailwind CSS v4 + shadcn (Radix + CVA), tokens `pv-*` e tema claro (o dark theme do site de documentação vive no CSS do app, não nos tokens do pacote — removido em 2.0.0).
+1. **O kit de componentes** `@semec/ds` (`packages/react/`) — 55 componentes React no manifest em 15/10/2026 (cada entrada do `manifest.js` é um componente, contado pelo export principal: `Card` conta uma vez, com `CardHeader`, `CardTitle` etc.; o `SemecProvider` fica fora da conta; o número vigente é o `componentCount` de `apps/docs/public/manifest.json`, gerado) + Tailwind CSS v4 + shadcn (Radix + CVA), tokens `pv-*` e tema único claro ([ADR-025](adr/0025-tema-unico-claro.md); o tema escuro do site de documentação vive no CSS do app, não nos tokens do pacote, de onde saiu na 2.0.0).
 2. **O site de documentação** (`apps/docs/`) — Next.js 16 com export estático, que publica os fundamentos, componentes e padrões e serve os artefatos para agentes.
 3. **Os artefatos para agentes de IA** (`apps/docs/public/`) — `llms.txt`, `llms-full.txt`, `manifest.json`, skills e um `.md` por componente, gerados a partir de uma fonte única (`packages/react/manifest.js`) pelo pipeline `build-artifacts.mjs` ([ADR-023](adr/0023-pipeline-unico-artefatos-ia.md)).
 
 ## Fase atual
 
-O kit é **publicado no npm público** desde 17/09/2026 ([ADR-022](adr/0022-publicacao-npm-publico.md)), sob o nome `@semec/ds`; a versão publicada hoje é a **3.0.0** (3.1.0 em preparação: features já no `main` e correções da auditoria de 14/10/2026). A versão vigente está sempre em `packages/react/package.json` e no [CHANGELOG](../packages/react/CHANGELOG.md). O consumo é via `npm install @semec/ds` (subpath exports: `/react`, `/react/validacao`, `/skills`, `/lite/skills`, tokens CSS e preset Tailwind).
+O kit é **publicado no npm público** desde 17/09/2026 ([ADR-022](adr/0022-publicacao-npm-publico.md)), sob o nome `@semec/ds`; a versão publicada em 15/10/2026 é a **3.1.0** (onda 2 da auditoria de 14/10/2026); a 3.2.0, aditiva, está em preparação com a onda 3. A versão vigente está sempre em `packages/react/package.json` e no [CHANGELOG](../packages/react/CHANGELOG.md). O consumo é via `npm install @semec/ds` (subpath exports: `/react`, `/react/validacao`, `/skills`, `/lite/skills`, tokens CSS e preset Tailwind).
 
-Não há Storybook, suíte de testes automatizados nem CI de acessibilidade. O site é export estático e a publicação é via GitHub Pages ([workflow](../.github/workflows/deploy-pages.yml)).
+Não há Storybook nem regressão visual. O kit tem testes com Vitest + Testing Library + axe (`npm test`, em `packages/react/test/`), e a CI ([ci.yml](../.github/workflows/ci.yml)) roda `lint`, `typecheck`, `test` (com zod 3 e 4), `build` (com conferência de deriva dos artefatos de agentes), `changeset` e o `gate` de qualidade (`npm run gate`: tokens, exports, smoke de acessibilidade com axe e estados abertos em Chromium). O site é export estático e a publicação é via GitHub Pages ([workflow](../.github/workflows/deploy-pages.yml)).
 
 ## O que este repositório não é
 
@@ -64,6 +64,9 @@ npm install       # instala o workspace (apps/* e packages/*)
 npm run dev       # site de docs em http://localhost:3000
 npm run build     # gera artefatos de IA (prebuild) + export estático em apps/docs/out
 npm run lint      # ESLint do site
+npm run typecheck # tsc --noEmit do kit
+npm test          # Vitest + Testing Library + axe do kit
+npm run gate      # gate de qualidade (o mesmo da CI)
 npm run proto:css # compila o CSS isolado dos componentes (public/proto/proto.css)
 ```
 
@@ -80,7 +83,7 @@ import { Button, Card, CardHeader, CardTitle, CardContent } from "@semec/ds/reac
 As decisões que definem este repositório estão nos [ADRs](adr/README.md). As principais, para quem chega agora:
 
 - [ADR-016](adr/0016-conteudo-em-portugues-codigo-em-ingles.md) — conteúdo PT-BR, código EN.
-- [ADR-012](adr/0012-tema-por-atributo-de-dados.md) — tema por `data-theme`.
+- [ADR-025](adr/0025-tema-unico-claro.md) — tema único claro no pacote (substitui o ADR-012; `data-theme` é só do site de documentação).
 - [ADR-014](adr/0014-wcag-21-aa-criterio-bloqueante.md) — WCAG 2.1 AA como critério bloqueante.
 - [ADR-017](adr/0017-workspace-apps-packages.md) — workspace `apps/` + `packages/`.
 - [ADR-018](adr/0018-pacote-componentes-ds-react.md) — registro histórico do pacote de componentes; o **nome vigente**, desde o [ADR-022](adr/0022-publicacao-npm-publico.md), é `@semec/ds`.

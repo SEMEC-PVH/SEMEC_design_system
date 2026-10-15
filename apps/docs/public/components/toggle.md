@@ -9,7 +9,7 @@ variants: "variant: default · outline · size: sm (36px visual, alvo 44px) · m
 
 # Toggle — `toggle`
 
-> Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos.
+> Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos.
 
 **Arquivo:** `src/components/toggle.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/toggle`
 
@@ -45,12 +45,14 @@ import { Bold } from "lucide-react";
 ## Prompt para IA
 
 ```text
-Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos. API e variantes: variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. API e variantes: variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as TogglePrimitive from "@radix-ui/react-toggle";
 import { cva, type VariantProps } from "class-variance-authority";
