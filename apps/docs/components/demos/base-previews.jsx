@@ -734,7 +734,7 @@ function InputOTPPreview() {
     <div className="w-full max-w-sm space-y-4 text-left">
       <div className="space-y-2">
         <p className="text-xs font-medium text-muted-foreground">Código de verificação</p>
-        <InputOTP value={value} onChange={setValue} maxLength={6}>
+        <InputOTP value={value} onValueChange={setValue} maxLength={6}>
           <InputOTPGroup>
             <InputOTPSlot index={0} />
             <InputOTPSlot index={1} />
@@ -775,7 +775,7 @@ function CalendarPreview() {
   const [value, setValue] = useState(() => new Date());
   return (
     <div className="w-fit rounded-lg border border-border bg-surface p-2 text-left">
-      <Calendar value={value} onChange={setValue} />
+      <Calendar value={value} onValueChange={setValue} />
       <p className="mt-2 px-1 text-xs text-muted-foreground">
         Selecionado: {value.toLocaleDateString("pt-BR")}
       </p>

@@ -13,10 +13,17 @@ const SelectValue = SelectPrimitive.Value;
 
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+    /**
+     * Contrato de formulário (ADR-015): `true` vira `aria-invalid="true"` e o
+     * estilo de erro. Fica no gatilho; `value`/`onValueChange`/`name`/`required`
+     * ficam no `Select` (raiz Radix).
+     */
+    invalid?: boolean;
+  }
+>(({ className, children, invalid, ...props }, ref) => {
   // Dentro de um FormField: id, aria-describedby, aria-invalid e aria-required.
-  const field = useFormFieldControl(props, { supportsRequired: true });
+  const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
   return (
   <SelectPrimitive.Trigger
     ref={ref}
