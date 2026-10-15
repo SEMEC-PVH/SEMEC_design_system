@@ -196,7 +196,12 @@ export function useFormFieldControl(
   const hasOwnName = props["aria-label"] !== undefined || props["aria-labelledby"] !== undefined;
   return withoutUndefined({
     id: props.id ?? ctx.controlId,
-    "aria-describedby": joinIds(props["aria-describedby"], ctx.describedBy),
+    // `invalid={false}` explícito: a mensagem de erro do FormField não descreve
+    // este controle (fica só a dica, se houver).
+    "aria-describedby": joinIds(
+      props["aria-describedby"],
+      props.invalid === false ? ctx.hintId : ctx.describedBy
+    ),
     "aria-invalid":
       props["aria-invalid"] ??
       (props.invalid !== undefined ? ownInvalid : ctx.invalid ? true : undefined),

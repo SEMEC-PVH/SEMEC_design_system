@@ -9,7 +9,7 @@ variants: "props: accept · maxSize · label · hint · error · invalid · onVa
 
 # Envio de arquivos — `file-upload`
 
-> Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio.
+> Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai).
 
 **Arquivo:** `src/components/file-upload.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/envio-de-arquivos`
 
@@ -53,7 +53,7 @@ import { FileUpload } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. API e variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · deprecadas: onChange(files) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). API e variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · deprecadas: onChange(files) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -147,6 +147,24 @@ const matchesAccept = (file: File, accept?: string) => {
   });
 };
 
+/**
+ * Põe `list` em `input.files` (via `DataTransfer`), para que o `<input>`
+ * nativo envie no `<form>` e valide `required` com o que a lista mostra.
+ * Devolve `false` quando o ambiente não permite (sem `DataTransfer`, ex.:
+ * jsdom ou navegador antigo); aí o input fica com a seleção nativa.
+ */
+const syncInputFiles = (input: HTMLInputElement | null, list: File[]) => {
+  if (!input || typeof DataTransfer === "undefined") return false;
+  try {
+    const transfer = new DataTransfer();
+    for (const file of list) transfer.items.add(file);
+    input.files = transfer.files;
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
   (
     {
@@ -199,26 +217,46 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       );
     }
 
-    const acceptFiles = (list: FileList | null) => {
-      if (!list || disabled) return;
+    // `input.files` acompanha a lista mostrada (seleção, soltar, `value` do
+    // pai), para o envio nativo e o `required` funcionarem (D1).
+    React.useEffect(() => {
+      syncInputFiles(inputRef.current, files);
+    }, [files]);
+
+    // Cancelar o seletor depois do clique (que limpa o input, abaixo) devolve
+    // ao input a lista atual.
+    const filesRef = React.useRef(files);
+    filesRef.current = files;
+    React.useEffect(() => {
+      const input = inputRef.current;
+      if (!input) return;
+      const restore = () => syncInputFiles(input, filesRef.current);
+      input.addEventListener("cancel", restore);
+      return () => input.removeEventListener("cancel", restore);
+    }, []);
+
+    /** Devolve os arquivos aceitos, ou `null` se nada mudou ou foi recusado. */
+    const acceptFiles = (list: FileList | null): File[] | null => {
+      if (!list || disabled) return null;
       let next = Array.from(list);
-      if (next.length === 0) return;
+      if (next.length === 0) return null;
       if (!multiple) next = next.slice(0, 1);
       if (next.some((f) => !matchesAccept(f, accept))) {
         setLocalError(text.invalidType);
-        return;
+        return null;
       }
       if (maxSize) {
         const oversized = next.filter((f) => f.size > maxSize);
         if (oversized.length > 0) {
           setLocalError(text.tooLarge(formatBytes(maxSize)));
-          return;
+          return null;
         }
       }
       setLocalError(undefined);
       if (value === undefined) setInternalFiles(next);
       onValueChange?.(next);
       onChange?.(next);
+      return next;
     };
 
     const describedBy =
@@ -228,7 +266,8 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             inputProps?.["aria-describedby"],
             hint ? hintId : null,
             message ? errorId : null,
-            field?.describedBy,
+            // `invalid={false}` explícito: o erro do FormField não descreve o campo.
+            invalidProp === false ? field?.hintId : field?.describedBy,
           ]
             .filter(Boolean)
             .join(" ")
@@ -294,11 +333,22 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             onClick={(e) => {
               // O clique na zona já abre o seletor; evita reabrir pela propagação.
               e.stopPropagation();
+              // Limpa antes de abrir o seletor, para que escolher de novo o
+              // mesmo arquivo dispare `change`. Só onde dá para restaurar a
+              // lista depois (cancelar, recusa); sem DataTransfer, não mexe.
+              if (typeof DataTransfer !== "undefined") e.currentTarget.value = "";
               inputProps?.onClick?.(e);
             }}
             onChange={(e) => {
-              acceptFiles(e.target.files);
-              e.currentTarget.value = "";
+              const input = e.currentTarget;
+              const accepted = acceptFiles(input.files);
+              // Recusa ou modo controlado: o input volta à lista mostrada (se o
+              // pai aceitar o novo `value`, o efeito acima sincroniza de novo).
+              const shown = accepted && value === undefined ? accepted : files;
+              if (!syncInputFiles(input, shown) && !accepted) {
+                // Sem DataTransfer: não deixa no input um arquivo recusado.
+                input.value = "";
+              }
             }}
           />
           <UploadCloud className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
