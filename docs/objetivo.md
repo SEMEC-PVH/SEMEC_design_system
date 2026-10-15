@@ -6,7 +6,7 @@
 
 O repositório do **Design System da SEMEC** (Secretaria Municipal de Economia de Porto Velho). Ele reúne, num só lugar:
 
-1. **O kit de componentes** `@semec/ds` (`packages/react/`) — 52 componentes React no manifest (mais o `SemecProvider`; a contagem vigente é o `componentCount` de `apps/docs/public/manifest.json`, gerado) + Tailwind CSS v4 + shadcn (Radix + CVA), tokens `pv-*` e tema único claro ([ADR-025](adr/0025-tema-unico-claro.md); o tema escuro do site de documentação vive no CSS do app, não nos tokens do pacote, de onde saiu na 2.0.0).
+1. **O kit de componentes** `@semec/ds` (`packages/react/`) — 55 componentes React no manifest em 15/10/2026 (cada entrada do `manifest.js` é um componente, contado pelo export principal: `Card` conta uma vez, com `CardHeader`, `CardTitle` etc.; o `SemecProvider` fica fora da conta; o número vigente é o `componentCount` de `apps/docs/public/manifest.json`, gerado) + Tailwind CSS v4 + shadcn (Radix + CVA), tokens `pv-*` e tema único claro ([ADR-025](adr/0025-tema-unico-claro.md); o tema escuro do site de documentação vive no CSS do app, não nos tokens do pacote, de onde saiu na 2.0.0).
 2. **O site de documentação** (`apps/docs/`) — Next.js 16 com export estático, que publica os fundamentos, componentes e padrões e serve os artefatos para agentes.
 3. **Os artefatos para agentes de IA** (`apps/docs/public/`) — `llms.txt`, `llms-full.txt`, `manifest.json`, skills e um `.md` por componente, gerados a partir de uma fonte única (`packages/react/manifest.js`) pelo pipeline `build-artifacts.mjs` ([ADR-023](adr/0023-pipeline-unico-artefatos-ia.md)).
 

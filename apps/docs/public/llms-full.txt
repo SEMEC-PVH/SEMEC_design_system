@@ -93,8 +93,10 @@ export * from "./components/input-mask";
    L1 — SEMÂNTICOS (`--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`,
         `--feedback-*`, `--space-*`, `--text-*`, `--radius-*`, `--elevation-*`)
         Camada do dia a dia. Diz o papel, não a cor.
-        `--pv-radius-*` e `--pv-duration-*` são L1 com nome próprio: guardam
-        o valor que o @theme expõe, sem autorreferência (AUD-57).
+        `--pv-radius-*`, `--pv-text-*`, `--pv-leading-*` e `--pv-duration-*`
+        são L1 com nome próprio: guardam o valor que o @theme expõe, sem
+        autorreferência (AUD-57). Os nomes públicos `--radius-*`,
+        `--text-*` e `--leading-*` continuam no :root, como apelidos.
 
    Uso no globals.css do site novo:
      @import "tailwindcss";
@@ -205,6 +207,9 @@ export * from "./components/input-mask";
   --pv-gray-600: #4b5563;
   --pv-gray-700: #374151;
   --pv-gray-900: #14233a;
+  /* Canais RGB de --pv-gray-900 (#14233a = 20 35 58), para sombra com
+     alfa sem color-mix (ver Elevação). Mude junto com --pv-gray-900. */
+  --pv-gray-900-rgb: 20 35 58;
 
   --pv-white: #ffffff;
   --pv-black: #000000;
@@ -277,23 +282,45 @@ export * from "./components/input-mask";
      Papel: display = título da página inicial · 3xl = título de página (h1)
      · 2xl = seção (h2) · xl = subtítulo · lg = destaque de corpo
      · base = corpo (padrão) · sm = apoio/tabela densa · xs = rótulo/legenda */
-  --text-xs:      0.75rem;  /* 12px */
-  --text-sm:      0.875rem; /* 14px */
-  --text-base:    1rem;     /* 16px */
-  --text-lg:      1.125rem; /* 18px */
-  --text-xl:      1.25rem;  /* 20px */
-  --text-2xl:     1.5rem;   /* 24px */
-  --text-3xl:     2rem;     /* 32px (o default do Tailwind é 30px) */
-  --text-display: 2.5rem;   /* 40px */
+  /* Valor em --pv-text-* / --pv-leading-*; --text-* e --leading-* são os
+     nomes públicos (var(--text-sm), text-sm, leading-sm) e apontam para
+     eles, sem `--text-xs: var(--text-xs)` no @theme (AUD-57, mesmo caso
+     do raio). */
+  --pv-text-xs:      0.75rem;  /* 12px */
+  --pv-text-sm:      0.875rem; /* 14px */
+  --pv-text-base:    1rem;     /* 16px */
+  --pv-text-lg:      1.125rem; /* 18px */
+  --pv-text-xl:      1.25rem;  /* 20px */
+  --pv-text-2xl:     1.5rem;   /* 24px */
+  --pv-text-3xl:     2rem;     /* 32px (o default do Tailwind é 30px) */
+  --pv-text-display: 2.5rem;   /* 40px */
 
-  --leading-xs:      1.4;
-  --leading-sm:      1.5;
-  --leading-base:    1.5;
-  --leading-lg:      1.4;
-  --leading-xl:      1.3;
-  --leading-2xl:     1.25;
-  --leading-3xl:     1.2;
-  --leading-display: 1.1;
+  --pv-leading-xs:      1.4;
+  --pv-leading-sm:      1.5;
+  --pv-leading-base:    1.5;
+  --pv-leading-lg:      1.4;
+  --pv-leading-xl:      1.3;
+  --pv-leading-2xl:     1.25;
+  --pv-leading-3xl:     1.2;
+  --pv-leading-display: 1.1;
+
+  --text-xs:      var(--pv-text-xs);
+  --text-sm:      var(--pv-text-sm);
+  --text-base:    var(--pv-text-base);
+  --text-lg:      var(--pv-text-lg);
+  --text-xl:      var(--pv-text-xl);
+  --text-2xl:     var(--pv-text-2xl);
+  --text-3xl:     var(--pv-text-3xl);
+  --text-display: var(--pv-text-display);
+
+  --leading-xs:      var(--pv-leading-xs);
+  --leading-sm:      var(--pv-leading-sm);
+  --leading-base:    var(--pv-leading-base);
+  --leading-lg:      var(--pv-leading-lg);
+  --leading-xl:      var(--pv-leading-xl);
+  --leading-2xl:     var(--pv-leading-2xl);
+  --leading-3xl:     var(--pv-leading-3xl);
+  --leading-display: var(--pv-leading-display);
 
   --font-regular:  400;
   --font-medium:   500;
@@ -339,14 +366,16 @@ export * from "./components/input-mask";
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Elevação
-     A sombra usa o azul-escuro do sistema (--pv-gray-900, rgb 20 35 58),
-     nunca preto puro. color-mix com transparent dá exatamente
-     rgba(20, 35, 58, .08 / .10 / .14), os valores anteriores (AUD-56).
-     ======================================================================= */
+     A sombra usa o azul-escuro do sistema (--pv-gray-900), nunca preto
+     puro, com alfa 8% / 10% / 14% (AUD-56). Escrita como rgb() com canais
+     do primitivo, sem hex e sem rgba() à mão: resulta exatamente em
+     rgba(20, 35, 58, .08 / .10 / .14). Não use color-mix aqui: o
+     Tailwind gera para ele um fallback sólido (sombra azul-marinho opaca)
+     em navegador sem color-mix, como Chrome < 111 em PCs antigos. */
   --elevation-0: none;
-  --elevation-1: 0 1px 2px color-mix(in srgb, var(--pv-gray-900) 8%, transparent);
-  --elevation-2: 0 4px 12px color-mix(in srgb, var(--pv-gray-900) 10%, transparent);
-  --elevation-3: 0 12px 32px color-mix(in srgb, var(--pv-gray-900) 14%, transparent);
+  --elevation-1: 0 1px 2px rgb(var(--pv-gray-900-rgb) / 0.08);
+  --elevation-2: 0 4px 12px rgb(var(--pv-gray-900-rgb) / 0.1);
+  --elevation-3: 0 12px 32px rgb(var(--pv-gray-900-rgb) / 0.14);
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Movimento
@@ -453,32 +482,32 @@ export * from "./components/input-mask";
   --font-sans: var(--font-family-sans);
 
   /* text-* aplica tamanho + entrelinha do degrau (leading-* sobrescreve). */
-  --text-xs:                    var(--text-xs);
-  --text-xs--line-height:       var(--leading-xs);
-  --text-sm:                    var(--text-sm);
-  --text-sm--line-height:       var(--leading-sm);
-  --text-base:                  var(--text-base);
-  --text-base--line-height:     var(--leading-base);
-  --text-lg:                    var(--text-lg);
-  --text-lg--line-height:       var(--leading-lg);
-  --text-xl:                    var(--text-xl);
-  --text-xl--line-height:       var(--leading-xl);
-  --text-2xl:                   var(--text-2xl);
-  --text-2xl--line-height:      var(--leading-2xl);
-  --text-3xl:                   var(--text-3xl);
-  --text-3xl--line-height:      var(--leading-3xl);
-  --text-display:               var(--text-display);
-  --text-display--line-height:  var(--leading-display);
+  --text-xs:                    var(--pv-text-xs);
+  --text-xs--line-height:       var(--pv-leading-xs);
+  --text-sm:                    var(--pv-text-sm);
+  --text-sm--line-height:       var(--pv-leading-sm);
+  --text-base:                  var(--pv-text-base);
+  --text-base--line-height:     var(--pv-leading-base);
+  --text-lg:                    var(--pv-text-lg);
+  --text-lg--line-height:       var(--pv-leading-lg);
+  --text-xl:                    var(--pv-text-xl);
+  --text-xl--line-height:       var(--pv-leading-xl);
+  --text-2xl:                   var(--pv-text-2xl);
+  --text-2xl--line-height:      var(--pv-leading-2xl);
+  --text-3xl:                   var(--pv-text-3xl);
+  --text-3xl--line-height:      var(--pv-leading-3xl);
+  --text-display:               var(--pv-text-display);
+  --text-display--line-height:  var(--pv-leading-display);
 
   /* leading-xs … leading-display (as nomeadas do Tailwind seguem valendo). */
-  --leading-xs:      var(--leading-xs);
-  --leading-sm:      var(--leading-sm);
-  --leading-base:    var(--leading-base);
-  --leading-lg:      var(--leading-lg);
-  --leading-xl:      var(--leading-xl);
-  --leading-2xl:     var(--leading-2xl);
-  --leading-3xl:     var(--leading-3xl);
-  --leading-display: var(--leading-display);
+  --leading-xs:      var(--pv-leading-xs);
+  --leading-sm:      var(--pv-leading-sm);
+  --leading-base:    var(--pv-leading-base);
+  --leading-lg:      var(--pv-leading-lg);
+  --leading-xl:      var(--pv-leading-xl);
+  --leading-2xl:     var(--pv-leading-2xl);
+  --leading-3xl:     var(--pv-leading-3xl);
+  --leading-display: var(--pv-leading-display);
 
   /* font-regular (400) + font-medium/semibold/bold do Tailwind, nos tokens. */
   --font-weight-regular:  var(--font-regular);
@@ -10396,7 +10425,7 @@ import { cn } from "@semec/ds/react";
 | `@semec/ds/skills/semec-ds` | Skill full do agente |
 | `@semec/ds/lite/skills/semec-ds-lite` | Skill lite (tokens + a11y + responsive) |
 
-**Poda (tree-shaking).** Desde a 3.2 cada componente é um módulo ESM próprio em `dist/react/components/` e o pacote declara `"sideEffects": ["**/*.css"]`, então o bundler do app descarta o que não é importado: `import { Button } from "@semec/ds/react"` custa cerca de 33 kB minificado com as dependências (quase tudo `tailwind-merge`) e 2 kB só de código do kit, em vez do kit inteiro (~340 kB na 3.1). Importar pela raiz ou pelo subpath dá o mesmo resultado num bundler com poda; o subpath ajuda ferramentas sem poda (ex.: `next dev` sem `optimizePackageImports`) e testes. A CI mede isso (`npm run test:dist`).
+**Poda (tree-shaking).** Desde a 3.2 cada componente é um módulo ESM próprio em `dist/react/components/` e o pacote declara `"sideEffects": ["**/*.css"]`, então o bundler do app descarta o que não é importado: `import { Button } from "@semec/ds/react"` custa cerca de 35 kB minificado com as dependências (quase tudo `tailwind-merge`); o código do kit fica em ~3 kB, em vez do kit inteiro (~340 kB na 3.1). Importar pela raiz ou pelo subpath dá o mesmo resultado num bundler com poda; o subpath ajuda ferramentas sem poda (ex.: `next dev` sem `optimizePackageImports`) e testes. A CI mede isso (`npm run test:dist`).
 
 Metadados de componente (o que versões anteriores deste README chamavam de `getComponentMetadata()`, função que nunca existiu) vêm de `@semec/ds/skills`: `dsBySlug["botoes"]`, `dsComponents`.
 
