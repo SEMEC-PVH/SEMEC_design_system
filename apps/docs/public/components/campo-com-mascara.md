@@ -9,7 +9,7 @@ variants: "mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo n�
 
 # Campo com máscara — `input-mask`
 
-> Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho; colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
+> Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
 
 **Arquivo:** `src/components/input-mask.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/campo-com-mascara`
 
@@ -58,7 +58,7 @@ import { FormField, InputMask } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `InputMask` (Campo com máscara) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho; colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara. API e variantes: mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: "AAA-9*99") · valor: defaultValue · value + onValueChange(masked, raw) · inputMode: numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `InputMask` (Campo com máscara) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara. API e variantes: mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: "AAA-9*99") · valor: defaultValue · value + onValueChange(masked, raw) · inputMode: numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -148,7 +148,17 @@ export function applyInputMask(value: string, mask: InputMaskPreset | string): I
   // Pontuação do próprio padrão no valor: ele já veio formatado, e um
   // caractere igual a um literal (ex.: o "5" de "+55") é o literal.
   const punctuation = new Set([...pattern].filter((ch) => !isSlot(ch) && !isAlphanumeric(ch)));
-  const looksFormatted = [...normalized].some((ch) => punctuation.has(ch));
+  // Entrada que começa com toda a sequência literal inicial do padrão
+  // (ex.: "0800" em "0800-999-9999", ignorando pontuação) também conta como
+  // formatada: o "0800" colado é o prefixo, não os primeiros dígitos.
+  let firstSlot = 0;
+  while (firstSlot < pattern.length && !isSlot(pattern.charAt(firstSlot))) firstSlot++;
+  const leadingLiteral = [...pattern.slice(0, firstSlot)].filter(isAlphanumeric).join("");
+  const startsWithLeading =
+    leadingLiteral.length > 0 &&
+    [...normalized].filter(isAlphanumeric).join("").startsWith(leadingLiteral);
+  const looksFormatted =
+    startsWithLeading || [...normalized].some((ch) => punctuation.has(ch));
   // Padrão só de dígitos: descarta a pontuação de quem colou ("(69) 3216-0000").
   const source = isNumericPattern(pattern) ? normalized.replace(/\D/g, "") : normalized;
 
@@ -199,6 +209,46 @@ function caretAfterRaw(masked: string, mask: InputMaskPreset | string, n: number
     }
   }
   return masked.length;
+}
+
+/**
+ * Backspace logo depois de um literal (ou Delete logo antes) apagaria só a
+ * pontuação, que a máscara repõe: o cursor andaria sem apagar nada. Aqui o
+ * literal é pulado e o caractere editável vizinho é apagado. Devolve `true`
+ * quando fez a exclusão (quem chamou cancela o evento original).
+ */
+function deleteAcrossLiteral(
+  el: HTMLInputElement,
+  mask: InputMaskPreset | string,
+  direction: "backward" | "forward"
+): boolean {
+  const start = el.selectionStart;
+  if (start === null || start !== el.selectionEnd) return false;
+  const current = el.value;
+  const pattern = resolvePattern(mask, current.replace(/\D/g, "").length);
+  const literalAt = (i: number) => i >= 0 && i < current.length && !isSlot(pattern.charAt(i));
+
+  let target = -1;
+  if (direction === "backward" && literalAt(start - 1)) {
+    target = start - 1;
+    while (target >= 0 && literalAt(target)) target--;
+  } else if (direction === "forward" && literalAt(start)) {
+    target = start;
+    while (target < current.length && literalAt(target)) target++;
+    if (target >= current.length) target = -1;
+  }
+  if (target < 0) return false;
+
+  const next = current.slice(0, target) + current.slice(target + 1);
+  const caret = direction === "backward" ? target : start;
+  // Setter nativo + evento "input": o React trata como digitação (onChange).
+  const view = el.ownerDocument.defaultView ?? window;
+  const setter = Object.getOwnPropertyDescriptor(view.HTMLInputElement.prototype, "value")?.set;
+  if (setter) setter.call(el, next);
+  else el.value = next;
+  el.setSelectionRange(caret, caret);
+  el.dispatchEvent(new view.Event("input", { bubbles: true }));
+  return true;
 }
 
 const presetInputMode: Record<InputMaskPreset, React.HTMLAttributes<HTMLInputElement>["inputMode"]> = {
@@ -267,45 +317,44 @@ const InputMask = React.forwardRef<HTMLInputElement, InputMaskProps>(
       onChange?.(event);
     };
 
-    /**
-     * Backspace logo depois de um literal (ou Delete logo antes) apagaria só
-     * a pontuação, que a máscara repõe: o cursor andaria sem apagar nada.
-     * Aqui o literal é pulado e o caractere editável vizinho é apagado.
-     */
+    // Backspace/Delete junto de literal: ver deleteAcrossLiteral.
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
       onKeyDown?.(event);
       if (event.defaultPrevented) return;
       if (event.key !== "Backspace" && event.key !== "Delete") return;
       if (event.altKey || event.ctrlKey || event.metaKey) return;
-      const el = event.currentTarget;
-      const start = el.selectionStart;
-      if (start === null || start !== el.selectionEnd) return;
-      const current = el.value;
-      const pattern = resolvePattern(mask, current.replace(/\D/g, "").length);
-      const literalAt = (i: number) => i >= 0 && i < current.length && !isSlot(pattern.charAt(i));
-
-      let target = -1;
-      if (event.key === "Backspace" && literalAt(start - 1)) {
-        target = start - 1;
-        while (target >= 0 && literalAt(target)) target--;
-      } else if (event.key === "Delete" && literalAt(start)) {
-        target = start;
-        while (target < current.length && literalAt(target)) target++;
-        if (target >= current.length) target = -1;
+      if (deleteAcrossLiteral(event.currentTarget, maskRef.current, event.key === "Backspace" ? "backward" : "forward")) {
+        // Cancelar o keydown também cancela o beforeinput: sem exclusão dupla.
+        event.preventDefault();
       }
-      if (target < 0) return;
-
-      event.preventDefault();
-      const next = current.slice(0, target) + current.slice(target + 1);
-      const caret = event.key === "Backspace" ? target : start;
-      // Setter nativo + evento "input": o React trata como digitação (onChange).
-      const view = el.ownerDocument.defaultView ?? window;
-      const setter = Object.getOwnPropertyDescriptor(view.HTMLInputElement.prototype, "value")?.set;
-      if (setter) setter.call(el, next);
-      else el.value = next;
-      el.setSelectionRange(caret, caret);
-      el.dispatchEvent(new view.Event("input", { bubbles: true }));
     };
+
+    // Teclado virtual do Android manda key "Unidentified" (229) no keydown:
+    // ali só o beforeinput (inputType) diz que é Backspace/Delete.
+    const maskRef = React.useRef(mask);
+    maskRef.current = mask;
+    const inputRef = React.useRef<HTMLInputElement | null>(null);
+    const setRefs = React.useCallback(
+      (el: HTMLInputElement | null) => {
+        inputRef.current = el;
+        if (typeof ref === "function") ref(el);
+        else if (ref) ref.current = el;
+      },
+      [ref]
+    );
+    React.useEffect(() => {
+      const el = inputRef.current;
+      if (!el) return;
+      const onBeforeInput = (event: Event) => {
+        const { inputType } = event as InputEvent;
+        if (inputType !== "deleteContentBackward" && inputType !== "deleteContentForward") return;
+        if (event.defaultPrevented) return;
+        const direction = inputType === "deleteContentBackward" ? "backward" : "forward";
+        if (deleteAcrossLiteral(el, maskRef.current, direction)) event.preventDefault();
+      };
+      el.addEventListener("beforeinput", onBeforeInput);
+      return () => el.removeEventListener("beforeinput", onBeforeInput);
+    }, []);
 
     const fallbackMode =
       (presetInputMode as Record<string, React.HTMLAttributes<HTMLInputElement>["inputMode"]>)[mask] ??
@@ -313,7 +362,7 @@ const InputMask = React.forwardRef<HTMLInputElement, InputMaskProps>(
 
     return (
       <Input
-        ref={ref}
+        ref={setRefs}
         type="text"
         inputMode={inputMode ?? fallbackMode}
         value={display}
