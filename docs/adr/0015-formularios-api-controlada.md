@@ -52,3 +52,5 @@ data: 2026-08-20
 > | `Label` | — | — | — | — | — | — | rótulo; sem contrato próprio |
 >
 > Testes: `packages/react/test/contrato-formulario.test.tsx`. Depreciações: [CONTRIBUTING.md](../../CONTRIBUTING.md) § *Depreciações anunciadas*.
+
+> **Nota de aplicação (4.0.0, AUD-35; não altera a decisão).** Os callbacks marcados como **deprecated** na tabela acima foram **removidos na 4.0**: `Calendar`, `Combobox`, `InputOTP` e `FileUpload` não têm mais `onChange` (o tipo é `onChange?: never` e o componente descarta a prop, que não chega ao DOM; um handler antigo nunca é chamado, nem com o valor nem com o evento que borbulha dos `<input>` internos). Esses quatro não ganharam `onChange` nativo de propósito: nenhum é um único `<input>`, e o evento da raiz não diria qual valor mudou. No `DatePicker`, `onChange` passou a ser o evento nativo do `<input type="date">`, como em `Input`/`Textarea`, e o valor ISO continua em `onValueChange`. O aviso em desenvolvimento e o helper `warnDeprecated` saíram junto. Guia e codemod: [docs/migracao-4.0.md](../migracao-4.0.md).

@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
   "version": "3.2.0",
-  "generatedAt": "2026-10-15T13:30:05.000Z",
+  "generatedAt": "2026-10-15T13:45:03.000Z",
   "componentCount": 55,
   "categories": [
     {
@@ -246,12 +246,16 @@
           "values": "options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer"
         },
         {
+          "prop": "removidas na 4.0",
+          "values": "onChange(value) → use onValueChange (guia docs/migracao-4.0.md; codemod codemod-4)"
+        },
+        {
           "prop": "deprecadas",
-          "values": "onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)"
+          "values": "ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText); anunciadas na 4.0, saem na 5.0"
         }
       ],
       "usage": "import { Combobox, FormField, Label } from \"@semec/ds/react\";\n\n// Rótulo visível pelo FormField: nome acessível = rótulo + texto do gatilho (WCAG 2.5.3)\n<FormField label=\"Tipo de documento\" error={erro}>\n  <Combobox\n    name=\"tipoDocumento\"\n    placeholder=\"Selecione o tipo de documento\"\n    searchPlaceholder=\"Buscar tipo…\"\n    emptyText=\"Nenhum tipo encontrado.\"\n    options={[{ value: \"cnpj\", label: \"CNPJ\" }, { value: \"cpf\", label: \"CPF\" }]}\n    value={valor}\n    onValueChange={setValor}\n  />\n</FormField>\n// name gera um <input type=\"hidden\"> com o valor: vai no FormData de um <form> nativo\n\n// Ou com <Label htmlFor> + id (também aceita aria-labelledby)\n<Label htmlFor=\"orgao\">Órgão emissor</Label>\n<Combobox id=\"orgao\" options={orgaos} />",
-      "prompt": "Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField. API e variantes: props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · deprecadas: onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "prompt": "Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField. API e variantes: props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · removidas na 4.0: onChange(value) → use onValueChange (guia docs/migracao-4.0.md; codemod codemod-4) · deprecadas: ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText); anunciadas na 4.0, saem na 5.0. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/combobox",
       "md": "/components/combobox.md"
     },
@@ -266,15 +270,15 @@
       "variants": [
         {
           "prop": "props",
-          "values": "nativo HTML (min · max · disabled · name · required) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar"
+          "values": "nativo HTML (min · max · disabled · name · required · onChange(evento)) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar"
         },
         {
-          "prop": "deprecadas",
-          "values": "onChange(value) (use onValueChange; na 4.0 o onChange passa a receber o evento nativo)"
+          "prop": "mudou na 4.0",
+          "values": "onChange é o evento nativo do <input> (até a 3.x recebia a string); para o valor, use onValueChange"
         }
       ],
       "usage": "import { DatePicker, FormField } from \"@semec/ds/react\";\n\n<FormField label=\"Data de vencimento\" hint=\"dd/mm/aaaa\">\n  <DatePicker id=\"vencimento\" name=\"vencimento\" defaultValue=\"2026-08-31\" />\n</FormField>\n\n// Controlado: onValueChange recebe o ISO (AAAA-MM-DD)\n<FormField label=\"Data de início\" error={erroData}>\n  <DatePicker value={inicio} onValueChange={setInicio} />\n</FormField>",
-      "prompt": "Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type=\"date\">` nativo — sem biblioteca de calendário. Um só indicador: botão \"Abrir calendário\" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). API e variantes: props: nativo HTML (min · max · disabled · name · required) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · deprecadas: onChange(value) (use onValueChange; na 4.0 o onChange passa a receber o evento nativo). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "prompt": "Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type=\"date\">` nativo — sem biblioteca de calendário. Um só indicador: botão \"Abrir calendário\" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). API e variantes: props: nativo HTML (min · max · disabled · name · required · onChange(evento)) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · mudou na 4.0: onChange é o evento nativo do <input> (até a 3.x recebia a string); para o valor, use onValueChange. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/seletor-de-data",
       "md": "/components/seletor-de-data.md"
     },
@@ -292,12 +296,12 @@
           "values": "accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels"
         },
         {
-          "prop": "deprecadas",
-          "values": "onChange(files) (use onValueChange; sai na 4.0)"
+          "prop": "removidas na 4.0",
+          "values": "onChange(files) → use onValueChange"
         }
       ],
       "usage": "import { FileUpload } from \"@semec/ds/react\";\n\n// `label` é o rótulo do campo de arquivo — não omita\n<FileUpload\n  label=\"Documento de identidade\"\n  accept=\".pdf,image/*\"\n  maxSize={5 * 1024 * 1024}\n  hint=\"PDF ou imagem, até 5 MB\"\n  value={arquivos}\n  onValueChange={setArquivos}\n/>\n\n// Textos fixos sobrescrevíveis (padrão PT-BR)\n<FileUpload label=\"Anexo\" labels={{ invalidType: \"Envie só PDF.\", tooLarge: (max) => `Máximo de ${max}.` }} />",
-      "prompt": "Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio. API e variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · deprecadas: onChange(files) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "prompt": "Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio. API e variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · removidas na 4.0: onChange(files) → use onValueChange. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/envio-de-arquivos",
       "md": "/components/envio-de-arquivos.md"
     },
@@ -922,10 +926,14 @@
         {
           "prop": "regras",
           "values": "inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action"
+        },
+        {
+          "prop": "deprecadas",
+          "values": "modal (AlertDialog) · onPointerDownOutside · onInteractOutside (AlertDialogContent): ignoradas desde a 3.1.0; anunciadas na 4.0, saem na 5.0"
         }
       ],
       "usage": "import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from \"@semec/ds/react\";\n\n<AlertDialog>\n  <AlertDialogTrigger asChild>\n    <Button variant=\"destructive\">Excluir</Button>\n  </AlertDialogTrigger>\n  <AlertDialogContent>\n    <AlertDialogHeader>\n      <AlertDialogTitle>Excluir requerimento?</AlertDialogTitle>\n      <AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription>\n    </AlertDialogHeader>\n    <AlertDialogFooter>\n      <AlertDialogCancel>Cancelar</AlertDialogCancel>\n      <AlertDialogAction variant=\"destructive\">Excluir</AlertDialogAction>\n    </AlertDialogFooter>\n  </AlertDialogContent>\n</AlertDialog>\n\n// Validar antes de fechar (ação assíncrona): controle open e impeça o fechamento automático\n<AlertDialog open={aberto} onOpenChange={setAberto}>\n  <AlertDialogContent>\n    …\n    <AlertDialogAction\n      variant=\"destructive\"\n      onClick={async (e) => { e.preventDefault(); await excluir(); setAberto(false); }}\n    >Excluir</AlertDialogAction>\n  </AlertDialogContent>\n</AlertDialog>",
-      "prompt": "Use o componente `AlertDialog` (Diálogo de alerta) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role=\"alertdialog\", sempre modal, não fecha por clique fora e abre com o foco no Cancelar. API e variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel · variant (Action/Cancel): as do Button; padrão primary (Action) e outline (Cancel), 44px · regras: inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "prompt": "Use o componente `AlertDialog` (Diálogo de alerta) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role=\"alertdialog\", sempre modal, não fecha por clique fora e abre com o foco no Cancelar. API e variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel · variant (Action/Cancel): as do Button; padrão primary (Action) e outline (Cancel), 44px · regras: inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action · deprecadas: modal (AlertDialog) · onPointerDownOutside · onInteractOutside (AlertDialogContent): ignoradas desde a 3.1.0; anunciadas na 4.0, saem na 5.0. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/dialogo-de-alerta",
       "md": "/components/dialogo-de-alerta.md"
     },
@@ -1095,12 +1103,12 @@
           "values": "value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total))"
         },
         {
-          "prop": "deprecadas",
-          "values": "onChange(value) (use onValueChange; sai na 4.0)"
+          "prop": "removidas na 4.0",
+          "values": "onChange(value) → use onValueChange"
         }
       ],
       "usage": "import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from \"@semec/ds/react\";\n\n// name gera um <input type=\"hidden\"> com o código: vai no FormData de um <form> nativo\n<InputOTP name=\"codigo\" value={code} onValueChange={setCode} maxLength={6}>\n  <InputOTPGroup>\n    <InputOTPSlot index={0} />\n    <InputOTPSlot index={1} />\n    <InputOTPSlot index={2} />\n  </InputOTPGroup>\n  <InputOTPSeparator />\n  <InputOTPGroup>\n    <InputOTPSlot index={3} />\n    <InputOTPSlot index={4} />\n    <InputOTPSlot index={5} />\n  </InputOTPGroup>\n</InputOTP>",
-      "prompt": "Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de código OTP com foco automático entre dígitos. API e variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · deprecadas: onChange(value) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "prompt": "Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de código OTP com foco automático entre dígitos. API e variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · removidas na 4.0: onChange(value) → use onValueChange. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/input-otp",
       "md": "/components/input-otp.md"
     },
@@ -1118,8 +1126,8 @@
           "values": "value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }>"
         },
         {
-          "prop": "deprecadas",
-          "values": "onChange(date) (use onValueChange; sai na 4.0)"
+          "prop": "removidas na 4.0",
+          "values": "onChange(date) → use onValueChange"
         },
         {
           "prop": "a11y",
@@ -1131,7 +1139,7 @@
         }
       ],
       "usage": "import { Calendar } from \"@semec/ds/react\";\n\n<Calendar value={data} onValueChange={setData} />\n\n<Calendar value={data} onValueChange={setData} min=\"2026-01-01\" max=\"2026-12-31\" />",
-      "prompt": "Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px. API e variantes: props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · deprecadas: onChange(date) (use onValueChange; sai na 4.0) · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome \"14 de outubro de 2026\" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "prompt": "Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px. API e variantes: props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · removidas na 4.0: onChange(date) → use onValueChange · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome \"14 de outubro de 2026\" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/calendario",
       "md": "/components/calendario.md"
     },

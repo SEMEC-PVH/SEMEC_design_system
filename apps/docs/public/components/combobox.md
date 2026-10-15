@@ -4,7 +4,7 @@ code: "combobox"
 slug: "combobox"
 file: "src/components/combobox.tsx"
 category: "formularios"
-variants: "props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · deprecadas: onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)"
+variants: "props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · removidas na 4.0: onChange(value) → use onValueChange (guia docs/migracao-4.0.md; codemod codemod-4) · deprecadas: ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText); anunciadas na 4.0, saem na 5.0"
 ---
 
 # Combobox — `combobox`
@@ -16,7 +16,8 @@ variants: "props: options · value · defaultValue · onValueChange · placehold
 ## Variantes
 
 - **props**: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer
-- **deprecadas**: onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)
+- **removidas na 4.0**: onChange(value) → use onValueChange (guia docs/migracao-4.0.md; codemod codemod-4)
+- **deprecadas**: ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText); anunciadas na 4.0, saem na 5.0
 
 ## Instalação (@semec/ds)
 
@@ -58,7 +59,7 @@ import { Combobox, FormField, Label } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField. API e variantes: props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · deprecadas: onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField. API e variantes: props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · removidas na 4.0: onChange(value) → use onValueChange (guia docs/migracao-4.0.md; codemod codemod-4) · deprecadas: ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText); anunciadas na 4.0, saem na 5.0. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -71,7 +72,6 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "../lib/utils";
-import { warnDeprecated } from "../lib/deprecation";
 import { useFormField, useFormFieldControl } from "./form-field";
 
 export interface ComboboxOption {
@@ -106,8 +106,12 @@ export interface ComboboxProps
   defaultValue?: string;
   /** Recebe o valor da opção escolhida (contrato de formulário, ADR-015). */
   onValueChange?: (value: string) => void;
-  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
-  onChange?: (value: string) => void;
+  /**
+   * Removido na 4.0 (AUD-35): use `onValueChange`. O Combobox não tem
+   * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado.
+   */
+  onChange?: never;
   /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
   invalid?: boolean;
   /** Texto do gatilho sem seleção. Padrão: "Selecione…". */
@@ -116,12 +120,13 @@ export interface ComboboxProps
   searchPlaceholder?: string;
   /** Texto quando a busca não encontra nada. Padrão: "Nenhum resultado.". */
   emptyText?: string;
-  /** @deprecated Use `emptyText`. Mantida por compatibilidade. */
+  /** @deprecated Use `emptyText`. Mantida por compatibilidade; sai na 5.0 (anunciado na 4.0). */
   emptyMessage?: string;
   /**
    * @deprecated Prefira rótulo visível (`<Label htmlFor={id}>` ou `FormField`)
    * ou `aria-labelledby`. Quando usada, vira um rótulo oculto somado ao texto
    * visível do gatilho (o nome acessível continua contendo o que se vê, 2.5.3).
+   * Sai na 5.0 (anunciado na 4.0); o atributo `aria-label` continua aceito.
    */
   ariaLabel?: string;
   /** Gera um `<input type="hidden" name>` com o valor, para envio em `<form>`. */
@@ -154,7 +159,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
       options,
       value,
       defaultValue,
-      onChange,
+      onChange: _removedOnChange,
       onValueChange,
       invalid,
       placeholder = "Selecione…",
@@ -187,12 +192,6 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
 
     const ctx = useFormField();
     const field = useFormFieldControl({ ...props, invalid });
-    if (onChange) {
-      warnDeprecated(
-        "Combobox.onChange",
-        "Combobox: `onChange(value)` está obsoleto e sai na 4.0. Use `onValueChange(value)`."
-      );
-    }
     const triggerId = field.id ?? props.id;
 
     const [open, setOpen] = React.useState(false);
@@ -263,7 +262,6 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
     const choose = (option: ComboboxOption) => {
       if (value === undefined) setInternalValue(option.value);
       onValueChange?.(option.value);
-      onChange?.(option.value);
       setOpen(false);
     };
 

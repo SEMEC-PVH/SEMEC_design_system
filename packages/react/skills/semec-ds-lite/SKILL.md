@@ -36,7 +36,7 @@ O pacote **não** exporta `shadcn.css` (removido na 2.0.0).
 
 ### L0 — Primitivos (`--pv-*`)
 
-Valores brutos. Nunca use primitivo direto em componente ou tela (nem como utilitário `bg-pv-*`, que sai na 4.0).
+Valores brutos. Nunca use primitivo direto em componente ou tela. Desde a 4.0 não existem utilitários `bg-pv-*` / `text-pv-*` / `border-pv-*` nem `--color-pv-*` (AUD-55): use o semântico do papel. Tabela primitivo → semântico: https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/migracao-4.0.md
 
 | Token | Valor | Uso |
 |-------|-------|-----|
@@ -81,6 +81,7 @@ Camada do dia a dia. Diz o papel, não a cor. Use estes, nunca os L0.
 | `--text-secondary` | Texto intermediário |
 | `--text-strong` | Texto em destaque |
 | `--text-on-brand` | Texto sobre fundo de marca |
+| `--text-brand` | Título institucional escuro (12,43:1 sobre `--surface`) |
 | `--tint` | Superfície colorida leve |
 | `--brand-hero` | Marca (faixas institucionais, hero, selo) |
 
@@ -148,6 +149,8 @@ Cada degrau tem altura de linha própria (`--leading-*`), já embutida no utilit
 | `ring-ring` / `ring-ring-inverse` | `--focus-ring` / `--focus-ring-inverse` |
 | `bg-primary`, `hover:bg-primary-hover` | `--action-primary` (+ hover) |
 | `bg-brand-hero` | `--brand-hero` |
+| `text-text-brand` | `--text-brand` |
+| `bg-success-emphasis` / `text-success-emphasis-foreground` | `--feedback-success-emphasis` / `--text-on-success-emphasis` (verde cheio; nunca como texto) |
 | `bg-destructive`, `text-destructive`, `bg-destructive-surface` | `--feedback-danger` (+ surface) |
 | `text-success` / `text-warning` / `text-info` (+ `bg-*-surface`) | feedback |
 | `p-space-N`, `gap-space-N`, `mt-space-N` | `--space-N` (a escala `p-N` do Tailwind tem os mesmos valores) |

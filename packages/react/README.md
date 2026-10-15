@@ -226,6 +226,10 @@ O que existe no pacote está em `tokens.css` (camadas L0 `--pv-*` e L1 semântic
 | `--text-muted`, `--text-secondary`, `--text-strong` | `text-text-muted`, `text-text-secondary`, `text-text-strong` | **Não** use `text-muted`/`text-secondary`: são a cor de fundo `--surface-alt` (1,09:1). `bg-muted`/`bg-secondary` seguem valendo |
 | `--surface-sunken` | `bg-surface-sunken` | Skeleton, trilha de Progress/Slider (1,47:1 sobre `--surface`) |
 | `--focus-ring-inverse` | `ring-ring-inverse` | Automático dentro de `data-surface="brand"` ou `bg-brand-hero` (9,38:1); `data-surface="default"` volta ao anel padrão |
+| `--text-brand` | `text-text-brand` | Título institucional escuro (12,43:1). Novo na 4.0 |
+| `--feedback-success-emphasis`, `--text-on-success-emphasis` | `bg-success-emphasis`, `text-success-emphasis-foreground` | Verde cheio do Toast `success` (texto 5,85:1). Novo na 4.0 |
+
+Primitivos `--pv-*` não geram utilitário desde a 4.0 (não há `bg-pv-*`).
 
 Link solto no texto (`<a>` sem `class`) é sublinhado pelo `tokens.css`; com classe, o sublinhado é do componente/utilitário (`underline`). Tokens de layout que aparecem no site de documentação (`--container-max`, `--measure`, `--control-height-*`, `data-density`) **não fazem parte do pacote**; use os utilitários do Tailwind indicados na skill `semec-ds` (seção "Responsive / Mobile").
 
@@ -271,7 +275,7 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 ## Dependências
 
 - **Peer**: React 19+, React DOM 19+
-- **Peer opcional**: `zod` ^3.23 — só se usar `@semec/ds/react/validacao`
+- **Peer opcional**: `zod` ^3.23 — só se usar `@semec/ds/react/validacao`; `typescript` >=4.7 — só para o codemod (`npx @semec/ds codemod-4`)
 - **Tailwind CSS**: v4+ no app (com `@source` apontando para `node_modules/@semec/ds/dist/react`, caminho relativo ao CSS)
 - **Instaladas automaticamente**: todos os `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, `get-nonce`
 
@@ -279,13 +283,25 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 
 - **3.0 e 3.1: bundle único e sem fronteira RSC.** Importar uma peça carregava o kit inteiro e importar `@semec/ds/react` num Server Component quebrava. Corrigido na 3.2 (saída por módulo, `"use client"` por componente e subpaths `@semec/ds/react/*`; ver o passo 5 de [Comece aqui](#comece-aqui) e [Subpath exports](#subpath-exports)).
 
-## Depreciações anunciadas (saem na 4.0)
+## Migração para a 4.0 e depreciações
 
-Avisadas a partir da 3.1.0 e válidas até a 4.0 (política de duas minors, ADR-013). Lista completa, com o que usar no lugar: [CONTRIBUTING.md § Depreciações anunciadas](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/CONTRIBUTING.md#depreciações-anunciadas).
+**Guia: [docs/migracao-4.0.md](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/migracao-4.0.md)**, com antes/depois, tabela primitivo → semântico e o codemod:
 
-- Importar por caminho de arquivo em `dist/` (o layout interno do `dist` não é contrato; use `@semec/ds/react` ou os subpaths `@semec/ds/react/*`, disponíveis desde a 3.2).
-- `onChange(value)` / `onChange(files)` nos campos não nativos (`Combobox`, `InputOTP`, `DatePicker`, `FileUpload`, `Calendar`): use `onValueChange`, com a mesma assinatura, disponível em todos desde a 3.2.0 (contrato `value` / `onValueChange` / `name` / `id` / `invalid`, ADR-015).
-- Utilitários de primitivo `bg-pv-*` / `text-pv-*` (use os semânticos).
+```bash
+npx @semec/ds codemod-4 src           # simulação: relata o que muda
+npx @semec/ds codemod-4 src --write   # grava as trocas onChange → onValueChange
+```
+
+O codemod lê o JSX com o `typescript` do projeto (peer opcional). Também roda como `node node_modules/@semec/ds/codemods/v4.mjs src`.
+
+Removido na 4.0 (anunciado desde a 3.1.0, política de duas minors, ADR-013):
+
+- `onChange(value)` / `onChange(files)` de `Combobox`, `InputOTP`, `FileUpload` e `Calendar`: use `onValueChange` (contrato `value` / `onValueChange` / `name` / `id` / `invalid`, ADR-015). O tipo recusa `onChange` e o componente o descarta.
+- `DatePicker`: `onChange` passa a receber o **evento nativo** do `<input type="date">`; o valor ISO vem em `onValueChange`.
+- Utilitários de primitivo `bg-pv-*` / `text-pv-*` / `border-pv-*` e as variáveis `--color-pv-*` (do `@theme` e do `pv-preset`): use os semânticos. As variáveis `--pv-*` continuam. Semânticos novos: `text-text-brand`, `bg-success-emphasis`, `text-success-emphasis-foreground`.
+- Import por caminho de arquivo em `dist/`: o `exports` bloqueia (`ERR_PACKAGE_PATH_NOT_EXPORTED`); use `@semec/ds/react` ou `@semec/ds/react/<componente>`.
+
+Depreciado, sai na 5.0: `ariaLabel` e `emptyMessage` do `Combobox`; `modal` do `AlertDialog` e `onPointerDownOutside`/`onInteractOutside` do `AlertDialogContent` (já ignorados). Lista oficial: [CONTRIBUTING.md § Depreciações anunciadas](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/CONTRIBUTING.md#depreciações-anunciadas).
 
 O que a 2.0.0 removeu sem aviso está na errata do [CHANGELOG](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/CHANGELOG.md).
 
