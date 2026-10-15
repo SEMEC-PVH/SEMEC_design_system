@@ -57,6 +57,7 @@ Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não r
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
 
 const LOCALE = "pt-BR";
@@ -102,7 +103,8 @@ export interface CalendarProps
   /**
    * Removido na 4.0 (AUD-35): use `onValueChange`. O Calendar não tem
    * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
-   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado.
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
    */
   onChange?: never;
   disabled?: boolean;
@@ -164,6 +166,8 @@ const navButtonClass =
  */
 const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
   ({ className, value, onChange: _removedOnChange, onValueChange, disabled, min, max, labels, ...props }, ref) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("Calendar");
     const text = { ...DEFAULT_LABELS, ...labels };
     const headingId = React.useId();
     const today = startOfDay(new Date());

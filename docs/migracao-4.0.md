@@ -12,9 +12,10 @@ A 4.0 só remove o que foi anunciado como depreciado na 3.1.0 e na 3.2.0, confor
 Ordem sugerida:
 
 1. Atualize para a 3.2.0 e resolva os avisos de depreciação no console de desenvolvimento.
-2. Rode o codemod em modo simulação: `npx @semec/ds codemod-4 src`.
-3. Rode com `--write`, revise o diff e resolva à mão as linhas marcadas como `revisar` e `utilitário`.
-4. Atualize para a 4.0 (`npm i @semec/ds@4`) e rode o typecheck: o TypeScript recusa o `onChange` antigo.
+2. Ainda na 3.2.0, rode o codemod da 4.0 em modo simulação. O `-p` baixa a 4.0 e o TypeScript 5 só para rodar o comando, sem mexer no `package.json`:
+   `npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 src`
+3. Rode de novo com `--write`, revise o diff e resolva à mão as linhas marcadas como `revisar` e `utilitário`.
+4. Atualize para a 4.0 (`npm i @semec/ds@4`) e rode o typecheck. Ele é a rede de segurança do que o codemod não vê: no TypeScript, todo `onChange` que sobrou em `Calendar`, `Combobox`, `InputOTP` e `FileUpload` vira erro de compilação. Em JavaScript, o componente mostra um `console.error` em desenvolvimento ("onChange foi removido na 4.0; use onValueChange").
 
 ## 1. `onChange(valor)` sai dos campos não nativos (AUD-35)
 
@@ -43,7 +44,7 @@ Depois (4.0):
 O que acontece com um `onChange` que sobrar:
 
 - **TypeScript:** a prop é tipada como `onChange?: never` nesses quatro componentes, então `onChange={setMunicipio}` não compila (`Type '…' is not assignable to type 'undefined'`); o JSDoc da prop, visível no editor, diz "Removido na 4.0 (AUD-35): use `onValueChange`".
-- **JavaScript:** o componente descarta a prop e ela não chega ao DOM. O handler nunca é chamado, nem com o valor nem com um evento. Sem isso, o `onChange` iria parar na `<div>` raiz e receberia o evento `change` que borbulha dos `<input>` internos (dígitos do `InputOTP`, `<input type="file">` do `FileUpload`), e um handler escrito para o valor quebraria em silêncio.
+- **JavaScript:** o componente descarta a prop e ela não chega ao DOM. O handler nunca é chamado, nem com o valor nem com um evento, e a seleção para de atualizar. Para isso não passar em silêncio, em desenvolvimento (`process.env.NODE_ENV !== "production"`) o componente mostra uma vez um `console.error`: "onChange foi removido na 4.0; use onValueChange (ver guia de migração)". Em produção não há mensagem. Sem isso, o `onChange` iria parar na `<div>` raiz e receberia o evento `change` que borbulha dos `<input>` internos (dígitos do `InputOTP`, `<input type="file">` do `FileUpload`), e um handler escrito para o valor quebraria em silêncio.
 - **Por que não há `onChange` nativo nesses quatro:** nenhum deles é um único `<input>`. O `Calendar` é uma grade de botões, o `Combobox` é um botão com uma camada flutuante, o `InputOTP` são vários campos e o `FileUpload` é uma zona de arrastar. Um evento nativo da raiz não diria qual valor mudou. Para o `<input type="file">` do `FileUpload`, continua existindo `inputProps` (exceto `onChange`, `value`, `type`, `id`, `accept` e `multiple`, que são do componente).
 
 ### `DatePicker`
@@ -132,16 +133,24 @@ O `@source "../node_modules/@semec/ds/dist/react"` do Tailwind não é import e 
 
 ## 4. Codemod
 
-O pacote traz um codemod (sem dependência nova; lê o JSX com o compilador TypeScript do seu projeto):
+O pacote traz um codemod a partir da 4.0 (bin `semec-ds`). Ele lê o JSX com a API JS do compilador TypeScript, que existe do TypeScript 4.7 ao 5.x; **o TypeScript 7 não tem essa API**. O pacote não declara o `typescript` como dependência: o codemod usa o do projeto ou o que vier no `npx -p`.
+
+Antes de atualizar (o app ainda na 3.x, que não tem o bin), rode a 4.0 e o TypeScript 5 só para o comando:
 
 ```bash
-npx @semec/ds codemod-4 src            # simulação: só relata
-npx @semec/ds codemod-4 src --write    # grava as trocas seguras
+npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 src            # simulação: só relata
+npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 src --write    # grava as trocas seguras
+```
+
+Depois de atualizar, com o TypeScript 5 no projeto (`npm i -D typescript@5`), o comando encurta:
+
+```bash
+npx semec-ds codemod-4 src --write
 # equivalente, sem npx:
 node node_modules/@semec/ds/codemods/v4.mjs src --write
 ```
 
-Sem `typescript` instalado no projeto, ele avisa. Instale (`npm i -D typescript`) ou rode com `npx -p typescript -p @semec/ds semec-ds codemod-4 src`.
+Sem um TypeScript utilizável, o codemod para com uma mensagem pedindo o TypeScript 5 (`npm i -D typescript@5` ou o `npx -p … -p typescript@5` acima). Se o projeto tiver o TypeScript 7, o `npx -p typescript@5` resolve: o codemod ignora o 7 e usa o 5 que veio no `npx`.
 
 O que ele faz:
 
@@ -149,7 +158,8 @@ O que ele faz:
 - **`DatePicker`:** reescreve quando a função inline recebe o valor (`(iso) => …`, `(v: string) => …`). Ignora quando ela já usa o evento (`(e) => e.target.value`). Quando o handler é uma referência (`onChange={salvar}`), só **relata** a linha, porque não dá para saber o que ele recebe.
 - **Relata** (`revisar`) o elemento que tem `onChange` e `onValueChange` ao mesmo tempo.
 - **Relata** (`utilitário`), sem reescrever, cada `*-pv-*` e cada `--color-pv-*` em `.js/.jsx/.ts/.tsx`, CSS, MDX, HTML, Vue, Svelte e Astro, com a sugestão da tabela acima. A troca é manual porque depende do papel do elemento.
-- **Relata** (`import`) cada `@semec/ds/dist/...`.
+- **Relata** (`import`) cada `@semec/ds/dist/...` usado como especificador de módulo: `import … from`, `import "…"`, `import()`, `require()`, `export … from` e `@import` no CSS. O `@source "../node_modules/@semec/ds/dist/react"` do Tailwind **não** é relatado: ele é o caminho documentado e continua igual.
+- **Relata** (`revisar`) o re-export por barrel local (`export { Combobox } from "@semec/ds/react"`, também com alias ou `export *`): os arquivos que importam do barrel não são reescritos.
 - Pula `node_modules`, `.next`, `dist`, `build`, `out`, `coverage` e pastas ocultas.
 
 Exemplo de saída:
@@ -171,7 +181,7 @@ src/tela.jsx
 Resumo: 3 arquivo(s) lido(s) · 7 onChange → onValueChange (não gravado) · 2 para revisar · 12 utilitário(s) L0 · 1 import(s) de dist/.
 ```
 
-Limites: o codemod não segue props repassadas por spread (`<Combobox {...props} />`) nem wrappers seus em volta dos componentes do kit. Depois dele, rode o typecheck: no TypeScript, todo `onChange` que sobrou em `Calendar`, `Combobox`, `InputOTP` e `FileUpload` vira erro de compilação.
+Limites: o codemod não detecta props repassadas por spread (`<Combobox {...props} />`), `React.createElement(Combobox, { onChange })`, wrappers seus em volta dos componentes do kit nem os usos que passam por um barrel local (este ele só relata). Por isso o typecheck é a rede de segurança: depois de atualizar para a 4.0, todo `onChange` que sobrou em `Calendar`, `Combobox`, `InputOTP` e `FileUpload` vira erro de compilação no TypeScript, e em JavaScript aparece o `console.error` de desenvolvimento.
 
 ## 5. O que continua depreciado (sai na 5.0)
 

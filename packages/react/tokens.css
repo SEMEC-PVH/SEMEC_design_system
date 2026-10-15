@@ -176,7 +176,12 @@
 
   /* Título de seção em azul institucional escuro (SectionHeader). Criado
      na 4.0 (AUD-55) para substituir `text-pv-blue-900`. 12,43:1 sobre
-     --surface e 11,48:1 sobre --bg. */
+     --surface e 11,48:1 sobre --bg.
+     Atenção: é COR, mas divide o prefixo --text-* com os TAMANHOS
+     (--text-xs … --text-display). Por isso fica só aqui no :root, como
+     --text-muted/--text-strong, e o @theme o expõe como --color-text-brand
+     (utilitário text-text-brand). Nunca declare --text-brand no @theme:
+     viraria o utilitário de tamanho text-brand. */
   --text-brand:        var(--pv-blue-900);
 
   /* ---- Marca ----------------------------------------------------------- */

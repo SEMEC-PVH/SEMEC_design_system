@@ -46,7 +46,7 @@ npm run proto:css       # isolated CSS build for prototyping
 - shadcn pattern: Radix primitives + CVA + clsx + tailwind-merge
 - Tokens use `pv-*` prefix (defined in `packages/react/tokens.css`)
 - Theme: package tokens are light-only (`tokens.css`, ADR-025, which supersedes ADR-012); docs app dark theme is site CSS (`data-theme`).
-- Token layers: L0 primitives `--pv-*` are never used directly. The `bg-pv-*`/`text-pv-*` utilities are deprecated (removed in 4.0, AUD-55); use L1 semantic utilities (`bg-primary`, `text-foreground`…). Radius scale: `rounded-sm` 2px · `rounded-md` 8px · `rounded-lg` 12px · `rounded-full` (values live in `--pv-radius-*`).
+- Token layers: L0 primitives `--pv-*` are never used directly. The `bg-pv-*`/`text-pv-*` utilities were removed in 4.0 (AUD-55; migration guide `docs/migracao-4.0.md`); use L1 semantic utilities (`bg-primary`, `text-foreground`…). Radius scale: `rounded-sm` 2px · `rounded-md` 8px · `rounded-lg` 12px · `rounded-full` (values live in `--pv-radius-*`).
 - Language: **PT-BR for content/UI labels, EN for code** (ADR-016)
 - Fonts: Poppins 400-700 (self-hosted woff2, ADR app/fonts)
 

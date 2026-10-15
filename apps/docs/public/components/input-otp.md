@@ -66,6 +66,7 @@ Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não rei
 
 import * as React from "react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
 import { useFormField, useFormFieldControl } from "./form-field";
 
@@ -120,7 +121,8 @@ export interface InputOTPProps
   /**
    * Removido na 4.0 (AUD-35): use `onValueChange`. O InputOTP não tem
    * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
-   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado.
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
    */
   onChange?: never;
   /** Gera um `<input type="hidden" name>` com o código, para envio em `<form>`. */
@@ -162,6 +164,8 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
     },
     ref
   ) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("InputOTP");
     const isControlled = value !== undefined;
     const slotsRef = React.useRef<(HTMLInputElement | null)[]>([]);
     const [internalSlots, setSlots] = React.useState<string[]>(() =>

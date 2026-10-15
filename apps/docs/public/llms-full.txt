@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-15T13:45:03.000Z — packages/react/manifest.js + packages/react/* — versão 3.2.0
+> Gerado 2026-10-15T14:23:03.000Z — packages/react/manifest.js + packages/react/* — versão 3.2.0
 
 ## Instalação
 
@@ -254,7 +254,12 @@ export * from "./components/input-mask";
 
   /* Título de seção em azul institucional escuro (SectionHeader). Criado
      na 4.0 (AUD-55) para substituir `text-pv-blue-900`. 12,43:1 sobre
-     --surface e 11,48:1 sobre --bg. */
+     --surface e 11,48:1 sobre --bg.
+     Atenção: é COR, mas divide o prefixo --text-* com os TAMANHOS
+     (--text-xs … --text-display). Por isso fica só aqui no :root, como
+     --text-muted/--text-strong, e o @theme o expõe como --color-text-brand
+     (utilitário text-text-brand). Nunca declare --text-brand no @theme:
+     viraria o utilitário de tamanho text-brand. */
   --text-brand:        var(--pv-blue-900);
 
   /* ---- Marca ----------------------------------------------------------- */
@@ -2193,6 +2198,7 @@ import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
 import { useFormField, useFormFieldControl } from "./form-field";
 
@@ -2231,7 +2237,8 @@ export interface ComboboxProps
   /**
    * Removido na 4.0 (AUD-35): use `onValueChange`. O Combobox não tem
    * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
-   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado.
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
    */
   onChange?: never;
   /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
@@ -2302,6 +2309,8 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
     },
     ref
   ) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("Combobox");
     const text = { ...defaultLabels, ...labels };
     const empty = emptyText ?? emptyMessage ?? "Nenhum resultado.";
     const hiddenLabel = ariaLabel ?? ariaLabelAttr;
@@ -2753,6 +2762,7 @@ Fonte:
 import * as React from "react";
 import { UploadCloud } from "lucide-react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
 import { useFormField } from "./form-field";
 
@@ -2792,7 +2802,8 @@ export interface FileUploadProps
   /**
    * Removido na 4.0 (AUD-35): use `onValueChange`. O FileUpload não tem
    * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
-   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado.
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
    */
   onChange?: never;
   /** `name` do `<input type="file">`. Atalho de `inputProps.name`. */
@@ -2881,6 +2892,8 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
     },
     ref
   ) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("FileUpload");
     const [internalFiles, setInternalFiles] = React.useState<File[]>([]);
     const files = value ?? internalFiles;
     const [drag, setDrag] = React.useState(false);
@@ -7357,6 +7370,7 @@ Fonte:
 
 import * as React from "react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
 import { useFormField, useFormFieldControl } from "./form-field";
 
@@ -7411,7 +7425,8 @@ export interface InputOTPProps
   /**
    * Removido na 4.0 (AUD-35): use `onValueChange`. O InputOTP não tem
    * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
-   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado.
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
    */
   onChange?: never;
   /** Gera um `<input type="hidden" name>` com o código, para envio em `<form>`. */
@@ -7453,6 +7468,8 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
     },
     ref
   ) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("InputOTP");
     const isControlled = value !== undefined;
     const slotsRef = React.useRef<(HTMLInputElement | null)[]>([]);
     const [internalSlots, setSlots] = React.useState<string[]>(() =>
@@ -7744,6 +7761,7 @@ Fonte:
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
 
 const LOCALE = "pt-BR";
@@ -7789,7 +7807,8 @@ export interface CalendarProps
   /**
    * Removido na 4.0 (AUD-35): use `onValueChange`. O Calendar não tem
    * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
-   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado.
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
    */
   onChange?: never;
   disabled?: boolean;
@@ -7851,6 +7870,8 @@ const navButtonClass =
  */
 const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
   ({ className, value, onChange: _removedOnChange, onValueChange, disabled, min, max, labels, ...props }, ref) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("Calendar");
     const text = { ...DEFAULT_LABELS, ...labels };
     const headingId = React.useId();
     const today = startOfDay(new Date());
@@ -10573,7 +10594,7 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 ## Dependências
 
 - **Peer**: React 19+, React DOM 19+
-- **Peer opcional**: `zod` ^3.23 — só se usar `@semec/ds/react/validacao`; `typescript` >=4.7 — só para o codemod (`npx @semec/ds codemod-4`)
+- **Peer opcional**: `zod` ^3.23 — só se usar `@semec/ds/react/validacao`
 - **Tailwind CSS**: v4+ no app (com `@source` apontando para `node_modules/@semec/ds/dist/react`, caminho relativo ao CSS)
 - **Instaladas automaticamente**: todos os `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, `get-nonce`
 
@@ -10586,15 +10607,16 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 **Guia: [docs/migracao-4.0.md](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/migracao-4.0.md)**, com antes/depois, tabela primitivo → semântico e o codemod:
 
 ```bash
-npx @semec/ds codemod-4 src           # simulação: relata o que muda
-npx @semec/ds codemod-4 src --write   # grava as trocas onChange → onValueChange
+# funciona com a 3.x ainda instalada (o -p traz a 4.0 e o TypeScript 5 só para o comando)
+npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 src           # simulação: relata o que muda
+npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 src --write   # grava as trocas onChange → onValueChange
 ```
 
-O codemod lê o JSX com o `typescript` do projeto (peer opcional). Também roda como `node node_modules/@semec/ds/codemods/v4.mjs src`.
+O codemod lê o JSX com a API do compilador do TypeScript 5 (o 7 não a tem); o `typescript` não é dependência do pacote. Com a 4.0 e o `typescript@5` no projeto, basta `npx semec-ds codemod-4 src` ou `node node_modules/@semec/ds/codemods/v4.mjs src`. O que ele não vê (spread, `React.createElement`, barrel) o typecheck da 4.0 pega.
 
 Removido na 4.0 (anunciado desde a 3.1.0, política de duas minors, ADR-013):
 
-- `onChange(value)` / `onChange(files)` de `Combobox`, `InputOTP`, `FileUpload` e `Calendar`: use `onValueChange` (contrato `value` / `onValueChange` / `name` / `id` / `invalid`, ADR-015). O tipo recusa `onChange` e o componente o descarta.
+- `onChange(value)` / `onChange(files)` de `Combobox`, `InputOTP`, `FileUpload` e `Calendar`: use `onValueChange` (contrato `value` / `onValueChange` / `name` / `id` / `invalid`, ADR-015). O tipo recusa `onChange` e o componente o descarta (com `console.error` único em desenvolvimento).
 - `DatePicker`: `onChange` passa a receber o **evento nativo** do `<input type="date">`; o valor ISO vem em `onValueChange`.
 - Utilitários de primitivo `bg-pv-*` / `text-pv-*` / `border-pv-*` e as variáveis `--color-pv-*` (do `@theme` e do `pv-preset`): use os semânticos. As variáveis `--pv-*` continuam. Semânticos novos: `text-text-brand`, `bg-success-emphasis`, `text-success-emphasis-foreground`.
 - Import por caminho de arquivo em `dist/`: o `exports` bloqueia (`ERR_PACKAGE_PATH_NOT_EXPORTED`); use `@semec/ds/react` ou `@semec/ds/react/<componente>`.

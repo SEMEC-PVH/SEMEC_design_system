@@ -275,7 +275,7 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 ## Dependências
 
 - **Peer**: React 19+, React DOM 19+
-- **Peer opcional**: `zod` ^3.23 — só se usar `@semec/ds/react/validacao`; `typescript` >=4.7 — só para o codemod (`npx @semec/ds codemod-4`)
+- **Peer opcional**: `zod` ^3.23 — só se usar `@semec/ds/react/validacao`
 - **Tailwind CSS**: v4+ no app (com `@source` apontando para `node_modules/@semec/ds/dist/react`, caminho relativo ao CSS)
 - **Instaladas automaticamente**: todos os `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, `get-nonce`
 
@@ -288,15 +288,16 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 **Guia: [docs/migracao-4.0.md](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/migracao-4.0.md)**, com antes/depois, tabela primitivo → semântico e o codemod:
 
 ```bash
-npx @semec/ds codemod-4 src           # simulação: relata o que muda
-npx @semec/ds codemod-4 src --write   # grava as trocas onChange → onValueChange
+# funciona com a 3.x ainda instalada (o -p traz a 4.0 e o TypeScript 5 só para o comando)
+npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 src           # simulação: relata o que muda
+npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 src --write   # grava as trocas onChange → onValueChange
 ```
 
-O codemod lê o JSX com o `typescript` do projeto (peer opcional). Também roda como `node node_modules/@semec/ds/codemods/v4.mjs src`.
+O codemod lê o JSX com a API do compilador do TypeScript 5 (o 7 não a tem); o `typescript` não é dependência do pacote. Com a 4.0 e o `typescript@5` no projeto, basta `npx semec-ds codemod-4 src` ou `node node_modules/@semec/ds/codemods/v4.mjs src`. O que ele não vê (spread, `React.createElement`, barrel) o typecheck da 4.0 pega.
 
 Removido na 4.0 (anunciado desde a 3.1.0, política de duas minors, ADR-013):
 
-- `onChange(value)` / `onChange(files)` de `Combobox`, `InputOTP`, `FileUpload` e `Calendar`: use `onValueChange` (contrato `value` / `onValueChange` / `name` / `id` / `invalid`, ADR-015). O tipo recusa `onChange` e o componente o descarta.
+- `onChange(value)` / `onChange(files)` de `Combobox`, `InputOTP`, `FileUpload` e `Calendar`: use `onValueChange` (contrato `value` / `onValueChange` / `name` / `id` / `invalid`, ADR-015). O tipo recusa `onChange` e o componente o descarta (com `console.error` único em desenvolvimento).
 - `DatePicker`: `onChange` passa a receber o **evento nativo** do `<input type="date">`; o valor ISO vem em `onValueChange`.
 - Utilitários de primitivo `bg-pv-*` / `text-pv-*` / `border-pv-*` e as variáveis `--color-pv-*` (do `@theme` e do `pv-preset`): use os semânticos. As variáveis `--pv-*` continuam. Semânticos novos: `text-text-brand`, `bg-success-emphasis`, `text-success-emphasis-foreground`.
 - Import por caminho de arquivo em `dist/`: o `exports` bloqueia (`ERR_PACKAGE_PATH_NOT_EXPORTED`); use `@semec/ds/react` ou `@semec/ds/react/<componente>`.

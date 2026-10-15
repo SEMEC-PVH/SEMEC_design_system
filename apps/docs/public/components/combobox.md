@@ -71,6 +71,7 @@ import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
 import { useFormField, useFormFieldControl } from "./form-field";
 
@@ -109,7 +110,8 @@ export interface ComboboxProps
   /**
    * Removido na 4.0 (AUD-35): use `onValueChange`. O Combobox não tem
    * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
-   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado.
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
    */
   onChange?: never;
   /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
@@ -180,6 +182,8 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
     },
     ref
   ) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("Combobox");
     const text = { ...defaultLabels, ...labels };
     const empty = emptyText ?? emptyMessage ?? "Nenhum resultado.";
     const hiddenLabel = ariaLabel ?? ariaLabelAttr;
