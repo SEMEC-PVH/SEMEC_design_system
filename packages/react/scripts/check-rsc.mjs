@@ -16,7 +16,13 @@
  * 3. O resultado é importado no Node. Se algum módulo sem `"use client"`
  *    chamar uma API só de cliente no topo (ex.: `createContext`), o import
  *    quebra aqui, como quebraria no `next build`.
- * 4. Varredura estática: módulo do `dist` sem `"use client"` não pode usar
+ * 4. Renderização real: os componentes de servidor (incluindo `Button` com
+ *    `loading`, `IconButton` com `loading` e `Button asChild loading`) são
+ *    renderizados com o renderer RSC do Next (`react-server-dom-webpack`,
+ *    em `next/dist/compiled`), com um manifest de cliente que aceita qualquer
+ *    client reference. Função passada a elemento host ou a client reference
+ *    ("Event handlers cannot be passed to Client Component props") falha aqui.
+ * 5. Varredura estática: módulo do `dist` sem `"use client"` não pode usar
  *    hook/API só de cliente nem definir handler de evento (que quebrariam ao
  *    renderizar no servidor), e todo `"use client"` do `src` tem de chegar ao
  *    topo do arquivo correspondente no `dist` (o esbuild podia descartá-lo).
@@ -24,6 +30,7 @@
  * Requer `npm run build:ds` antes. Sai com código 1 em qualquer falha.
  */
 import fs from "node:fs";
+import { createRequire } from "node:module";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -150,7 +157,100 @@ if (server) {
   );
 }
 
-// 4: varredura estática do dist.
+// 4: renderizar de verdade com o renderer RSC (react-server-dom-webpack do Next).
+let rsdwPath = null;
+try {
+  rsdwPath = createRequire(path.join(pkgRoot, "package.json")).resolve(
+    "next/dist/compiled/react-server-dom-webpack/server.node.js",
+  );
+} catch {
+  errors.push("renderer RSC não encontrado (next/dist/compiled/react-server-dom-webpack). Rode `npm install` na raiz.");
+}
+
+if (rsdwPath) {
+  const renderDir = fs.mkdtempSync(path.join(os.tmpdir(), "semec-rsc-render-"));
+  const renderFile = path.join(renderDir, "render.mjs");
+  const harness = `
+import * as React from "react";
+import { renderToPipeableStream } from "next/dist/compiled/react-server-dom-webpack/server.node.js";
+import { Writable } from "node:stream";
+import * as DS from "@semec/ds/react";
+import { Button as SubpathButton } from "@semec/ds/react/button";
+
+const h = React.createElement;
+// Manifest de cliente que resolve qualquer client reference (só importa o servidor).
+const clientManifest = new Proxy({}, {
+  get: (_t, id) => (typeof id === "string" ? { id, chunks: [], name: "*", async: false } : undefined),
+});
+
+export const cases = [
+  ["Button", () => h(DS.Button, null, "Enviar")],
+  ["Button loading", () => h(DS.Button, { loading: true }, "Enviar")],
+  ["Button loading + loadingText", () => h(DS.Button, { loading: true, loadingText: "Enviando…", type: "submit" }, "Enviar")],
+  ["Button asChild", () => h(DS.Button, { asChild: true }, h("a", { href: "/x" }, "Ir"))],
+  ["Button asChild loading", () => h(DS.Button, { asChild: true, loading: true }, h("a", { href: "/x" }, "Ir"))],
+  ["@semec/ds/react/button loading", () => h(SubpathButton, { loading: true }, "Enviar")],
+  ["IconButton", () => h(DS.IconButton, { label: "Baixar" }, h("svg", { "aria-hidden": "true" }))],
+  ["IconButton loading", () => h(DS.IconButton, { label: "Baixar", loading: true }, h("svg", { "aria-hidden": "true" }))],
+  ["Spinner", () => h(DS.Spinner, { label: "Carregando" })],
+  ["Spinner decorative", () => h(DS.Spinner, { decorative: true })],
+  ["Heading", () => h(DS.Heading, { level: 1 }, "Título")],
+  ["Badge", () => h(DS.Badge, null, "Novo")],
+  ["Link", () => h(DS.Link, { href: "/a" }, "Link")],
+  ["Card", () => h(DS.Card, null, h(DS.CardHeader, null, h(DS.CardTitle, null, "Cartão")), h(DS.CardContent, null, "Corpo"))],
+  ["Stepper (client reference)", () => h(DS.Stepper, { steps: [{ label: "A" }, { label: "B" }], currentStep: 0 })],
+];
+
+const firstLine = (err) => String(err?.message ?? err).split(String.fromCharCode(10))[0];
+
+export function render(element) {
+  return new Promise((resolve) => {
+    const errs = [];
+    let settled = false;
+    const done = () => { if (!settled) { settled = true; resolve(errs); } };
+    try {
+      const stream = renderToPipeableStream(element, clientManifest, {
+        onError(err) { errs.push(firstLine(err)); },
+      });
+      stream.pipe(new Writable({ write(_c, _e, cb) { cb(); }, final(cb) { cb(); done(); } }));
+    } catch (err) {
+      errs.push(firstLine(err));
+      done();
+    }
+  });
+}
+`;
+  try {
+    await esbuild.build({
+      stdin: { contents: harness, resolveDir: pkgRoot, loader: "js" },
+      bundle: true,
+      platform: "node",
+      format: "esm",
+      conditions: ["react-server"],
+      mainFields: ["module", "main"],
+      outfile: renderFile,
+      logLevel: "error",
+      define: { "process.env.NODE_ENV": '"production"' },
+      // CJS do renderer usa require() de módulos do Node.
+      banner: { js: 'import { createRequire as __cr } from "node:module"; const require = __cr(import.meta.url);' },
+      plugins: [clientReferences],
+    });
+    const harnessModule = await import(pathToFileURL(renderFile).href);
+    let rendered = 0;
+    for (const [label, make] of harnessModule.cases) {
+      const errs = await harnessModule.render(make());
+      if (errs.length > 0) errors.push(`renderizar <${label}> no servidor (RSC) falhou: ${errs.join(" | ")}`);
+      else rendered++;
+    }
+    console.log(`check-rsc: ${rendered}/${harnessModule.cases.length} caso(s) renderizados com react-server-dom-webpack.`);
+  } catch (err) {
+    errors.push(`renderização RSC quebrou: ${err?.stack ?? err}`);
+  } finally {
+    fs.rmSync(renderDir, { recursive: true, force: true });
+  }
+}
+
+// 5: varredura estática do dist.
 const CLIENT_ONLY_API =
   /\b(useState|useEffect|useLayoutEffect|useInsertionEffect|useReducer|useRef|useContext|createContext|useImperativeHandle|useSyncExternalStore|useTransition|useDeferredValue|useOptimistic|useActionState|useFormStatus|startTransition)\b/;
 const INLINE_HANDLER = /\bon[A-Z][A-Za-z]*\s*:\s*(?:\(|async\b|function\b|[A-Za-z_$][\w$]*\s*=>)/;

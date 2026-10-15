@@ -98,6 +98,35 @@ describe("Button loading", () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
+  it("asChild + loading: spinner no link, navegação e clique bloqueados, foco mantido", () => {
+    const onParentClick = vi.fn();
+    const { rerender } = render(
+      <div onClick={onParentClick}>
+        <Button asChild>
+          <a href="/protocolo">Ver protocolo</a>
+        </Button>
+      </div>
+    );
+    const link = screen.getByRole("link", { name: "Ver protocolo" });
+    link.focus();
+    rerender(
+      <div onClick={onParentClick}>
+        <Button asChild loading>
+          <a href="/protocolo">Ver protocolo</a>
+        </Button>
+      </div>
+    );
+    const same = screen.getByRole("link", { name: "Ver protocolo" });
+    expect(same).toBe(link);
+    expect(link).toHaveFocus();
+    expect(link).toHaveAttribute("aria-busy", "true");
+    expect(link).toHaveAttribute("aria-disabled", "true");
+    expect(link.querySelector("svg.animate-spin")).not.toBeNull();
+    // fireEvent devolve false quando o evento teve preventDefault.
+    expect(fireEvent.click(link)).toBe(false);
+    expect(onParentClick).not.toHaveBeenCalled();
+  });
+
   it("sem `loading` o comportamento não muda (disabled nativo continua valendo)", () => {
     render(<Button disabled>Salvar</Button>);
     const button = screen.getByRole("button", { name: "Salvar" });
