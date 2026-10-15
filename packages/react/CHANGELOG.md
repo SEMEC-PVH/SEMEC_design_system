@@ -1,5 +1,43 @@
 # @semec/ds
 
+## 3.2.0
+
+### Minor Changes
+
+- 1786562: Componentes novos e estado de carregamento no botão (AUD-36, AUD-63), sem remover nada público:
+  
+  - `Stepper`: etapas de um processo em `ol`/`li`, etapa atual com `aria-current="step"`, situação de cada etapa em texto para leitor de tela, horizontal a partir de 768px e empilhado em telas estreitas; com `onStepClick`, as etapas concluídas e a atual viram botões de 44px. Textos em PT-BR sobrescrevíveis por `labels`.
+  - `PasswordInput`: compõe o `Input` com botão de 44px para mostrar ou ocultar a senha (`aria-pressed`, `aria-controls`, nome fixo "Mostrar senha" sobrescrevível por `labels`); repassa todas as props do `Input`, inclusive `autoComplete`.
+  - `InputMask`: compõe o `Input` com máscaras de CPF, CNPJ, CEP, data e telefone (fixo/celular automático) ou padrão próprio (`9`, `A`, `*`). Cursor estável ao editar no meio, colar com outra pontuação funciona, `inputMode` pela máscara, `onValueChange(masked, raw)`. Também exporta `applyInputMask` e `inputMaskPatterns`.
+  - `Button` ganha `loading` e `loadingText`: Spinner decorativo, `aria-busy="true"`, `aria-disabled="true"` e clique bloqueado, sem tirar o foco; o nome acessível continua sendo o texto visível. `IconButton` ganha `loading` (Spinner no lugar do ícone). O `disabled` nativo continua como antes.
+  - `Spinner` ganha `decorative`: só visual (raiz `<span aria-hidden>`, sem `role`, `aria-label` nem texto sr-only). Sem a prop, nada muda.
+  - `Button` com `loading` (e `IconButton` com `loading`, `Button asChild loading`) renderiza num React Server Component: o bloqueio do clique fica num filho `"use client"`, e o elemento é o mesmo com e sem `loading` (o foco não se perde). Com `asChild`, o spinner entra dentro do link.
+  - `InputMask`: dígito igual a literal do padrão (ex.: o `5` de `+55`) não é mais engolido; nos telefones, `+55`/`55` de país colado é descartado; Backspace logo depois de um literal e Delete logo antes apagam o dígito vizinho.
+  - `PasswordInput`: `spellCheck={false}`, `autoCapitalize="none"` e `autoCorrect="off"` por padrão (sobrescrevíveis).
+  - `Button` com `loading`: o clique cancela só envio e navegação e continua subindo aos ancestrais; com `asChild`, o `onClick` do filho também não dispara.
+  - `InputMask`: valor que começa com o prefixo fixo do padrão (ex.: `08001234567` em `0800-999-9999`) não repete o prefixo; Backspace/Delete junto de literal funcionam no teclado virtual do Android (`beforeinput`).
+- 1786562: Contrato único de formulário (ADR-015, AUD-35), só aditivo:
+  
+  - `onValueChange(valor)` em `Input`, `Textarea`, `DatePicker`, `Combobox`, `InputOTP`, `FileUpload` e `Calendar` (em `Input`/`Textarea`, o `onChange` nativo continua recebendo o evento).
+  - `invalid` (boolean → `aria-invalid` + estilo de erro) em `Input`, `Textarea`, `DatePicker`, `Checkbox`, `Switch`, `RadioGroup`, `SelectTrigger`, `Slider`, `Combobox`, `InputOTP`, `FileUpload` e `FormField` (sem mensagem). Passado explicitamente, vence o estado do `FormField`.
+  - `InputOTP` ganha `name` (input oculto, vai no `FormData`), `form`, `defaultValue` e `required`.
+  - `FileUpload` ganha `name`, `required` e `disabled` de primeiro nível.
+  - Correção: o `FileUpload` agora funciona em `<form>` nativo. O `input.files` acompanha a lista mostrada (antes era zerado a cada escolha, e por isso o arquivo não ia no `FormData` e o `required` nunca validava). Arquivos soltos na zona também passam a ser enviados.
+  - `invalid={false}` explícito dentro de um `FormField` com erro não liga mais a mensagem ao `aria-describedby` do controle.
+  - Tabela de equivalência por componente na emenda de 15/10/2026 do ADR-015.
+  
+  Depreciação: o `onChange(value)` de `Combobox`, `InputOTP`, `DatePicker` e `Calendar` e o `onChange(files)` de `FileUpload` ficam obsoletos (aviso único em desenvolvimento) e saem na 4.0; use `onValueChange`, com a mesma assinatura. No `DatePicker`, o `onChange` passa a receber o evento nativo na 4.0.
+- 1786562: Saída por módulo e fronteira RSC (AUD-20). O `dist/react` deixa de ser um bundle único: cada arquivo de `src/components` e `src/lib` vira um módulo ESM próprio (imports relativos com `.js`), e o `index.js` só reexporta. Com o `sideEffects` restrito ao CSS, o bundler do app poda o que não é importado: `import { Button } from "@semec/ds/react"` cai de ~340 kB para cerca de 35 kB minificado com as dependências, quase tudo `tailwind-merge` (o código do kit fica em ~3 kB). Os componentes interativos (estado, efeitos, contexto, Radix ou handlers) passam a declarar `"use client"`, preservado no `dist`, e importar `@semec/ds/react` num Server Component do Next App Router deixa de quebrar; os apresentacionais (`Heading`, `Card`, `Badge`, `Button`, `Link`, `Table` etc.) renderizam no servidor. Novos subpaths `@semec/ds/react/<componente>` (ex.: `@semec/ds/react/button`), com tipos. Mudança só aditiva: `@semec/ds/react` e os demais exports seguem iguais. Novo `npm run test:dist` (CI) prova o import na camada `react-server` e limita o tamanho do `Button` sozinho.
+- 1786562: Tokens e documentação canônica (onda 3 da auditoria de 14/10/2026). Nenhum valor renderizado muda.
+  
+  - **Novo primitivo `--pv-yellow-50`** (`#fdf6e3`, AUD-56): `--feedback-warning-surface` passa a apontar para ele, em vez de um hex solto no L1. Primitivo novo não ganha utilitário `bg-pv-*`.
+  - **Elevações sem `rgba()`** (AUD-56): `--elevation-1/2/3` usam `rgb(var(--pv-gray-900-rgb) / 0.08 | 0.1 | 0.14)`, com o novo primitivo `--pv-gray-900-rgb: 20 35 58` (canais de `--pv-gray-900`), e resultam exatamente nos `rgba(20, 35, 58, …)` anteriores. Sem `color-mix`, de propósito: o Tailwind gera para ele um fallback de sombra opaca em navegadores antigos (Chrome < 111).
+  - **Raio sem autorreferência** (AUD-57): a escala fica como está (`rounded-sm` 2px · `rounded-md` 8px · `rounded-lg` 12px · `rounded-full`). O valor passa a morar em `--pv-radius-*`; `--radius-*` continua no `:root` apontando para ele, e o `@theme` deixa de declarar `--radius-sm: var(--radius-sm)`, que entrava em ciclo quando o `tokens.css` era importado dentro de `@layer`. `var(--radius-*)` e `rounded-*` seguem funcionando. `rounded-xl` e acima são o padrão do Tailwind, fora da escala.
+  - **Tipografia sem autorreferência** (AUD-57, mesmo caso do raio): o valor da escala passa a morar em `--pv-text-*` e `--pv-leading-*`; `--text-*` e `--leading-*` continuam no `:root` como apelidos, e o `@theme` deixa de declarar `--text-xs: var(--text-xs)` e `--leading-xs: var(--leading-xs)` (16 autorreferências). `text-*`, `leading-*` e `var(--text-*)` seguem iguais.
+  - Depreciação: utilitários de primitivo `bg-pv-*` / `text-pv-*` / `border-pv-*` (de `--color-pv-*` no `@theme` e das cores `pv-*` do `pv-preset`) saem na 4.0 (AUD-55, anunciado na 3.1.0). O comentário do `tokens.css` que os chamava de "uso direto" foi corrigido e marca o bloco como `@deprecated`; as variáveis `--pv-*` continuam. Use os semânticos (`bg-primary`, `bg-brand-hero`, `text-foreground`, `bg-success-surface`…).
+  - **Avisos cancelados:** a escala de raio não muda na 4.0 (AUD-57) e o `Button` mantém `disabled` nativo; `aria-disabled` focalizável vale só durante o `loading` (AUD-63).
+  - **Licença e crédito** (AMB-09, AUD-69): crédito à SEMEC é recomendado, não obrigatório (MIT). As skills `semec-ds` e `semec-ds-lite` deixam de dizer "Crédito obrigatório", o `manifest.json` do lite passa a `credit.required: false` e o README do pacote ganha a seção "Licença e crédito".
+
 ## 3.1.0
 
 ### Minor Changes
