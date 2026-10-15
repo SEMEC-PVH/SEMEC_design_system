@@ -136,6 +136,11 @@ function componentSource(c) {
 // Nenhum documento cita número fixo: a SKILL usa placeholders e o README do pacote
 // tem um bloco entre marcadores, os dois preenchidos a partir de dsComponents.
 const componentCount = dsComponents.length;
+
+/** Instalação do kit React: `lucide-react` é peer e só o npm 7+ o instala sozinho. */
+const INSTALL_CMD = "npm install @semec/ds lucide-react";
+const PEERS_NOTE =
+  "lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.";
 const homepage = (pkgJson.homepage || "https://semec-pvh.github.io/SEMEC_design_system/").replace(/\/?$/, "/");
 
 function componentsByCategory() {
@@ -188,6 +193,7 @@ const INTEGRATOR_NOTE = /[ \t]*<!-- INTEGRADOR:[\s\S]*?-->[ \t]*\n?/g;
  * Renderiza uma SKILL canônica para um destino.
  * - `{{ds:component-count}}` e `<!-- ds:component-list -->` → gerados do manifest;
  * - `{{ds:homepage}}` → URL do site de documentação;
+ * - `{{ds:version}}` → versão do package.json (nunca escrita à mão na SKILL);
  * - blocos `<!-- ds:maintainer:start -->…<!-- ds:maintainer:end -->` (caminhos do
  *   monorepo, scripts de manutenção) só ficam na cópia do repositório
  *   (`.claude/`, `.opencode/`); saem da SKILL publicada no npm e no site (AUD-67);
@@ -198,6 +204,7 @@ function renderSkill(src, { maintainer = false } = {}) {
   out = out
     .replaceAll("{{ds:component-count}}", String(componentCount))
     .replaceAll("{{ds:homepage}}", homepage)
+    .replaceAll("{{ds:version}}", version)
     .replace("<!-- ds:component-list -->", skillComponentList());
   out = maintainer
     ? out.replace(/<!-- ds:maintainer:(start|end) -->\n?/g, "")
@@ -260,6 +267,8 @@ function buildManifest({ site = false } = {}) {
         : {}),
     })),
     install: {
+      packages: INSTALL_CMD,
+      peers: PEERS_NOTE,
       tokens: 'import "@semec/ds/react/tokens.css";',
       preset: '@source "../node_modules/@semec/ds/dist/react";',
       utils: 'import { cn } from "@semec/ds/react";',
@@ -300,8 +309,10 @@ ${c.variants?.length ? c.variants.map((v) => `- **${v.prop}**: ${v.values}`).joi
 ## Instalação (@semec/ds)
 
 \`\`\`bash
-npm install @semec/ds
+${INSTALL_CMD}
 \`\`\`
+
+${PEERS_NOTE}
 
 \`\`\`css
 @import "tailwindcss";
@@ -344,10 +355,15 @@ function llmsIndex({ site = false, lite = false } = {}) {
         "- `/skills/semec-ds-lite/SKILL.md` — skill lite (tokens + a11y + responsive, sem React)",
         "- No repositório: `.claude/skills/semec-ds/SKILL.md` e `.opencode/skills/semec-ds/SKILL.md`",
       ]
-    : [
-        "- `semec-ds/SKILL.md` — skill full (`@semec/ds/skills/semec-ds`)",
-        "- `semec-ds-lite/SKILL.md` — skill lite (`@semec/ds/lite/skills/semec-ds-lite`)",
-      ];
+    : lite
+      ? [
+          // Em dist/lite só existe a skill lite (listada acima); a full fica em dist/skills.
+          "- Skill full, com os componentes React: `@semec/ds/skills/semec-ds` (fora desta pasta)",
+        ]
+      : [
+          "- `semec-ds/SKILL.md` — skill full (`@semec/ds/skills/semec-ds`)",
+          "- `semec-ds-lite/SKILL.md` — skill lite (`@semec/ds/lite/skills/semec-ds-lite`)",
+        ];
 
   const artifactPaths = lite
     ? site
@@ -358,7 +374,7 @@ function llmsIndex({ site = false, lite = false } = {}) {
       : [
           "- `llms.txt` — este índice",
           "- `manifest.json` — JSON com categorias e tokens",
-          "- `semec-ds-lite/SKILL.md` — skill lite",
+          "- `semec-ds-lite/SKILL.md` — skill lite (`@semec/ds/lite/skills/semec-ds-lite`)",
         ]
     : site
       ? [
@@ -386,16 +402,29 @@ function llmsIndex({ site = false, lite = false } = {}) {
       "npm install @semec/ds",
       "```",
       "",
+      "Com Tailwind v4 (no CSS global, `fonts.css` antes do `tokens.css`):",
+      "",
       "```css",
       '@import "tailwindcss";',
+      '@import "@semec/ds/lite/fonts.css";',
       '@import "@semec/ds/lite/tokens.css";',
       "```",
       "",
       "Sem `@source` para `dist/react`: a variante lite não usa os componentes React, então o Tailwind só precisa varrer o código do próprio app.",
       "",
+      "Sem Tailwind: as variáveis `--*` e a camada base funcionam em CSS puro. Os subpaths `@semec/ds/lite/*.css` só resolvem num bundler (`import` no JS ou `@import` processado por Vite/Next); num `<link>`, use os arquivos reais:",
+      "",
+      "```html",
+      '<link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/fonts.css" />',
+      '<link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/tokens.css" />',
+      "```",
+      "",
+      "Sem `node_modules` publicado, copie `dist/react/tokens.css`, `dist/react/fonts.css` e `dist/react/fonts/` para a pasta estática (`fonts/` ao lado do `fonts.css`).",
+      "",
       "## Inclui",
       "",
-      "- Tokens de identidade visual (L0 + L1)",
+      "- Tokens de identidade visual L0 + L1 (`tokens.css`)",
+      "- Fonte Poppins 400–700 auto-hospedada, SIL OFL 1.1 (`fonts.css`)",
       "- Padrões de acessibilidade (WCAG 2.1 AA)",
       "- Padrões responsive / mobile",
       "- Padrões visuais (formulários, navegação, feedback, dados)",
@@ -429,8 +458,10 @@ function llmsIndex({ site = false, lite = false } = {}) {
     "## Instalar",
     "",
     "```bash",
-    "npm install @semec/ds",
+    INSTALL_CMD,
     "```",
+    "",
+    PEERS_NOTE,
     "",
     "```css",
     '@import "tailwindcss";',
@@ -501,7 +532,7 @@ function llmsIndex({ site = false, lite = false } = {}) {
 function llmsFullDump() {
   let full = `# SEMEC Design System — Dump completo para IA\n\n`;
   full += `> Gerado ${generatedAt} — packages/react/manifest.js + packages/react/* — versão ${version}\n\n`;
-  full += `## Instalação\n\n\`\`\`bash\nnpm install @semec/ds\n\`\`\`\n\n`;
+  full += `## Instalação\n\n\`\`\`bash\n${INSTALL_CMD}\n\`\`\`\n\n${PEERS_NOTE}\n\n`;
   full += `## packages/react/src/index.ts — barrel\n\n\`\`\`ts\n${baseIndex}\n\`\`\`\n\n`;
   full += `## packages/react/tokens.css\n\n\`\`\`css\n${tokensCss}\n\`\`\`\n\n`;
   full += `## packages/react/pv-preset.ts\n\n\`\`\`ts\n${pvPreset}\n\`\`\`\n\n`;
@@ -609,11 +640,13 @@ function buildDist() {
           "Tokens, acessibilidade, responsive e padrões visuais. Sem componentes React.",
         categories: dsCategories,
         install: {
-          css: '@import "tailwindcss"; @import "@semec/ds/lite/tokens.css";',
+          css: '@import "tailwindcss"; @import "@semec/ds/lite/fonts.css"; @import "@semec/ds/lite/tokens.css";',
           note: "Sem @source para dist/react: a variante lite não usa componentes React.",
+          withoutTailwind:
+            "Os subpaths @semec/ds/lite/*.css só resolvem num bundler. Num <link>, use node_modules/@semec/ds/dist/react/fonts.css e node_modules/@semec/ds/dist/react/tokens.css (ou copie esses arquivos e a pasta fonts/ para a pasta estática).",
         },
         tokens: {
-          files: ["tokens.css", "pv-preset.ts"],
+          files: ["tokens.css", "fonts.css", "pv-preset.ts"],
           primitives: "pv-* prefixed (L0)",
           semantic: "L1 — --bg, --fg, --surface, --action-primary, --feedback-*, etc.",
         },
