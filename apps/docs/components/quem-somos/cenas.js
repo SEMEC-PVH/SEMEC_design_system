@@ -14,11 +14,10 @@ export function cenaVitoria({ chefeId, lider, proximo, vencidos }) {
   const chefe = CHEFES.find((c) => c.id === chefeId);
   if (!chefe || !lider) return null;
   const seguinte = CHEFES.find((c) => c.requer === chefeId && !c.bonus);
-  // O ginásio bônus (ML) não conta para o Full Stack.
   const faltam = CHEFES.filter((c) => c.id !== "diretoria" && !c.bonus && !vencidos.includes(c.id)).length;
   const restante =
     faltam <= 0
-      ? "Agora você tem as três Stacks. Só falta a Diretoria para virar Full Stack!"
+      ? "Agora você tem as quatro Stacks. Só falta a Diretoria para virar Full Stack!"
       : `${faltam === 1 ? "Falta 1 Stack" : `Faltam ${faltam} Stacks`} para você enfrentar a Diretoria.`;
 
   const L = lider.index;
@@ -35,7 +34,7 @@ export function cenaVitoria({ chefeId, lider, proximo, vencidos }) {
       },
     },
     { cam: "player", zoom: 0.7, dur: 0.8 },
-    { emblem: "player", color: COR_STACK[chefe.stack.id] },
+    { emblem: "player", color: COR_STACK[chefe.stack.id], insignia: chefe.stack.id },
     { hop: "player", times: 1 },
     { say: { title: "Stack conquistada!", text: `Você recebeu a ${chefe.stack.nome}. ${restante}` } },
   ];
@@ -48,7 +47,7 @@ export function cenaVitoria({ chefeId, lider, proximo, vencidos }) {
           title: lider.name,
           falante: L,
           text: ehDiretoria
-            ? `A Diretoria quer te conhecer. Vou avisar ${proximo.name}, lá na sede da SEMEC!`
+            ? `A Diretoria quer te conhecer. Vou avisar ${proximo.name}, lá na sede da SEMFAZ!`
             : `O ${seguinte.ginasio} acabou de abrir. Vou avisar ${proximo.name}!`,
         },
       },
@@ -60,7 +59,7 @@ export function cenaVitoria({ chefeId, lider, proximo, vencidos }) {
           title: proximo.name,
           falante: proximo.index,
           text: ehDiretoria
-            ? "Então é você que juntou as três Stacks? Venha até a sede. Estou esperando!"
+            ? "Então é você que juntou as quatro Stacks? Venha até a sede. Estou esperando!"
             : `Ouvi dizer que tem gente nova com a ${chefe.stack.nome}... Venha me desafiar no ${seguinte.ginasio}!`,
         },
       }
@@ -151,6 +150,82 @@ export function cenaOcarina({ epoca, pedro }) {
     { mundo: { tocar: false } },
     { cam: P, zoom: 0.7, dur: 1.2 },
     fala("De volta ao presente! Quando quiser viajar de novo, é só falar comigo."),
+    { cam: "player", dur: 1 },
+    { cam: "follow" },
+  ];
+}
+
+// Entrega de uma quest de coleta (quests-coleta.js): quem deu a quest
+// comemora e a Stack especial sobe sobre o jogador. Na da campanha, antes, o
+// microfone da Emily faz o show na praça (passo { mundo: { show } }).
+export function cenaColeta({ quest }) {
+  const N = quest.npc; // id do walker: ator de câmera em vila-engine.js
+  const fala = (text) => ({ say: { title: quest.nomeNpc, falante: { name: quest.nomeNpc, retrato: N }, text } });
+  const show =
+    quest.id === "campanha"
+      ? [
+          { cam: N, zoom: 0.65, dur: 1.2 },
+          fala("As três campanhas no ar e a cidade inteira comentando... olha, ele criou coragem! Vai começar o show!"),
+          { mundo: { show: N } },
+          { wait: 0.4 },
+          fala("Ele cantou! Na frente de todo mundo! Comunicação boa é assim: clara, para todos e com o coração."),
+        ]
+      : [
+          { cam: N, zoom: 0.65, dur: 1.2 },
+          fala("Página por página, o Livro Sábio está inteiro de novo. E você respondeu tudo certinho!"),
+        ];
+  const depois =
+    quest.id === "paginas"
+      ? [fala("Ah, e quando quiser, venha falar comigo: este livro guarda uma história que eu adoro contar.")]
+      : [];
+  return [
+    ...show,
+    { cam: "player", zoom: 0.7, dur: 0.8 },
+    { emblem: "player", color: quest.recompensa.cor, insignia: quest.recompensa.id },
+    { hop: "player", times: 1 },
+    { say: { title: "Stack conquistada!", text: `Você recebeu a ${quest.recompensa.nome}.` } },
+    ...depois,
+    { cam: "player", dur: 0.8 },
+    { cam: "follow" },
+  ];
+}
+
+// Roda de história do Zé Carlos (depois da quest das páginas): o relógio
+// corre até a noite, o time senta em volta da fogueira e o Livro Sábio solta
+// uma página ilustrada por trecho (public/quem-somos/historia/N.webp).
+export const HISTORIA_DS = [
+  "Há um tempo, cada sistema da prefeitura tinha um jeito: botão de toda cor, formulário de todo tamanho. Quem usava vivia se perdendo.",
+  "Aí o Pedro juntou a turma e perguntou: \"E se tudo falasse a mesma língua?\" Foi como acender uma lâmpada.",
+  "Primeiro vieram os tokens: as cores, os espaços e a fonte, cada um com o seu nome. Como uma caixa de lápis bem organizada.",
+  "Depois, os componentes: botão, campo, cartão, tabela... peça por peça, como blocos de montar que sempre se encaixam.",
+  "E ninguém podia ficar de fora: contraste para quem enxerga pouco, teclado para quem não usa mouse, leitor de tela para quem não enxerga.",
+  "Assim nasceu o Design System da SEMEC: um kit que qualquer escola pode usar. E essa história continua... com você!",
+];
+
+export function cenaHistoria() {
+  const Z = "ze-carlos";
+  const fala = (text) => ({ say: { title: "Zé Carlos", falante: { name: "Zé Carlos", retrato: Z }, text } });
+  return [
+    { cam: Z, zoom: 0.7, dur: 1.2 },
+    fala("Querem saber como tudo isso aqui começou? Então chega mais, que essa história é das boas!"),
+    { mundo: { efeito: "relogio", on: true, sentido: 1 } },
+    { mundo: { tempo: 1, dias: 0, ate: 19.5, dur: 3 } },
+    { mundo: { efeito: "relogio", on: false } },
+    { mundo: { roda: true } },
+    { cam: [6, 11], zoom: 0.8, dur: 1.4 },
+    { wait: 0.8 },
+    fala("Senta aí, pessoal. Esta é a história de como nasceu o Design System da SEMEC."),
+    { mundo: { apresenta: Z, show: "sabio" } },
+    ...HISTORIA_DS.flatMap((texto, i) => [{ mundo: { pagina: i } }, fala(texto)]),
+    // Fecha o livro (a animação de fechar roda antes da próxima fala).
+    { mundo: { pagina: null } },
+    { wait: 0.6 },
+    { hop: "player", times: 2 },
+    fala("Gostaram? Toda vez que alguém usa o kit, a história ganha uma página nova."),
+    { mundo: { roda: false } },
+    { mundo: { efeito: "relogio", on: true, sentido: -1 } },
+    { mundo: { tempo: "voltar", dur: 2 } },
+    { mundo: { efeito: "relogio", on: false } },
     { cam: "player", dur: 1 },
     { cam: "follow" },
   ];

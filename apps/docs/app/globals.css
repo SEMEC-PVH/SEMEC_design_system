@@ -2279,40 +2279,279 @@ footer {
   font-weight: 600;
   line-height: 1.5;
 }
-.vila-stacks {
+/* Ícone da StackDex no canto inferior esquerdo (abre a mesma coleção).
+   Paleta fixa da StackDex nos dois temas: branco sobre blue-hero ≈ 10:1;
+   gray-950 sobre yellow-400 ≈ 13:1; moldura gray-950 sobre o mapa. */
+.vila-dex-icone {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
   display: flex;
-  gap: 0.3rem;
-  margin: 0.35rem 0 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
   padding: 0;
-  list-style: none;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
 }
-.vila-stack {
+.vila-dex-icone-aparelho {
+  position: relative;
   display: grid;
   place-items: center;
-  min-width: 1.9rem;
-  height: 1.5rem;
-  margin: 0;
-  padding: 0 0.25rem;
-  border: 2px dashed var(--text-muted);
+  width: 4.75rem;
+  height: 4.75rem;
+  border: 3px solid var(--pv-gray-950);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--pv-blue-hero) 70%, var(--pv-blue-400)), var(--pv-blue-hero) 70%);
+  box-shadow: 0 4px 0 var(--pv-gray-950);
+  transition: transform 0.15s ease;
+}
+.vila-dex-icone-lente {
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 3px solid var(--pv-white);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--pv-blue-100) 0 18%, var(--pv-blue-400) 20%, var(--pv-blue-700) 100%);
+  box-shadow: 0 0 0 2px var(--pv-gray-950);
+}
+.vila-dex-icone-leds {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.85rem;
+  display: flex;
+  gap: 0.15rem;
+}
+.vila-dex-icone-leds span {
+  width: 0.35rem;
+  height: 0.35rem;
+  border: 1px solid var(--pv-gray-950);
+  border-radius: 50%;
+  background: var(--pv-red-500);
+}
+.vila-dex-icone-leds span:nth-child(2) {
+  background: var(--pv-yellow-400);
+}
+.vila-dex-icone-leds span:nth-child(3) {
+  background: var(--pv-green-500);
+}
+.vila-dex-icone-nome {
+  padding: 0.05rem 0.45rem;
+  border: 2px solid var(--pv-gray-950);
   border-radius: var(--radius-md);
-  color: var(--text-muted);
+  background: var(--pv-blue-hero);
+  color: var(--pv-white);
   font-size: var(--font-size-xs);
-  font-weight: 700;
-  line-height: 1;
+  font-weight: 800;
+  line-height: 1.4;
 }
-.vila-stack[data-ok="true"] {
-  border-style: solid;
-  border-color: var(--color-action-primary);
-  background: var(--color-action-primary);
-  /* --surface (e não branco): no tema escuro o azul de ação é claro. */
-  color: var(--surface);
-}
-/* Stack especial da quest (Ocarina): dourada, para não confundir com as dos
-   ginásios. Texto gray-950 sobre yellow-400 (12,2:1) nos dois temas. */
-.vila-stack--especial[data-ok="true"] {
-  border-color: var(--pv-yellow-400);
+.vila-dex-icone-contagem {
+  position: absolute;
+  top: -0.3rem;
+  right: -0.6rem;
+  padding: 0 0.4rem;
+  border: 2px solid var(--pv-gray-950);
+  border-radius: var(--radius-full);
   background: var(--pv-yellow-400);
   color: var(--pv-gray-950);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+}
+.vila-dex-icone:hover .vila-dex-icone-aparelho {
+  transform: translateY(-2px) rotate(-6deg);
+}
+.vila-dex-icone:active .vila-dex-icone-aparelho {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--pv-gray-950);
+}
+.vila-dex-icone:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vila-dex-icone-aparelho {
+    transition: none;
+  }
+  .vila-dex-icone:hover .vila-dex-icone-aparelho {
+    transform: none;
+  }
+}
+/* Íris de entrada/saída da Galeria da Equipe (VilaSemec.jsx): um círculo
+   transparente cercado por uma sombra enorme fecha sobre o jogador (centro da
+   tela), mostra o nome do lugar no escuro e abre do outro lado. Durações
+   iguais às de TRANSICAO em vila-engine.js. Branco sobre gray-950 ≈ 19:1. */
+.vila-iris {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+.vila-iris::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 300vmax var(--pv-gray-950);
+  transform: translate(-50%, -50%);
+}
+.vila-iris[data-fase="fechar"]::before {
+  animation: vila-iris-fecha 0.7s ease-in both;
+}
+.vila-iris[data-fase="abrir"]::before {
+  animation: vila-iris-abre 0.7s ease-out both;
+}
+.vila .vila-iris-titulo {
+  position: relative;
+  margin: 0;
+  max-width: none;
+  color: var(--pv-white);
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  opacity: 0;
+}
+.vila-iris[data-fase="fechar"] .vila-iris-titulo {
+  animation: vila-iris-titulo 0.3s ease-out 0.55s both;
+}
+.vila-iris[data-fase="abrir"] .vila-iris-titulo {
+  opacity: 1;
+  animation: vila-iris-titulo 0.25s ease-in reverse both;
+}
+@keyframes vila-iris-fecha {
+  from {
+    width: 260vmax;
+    height: 260vmax;
+  }
+  to {
+    width: 0;
+    height: 0;
+  }
+}
+@keyframes vila-iris-abre {
+  from {
+    width: 0;
+    height: 0;
+  }
+  to {
+    width: 260vmax;
+    height: 260vmax;
+  }
+}
+@keyframes vila-iris-titulo {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vila-iris[data-fase]::before {
+    animation-duration: 0.2s;
+  }
+  .vila-iris[data-fase] .vila-iris-titulo {
+    animation: none;
+    opacity: 1;
+  }
+}
+/* Viagem de elevador no prédio da SEMFAZ (VilaSemec.jsx): duas portas de
+   aço fecham sobre a tela, o display mostra o andar de destino e elas abrem
+   do outro lado. Durações casadas com TRANSICAO_ELEVADOR em vila-engine.js.
+   Display yellow-400 sobre gray-950 ≈ 13:1. */
+.vila-elevador {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+.vila-elevador-porta {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background: linear-gradient(90deg, var(--pv-gray-400), var(--pv-gray-200) 40%, var(--pv-gray-400));
+  border: 3px solid var(--pv-gray-700);
+}
+.vila-elevador-porta:first-child {
+  left: 0;
+  transform: translateX(-100%);
+}
+.vila-elevador-porta:nth-child(2) {
+  right: 0;
+  transform: translateX(100%);
+}
+.vila-elevador[data-fase="fechar"] .vila-elevador-porta {
+  animation: vila-elevador-fecha 0.45s ease-in 0.75s forwards;
+}
+.vila-elevador[data-fase="abrir"] .vila-elevador-porta {
+  transform: none;
+  animation: vila-elevador-abre 0.6s ease-out 0.1s forwards;
+}
+.vila .vila-elevador-display {
+  position: relative;
+  margin: 0;
+  max-width: none;
+  padding: 0.4rem 1rem;
+  border: 3px solid var(--pv-gray-700);
+  border-radius: var(--radius-md);
+  background: var(--pv-gray-950);
+  color: var(--pv-yellow-400);
+  font-family: var(--font-family-mono, monospace);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  opacity: 0;
+}
+.vila-elevador[data-fase="fechar"] .vila-elevador-display {
+  animation: vila-iris-titulo 0.3s ease-out 1.15s both;
+}
+.vila-elevador[data-fase="abrir"] .vila-elevador-display {
+  opacity: 1;
+  animation: vila-iris-titulo 0.2s ease-in reverse both;
+}
+@keyframes vila-elevador-fecha {
+  to {
+    transform: none;
+  }
+}
+@keyframes vila-elevador-abre {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translateX(var(--vila-elevador-lado, -100%));
+  }
+}
+.vila-elevador-porta:nth-child(2) {
+  --vila-elevador-lado: 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vila-elevador[data-fase] .vila-elevador-porta {
+    animation: none;
+    transform: none;
+  }
+  .vila-elevador[data-fase="abrir"] .vila-elevador-porta {
+    visibility: hidden;
+  }
+  .vila-elevador[data-fase] .vila-elevador-display {
+    animation: none;
+    opacity: 1;
+  }
 }
 /* Canto direito do HUD: ações em cima, painel da quest embaixo. */
 .vila-hud-direita {
@@ -2871,8 +3110,9 @@ footer {
   .vila:has(.vila-dialog) .vila-pad {
     bottom: 11rem;
   }
+  /* Os avisos ficam à direita do ícone da StackDex. */
   .vila-chip {
-    left: 1rem;
+    left: 6.5rem;
     transform: none;
   }
 }

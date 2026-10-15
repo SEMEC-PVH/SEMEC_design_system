@@ -1,4 +1,4 @@
-// Sede da SEMEC (Secretaria Municipal de Educação), inspirada no prédio real
+// Sede da SEMFAZ (Secretaria Municipal de Economia), inspirada no prédio real
 // da Av. Sete de Setembro, 744 (Porto Velho): marquise branca larga em
 // balanço com o letreiro por extenso, térreo de vidro escuro recuado com
 // escada central entre dois blocos brancos e acesso à garagem à direita. Sobre
@@ -114,7 +114,7 @@ function makeLetteringTexture(pal) {
   g.font = `700 48px ${font}`;
   g.fillText("S", 56, H / 2 + 2);
   // Nome em letras caixa-alta grafite (reduz a fonte até caber).
-  const text = "SECRETARIA MUNICIPAL DE EDUCAÇÃO - SEMEC";
+  const text = "SECRETARIA MUNICIPAL DE ECONOMIA - SEMFAZ";
   const x0 = 130;
   const maxW = W - x0 - 16;
   let size = 76;
@@ -187,7 +187,7 @@ function makeRondoniaFlag(pal) {
   return canvasTexture(canvas, false);
 }
 
-// Bandeira institucional da SEMEC (azul com marca branca).
+// Bandeira institucional da SEMFAZ (azul com marca branca).
 function makeSemecFlag(pal) {
   const canvas = makeCanvas(140, 96);
   const g = canvas.getContext("2d");
@@ -198,7 +198,7 @@ function makeSemecFlag(pal) {
   g.fillStyle = pal.pv("white").getStyle();
   g.textAlign = "center";
   g.font = `700 30px ${pal.font}`;
-  g.fillText("SEMEC", 70, 56);
+  g.fillText("SEMFAZ", 70, 56);
   return canvasTexture(canvas, false);
 }
 
@@ -545,7 +545,7 @@ export function buildSemec(group, b, ctx) {
   // ---- Animação: bandeiras tremulando ------------------------------------------
   onFrame((t) => waveFlags(t));
 
-  // Placa "SEMEC" do motor na faixa branca sob o volume baixo.
+  // Placa "SEMFAZ" do motor na faixa branca sob o volume baixo.
   return {
     labelPos: new THREE.Vector3((tM + tR1) / 2, (ct + bandTop) / 2, zR + 0.056),
     labelBg: blue,

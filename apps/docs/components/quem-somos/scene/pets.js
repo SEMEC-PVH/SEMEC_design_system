@@ -518,7 +518,9 @@ export function livroPet({ height = 0.5 }) {
   });
 }
 
-export function microfonePet({ height = 0.52 }) {
+// 0,56: o lacinho soma altura e o corpo é estreito; o fitModel escala pela
+// altura total, então sobe um pouco para o corpo ficar do tamanho dos outros.
+export function microfonePet({ height = 0.56 }) {
   return toyPet({
     height,
     shadowSize: 0.18,

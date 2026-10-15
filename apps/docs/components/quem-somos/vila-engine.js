@@ -24,12 +24,20 @@ import { createNightLights } from "./scene/nightlights";
 import { createCutscene } from "./scene/cutscene";
 import { createPedro } from "./scene/pedro";
 import { createOcarinaHideout, createQuestMarker } from "./scene/quest";
+import { createColetaveis } from "./scene/coleta";
+import { createHistoria } from "./scene/historia";
+import { createSentado } from "./scene/sentar";
+import { urlInsignia } from "./insignias";
+import { QUESTS_COLETA } from "./quests-coleta";
 import { createEpocas } from "./scene/epocas";
 import { createWalkers, WALKER_IDS } from "./scene/walkers";
 import { buildVegetation } from "./scene/vegetation";
 import { buildGround } from "./scene/ground";
 import { areaOf } from "./areas";
 import { ehLeve, arquivoLeve } from "./scene/qualidade";
+import { createMuseu } from "./scene/museu";
+import { createEscritorio } from "./predio/escritorio";
+import { andarPorId } from "./predio/andares";
 
 const W = 30;
 const H = 24;
@@ -70,14 +78,14 @@ const ZOOM_MIN = 0.55;
 const ZOOM_MAX = 1.6;
 
 const BUILDINGS = [
-  { id: "semec", kind: "semec", x: 3, y: 3, w: 6, h: 4, label: "SEMEC" },
+  { id: "semec", kind: "semec", x: 3, y: 3, w: 6, h: 4, label: "SEMFAZ" },
   // Bairro de tecnologia: Front-End e Back-End lado a lado ao sul da rua
   // principal. O Banco de Dados (torre alta) fica ao norte, encostado na
   // floresta: prédio alto com chão andável atrás esconde o jogador da câmera.
   { id: "frontend", kind: "frontend", x: 16, y: 11, w: 5, h: 4, label: "FRONT-END" },
   { id: "backend", kind: "backend", x: 22, y: 11, w: 5, h: 4, label: "BACK-END" },
   { id: "database", kind: "database", x: 11, y: 2, w: 4, h: 4, label: "BANCO DE DADOS" },
-  // Laboratório de Machine Learning (ginásio bônus da Mariana), na beira do
+  // Laboratório de Machine Learning (4º ginásio, da Mariana), na beira do
   // rio, ao lado do Banco de Dados; árvores atrás pelo mesmo motivo.
   { id: "ml", kind: "ml", x: 16, y: 3, w: 4, h: 3, label: "MACHINE LEARNING" },
 ];
@@ -135,6 +143,17 @@ const QUEST_NEAR = 3;
 const FESTA_SPOTS = [
   [6, 9], [8, 9], [6, 11], [8, 11], [4, 10], [9, 10], [3, 9], [9, 9],
 ];
+// Roda de história do Zé Carlos (cenas.js, cenaHistoria): fogueira no canto
+// entre os tiles (6,11)–(7,12), no gramado livre ao lado do passeio dele (sem
+// flores dentro da roda); o acampamento e os assentos ficam em
+// scene/historia.js.
+const FOGO_TILE = [6, 11];
+// Aprendizes do Laboratório de ML (batalha/dados.js, TREINADORES): chibis de
+// jaleco na frente do laboratório, com batalhas opcionais antes da Mariana.
+const TREINADORES_VILA = [
+  { id: "aprendiz-numpy", x: 16, y: 7, dir: "down" },
+  { id: "aprendiz-seaborn", x: 21, y: 6, dir: "left" },
+];
 const AREA_SPOTS = {
   frontend: [
     { x: 16, y: 15, dir: "down" },
@@ -151,7 +170,7 @@ const AREA_SPOTS = {
     { x: 15, y: 5, dir: "left" },
     { x: 10, y: 4, dir: "right" },
   ],
-  // Porta do laboratório de Machine Learning (ginásio bônus).
+  // Porta do laboratório de Machine Learning (4º ginásio).
   ml: [{ x: 18, y: 6, dir: "down" }],
   generic: [
     { x: 21, y: 7, dir: "up" },
@@ -162,6 +181,20 @@ const AREA_SPOTS = {
 };
 
 const START = { x: 14, y: 20, dir: "up" };
+
+// Prédio da SEMFAZ: a porta fica no alto da escada, no tile (6,6); quem sobe
+// de (6,7) entra no térreo. Cada andar (predio/andares.js) tem cena própria.
+const SEMEC_PORTA = { x: 6, y: 6 };
+const SEMEC_FRENTE = { x: 6, y: 7 };
+// Transição de entrada/saída: anda até a porta enquanto a íris fecha, troca
+// de cena no escuro e entra andando enquanto ela abre (a íris é da interface,
+// com as mesmas durações: .vila-iris no globals.css).
+const TRANSICAO = { fechar: 0.7, escuro: 0.3, abrir: 0.7 };
+const TRANSICAO_RAPIDA = { fechar: 0.2, escuro: 0.1, abrir: 0.2 };
+// Elevador: entra, as portas fecham, o painel conta os andares e abre.
+const TRANSICAO_ELEVADOR = { fechar: 0.9, escuro: 1.2, abrir: 0.8 };
+// Câmera dentro do prédio: a mesma distância da Vila.
+const MUSEU_ZOOM = 1;
 
 function buildMap() {
   const g = Array.from({ length: H }, () => Array(W).fill(GRASS));
@@ -233,7 +266,7 @@ function mulberry32(seed) {
   };
 }
 
-function readPalette() {
+export function readPalette() {
   const cs = getComputedStyle(document.documentElement);
   const pv = (name) => {
     const v = cs.getPropertyValue(`--pv-${name}`).trim();
@@ -553,9 +586,24 @@ export function createVila(host, options) {
     // Quest da ocarina: perto do Pedro (true/false) e ocarina encontrada.
     onQuestNear = () => {},
     onQuestFind = () => {},
+    // Quests de coleta (quests-coleta.js): pisou num item ({ quest, item }) e
+    // chegou perto de quem dá a quest ({ quest, perto }).
+    onColeta = () => {},
+    onColetaPerto = () => {},
     // Efeito visual de uma cena, feito na interface: { efeito: "sepia", on }
     // ou { efeito: "relogio", on, sentido }.
     onCutsceneEfeito = () => {},
+    // Galeria da Equipe: quadros na ordem dos slots (museu-dados.js), troca de
+    // lugar ({ local: "vila" | id do andar }), fases da íris ({ fase: "fechar" |
+    // "abrir", para }) e quadro em foco pelo jogo ({ id }).
+    quadrosMuseu = [],
+    onLocal = () => {},
+    onTransicao = () => {},
+    onQuadro = () => {},
+    // Prédio da SEMFAZ: o jogador chamou o elevador ({ andar: id atual }).
+    onElevador = () => {},
+    // Objeto que ensina num andar ({ id, titulo, texto }): Espaço de frente.
+    onInfo = () => {},
   } = options;
 
   const map = buildMap();
@@ -757,6 +805,23 @@ export function createVila(host, options) {
     npcs.push(npc);
     occupied.set(`${spot.x},${spot.y}`, npc);
   });
+  // Aprendizes (depois dos membros: as cenas que reúnem o time usam os
+  // primeiros da lista). `index` null: não são da equipe; a conversa sai como
+  // onInteract({ type: "treinador", id }).
+  for (const t of TREINADORES_VILA) {
+    const fig = makeChibi({ shirt: pal.white, eye: pal.eye, variant: npcs.length + 3 });
+    fig.position.copy(tileToWorld(t.x, t.y));
+    fig.rotation.y = DIRS[t.dir].rot;
+    const marker = makeMarker({ leader: false });
+    marker.position.y = MARKER_Y;
+    marker.rotation.set(MARKER_TILT, -fig.rotation.y, 0);
+    fig.add(marker);
+    fig.traverse((o) => (o.userData.npcIndex = npcs.length));
+    scene.add(fig);
+    const npc = { index: null, treinador: t.id, x: t.x, y: t.y, dir: t.dir, fig, marker, markerY: MARKER_Y, talked: false, leader: false, beaten: false, phase: rand() * 6 };
+    npcs.push(npc);
+    occupied.set(`${t.x},${t.y}`, npc);
+  }
 
   // ---- Luzes da noite (postes, janelas, vaga-lumes) -------------------------
   // Criado depois de toda a cena: recolhe os materiais emissivos já montados.
@@ -866,6 +931,20 @@ export function createVila(host, options) {
         isPaused: () => paused || cutscene.active,
       })
     : [];
+  // Quests de coleta: itens no mapa (scene/coleta.js) e o cristal de quest
+  // sobre quem dá cada uma (Zé Carlos, Emily).
+  const coletaveis = createColetaveis({ scene, pal, track, tileToWorld, reducedMotion });
+  const questsColeta = Object.values(QUESTS_COLETA).map((q) => {
+    coletaveis.add(q.id, q.itens, q.id === "paginas" ? "pagina" : "nota");
+    const walker = walkers.find((w) => w.id === q.npc) ?? null;
+    const marker = createQuestMarker({ pal, track, reducedMotion });
+    marker.object.userData.baseY = 1.42;
+    marker.object.position.y = 1.42;
+    walker?.owner.root.add(marker.object);
+    return { quest: q, walker, marker, perto: false };
+  });
+  const tileOf = (pos) => ({ x: Math.floor(pos.x + W / 2), y: Math.floor(pos.z + H / 2) });
+
   if (modelUrl) {
     loader
       .loadAsync(modelUrl.replace(/gava\.glb$/, arquivoLeve("gava.glb", lite)))
@@ -992,12 +1071,39 @@ export function createVila(host, options) {
   const inBounds = (x, y) => x >= 0 && y >= 0 && x < W && y < H;
   const passable = (x, y) => inBounds(x, y) && WALKABLE.has(map[y][x]) && !occupied.has(`${x},${y}`);
 
+  // ---- Galeria da Equipe: o jogador anda na grade do lugar em que está -------
+  let local = "vila";
+  // Interiores do prédio (térreo, andares e Galeria), criados na primeira
+  // visita e guardados; `interior` é o atual (null na Vila).
+  const interiores = new Map();
+  let interior = null;
+  let transicao = null; // { para, t, fase, de, ate }
+  let foco = null; // id do quadro com a câmera em close
+  let voltaDoFoco = 0; // segundos de câmera suave depois de fechar o close
+  let snapCamera = false;
+  const camLook = new THREE.Vector3();
+  const noPredio = () => local !== "vila";
+  const paraMundo = (x, y) => (noPredio() ? interior.tileToWorld(x, y) : tileToWorld(x, y));
+  const podeAndar = (x, y) => (noPredio() ? interior.passable(x, y) : passable(x, y));
+  const dentro = (x, y) => (noPredio() ? interior.inBounds(x, y) : inBounds(x, y));
+
   function frontOf() {
     const d = DIRS[player.dir];
     return { x: player.x + d.dx, y: player.y + d.dy };
   }
 
   function targetAt(x, y) {
+    if (noPredio()) {
+      const pessoa = interior.pessoaEm(x, y);
+      if (pessoa) return { type: "pessoa", id: pessoa.id };
+      const saida = interior.saidaEm(x, y);
+      if (saida) return { type: "saida", saida };
+      const quadro = interior.quadroNaParede(x, y);
+      if (quadro) return { type: "quadro", id: quadro };
+      const info = interior.infoEm?.(x, y);
+      return info ? { type: "info", info } : null;
+    }
+    if (x === SEMEC_PORTA.x && y === SEMEC_PORTA.y) return { type: "porta" };
     const npc = occupied.get(`${x},${y}`);
     if (npc) return { type: npc.isWalker ? "pedro" : "npc", npc };
     const sign = SIGNS.find((sg) => sg.x === x && sg.y === y);
@@ -1013,11 +1119,22 @@ export function createVila(host, options) {
     const inspectId = t?.type === "pedro" ? (t.npc.inspectId ?? t.npc.id ?? null) : null;
     let key = "";
     if (inspectId) key = `inspect:${inspectId}`;
-    else if (t?.type === "npc") key = `npc:${t.npc.index}`;
+    else if (t?.type === "npc") key = `npc:${t.npc.treinador ?? t.npc.index}`;
     else if (t?.type === "sign") key = `sign:${t.sign.id}`;
+    else if (t?.type === "pessoa" || t?.type === "quadro") key = `${t.type}:${t.id}`;
+    else if (t?.type === "info") key = `info:${t.info.id}`;
+    else if (t?.type === "porta") key = t.type;
+    else if (t?.type === "saida") key = `saida:${t.saida}`;
     if (key === lastFacingKey) return;
     lastFacingKey = key;
+    if (noPredio()) interior.setPerto(t?.type === "quadro" ? t.id : null);
+    if (t?.type === "pessoa") return onFacing({ type: "museu-pessoa", id: t.id });
+    if (t?.type === "quadro") return onFacing({ type: "quadro", id: t.id });
+    if (t?.type === "info") return onFacing({ type: "info", id: t.info.id, titulo: t.info.titulo });
+    if (t?.type === "porta") return onFacing({ type: "porta" });
+    if (t?.type === "saida") return onFacing({ type: "saida", saida: t.saida });
     if (inspectId) onFacing({ type: "inspect", id: inspectId });
+    else if (t?.type === "npc" && t.npc.treinador) onFacing({ type: "treinador", id: t.npc.treinador });
     else if (t?.type === "npc") onFacing({ type: "npc", index: t.npc.index });
     else if (t?.type === "sign") onFacing({ type: "sign", id: t.sign.id });
     else onFacing(null);
@@ -1034,16 +1151,25 @@ export function createVila(host, options) {
     const nx = player.x + d.dx;
     const ny = player.y + d.dy;
     if (player.dir !== dir) face(dir);
-    if (!passable(nx, ny)) return false;
+    // Subir a escada da SEMEC entra na galeria; pisar na porta dela sai.
+    if (!noPredio() && nx === SEMEC_PORTA.x && ny === SEMEC_PORTA.y) {
+      entrarOuSair("terreo");
+      return false;
+    }
+    if (noPredio() && interior.saidaEm(nx, ny)) {
+      usarSaida(interior.saidaEm(nx, ny));
+      return false;
+    }
+    if (!podeAndar(nx, ny)) return false;
     player.move = {
-      from: tileToWorld(player.x, player.y),
-      to: tileToWorld(nx, ny),
+      from: paraMundo(player.x, player.y),
+      to: paraMundo(nx, ny),
       t: 0,
       dur: player.run ? STEP_RUN : STEP_WALK,
     };
     player.x = nx;
     player.y = ny;
-    veg.rustle(nx, ny);
+    if (!noPredio()) veg.rustle(nx, ny);
     if (coding) stopCoding();
     player.idle = 0;
     return true;
@@ -1065,11 +1191,29 @@ export function createVila(host, options) {
     return true;
   }
 
+  // Item de quest de coleta: pisou no tile (ou de frente, com Espaço). Quem
+  // decide se coleta é a interface (a página do Zé pede a resposta certa).
+  function tryColeta(x, y) {
+    const hit = coletaveis.itemAt(x, y);
+    if (hit) onColeta(hit);
+    return Boolean(hit);
+  }
+
   function interact() {
     const f = frontOf();
     const t = targetAt(f.x, f.y);
+    if (t?.type === "porta") return entrarOuSair("terreo");
+    if (t?.type === "saida") return usarSaida(t.saida);
+    if (t?.type === "quadro") return abrirQuadro(t.id);
+    if (t?.type === "info") return onInfo(t.info);
+    if (t?.type === "pessoa") {
+      interior.falar(t.id, DIRS[OPPOSITE[player.dir]].rot);
+      onInspect({ id: t.id, museu: true });
+      return;
+    }
+    if (noPredio()) return;
     if (!t) {
-      tryFindOcarina(f.x, f.y);
+      if (!tryFindOcarina(f.x, f.y)) tryColeta(f.x, f.y);
       return;
     }
     if (t.type === "pedro") {
@@ -1096,7 +1240,8 @@ export function createVila(host, options) {
         // Líder só ganha o "✓" quando o ginásio é vencido (setLeadersDone).
         if (!npc.leader) paintMarker(npc, pal.markerDone);
       }
-      onInteract({ type: "npc", index: npc.index });
+      if (npc.treinador) onInteract({ type: "treinador", id: npc.treinador });
+      else onInteract({ type: "npc", index: npc.index });
     } else {
       onInteract({ type: "sign", id: t.sign.id });
     }
@@ -1104,7 +1249,7 @@ export function createVila(host, options) {
 
   // Busca em largura até o tile (ou até um vizinho, se o alvo bloqueia).
   function findPath(tx, ty) {
-    const goalIsBlocked = !passable(tx, ty);
+    const goalIsBlocked = !podeAndar(tx, ty);
     const isGoal = (x, y) =>
       goalIsBlocked ? Math.abs(x - tx) + Math.abs(y - ty) === 1 : x === tx && y === ty;
     const startKey = `${player.x},${player.y}`;
@@ -1126,12 +1271,224 @@ export function createVila(host, options) {
         const nx = x + d.dx;
         const ny = y + d.dy;
         const k = `${nx},${ny}`;
-        if (prev.has(k) || !passable(nx, ny)) continue;
+        if (prev.has(k) || !dentro(nx, ny) || !podeAndar(nx, ny)) continue;
         prev.set(k, { from: `${x},${y}`, dir });
         queue.push([nx, ny]);
       }
     }
     return null;
+  }
+
+  // ---- Prédio da SEMFAZ: entrada, saída, elevador e close nas fotos ---------
+  // Interior de um andar (predio/andares.js): a Galeria da Equipe é o museu
+  // (scene/museu/); os outros são escritórios (predio/escritorio.js). Os dois
+  // guardam e descartam os próprios recursos (o escritório vai sem o `track`
+  // do motor, e o cache da mobília, que é por `track`, vai junto).
+  function obterInterior(id) {
+    if (interiores.has(id)) return interiores.get(id);
+    const andar = andarPorId(id);
+    const novo = andar.galeria
+      ? createMuseu({
+          loader,
+          baseUrl: modelUrl ? modelUrl.replace(/gava\.glb$/, "") : "",
+          pal,
+          lite,
+          reducedMotion,
+          quadros: quadrosMuseu,
+        })
+      : createEscritorio({ andar, pal, lite, reducedMotion });
+    interiores.set(id, novo);
+    return novo;
+  }
+
+  // Em PC fraco (vídeo integrado, 8 GB), guardar os 7 interiores pesa: cada
+  // escritório tem ~20-28 MB de texturas (fotos, placas, carpete) e a Galeria
+  // ~60 MB, fora o mapa de sombra 2048² de cada um nos níveis com sombra.
+  // Ficam só o atual e o anterior (ida e volta pelo elevador ou à rua sem
+  // reconstruir); os outros são descartados e refeitos na próxima visita.
+  const MAX_INTERIORES = 2;
+  function guardarSoRecentes(atual) {
+    // Map mantém a ordem de inserção: reinserir o atual o põe no fim (LRU).
+    const atualObj = interiores.get(atual);
+    if (atualObj) {
+      interiores.delete(atual);
+      interiores.set(atual, atualObj);
+    }
+    while (interiores.size > MAX_INTERIORES) {
+      const [id, velho] = interiores.entries().next().value;
+      if (velho === interior) break;
+      interiores.delete(id);
+      descartarInterior(velho);
+    }
+  }
+  function descartarInterior(i) {
+    // As luzes guardam o mapa de sombra (render target); o dispose do
+    // interior não as alcança.
+    const luzes = [];
+    i.scene.traverse((o) => {
+      if (o.isLight) luzes.push(o);
+    });
+    i.dispose();
+    for (const l of luzes) l.dispose?.();
+  }
+
+  // Porta da rua (térreo) ou elevador: o tile de saída do interior atual.
+  function usarSaida(tipo) {
+    if (tipo === "rua") entrarOuSair("vila");
+    else if (tipo === "elevador") {
+      held.length = 0;
+      player.path = [];
+      onElevador({ andar: local });
+    }
+  }
+
+  // Tile do elevador (ou da porta) atrás de um ponto de chegada.
+  const atrasDe = (c) => ({ x: c.x - DIRS[c.dir].dx, y: c.y - DIRS[c.dir].dy });
+  const rotuloDe = (para) => {
+    const andar = para === "vila" ? null : andarPorId(para);
+    return andar ? `${andar.rotulo} · ${andar.nome}` : "Vila SEMEC";
+  };
+
+  // `para`: id do andar ou "vila". `modo`: "porta" (rua) ou "elevador".
+  function entrarOuSair(para, modo = "porta") {
+    if (transicao || cutscene.active || para === local) return;
+    held.length = 0;
+    player.path = [];
+    player.pending = null;
+    player.idle = 0;
+    if (coding) stopCoding();
+    hover.visible = false;
+    // Anda até o batente: na Vila, a porta no alto da escada; dentro, a porta
+    // da rua ou o elevador (que abre antes).
+    let ate;
+    if (!noPredio()) ate = tileToWorld(SEMEC_PORTA.x, SEMEC_PORTA.y).add(new THREE.Vector3(0, 0, 0.2));
+    else if (modo === "elevador") {
+      const e = atrasDe(interior.chegada);
+      ate = interior.tileToWorld(e.x, e.y);
+      face(OPPOSITE[interior.chegada.dir]);
+    } else {
+      const r = atrasDe(interior.entradaRua ?? interior.chegada);
+      ate = interior.tileToWorld(r.x, r.y);
+      interior.abrirPorta(1);
+    }
+    transicao = { para, modo, t: 0, fase: "fechar", de: player.root.position.clone(), ate };
+    onTransicao({ fase: "fechar", para, modo, rotulo: rotuloDe(para) });
+  }
+
+  // No escuro (íris ou portas do elevador fechadas): troca a cena, põe o
+  // jogador no batente do outro lado e prepara a caminhada de chegada.
+  function trocarDeLugar() {
+    const tr = transicao;
+    if (tr.para === "vila") {
+      local = "vila";
+      interior = null;
+      scene.add(player.root);
+      player.x = SEMEC_FRENTE.x;
+      player.y = SEMEC_FRENTE.y;
+      tr.de = tileToWorld(SEMEC_PORTA.x, SEMEC_PORTA.y).add(new THREE.Vector3(0, 0, 0.2));
+      tr.ate = tileToWorld(player.x, player.y);
+      face("down");
+    } else {
+      interior?.abrirElevador?.(0);
+      interior = obterInterior(tr.para);
+      local = tr.para;
+      guardarSoRecentes(tr.para);
+      interior.scene.add(player.root);
+      // Da rua, entra pela porta do térreo; de elevador, sai dele.
+      const c = tr.modo === "porta" && interior.entradaRua ? interior.entradaRua : interior.chegada;
+      const de = atrasDe(c);
+      player.x = c.x;
+      player.y = c.y;
+      tr.de = interior.tileToWorld(de.x, de.y);
+      tr.ate = interior.tileToWorld(c.x, c.y);
+      if (tr.modo === "elevador") interior.abrirElevador?.(1);
+      else interior.abrirPorta(1);
+      face(c.dir);
+    }
+    player.root.position.copy(tr.de);
+    camTarget.copy(tr.ate);
+    snapCamera = true;
+    lastFacingKey = "";
+    onLocal({ local });
+    onTransicao({ fase: "abrir", para: tr.para, modo: tr.modo, rotulo: rotuloDe(tr.para) });
+  }
+
+  // Avança a transição; true enquanto o jogador anda sozinho (anima o passo).
+  function atualizarTransicao(dt) {
+    const tr = transicao;
+    const T = reducedMotion ? TRANSICAO_RAPIDA : tr.modo === "elevador" ? TRANSICAO_ELEVADOR : TRANSICAO;
+    tr.t += dt;
+    if (tr.fase === "fechar") {
+      // O elevador abre primeiro; o jogador entra e as portas fecham.
+      if (tr.modo === "elevador" && noPredio()) {
+        const kAbre = Math.min(tr.t / (T.fechar * 0.4), 1);
+        const kFecha = Math.max(0, (tr.t - T.fechar) / (T.escuro * 0.5));
+        interior.abrirElevador?.(Math.max(0, Math.min(kAbre, 1 - kFecha)));
+      }
+      const k = Math.min(tr.t / T.fechar, 1);
+      player.root.position.lerpVectors(tr.de, tr.ate, k);
+      if (tr.t >= T.fechar + T.escuro) {
+        trocarDeLugar();
+        tr.fase = "abrir";
+        tr.t = 0;
+      }
+      return k < 1;
+    }
+    const k = Math.min(tr.t / T.abrir, 1);
+    player.root.position.lerpVectors(tr.de, tr.ate, k);
+    // A porta (ou o elevador) fecha atrás de quem chega.
+    if (noPredio()) {
+      if (tr.modo === "elevador") interior.abrirElevador?.(1 - k);
+      else interior.abrirPorta(1 - k);
+    }
+    if (k >= 1) {
+      transicao = null;
+      reportFacing();
+      return false;
+    }
+    return true;
+  }
+
+  function abrirQuadro(id) {
+    if (!noPredio() || !interior.pose(id)) return;
+    foco = id;
+    held.length = 0;
+    player.path = [];
+    player.pending = null;
+    if (coding) stopCoding();
+    // No close, a câmera fica atrás do jogador: ele sairia na frente da placa.
+    player.root.visible = false;
+    interior.setDestaque(id);
+    onQuadro({ id });
+  }
+
+  // Câmera do close: de frente para o quadro, a uma distância em que ele
+  // ocupa ~70% da altura, deslocada para o lado do painel da interface
+  // (à direita na tela larga; embaixo na estreita).
+  const vLado = new THREE.Vector3();
+  function cameraDoQuadro(pose, posOut, lookOut) {
+    const tanMeio = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    const largo = camera.aspect >= 1;
+    // A placa de latão fica logo abaixo da moldura: entra no enquadramento.
+    const abaixo = pose.abaixo ?? 0;
+    const altura = pose.altura + abaixo;
+    let dist = altura / 0.78 / (2 * tanMeio);
+    if (!largo) dist = Math.max(dist, pose.largura / 0.85 / (2 * tanMeio * camera.aspect));
+    lookOut.copy(pose.centro);
+    lookOut.y -= abaixo / 2;
+    posOut.copy(lookOut).addScaledVector(pose.normal, dist);
+    if (largo) {
+      // Direita da câmera de frente para o quadro: (-normal) × cima. Câmera
+      // e alvo vão para a direita: o quadro fica à esquerda, o painel à direita.
+      vLado.set(pose.normal.z, 0, -pose.normal.x);
+      const meiaLargura = dist * tanMeio * camera.aspect;
+      lookOut.addScaledVector(vLado, meiaLargura * 0.4);
+      posOut.addScaledVector(vLado, meiaLargura * 0.4);
+    } else {
+      const meiaAltura = dist * tanMeio;
+      lookOut.y -= meiaAltura * 0.45;
+      posOut.y -= meiaAltura * 0.45;
+    }
   }
 
   // ---- Cenas (scene/cutscene.js) ----------------------------------------------
@@ -1160,6 +1517,12 @@ export function createVila(host, options) {
       // cuida de para onde olha (scene/pedro.js).
       if (pedro && who === pedro.index) {
         return { x: pedro.x, y: pedro.y, object: pedro.root, face() {}, moveTo() {} };
+      }
+      // Dupla que passeia (id do walker, ex. "emily"): ator de câmera.
+      const walker = typeof who === "string" ? walkers.find((w) => w.id === who) : null;
+      if (walker) {
+        const p = tileOf(walker.owner.root.position);
+        return { x: p.x, y: p.y, object: walker.owner.root, face() {}, moveTo() {} };
       }
       const n = npcByIndex.get(who);
       if (!n) return null;
@@ -1202,20 +1565,21 @@ export function createVila(host, options) {
   let tempoAnim = null; // { from, to, t, dur, cmd }
   let tempoAplicado = 0; // horas somadas pela cena (o "voltar" desfaz)
   const reuniao = new Map(); // npc → { x, y, dir } de antes da festa
-  function reunir(on) {
+  // spots: [[x, y, dir?], …] (sem dir: virado para a câmera).
+  function reunir(on, spots = FESTA_SPOTS) {
     if (on && !reuniao.size) {
-      for (const n of npcs.slice(0, FESTA_SPOTS.length)) {
+      for (const n of npcs.slice(0, spots.length)) {
         reuniao.set(n, { x: n.x, y: n.y, dir: n.dir });
         occupied.delete(`${n.x},${n.y}`);
       }
       [...reuniao.keys()].forEach((n, i) => {
-        const [x, y] = FESTA_SPOTS[i];
+        const [x, y, dir = "down"] = spots[i];
         n.x = x;
         n.y = y;
-        n.dir = "down";
+        n.dir = dir;
         occupied.set(`${x},${y}`, n);
         n.fig.position.copy(tileToWorld(x, y));
-        n.fig.rotation.y = DIRS.down.rot;
+        n.fig.rotation.y = DIRS[dir].rot;
       });
     } else if (!on && reuniao.size) {
       for (const n of reuniao.keys()) occupied.delete(`${n.x},${n.y}`);
@@ -1230,6 +1594,92 @@ export function createVila(host, options) {
       reuniao.clear();
     }
   }
+  // Roda de história: acampamento com fogueira (scene/historia.js) e o time
+  // sentado nos bancos, virado para o fogo. Assentos (índices em
+  // historia.ASSENTOS, ângulo a partir do norte): 0 Zé (de frente para a
+  // câmera), -30 Pedro, 30/±60/±90/-120 os chibis, 120 Emily, 150 o jogador.
+  const fogoPos = tileToWorld(...FOGO_TILE).add(new THREE.Vector3(0.5, 0, 0.5));
+  const historia = createHistoria({ scene, pal, track, reducedMotion, lite });
+  historia.setPos(fogoPos);
+  const RODA = { ze: 0, pedro: 1, chibis: [2, 3, 4, 5, 6, 7], emily: 8, jogador: 10 };
+  let rodaAntes = null; // estado de antes da cena (para devolver tudo)
+  // Pose sentada (scene/sentar.js), criada na primeira roda (os GLBs já
+  // carregaram). O corpo fica 0,1 atrás do centro do banco, com a borda da
+  // frente do banco em z = 0,05 do corpo.
+  const sentados = new Map(); // root do corpo → sentado
+  function sentar(root, on) {
+    if (!root) return;
+    let s = sentados.get(root);
+    if (!s && on) {
+      s = createSentado(root, { alturaAssento: historia.alturaAssento, bordaAssento: 0.05 });
+      if (s.tipo) sentados.set(root, s);
+    }
+    s?.setSentado(on, { instantaneo: reducedMotion || !on });
+  }
+  const noBanco = (s) => s.pos.clone().addScaledVector(new THREE.Vector3(Math.sin(s.yaw), 0, Math.cos(s.yaw)), -0.1);
+  // Mascote ao lado do dono, um pouco para fora da roda.
+  const aoLado = (i, graus) => {
+    const s = historia.ASSENTOS[i];
+    const a = Math.atan2(s.x, -s.z) + THREE.MathUtils.degToRad(graus);
+    return new THREE.Vector3(Math.sin(a) * 1.95, 0, -Math.cos(a) * 1.95).add(fogoPos);
+  };
+  function roda(on) {
+    const ze = walkers.find((w) => w.id === "ze-carlos");
+    const emily = walkers.find((w) => w.id === "emily");
+    if (on) {
+      if (rodaAntes) return;
+      rodaAntes = { npcs: [], jogador: { x: player.x, y: player.y, dir: player.dir } };
+      npcs.slice(0, RODA.chibis.length).forEach((n, i) => {
+        rodaAntes.npcs.push({ n, x: n.x, y: n.y, dir: n.dir, marker: n.marker?.visible });
+        const s = historia.assento(RODA.chibis[i]);
+        n.fig.position.copy(noBanco(s));
+        n.fig.rotation.y = s.yaw;
+        sentar(n.fig, true);
+        // Chefe com boneco 3D: o 3D segue o chibi (invisível) e senta junto.
+        if (n.boneco) sentar(walkers.find((w) => w.id === n.boneco)?.owner.root, true);
+        // Balões (estrela, "!", "✓") saem de cena enquanto o Zé conta.
+        if (n.marker) n.marker.visible = false;
+      });
+      rodaAntes.cristais = questsColeta.map((qc) => qc.marker.object.visible);
+      for (const qc of questsColeta) qc.marker.object.visible = false;
+      const sz = historia.assento(RODA.ze);
+      ze?.encenar(noBanco(sz), sz.yaw, aoLado(RODA.ze, 14));
+      sentar(ze?.owner.root, true);
+      const se = historia.assento(RODA.emily);
+      emily?.encenar(noBanco(se), se.yaw, aoLado(RODA.emily, 14));
+      sentar(emily?.owner.root, true);
+      const sp = historia.assento(RODA.pedro);
+      pedro?.encenar(noBanco(sp), sp.yaw);
+      sentar(pedro?.root, true);
+      const sj = historia.assento(RODA.jogador);
+      player.root.position.copy(noBanco(sj));
+      player.root.rotation.y = sj.yaw;
+      sentar(player.body, true);
+      historia.setOn(true);
+    } else if (rodaAntes) {
+      for (const root of sentados.keys()) sentar(root, false);
+      for (const { n, x, y, dir, marker } of rodaAntes.npcs) {
+        n.x = x;
+        n.y = y;
+        n.dir = dir;
+        n.fig.position.copy(tileToWorld(x, y));
+        n.fig.rotation.y = DIRS[dir].rot;
+        if (n.marker && marker !== undefined) n.marker.visible = marker;
+      }
+      questsColeta.forEach((qc, i) => (qc.marker.object.visible = rodaAntes.cristais[i]));
+      ze?.liberar();
+      emily?.liberar();
+      pedro?.liberar();
+      const j = rodaAntes.jogador;
+      player.x = j.x;
+      player.y = j.y;
+      player.root.position.copy(tileToWorld(j.x, j.y));
+      face(j.dir);
+      rodaAntes = null;
+      historia.setOn(false);
+    }
+  }
+
   function mundo(cmd, instant) {
     const rapido = instant || reducedMotion;
     if (cmd.tocar !== undefined) {
@@ -1242,8 +1692,32 @@ export function createVila(host, options) {
       epocas.set(cmd.epoca, { dur: rapido ? 0 : (cmd.dur ?? 0) });
       return 0;
     }
+    // Show da Emily: o mascote canta e as notas sobem em espiral.
+    if (cmd.show !== undefined) {
+      const w = walkers.find((x) => x.id === cmd.show);
+      if (!w || rapido) return 0;
+      w.pet.perform("cantar");
+      coletaveis.burst(w.owner.root.position);
+      return coletaveis.BURST_TIME;
+    }
     if (cmd.reunir !== undefined) {
       reunir(cmd.reunir);
+      return 0;
+    }
+    if (cmd.roda !== undefined) {
+      roda(cmd.roda);
+      return 0;
+    }
+    // Página da história sobre a fogueira (índice ou null): espera a troca.
+    // A ilustração aparece grande na interface (LivroHistoria.jsx).
+    if (cmd.pagina !== undefined) {
+      onCutsceneEfeito({ efeito: "pagina", pagina: cmd.pagina });
+      return rapido ? 0 : 0.9;
+    }
+    // Mascote se apresenta (ex. o Livro Sábio abrindo a história).
+    if (cmd.apresenta !== undefined) {
+      const w = walkers.find((x) => x.id === cmd.apresenta);
+      if (w && !rapido) w.pet.perform(cmd.show);
       return 0;
     }
     if (cmd.efeito !== undefined) {
@@ -1288,6 +1762,7 @@ export function createVila(host, options) {
     reducedMotion,
     actors,
     onSay: (fala) => onCutsceneSay(fala),
+    urlInsignia,
   });
 
   // ---- Entrada ------------------------------------------------------------------
@@ -1300,7 +1775,7 @@ export function createVila(host, options) {
       player.path = [];
       player.pending = null;
       if (!held.includes(dir)) held.push(dir);
-      if (!player.move && player.dir !== dir && !paused) {
+      if (!player.move && player.dir !== dir && !paused && !transicao && !foco) {
         face(dir);
         player.turnLock = TURN_LOCK;
       }
@@ -1321,7 +1796,7 @@ export function createVila(host, options) {
       player.run = on;
     },
     interact() {
-      if (!paused && !player.move && !cutscene.active) interact();
+      if (!paused && !player.move && !cutscene.active && !transicao && !foco) interact();
     },
     setPaused(p) {
       paused = p;
@@ -1341,6 +1816,19 @@ export function createVila(host, options) {
         if (celebrar) pedro?.celebrate();
         else pedro?.setHasOcarina(true);
       } else pedro?.setHasOcarina(false);
+    },
+    // Estado de uma quest de coleta ({ etapa, itens }, quests-coleta.js):
+    // cristal sobre quem dá a quest e itens que ainda faltam no mapa.
+    setColeta(questId, estado) {
+      const qc = questsColeta.find((q) => q.quest.id === questId);
+      if (!qc) return;
+      const visual = { nova: "nova", coletando: "procurando", pronta: "achou", concluida: "concluida" };
+      qc.marker.setEtapa(visual[estado.etapa] ?? "nova");
+      coletaveis.set(questId, { visivel: estado.etapa === "coletando", coletados: estado.itens });
+    },
+    // Item aceito pela interface: sobe girando sobre o jogador e some.
+    coletar(questId, itemId) {
+      coletaveis.pop(questId, itemId, player.root.position);
     },
     // Líderes já vencidos (Set/array de índices em members): estrela → "✓".
     setLeadersDone(indices) {
@@ -1374,6 +1862,29 @@ export function createVila(host, options) {
     setAttract(on) {
       attract = on;
     },
+    // Galeria da Equipe: onde o jogador está, troca do quadro em close (setas
+    // do painel), fim do close e saída pela interface.
+    get local() {
+      return local;
+    },
+    focarQuadro(id) {
+      if (!noPredio() || !interior.pose(id)) return;
+      foco = id;
+      interior.setDestaque(id);
+    },
+    fecharQuadro() {
+      if (!foco) return;
+      foco = null;
+      voltaDoFoco = 1.4;
+      player.root.visible = true;
+      interior?.setDestaque(null);
+      lastFacingKey = "";
+      reportFacing();
+    },
+    // Painel do elevador: vai para o andar escolhido.
+    irParaAndar(id) {
+      if (noPredio() && !foco && andarPorId(id)) entrarOuSair(id, "elevador");
+    },
     dispose,
   };
 
@@ -1392,6 +1903,19 @@ export function createVila(host, options) {
     const r = renderer.domElement.getBoundingClientRect();
     pointer.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
     raycaster.setFromCamera(pointer, camera);
+    if (noPredio()) {
+      const quadro = raycaster.intersectObjects(interior.hitQuadros, false)[0];
+      const pessoa = raycaster.intersectObjects(interior.hitPessoas, true)[0];
+      if (pessoa && (!quadro || pessoa.distance <= quadro.distance)) return { inspect: pessoa.object.userData.inspectId, museu: true };
+      if (quadro) return { quadro: quadro.object.userData.quadroId };
+      const p = raycaster.ray.intersectPlane(groundPlane, v);
+      if (!p) return null;
+      // Clique na parede do fundo (as portas do elevador, por exemplo): o chão
+      // "atrás" dela fica fora do andar; vale o tile da parede mais próximo.
+      const x = THREE.MathUtils.clamp(Math.floor(p.x + interior.MW / 2), 0, interior.MW - 1);
+      const y = THREE.MathUtils.clamp(Math.floor(p.z + interior.MH / 2), 0, interior.MH - 1);
+      return { x, y };
+    }
     const hit = raycaster.intersectObjects(npcFigs, true)[0];
     const proxyHit = raycaster.intersectObjects(inspectProxies(), true)[0];
     // Proxy na frente (ou sem boneco chibi na linha): ficha do personagem.
@@ -1414,14 +1938,14 @@ export function createVila(host, options) {
   function onPointerMove(ev) {
     if (ev.pointerType !== "mouse") return;
     const t = pick(ev);
-    if (t?.inspect) {
+    if (t?.inspect || t?.quadro) {
       renderer.domElement.classList.add("is-pointer");
       hover.visible = false;
       return;
     }
     const target = t && targetAt(t.x, t.y);
     renderer.domElement.classList.toggle("is-pointer", Boolean(target));
-    if (t && passable(t.x, t.y)) {
+    if (t && !noPredio() && passable(t.x, t.y)) {
       hover.position.copy(tileToWorld(t.x, t.y)).setY(0.012);
       hover.visible = true;
     } else hover.visible = false;
@@ -1432,12 +1956,22 @@ export function createVila(host, options) {
   }
 
   function onClick(ev) {
-    if (paused || cutscene.active) return;
+    if (paused || cutscene.active || transicao || foco) return;
     const t = pick(ev);
     if (!t) return;
     // Personagem 3D ou mascote: abre a ficha sem andar até ele.
     if (t.inspect) {
-      onInspect({ id: t.inspect });
+      onInspect(t.museu ? { id: t.inspect, museu: true } : { id: t.inspect });
+      return;
+    }
+    // Quadro: anda até o ponto de vista dele e abre o close.
+    if (t.quadro) {
+      const vista = interior.pontoDeVista(t.quadro);
+      const path = vista && findPath(vista.x, vista.y);
+      if (!path) return;
+      held.length = 0;
+      player.path = path;
+      player.pending = { x: vista.x + DIRS[vista.dir].dx, y: vista.y + DIRS[vista.dir].dy };
       return;
     }
     const target = targetAt(t.x, t.y);
@@ -1505,7 +2039,7 @@ export function createVila(host, options) {
       }
       if (m.t >= 1) {
         player.move = null;
-        tryFindOcarina(player.x, player.y);
+        if (!noPredio() && !tryFindOcarina(player.x, player.y)) tryColeta(player.x, player.y);
         if (player.body) {
           player.body.position.y = 0;
           player.body.rotation.z = 0;
@@ -1513,7 +2047,7 @@ export function createVila(host, options) {
         reportFacing();
       }
     }
-    if (!player.move && !paused && !cutscene.active) {
+    if (!player.move && !paused && !cutscene.active && !transicao && !foco) {
       const want = held[held.length - 1];
       if (want && player.turnLock <= 0) tryStep(want);
       else if (!want && player.path.length) {
@@ -1533,12 +2067,33 @@ export function createVila(host, options) {
     }
     if (!player.move && !held.length && !player.path.length) {
       player.idle += dt;
-      if (!coding && !cutscene.active && player.idle > IDLE_BEFORE_CODING) startCoding();
+      // Sentar para programar vira o jogador para a câmera (para baixo): não
+      // senta de frente para alguém/uma mesa/uma saída nem quando embaixo há
+      // um alvo, senão a dica "Espaço: …" (e o alvo do Espaço) mudaria sem o
+      // jogador ter feito nada.
+      if (
+        !coding &&
+        !cutscene.active &&
+        !transicao &&
+        !foco &&
+        player.idle > IDLE_BEFORE_CODING &&
+        !lastFacingKey &&
+        !targetAt(player.x + DIRS.down.dx, player.y + DIRS.down.dy)
+      )
+        startCoding();
     }
-    if (player.move && !walking) startWalk();
-    else if (!player.move && walking) stopWalk();
+    // Entrando ou saindo da galeria, o jogador anda sozinho até a porta.
+    const andandoSozinho = transicao ? atualizarTransicao(dt) : false;
+    const emPasso = Boolean(player.move) || andandoSozinho;
+    if (emPasso && !walking) startWalk();
+    else if (!emPasso && walking) stopWalk();
     if (walking && actions?.andando) actions.andando.timeScale = walkTimeScale();
     if (mixer) mixer.update(dt);
+    // Na galeria, a Vila fica parada: só o relógio anda.
+    if (noPredio()) {
+      tickMuseu(dt);
+      return;
+    }
     pedro?.update(dt);
     questMarker.update(t, dt);
     ocarina?.update(t, dt);
@@ -1551,6 +2106,20 @@ export function createVila(host, options) {
       }
     }
     for (const w of walkers) w.update(dt);
+    coletaveis.update(t, dt);
+    historia.update(t, dt);
+    // Depois de todos os mixers (jogador, Pedro, duplas): pose sentada.
+    for (const s of sentados.values()) s.update(dt);
+    for (const qc of questsColeta) {
+      qc.marker.update(t, dt);
+      if (!qc.walker) continue;
+      const p = tileOf(qc.walker.owner.root.position);
+      const perto = Math.max(Math.abs(player.x - p.x), Math.abs(player.y - p.y)) <= QUEST_NEAR;
+      if (perto !== qc.perto) {
+        qc.perto = perto;
+        onColetaPerto({ quest: qc.quest.id, perto });
+      }
+    }
     // Pedro e as duplas andam sozinhos: a dica "Espaço: …" acompanha quem
     // entra ou sai da frente do jogador (barato: uma consulta na grade).
     if (!player.move) reportFacing();
@@ -1637,13 +2206,52 @@ export function createVila(host, options) {
     lighting.render(ts);
   }
 
+  const vPos = new THREE.Vector3();
+  const vLook = new THREE.Vector3();
+  function tickMuseu(dt) {
+    if (coding && laptopPose) {
+      for (const p of laptopPose) {
+        p.o.scale.copy(p.s);
+        p.o.quaternion.copy(p.q);
+      }
+    }
+    dayNight.update(dt);
+    const clock = formatClock(dayNight.state.hours);
+    if (clock !== lastClock) {
+      lastClock = clock;
+      onClock({ time: clock, night: dayNight.state.night > 0.5 });
+    }
+    interior.update(t, dt);
+    // Câmera: segue o jogador como na Vila (mais perto) ou voa até o quadro
+    // em foco; ao fechar o close, volta devagar.
+    const pose = foco ? interior.pose(foco) : null;
+    if (pose) cameraDoQuadro(pose, vPos, vLook);
+    else {
+      camTarget.lerp(player.root.position, reducedMotion ? 1 : 1 - Math.exp(-dt * 6));
+      vLook.set(camTarget.x, camTarget.y + 0.4, camTarget.z);
+      vPos.copy(camTarget).addScaledVector(CAM_OFFSET, (camera.userData.far || 1) * MUSEU_ZOOM * userZoom);
+    }
+    if (voltaDoFoco > 0) voltaDoFoco -= dt;
+    const suave = Boolean(pose) || voltaDoFoco > 0;
+    const r = snapCamera || reducedMotion ? 1 : 1 - Math.exp(-dt * (suave ? 3 : 30));
+    snapCamera = false;
+    camera.position.lerp(vPos, r);
+    camLook.lerp(vLook, r);
+    camera.lookAt(camLook);
+    renderer.render(interior.scene, camera);
+  }
+
   renderer.setAnimationLoop(tick);
-  window.__vilaDbg = { player, occupied, passable, pedro, walkers, map, epocas, get paused() { return paused; }, get cut() { return cutscene.active; } }; // TEMP-HOOK
+  window.__vilaDbg = { get local() { return local; }, get interior() { return interior; }, player, occupied, passable, pedro, walkers, map, epocas, get paused() { return paused; }, get cut() { return cutscene.active; }, renderer, camera, interiores }; // TEMP-HOOK
   reportFacing();
   onReady();
 
   function dispose() {
     disposed = true;
+    // Todos os interiores visitados (não só o atual): o museu descarta os
+    // próprios recursos; os escritórios saem da cena e o `track` abaixo libera.
+    for (const i of interiores.values()) descartarInterior(i);
+    interiores.clear();
     pedro?.dispose();
     ocarina?.dispose();
     for (const w of walkers) w.dispose();

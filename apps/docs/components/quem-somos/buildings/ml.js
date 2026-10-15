@@ -1,4 +1,4 @@
-// Prédio Laboratório de Machine Learning da Vila SEMEC (ginásio bônus da
+// Prédio Laboratório de Machine Learning da Vila SEMEC (4º ginásio, da
 // Mariana): caixa de vidro e metal escuro sobre base de concreto clara.
 // Fachada: faixa superior de vidro escuro com uma rede neural luminosa
 // (3 camadas de nós ligados por linhas, com pulsos de luz percorrendo as

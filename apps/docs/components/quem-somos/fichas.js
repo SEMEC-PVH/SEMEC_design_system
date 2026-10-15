@@ -117,7 +117,7 @@ export const FICHAS = {
     nomeCompleto: "Zé Carlos",
     subtitulo: "Equipe SEMEC",
     descricao:
-      "Cabelo grisalho, sorriso de canto e camiseta azul-marinho. Passeia pelo gramado ao sul da SEMEC sem pressa, sempre com o livro de estimação ao lado.",
+      "Cabelo grisalho, sorriso de canto e camiseta azul-marinho. Passeia pelo gramado ao sul da SEMFAZ sem pressa, sempre com o livro de estimação ao lado.",
     imagem: "ze-carlos.webp",
     alt: "Boneco do Zé Carlos",
     mascote: "livro",
@@ -148,9 +148,9 @@ export const FICHAS = {
     nome: "Microfone",
     subtitulo: "Mascote da Emily",
     descricao:
-      "Um microfone retrô cor de coral que nunca sai do ritmo. Balança cantando, estica nas notas altas e fecha o show com um giro de estrela do rock.",
+      "Um microfone roxinho de lacinho rosa, meio tímido, que não larga a sua nota musical dourada. Fica vermelho quando aplaudem, mas canta junto com a Emily e fecha o show com um giro.",
     imagem: "microfone.webp",
-    alt: "Boneco do Microfone retrô cor de coral, mascote da Emily",
+    alt: "Boneco de um microfone roxo com lacinho rosa segurando uma nota musical dourada, mascote da Emily",
     dono: "emily",
   },
 };

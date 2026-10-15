@@ -46,7 +46,7 @@ export function createPedro({
   let hasOcarina = false;
   // Tocando numa cena (cenaOcarina): dança sem parar até tocar(false).
   let tocando = false;
-  const restYaw = spot.rot;
+  let restYaw = spot.rot;
   let yaw = restYaw;
   let yawGoal = restYaw;
   let faceTimer = 0;
@@ -217,5 +217,24 @@ export function createPedro({
     occupied.forEach((v, key) => v === self && occupied.delete(key));
   }
 
-  return Object.assign(self, { update, talk, celebrate, tocar, setHasOcarina, dispose, hitProxies });
+  // Cena (roda de história): vai para outro lugar, virado para `novoYaw`,
+  // até liberar(), que devolve ele à porta da SEMEC.
+  let palco = null;
+  function encenar(pos, novoYaw) {
+    if (!palco) palco = { pos: root.position.clone(), restYaw };
+    root.position.copy(pos);
+    markerHolder.visible = false;
+    yaw = yawGoal = restYaw = novoYaw;
+    root.rotation.y = yaw;
+  }
+  function liberar() {
+    if (!palco) return;
+    root.position.copy(palco.pos);
+    markerHolder.visible = true;
+    yaw = yawGoal = restYaw = palco.restYaw;
+    root.rotation.y = yaw;
+    palco = null;
+  }
+
+  return Object.assign(self, { update, talk, celebrate, tocar, setHasOcarina, encenar, liberar, dispose, hitProxies });
 }

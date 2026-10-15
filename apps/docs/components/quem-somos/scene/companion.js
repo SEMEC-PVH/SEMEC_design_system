@@ -425,9 +425,36 @@ export function createCompanion({
     showWait = randomShowGap();
   }
 
+  // Cena (roda de história): dono e mascote ficam num lugar fixo, parados,
+  // até liberar(), que devolve cada um ao tile do passeio.
+  let staged = null;
+  function encenar(ownerPos, yaw, petPos) {
+    if (state === "loading" || anchor) return;
+    staged = { petPos: mascot.root.position.clone() };
+    move = null;
+    owner.root.position.copy(ownerPos);
+    mascot.root.position.copy(petPos);
+    owner.yaw = owner.yawGoal = mascot.yaw = mascot.yawGoal = yaw;
+    owner.root.rotation.y = mascot.root.rotation.y = yaw;
+    owner.clips?.play("parado");
+  }
+  function liberar() {
+    if (!staged) return;
+    owner.root.position.copy(tileToWorld(ox, oy));
+    mascot.root.position.copy(staged.petPos);
+    staged = null;
+    rest(1.5);
+  }
+
   function update(dt) {
     if (state === "loading") return;
     updateBubble(dt);
+    if (staged) {
+      owner.clips?.mixer.update(dt);
+      owner.toy?.update(dt, false);
+      pet.update(dt, { speed: 0 });
+      return;
+    }
     if (state === "still") {
       if (anchor) {
         owner.root.position.copy(anchor.position);
@@ -474,5 +501,5 @@ export function createCompanion({
     occupied.forEach((v, key) => v.group === self && occupied.delete(key));
   }
 
-  return Object.assign(self, { update, talk, cheer, dispose, owner, mascot, pet, hitProxies });
+  return Object.assign(self, { update, talk, cheer, encenar, liberar, dispose, owner, mascot, pet, hitProxies });
 }

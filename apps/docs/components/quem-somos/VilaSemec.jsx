@@ -5,17 +5,25 @@ import { Moon, Sun } from "lucide-react";
 import TitleScreen from "./TitleScreen";
 import FullscreenButton from "./FullscreenButton";
 import { areaOf, CHEFE_POR_AREA, mapaDeLideres } from "./areas";
-import { CHEFES, LINGUAGENS } from "./batalha/dados";
+import { CHEFES, LINGUAGENS, TREINADORES } from "./batalha/dados";
 import { nomeTipo } from "./batalha/motor";
 import { useProgresso } from "./batalha/progresso";
 import ModalJornada from "./batalha/ModalJornada";
 import EscolhaInicial from "./batalha/EscolhaInicial";
 import BatalhaOverlay from "./batalha/BatalhaOverlay";
-import { cenaOcarina, cenaVitoria } from "./cenas";
+import { cenaColeta, cenaHistoria, cenaOcarina, cenaVitoria } from "./cenas";
 import Retrato, { bocaAberta, useDigitacao } from "./Retrato";
 import FichaPersonagem from "./FichaPersonagem";
+import LivroHistoria from "./LivroHistoria";
+import StackDex from "./StackDex";
+import QuadroMuseu from "./QuadroMuseu";
+import { montarQuadros } from "./museu-dados";
+import PainelElevador from "./PainelElevador";
+import { FONTE_SEMFAZ, PESSOAS_SEMFAZ, andarPorId } from "./predio/andares";
+import Campanha from "./campanha/Campanha";
 import { FICHAS, ehFicha } from "./fichas";
 import { QUEST, useQuest } from "./quest";
+import { IDS_COLETA, QUESTS_COLETA, objetivoColeta, questDoNpc, useQuestsColeta } from "./quests-coleta";
 import {
   assinarPreferencia,
   ehLeve,
@@ -79,7 +87,7 @@ const SIGN_TEXT = {
   },
   "machine-learning": {
     title: "Laboratório de Machine Learning",
-    text: "Ginásio bônus: aqui os dados viram previsões. Limpar, treinar, testar — e nada de overfitting! Liberado depois da Data Stack.",
+    text: "4º ginásio: aqui os dados viram previsões. Limpar, treinar, testar — e nada de overfitting! Liberado depois da Data Stack.",
   },
   "banco-de-dados": {
     title: "Banco de Dados",
@@ -92,10 +100,8 @@ const SIGN_TEXT = {
 };
 
 const CHEFE_POR_ID = Object.fromEntries(CHEFES.map((c) => [c.id, c]));
-// Ginásios da trilha do Full Stack (o bônus de ML fica de fora).
+// Ginásios da trilha do Full Stack (algum `bonus` ficaria de fora).
 const GINASIOS = CHEFES.filter((c) => c.id !== "diretoria" && !c.bonus);
-// Sigla visível de cada Stack no HUD (o nome completo vai para o leitor de tela).
-const SIGLA_STACK = { front: "FE", back: "BE", dados: "DB", ia: "IA", full: "FS" };
 // Canções da ocarina do Pedro (cenas.js, cenaOcarina): dois futuros para
 // comparar e o passado.
 const CANCOES = [
@@ -163,9 +169,53 @@ export default function VilaSemec({ members }) {
   const { etapa: questEtapa, avancar: avancarQuest } = useQuest();
   const [questPerto, setQuestPerto] = useState(false);
   const [questFeita, setQuestFeita] = useState(false);
+  // Quests de coleta do Zé Carlos e da Emily (quests-coleta.js): estado
+  // salvo, perto de quem dá cada uma e a recém-concluída (painel no canto).
+  const { estados: coletas, aplicar: aplicarColeta, reiniciarTodas: reiniciarColetas } = useQuestsColeta();
+  const coletasRef = useRef(coletas);
+  useEffect(() => {
+    coletasRef.current = coletas;
+  }, [coletas]);
+  const [coletaPerto, setColetaPerto] = useState({});
+  const [coletaFeita, setColetaFeita] = useState(null);
+  // Mini game da Emily (campanha/Campanha.jsx) aberto sobre o jogo.
+  const [campanhaAberta, setCampanhaAberta] = useState(false);
+  // StackDex (coleção das insígnias em tela cheia), aberta pelo ícone do canto.
+  const [dexAberta, setDexAberta] = useState(false);
+  // Galeria da Equipe (museu dentro da SEMEC): onde o jogador está, fase da
+  // íris de entrada/saída e o quadro em close ({ id, estreito }).
+  const [local, setLocal] = useState("vila");
+  const [transicao, setTransicao] = useState(null); // { fase, para, modo, rotulo }
+  const [quadroAberto, setQuadroAberto] = useState(null);
+  const [elevadorAberto, setElevadorAberto] = useState(false);
+  const quadrosMuseu = useMemo(() => montarQuadros(members), [members]);
+  // Prédio da SEMFAZ: o andar atual (null na Vila) e quem aparece no painel
+  // do close (quadros da Galeria ou as mesas do andar).
+  const andarAtual = local === "vila" ? null : andarPorId(local);
+  const naGaleria = Boolean(andarAtual?.galeria);
+  const itensDoAndar = useMemo(() => {
+    if (!andarAtual) return [];
+    return andarAtual.galeria ? quadrosMuseu : andarAtual.zonas.flatMap((z) => z.pessoas);
+  }, [andarAtual, quadrosMuseu]);
+  // A íris some depois de abrir (0,7 s no motor; 0,2 s com movimento
+  // reduzido, quando o nome do lugar não pode ficar parado sobre a cena).
+  useEffect(() => {
+    if (transicao?.fase !== "abrir") return undefined;
+    const ms = movimentoReduzido ? 250 : transicao.modo === "elevador" ? 900 : 800;
+    const id = setTimeout(() => setTransicao(null), ms);
+    return () => clearTimeout(id);
+  }, [transicao, movimentoReduzido]);
+  // O ícone que abriu a StackDex recebe o foco de volta.
+  const dexOrigemRef = useRef(null);
+  const abrirDex = useCallback((ev) => {
+    dexOrigemRef.current = ev.currentTarget;
+    setDexAberta(true);
+  }, []);
   // Efeitos da cena da ocarina: tom sépia (passado) e relógio correndo.
   const [sepia, setSepia] = useState(false);
   const [relogioCena, setRelogioCena] = useState(null);
+  // Página do livro na roda de história do Zé (cenas.js, cenaHistoria).
+  const [paginaHistoria, setPaginaHistoria] = useState(null);
   const cenaId = useRef(0);
 
   // Índice em members → id do chefe (líderes dos ginásios e Diretoria).
@@ -202,6 +252,37 @@ export default function VilaSemec({ members }) {
       });
     },
     [members, progresso]
+  );
+
+  // Aprendizes do Laboratório de ML (batalha/dados.js, TREINADORES): batalha
+  // opcional, sem Stack, com o mesmo modal dos ginásios.
+  const abrirTreinador = useCallback(
+    (id) => {
+      const t = TREINADORES.find((x) => x.id === id);
+      if (!t) return;
+      const fala = (text, actions) => ({ title: t.titulo, text, ...(actions ? { actions } : {}) });
+      const lutar = (label) => ({
+        label,
+        primary: true,
+        onSelect: () => {
+          if (!progresso?.jogador) return;
+          rodadaRef.current += 1;
+          setDialog(null);
+          setModal({ tipo: "batalha", chefeId: t.id, chefe: t, jogador: progresso.jogador, rodada: rodadaRef.current });
+        },
+      });
+      const agoraNao = { label: "Agora não", onSelect: dismiss };
+      let pages;
+      if (!temInicial) {
+        pages = [fala(`${t.falaApresentacao} Para batalhar, primeiro pegue a sua linguagem com a Diretoria, lá na SEMEC.`)];
+      } else if (vencidos.includes(t.id)) {
+        pages = [fala(t.falaRevanche, [lutar("Revanche"), agoraNao])];
+      } else {
+        pages = [fala(t.falaApresentacao), fala(`${t.falaInicio} Dica: ${t.dica}`, [lutar("Batalhar!"), agoraNao])];
+      }
+      setDialog({ pages, page: 0 });
+    },
+    [progresso, temInicial, vencidos, dismiss]
   );
 
   const acoesBatalha = useCallback(
@@ -247,6 +328,7 @@ export default function VilaSemec({ members }) {
                   // líderes (efeito de setLeadersDone) voltam ao início.
                   recomecar();
                   avancarQuest("nova");
+                  reiniciarColetas();
                   setDialog({
                     pages: [
                       {
@@ -266,7 +348,7 @@ export default function VilaSemec({ members }) {
         page: 0,
       });
     },
-    [recomecar, avancarQuest, acaoEscolherLinguagem, dismiss]
+    [recomecar, avancarQuest, reiniciarColetas, acaoEscolherLinguagem, dismiss]
   );
 
   // Fala de quem é líder (ginásio ou Diretoria), conforme o progresso.
@@ -307,7 +389,7 @@ export default function VilaSemec({ members }) {
         if (venceu) {
           return comRecomeco({
             ...base,
-            text: "Parabéns, Full Stack! Você venceu os três ginásios e a Diretoria. Quer uma revanche?",
+            text: "Parabéns, Full Stack! Você venceu os quatro ginásios e a Diretoria. Quer uma revanche?",
             actions: acoesBatalha(chefeId, index, "Revanche"),
           });
         }
@@ -435,6 +517,211 @@ export default function VilaSemec({ members }) {
     [members, questEtapa, avancarQuest, acoesOcarina, dismiss]
   );
 
+  // Entrega de uma quest de coleta: cena (show da Emily ou o livro do Zé) e a
+  // Stack especial no fim.
+  const entregarColeta = useCallback(
+    (id) => {
+      const engine = engineRef.current;
+      aplicarColeta(id, { tipo: "concluir" });
+      setColetaFeita(id);
+      setDialog(null);
+      if (!engine) return;
+      const cenaAtual = ++cenaId.current;
+      setCena(true);
+      engine.playCutscene(cenaColeta({ quest: QUESTS_COLETA[id] })).then(() => {
+        if (cenaAtual !== cenaId.current) return;
+        setCena(false);
+        // O painel "Quest concluída" aparece depois da cena (e some sozinho).
+        setColetaFeita(id);
+        setDialog(null);
+        focusStage();
+      });
+    },
+    [aplicarColeta, focusStage]
+  );
+
+  // Roda de história do Zé Carlos (cenas.js, cenaHistoria), liberada depois
+  // da quest das páginas.
+  const contarHistoria = useCallback(() => {
+    const engine = engineRef.current;
+    setDialog(null);
+    if (!engine) return;
+    const cenaAtual = ++cenaId.current;
+    setCena(true);
+    engine.playCutscene(cenaHistoria()).then(() => {
+      if (cenaAtual !== cenaId.current) return;
+      setCena(false);
+      setDialog(null);
+      setRelogioCena(null);
+      setPaginaHistoria(null);
+      focusStage();
+    });
+  }, [focusStage]);
+
+  // Fim do mini game da Emily. Venceu pela 1ª vez: show do microfone e Stack.
+  const fimCampanha = useCallback(
+    ({ venceu }) => {
+      setCampanhaAberta(false);
+      const etapa = coletasRef.current.campanha.etapa;
+      if (venceu && etapa === "coletando") {
+        aplicarColeta("campanha", { tipo: "vencer" });
+        entregarColeta("campanha");
+        return;
+      }
+      focusStage();
+    },
+    [aplicarColeta, entregarColeta, focusStage]
+  );
+  const sairCampanha = useCallback(() => {
+    setCampanhaAberta(false);
+    focusStage();
+  }, [focusStage]);
+
+  // Fala de quem dá a quest de coleta (Zé Carlos, Emily), conforme a etapa.
+  const abrirQuestColeta = useCallback(
+    (id) => {
+      const q = QUESTS_COLETA[id];
+      const est = coletasRef.current[id];
+      const fala = (text, actions) => ({
+        title: q.nomeNpc,
+        falante: { name: q.nomeNpc, retrato: q.npc },
+        ficha: q.npc,
+        text,
+        ...(actions ? { actions } : {}),
+      });
+      const agoraNao = { label: "Agora não", onSelect: dismiss };
+      const aceitar = (resposta) => ({
+        label: "Aceitar quest",
+        primary: true,
+        onSelect: () => {
+          aplicarColeta(id, { tipo: "aceitar" });
+          setDialog({ pages: [fala(resposta)], page: 0 });
+        },
+      });
+      const entregar = (label) => ({ label, primary: true, onSelect: () => entregarColeta(id) });
+      let pages;
+      if (id === "paginas") {
+        if (est.etapa === "nova") {
+          pages = [
+            fala(
+              "Olá! Eu sou o Zé Carlos. Este aqui é o meu Livro Sábio... ou o que sobrou dele. Uma ventania arrancou quatro páginas e espalhou tudo pela Vila!"
+            ),
+            fala(
+              "Cada página tem uma pergunta sobre o nosso Design System. Se você achar as páginas e responder certo, elas voltam para o livro. Topa o desafio?",
+              [
+                aceitar(
+                  "Ótimo! As páginas brilham quando estão perto. Olhe ao lado da sede da SEMEC, perto do Back-End, no sul da Vila e lá na borda leste."
+                ),
+                agoraNao,
+              ]
+            ),
+          ];
+        } else if (est.etapa === "coletando") {
+          pages = [
+            fala(`Já voltaram ${est.itens.length} de ${q.itens.length} páginas. As outras ainda estão voando por aí: procure o brilho!`),
+          ];
+        } else if (est.etapa === "pronta") {
+          pages = [fala("Todas as páginas! Deixa eu colocar de volta no livro...", [entregar("Entregar as páginas")])];
+        } else {
+          pages = [
+            fala("O Livro Sábio está inteirinho, graças a você. E ele guarda uma história que eu adoro contar... Quer ouvir?", [
+              { label: "Ouvir uma história", primary: true, onSelect: contarHistoria },
+              agoraNao,
+            ]),
+          ];
+        }
+      } else {
+        // Emily: mini game "Campanha da SEMEC".
+        const jogar = (label) => ({
+          label,
+          primary: true,
+          onSelect: () => {
+            aplicarColeta(id, { tipo: "aceitar" });
+            setDialog(null);
+            setCampanhaAberta(true);
+          },
+        });
+        if (est.etapa === "nova") {
+          pages = [
+            fala("Oi! Eu sou a Emily, cuido da comunicação da SEMEC. Este é o meu microfone... ele canta lindamente, mas é tímido demais."),
+            fala(
+              "Tenho três campanhas para colocar no ar e preciso de ajuda para montar os posts: público, canal, título, arte e a descrição da imagem. Se a cidade gostar, aposto que ele cria coragem! Topa?",
+              [jogar("Montar as campanhas"), agoraNao]
+            ),
+          ];
+        } else if (est.etapa === "coletando") {
+          pages = [fala("Vamos tentar as campanhas de novo? Lembra: falar simples, para quem importa, e que todo mundo consiga ler.", [jogar("Jogar de novo"), agoraNao])];
+        } else if (est.etapa === "pronta") {
+          pages = [fala("As campanhas estão no ar! Olha só o microfone, todo animado...", [entregar("Comemorar")])];
+        } else {
+          pages = [
+            fala("Depois daquele show ele não para de cantar! Quer montar as campanhas de novo, só pela diversão?", [
+              { label: "Jogar de novo", primary: true, onSelect: () => { setDialog(null); setCampanhaAberta(true); } },
+              agoraNao,
+            ]),
+          ];
+        }
+      }
+      setDialog({ pages, page: 0 });
+    },
+    [aplicarColeta, entregarColeta, contarHistoria, dismiss]
+  );
+
+  // Pisou num item de quest de coleta. Nota: coleta na hora. Página do Zé:
+  // só volta para o livro com a resposta certa (errar não perde nada).
+  const onColetaRef = useRef(null);
+  useEffect(() => {
+    onColetaRef.current = ({ quest: id, item: itemId }) => {
+      const q = QUESTS_COLETA[id];
+      const est = coletasRef.current[id];
+      const item = q?.itens.find((i) => i.id === itemId);
+      if (!item || est.etapa !== "coletando" || est.itens.includes(itemId)) return;
+      const faltam = q.itens.length - est.itens.length - 1;
+      const resto =
+        faltam > 0
+          ? `${faltam > 1 ? "Faltam" : "Falta"} ${faltam} ${faltam > 1 ? q.item.plural : q.item.nome}.`
+          : `Agora leve tudo para o ${q.nomeNpc}!`;
+      const coletar = () => {
+        aplicarColeta(id, { tipo: "coletar", item: itemId });
+        engineRef.current?.coletar(id, itemId);
+      };
+      const errou = () =>
+        setDialog({
+          pages: [
+            {
+              title: "Página do Livro Sábio",
+              text: "Hmm, não é bem isso. A página continua aqui: pense mais um pouco e tente de novo.",
+              actions: [
+                { label: "Tentar de novo", primary: true, onSelect: () => perguntar() },
+                { label: "Depois", onSelect: dismiss },
+              ],
+            },
+          ],
+          page: 0,
+        });
+      function perguntar() {
+        setDialog({
+          pages: [
+            {
+              title: "Página do Livro Sábio",
+              text: item.pergunta,
+              actions: item.opcoes.map((op, i) => ({
+                label: op,
+                onSelect: () => {
+                  if (i !== item.certa) return errou();
+                  coletar();
+                  setDialog({ pages: [{ title: "Resposta certa!", text: `${item.explicacao} ${resto}` }], page: 0 });
+                },
+              })),
+            },
+          ],
+          page: 0,
+        });
+      }
+      perguntar();
+    };
+  }, [aplicarColeta, dismiss]);
+
   const openNpc = useCallback(
     (index) => {
       const m = members[index];
@@ -497,9 +784,10 @@ export default function VilaSemec({ members }) {
   useEffect(() => {
     onInteractRef.current = (ev) => {
       if (ev.type === "npc") openNpc(ev.index);
+      else if (ev.type === "treinador") abrirTreinador(ev.id);
       else if (SIGN_TEXT[ev.id]) setDialog({ pages: [SIGN_TEXT[ev.id]], page: 0 });
     };
-  }, [openNpc]);
+  }, [openNpc, abrirTreinador]);
 
   // Pisou na ocarina (o motor já mostra ela subindo): avisa e manda devolver.
   const onQuestFindRef = useRef(null);
@@ -523,10 +811,23 @@ export default function VilaSemec({ members }) {
   const onInspectRef = useRef(null);
   useEffect(() => {
     onInspectRef.current = (ev) => {
-      if (!started || cena || modal || !ehFicha(ev?.id)) return;
+      if (!started || cena || modal) return;
+      // Na galeria, todo mundo só mostra a ficha (sem quests nem batalhas).
+      if (ev?.museu) {
+        if (ehFicha(ev.id)) setFicha(ev.id);
+        return;
+      }
+      // Zé Carlos e Emily dão quest: conversam em vez de abrir a ficha (a
+      // ficha fica no botão "Ver ficha" do diálogo).
+      const questId = questDoNpc(ev?.id);
+      if (questId) {
+        abrirQuestColeta(questId);
+        return;
+      }
+      if (!ehFicha(ev?.id)) return;
       setFicha(ev.id);
     };
-  }, [started, cena, modal]);
+  }, [started, cena, modal, abrirQuestColeta]);
 
   useEffect(() => {
     let engine = null;
@@ -544,6 +845,12 @@ export default function VilaSemec({ members }) {
         }
         setSemAceleracao(gpu.software);
         setNivelAtual(nivel);
+        // Motor novo (recarga a quente, troca de membros) nasce na Vila: a
+        // interface não pode ficar presa num andar, íris ou painel do motor antigo.
+        setLocal("vila");
+        setTransicao(null);
+        setQuadroAberto(null);
+        setElevadorAberto(false);
         engine = createVila(hostRef.current, {
           members,
           leaders: new Set(mapaDeLideres(members).keys()),
@@ -564,9 +871,26 @@ export default function VilaSemec({ members }) {
           onCutsceneSay: (fala) => setDialog({ pages: [fala], page: 0, cena: true }),
           onQuestNear: setQuestPerto,
           onQuestFind: () => onQuestFindRef.current?.(),
+          onColeta: (ev) => onColetaRef.current?.(ev),
+          onColetaPerto: ({ quest, perto }) => setColetaPerto((p) => (p[quest] === perto ? p : { ...p, [quest]: perto })),
+          quadrosMuseu,
+          onLocal: ({ local: l }) => setLocal(l),
+          onElevador: () => setElevadorAberto(true),
+          // Objeto que ensina: o texto abre na caixa de diálogo (texto pode
+          // ser uma lista de páginas).
+          onInfo: (info) => {
+            const textos = Array.isArray(info.texto) ? info.texto : [info.texto];
+            setDialog({ pages: textos.map((text) => ({ title: info.titulo, text })), page: 0 });
+          },
+          onTransicao: (ev) => setTransicao(ev),
+          onQuadro: ({ id }) => {
+            const h = hostRef.current;
+            setQuadroAberto({ id, estreito: Boolean(h && h.clientWidth < h.clientHeight) });
+          },
           onCutsceneEfeito: (cmd) => {
             if (cmd.efeito === "sepia") setSepia(Boolean(cmd.on));
             else if (cmd.efeito === "relogio") setRelogioCena(cmd.on ? { sentido: cmd.sentido } : null);
+            else if (cmd.efeito === "pagina") setPaginaHistoria(cmd.pagina);
           },
         });
         engineRef.current = engine;
@@ -582,12 +906,14 @@ export default function VilaSemec({ members }) {
       engineRef.current = null;
       engine?.dispose();
     };
-  }, [members, graficos]);
+  }, [members, graficos, quadrosMuseu]);
 
   useEffect(() => {
-    engineRef.current?.setPaused(!started || Boolean(dialog) || Boolean(modal) || Boolean(ficha));
+    engineRef.current?.setPaused(
+      !started || Boolean(dialog) || Boolean(modal) || Boolean(ficha) || campanhaAberta || dexAberta || elevadorAberto
+    );
     engineRef.current?.setAttract(!started);
-  }, [started, dialog, modal, ficha, status]);
+  }, [started, dialog, modal, ficha, campanhaAberta, dexAberta, elevadorAberto, status]);
 
   // Fechou a ficha: o foco volta ao palco. Roda depois da limpeza da ficha,
   // que tira o `inert` do palco.
@@ -610,6 +936,16 @@ export default function VilaSemec({ members }) {
   useEffect(() => {
     engineRef.current?.setQuest(questEtapa);
   }, [questEtapa, status]);
+  // Quests de coleta no mapa: cristal sobre quem dá e itens que faltam.
+  useEffect(() => {
+    for (const id of IDS_COLETA) engineRef.current?.setColeta(id, coletas[id]);
+  }, [coletas, status]);
+  // "Quest concluída" (coleta) fica alguns segundos no canto e some.
+  useEffect(() => {
+    if (!coletaFeita) return undefined;
+    const t = setTimeout(() => setColetaFeita(null), QUEST_FEITA_MS);
+    return () => clearTimeout(t);
+  }, [coletaFeita]);
 
   // "Quest concluída" fica alguns segundos no canto e some.
   useEffect(() => {
@@ -707,7 +1043,15 @@ export default function VilaSemec({ members }) {
       { label: "Ver ficha", ficha: fichaDaFala },
     ];
   }
-  const falante = current && Number.isInteger(current.falante) ? members[current.falante] : null;
+  // Quem fala: índice em members ou, para quem não é da lista (Zé Carlos,
+  // Emily), { name, retrato } direto (public/quem-somos/retratos/).
+  const falante = !current
+    ? null
+    : Number.isInteger(current.falante)
+      ? members[current.falante]
+      : current.falante?.retrato
+        ? current.falante
+        : null;
 
   const focusChoices = useCallback(() => {
     actionsRef.current?.querySelector("button")?.focus({ preventScroll: true });
@@ -842,8 +1186,21 @@ export default function VilaSemec({ members }) {
   };
 
   let hint = "";
-  if (cena || ficha) {
+  if (cena || ficha || quadroAberto || transicao || elevadorAberto) {
     hint = "";
+  } else if (!dialog && !modal && facing?.type === "porta") {
+    hint = "Espaço: entrar na SEMFAZ";
+  } else if (!dialog && !modal && facing?.type === "info") {
+    hint = `Espaço: ler sobre ${facing.titulo}`;
+  } else if (!dialog && !modal && facing?.type === "saida") {
+    hint = facing.saida === "elevador" ? "Espaço: chamar o elevador" : "Espaço: sair para a Vila";
+  } else if (!dialog && !modal && facing?.type === "quadro") {
+    const q = quadrosMuseu.find((x) => x.id === facing.id);
+    const p = q ? null : PESSOAS_SEMFAZ.find((x) => x.id === facing.id);
+    if (q) hint = `Espaço: ver o quadro de ${q.nome}`;
+    else if (p) hint = `Espaço: conhecer ${p.nome} (${p.setor})`;
+  } else if (!dialog && !modal && facing?.type === "museu-pessoa" && ehFicha(facing.id)) {
+    hint = `Espaço: falar com ${FICHAS[facing.id].nome}`;
   } else if (!dialog && !modal && facing?.type === "npc" && members[facing.index]) {
     const chefeId = lideres.get(facing.index);
     const papel = chefeId
@@ -852,8 +1209,14 @@ export default function VilaSemec({ members }) {
         ? ` (quest: ${QUEST.titulo})`
         : "";
     hint = `Espaço: falar com ${members[facing.index].name}${papel}`;
+  } else if (!dialog && !modal && facing?.type === "treinador") {
+    const t = TREINADORES.find((x) => x.id === facing.id);
+    if (t) hint = `Espaço: falar com ${t.titulo}`;
   } else if (!dialog && !modal && facing?.type === "sign") {
     hint = "Espaço: ler a placa";
+  } else if (!dialog && !modal && facing?.type === "inspect" && questDoNpc(facing.id)) {
+    const q = QUESTS_COLETA[questDoNpc(facing.id)];
+    hint = `Espaço: falar com ${q.nomeNpc} (quest: ${q.titulo})`;
   } else if (!dialog && !modal && facing?.type === "inspect" && ehFicha(facing.id)) {
     hint = `Espaço: ver a ficha de ${FICHAS[facing.id].nome}`;
   }
@@ -863,7 +1226,24 @@ export default function VilaSemec({ members }) {
   // Painel da quest: ao chegar perto do Pedro, durante a busca e logo depois
   // da entrega.
   const questConcluida = questEtapa === "concluida";
-  const mostrarQuest = started && !cena && (questFeita || (!questConcluida && (questPerto || questEtapa !== "nova")));
+  const naVila = local === "vila";
+  const mostrarQuest = started && !cena && naVila && (questFeita || (!questConcluida && (questPerto || questEtapa !== "nova")));
+  // Stacks no HUD (insígnias de insignias.js): ginásios, ocarina e as das
+  // quests do Zé e da Emily; cinza enquanto não conquistadas.
+  const stacksHud = [
+    ...CHEFES.map((c) => ({ id: c.stack.id, nome: c.stack.nome, ok: vencidos.includes(c.id) })),
+    { id: QUEST.recompensa.id, nome: QUEST.recompensa.nome, ok: questConcluida },
+    ...IDS_COLETA.map((id) => {
+      const r = QUESTS_COLETA[id].recompensa;
+      return { id: r.id, nome: r.nome, ok: coletas[id].etapa === "concluida" };
+    }),
+  ];
+  // Quests de coleta: mesma regra, por quest.
+  const mostrarColeta = (id) =>
+    started &&
+    !cena &&
+    naVila &&
+    (coletaFeita === id || (coletas[id].etapa !== "concluida" && (coletaPerto[id] || coletas[id].etapa !== "nova")));
 
   return (
     <section className="vila" data-sepia={sepia || undefined} aria-labelledby="vila-titulo">
@@ -904,12 +1284,20 @@ export default function VilaSemec({ members }) {
         />
       )}
 
-      {started && !cena && (
+      {started && !cena && !quadroAberto && (
         <div className="vila-hud vila-hud--top">
           <div className="vila-panel vila-title">
-            <h1 id="vila-titulo">Quem Somos</h1>
+            <h1 id="vila-titulo">{naVila ? "Quem Somos" : naGaleria ? "Galeria da Equipe" : andarAtual?.nome}</h1>
             <p className="vila-counter">
-              Conversas: <strong>{talked.size}</strong>/{total}
+              {naVila ? (
+                <>
+                  Conversas: <strong>{talked.size}</strong>/{total}
+                </>
+              ) : (
+                <>
+                  {andarAtual?.rotulo} · {naGaleria ? "Quadros" : "Pessoas"}: <strong>{itensDoAndar.length}</strong>
+                </>
+              )}
             </p>
             {clock && (
               <p className="vila-clock">
@@ -931,29 +1319,6 @@ export default function VilaSemec({ members }) {
             ) : (
               <p className="vila-lang vila-lang--vazia">Sem linguagem ainda</p>
             )}
-            <ul className="vila-stacks" aria-label="Stacks">
-              {CHEFES.map((c) => {
-                const ok = vencidos.includes(c.id);
-                return (
-                  <li key={c.id} className="vila-stack" data-ok={ok} title={`${c.stack.nome}${ok ? "" : " (ainda não)"}`}>
-                    <span aria-hidden="true">{SIGLA_STACK[c.stack.id]}</span>
-                    <span className="sr-only">
-                      {c.stack.nome}: {ok ? "conquistada" : "ainda não conquistada"}
-                    </span>
-                  </li>
-                );
-              })}
-              <li
-                className="vila-stack vila-stack--especial"
-                data-ok={questConcluida}
-                title={`${QUEST.recompensa.nome}${questConcluida ? "" : " (ainda não)"}`}
-              >
-                <span aria-hidden="true">{QUEST.recompensa.sigla}</span>
-                <span className="sr-only">
-                  {QUEST.recompensa.nome}: {questConcluida ? "conquistada" : "ainda não conquistada"}
-                </span>
-              </li>
-            </ul>
           </div>
           <div className="vila-hud-direita">
             <div className="vila-hud-actions">
@@ -981,6 +1346,28 @@ export default function VilaSemec({ members }) {
                 </p>
               </section>
             )}
+            {IDS_COLETA.filter((id) => mostrarColeta(id)).map((id) => {
+              const q = QUESTS_COLETA[id];
+              const est = coletas[id];
+              const feita = est.etapa === "concluida";
+              return (
+                <section key={id} className="vila-panel vila-quest" data-etapa={est.etapa} aria-labelledby={`vila-quest-titulo-${id}`}>
+                  <p className="vila-quest-tag">{feita ? "Quest concluída" : est.etapa === "nova" ? "Nova quest" : "Quest em andamento"}</p>
+                  <h2 id={`vila-quest-titulo-${id}`} className="vila-quest-titulo">
+                    <span className="vila-quest-icone" aria-hidden="true">
+                      ◆
+                    </span>
+                    {q.titulo}
+                  </h2>
+                  <p className="vila-quest-objetivo" aria-live="polite">
+                    {objetivoColeta(q, est)}
+                  </p>
+                  <p className="vila-quest-recompensa">
+                    Recompensa: <strong>{q.recompensa.nome}</strong>
+                  </p>
+                </section>
+              );
+            })}
           </div>
         </div>
       )}
@@ -1019,7 +1406,7 @@ export default function VilaSemec({ members }) {
         </>
       )}
 
-      {status === "ready" && started && !focused && !dialog && !modal && !ficha && !cena && (
+      {status === "ready" && started && !focused && !dialog && !modal && !ficha && !cena && !quadroAberto && (
         <p className="vila-chip" aria-hidden="true">
           Clique no mapa para jogar
         </p>
@@ -1033,6 +1420,76 @@ export default function VilaSemec({ members }) {
         {hint}
       </p>
 
+      {/* Entrada e saída do prédio: íris que fecha no escuro, com o nome do
+          lugar, e abre do outro lado. De elevador: portas que fecham, display
+          do andar e abrem (durações em vila-engine.js). */}
+      {transicao && transicao.modo !== "elevador" && (
+        <div className="vila-iris" data-fase={transicao.fase} aria-hidden="true">
+          <p className="vila-iris-titulo">{transicao.rotulo}</p>
+        </div>
+      )}
+      {transicao?.modo === "elevador" && (
+        <div className="vila-elevador" data-fase={transicao.fase} aria-hidden="true">
+          <span className="vila-elevador-porta" />
+          <span className="vila-elevador-porta" />
+          <p className="vila-elevador-display">{transicao.rotulo}</p>
+        </div>
+      )}
+      <p className="sr-only" aria-live="polite">
+        {!started || naVila
+          ? ""
+          : naGaleria
+            ? "Você está na Galeria da Equipe. Quadros nas paredes: aproxime-se e aperte Espaço para ver. O elevador fica ao sul."
+            : `Você está no ${andarAtual?.rotulo}, ${andarAtual?.nome}. Aproxime-se de uma mesa e aperte Espaço para conhecer quem chefia cada setor. O elevador fica ao norte.`}
+      </p>
+      {elevadorAberto && (
+        <PainelElevador
+          atual={local}
+          onEscolher={(id) => {
+            setElevadorAberto(false);
+            engineRef.current?.irParaAndar(id);
+            requestAnimationFrame(() => focusStage());
+          }}
+          onFechar={() => {
+            setElevadorAberto(false);
+            requestAnimationFrame(() => focusStage());
+          }}
+        />
+      )}
+      {quadroAberto && (
+        <QuadroMuseu
+          quadros={itensDoAndar}
+          tipo={naGaleria ? "quadro" : "mesa"}
+          fonte={naGaleria ? null : FONTE_SEMFAZ}
+          id={quadroAberto.id}
+          estreito={quadroAberto.estreito}
+          onTrocar={(id) => {
+            engineRef.current?.focarQuadro(id);
+            setQuadroAberto((q) => ({ ...q, id }));
+          }}
+          onFechar={() => {
+            engineRef.current?.fecharQuadro();
+            setQuadroAberto(null);
+            requestAnimationFrame(() => focusStage());
+          }}
+        />
+      )}
+
+      {campanhaAberta && <Campanha onFim={fimCampanha} onSair={sairCampanha} />}
+      {dexAberta && (
+        <StackDex
+          itens={stacksHud.map((st) => ({ id: st.id, ok: st.ok }))}
+          onFechar={() => {
+            setDexAberta(false);
+            // Devolve o foco ao botão que abriu (depois que o overlay sai).
+            requestAnimationFrame(() => dexOrigemRef.current?.focus());
+          }}
+        />
+      )}
+
+      {/* Roda de história do Zé: a ilustração grande fica atrás do diálogo. */}
+      {cena && <LivroHistoria pagina={paginaHistoria} />}
+
       {current && (
         <div
           className={`vila-dialog${falante ? " vila-dialog--retrato" : ""}`}
@@ -1042,7 +1499,7 @@ export default function VilaSemec({ members }) {
         >
           {falante && (
             <Retrato
-              key={current.falante}
+              key={falante.retrato ?? current.falante}
               membro={falante}
               falando={!digitacao.pronto && !movimentoReduzido}
               boca={bocaAberta(digitacao.visivel, digitacao.pronto)}
@@ -1089,6 +1546,28 @@ export default function VilaSemec({ members }) {
             )}
           </div>
         </div>
+      )}
+
+      {/* Atalho da StackDex no canto inferior esquerdo: um "aparelho" redondo. */}
+      {started && !cena && !dialog && !modal && !ficha && !quadroAberto && (
+        <button type="button" className="vila-dex-icone" aria-haspopup="dialog" onClick={abrirDex}>
+          <span className="vila-dex-icone-aparelho" aria-hidden="true">
+            <span className="vila-dex-icone-lente" />
+            <span className="vila-dex-icone-leds">
+              <span />
+              <span />
+              <span />
+            </span>
+          </span>
+          <span className="vila-dex-icone-nome">StackDex</span>
+          <span className="vila-dex-icone-contagem">
+            {stacksHud.filter((st) => st.ok).length}
+            <span aria-hidden="true">/</span>
+            <span className="sr-only"> de </span>
+            {stacksHud.length}
+            <span className="sr-only"> insígnias</span>
+          </span>
+        </button>
       )}
 
       {started && !modal && !ficha && !cena && (
@@ -1139,7 +1618,8 @@ export default function VilaSemec({ members }) {
           onFim={(resultado, jogadorFinal) => {
             const primeira = !vencidos.includes(modal.chefeId);
             const retorno = registrarResultado(modal.chefeId, resultado, jogadorFinal);
-            if (retorno.venceu && primeira && modal.chefeId !== "diretoria") cenaPendente.current = modal.chefeId;
+            // Cena de vitória só nos ginásios (treinador não dá Stack).
+            if (retorno.venceu && primeira && modal.chefeId !== "diretoria" && CHEFE_POR_ID[modal.chefeId]) cenaPendente.current = modal.chefeId;
             return retorno;
           }}
           onFechar={fecharModal}
