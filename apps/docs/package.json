@@ -7,9 +7,10 @@
     "node": ">=22"
   },
   "scripts": {
+    "predev": "node scripts/garantir-semfaz.mjs",
     "dev": "next dev",
     "build": "next build",
-    "prebuild": "node ../../packages/react/scripts/build-artifacts.mjs --target=docs-public",
+    "prebuild": "node scripts/garantir-semfaz.mjs && node ../../packages/react/scripts/build-artifacts.mjs --target=docs-public",
     "start": "next start",
     "lint": "eslint .",
     "test:batalha": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test components/quem-somos/batalha/__tests__/*.test.js",

@@ -1,0 +1,1050 @@
+{
+  "fonte": "https://servicos.portovelho.ro.gov.br/secretaria/ZWjR7BErm0wMvbmOeYAlO1nqVyD42o/equipe",
+  "atualizadoEm": null,
+  "exemplo": true,
+  "aviso": "Dados fictícios. Os reais são gerados por scripts/atualizar-semfaz.mjs e não vão para o git.",
+  "setores": [
+    {
+      "codigo": "6",
+      "nome": "SECRETARIA MUNICIPAL DE ECONOMIA",
+      "pai": null,
+      "nivel": 0,
+      "email": "gab.semfaz@portovelho.ro.gov.br",
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Secretaria Municipal De Economia",
+        "funcao": "Secretário Municipal de Economia",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1",
+      "nome": "Gabinete",
+      "pai": "6",
+      "nivel": 1,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Gabinete",
+        "funcao": "Secretária Executiva",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.1",
+      "nome": "ASTEC",
+      "pai": "6.1",
+      "nivel": 2,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Astec",
+        "funcao": "Assessor Chefe",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.2",
+      "nome": "Departamento de Inovação e Integração",
+      "pai": "6.1",
+      "nivel": 2,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Departamento De Inovação E Integração",
+        "funcao": "Diretor de Inovação e Integração",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.3",
+      "nome": "Conselho de Servidores pertencentes ao Grupo TAF",
+      "pai": "6.1",
+      "nivel": 2,
+      "email": "gab.semfaz@portovelho.ro.gov.br",
+      "atribuicao": "Compete aos Conselhos de Servidores Pertencentes ao Grupo TAF: I – opinar sobre medidas de caráter administrativo da categoria, submetidas pelo Secretário da respectiva pasta; II – sugerir ao Prefeito Municipal, por intermédio do Secretário da respectiva pasta, a adoção de medidas e providências necessárias ao bom desempenho dos serviços a cargo da respectiva Secretaria; III – organizar a lista de promoção dos ocupantes dos cargos das respectivas Secretarias, referidos nesta Lei, segundo os critérios legais. IV – opinar sobre qualquer matéria de interesse da respectiva Secretaria, quando solicitado seu pronunciamento pelo secretário.",
+      "gestor": null
+    },
+    {
+      "codigo": "6.1.4",
+      "nome": "Secretaria Executiva de Finanças e Contabilidade",
+      "pai": "6.1",
+      "nivel": 2,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Secretaria Executiva De Finanças E Contabilidade",
+        "funcao": "Secretário Executivo de Finanças e Contabilidade",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.4.1",
+      "nome": "Departamento de Gestão Financeira",
+      "pai": "6.1.4",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Departamento De Gestão Financeira",
+        "funcao": "Diretor do Departamento de Gestão Financeira",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.4.1.1",
+      "nome": "Divisão de Conciliação de Contas Bancárias",
+      "pai": "6.1.4.1",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Conciliação De Contas Bancárias",
+        "funcao": "Gerente da Divisão de Conciliação de Contas Bancárias",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.4.1.2",
+      "nome": "Divisão de Controle e Acompanhamento de Pagamento",
+      "pai": "6.1.4.1",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Controle E Acompanhamento De Pagamento",
+        "funcao": "Gerente da Divisão de Controle e Acompanhamento de Pagamento",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.4.1.3",
+      "nome": "Divisão de Tesouraria",
+      "pai": "6.1.4.1",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Tesouraria",
+        "funcao": "Gerente da Divisão de Tesouraria",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.4.1.4",
+      "nome": "Divisão de Planejamento e Controle das Finanças",
+      "pai": "6.1.4.1",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Planejamento E Controle Das Finanças",
+        "funcao": "Gerente da Divisão de Planejamento e Controle das Finanças",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.4.2",
+      "nome": "Diretoria Executiva de Contabilidade",
+      "pai": "6.1.4",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Diretoria Executiva De Contabilidade",
+        "funcao": "Diretora Executiva de Contabilidade",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.4.2.1",
+      "nome": "Divisão de Demonstrativos e Prestação de Contas",
+      "pai": "6.1.4.2",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Demonstrativos E Prestação De Contas",
+        "funcao": "Gerente da Divisão de Demonstrativos e Prestação de Contas - DDPC",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.4.2.2",
+      "nome": "Divisão de Contabilidade Geral",
+      "pai": "6.1.4.2",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Contabilidade Geral",
+        "funcao": "Gerente da Divisão de Contabilidade Geral",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.4.2.3",
+      "nome": "Divisão de Controle de Dívidas e Bens Patrimoniais",
+      "pai": "6.1.4.2",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Controle De Dívidas E Bens Patrimoniais",
+        "funcao": "Gerente da Divisão de Controle de Dívidas e Bens Patrimoniais",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.4.2.4",
+      "nome": "Divisão de Análise e Informações de Custos",
+      "pai": "6.1.4.2",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Análise E Informações De Custos",
+        "funcao": "Gerente da Divisão de Análise e Informações de Custos",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.4.2.5",
+      "nome": "Divisão de Elaboração de Normas e Procedimentos Contábeis",
+      "pai": "6.1.4.2",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Elaboração De Normas E Procedimentos Contábeis",
+        "funcao": "Gerente da Divisão de Elaboração de Normas e Procedimentos Contábeis",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5",
+      "nome": "Secretaria Executiva da Receita Municipal",
+      "pai": "6.1",
+      "nivel": 2,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Secretaria Executiva Da Receita Municipal",
+        "funcao": "Secretário Executivo da Receita Municipal",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5.1",
+      "nome": "Departamento de Fiscalização",
+      "pai": "6.1.5",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": "Ao Departamento de Fiscalização (DEF), compete exercer a fiscalização dos Impostos, Taxas e Contribuições, inclusive os tributos abrangidos pela Lei Complementar nº. 123/2006 (Simples Nacional) e suas alterações, o acompanhamento dos repasses constitucionais, bem como as atividades de fiscalização de Poder de Policia no que tange ao licenciamento das atividades econômicas e a sua respectiva tributação, em conformidade com o Art. 23 do Decreto n.º 15.035 de 26 de janeiro de 2018.",
+      "gestor": {
+        "nome": "Chefia de Departamento De Fiscalização",
+        "funcao": "Diretor do Departamento de Fiscalização",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5.1.1",
+      "nome": "Divisão de Fiscalização de Taxas",
+      "pai": "6.1.5.1",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Fiscalização De Taxas",
+        "funcao": "Gerente de Fiscalização de Taxas",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5.1.2",
+      "nome": "Divisão de Tributação Imobiliária",
+      "pai": "6.1.5.1",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Tributação Imobiliária",
+        "funcao": "Gerente da Divisão de Tributação Imobiliária",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5.1.3",
+      "nome": "Divisão de Auditoria de Bens e Serviços",
+      "pai": "6.1.5.1",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Auditoria De Bens E Serviços",
+        "funcao": "Gerente da Divisão de Auditoria de Bens e Serviços",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5.1.4",
+      "nome": "Divisão de Consultas e Normas",
+      "pai": "6.1.5.1",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Consultas E Normas",
+        "funcao": "Gerente da Divisão de Consultas e Normas",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5.2",
+      "nome": "Departamento de Cadastros Fiscais",
+      "pai": "6.1.5",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Departamento De Cadastros Fiscais",
+        "funcao": "Diretor do Departamento de Cadastros Fiscais",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5.2.1",
+      "nome": "Divisão de Geoprocessamento e Vistoria",
+      "pai": "6.1.5.2",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Geoprocessamento E Vistoria",
+        "funcao": "Gerente da Divisão de Geoprocessamento e Vistoria",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5.2.2",
+      "nome": "Divisão de Cadastro Imobiliário",
+      "pai": "6.1.5.2",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Cadastro Imobiliário",
+        "funcao": "Gerente da Divisão de Cadastro Imobiliário",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5.2.3",
+      "nome": "Divisão de Cadastro Econômico",
+      "pai": "6.1.5.2",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Cadastro Econômico",
+        "funcao": "Gerente da Divisão de Cadastro Econômico",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5.3",
+      "nome": "Departamento de Gestão Tributária",
+      "pai": "6.1.5",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Departamento De Gestão Tributária",
+        "funcao": "Diretor do Departamento de Gestão Tributária",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5.3.1",
+      "nome": "Divisão de Cobrança",
+      "pai": "6.1.5.3",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Cobrança",
+        "funcao": "Gerente da Divisão de Cobrança - DCOB",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5.3.2",
+      "nome": "Divisão de Arrecadação",
+      "pai": "6.1.5.3",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Arrecadação",
+        "funcao": "Gerente de Arrecadação.",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5.3.3",
+      "nome": "Divisão de Atendimento ao Cidadão",
+      "pai": "6.1.5.3",
+      "nivel": 4,
+      "email": "dep.tributario@gmail.com",
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Atendimento Ao Cidadão",
+        "funcao": "Gerente da Divisão de Atendimento ao Cidadão.",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.5.3.3.1",
+      "nome": "Setor de Protocolo",
+      "pai": "6.1.5.3.3",
+      "nivel": 5,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Setor De Protocolo",
+        "funcao": "Responsável pelo Protocolo",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.6",
+      "nome": "Departamento de Tecnologia",
+      "pai": "6.1",
+      "nivel": 2,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Departamento De Tecnologia",
+        "funcao": "Diretor de Tecnologia",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.7",
+      "nome": "Departamento Administrativo",
+      "pai": "6.1",
+      "nivel": 2,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Departamento Administrativo",
+        "funcao": "Diretor do Departamento Administração",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.7.1",
+      "nome": "Divisão de Controle e Análise Processual",
+      "pai": "6.1.7",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Controle E Análise Processual",
+        "funcao": "Gerente da da Divisão de Controle e Análise Processual",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.7.2",
+      "nome": "Divisão de Gestão de Pessoas",
+      "pai": "6.1.7",
+      "nivel": 3,
+      "email": "drhu.semfaz@portovelho.ro.gov.br",
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Gestão De Pessoas",
+        "funcao": "Gerente da Divisão de Recursos Humanos",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.7.3",
+      "nome": "Divisão de Material e Patrimônio",
+      "pai": "6.1.7",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Material E Patrimônio",
+        "funcao": "Gerente da Divisão de Material e Patrimônio",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.7.4",
+      "nome": "Divisão de Transporte e Logística",
+      "pai": "6.1.7",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Transporte E Logística",
+        "funcao": "Gerente da Divisão de Transportes e Logística",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.7.5",
+      "nome": "Coordenadoria de Apoio Administrativo",
+      "pai": "6.1.7",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Coordenadoria De Apoio Administrativo",
+        "funcao": "Coordenadora de Apoio Administrativo",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.8",
+      "nome": "Conselho de Recursos Fiscais",
+      "pai": "6.1",
+      "nivel": 2,
+      "email": null,
+      "atribuicao": null,
+      "gestor": null
+    },
+    {
+      "codigo": "6.1.8.1",
+      "nome": "Secretaria do Conselho de Recursos Fiscais",
+      "pai": "6.1.8",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Secretaria Do Conselho De Recursos Fiscais",
+        "funcao": "Secretária do Conselho de Recursos Fiscais",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.9",
+      "nome": "Secretaria Executiva de Planejamento",
+      "pai": "6.1",
+      "nivel": 2,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Secretaria Executiva De Planejamento",
+        "funcao": "Secretária Executiva de Planejamento",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.9.1",
+      "nome": "Departamento de Pesquisa, Estatística e Indicadores",
+      "pai": "6.1.9",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Departamento De Pesquisa, Estatística E Indicadores",
+        "funcao": "Diretora do Departamento de Pesquisa, Estatística e Indicadores",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.9.1.1",
+      "nome": "Divisão de Informações Estatísticas, Indicadores e Análises",
+      "pai": "6.1.9.1",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Informações Estatísticas, Indicadores E Análises",
+        "funcao": "Gerente da Divisão de Informações Estatísticas, Indicadores e Análise",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.9.1.2",
+      "nome": "Divisão de Articulação Intersetorial e Pesquisa",
+      "pai": "6.1.9.1",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Articulação Intersetorial E Pesquisa",
+        "funcao": "Gerente da Divisão de Articulação Intersetorial e Pesquisa",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.9.2",
+      "nome": "Departamento de Geoprocessamento",
+      "pai": "6.1.9",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Departamento De Geoprocessamento",
+        "funcao": "Diretor do Departamento de Geoprocessamento - DGEO",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.9.2.1",
+      "nome": "Divisão de Tratamento e Análise de Dados",
+      "pai": "6.1.9.2",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Tratamento E Análise De Dados",
+        "funcao": "Gerente da Divisão de Tratamento e Análise de Dados (DTAD)",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.9.2.2",
+      "nome": "Divisão de Coleta e Armazenamento Dados",
+      "pai": "6.1.9.2",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Coleta E Armazenamento Dados",
+        "funcao": "Gerente da Divisão de Coleta e Armazenamento de Dados - (DCAD)",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.9.2.3",
+      "nome": "Divisão de Articulação Sistêmica Intersetorial",
+      "pai": "6.1.9.2",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Articulação Sistêmica Intersetorial",
+        "funcao": "Gerente da Divisão de Articulação Sistêmica Intersetorial – DASI - Departamento de Geoprocessamento.",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.9.3",
+      "nome": "Departamento de Implementação do Plano Diretor",
+      "pai": "6.1.9",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Departamento De Implementação Do Plano Diretor",
+        "funcao": "Diretora do Departamento de Implementação do Plano Diretor",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.9.3.1",
+      "nome": "Divisão de Acompanhamento de Programas e Projetos Estratégicos",
+      "pai": "6.1.9.3",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Acompanhamento De Programas E Projetos Estratégic",
+        "funcao": "Gerente da Divisão de Acompanhamento de Programas e Projetos Estratégicos",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.9.3.2",
+      "nome": "Divisão de Monitoramento e Avaliação do Plano Diretor",
+      "pai": "6.1.9.3",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Monitoramento E Avaliação Do Plano Diretor",
+        "funcao": "Gerente da Divisão de Monitoramento e Avaliação do Plano Diretor",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.10",
+      "nome": "Gabinete Adjunto",
+      "pai": "6.1",
+      "nivel": 2,
+      "email": "gabinete.adj.semec@portovelho.ro.gov.br",
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Gabinete Adjunto",
+        "funcao": "Secretário Adjunto",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.11",
+      "nome": "Departamento de Sistemas",
+      "pai": "6.1",
+      "nivel": 2,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Departamento De Sistemas",
+        "funcao": "Diretor do Departamento de Sistemas",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.12",
+      "nome": "Secretaria Executiva de Orçamento",
+      "pai": "6.1",
+      "nivel": 2,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Secretaria Executiva De Orçamento",
+        "funcao": "Secretária Executiva de Orçamento",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.12.1",
+      "nome": "Departamento de Planejamento Orçamentário",
+      "pai": "6.1.12",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Departamento De Planejamento Orçamentário",
+        "funcao": "Diretora do Departamento de Planejamento Orçamentário",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.12.1.1",
+      "nome": "Divisão de Elaboração Orçamentária",
+      "pai": "6.1.12.1",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Elaboração Orçamentária",
+        "funcao": "Gerente da Divisão de Elaboração Orçamentária",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.12.1.2",
+      "nome": "Divisão de Monitoramento e Avaliação do Planejamento Orçamentário",
+      "pai": "6.1.12.1",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Monitoramento E Avaliação Do Planejamento Orçamen",
+        "funcao": "Gerente da Divisão de Monitoramento e Avaliação do Planejamento Orçamentário",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.12.2",
+      "nome": "Departamento de Pesquisa e Projeções de Receitas",
+      "pai": "6.1.12",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Departamento De Pesquisa E Projeções De Receitas",
+        "funcao": "Diretor do Departamento de Pesquisa e Projeções de Receitas",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.12.2.1",
+      "nome": "Divisão de Normas e Procedimentos Orçamentários da Receita",
+      "pai": "6.1.12.2",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Normas E Procedimentos Orçamentários Da Receita",
+        "funcao": "Gerente da Divisão de Normas e Procedimentos Orçamentários da Receita",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.12.2.2",
+      "nome": "Divisão de Estudos e Projeções de Receita Orçamentária",
+      "pai": "6.1.12.2",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Estudos E Projeções De Receita Orçamentária",
+        "funcao": "Gerente da Divisão de Estudos e Projeções de Receita Orçamentária",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.12.3",
+      "nome": "Departamento de Controle e Acompanhamento da Execução do Orçamento",
+      "pai": "6.1.12",
+      "nivel": 3,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Departamento De Controle E Acompanhamento Da Execução Do Orç",
+        "funcao": "Diretor do Departamento de Controle e Acompanhamento da Execução do Orçamento",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.12.3.1",
+      "nome": "Divisão de Procedimentos e Ajustes Programáticos de Orçamento",
+      "pai": "6.1.12.3",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Procedimentos E Ajustes Programáticos De Orçament",
+        "funcao": "Gerente da Divisão de Procedimentos e Ajustes Programáticos do Orçamento",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.12.3.2",
+      "nome": "Divisão de Acompanhamento de Atividades Orçamentárias Especiais",
+      "pai": "6.1.12.3",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Acompanhamento De Atividades Orçamentárias Especi",
+        "funcao": "Gerente da Divisão de Acompanhamento Atividades Orçamentárias Especiais",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.12.3.3",
+      "nome": "Divisão de Execução Orçamentária",
+      "pai": "6.1.12.3",
+      "nivel": 4,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Divisão De Execução Orçamentária",
+        "funcao": "Gerente da Divisão de Execução Orçamentária",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    },
+    {
+      "codigo": "6.1.13",
+      "nome": "Assessoria de Controle Interno",
+      "pai": "6.1",
+      "nivel": 2,
+      "email": null,
+      "atribuicao": null,
+      "gestor": {
+        "nome": "Chefia de Assessoria De Controle Interno",
+        "funcao": "Supervisora da Assessoria de Controle Interno",
+        "qualificacao": null,
+        "email": null,
+        "nomeacao": null,
+        "foto": null
+      }
+    }
+  ]
+}

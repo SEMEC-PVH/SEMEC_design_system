@@ -50,3 +50,15 @@ next-env.d.ts
 /referencias/
 # arquivos de trabalho do boneco 3D (Blender, ~500 MB; o jogo usa a cópia em apps/docs/public/quem-somos/gava.glb)
 /personagem-gava/
+
+# Fontes 3D dos personagens (~1,8 GB de .blend/.fbx/.glb pesados): backup fora
+# do git. Os GLBs leves usados pelo site ficam em apps/docs/public/quem-somos.
+/personagem_*/
+# Capturas de tela de referência do prédio.
+/semec/
+
+# Dados reais da SEMFAZ (servidores, qualificações e fotos): o repositório é
+# público. Gere com apps/docs/scripts/atualizar-semfaz.mjs; sem eles, o build
+# usa semfaz.exemplo.json (fictício).
+apps/docs/components/quem-somos/predio/semfaz.json
+apps/docs/public/quem-somos/semfaz/
