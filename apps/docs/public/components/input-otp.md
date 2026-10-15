@@ -62,6 +62,8 @@ Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não rei
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 
 import { cn } from "../lib/utils";

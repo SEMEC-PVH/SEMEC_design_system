@@ -156,4 +156,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--action-primary` etc.), nunca hex solto
 
-> Gerado 2026-10-15T12:27:03.000Z a partir de packages/react/manifest.js. Versão 3.1.0.
+> Gerado 2026-10-15T12:30:10.000Z a partir de packages/react/manifest.js. Versão 3.1.0.

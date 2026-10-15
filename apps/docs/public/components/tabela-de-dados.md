@@ -69,6 +69,8 @@ Use o componente `DataTable` (Tabela de dados) importado de `@semec/ds/react`; n
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 

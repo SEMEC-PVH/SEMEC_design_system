@@ -1,0 +1,5 @@
+---
+"@semec/ds": minor
+---
+
+Saída por módulo e fronteira RSC (AUD-20). O `dist/react` deixa de ser um bundle único: cada arquivo de `src/components` e `src/lib` vira um módulo ESM próprio (imports relativos com `.js`), e o `index.js` só reexporta. Com o `sideEffects` restrito ao CSS, o bundler do app poda o que não é importado: `import { Button } from "@semec/ds/react"` cai de ~340 kB para ~33 kB minificado com as dependências (2 kB só de código do kit). Os componentes interativos (estado, efeitos, contexto, Radix ou handlers) passam a declarar `"use client"`, preservado no `dist`, e importar `@semec/ds/react` num Server Component do Next App Router deixa de quebrar; os apresentacionais (`Heading`, `Card`, `Badge`, `Button`, `Link`, `Table` etc.) renderizam no servidor. Novos subpaths `@semec/ds/react/<componente>` (ex.: `@semec/ds/react/button`), com tipos. Mudança só aditiva: `@semec/ds/react` e os demais exports seguem iguais. Novo `npm run test:dist` (CI) prova o import na camada `react-server` e limita o tamanho do `Button` sozinho.

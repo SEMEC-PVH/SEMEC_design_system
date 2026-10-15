@@ -62,6 +62,8 @@ Use o componente `Drawer` (Drawer) importado de `@semec/ds/react`; não reimplem
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";

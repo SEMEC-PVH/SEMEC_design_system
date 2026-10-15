@@ -53,6 +53,8 @@ Use o componente `Tooltip` (Dica) importado de `@semec/ds/react`; não reimpleme
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 

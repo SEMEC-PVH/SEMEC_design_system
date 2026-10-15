@@ -55,6 +55,8 @@ Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; 
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import { Calendar as CalendarIcon } from "lucide-react";
 

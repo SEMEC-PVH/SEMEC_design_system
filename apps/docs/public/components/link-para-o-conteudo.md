@@ -52,6 +52,8 @@ Use o componente `SkipLink` (Link para o conteúdo) importado de `@semec/ds/reac
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 
 import { cn } from "../lib/utils";

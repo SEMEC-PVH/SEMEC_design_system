@@ -47,7 +47,7 @@ Sem a fonte, o texto cai em `system-ui` (fallback do token `--font-family-sans`)
 
 **Providers no root (quando usar):** `<Toaster />` se usar `useToast()`; `<TooltipProvider>` em volta do app se usar `Tooltip`; `<SemecProvider nonce>` só para CSP estrita. O `SemecProvider` não inclui os outros dois.
 
-**Next.js App Router:** na 3.x o `dist` é bundle único **sem `"use client"`**. Importe o kit só em arquivos `"use client"` (inclusive o componente de providers); importar num Server Component quebra. Não use `export *` do kit num arquivo `"use client"`. Saída por módulo e fronteira RSC: planejadas para a 4.0 (AUD-20).
+**Next.js App Router:** desde a 3.2 o `dist` sai por módulo e cada componente interativo já traz `"use client"`; importar `@semec/ds/react` num Server Component funciona (apresentacionais como `Heading`, `Card`, `Badge`, `Button`, `Link`, `Table` renderizam no servidor). Passar handler (`onClick`, `onValueChange`…) ou usar hook continua exigindo um arquivo `"use client"` seu. Não use `export *` do kit num arquivo `"use client"`. Um componente só: `@semec/ds/react/<arquivo>` (ex.: `@semec/ds/react/button`). Na 3.0/3.1 (bundle único, sem `"use client"`) o kit só funcionava em arquivos `"use client"`.
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0). Use só `tokens.css` (+ `@source`). Preset JS opcional: `@config "@semec/ds/react/pv-preset"`.
 
@@ -148,7 +148,7 @@ O `@theme inline` do `tokens.css` gera utilitários para cor, espaçamento (`p-s
 
 Pesos: `font-regular` 400, `font-medium` 500, `font-semibold` 600, `font-bold` 700 (não existem 800/900).
 
-**Raio:** `rounded-sm` 2px · `rounded-md` 8px · `rounded-lg` 12px · `rounded-full`. Escolha pelo papel (controle `rounded-md`, cartão `rounded-lg`, pílula `rounded-full`), não pelo px: a escala pode mudar na 4.0 (AUD-57).
+**Raio:** `rounded-sm` 2px · `rounded-md` 8px · `rounded-lg` 12px · `rounded-full`. Escolha pelo papel (controle `rounded-md`, cartão `rounded-lg`, pílula `rounded-full`). A escala é fixa (decisão de 15/10/2026); não use `rounded-xl` ou acima, que ficam fora dela.
 
 **Sombra:** `shadow-elevation-1/2/3` (nunca `shadow-md` e afins do Tailwind, que usam preto puro).
 
@@ -450,8 +450,6 @@ Avisadas a partir da 3.1.0, conforme o ADR-013 (duas minors antes de remover). N
 - Importar por caminho de arquivo em `dist/` (`@semec/ds/dist/react/...`): use só os subpaths do `exports` (AUD-20).
 - `onChange(value)` / `onChange(files)` em `Calendar`, `Combobox`, `DatePicker`, `InputOTP` e `FileUpload`: use `onValueChange` (mesma assinatura, existe em todos desde a 3.2.0). No `DatePicker`, o `onChange` volta a ser o evento nativo na 4.0 (AUD-35).
 - Utilitários de primitivo `bg-pv-*` / `text-pv-*` / `border-pv-*`: use os semânticos (AUD-55).
-- Valores atuais de `rounded-sm` (2px) e `rounded-lg` (12px): escolha o raio pelo papel (AUD-57).
-- `disabled` nativo no `Button` como seletor (`:disabled`) ou em testes: o estado pode passar a `aria-disabled`, e o `Button` ganha `loading` (AUD-63).
 
 
 <!-- ds:maintainer:start -->

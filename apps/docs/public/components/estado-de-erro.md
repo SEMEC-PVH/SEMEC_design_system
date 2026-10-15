@@ -62,6 +62,8 @@ Use o componente `ErrorState` (Estado de erro) importado de `@semec/ds/react`; n
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import { AlertCircle, RotateCcw } from "lucide-react";
 

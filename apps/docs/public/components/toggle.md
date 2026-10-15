@@ -51,6 +51,8 @@ Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplem
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as TogglePrimitive from "@radix-ui/react-toggle";
 import { cva, type VariantProps } from "class-variance-authority";

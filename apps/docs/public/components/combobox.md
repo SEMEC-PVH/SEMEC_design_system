@@ -64,6 +64,8 @@ Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reim
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Check, ChevronsUpDown } from "lucide-react";

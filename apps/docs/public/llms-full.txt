@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-15T12:27:03.000Z — packages/react/manifest.js + packages/react/* — versão 3.1.0
+> Gerado 2026-10-15T12:30:10.000Z — packages/react/manifest.js + packages/react/* — versão 3.1.0
 
 ## Instalação
 
@@ -1276,6 +1276,8 @@ Use o componente `Input` (Caixa de texto) importado de `@semec/ds/react`; não r
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 
 import { cn } from "../lib/utils";
@@ -1348,6 +1350,8 @@ Use o componente `Textarea` (Área de texto) importado de `@semec/ds/react`; nã
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 
 import { cn } from "../lib/utils";
@@ -1433,6 +1437,8 @@ Use o componente `Select` (Menu de seleção) importado de `@semec/ds/react`; n�
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
@@ -1636,6 +1642,8 @@ Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reim
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -2053,6 +2061,8 @@ Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; 
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import { Calendar as CalendarIcon } from "lucide-react";
 
@@ -2202,6 +2212,8 @@ Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import { UploadCloud } from "lucide-react";
 
@@ -2519,6 +2531,8 @@ Use o componente `Checkbox` (Caixa de marcação) importado de `@semec/ds/react`
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { Check } from "lucide-react";
@@ -2585,6 +2599,8 @@ Use o componente `RadioGroup` (Botão de opção) importado de `@semec/ds/react`
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Circle } from "lucide-react";
@@ -2665,6 +2681,8 @@ Use o componente `Switch` (Interruptor) importado de `@semec/ds/react`; não rei
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as SwitchPrimitives from "@radix-ui/react-switch";
 
@@ -2724,6 +2742,8 @@ Use o componente `Label` (Rótulo) importado de `@semec/ds/react`; não reimplem
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as LabelPrimitive from "@radix-ui/react-label";
 
@@ -2785,6 +2805,8 @@ Use o componente `FormField` (Campo de formulário) importado de `@semec/ds/reac
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 
 import { cn } from "../lib/utils";
@@ -3810,6 +3832,8 @@ Use o componente `ErrorState` (Estado de erro) importado de `@semec/ds/react`; n
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import { AlertCircle, RotateCcw } from "lucide-react";
 
@@ -4061,6 +4085,8 @@ Use o componente `Header` (Cabeçalho) importado de `@semec/ds/react`; não reim
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 
 import { cn } from "../lib/utils";
@@ -4259,6 +4285,8 @@ Use o componente `SkipLink` (Link para o conteúdo) importado de `@semec/ds/reac
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 
 import { cn } from "../lib/utils";
@@ -4497,6 +4525,8 @@ Use o componente `Tabs` (Abas) importado de `@semec/ds/react`; não reimplemente
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 
@@ -4585,6 +4615,8 @@ Use o componente `Pagination` (Paginação) importado de `@semec/ds/react`; não
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -4738,6 +4770,8 @@ Use o componente `SidebarToggleButton` (Gatilho da barra lateral) importado de `
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 
 import { IconButton, type IconButtonProps } from "./icon-button";
@@ -4876,6 +4910,8 @@ Use o componente `Dialog` (Modal) importado de `@semec/ds/react`; não reimpleme
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
@@ -5351,6 +5387,8 @@ Use o componente `Tooltip` (Dica) importado de `@semec/ds/react`; não reimpleme
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
@@ -5578,6 +5616,8 @@ Use o componente `Accordion` (Acordeão) importado de `@semec/ds/react`; não re
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import { ChevronDown } from "lucide-react";
@@ -5683,6 +5723,8 @@ Use o componente `AlertDialog` (Diálogo de alerta) importado de `@semec/ds/reac
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import type * as DialogPrimitive from "@radix-ui/react-dialog";
@@ -5913,6 +5955,8 @@ Use o componente `Popover` (Popover) importado de `@semec/ds/react`; não reimpl
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 
@@ -6025,6 +6069,8 @@ Use o componente `Avatar` (Avatar) importado de `@semec/ds/react`; não reimplem
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 
@@ -6101,6 +6147,8 @@ Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplem
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as TogglePrimitive from "@radix-ui/react-toggle";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -6245,6 +6293,8 @@ Use o componente `Progress` (Progresso) importado de `@semec/ds/react`; não rei
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as ProgressPrimitive from "@radix-ui/react-progress";
 
@@ -6311,6 +6361,8 @@ Use o componente `Slider` (Slider) importado de `@semec/ds/react`; não reimplem
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 
@@ -6437,6 +6489,8 @@ Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não rei
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 
 import { cn } from "../lib/utils";
@@ -6814,6 +6868,8 @@ Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não r
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -7149,6 +7205,8 @@ Use o componente `ScrollArea` (Área de scroll) importado de `@semec/ds/react`; 
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
@@ -7232,6 +7290,8 @@ Use o componente `DropdownMenu` (Menu suspenso) importado de `@semec/ds/react`; 
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronRight, Circle } from "lucide-react";
@@ -7486,6 +7546,8 @@ Use o componente `Drawer` (Drawer) importado de `@semec/ds/react`; não reimplem
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
@@ -7663,6 +7725,8 @@ Use o componente `Sheet` (Sheet) importado de `@semec/ds/react`; não reimplemen
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
@@ -7844,6 +7908,8 @@ Use o componente `DataTable` (Tabela de dados) importado de `@semec/ds/react`; n
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -8302,6 +8368,8 @@ Use o componente `NavigationMenu` (Menu de navegação) importado de `@semec/ds/
 
 Fonte:
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { cva } from "class-variance-authority";
@@ -9443,20 +9511,23 @@ export function Providers({ children }: { children: React.ReactNode }) {
 }
 ```
 
-### 5. Next.js App Router: importe o kit só em arquivos `"use client"`
+### 5. Next.js App Router: Server Components e `"use client"`
 
-Na 3.0 e na 3.1 o `dist` é **um bundle único, sem a diretiva `"use client"`**. Importar `@semec/ds/react` num Server Component quebra (hooks como `useLayoutEffect` não existem no ambiente `react-server`). Até a correção (planejada para uma versão futura, AUD-20):
+A partir da 3.2 o `dist` sai **um arquivo por módulo**, e cada componente interativo (estado, efeitos, contexto, Radix ou handlers) começa com `"use client"`. Por isso:
 
-- use os componentes em arquivos que começam com `"use client"`;
-- monte os providers do passo 4 num componente `"use client"` (ex.: `app/providers.tsx`) e use-o no `layout`;
-- não use `export *` para reexportar o kit num arquivo `"use client"`; reexporte por nome ou importe direto.
+- **pode importar `@semec/ds/react` num Server Component.** Os componentes de apresentação (`Heading`, `Card`, `Badge`, `Button`, `Link`, `Table`, `Alert`, `Skeleton`, `Spinner`, `Separator`, `Breadcrumb`, `EmptyState`, `Footer`, `Timeline`, `IconButton`) renderizam no servidor; os interativos viram fronteira de cliente sozinhos;
+- props de função (`onClick`, `onValueChange`, `onOpenChange`…) continuam exigindo um arquivo `"use client"` seu, como em qualquer componente de cliente;
+- os providers do passo 4 já são de cliente e podem ir direto no `layout`;
+- não use `export *` para reexportar o kit num arquivo `"use client"` (o Next não aceita); reexporte por nome ou importe direto.
+
+Na 3.0 e na 3.1 o `dist` era um bundle único sem `"use client"` e importar o kit num Server Component quebrava; se estiver preso a essas versões, use o kit só em arquivos `"use client"`.
 
 Em Vite/SPA nada disso se aplica.
 
 ## Uso rápido
 
 ```tsx
-"use client"; // só necessário no Next App Router
+"use client"; // no Next App Router, só se este arquivo passar handlers ou usar hooks
 
 import { Button, Input, Card, CardHeader, CardTitle, CardContent, Label } from "@semec/ds/react";
 
@@ -9540,6 +9611,7 @@ import { cn } from "@semec/ds/react";
 | Import | O que é |
 |---|---|
 | `@semec/ds/react` | Todos os componentes, `cn()`, masks e validadores puros |
+| `@semec/ds/react/<componente>` | Um componente só, pelo nome do arquivo em `src/components` (ex.: `@semec/ds/react/button`, `@semec/ds/react/dialog`, `@semec/ds/react/form-field`). Desde a 3.2 |
 | `@semec/ds/react/validacao` | Schemas Zod (exige o peer `zod`) |
 | `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) + utilitários de animação |
 | `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS config) |
@@ -9552,6 +9624,8 @@ import { cn } from "@semec/ds/react";
 | `@semec/ds/skills/components/*.md` | Chunk RAG por componente |
 | `@semec/ds/skills/semec-ds` | Skill full do agente |
 | `@semec/ds/lite/skills/semec-ds-lite` | Skill lite (tokens + a11y + responsive) |
+
+**Poda (tree-shaking).** Desde a 3.2 cada componente é um módulo ESM próprio em `dist/react/components/` e o pacote declara `"sideEffects": ["**/*.css"]`, então o bundler do app descarta o que não é importado: `import { Button } from "@semec/ds/react"` custa cerca de 33 kB minificado com as dependências (quase tudo `tailwind-merge`) e 2 kB só de código do kit, em vez do kit inteiro (~340 kB na 3.1). Importar pela raiz ou pelo subpath dá o mesmo resultado num bundler com poda; o subpath ajuda ferramentas sem poda (ex.: `next dev` sem `optimizePackageImports`) e testes. A CI mede isso (`npm run test:dist`).
 
 Metadados de componente (o que versões anteriores deste README chamavam de `getComponentMetadata()`, função que nunca existiu) vêm de `@semec/ds/skills`: `dsBySlug["botoes"]`, `dsComponents`.
 
@@ -9632,20 +9706,17 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 - **Tailwind CSS**: v4+ no app (com `@source` apontando para `node_modules/@semec/ds/dist/react`, caminho relativo ao CSS)
 - **Instaladas automaticamente**: todos os `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, `get-nonce`
 
-## Limitações conhecidas (3.0 e 3.1)
+## Limitações conhecidas
 
-- **Bundle único**: importar uma peça carrega o kit inteiro (sem poda de árvore por módulo). Saída por módulo planejada para uma versão futura (AUD-20).
-- **Sem fronteira RSC**: ver o passo 5 de [Comece aqui](#comece-aqui).
+- **3.0 e 3.1: bundle único e sem fronteira RSC.** Importar uma peça carregava o kit inteiro e importar `@semec/ds/react` num Server Component quebrava. Corrigido na 3.2 (saída por módulo, `"use client"` por componente e subpaths `@semec/ds/react/*`; ver o passo 5 de [Comece aqui](#comece-aqui) e [Subpath exports](#subpath-exports)).
 
 ## Depreciações anunciadas (saem na 4.0)
 
 Avisadas a partir da 3.1.0 e válidas até a 4.0 (política de duas minors, ADR-013). Lista completa, com o que usar no lugar: [CONTRIBUTING.md § Depreciações anunciadas](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/CONTRIBUTING.md#depreciações-anunciadas).
 
-- Importar por caminho de arquivo em `dist/` (o bundle único vira saída por módulo e subpaths `@semec/ds/react/*`).
+- Importar por caminho de arquivo em `dist/` (o layout interno do `dist` não é contrato; use `@semec/ds/react` ou os subpaths `@semec/ds/react/*`, disponíveis desde a 3.2).
 - `onChange(value)` / `onChange(files)` nos campos não nativos (`Combobox`, `InputOTP`, `DatePicker`, `FileUpload`, `Calendar`): use `onValueChange`, com a mesma assinatura, disponível em todos desde a 3.2.0 (contrato `value` / `onValueChange` / `name` / `id` / `invalid`, ADR-015).
 - Utilitários de primitivo `bg-pv-*` / `text-pv-*` (use os semânticos).
-- Valores atuais de `rounded-sm` e `rounded-lg` (escolha o raio pelo papel, não pelo px).
-- `Button` desabilitado por `disabled` nativo (pode virar `aria-disabled`; não dependa de `:disabled`).
 
 O que a 2.0.0 removeu sem aviso está na errata do [CHANGELOG](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/CHANGELOG.md).
 

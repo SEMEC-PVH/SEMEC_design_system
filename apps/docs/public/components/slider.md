@@ -51,6 +51,8 @@ Use o componente `Slider` (Slider) importado de `@semec/ds/react`; não reimplem
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 
