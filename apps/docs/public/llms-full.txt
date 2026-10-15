@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-15T16:02:39.000Z — packages/react/manifest.js + packages/react/* — versão 4.0.0
+> Gerado 2026-10-15T16:05:20.000Z — packages/react/manifest.js + packages/react/* — versão 4.0.1
 
 ## Instalação
 
@@ -984,7 +984,7 @@ export default {
 ```json
 {
   "name": "@semec/ds",
-  "version": "4.0.0"
+  "version": "4.0.1"
 }
 ```
 
