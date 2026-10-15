@@ -98,12 +98,13 @@ describe("Button loading", () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  it("asChild + loading: spinner no link, navegação e clique bloqueados, foco mantido", () => {
+  it("asChild + loading: spinner no link, navegação e onClick do filho bloqueados, foco mantido", () => {
     const onParentClick = vi.fn();
+    const onLinkClick = vi.fn();
     const { rerender } = render(
       <div onClick={onParentClick}>
         <Button asChild>
-          <a href="/protocolo">Ver protocolo</a>
+          <a href="/protocolo" onClick={onLinkClick}>Ver protocolo</a>
         </Button>
       </div>
     );
@@ -112,7 +113,7 @@ describe("Button loading", () => {
     rerender(
       <div onClick={onParentClick}>
         <Button asChild loading>
-          <a href="/protocolo">Ver protocolo</a>
+          <a href="/protocolo" onClick={onLinkClick}>Ver protocolo</a>
         </Button>
       </div>
     );
@@ -124,7 +125,32 @@ describe("Button loading", () => {
     expect(link.querySelector("svg.animate-spin")).not.toBeNull();
     // fireEvent devolve false quando o evento teve preventDefault.
     expect(fireEvent.click(link)).toBe(false);
-    expect(onParentClick).not.toHaveBeenCalled();
+    expect(onLinkClick).not.toHaveBeenCalled();
+    // O clique continua subindo para os ancestrais (N2).
+    expect(onParentClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("loading: ancestrais e document recebem o clique; o onClick do botão não", () => {
+    const onClick = vi.fn();
+    const onParentClick = vi.fn();
+    const onDocumentClick = vi.fn();
+    document.addEventListener("click", onDocumentClick);
+    try {
+      render(
+        <div onClick={onParentClick}>
+          <Button loading onClick={onClick}>
+            Salvar
+          </Button>
+        </div>
+      );
+      const button = screen.getByRole("button", { name: "Salvar" });
+      expect(fireEvent.click(button)).toBe(false);
+      expect(onClick).not.toHaveBeenCalled();
+      expect(onParentClick).toHaveBeenCalledTimes(1);
+      expect(onDocumentClick).toHaveBeenCalledTimes(1);
+    } finally {
+      document.removeEventListener("click", onDocumentClick);
+    }
   });
 
   it("sem `loading` o comportamento não muda (disabled nativo continua valendo)", () => {

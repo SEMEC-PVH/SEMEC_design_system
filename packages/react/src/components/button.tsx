@@ -89,7 +89,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {!loading ? (
           children
         ) : asChild ? (
-          [<ButtonLoadingIndicator key="loading" />, <Slottable key="child">{children}</Slottable>]
+          [
+            <ButtonLoadingIndicator key="loading" />,
+            // O Slot mesclaria o onClick do filho (ex.: <a onClick>): durante o
+            // loading ele também não é repassado.
+            <Slottable key="child">
+              {React.isValidElement<{ onClick?: unknown }>(children)
+                ? React.cloneElement(children, { onClick: undefined })
+                : children}
+            </Slottable>,
+          ]
         ) : (
           <>
             <ButtonLoadingIndicator />

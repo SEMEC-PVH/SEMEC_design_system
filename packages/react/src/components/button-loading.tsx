@@ -14,9 +14,11 @@ import { Spinner } from "./spinner";
  * continua código de servidor, e o elemento `<button>`/`<a>` é o mesmo com e
  * sem `loading`, então quem estava com o foco nele não o perde.
  *
- * O listener fica no próprio elemento (pai do spinner): `preventDefault`
- * cancela o envio do formulário e a navegação do link, e `stopPropagation`
- * impede que o clique chegue aos handlers do React (delegados na raiz).
+ * O listener fica no próprio elemento (pai do spinner) e só chama
+ * `preventDefault`, que cancela o envio do formulário e a navegação do link.
+ * O clique continua subindo: handlers de ancestrais (onClick de um container,
+ * analytics no `document`) recebem o evento. Os handlers de quem usa o botão
+ * não disparam porque o `Button` não os repassa durante o `loading`.
  */
 const ButtonLoadingIndicator = () => {
   const ref = React.useRef<HTMLDivElement>(null);
@@ -26,7 +28,6 @@ const ButtonLoadingIndicator = () => {
     if (!host) return;
     const block = (event: Event) => {
       event.preventDefault();
-      event.stopPropagation();
     };
     host.addEventListener("click", block);
     return () => host.removeEventListener("click", block);
