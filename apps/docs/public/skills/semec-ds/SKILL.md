@@ -55,7 +55,7 @@ O pacote **não** exporta `shadcn.css` (removido na 2.0.0). Use só `tokens.css`
 
 ### L0 — Primitivos (`--pv-*`)
 
-Valores brutos. Nunca use direto em componente ou tela (nem como utilitário `bg-pv-*`, que sai na 4.0).
+Valores brutos. Nunca use direto em componente ou tela. Desde a 4.0 não existem utilitários `bg-pv-*` / `text-pv-*` / `border-pv-*` (AUD-55): a classe não gera CSS. Use o semântico do papel (tabela em `docs/migracao-4.0.md`).
 
 | Token | Valor | Uso |
 |-------|-------|-----|
@@ -83,11 +83,11 @@ Valores brutos. Nunca use direto em componente ou tela (nem como utilitário `bg
 
 Camada do dia a dia. Diz o papel, não a cor. Use estes, nunca os L0.
 
-**Cor:** `--bg`, `--fg`, `--surface`, `--surface-alt`, `--surface-sunken`, `--border`, `--border-strong`, `--focus-ring`, `--focus-ring-inverse`, `--text-muted`, `--text-secondary`, `--text-strong`, `--text-on-brand`, `--tint`, `--brand-hero`
+**Cor:** `--bg`, `--fg`, `--surface`, `--surface-alt`, `--surface-sunken`, `--border`, `--border-strong`, `--focus-ring`, `--focus-ring-inverse`, `--text-muted`, `--text-secondary`, `--text-strong`, `--text-on-brand`, `--text-brand`, `--tint`, `--brand-hero`
 
 **Ação:** `--action-primary`, `--action-primary-hover`, `--action-primary-active`
 
-**Feedback:** `--feedback-success`, `--feedback-warning`, `--feedback-danger`, `--feedback-info` (+ `-surface`)
+**Feedback:** `--feedback-success`, `--feedback-warning`, `--feedback-danger`, `--feedback-info` (+ `-surface`); `--feedback-success-emphasis` + `--text-on-success-emphasis` (verde cheio do Toast `success`)
 
 **Tipografia:** `--font-family-sans`, `--text-xs/sm/base/lg/xl/2xl/3xl` e `--text-display`, `--leading-*`, `--font-regular/medium/semibold/bold`
 
@@ -118,11 +118,13 @@ O `@theme inline` do `tokens.css` gera utilitários para cor, espaçamento (`p-s
 | Texto em destaque (15,77:1) | `--text-strong` | `text-text-strong` (ou `text-foreground`) |
 | Texto sobre marca/ação | `--text-on-brand` | `text-text-on-brand` (ou `text-primary-foreground`) |
 | Marca | `--brand-hero` | `bg-brand-hero`, `text-brand-hero` |
+| Título institucional escuro (12,43:1) | `--text-brand` | `text-text-brand` |
 | Ação primária | `--action-primary` (+ hover/active) | `bg-primary`, `hover:bg-primary-hover`, `active:bg-primary-active`, `text-primary` |
 | Anel de foco | `--focus-ring` | `ring-ring`, `outline-ring` |
 | Anel de foco sobre marca | `--focus-ring-inverse` | `ring-ring-inverse` |
 | Perigo | `--feedback-danger` (+ surface) | `bg-destructive`, `text-destructive`, `bg-destructive-surface` |
 | Sucesso / aviso / info | `--feedback-*` (+ surface) | `text-success`, `bg-success-surface`, `text-warning`, `bg-warning-surface`, `text-info`, `bg-info-surface` |
+| Sucesso em destaque (fundo cheio, texto 5,85:1) | `--feedback-success-emphasis` / `--text-on-success-emphasis` | `bg-success-emphasis text-success-emphasis-foreground` (nunca o verde cheio como texto: 2,13:1) |
 | Superfície colorida leve | `--tint` | `bg-tint` |
 
 **Armadilha (AUD-30):** **nunca** use `text-muted` nem `text-secondary` para texto: eles **compilam para a cor de fundo** `--surface-alt` (1,09:1, texto invisível), porque `--color-muted` e `--color-secondary` são cores de superfície no estilo shadcn. Use `text-text-muted`, `text-text-secondary` e `text-text-strong`.
@@ -458,7 +460,7 @@ export function ExemploFormulario() {
 Todo controle de formulário do kit fala a mesma língua: `value` / `defaultValue` · `onValueChange(valor)` · `name` · `id` · `invalid` · `disabled` · `required`.
 
 - `onValueChange` recebe o **valor** (string, `File[]`, `Date`, `number[]`), nunca o evento. Use-o em `Input`, `Textarea`, `DatePicker`, `Combobox`, `InputOTP`, `FileUpload`, `Calendar`, `Select`, `RadioGroup` e `Slider`.
-- Em `Input`/`Textarea`, `onChange` continua sendo o evento nativo (não está obsoleto). Em `Combobox`, `InputOTP`, `DatePicker`, `FileUpload` e `Calendar`, o `onChange(valor)` está obsoleto: não gere código novo com ele.
+- `onChange` é sempre o **evento nativo**: em `Input`, `Textarea` e, desde a 4.0, `DatePicker`. `Combobox`, `InputOTP`, `FileUpload` e `Calendar` não têm `onChange` (removido na 4.0; o tipo recusa e o componente descarta, com `console.error` em desenvolvimento): use `onValueChange`.
 - `Checkbox` e `Switch` mantêm a API Radix: `checked` / `onCheckedChange` (equivalem a `value` / `onValueChange`; ali `value` é o valor enviado no form). `Toggle` (`pressed` / `onPressedChange`) não é controle de formulário.
 - `invalid` (boolean) vira `aria-invalid="true"` + borda de erro. Dentro do `FormField`, `error="mensagem"` já marca o filho; `invalid` explícito no controle vence. `error` é sempre texto (`FormField`, `FileUpload`); para marcar sem texto, use `invalid` (o `FormField` também aceita).
 - `name` envia em `<form>` nativo, inclusive em `Combobox` e `InputOTP` (input oculto). No `Select`, `name`/`value`/`onValueChange` vão na raiz e `invalid` no `SelectTrigger`.
@@ -504,13 +506,18 @@ Todo controle de formulário do kit fala a mesma língua: `value` / `defaultValu
 - Sem hex solto, sem `rgba()`, sem `style` inline — use tokens L1
 - CSP: Dialog/Drawer/Sheet/DropdownMenu usam `SemecProvider` com nonce. Medido (SEM-752/780): Popover 0 violações; ScrollArea e Select 1 cada, mesmo com nonce (CSS estático de scrollbar no `tokens.css`).
 
-## Depreciações anunciadas (saem na 4.0)
+## Removido na 4.0 e depreciações anunciadas
 
-Avisadas a partir da 3.1.0, conforme o ADR-013 (duas minors antes de remover). Não gere código novo que dependa disto:
+Removido na 4.0 (anunciado desde a 3.1.0, ADR-013). Guia com antes/depois e codemod (`npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 <pasta>`): https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/migracao-4.0.md
 
-- Importar por caminho de arquivo em `dist/` (`@semec/ds/dist/react/...`): use só os subpaths do `exports` (AUD-20).
-- `onChange(value)` / `onChange(files)` em `Calendar`, `Combobox`, `DatePicker`, `InputOTP` e `FileUpload`: use `onValueChange` (mesma assinatura, existe em todos desde a 3.2.0). No `DatePicker`, o `onChange` volta a ser o evento nativo na 4.0 (AUD-35).
-- Utilitários de primitivo `bg-pv-*` / `text-pv-*` / `border-pv-*`: use os semânticos (AUD-55).
+- `onChange(value)` / `onChange(files)` de `Calendar`, `Combobox`, `InputOTP` e `FileUpload`: use `onValueChange` (AUD-35). No `DatePicker`, `onChange` é o evento nativo e o valor vem em `onValueChange`.
+- Utilitários de primitivo `bg-pv-*` / `text-pv-*` / `border-pv-*` e as variáveis `--color-pv-*`: use os semânticos (AUD-55). As variáveis `--pv-*` continuam, mas não são para uso direto.
+- Import por caminho de arquivo em `dist/` (`@semec/ds/dist/react/...`): use só os subpaths do `exports` (AUD-20).
+
+Depreciado, sai na 5.0 (não gere código novo com isto):
+
+- `Combobox`: `ariaLabel` (use rótulo visível ou o atributo `aria-label`) e `emptyMessage` (use `emptyText`).
+- `AlertDialog` `modal` e `AlertDialogContent` `onPointerDownOutside` / `onInteractOutside`: já são ignorados.
 
 ## Arquivos para IA
 

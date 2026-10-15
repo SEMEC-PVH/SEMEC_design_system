@@ -16,7 +16,7 @@ import { buttonVariants } from "./button";
 export interface AlertDialogProps extends AlertDialogPrimitive.AlertDialogProps {
   /**
    * @deprecated Ignorado: o AlertDialog é sempre modal. Mantido só por
-   * compatibilidade com a versão anterior.
+   * compatibilidade com a versão anterior; sai na 5.0 (anunciado na 4.0).
    */
   modal?: boolean;
 }
@@ -49,12 +49,12 @@ export interface AlertDialogContentProps
   extends AlertDialogPrimitive.AlertDialogContentProps {
   /**
    * @deprecated Ignorado: o AlertDialog não fecha por clique fora. Mantido só
-   * por compatibilidade com a versão anterior.
+   * por compatibilidade com a versão anterior; sai na 5.0 (anunciado na 4.0).
    */
   onPointerDownOutside?: DialogPrimitive.DialogContentProps["onPointerDownOutside"];
   /**
    * @deprecated Ignorado: o AlertDialog não fecha por interação fora. Mantido
-   * só por compatibilidade com a versão anterior.
+   * só por compatibilidade com a versão anterior; sai na 5.0 (anunciado na 4.0).
    */
   onInteractOutside?: DialogPrimitive.DialogContentProps["onInteractOutside"];
 }

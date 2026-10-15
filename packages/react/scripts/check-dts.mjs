@@ -34,6 +34,13 @@ import { Stepper as SubStepper, type StepperProps } from "@semec/ds/react/steppe
 import { InputMask as SubInputMask, applyInputMask, inputMaskPatterns, type InputMaskPreset } from "@semec/ds/react/input-mask";
 import { PasswordInput as SubPasswordInput, type PasswordInputProps } from "@semec/ds/react/password-input";
 import { FormField as SubFormField, useFormFieldControl } from "@semec/ds/react/form-field";
+import type {
+  CalendarProps,
+  ComboboxProps,
+  DatePickerProps,
+  FileUploadProps,
+  InputOTPProps,
+} from "@semec/ds/react";
 // Módulo interno do loading: fica fora dos exports e não pode resolver.
 // @ts-expect-error
 import { ButtonLoadingIndicator } from "@semec/ds/react/button-loading";
@@ -67,6 +74,30 @@ export const element = (
   </FormField>
 );
 
+// 4.0 (AUD-35): o onChange(valor) saiu. O tipo recusa o handler antigo...
+// @ts-expect-error onChange(date) removido do Calendar
+const oldCalendar: CalendarProps = { onChange: (date: Date) => date };
+// @ts-expect-error onChange(value) removido do Combobox
+const oldCombobox: ComboboxProps = { options: [], onChange: (value: string) => value };
+// @ts-expect-error onChange(value) removido do InputOTP
+const oldOtp: InputOTPProps = { onChange: (value: string) => value };
+// @ts-expect-error onChange(files) removido do FileUpload
+const oldUpload: FileUploadProps = { onChange: (files: File[]) => files };
+// @ts-expect-error no DatePicker, onChange é o evento nativo, não a string
+const oldDatePicker: DatePickerProps = { onChange: (value: string) => value.trim() };
+// ...e aceita o contrato novo: onValueChange(valor) e, no DatePicker, o evento nativo.
+const newProps: [CalendarProps, ComboboxProps, InputOTPProps, FileUploadProps, DatePickerProps] = [
+  { onValueChange: (date: Date) => date },
+  { options: [], onValueChange: (value: string) => value },
+  { onValueChange: (value: string) => value },
+  { onValueChange: (files: File[]) => files },
+  {
+    onValueChange: (value: string) => value,
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => event.target.value,
+  },
+];
+
+export { oldCalendar, oldCombobox, oldOtp, oldUpload, oldDatePicker, newProps };
 export { same, masked, pattern, classes, useFormFieldControl, React };
 `;
 
@@ -97,7 +128,7 @@ try {
     console.error("check-dts: os .d.ts publicados não compilam como consumidor nodenext:");
     console.error((result.stdout || "") + (result.stderr || ""));
   } else {
-    console.log("check-dts: ok (@semec/ds/react e subpaths button, stepper, input-mask, password-input, form-field; button-loading fechado; nodenext, skipLibCheck false).");
+    console.log("check-dts: ok (@semec/ds/react e subpaths button, stepper, input-mask, password-input, form-field; button-loading fechado; onChange(valor) da 3.x recusado; nodenext, skipLibCheck false).");
   }
 } finally {
   fs.rmSync(dir, { recursive: true, force: true });

@@ -41,6 +41,7 @@ export default {
         "text-secondary": "var(--text-secondary)",
         "text-strong": "var(--text-strong)",
         "text-on-brand": "var(--text-on-brand)",
+        "text-brand": "var(--text-brand)",
         primary: {
           DEFAULT: "var(--action-primary)",
           hover: "var(--action-primary-hover)",
@@ -55,6 +56,10 @@ export default {
         success: {
           DEFAULT: "var(--feedback-success)",
           surface: "var(--feedback-success-surface)",
+          emphasis: {
+            DEFAULT: "var(--feedback-success-emphasis)",
+            foreground: "var(--text-on-success-emphasis)",
+          },
         },
         warning: {
           DEFAULT: "var(--feedback-warning)",
@@ -66,41 +71,8 @@ export default {
         },
         tint: "var(--tint)",
         "brand-hero": "var(--brand-hero)",
-        // @deprecated desde a 3.1.0, sai na 4.0 (AUD-55): cores de primitivo
-        // (`bg-pv-*`, `text-pv-*`). Use o semântico do papel (`bg-primary`,
-        // `bg-brand-hero`, `text-foreground`…). Primitivo novo não entra aqui.
-        "pv-blue": {
-          50: "var(--pv-blue-50)",
-          600: "var(--pv-blue-600)",
-          700: "var(--pv-blue-700)",
-          800: "var(--pv-blue-800)",
-          900: "var(--pv-blue-900)",
-          hero: "var(--pv-blue-hero)",
-        },
-        "pv-green": {
-          50: "var(--pv-green-50)",
-          500: "var(--pv-green-500)",
-          800: "var(--pv-green-800)",
-        },
-        "pv-yellow": {
-          800: "var(--pv-yellow-800)",
-        },
-        "pv-red": {
-          50: "var(--pv-red-50)",
-          700: "var(--pv-red-700)",
-        },
-        "pv-gray": {
-          50: "var(--pv-gray-50)",
-          100: "var(--pv-gray-100)",
-          200: "var(--pv-gray-200)",
-          300: "var(--pv-gray-300)",
-          400: "var(--pv-gray-400)",
-          600: "var(--pv-gray-600)",
-          700: "var(--pv-gray-700)",
-          900: "var(--pv-gray-900)",
-        },
-        "pv-white": "var(--pv-white)",
-        "pv-black": "var(--pv-black)",
+        // Sem cores de primitivo desde a 4.0 (AUD-55): não há `bg-pv-*`.
+        // Use o semântico do papel; tabela em docs/migracao-4.0.md.
       },
       fontFamily: {
         sans: ["var(--font-family-sans)", "system-ui", "sans-serif"],

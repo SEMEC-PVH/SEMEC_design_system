@@ -4,7 +4,7 @@ code: "input-otp"
 slug: "input-otp"
 file: "src/components/input-otp.tsx"
 category: "formularios"
-variants: "composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · deprecadas: onChange(value) (use onValueChange; sai na 4.0)"
+variants: "composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · removidas na 4.0: onChange(value) → use onValueChange"
 ---
 
 # Input OTP — `input-otp`
@@ -17,7 +17,7 @@ variants: "composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSe
 
 - **composição**: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator
 - **props**: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total))
-- **deprecadas**: onChange(value) (use onValueChange; sai na 4.0)
+- **removidas na 4.0**: onChange(value) → use onValueChange
 
 ## Instalação (@semec/ds)
 
@@ -56,7 +56,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec
 ## Prompt para IA
 
 ```text
-Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de código OTP com foco automático entre dígitos. API e variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · deprecadas: onChange(value) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de código OTP com foco automático entre dígitos. API e variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · removidas na 4.0: onChange(value) → use onValueChange. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -66,8 +66,8 @@ Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não rei
 
 import * as React from "react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
-import { warnDeprecated } from "../lib/deprecation";
 import { useFormField, useFormFieldControl } from "./form-field";
 
 interface InputOTPContextValue {
@@ -118,8 +118,13 @@ export interface InputOTPProps
    * Contrato de formulário (ADR-015).
    */
   onValueChange?: (value: string) => void;
-  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
-  onChange?: (value: string) => void;
+  /**
+   * Removido na 4.0 (AUD-35): use `onValueChange`. O InputOTP não tem
+   * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
+   */
+  onChange?: never;
   /** Gera um `<input type="hidden" name>` com o código, para envio em `<form>`. */
   name?: string;
   /** `id` do `<form>` do input oculto, quando o InputOTP fica fora dele. */
@@ -145,7 +150,7 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
       className,
       value,
       defaultValue,
-      onChange,
+      onChange: _removedOnChange,
       onValueChange,
       name,
       form,
@@ -159,6 +164,8 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
     },
     ref
   ) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("InputOTP");
     const isControlled = value !== undefined;
     const slotsRef = React.useRef<(HTMLInputElement | null)[]>([]);
     const [internalSlots, setSlots] = React.useState<string[]>(() =>
@@ -172,12 +179,6 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
         maxLength
       )
     );
-    if (onChange) {
-      warnDeprecated(
-        "InputOTP.onChange",
-        "InputOTP: `onChange(value)` está obsoleto e sai na 4.0. Use `onValueChange(value)`."
-      );
-    }
 
     // Modo controlado: a tela reflete sempre o `value` do pai. O array interno
     // só é usado enquanto o pai aceitar o que foi emitido (value === join), o
@@ -201,9 +202,8 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
       (next: string[]) => {
         setSlots(next);
         onValueChange?.(next.join(""));
-        onChange?.(next.join(""));
       },
-      [onChange, onValueChange]
+      [onValueChange]
     );
 
     const fillFrom = React.useCallback(

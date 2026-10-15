@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-15T13:30:05.000Z — packages/react/manifest.js + packages/react/* — versão 3.2.0
+> Gerado 2026-10-15T14:23:03.000Z — packages/react/manifest.js + packages/react/* — versão 3.2.0
 
 ## Instalação
 
@@ -85,10 +85,10 @@ export * from "./components/input-mask";
    L0 — PRIMITIVOS (`--pv-*`)
         Valores brutos. Invariantes de tema. Nunca use primitivo direto
         em componente nem em tela: nem a variável `--pv-*`, nem utilitário.
-        Os utilitários `bg-pv-*`, `text-pv-*`, `border-pv-*` (gerados de
-        `--color-pv-*` no @theme abaixo) estão DEPRECIADOS desde a 3.1.0 e
-        saem na 4.0 (AUD-55, ADR-013); as variáveis `--pv-*` continuam.
-        Primitivo novo não ganha utilitário.
+        Desde a 4.0 (AUD-55) o @theme não expõe primitivo: os utilitários
+        `bg-pv-*`, `text-pv-*`, `border-pv-*` deixaram de existir. As
+        variáveis `--pv-*` continuam aqui no :root, como base dos L1.
+        Tabela primitivo → semântico: docs/migracao-4.0.md.
 
    L1 — SEMÂNTICOS (`--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`,
         `--feedback-*`, `--space-*`, `--text-*`, `--radius-*`, `--elevation-*`)
@@ -252,6 +252,16 @@ export * from "./components/input-mask";
   --text-on-brand:     var(--pv-white);
   --tint:              var(--pv-blue-50);
 
+  /* Título de seção em azul institucional escuro (SectionHeader). Criado
+     na 4.0 (AUD-55) para substituir `text-pv-blue-900`. 12,43:1 sobre
+     --surface e 11,48:1 sobre --bg.
+     Atenção: é COR, mas divide o prefixo --text-* com os TAMANHOS
+     (--text-xs … --text-display). Por isso fica só aqui no :root, como
+     --text-muted/--text-strong, e o @theme o expõe como --color-text-brand
+     (utilitário text-text-brand). Nunca declare --text-brand no @theme:
+     viraria o utilitário de tamanho text-brand. */
+  --text-brand:        var(--pv-blue-900);
+
   /* ---- Marca ----------------------------------------------------------- */
   --brand-hero:        var(--pv-blue-hero);
 
@@ -270,6 +280,13 @@ export * from "./components/input-mask";
   --feedback-warning-surface: var(--pv-yellow-50);
   --feedback-danger-surface:  var(--pv-red-50);
   --feedback-info-surface:    var(--pv-blue-50);
+
+  /* Sucesso em destaque: fundo verde cheio do Toast `success` com texto
+     azul institucional escuro (5,85:1). Criados na 4.0 (AUD-55) para
+     substituir `bg-pv-green-500` / `text-pv-blue-900`. Não use o verde
+     cheio como cor de texto (2,13:1 sobre --surface). */
+  --feedback-success-emphasis:    var(--pv-green-500);
+  --text-on-success-emphasis:     var(--pv-blue-900);
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Tipografia
@@ -395,38 +412,8 @@ export * from "./components/input-mask";
    valores: as utilities leem as custom properties acima em runtime.
    ========================================================================== */
 @theme inline {
-  /* -- Primitivos: @deprecated desde a 3.1.0, saem na 4.0 (AUD-55) ------
-     Geram bg-pv-*, text-pv-*, border-pv-*. NÃO são para uso direto: use o
-     semântico do papel (bg-primary, bg-brand-hero, text-foreground,
-     bg-success-surface…). Ficam aqui só para não quebrar quem já usa;
-     primitivo novo (ex.: --pv-yellow-50) não entra nesta lista. -- */
-  --color-pv-blue-50:   var(--pv-blue-50);
-  --color-pv-blue-600:  var(--pv-blue-600);
-  --color-pv-blue-700:  var(--pv-blue-700);
-  --color-pv-blue-800:  var(--pv-blue-800);
-  --color-pv-blue-hero: var(--pv-blue-hero);
-
-  --color-pv-green-50:  var(--pv-green-50);
-  --color-pv-green-500: var(--pv-green-500);
-  --color-pv-green-800: var(--pv-green-800);
-  --color-pv-blue-900:  var(--pv-blue-900);
-
-  --color-pv-yellow-800: var(--pv-yellow-800);
-
-  --color-pv-red-50:  var(--pv-red-50);
-  --color-pv-red-700: var(--pv-red-700);
-
-  --color-pv-gray-50:  var(--pv-gray-50);
-  --color-pv-gray-100: var(--pv-gray-100);
-  --color-pv-gray-200: var(--pv-gray-200);
-  --color-pv-gray-300: var(--pv-gray-300);
-  --color-pv-gray-400: var(--pv-gray-400);
-  --color-pv-gray-600: var(--pv-gray-600);
-  --color-pv-gray-700: var(--pv-gray-700);
-  --color-pv-gray-900: var(--pv-gray-900);
-
-  --color-pv-white: var(--pv-white);
-  --color-pv-black: var(--pv-black);
+  /* -- Primitivos: nenhum. Desde a 4.0 (AUD-55) o @theme só expõe
+     semânticos; não há bg-pv-*, text-pv-*, border-pv-*. -- */
 
   /* -- Semânticos (uso shadcn: bg-card, text-muted-foreground, etc.) -- */
   --color-background:           var(--bg);
@@ -462,6 +449,7 @@ export * from "./components/input-mask";
   --color-text-secondary:       var(--text-secondary);
   --color-text-strong:          var(--text-strong);
   --color-text-on-brand:        var(--text-on-brand);
+  --color-text-brand:           var(--text-brand);
 
   --color-destructive-surface: var(--feedback-danger-surface);
   --color-primary-hover:      var(--action-primary-hover);
@@ -469,6 +457,8 @@ export * from "./components/input-mask";
 
   --color-success:            var(--feedback-success);
   --color-success-surface:    var(--feedback-success-surface);
+  --color-success-emphasis:   var(--feedback-success-emphasis);
+  --color-success-emphasis-foreground: var(--text-on-success-emphasis);
   --color-warning:            var(--feedback-warning);
   --color-warning-surface:    var(--feedback-warning-surface);
   --color-info:               var(--feedback-info);
@@ -838,6 +828,7 @@ export default {
         "text-secondary": "var(--text-secondary)",
         "text-strong": "var(--text-strong)",
         "text-on-brand": "var(--text-on-brand)",
+        "text-brand": "var(--text-brand)",
         primary: {
           DEFAULT: "var(--action-primary)",
           hover: "var(--action-primary-hover)",
@@ -852,6 +843,10 @@ export default {
         success: {
           DEFAULT: "var(--feedback-success)",
           surface: "var(--feedback-success-surface)",
+          emphasis: {
+            DEFAULT: "var(--feedback-success-emphasis)",
+            foreground: "var(--text-on-success-emphasis)",
+          },
         },
         warning: {
           DEFAULT: "var(--feedback-warning)",
@@ -863,41 +858,8 @@ export default {
         },
         tint: "var(--tint)",
         "brand-hero": "var(--brand-hero)",
-        // @deprecated desde a 3.1.0, sai na 4.0 (AUD-55): cores de primitivo
-        // (`bg-pv-*`, `text-pv-*`). Use o semântico do papel (`bg-primary`,
-        // `bg-brand-hero`, `text-foreground`…). Primitivo novo não entra aqui.
-        "pv-blue": {
-          50: "var(--pv-blue-50)",
-          600: "var(--pv-blue-600)",
-          700: "var(--pv-blue-700)",
-          800: "var(--pv-blue-800)",
-          900: "var(--pv-blue-900)",
-          hero: "var(--pv-blue-hero)",
-        },
-        "pv-green": {
-          50: "var(--pv-green-50)",
-          500: "var(--pv-green-500)",
-          800: "var(--pv-green-800)",
-        },
-        "pv-yellow": {
-          800: "var(--pv-yellow-800)",
-        },
-        "pv-red": {
-          50: "var(--pv-red-50)",
-          700: "var(--pv-red-700)",
-        },
-        "pv-gray": {
-          50: "var(--pv-gray-50)",
-          100: "var(--pv-gray-100)",
-          200: "var(--pv-gray-200)",
-          300: "var(--pv-gray-300)",
-          400: "var(--pv-gray-400)",
-          600: "var(--pv-gray-600)",
-          700: "var(--pv-gray-700)",
-          900: "var(--pv-gray-900)",
-        },
-        "pv-white": "var(--pv-white)",
-        "pv-black": "var(--pv-black)",
+        // Sem cores de primitivo desde a 4.0 (AUD-55): não há `bg-pv-*`.
+        // Use o semântico do papel; tabela em docs/migracao-4.0.md.
       },
       fontFamily: {
         sans: ["var(--font-family-sans)", "system-ui", "sans-serif"],
@@ -2198,7 +2160,7 @@ export {
 
 Desc: Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.
 
-Variantes: props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · deprecadas: onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)
+Variantes: props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · removidas na 4.0: onChange(value) → use onValueChange (guia docs/migracao-4.0.md; codemod codemod-4) · deprecadas: ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText); anunciadas na 4.0, saem na 5.0
 
 Uso:
 ```tsx
@@ -2225,7 +2187,7 @@ import { Combobox, FormField, Label } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField. API e variantes: props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · deprecadas: onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField. API e variantes: props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · removidas na 4.0: onChange(value) → use onValueChange (guia docs/migracao-4.0.md; codemod codemod-4) · deprecadas: ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText); anunciadas na 4.0, saem na 5.0. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -2236,8 +2198,8 @@ import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
-import { warnDeprecated } from "../lib/deprecation";
 import { useFormField, useFormFieldControl } from "./form-field";
 
 export interface ComboboxOption {
@@ -2272,8 +2234,13 @@ export interface ComboboxProps
   defaultValue?: string;
   /** Recebe o valor da opção escolhida (contrato de formulário, ADR-015). */
   onValueChange?: (value: string) => void;
-  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
-  onChange?: (value: string) => void;
+  /**
+   * Removido na 4.0 (AUD-35): use `onValueChange`. O Combobox não tem
+   * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
+   */
+  onChange?: never;
   /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
   invalid?: boolean;
   /** Texto do gatilho sem seleção. Padrão: "Selecione…". */
@@ -2282,12 +2249,13 @@ export interface ComboboxProps
   searchPlaceholder?: string;
   /** Texto quando a busca não encontra nada. Padrão: "Nenhum resultado.". */
   emptyText?: string;
-  /** @deprecated Use `emptyText`. Mantida por compatibilidade. */
+  /** @deprecated Use `emptyText`. Mantida por compatibilidade; sai na 5.0 (anunciado na 4.0). */
   emptyMessage?: string;
   /**
    * @deprecated Prefira rótulo visível (`<Label htmlFor={id}>` ou `FormField`)
    * ou `aria-labelledby`. Quando usada, vira um rótulo oculto somado ao texto
    * visível do gatilho (o nome acessível continua contendo o que se vê, 2.5.3).
+   * Sai na 5.0 (anunciado na 4.0); o atributo `aria-label` continua aceito.
    */
   ariaLabel?: string;
   /** Gera um `<input type="hidden" name>` com o valor, para envio em `<form>`. */
@@ -2320,7 +2288,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
       options,
       value,
       defaultValue,
-      onChange,
+      onChange: _removedOnChange,
       onValueChange,
       invalid,
       placeholder = "Selecione…",
@@ -2341,6 +2309,8 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
     },
     ref
   ) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("Combobox");
     const text = { ...defaultLabels, ...labels };
     const empty = emptyText ?? emptyMessage ?? "Nenhum resultado.";
     const hiddenLabel = ariaLabel ?? ariaLabelAttr;
@@ -2353,12 +2323,6 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
 
     const ctx = useFormField();
     const field = useFormFieldControl({ ...props, invalid });
-    if (onChange) {
-      warnDeprecated(
-        "Combobox.onChange",
-        "Combobox: `onChange(value)` está obsoleto e sai na 4.0. Use `onValueChange(value)`."
-      );
-    }
     const triggerId = field.id ?? props.id;
 
     const [open, setOpen] = React.useState(false);
@@ -2429,7 +2393,6 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
     const choose = (option: ComboboxOption) => {
       if (value === undefined) setInternalValue(option.value);
       onValueChange?.(option.value);
-      onChange?.(option.value);
       setOpen(false);
     };
 
@@ -2626,7 +2589,7 @@ export { Combobox };
 
 Desc: Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).
 
-Variantes: props: nativo HTML (min · max · disabled · name · required) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · deprecadas: onChange(value) (use onValueChange; na 4.0 o onChange passa a receber o evento nativo)
+Variantes: props: nativo HTML (min · max · disabled · name · required · onChange(evento)) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · mudou na 4.0: onChange é o evento nativo do <input> (até a 3.x recebia a string); para o valor, use onValueChange
 
 Uso:
 ```tsx
@@ -2644,7 +2607,7 @@ import { DatePicker, FormField } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). API e variantes: props: nativo HTML (min · max · disabled · name · required) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · deprecadas: onChange(value) (use onValueChange; na 4.0 o onChange passa a receber o evento nativo). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). API e variantes: props: nativo HTML (min · max · disabled · name · required · onChange(evento)) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · mudou na 4.0: onChange é o evento nativo do <input> (até a 3.x recebia a string); para o valor, use onValueChange. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -2655,7 +2618,6 @@ import * as React from "react";
 import { Calendar as CalendarIcon } from "lucide-react";
 
 import { cn } from "../lib/utils";
-import { warnDeprecated } from "../lib/deprecation";
 import { useFormFieldControl } from "./form-field";
 
 export interface DatePickerLabels {
@@ -2668,16 +2630,17 @@ const defaultLabels: DatePickerLabels = {
 };
 
 export interface DatePickerProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "onChange"> {
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "value"> {
   /** Valor ISO (`AAAA-MM-DD`), modo controlado. Para não controlado, use `defaultValue`. */
   value?: string;
   /** Recebe o valor ISO (`AAAA-MM-DD`, ou `""` ao limpar) a cada mudança (ADR-015). */
   onValueChange?: (value: string) => void;
   /**
-   * @deprecated Use `onValueChange`. Recebe o valor (string), não o evento;
-   * na 4.0, `onChange` passa a receber o evento nativo do `<input>` (AUD-35).
+   * Evento nativo do `<input type="date">`, como em `Input`/`Textarea`. Até a
+   * 3.x recebia o valor (string); desde a 4.0 recebe o evento (AUD-35). Para o
+   * valor já extraído, use `onValueChange`.
    */
-  onChange?: (value: string) => void;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
   /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
   invalid?: boolean;
   /** Textos fixos (PT-BR por padrão). */
@@ -2700,12 +2663,6 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
   ) => {
     const text = { ...defaultLabels, ...labels };
     const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
-    if (onChange) {
-      warnDeprecated(
-        "DatePicker.onChange",
-        "DatePicker: `onChange(value)` está obsoleto e muda na 4.0 (passa a receber o evento nativo). Use `onValueChange(value)`."
-      );
-    }
     const inputRef = React.useRef<HTMLInputElement | null>(null);
     const setRefs = React.useCallback(
       (el: HTMLInputElement | null) => {
@@ -2738,8 +2695,8 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
           disabled={disabled}
           readOnly={readOnly}
           onChange={(e) => {
+            onChange?.(e);
             onValueChange?.(e.target.value);
-            onChange?.(e.target.value);
           }}
           className={cn(
             "flex h-11 w-full appearance-none rounded-md border border-input bg-background px-3 py-2 pr-12 text-sm text-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&::-webkit-calendar-picker-indicator]:hidden",
@@ -2773,7 +2730,7 @@ export { DatePicker };
 
 Desc: Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio.
 
-Variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · deprecadas: onChange(files) (use onValueChange; sai na 4.0)
+Variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · removidas na 4.0: onChange(files) → use onValueChange
 
 Uso:
 ```tsx
@@ -2795,7 +2752,7 @@ import { FileUpload } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio. API e variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · deprecadas: onChange(files) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio. API e variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · removidas na 4.0: onChange(files) → use onValueChange. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -2805,8 +2762,8 @@ Fonte:
 import * as React from "react";
 import { UploadCloud } from "lucide-react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
-import { warnDeprecated } from "../lib/deprecation";
 import { useFormField } from "./form-field";
 
 export interface FileUploadLabels {
@@ -2842,8 +2799,13 @@ export interface FileUploadProps
   invalid?: boolean;
   /** Recebe os arquivos aceitos (contrato de formulário, ADR-015). */
   onValueChange?: (files: File[]) => void;
-  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
-  onChange?: (files: File[]) => void;
+  /**
+   * Removido na 4.0 (AUD-35): use `onValueChange`. O FileUpload não tem
+   * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
+   */
+  onChange?: never;
   /** `name` do `<input type="file">`. Atalho de `inputProps.name`. */
   name?: string;
   /** `required` do `<input type="file">`. Atalho de `inputProps.required`. */
@@ -2916,7 +2878,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       hint,
       error,
       invalid: invalidProp,
-      onChange,
+      onChange: _removedOnChange,
       onValueChange,
       name,
       required,
@@ -2930,6 +2892,8 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
     },
     ref
   ) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("FileUpload");
     const [internalFiles, setInternalFiles] = React.useState<File[]>([]);
     const files = value ?? internalFiles;
     const [drag, setDrag] = React.useState(false);
@@ -2951,12 +2915,6 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
     const hintId = `${idBase}-hint`;
     const errorId = `${idBase}-error`;
     const message = localError ?? error;
-    if (onChange) {
-      warnDeprecated(
-        "FileUpload.onChange",
-        "FileUpload: `onChange(files)` está obsoleto e sai na 4.0. Use `onValueChange(files)`."
-      );
-    }
 
     // `input.files` acompanha a lista mostrada (seleção, soltar, `value` do
     // pai), para o envio nativo e o `required` funcionarem (D1).
@@ -2996,7 +2954,6 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       setLocalError(undefined);
       if (value === undefined) setInternalFiles(next);
       onValueChange?.(next);
-      onChange?.(next);
       return next;
     };
 
@@ -3976,7 +3933,7 @@ const SectionHeader = React.forwardRef<HTMLDivElement, SectionHeaderProps>(
       {...props}
     >
       <div className="flex items-center justify-between gap-2">
-        <TitleTag className="text-xl font-bold text-pv-blue-900 uppercase tracking-wide">
+        <TitleTag className="text-xl font-bold text-text-brand uppercase tracking-wide">
           {title}
         </TitleTag>
         {badge}
@@ -5999,7 +5956,7 @@ const toastVariants = cva(
       variant: {
         default: "border-border bg-card text-card-foreground",
         success:
-          "border-none bg-pv-green-500 text-pv-blue-900 px-5 py-4 [&_[toast-close]]:text-pv-blue-900 [&_[toast-close]]:hover:bg-pv-blue-900/10",
+          "border-none bg-success-emphasis text-success-emphasis-foreground px-5 py-4 [&_[toast-close]]:text-success-emphasis-foreground [&_[toast-close]]:hover:bg-success-emphasis-foreground/10",
         warning: "border-warning/40 bg-warning-surface text-foreground",
         destructive: "border-destructive/40 bg-destructive-surface text-destructive",
       },
@@ -6573,7 +6530,7 @@ export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };
 
 Desc: Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role="alertdialog", sempre modal, não fecha por clique fora e abre com o foco no Cancelar.
 
-Variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel · variant (Action/Cancel): as do Button; padrão primary (Action) e outline (Cancel), 44px · regras: inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action
+Variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel · variant (Action/Cancel): as do Button; padrão primary (Action) e outline (Cancel), 44px · regras: inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action · deprecadas: modal (AlertDialog) · onPointerDownOutside · onInteractOutside (AlertDialogContent): ignoradas desde a 3.1.0; anunciadas na 4.0, saem na 5.0
 
 Uso:
 ```tsx
@@ -6609,7 +6566,7 @@ import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader,
 
 Prompt:
 ```text
-Use o componente `AlertDialog` (Diálogo de alerta) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role="alertdialog", sempre modal, não fecha por clique fora e abre com o foco no Cancelar. API e variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel · variant (Action/Cancel): as do Button; padrão primary (Action) e outline (Cancel), 44px · regras: inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `AlertDialog` (Diálogo de alerta) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role="alertdialog", sempre modal, não fecha por clique fora e abre com o foco no Cancelar. API e variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel · variant (Action/Cancel): as do Button; padrão primary (Action) e outline (Cancel), 44px · regras: inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action · deprecadas: modal (AlertDialog) · onPointerDownOutside · onInteractOutside (AlertDialogContent): ignoradas desde a 3.1.0; anunciadas na 4.0, saem na 5.0. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -6632,7 +6589,7 @@ import { buttonVariants } from "./button";
 export interface AlertDialogProps extends AlertDialogPrimitive.AlertDialogProps {
   /**
    * @deprecated Ignorado: o AlertDialog é sempre modal. Mantido só por
-   * compatibilidade com a versão anterior.
+   * compatibilidade com a versão anterior; sai na 5.0 (anunciado na 4.0).
    */
   modal?: boolean;
 }
@@ -6665,12 +6622,12 @@ export interface AlertDialogContentProps
   extends AlertDialogPrimitive.AlertDialogContentProps {
   /**
    * @deprecated Ignorado: o AlertDialog não fecha por clique fora. Mantido só
-   * por compatibilidade com a versão anterior.
+   * por compatibilidade com a versão anterior; sai na 5.0 (anunciado na 4.0).
    */
   onPointerDownOutside?: DialogPrimitive.DialogContentProps["onPointerDownOutside"];
   /**
    * @deprecated Ignorado: o AlertDialog não fecha por interação fora. Mantido
-   * só por compatibilidade com a versão anterior.
+   * só por compatibilidade com a versão anterior; sai na 5.0 (anunciado na 4.0).
    */
   onInteractOutside?: DialogPrimitive.DialogContentProps["onInteractOutside"];
 }
@@ -7380,7 +7337,7 @@ export { Slider };
 
 Desc: Campo de código OTP com foco automático entre dígitos.
 
-Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · deprecadas: onChange(value) (use onValueChange; sai na 4.0)
+Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · removidas na 4.0: onChange(value) → use onValueChange
 
 Uso:
 ```tsx
@@ -7404,7 +7361,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec
 
 Prompt:
 ```text
-Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de código OTP com foco automático entre dígitos. API e variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · deprecadas: onChange(value) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de código OTP com foco automático entre dígitos. API e variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · removidas na 4.0: onChange(value) → use onValueChange. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -7413,8 +7370,8 @@ Fonte:
 
 import * as React from "react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
-import { warnDeprecated } from "../lib/deprecation";
 import { useFormField, useFormFieldControl } from "./form-field";
 
 interface InputOTPContextValue {
@@ -7465,8 +7422,13 @@ export interface InputOTPProps
    * Contrato de formulário (ADR-015).
    */
   onValueChange?: (value: string) => void;
-  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
-  onChange?: (value: string) => void;
+  /**
+   * Removido na 4.0 (AUD-35): use `onValueChange`. O InputOTP não tem
+   * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
+   */
+  onChange?: never;
   /** Gera um `<input type="hidden" name>` com o código, para envio em `<form>`. */
   name?: string;
   /** `id` do `<form>` do input oculto, quando o InputOTP fica fora dele. */
@@ -7492,7 +7454,7 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
       className,
       value,
       defaultValue,
-      onChange,
+      onChange: _removedOnChange,
       onValueChange,
       name,
       form,
@@ -7506,6 +7468,8 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
     },
     ref
   ) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("InputOTP");
     const isControlled = value !== undefined;
     const slotsRef = React.useRef<(HTMLInputElement | null)[]>([]);
     const [internalSlots, setSlots] = React.useState<string[]>(() =>
@@ -7519,12 +7483,6 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
         maxLength
       )
     );
-    if (onChange) {
-      warnDeprecated(
-        "InputOTP.onChange",
-        "InputOTP: `onChange(value)` está obsoleto e sai na 4.0. Use `onValueChange(value)`."
-      );
-    }
 
     // Modo controlado: a tela reflete sempre o `value` do pai. O array interno
     // só é usado enquanto o pai aceitar o que foi emitido (value === join), o
@@ -7548,9 +7506,8 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
       (next: string[]) => {
         setSlots(next);
         onValueChange?.(next.join(""));
-        onChange?.(next.join(""));
       },
-      [onChange, onValueChange]
+      [onValueChange]
     );
 
     const fillFrom = React.useCallback(
@@ -7781,7 +7738,7 @@ export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator };
 
 Desc: Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px.
 
-Variantes: props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · deprecadas: onChange(date) (use onValueChange; sai na 4.0) · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome "14 de outubro de 2026" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona
+Variantes: props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · removidas na 4.0: onChange(date) → use onValueChange · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome "14 de outubro de 2026" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona
 
 Uso:
 ```tsx
@@ -7794,7 +7751,7 @@ import { Calendar } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px. API e variantes: props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · deprecadas: onChange(date) (use onValueChange; sai na 4.0) · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome "14 de outubro de 2026" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px. API e variantes: props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · removidas na 4.0: onChange(date) → use onValueChange · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome "14 de outubro de 2026" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -7804,7 +7761,7 @@ Fonte:
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { warnDeprecated } from "../lib/deprecation";
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
 
 const LOCALE = "pt-BR";
@@ -7847,8 +7804,13 @@ export interface CalendarProps
   value?: Date | null;
   /** Recebe a data escolhida (contrato de formulário, ADR-015). */
   onValueChange?: (date: Date) => void;
-  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
-  onChange?: (date: Date) => void;
+  /**
+   * Removido na 4.0 (AUD-35): use `onValueChange`. O Calendar não tem
+   * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
+   */
+  onChange?: never;
   disabled?: boolean;
   /** Data mínima selecionável (`AAAA-MM-DD`). */
   min?: string;
@@ -7907,14 +7869,10 @@ const navButtonClass =
  * (`Shift` + `PageUp`/`PageDown` trocam o ano) e `Enter`/`Espaço` selecionam.
  */
 const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
-  ({ className, value, onChange, onValueChange, disabled, min, max, labels, ...props }, ref) => {
+  ({ className, value, onChange: _removedOnChange, onValueChange, disabled, min, max, labels, ...props }, ref) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("Calendar");
     const text = { ...DEFAULT_LABELS, ...labels };
-    if (onChange) {
-      warnDeprecated(
-        "Calendar.onChange",
-        "Calendar: `onChange(date)` está obsoleto e sai na 4.0. Use `onValueChange(date)`."
-      );
-    }
     const headingId = React.useId();
     const today = startOfDay(new Date());
 
@@ -7955,7 +7913,6 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
     const select = (date: Date) => {
       if (isDisabled(date)) return;
       onValueChange?.(date);
-      onChange?.(date);
     };
 
     const moveFocus = (date: Date) => {
@@ -10588,6 +10545,10 @@ O que existe no pacote está em `tokens.css` (camadas L0 `--pv-*` e L1 semântic
 | `--text-muted`, `--text-secondary`, `--text-strong` | `text-text-muted`, `text-text-secondary`, `text-text-strong` | **Não** use `text-muted`/`text-secondary`: são a cor de fundo `--surface-alt` (1,09:1). `bg-muted`/`bg-secondary` seguem valendo |
 | `--surface-sunken` | `bg-surface-sunken` | Skeleton, trilha de Progress/Slider (1,47:1 sobre `--surface`) |
 | `--focus-ring-inverse` | `ring-ring-inverse` | Automático dentro de `data-surface="brand"` ou `bg-brand-hero` (9,38:1); `data-surface="default"` volta ao anel padrão |
+| `--text-brand` | `text-text-brand` | Título institucional escuro (12,43:1). Novo na 4.0 |
+| `--feedback-success-emphasis`, `--text-on-success-emphasis` | `bg-success-emphasis`, `text-success-emphasis-foreground` | Verde cheio do Toast `success` (texto 5,85:1). Novo na 4.0 |
+
+Primitivos `--pv-*` não geram utilitário desde a 4.0 (não há `bg-pv-*`).
 
 Link solto no texto (`<a>` sem `class`) é sublinhado pelo `tokens.css`; com classe, o sublinhado é do componente/utilitário (`underline`). Tokens de layout que aparecem no site de documentação (`--container-max`, `--measure`, `--control-height-*`, `data-density`) **não fazem parte do pacote**; use os utilitários do Tailwind indicados na skill `semec-ds` (seção "Responsive / Mobile").
 
@@ -10641,13 +10602,26 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 
 - **3.0 e 3.1: bundle único e sem fronteira RSC.** Importar uma peça carregava o kit inteiro e importar `@semec/ds/react` num Server Component quebrava. Corrigido na 3.2 (saída por módulo, `"use client"` por componente e subpaths `@semec/ds/react/*`; ver o passo 5 de [Comece aqui](#comece-aqui) e [Subpath exports](#subpath-exports)).
 
-## Depreciações anunciadas (saem na 4.0)
+## Migração para a 4.0 e depreciações
 
-Avisadas a partir da 3.1.0 e válidas até a 4.0 (política de duas minors, ADR-013). Lista completa, com o que usar no lugar: [CONTRIBUTING.md § Depreciações anunciadas](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/CONTRIBUTING.md#depreciações-anunciadas).
+**Guia: [docs/migracao-4.0.md](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/migracao-4.0.md)**, com antes/depois, tabela primitivo → semântico e o codemod:
 
-- Importar por caminho de arquivo em `dist/` (o layout interno do `dist` não é contrato; use `@semec/ds/react` ou os subpaths `@semec/ds/react/*`, disponíveis desde a 3.2).
-- `onChange(value)` / `onChange(files)` nos campos não nativos (`Combobox`, `InputOTP`, `DatePicker`, `FileUpload`, `Calendar`): use `onValueChange`, com a mesma assinatura, disponível em todos desde a 3.2.0 (contrato `value` / `onValueChange` / `name` / `id` / `invalid`, ADR-015).
-- Utilitários de primitivo `bg-pv-*` / `text-pv-*` (use os semânticos).
+```bash
+# funciona com a 3.x ainda instalada (o -p traz a 4.0 e o TypeScript 5 só para o comando)
+npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 src           # simulação: relata o que muda
+npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 src --write   # grava as trocas onChange → onValueChange
+```
+
+O codemod lê o JSX com a API do compilador do TypeScript 5 (o 7 não a tem); o `typescript` não é dependência do pacote. Com a 4.0 e o `typescript@5` no projeto, basta `npx semec-ds codemod-4 src` ou `node node_modules/@semec/ds/codemods/v4.mjs src`. O que ele não vê (spread, `React.createElement`, barrel) o typecheck da 4.0 pega.
+
+Removido na 4.0 (anunciado desde a 3.1.0, política de duas minors, ADR-013):
+
+- `onChange(value)` / `onChange(files)` de `Combobox`, `InputOTP`, `FileUpload` e `Calendar`: use `onValueChange` (contrato `value` / `onValueChange` / `name` / `id` / `invalid`, ADR-015). O tipo recusa `onChange` e o componente o descarta (com `console.error` único em desenvolvimento).
+- `DatePicker`: `onChange` passa a receber o **evento nativo** do `<input type="date">`; o valor ISO vem em `onValueChange`.
+- Utilitários de primitivo `bg-pv-*` / `text-pv-*` / `border-pv-*` e as variáveis `--color-pv-*` (do `@theme` e do `pv-preset`): use os semânticos. As variáveis `--pv-*` continuam. Semânticos novos: `text-text-brand`, `bg-success-emphasis`, `text-success-emphasis-foreground`.
+- Import por caminho de arquivo em `dist/`: o `exports` bloqueia (`ERR_PACKAGE_PATH_NOT_EXPORTED`); use `@semec/ds/react` ou `@semec/ds/react/<componente>`.
+
+Depreciado, sai na 5.0: `ariaLabel` e `emptyMessage` do `Combobox`; `modal` do `AlertDialog` e `onPointerDownOutside`/`onInteractOutside` do `AlertDialogContent` (já ignorados). Lista oficial: [CONTRIBUTING.md § Depreciações anunciadas](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/CONTRIBUTING.md#depreciações-anunciadas).
 
 O que a 2.0.0 removeu sem aviso está na errata do [CHANGELOG](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/CHANGELOG.md).
 

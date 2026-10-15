@@ -86,8 +86,12 @@
   --color-ring: var(--color-focus-ring);
   --color-tint: var(--tint);
   --color-brand-hero: var(--brand-hero);
-  --color-pv-green-500: var(--pv-green-500);
-  --color-pv-blue-900: var(--pv-blue-900);
+  /* Semânticos criados na 4.0 (AUD-55) no lugar de bg-pv-green-500 /
+     text-pv-blue-900 (o site não tem L1 equivalente; os primitivos vêm do
+     site e do PreviewFrame). Sem --color-pv-*: o kit não expõe primitivo. */
+  --color-text-brand: var(--pv-blue-900);
+  --color-success-emphasis: var(--pv-green-500);
+  --color-success-emphasis-foreground: var(--pv-blue-900);
 
   /* Onda 2 da auditoria (espelham packages/react/tokens.css) */
   /* AUD-53: bg-surface-sunken. O site já usa --color-surface-sunken com
