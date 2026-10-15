@@ -1,5 +1,136 @@
 # @semec/ds
 
+## 3.1.0
+
+### Minor Changes
+
+- e7d0760: Publica o que já estava no `main` e não saiu no npm 3.0.0 (diff `fb7d782..main` em `packages/react`).
+  
+  **Novidades**
+  
+  - `ErrorState`: estado de falha ao carregar, com `title`, `description`, `icon`, `action`, `onRetry`/`retryLabel` (padrão "Tentar novamente") e `variant` `"default"` ou `"inline"`.
+  - `FormHeader` e `SectionHeader` (no módulo do Card): cabeçalho de formulário em faixa e cabeçalho de seção com `title`, `description` e `badge`.
+  - `Button` com `variant="success"`.
+  - `portalContainer` em `Combobox` e `DropdownMenuContent`, para escolher onde a camada flutuante é montada (por exemplo, o `body` de um iframe).
+  - Tokens `--pv-green-500` (#82C353) e `--pv-blue-900` (#26325B), com utilitários `bg-pv-green-500`/`text-pv-blue-900` e as mesmas cores no preset JS (`pv-green.500`, `pv-blue.900`).
+  
+  **Correções**
+  
+  - `DataTable`: ordenação por teclado (botão no cabeçalho com "Ordenar por …"), `aria-sort` e `scope="col"`.
+  - `InputOTP`: `value` e `onChange` passam a ser opcionais (sem `onChange` vira só leitura, sem erro), e o separador fica `aria-hidden`.
+  - `DatePicker` esconde o ícone nativo de calendário do WebKit (o do kit continua).
+  - `Select`: o conteúdo acompanha a largura do gatilho, e os itens longos quebram linha.
+  - `AlertDescription` formata listas (`ul`/`ol`).
+  
+  **Mudanças visuais (sem mudança de API)**
+  
+  - `Toast`: a pilha passa para o canto superior direito; a variante `success` ganha fundo verde `--pv-green-500` com texto `--pv-blue-900`; o título fica 16px/bold.
+  - `Input`, `Textarea` e `Select` passam a usar fundo `bg-surface` (branco) em vez de `bg-background`.
+- eaa3edd: Componentes de conteúdo (onda 2 da auditoria 2026-10).
+  
+  - **Novos componentes (AUD-36):** `Heading` (`level` 1–6 e `size` independente, na escala do kit), `SkipLink` ("Pular para o conteúdo principal", visível no foco, leva o foco ao alvo `#conteudo` ou `href`) e `Footer` (`<footer>`/`contentinfo` com `FooterContent`, `FooterSection`, `FooterLinks`, `FooterLink` e `FooterBottom`). Stepper, PasswordInput e máscara de Input seguem no backlog.
+  - **Alert (AUD-22):** o `role` agora depende da variante: `destructive` → `role="alert"`; `default`, `success` e `warning` → `role="status"`. Nova prop `announce` (`assertive` · `polite` · `off`) para sobrescrever; um `role` explícito tem precedência. **Atenção:** `warning` e `success` deixam de interromper o leitor de tela; passe `announce="assertive"` onde o aviso exigir ação imediata.
+  - **Níveis de título (AUD-23):** nova prop `as` em `AlertTitle`, `CardTitle` e `TimelineTitle`, e `titleAs` em `EmptyState`, `ErrorState`, `SectionHeader` e `FooterSection`. Padrões mantidos (`CardTitle`/`TimelineTitle` `div`, `EmptyState`/`ErrorState` `h3`, `SectionHeader` `h2`), exceto `AlertTitle`, que passa de `<h5>` fixo para `div`: o `<h5>` quebrava a ordem dos títulos (`heading-order`). Use `as="h2"`…`"h6"` quando o aviso abrir uma seção.
+  - **Superfícies (AUD-53):** `Skeleton` usa `bg-surface-sunken`, vira `forwardRef` e é `aria-hidden` por padrão (anuncie o carregamento com `aria-busy` no contêiner). A trilha do `Progress` ganha contorno `border-strong` sobre `surface` (3,77:1 sobre branco, 3,49:1 sobre `bg`; antes 1,09:1); o indicador `primary` tem 5,42:1 sobre a trilha.
+  - **Timeline (AUD-61):** `Timeline` renderiza `<ol>` e `TimelineItem` `<li>`; `TimelineDot` ganha `srLabel` para o status em texto e passa de 12 px para 16 px; `TimelineConnector` deixa de ser `absolute` e fica visível (`flex-1`, `bg-border-strong`, 3,77:1). O espaçamento entre itens passou do `TimelineItem` para o `TimelineContent`.
+  - **HeaderBrand (AUD-62):** sem `logo`, o placeholder é decorativo (`aria-hidden`, antes `role="img"`) e há um aviso no console em desenvolvimento. O nome quebra linha no mobile em vez de truncar (nova prop `truncate` para o corte antigo); `Header` ganha `flex-wrap`. Novas props `homeLabel` e `href` aceita `""`/`null` para marca sem link.
+  - **Sombras (AUD-29):** `Card` usa `shadow-elevation-1` no lugar de `shadow-md`.
+  - **Textos e tipos (AUD-31, AUD-59, AUD-64):** `DataTable` aceita `labels` (`sortBy`, `pageOf`, `previous`, `next`) e `Spinner` aceita `label`, com padrões em PT-BR. Contêineres de ícone de `EmptyState`/`ErrorState` ficam `aria-hidden`. Interfaces de props exportadas: `AlertProps`, `AlertTitleProps`, `CardTitleProps`, `EmptyStateProps`, `SeparatorProps`, `SemecProviderProps`, `SkeletonProps`, `ProgressProps`, `SpinnerProps`, `TimelineDotProps`, `TimelineTitleProps`, `DataTableLabels`, e os tipos `HeadingLevel`/`HeadingTag`.
+- 6bc4037: Artefatos de IA, SKILLs e política de depreciação (onda 2 da auditoria de 14/10/2026).
+  
+  - Contagem e lista de componentes geradas do manifest pelo `build-artifacts.mjs` (SKILL, README do pacote, `llms.txt`); `manifest.json` ganha `componentCount` e `exportName` por componente (AUD-49).
+  - SKILL `semec-ds` corrigida: texto grande (≥ 24px regular ou ≥ 18,66px bold), 44px como régua do DS (o 2.5.5 é AAA), tabela token → utilitário com a armadilha `text-muted`/`text-secondary`, espaçamento e escala tipográfica, nova seção "Comportamentos fixos do kit" (AUD-50, AUD-30, AUD-27, AUD-28).
+  - Nova seção "Padrões de tela" na SKILL: esqueleto com `SkipLink`, `Header`, `Heading`, `Footer`, landmarks, container único, título da página, tabelas no mobile e Sidebar (AUD-51); marca = `brand-hero`, ação = `primary` (AUD-58).
+  - O prompt por componente (`dsPrompt`) passa a mandar usar o componente de `@semec/ds/react` em vez de recriá-lo; a SKILL publicada no npm e no site sai sem as seções de mantenedor (AUD-67).
+  - Variante lite coerente com "sem React": `@semec/ds/lite/tokens.css` sem `@source` para `dist/react` (AUD-68).
+  - Depreciação: anunciado para sair na 4.0 (ADR-013): import por caminho de arquivo em `dist/` (AUD-20), `onChange(value)`/`onChange(files)` nos campos não nativos (AUD-35), utilitários de primitivo `bg-pv-*`/`text-pv-*` (AUD-55), valores atuais de `rounded-sm`/`rounded-lg` (AUD-57) e `disabled` nativo do `Button` como seletor (AUD-63). Lista em CONTRIBUTING.md § Depreciações anunciadas; errata da 2.0.0 no CHANGELOG (AUD-43).
+- 81517cd: Formulários (onda 2 da auditoria 2026-10):
+  
+  - **Combobox no padrão APG** (AUD-03, #17): o gatilho é uma parada de Tab e abre uma camada nomeada com o campo de busca (`role="combobox"`, `aria-expanded`, `aria-controls`, `aria-activedescendant`, `aria-autocomplete="list"`) e a lista (`role="listbox"` + `role="option"`/`aria-selected`). Setas ↑/↓, Home/End, Enter seleciona (sem enviar o formulário), Esc fecha e devolve o foco ao gatilho, Tab fecha e segue. `ComboboxProps` passa a estender os atributos de `<button>` (`id`, `aria-*`, `disabled`…), com as novas props `name` (gera `<input type="hidden">`), `defaultValue`, `required`, `searchPlaceholder`, `emptyText` e `labels`. O nome acessível passa a ser rótulo + texto visível (corrige `label-content-name-mismatch`, WCAG 2.5.3) e funciona com `<Label htmlFor>`, FormField e `aria-labelledby`. `ariaLabel` e `emptyMessage` ficam `@deprecated`, sem remoção; o padrão genérico "Selecionar" sai.
+  - **FormField liga dica e erro ao campo** (AUD-21): novo `FormFieldContext` (+ `useFormField` e `useFormFieldControl`). Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider recebem `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que o consumidor passou. O `<label for>` acompanha o `id` do filho; em controles não rotuláveis (RadioGroup, InputOTP, Slider) o rótulo vira `aria-labelledby`. Novos tipos `InputProps` e `TextareaProps`.
+  - **Menos `role="alert"`** (AUD-22): o erro do FormField não usa mais `role="alert"` (é lido ao focar o campo; o anúncio fica com o ErrorSummary); o erro do FileUpload vira região `aria-live="polite"` sempre montada.
+  - **DatePicker com um só indicador** (AUD-54): o ícone virou botão "Abrir calendário" de 44px que chama `showPicker()` (recuo: foco no campo); o indicador nativo segue oculto e, no Firefox, fica só o nativo. Nova prop `labels`.
+  - **Alvos de 44px** (AUD-10): opções do Combobox e itens do Select com `min-h-11`, busca do Combobox `h-11`; Switch e polegar do Slider ganham área de toque de 44px sem mudar o desenho.
+  - **Textos sobrescrevíveis** (AUD-31): `labels` em Combobox, DatePicker, FileUpload e InputOTP (padrões em PT-BR).
+  - **Ícones decorativos com `aria-hidden`** (AUD-59) em Select, Checkbox e RadioGroup.
+  - **Tipos e ids** (AUD-64): `export interface` em `ComboboxProps`, `FormFieldProps`, `ErrorSummaryProps`, `InputOTPProps`, `InputOTPSlotProps`; o ErrorSummary troca o id fixo do título por `useId`, aceita ref de função e perde a margem externa `mb-6` (espace pelo layout).
+  - **Sombras por token** (AUD-29): `shadow-sm`/`shadow-lg` viram `shadow-elevation-1/2` em Combobox, Select, Checkbox, RadioGroup, Switch e InputOTP.
+- abc0b06: Navegação e controles (onda 2 da auditoria 2026-10).
+  
+  - **Calendar no padrão APG de grade de datas (AUD-37).** `role="grid"` rotulado pelo mês (`aria-live="polite"`), uma parada de `Tab` (roving tabindex), setas, `Home`/`End`, `PageUp`/`PageDown` (mês) e `Shift+PageUp`/`PageDown` (ano), `Enter`/`Espaço` para selecionar, `aria-selected`, `aria-current="date"` no dia de hoje e `aria-disabled` fora de `min`/`max`. Cada dia tem nome completo em PT-BR via `Intl` ("14 de outubro de 2026"). `min`/`max` em `AAAA-MM-DD` passam a ser lidos como data local (antes, o `new Date()` em UTC deslocava um dia). Nova prop `labels` (`previousMonth`, `nextMonth`) e tipos `CalendarProps`/`CalendarLabels` exportados.
+  - **Alvos de 44px (AUD-10).** `TabsTrigger`, `NavigationMenuTrigger`, `Toggle` `md` (padrão), células e botões do `Calendar` passam a ter 44px; `Toggle` `lg` vai a 48px. `Button` `sm` e `Toggle` `sm` mantêm o visual de 36px, com a área clicável estendida a 44×44px por pseudo-elemento.
+  - **Aba ativa sem depender só de cor (AUD-38).** Barra inferior de 3px em `primary` (4,97:1 contra a lista e 5,00:1 contra o fundo da aba) e peso semibold.
+  - **Link sublinhado por padrão (AUD-25).** Nova prop `underline` (padrão `true`); `underline={false}` sublinha só no hover e fica restrito a contextos de navegação.
+  - **NavigationMenu em PT-BR (AUD-31).** O `<nav>` passa a se chamar "Menu principal" (antes, "Main" do Radix); sobrescreva com `aria-label`. O `aria-hidden-focus` com o menu aberto vem do sentinela de foco do Radix e foi incluído na EXC-01 com a evidência.
+  - **Pagination com textos sobrescrevíveis (AUD-31).** Nova prop `labels` (`navigation`, `previous`, `next`, `page(n)`); os botões numéricos passam a se chamar "Página N".
+  - **`DropdownMenuShortcut` com contraste AA (AUD-39).** `opacity-60` (4,28:1) trocado por `text-muted-foreground` (7,56:1).
+  - **Sombras por token (AUD-29), ícones decorativos com `aria-hidden` (AUD-59) e props exportadas (AUD-64)** em Tabs, NavigationMenu, DropdownMenu, Calendar e Breadcrumb (`BreadcrumbProps`, `DropdownMenuItemProps` e afins).
+- 9158fb2: Overlays acessíveis (onda 2 da auditoria):
+  
+  - `AlertDialog` passa a usar `@radix-ui/react-alert-dialog` (AUD-34, Refs #34): `role="alertdialog"`, sempre modal, não fecha por clique fora e abre com o foco em `AlertDialogCancel`. Todos os exports e props anteriores continuam aceitos; `modal` (no `AlertDialog`) e `onPointerDownOutside`/`onInteractOutside` (no `AlertDialogContent`) ficam `@deprecated` e são ignorados. `AlertDialogAction` e `AlertDialogCancel` ganham a prop `variant` (as do `Button`; padrão `primary` e `outline`) e passam a 44px de altura. Novos tipos exportados: `AlertDialogProps`, `AlertDialogContentProps`, `AlertDialogActionProps`, `AlertDialogCancelProps`.
+  - Botão X de `Dialog`, `Sheet` e `Drawer` com alvo de 44×44px (ícone continua com 16px); `DialogHeader`, `SheetHeader` e `DrawerHeader` reservam espaço à direita para o X. `ToastAction` com 44px de altura e X do Toast com alvo de 44px sem mudar a altura do aviso (AUD-10, Refs #24).
+  - Nova prop `closeLabel` em `DialogContent`, `SheetContent` e `DrawerContent` (padrão "Fechar") e novo tipo `DialogContentProps` (AUD-31, AUD-64).
+  - `SheetContent` e `DrawerContent` rolam o conteúdo longo (`overflow-y-auto`; `top`/`bottom` com altura máxima de 85dvh); `DialogContent` e `AlertDialogContent` limitados à altura da tela com rolagem. Manifest documenta o padrão controlado sem Trigger com `onCloseAutoFocus` devolvendo o foco à origem (AUD-52).
+  - X do Toast sem `opacity-60`: contraste de 2,76–2,87:1 para 6,91–7,56:1 (`text-muted-foreground` sobre card, `warning-surface` e `destructive-surface`); na variante `success`, de 4,06:1 para 5,85:1 (AUD-39).
+  - `ToasterProps` agora é `export interface` (AUD-64).
+- cc37b69: Empacotamento, tipos e testes do `@semec/ds` (onda 2 da auditoria, Refs #34).
+  
+  - **Tipos em `node16`/`nodenext` (AUD-40):** os `.d.ts` de `dist/react` agora usam especificadores relativos com extensão `.js`; `import { Button } from "@semec/ds/react"` deixa de dar TS2305 em projetos com `moduleResolution: "nodenext"`. Continua funcionando com `bundler`. Os `.d.ts.map` deixaram de ser publicados (apontavam para `src/`, que saiu do tarball).
+  - **Dependências (AUD-44):** `tailwind-merge` 2 → 3 (entende a sintaxe do Tailwind v4: `cn("p-4 p-(--space-2)")` resolve para `p-(--space-2)`), com `extendTailwindMerge` para os utilitários de token (`text-display`, `p-space-N`, `shadow-elevation-N`, `duration-fast`...). Peer `zod` aceita `^3.23.0 || ^4.0.0` (validação testada nas duas). Novo peer `tailwindcss ^4.0.0`.
+  - **`lucide-react` como peer (AUD-59):** sai de `dependencies` e vira peer `>=0.468.0 <2`, sem cópia duplicada no app. npm 7+ e pnpm 8+ instalam o peer sozinhos; com Yarn, instale `lucide-react` se o app ainda não tiver.
+  - **Tarball (AUD-65):** inclui `LICENSE` e `CHANGELOG.md`; deixa de levar `src/`, `manifest.js` e `server.js` da raiz (nenhum era alcançável pelos `exports`; as cópias usadas estão em `dist/`). 251 → 132 arquivos, 314,7 kB → 265,3 kB. Novos exports: `./package.json`, `./react/fonts.css`, `./react/fonts/*` e `./lite/fonts.css`. `engines.node >=22`.
+  - **Testes (AUD-45):** primeira suíte Vitest + Testing Library + axe (`npm test`), com render de cada componente do manifest, teclado em Dialog, Tabs, Accordion, Select e DropdownMenu e axe nas camadas abertas; o gate passa a auditar as camadas abertas no Chromium (EXC-01 só em Select e DropdownMenu).
+- d05512c: Sidebar: gaveta mobile acessível, landmark, `aria-current`, `tooltip` e breakpoint único (AUD-09, AUD-32, AUD-33, AUD-10, AUD-31, AUD-59, AUD-64, AUD-29; Refs #23).
+  
+  - **Gaveta mobile (AUD-09):** agora é um modal sobre o Radix Dialog. O foco fica preso na gaveta, Esc fecha, o conteúdo de trás fica inerte (`aria-hidden` e rolagem travada) e o foco volta para quem abriu (o `SidebarTrigger`, outro gatilho ou o elemento focado antes do Ctrl/⌘+B). A gaveta tem título acessível (sr-only, "Menu de navegação") e um botão visível "Fechar menu" de 44×44. O portal fica dentro do `SidebarProvider`, então as variáveis `--sidebar-*` continuam valendo.
+  - **`SidebarTrigger`:** 44×44 (`h-11 w-11`, antes 36), `aria-expanded` e `aria-controls` (aponta para o painel só quando ele existe no DOM), `type="button"` e nova prop `label` (padrão "Alternar barra lateral").
+  - **Landmark (AUD-32):** no desktop (e dentro da gaveta), o conteúdo fica num `<nav aria-label="Menu lateral">`. Nova prop `as` (`"nav"` · `"aside"` · `"div"`) e `aria-label` direto sobrescreve o nome.
+  - **`SidebarInset`:** nova prop `as` (`"main"` padrão · `"div"` · `"section"`). Sem a prop, continua `<main>`; use `as="div"` quando o layout já tiver o próprio `<main>`. Ganhou `min-w-0` de fábrica (AUD-33) e a sombra do `variant="inset"` passou a `shadow-elevation-1` (AUD-29).
+  - **Item ativo:** `SidebarMenuButton isActive` e `SidebarMenuSubButton isActive` geram `aria-current="page"` (sobrescrevível pela própria prop `aria-current`).
+  - **`tooltip`:** a prop de `SidebarMenuButton` agora funciona (Tooltip do kit, à direita, só no modo recolhido `collapsible="icon"`) e não vaza mais para o DOM. O `SidebarProvider` inclui um `TooltipProvider`.
+  - **Breakpoint (AUD-33):** a troca para gaveta usa `matchMedia("not all and (min-width: 48rem)")` com listener e é segura em SSR (no servidor vale desktop). O breakpoint é único: abaixo de 768px (48rem), o complemento exato do `md:` que a versão desktop já usava. Ao alargar a tela, a gaveta aberta fecha.
+  - **Alvos de 44px (AUD-10):** `SidebarMenuButton` e `SidebarMenuSubButton` com `min-h-11`; no modo recolhido o botão tem 44×44, e a largura do modo ícone passou de 3rem para 3,75rem.
+  - **Desktop recolhido em `offcanvas`:** a barra fora da tela fica `inert` (sai da ordem de Tab), a menos que você passe `inert` explicitamente.
+  - **Textos (AUD-31):** nova prop `labels` em `Sidebar` (`navigation`, `mobileTitle`, `close`), todos com padrão em PT-BR.
+  - **Ícones (AUD-59):** `PanelLeft` e o X da gaveta com `aria-hidden="true"`.
+  - **Tipos (AUD-64):** novas interfaces exportadas `SidebarProviderProps`, `SidebarProps`, `SidebarLabels`, `SidebarTriggerProps`, `SidebarInsetProps`, `SidebarMenuButtonProps` e `SidebarMenuSubButtonProps`. `setOpenMobile` do `useSidebar()` passa a aceitar função (`setOpenMobile((v) => !v)`), como já funcionava na prática.
+  
+  **Migração:** nenhuma quebra de API. Quem testava o painel mobile por `aria-label="Navegação"` deve usar o papel `dialog` com nome "Menu de navegação" (ou passar `labels.mobileTitle`). Na gaveta fechada o painel não fica mais no DOM, então o `ref` da `Sidebar` em telas estreitas é `null` até ela abrir.
+- 4030e40: Fundação (onda 2 da auditoria 2026-10):
+  
+  - **AUD-26** — Poppins auto-hospedada: novo `@semec/ds/react/fonts.css` com `@font-face` 400, 500, 600 e 700 (`font-display: swap`) e os `.woff2` em `dist/react/fonts/`, com a licença SIL OFL 1.1 (`fonts/OFL.txt`). Não há 800/900. Importe antes do `tokens.css`.
+  - **AUD-27** — a escala `--space-*` vira utilitário: `p-space-4`, `gap-space-2`, `mt-space-12`… (CSS-first e preset JS com os mesmos nomes). Os utilitários numéricos do Tailwind continuam como estão.
+  - **AUD-28** — escala tipográfica completa: `--text-3xl` passa a 32px (era o 30px do Tailwind) e entra `--text-display` (40px). Cada `text-*` aplica a entrelinha do degrau (`--leading-*`); entram `leading-xs`…`leading-display` e `font-regular`. *Mudança visual:* a entrelinha padrão de `text-xs`/`sm`/`lg`/`xl`/`2xl` passa à da especificação (ex.: `text-sm` 20px → 21px).
+  - **AUD-30** — novos `text-text-muted`, `text-text-secondary`, `text-text-strong` e `text-text-on-brand`. `text-muted`/`text-secondary` continuam sendo a cor de fundo `--surface-alt` (1,09:1) e não devem ser usados para texto; `bg-muted`/`bg-secondary` não mudam.
+  - **AUD-53** — novo `--surface-sunken` (`bg-surface-sunken`, primitivo `--pv-gray-300`): 1,47:1 sobre `--surface`; preenchimento `--action-primary` sobre ele, 3,68:1.
+  - **AUD-60** — novo `--focus-ring-inverse` (`ring-ring-inverse`). Dentro de `data-surface="brand"` ou `bg-brand-hero`, o anel de foco (outline global e `ring-ring`) passa ao inverso: 9,38:1 sobre `--brand-hero` (antes 1,00:1). `data-surface="default"` volta ao anel padrão.
+  - **AUD-25** (parte global) — o reset de `a` continua em `@layer base`, então `underline` sempre vence; `<a>` sem `class` passa a ser sublinhado.
+
+### Patch Changes
+
+- 37d1345: Input e Textarea: anel de foco do campo inválido agora usa `destructive` a 100% (6,47:1 sobre a superfície, antes 1,69:1) (AUD-24, #33).
+- ad75435: FileUpload: anel de foco visível na zona quando o input está focado. Novas props opcionais: `value` (controlado), `multiple`, `id` e `inputProps`. O `accept` agora também é validado ao arrastar e soltar. O `className` vale só na raiz. Dica e erro ficam ligados ao input por `aria-describedby`, com `aria-invalid` quando há erro (#18).
+  
+  **Migração:** o `id` passado ao `FileUpload` agora vai para o `<input type="file">`, não para a `div` raiz. Assim `<label htmlFor>` e os links do ErrorSummary focam o campo. Se algum CSS ou teste usava esse `id` para achar a raiz, troque por `className` ou por um `data-*` na raiz.
+- d6c47ef: InputOTP: o foco avança entre os dígitos, e digitar, editar o dígito do meio e colar funcionam (#16). A tela guarda a posição de cada slot, mas o `onChange` entrega só os dígitos preenchidos, sem lacunas: com "1" no slot 1 e "6" no slot 6, o valor emitido é "16". No modo controlado, a tela segue sempre o `value` do pai (se o pai truncar ou recusar, vale o `value`). Sem `value`, o componente funciona como não controlado. O anel de foco aparece só no slot focado (`focus-within`). Há `autocomplete="one-time-code"`, e o grupo tem `role="group"` rotulado: aceita `aria-label`/`aria-labelledby`, com "Código de verificação" como padrão.
+- 73c2276: Slider: `aria-label`/`aria-labelledby` passam para os polegares (`role="slider"`), um polegar por valor e nova prop opcional `getAriaLabel(index)` para nomear cada polegar (#22).
+- db1e7e6: `Badge` success/warning/danger/info passa a usar os tokens `--feedback-*-surface` opacos (#20), garantindo contraste AA em qualquer fundo (info 4,89:1, warning 5,49:1, danger 5,91:1, success 6,31:1). Atenção: o fundo dessas variantes deixa de ser semitransparente e agora é opaco, então não deixa mais passar a cor do container.
+- fd65721: Foco visível em itens de `DropdownMenu` e `Select` (#21): o item focado ganha anel interno de 2px em `--focus-ring` (9,38:1 sobre o popover) e fundo `tint`, em vez de só um fundo sutil de 1,09:1. Como o Radix move o foco para o item sob o mouse, o anel também aparece no hover.
+- e397c12: Toast acessível em PT-BR (#15): `ToastClose` ganha nome acessível "Fechar notificação"; `ToastProvider` e `ToastViewport` usam "Notificação" e "Notificações ({hotkey})" por padrão; `Toaster` aceita `label`, `viewportLabel` e `closeLabel` opcionais.
+- 89ff295: DataTable e Pagination acessíveis por teclado (#19, AUD-05): publica a ordenação por botão com `aria-sort` (b142658), `aria-sort="none"` quando `sortDir` é nulo, linha com `onRowClick` focável e ativável por Enter/Espaço com contorno de foco visível, ícones decorativos com `aria-hidden` e alvos de paginação de 44px (`h-11`).
+- a91bbdc: Corrige os exemplos de uso do manifest (artefatos de IA e páginas de componente): Toast com `<Toaster />` + `useToast()` (#27); `SidebarToggleButton` separado do `SidebarTrigger` e Dica com `IconButton label` (#28); todos os exemplos com rótulo ou nome acessível (#30); a11y real da Tabela e da Tabela de dados; "estados vazios" em PT-BR.
+- 5414ddf: `SidebarToggleButton`: `label` deixa de ser obrigatório (#28). Sem ele, o nome acessível alterna entre `labelOpen`/`labelClosed` ("Fechar menu"/"Abrir menu"); com ele, vira rótulo fixo, e o estado continua em `aria-expanded`.
+  
+  **Migração:** antes, o `label` passado ao `SidebarToggleButton` era descartado em silêncio. Agora ele é usado como rótulo fixo do botão (o estado aberto/fechado continua anunciado por `aria-expanded`). Se você passava `label` só para o TypeScript compilar e quer manter o rótulo dinâmico ("Fechar menu"/"Abrir menu"), remova a prop ou use `labelOpen`/`labelClosed`.
+- 1150c2d: Exporta `cn()` (clsx + tailwind-merge) no entry `@semec/ds/react`, como o README e a SKILL já anunciavam (AUD-41, Refs #33).
+- d13e106: Documentação publicada no pacote: errata do CHANGELOG 3.0.0 (bundle único, sem `"use client"`; usar o kit em arquivos `"use client"` no Next App Router) (#25); receita de Toast com `<Toaster />` + `useToast()` nas skills (#27); skills sem tokens inexistentes no pacote (`--container-max`, `--measure`, `--control-height-*`, `data-density`, `--pv-blue-900 #1e3a5f`) (#29); bloco "Comece aqui" no README com Radix automático, `@source` relativo ao CSS, carga da Poppins, `<Toaster />`/`TooltipProvider` e contagem real de 49 componentes (#31); URLs `repository`/`homepage`/`bugs` e links do README apontando para `SEMEC-PVH/SEMEC_design_system` (AUD-42, Refs #33).
+- 6bf315a: `dsTokens` (`@semec/ds/lite/skills`) alinhado ao `tokens.css` publicado: sai `--pv-green-600`, `--font-poppins` e `--font-mono` (inexistentes no pacote); entram `--font-medium`, `--font-semibold` e `--text-on-brand` (#29).
+- 6941bed: Torna determinístico o carimbo `generatedAt` / "Gerado em" dos artefatos de agentes (llms.txt, llms-full.txt, manifest.json): usa `SOURCE_DATE_EPOCH` ou a data do último commit do pacote, em vez da hora do build (#26).
+- 64f2474: Integração da onda 2 da auditoria (#34):
+  
+  - `AlertDialogContent` declara `aria-modal="true"`. Sem ele, leitores de tela e o axe não reconheciam o `role="alertdialog"` como modal e acusavam `aria-hidden-focus` no conteúdo de fundo (AUD-34).
+  - As células do `Calendar` declaram `role="gridcell"` explicitamente, para que `aria-selected` valha em qualquer árvore de acessibilidade (AUD-37).
+
 ## 3.0.0
 
 > **Errata (registrada em 14/10/2026, auditoria AUD-11, #25).** O item "Build com `splitting: true` (ESM por módulo) para poda de árvore" desta versão **não corresponde ao que foi publicado**. O texto original foi mantido, riscado, logo abaixo. Estado real da 3.0.0 (que continua valendo na 3.1.0):
