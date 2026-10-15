@@ -30,7 +30,8 @@ data: 2026-08-20
 > 3. **Nomes próprios do Radix ficam como estão**, sem alias: `checked`/`defaultChecked`/`onCheckedChange` (`Checkbox`, `Switch`) e `pressed`/`onPressedChange` (`Toggle`). Motivo: nesses primitivos `value` já é o **valor enviado no formulário** (padrão `"on"`), e um `onValueChange(boolean)` ao lado de `value: string` confundiria. A equivalência é documental: `checked` ≡ `value`, `onCheckedChange` ≡ `onValueChange`.
 > 4. **`invalid: boolean` → `aria-invalid="true"`** e o estilo de erro do campo. Passado explicitamente, vence o estado do `FormField` (inclusive `invalid={false}`); `aria-invalid` passado à mão vence os dois. A ligação é a mesma do `FormFieldContext` (AUD-21), em `useFormFieldControl`.
 > 5. **Erro com mensagem é `error: string`** e existe só onde o componente desenha o texto (`FormField`, `FileUpload`). `error="…"` equivale a `invalid` + mensagem. Nenhum componente aceita `error: boolean`; para marcar sem texto, use `invalid`. O `FormField` também ganhou `invalid` (sem mensagem).
-> 6. **`name` envia em `<form>` nativo.** Nos controles que não são `<input>` (`Combobox`, `InputOTP`), `name` gera um `<input type="hidden">` com o valor (aceitam também `form`).
+> 6. **`name` envia em `<form>` nativo.** Nos controles que não são `<input>` (`Combobox`, `InputOTP`), `name` gera um `<input type="hidden">` com o valor (aceitam também `form`). No `FileUpload`, o `input.files` é mantido igual à lista mostrada (via `DataTransfer`), para o arquivo ir no `FormData` e o `required` valer; conferido no Chromium pelo gate (`scripts/gate/check-form-submit.mjs`).
+> 7. **`invalid={false}` explícito** desliga também a ligação da mensagem de erro do `FormField` ao `aria-describedby` do controle (a dica continua).
 >
 > | Componente | Valor | Callback do contrato | Callback antigo (status) | `name` | `invalid` | `required` | Observação |
 > |---|---|---|---|---|---|---|---|

@@ -43,8 +43,11 @@ export interface InputOTPProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue"> {
   /** Valor controlado. Sem ele, o componente guarda o estado sozinho. */
   value?: string;
-  /** Valor inicial (modo não controlado). */
-  defaultValue?: string;
+  /**
+   * Valor inicial (modo não controlado). Aceita o tipo herdado de
+   * `HTMLAttributes` (3.1.0) e normaliza para string.
+   */
+  defaultValue?: string | number | readonly string[];
   /**
    * Recebe os dígitos preenchidos concatenados, sem lacunas: com "1" no slot 1
    * e "6" no slot 6, o valor emitido é "16" (a tela mantém as posições).
@@ -95,7 +98,15 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
     const isControlled = value !== undefined;
     const slotsRef = React.useRef<(HTMLInputElement | null)[]>([]);
     const [internalSlots, setSlots] = React.useState<string[]>(() =>
-      toSlots(value ?? defaultValue ?? "", maxLength)
+      toSlots(
+        value ??
+          (Array.isArray(defaultValue)
+            ? defaultValue.join("")
+            : defaultValue !== undefined
+              ? String(defaultValue)
+              : ""),
+        maxLength
+      )
     );
     if (onChange) {
       warnDeprecated(

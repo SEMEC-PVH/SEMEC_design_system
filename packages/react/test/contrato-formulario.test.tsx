@@ -330,3 +330,134 @@ describe("name no envio de <form> nativo (FormData)", () => {
     expect(input).toBeRequired();
   });
 });
+
+describe("FileUpload: input.files acompanha a lista (D1)", () => {
+  // O jsdom não tem DataTransfer nem deixa montar FileList: aqui um DataTransfer
+  // mínimo e um `files` gravável no próprio input conferem a sincronização.
+  // O envio real (FormData + checkValidity) roda no Chromium, em
+  // scripts/gate/check-form-submit.mjs.
+  class FakeDataTransfer {
+    private list: File[] = [];
+    items = { add: (file: File) => void this.list.push(file) };
+    get files() {
+      return this.list as unknown as FileList;
+    }
+  }
+
+  function writableFiles(input: HTMLElement) {
+    let store: File[] = [];
+    Object.defineProperty(input, "files", {
+      configurable: true,
+      get: () => store,
+      set: (v: File[]) => {
+        store = Array.from(v);
+      },
+    });
+    return {
+      get names() {
+        return store.map((f) => f.name);
+      },
+      pick(files: File[]) {
+        store = files;
+        fireEvent.change(input);
+      },
+    };
+  }
+
+  const pdf = (name: string) => new File(["%PDF"], name, { type: "application/pdf" });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("aceito fica no input; recusado não substitui o aceito", () => {
+    vi.stubGlobal("DataTransfer", FakeDataTransfer);
+    render(<FileUpload label="Doc" name="doc" accept=".pdf" />);
+    const files = writableFiles(screen.getByLabelText("Doc"));
+    files.pick([pdf("a.pdf")]);
+    expect(files.names).toEqual(["a.pdf"]);
+    files.pick([new File(["MZ"], "b.exe")]);
+    expect(files.names).toEqual(["a.pdf"]);
+    expect(screen.getByText("Tipo de arquivo não permitido.")).toBeInTheDocument();
+  });
+
+  it("controlado: o value do pai vai para o input (remover esvazia)", () => {
+    vi.stubGlobal("DataTransfer", FakeDataTransfer);
+    const { rerender } = render(<FileUpload label="Doc" value={[]} />);
+    const files = writableFiles(screen.getByLabelText("Doc"));
+    rerender(<FileUpload label="Doc" value={[pdf("x.pdf"), pdf("y.pdf")]} />);
+    expect(files.names).toEqual(["x.pdf", "y.pdf"]);
+    rerender(<FileUpload label="Doc" value={[]} />);
+    expect(files.names).toEqual([]);
+  });
+
+  it("cancelar o seletor devolve a lista ao input", () => {
+    vi.stubGlobal("DataTransfer", FakeDataTransfer);
+    render(<FileUpload label="Doc" />);
+    const input = screen.getByLabelText("Doc");
+    const files = writableFiles(input);
+    files.pick([pdf("a.pdf")]);
+    input.files = new FakeDataTransfer().files; // como o clique que limpa o input
+    expect(files.names).toEqual([]);
+    fireEvent(input, new Event("cancel"));
+    expect(files.names).toEqual(["a.pdf"]);
+  });
+
+  it("sem DataTransfer, degrada sem erro e mantém a lista", async () => {
+    vi.stubGlobal("DataTransfer", undefined);
+    render(<FileUpload label="Doc" />);
+    await userEvent.setup().upload(screen.getByLabelText("Doc"), pdf("a.pdf"));
+    expect(screen.getByText("a.pdf")).toBeInTheDocument();
+  });
+});
+
+describe("InputOTP.defaultValue (compatível com 3.1.0)", () => {
+  it.each([
+    ["string", "12", "1"],
+    ["number", 34, "3"],
+    ["array", ["5", "6"], "5"],
+  ] as const)("aceita %s e normaliza para string", (_tipo, defaultValue, primeiro) => {
+    render(
+      <InputOTP maxLength={2} defaultValue={defaultValue}>
+        <InputOTPGroup>
+          <InputOTPSlot index={0} />
+          <InputOTPSlot index={1} />
+        </InputOTPGroup>
+      </InputOTP>
+    );
+    expect(screen.getByRole("textbox", { name: "Dígito 1 de 2" })).toHaveValue(primeiro);
+  });
+});
+
+describe("invalid={false} explícito não liga a mensagem de erro do FormField", () => {
+  it("Input: sem aria-invalid e sem o erro no aria-describedby", () => {
+    render(
+      <FormField label="CPF" id="cpf" error="Informe o CPF.">
+        <Input invalid={false} aria-describedby="extra" />
+      </FormField>
+    );
+    const input = screen.getByRole("textbox", { name: "CPF" });
+    expect(input).not.toHaveAttribute("aria-invalid");
+    expect(input).toHaveAttribute("aria-describedby", "extra");
+  });
+
+  it("Input: a dica continua ligada", () => {
+    render(
+      <FormField label="CPF" id="cpf" hint="Só números">
+        <Input invalid={false} />
+      </FormField>
+    );
+    expect(screen.getByRole("textbox", { name: "CPF" })).toHaveAttribute("aria-describedby", "cpf-hint");
+  });
+
+  it("FileUpload: idem", () => {
+    render(
+      <FormField label="Anexo" id="anexo" error="Envie o anexo.">
+        <FileUpload invalid={false} />
+      </FormField>
+    );
+    const input = screen.getByLabelText("Anexo");
+    expect(input).not.toHaveAttribute("aria-invalid");
+    expect(input.getAttribute("aria-describedby") ?? "").not.toContain("anexo-error");
+  });
+});
