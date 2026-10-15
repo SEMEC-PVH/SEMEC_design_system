@@ -3,6 +3,7 @@
 import * as React from "react";
 import { UploadCloud } from "lucide-react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
 import { useFormField } from "./form-field";
 
@@ -42,7 +43,8 @@ export interface FileUploadProps
   /**
    * Removido na 4.0 (AUD-35): use `onValueChange`. O FileUpload não tem
    * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
-   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado.
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
    */
   onChange?: never;
   /** `name` do `<input type="file">`. Atalho de `inputProps.name`. */
@@ -131,6 +133,8 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
     },
     ref
   ) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("FileUpload");
     const [internalFiles, setInternalFiles] = React.useState<File[]>([]);
     const files = value ?? internalFiles;
     const [drag, setDrag] = React.useState(false);

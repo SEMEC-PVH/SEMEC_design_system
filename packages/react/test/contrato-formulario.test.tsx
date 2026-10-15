@@ -38,7 +38,35 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+/** O onChange removido gera um único console.error em desenvolvimento, mesmo com vários renders. */
+function expectRemovedOnChangeError(error: ReturnType<typeof vi.spyOn>, component: string) {
+  const calls = error.mock.calls.filter(([msg]) => String(msg).includes(`${component}: onChange`));
+  expect(calls).toHaveLength(1);
+  expect(String(calls[0]![0])).toContain("onChange foi removido na 4.0; use onValueChange (ver guia de migração");
+}
+
 const formData = (form: HTMLFormElement) => Object.fromEntries(new FormData(form).entries());
+
+describe("onChange removido na 4.0: erro único só em desenvolvimento", () => {
+  it("não reporta em produção nem repete o mesmo componente", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const env = process.env.NODE_ENV;
+    vi.resetModules();
+    try {
+      process.env.NODE_ENV = "production";
+      const prod = await import("../src/lib/removed-prop");
+      prod.reportRemovedOnChange("Combobox");
+      expect(error).not.toHaveBeenCalled();
+      process.env.NODE_ENV = "development";
+      prod.reportRemovedOnChange("Combobox");
+      prod.reportRemovedOnChange("Combobox");
+      expect(error).toHaveBeenCalledTimes(1);
+    } finally {
+      process.env.NODE_ENV = env;
+      vi.resetModules();
+    }
+  });
+});
 
 describe("onValueChange", () => {
   it("Input: onValueChange recebe a string e o onChange nativo continua recebendo o evento", async () => {
@@ -92,6 +120,7 @@ describe("onValueChange", () => {
 
   it("Combobox: onValueChange recebe o valor da opção; o onChange da 3.x não é mais chamado (4.0)", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
     const onValueChange = vi.fn();
     const onChange = vi.fn();
     render(
@@ -108,6 +137,7 @@ describe("onValueChange", () => {
     await user.click(within(await screen.findByRole("listbox")).getByRole("option", { name: "Porto Velho" }));
     expect(onValueChange).toHaveBeenCalledWith("pvh");
     expect(onChange).not.toHaveBeenCalled();
+    expectRemovedOnChangeError(error, "Combobox");
     expect(warn).not.toHaveBeenCalled();
   });
 
@@ -129,6 +159,7 @@ describe("onValueChange", () => {
 
   it("InputOTP: o onChange(value) da 3.x não é mais chamado (4.0), nem com o evento dos dígitos", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
     const onValueChange = vi.fn();
     const onChange = vi.fn();
     render(
@@ -143,10 +174,12 @@ describe("onValueChange", () => {
     await userEvent.setup().type(screen.getByRole("textbox", { name: "Dígito 1 de 4" }), "7");
     expect(onValueChange).toHaveBeenLastCalledWith("7");
     expect(onChange).not.toHaveBeenCalled();
+    expectRemovedOnChangeError(error, "InputOTP");
     expect(warn).not.toHaveBeenCalled();
   });
 
   it("Calendar: o onChange(date) da 3.x não é mais chamado (4.0)", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
     const onValueChange = vi.fn();
     const onChange = vi.fn();
     render(
@@ -159,10 +192,12 @@ describe("onValueChange", () => {
     await userEvent.setup().click(screen.getByRole("gridcell", { name: "15 de outubro de 2026" }));
     expect(onValueChange).toHaveBeenCalledTimes(1);
     expect(onChange).not.toHaveBeenCalled();
+    expectRemovedOnChangeError(error, "Calendar");
   });
 
   it("FileUpload: onValueChange recebe os arquivos; o onChange(files) da 3.x não é mais chamado (4.0)", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
     const onValueChange = vi.fn();
     const onChange = vi.fn();
     render(
@@ -173,6 +208,7 @@ describe("onValueChange", () => {
     expect(onValueChange).toHaveBeenCalledWith([file]);
     // Nem com os arquivos, nem com o evento do <input type="file"> que borbulha.
     expect(onChange).not.toHaveBeenCalled();
+    expectRemovedOnChangeError(error, "FileUpload");
     expect(warn).not.toHaveBeenCalled();
   });
 
