@@ -4,18 +4,19 @@ code: "textarea"
 slug: "area-de-texto"
 file: "src/components/textarea.tsx"
 category: "formularios"
-variants: "estados: padrão · inválido · disabled"
+variants: "estados: padrão · inválido (invalid) · disabled · contrato: value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required"
 ---
 
 # Área de texto — `textarea`
 
-> Campo multilinha com as mesmas variantes visuais do campo de texto.
+> Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`).
 
 **Arquivo:** `src/components/textarea.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/area-de-texto`
 
 ## Variantes
 
-- **estados**: padrão · inválido · disabled
+- **estados**: padrão · inválido (invalid) · disabled
+- **contrato**: value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required
 
 ## Instalação (@semec/ds)
 
@@ -36,14 +37,14 @@ npm install @semec/ds
 import { FormField, Textarea } from "@semec/ds/react";
 
 <FormField label="Descreva a demanda" hint="Até 500 caracteres">
-  <Textarea id="demanda" rows={4} />
+  <Textarea id="demanda" name="demanda" rows={4} value={demanda} onValueChange={setDemanda} />
 </FormField>
 ```
 
 ## Prompt para IA
 
 ```text
-Use o componente `Textarea` (Área de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo multilinha com as mesmas variantes visuais do campo de texto. API e variantes: estados: padrão · inválido · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Textarea` (Área de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`). API e variantes: estados: padrão · inválido (invalid) · disabled · contrato: value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -54,12 +55,28 @@ import * as React from "react";
 import { cn } from "../lib/utils";
 import { useFormFieldControl } from "./form-field";
 
-export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  /**
+   * Recebe o valor (string) a cada mudança, junto com o `onChange` nativo, que
+   * continua recebendo o evento (contrato de formulário, ADR-015).
+   */
+  onValueChange?: (value: string) => void;
+  /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
+  invalid?: boolean;
+}
 
 /** Campo multilinha. Dentro de um `FormField`, recebe `id`, `aria-describedby` e `aria-invalid`. */
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, ...props }, ref) => {
-    const field = useFormFieldControl(props, { supportsRequired: true });
+  ({ className, invalid, onValueChange, ...props }, ref) => {
+    const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
+    const { onChange } = props;
+    const handleChange =
+      onChange || onValueChange
+        ? (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+            onChange?.(event);
+            onValueChange?.(event.target.value);
+          }
+        : undefined;
     return (
       <textarea
         className={cn(
@@ -69,6 +86,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         ref={ref}
         {...props}
         {...field}
+        onChange={handleChange}
       />
     );
   }

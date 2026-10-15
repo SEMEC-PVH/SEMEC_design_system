@@ -4,7 +4,7 @@ code: "calendar"
 slug: "calendario"
 file: "src/components/calendar.tsx"
 category: "formularios"
-variants: "props: value · onChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome '14 de outubro de 2026' · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona"
+variants: "props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · deprecadas: onChange(date) (use onValueChange; sai na 4.0) · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome '14 de outubro de 2026' · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona"
 ---
 
 # Calendário — `calendar`
@@ -15,7 +15,8 @@ variants: "props: value · onChange · min · max (AAAA-MM-DD, data local) · di
 
 ## Variantes
 
-- **props**: value · onChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }>
+- **props**: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }>
+- **deprecadas**: onChange(date) (use onValueChange; sai na 4.0)
 - **a11y**: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome "14 de outubro de 2026"
 - **teclado**: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona
 
@@ -37,15 +38,15 @@ npm install @semec/ds
 ```tsx
 import { Calendar } from "@semec/ds/react";
 
-<Calendar value={data} onChange={setData} />
+<Calendar value={data} onValueChange={setData} />
 
-<Calendar value={data} onChange={setData} min="2026-01-01" max="2026-12-31" />
+<Calendar value={data} onValueChange={setData} min="2026-01-01" max="2026-12-31" />
 ```
 
 ## Prompt para IA
 
 ```text
-Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px. API e variantes: props: value · onChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome "14 de outubro de 2026" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px. API e variantes: props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · deprecadas: onChange(date) (use onValueChange; sai na 4.0) · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome "14 de outubro de 2026" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -54,6 +55,7 @@ Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não r
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import { warnDeprecated } from "../lib/deprecation";
 import { cn } from "../lib/utils";
 
 const LOCALE = "pt-BR";
@@ -94,6 +96,9 @@ const DEFAULT_LABELS: CalendarLabels = {
 export interface CalendarProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
   value?: Date | null;
+  /** Recebe a data escolhida (contrato de formulário, ADR-015). */
+  onValueChange?: (date: Date) => void;
+  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
   onChange?: (date: Date) => void;
   disabled?: boolean;
   /** Data mínima selecionável (`AAAA-MM-DD`). */
@@ -153,8 +158,14 @@ const navButtonClass =
  * (`Shift` + `PageUp`/`PageDown` trocam o ano) e `Enter`/`Espaço` selecionam.
  */
 const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
-  ({ className, value, onChange, disabled, min, max, labels, ...props }, ref) => {
+  ({ className, value, onChange, onValueChange, disabled, min, max, labels, ...props }, ref) => {
     const text = { ...DEFAULT_LABELS, ...labels };
+    if (onChange) {
+      warnDeprecated(
+        "Calendar.onChange",
+        "Calendar: `onChange(date)` está obsoleto e sai na 4.0. Use `onValueChange(date)`."
+      );
+    }
     const headingId = React.useId();
     const today = startOfDay(new Date());
 
@@ -194,6 +205,7 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
 
     const select = (date: Date) => {
       if (isDisabled(date)) return;
+      onValueChange?.(date);
       onChange?.(date);
     };
 

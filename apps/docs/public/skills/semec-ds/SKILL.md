@@ -171,20 +171,20 @@ Lista gerada do manifest (export principal, `code` e descrição). Detalhes, var
 
 ### Formulários (16)
 
-- `Input` (`input`) — Campo de texto. Estado de erro via `aria-invalid`. Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente.
-- `Textarea` (`textarea`) — Campo multilinha com as mesmas variantes visuais do campo de texto.
-- `Select` (`select`) — Seleção fechada com gatilho, conteúdo e itens compostos.
+- `Input` (`input`) — Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string.
+- `Textarea` (`textarea`) — Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`).
+- `Select` (`select`) — Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`).
 - `Combobox` (`combobox`) — Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.
 - `DatePicker` (`date-picker`) — Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).
-- `FileUpload` (`file-upload`) — Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.
-- `Checkbox` (`checkbox`) — Caixa de marcação com estado indeterminado.
-- `RadioGroup` (`radio-group`) — Escolha única entre duas ou mais opções.
-- `Switch` (`switch`) — Interruptor on/off para ativação imediata.
+- `FileUpload` (`file-upload`) — Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio.
+- `Checkbox` (`checkbox`) — Caixa de marcação com estado indeterminado. Mantém a API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.
+- `RadioGroup` (`radio-group`) — Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`.
+- `Switch` (`switch`) — Interruptor on/off para ativação imediata. API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.
 - `Label` (`label`) — Rótulo acessível vinculado ao campo.
 - `FormField` (`form-field`) — Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role="alert"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast.
 - `ErrorSummary` (`error-summary`) — Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático, título ligado por id gerado. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`).
-- `Toggle` (`toggle`) — Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos.
-- `Slider` (`slider`) — Controle deslizante para faixas de valor.
+- `Toggle` (`toggle`) — Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos.
+- `Slider` (`slider`) — Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares.
 - `InputOTP` (`input-otp`) — Campo de código OTP com foco automático entre dígitos.
 - `Calendar` (`calendar`) — Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px.
 
@@ -438,7 +438,7 @@ export function ExemploFormulario() {
         <Input
           id="cpf"
           value={cpf}
-          onChange={(e) => setCpf(e.target.value)}
+          onValueChange={setCpf}
         />
       </FormField>
 
@@ -449,6 +449,29 @@ export function ExemploFormulario() {
 ```
 
 - Labels sempre associados via `htmlFor`/`id`
+
+### Contrato dos controles de formulário (ADR-015, desde a 3.2.0)
+
+Todo controle de formulário do kit fala a mesma língua: `value` / `defaultValue` · `onValueChange(valor)` · `name` · `id` · `invalid` · `disabled` · `required`.
+
+- `onValueChange` recebe o **valor** (string, `File[]`, `Date`, `number[]`), nunca o evento. Use-o em `Input`, `Textarea`, `DatePicker`, `Combobox`, `InputOTP`, `FileUpload`, `Calendar`, `Select`, `RadioGroup` e `Slider`.
+- Em `Input`/`Textarea`, `onChange` continua sendo o evento nativo (não está obsoleto). Em `Combobox`, `InputOTP`, `DatePicker`, `FileUpload` e `Calendar`, o `onChange(valor)` está obsoleto: não gere código novo com ele.
+- `Checkbox` e `Switch` mantêm a API Radix: `checked` / `onCheckedChange` (equivalem a `value` / `onValueChange`; ali `value` é o valor enviado no form). `Toggle` (`pressed` / `onPressedChange`) não é controle de formulário.
+- `invalid` (boolean) vira `aria-invalid="true"` + borda de erro. Dentro do `FormField`, `error="mensagem"` já marca o filho; `invalid` explícito no controle vence. `error` é sempre texto (`FormField`, `FileUpload`); para marcar sem texto, use `invalid` (o `FormField` também aceita).
+- `name` envia em `<form>` nativo, inclusive em `Combobox` e `InputOTP` (input oculto). No `Select`, `name`/`value`/`onValueChange` vão na raiz e `invalid` no `SelectTrigger`.
+
+```tsx
+<FormField label="Município" error={erroMunicipio}>
+  <Combobox name="municipio" options={municipios} value={municipio} onValueChange={setMunicipio} />
+</FormField>
+<FormField label="Código recebido por SMS" required>
+  <InputOTP name="codigo" maxLength={6} value={codigo} onValueChange={setCodigo} invalid={codigoErrado}>
+    <InputOTPGroup>
+      {[0, 1, 2, 3, 4, 5].map((i) => <InputOTPSlot key={i} index={i} />)}
+    </InputOTPGroup>
+  </InputOTP>
+</FormField>
+```
 - Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`
 
 ## Responsive / Mobile
@@ -483,7 +506,7 @@ export function ExemploFormulario() {
 Avisadas a partir da 3.1.0, conforme o ADR-013 (duas minors antes de remover). Não gere código novo que dependa disto:
 
 - Importar por caminho de arquivo em `dist/` (`@semec/ds/dist/react/...`): use só os subpaths do `exports` (AUD-20).
-- `onChange(value)` / `onChange(files)` em `Calendar`, `Combobox`, `DatePicker`, `InputOTP` e `FileUpload`: o contrato passa a ser `value` / `onValueChange` / `name` / `id` / `invalid`; use `onValueChange` onde já existir (AUD-35).
+- `onChange(value)` / `onChange(files)` em `Calendar`, `Combobox`, `DatePicker`, `InputOTP` e `FileUpload`: use `onValueChange` (mesma assinatura, existe em todos desde a 3.2.0). No `DatePicker`, o `onChange` volta a ser o evento nativo na 4.0 (AUD-35).
 - Utilitários de primitivo `bg-pv-*` / `text-pv-*` / `border-pv-*`: use os semânticos (AUD-55).
 - Valores atuais de `rounded-sm` (2px) e `rounded-lg` (12px): escolha o raio pelo papel (AUD-57).
 - `disabled` nativo no `Button` como seletor (`:disabled`) ou em testes: o estado pode passar a `aria-disabled`, e o `Button` ganha `loading` (AUD-63).

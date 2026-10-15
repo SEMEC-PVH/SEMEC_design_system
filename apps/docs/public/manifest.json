@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
   "version": "3.1.0",
-  "generatedAt": "2026-10-14T19:05:44.000Z",
+  "generatedAt": "2026-10-15T12:22:40.000Z",
   "componentCount": 52,
   "categories": [
     {
@@ -108,15 +108,19 @@
       "exportName": "Input",
       "file": "src/components/input.tsx",
       "category": "formularios",
-      "desc": "Campo de texto. Estado de erro via `aria-invalid`. Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente.",
+      "desc": "Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string.",
       "variants": [
         {
           "prop": "estados",
-          "values": "padrão · inválido (aria-invalid) · disabled"
+          "values": "padrão · inválido (invalid / aria-invalid) · disabled"
+        },
+        {
+          "prop": "contrato",
+          "values": "value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required"
         }
       ],
-      "usage": "import { FormField, Input } from \"@semec/ds/react\";\n\n// Todo campo precisa de rótulo visível (placeholder não substitui o rótulo).\n// Dentro do FormField, id, aria-describedby e aria-invalid são ligados sozinhos.\n<FormField label=\"Nome completo\" hint=\"Como no documento\">\n  <Input autoComplete=\"name\" />\n</FormField>\n\n// Com id próprio (ex.: alvo do ErrorSummary): o rótulo e a mensagem seguem o id\n<FormField label=\"CPF\" error=\"Informe os 11 dígitos do CPF.\">\n  <Input id=\"cpf\" inputMode=\"numeric\" />\n</FormField>\n// → <label for=\"cpf\">, aria-invalid=\"true\", aria-describedby=\"cpf-error\"",
-      "prompt": "Use o componente `Input` (Caixa de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de texto. Estado de erro via `aria-invalid`. Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. API e variantes: estados: padrão · inválido (aria-invalid) · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { FormField, Input } from \"@semec/ds/react\";\n\n// Todo campo precisa de rótulo visível (placeholder não substitui o rótulo).\n// Dentro do FormField, id, aria-describedby e aria-invalid são ligados sozinhos.\n<FormField label=\"Nome completo\" hint=\"Como no documento\">\n  <Input autoComplete=\"name\" />\n</FormField>\n\n// Com id próprio (ex.: alvo do ErrorSummary): o rótulo e a mensagem seguem o id\n<FormField label=\"CPF\" error=\"Informe os 11 dígitos do CPF.\">\n  <Input id=\"cpf\" inputMode=\"numeric\" />\n</FormField>\n// → <label for=\"cpf\">, aria-invalid=\"true\", aria-describedby=\"cpf-error\"\n\n// Controlado: onValueChange recebe a string (onChange continua recebendo o evento)\n<FormField label=\"E-mail\">\n  <Input type=\"email\" name=\"email\" value={email} onValueChange={setEmail} invalid={emailInvalido} />\n</FormField>",
+      "prompt": "Use o componente `Input` (Caixa de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string. API e variantes: estados: padrão · inválido (invalid / aria-invalid) · disabled · contrato: value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/caixa-de-texto",
       "md": "/components/caixa-de-texto.md"
     },
@@ -127,15 +131,19 @@
       "exportName": "Textarea",
       "file": "src/components/textarea.tsx",
       "category": "formularios",
-      "desc": "Campo multilinha com as mesmas variantes visuais do campo de texto.",
+      "desc": "Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`).",
       "variants": [
         {
           "prop": "estados",
-          "values": "padrão · inválido · disabled"
+          "values": "padrão · inválido (invalid) · disabled"
+        },
+        {
+          "prop": "contrato",
+          "values": "value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required"
         }
       ],
-      "usage": "import { FormField, Textarea } from \"@semec/ds/react\";\n\n<FormField label=\"Descreva a demanda\" hint=\"Até 500 caracteres\">\n  <Textarea id=\"demanda\" rows={4} />\n</FormField>",
-      "prompt": "Use o componente `Textarea` (Área de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo multilinha com as mesmas variantes visuais do campo de texto. API e variantes: estados: padrão · inválido · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { FormField, Textarea } from \"@semec/ds/react\";\n\n<FormField label=\"Descreva a demanda\" hint=\"Até 500 caracteres\">\n  <Textarea id=\"demanda\" name=\"demanda\" rows={4} value={demanda} onValueChange={setDemanda} />\n</FormField>",
+      "prompt": "Use o componente `Textarea` (Área de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`). API e variantes: estados: padrão · inválido (invalid) · disabled · contrato: value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/area-de-texto",
       "md": "/components/area-de-texto.md"
     },
@@ -146,15 +154,19 @@
       "exportName": "Select",
       "file": "src/components/select.tsx",
       "category": "formularios",
-      "desc": "Seleção fechada com gatilho, conteúdo e itens compostos.",
+      "desc": "Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`).",
       "variants": [
         {
           "prop": "composição",
           "values": "Select · SelectTrigger · SelectValue · SelectContent · SelectItem"
+        },
+        {
+          "prop": "contrato",
+          "values": "Select: value · defaultValue · onValueChange · name · required · disabled — SelectTrigger: id · invalid"
         }
       ],
-      "usage": "import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from \"@semec/ds/react\";\n\n<Select defaultValue=\"pbh\">\n  <SelectTrigger aria-label=\"Município\"><SelectValue placeholder=\"Município\" /></SelectTrigger>\n  <SelectContent>\n    <SelectItem value=\"pbh\">Porto Velho</SelectItem>\n    <SelectItem value=\"riob\">Rio Branco</SelectItem>\n  </SelectContent>\n</Select>\n\n// Dentro de FormField, o SelectTrigger recebe id, aria-describedby e aria-invalid\n<FormField label=\"Município\" error={erro}>\n  <Select>\n    <SelectTrigger><SelectValue placeholder=\"Selecione\" /></SelectTrigger>\n    <SelectContent>\n      <SelectItem value=\"pbh\">Porto Velho</SelectItem>\n    </SelectContent>\n  </Select>\n</FormField>",
-      "prompt": "Use o componente `Select` (Menu de seleção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção fechada com gatilho, conteúdo e itens compostos. API e variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from \"@semec/ds/react\";\n\n<Select defaultValue=\"pbh\">\n  <SelectTrigger aria-label=\"Município\"><SelectValue placeholder=\"Município\" /></SelectTrigger>\n  <SelectContent>\n    <SelectItem value=\"pbh\">Porto Velho</SelectItem>\n    <SelectItem value=\"riob\">Rio Branco</SelectItem>\n  </SelectContent>\n</Select>\n\n// Dentro de FormField, o SelectTrigger recebe id, aria-describedby e aria-invalid\n<FormField label=\"Município\" error={erro}>\n  <Select name=\"municipio\" value={municipio} onValueChange={setMunicipio}>\n    <SelectTrigger><SelectValue placeholder=\"Selecione\" /></SelectTrigger>\n    <SelectContent>\n      <SelectItem value=\"pbh\">Porto Velho</SelectItem>\n    </SelectContent>\n  </Select>\n</FormField>",
+      "prompt": "Use o componente `Select` (Menu de seleção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`). API e variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem · contrato: Select: value · defaultValue · onValueChange · name · required · disabled — SelectTrigger: id · invalid. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/menu-de-selecao",
       "md": "/components/menu-de-selecao.md"
     },
@@ -169,15 +181,15 @@
       "variants": [
         {
           "prop": "props",
-          "values": "options · value · defaultValue · onChange · placeholder · searchPlaceholder · emptyText · name · required · disabled · labels · portalContainer"
+          "values": "options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer"
         },
         {
           "prop": "deprecadas",
-          "values": "ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)"
+          "values": "onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)"
         }
       ],
-      "usage": "import { Combobox, FormField, Label } from \"@semec/ds/react\";\n\n// Rótulo visível pelo FormField: nome acessível = rótulo + texto do gatilho (WCAG 2.5.3)\n<FormField label=\"Tipo de documento\" error={erro}>\n  <Combobox\n    name=\"tipoDocumento\"\n    placeholder=\"Selecione o tipo de documento\"\n    searchPlaceholder=\"Buscar tipo…\"\n    emptyText=\"Nenhum tipo encontrado.\"\n    options={[{ value: \"cnpj\", label: \"CNPJ\" }, { value: \"cpf\", label: \"CPF\" }]}\n    value={valor}\n    onChange={setValor}\n  />\n</FormField>\n\n// Ou com <Label htmlFor> + id (também aceita aria-labelledby)\n<Label htmlFor=\"orgao\">Órgão emissor</Label>\n<Combobox id=\"orgao\" options={orgaos} />",
-      "prompt": "Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField. API e variantes: props: options · value · defaultValue · onChange · placeholder · searchPlaceholder · emptyText · name · required · disabled · labels · portalContainer · deprecadas: ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { Combobox, FormField, Label } from \"@semec/ds/react\";\n\n// Rótulo visível pelo FormField: nome acessível = rótulo + texto do gatilho (WCAG 2.5.3)\n<FormField label=\"Tipo de documento\" error={erro}>\n  <Combobox\n    name=\"tipoDocumento\"\n    placeholder=\"Selecione o tipo de documento\"\n    searchPlaceholder=\"Buscar tipo…\"\n    emptyText=\"Nenhum tipo encontrado.\"\n    options={[{ value: \"cnpj\", label: \"CNPJ\" }, { value: \"cpf\", label: \"CPF\" }]}\n    value={valor}\n    onValueChange={setValor}\n  />\n</FormField>\n// name gera um <input type=\"hidden\"> com o valor: vai no FormData de um <form> nativo\n\n// Ou com <Label htmlFor> + id (também aceita aria-labelledby)\n<Label htmlFor=\"orgao\">Órgão emissor</Label>\n<Combobox id=\"orgao\" options={orgaos} />",
+      "prompt": "Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField. API e variantes: props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · deprecadas: onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/combobox",
       "md": "/components/combobox.md"
     },
@@ -192,11 +204,15 @@
       "variants": [
         {
           "prop": "props",
-          "values": "nativo HTML (min · max · disabled) + labels.openCalendar + variantes visuais do campo"
+          "values": "nativo HTML (min · max · disabled · name · required) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar"
+        },
+        {
+          "prop": "deprecadas",
+          "values": "onChange(value) (use onValueChange; na 4.0 o onChange passa a receber o evento nativo)"
         }
       ],
-      "usage": "import { DatePicker, FormField } from \"@semec/ds/react\";\n\n<FormField label=\"Data de vencimento\" hint=\"dd/mm/aaaa\">\n  <DatePicker id=\"vencimento\" defaultValue=\"2026-08-31\" />\n</FormField>",
-      "prompt": "Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type=\"date\">` nativo — sem biblioteca de calendário. Um só indicador: botão \"Abrir calendário\" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). API e variantes: props: nativo HTML (min · max · disabled) + labels.openCalendar + variantes visuais do campo. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { DatePicker, FormField } from \"@semec/ds/react\";\n\n<FormField label=\"Data de vencimento\" hint=\"dd/mm/aaaa\">\n  <DatePicker id=\"vencimento\" name=\"vencimento\" defaultValue=\"2026-08-31\" />\n</FormField>\n\n// Controlado: onValueChange recebe o ISO (AAAA-MM-DD)\n<FormField label=\"Data de início\" error={erroData}>\n  <DatePicker value={inicio} onValueChange={setInicio} />\n</FormField>",
+      "prompt": "Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type=\"date\">` nativo — sem biblioteca de calendário. Um só indicador: botão \"Abrir calendário\" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). API e variantes: props: nativo HTML (min · max · disabled · name · required) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · deprecadas: onChange(value) (use onValueChange; na 4.0 o onChange passa a receber o evento nativo). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/seletor-de-data",
       "md": "/components/seletor-de-data.md"
     },
@@ -207,15 +223,19 @@
       "exportName": "FileUpload",
       "file": "src/components/file-upload.tsx",
       "category": "formularios",
-      "desc": "Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.",
+      "desc": "Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio.",
       "variants": [
         {
           "prop": "props",
-          "values": "accept · maxSize · label · hint · error · onChange · value · multiple · id · inputProps · labels"
+          "values": "accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels"
+        },
+        {
+          "prop": "deprecadas",
+          "values": "onChange(files) (use onValueChange; sai na 4.0)"
         }
       ],
-      "usage": "import { FileUpload } from \"@semec/ds/react\";\n\n// `label` é o rótulo do campo de arquivo — não omita\n<FileUpload\n  label=\"Documento de identidade\"\n  accept=\".pdf,image/*\"\n  maxSize={5 * 1024 * 1024}\n  hint=\"PDF ou imagem, até 5 MB\"\n/>\n\n// Textos fixos sobrescrevíveis (padrão PT-BR)\n<FileUpload label=\"Anexo\" labels={{ invalidType: \"Envie só PDF.\", tooLarge: (max) => `Máximo de ${max}.` }} />",
-      "prompt": "Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. API e variantes: props: accept · maxSize · label · hint · error · onChange · value · multiple · id · inputProps · labels. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { FileUpload } from \"@semec/ds/react\";\n\n// `label` é o rótulo do campo de arquivo — não omita\n<FileUpload\n  label=\"Documento de identidade\"\n  accept=\".pdf,image/*\"\n  maxSize={5 * 1024 * 1024}\n  hint=\"PDF ou imagem, até 5 MB\"\n  value={arquivos}\n  onValueChange={setArquivos}\n/>\n\n// Textos fixos sobrescrevíveis (padrão PT-BR)\n<FileUpload label=\"Anexo\" labels={{ invalidType: \"Envie só PDF.\", tooLarge: (max) => `Máximo de ${max}.` }} />",
+      "prompt": "Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. API e variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · deprecadas: onChange(files) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/envio-de-arquivos",
       "md": "/components/envio-de-arquivos.md"
     },
@@ -226,15 +246,19 @@
       "exportName": "Checkbox",
       "file": "src/components/checkbox.tsx",
       "category": "formularios",
-      "desc": "Caixa de marcação com estado indeterminado.",
+      "desc": "Caixa de marcação com estado indeterminado. Mantém a API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.",
       "variants": [
         {
           "prop": "estados",
-          "values": "desmarcado · marcado (checked) · indeterminado · disabled"
+          "values": "desmarcado · marcado (checked) · indeterminado · disabled · inválido (invalid)"
+        },
+        {
+          "prop": "contrato",
+          "values": "checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required"
         }
       ],
-      "usage": "import { Checkbox, Label } from \"@semec/ds/react\";\n\n<div className=\"flex items-center gap-2\">\n  <Checkbox id=\"termos\" />\n  <Label htmlFor=\"termos\">Aceito os termos</Label>\n</div>",
-      "prompt": "Use o componente `Checkbox` (Caixa de marcação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Caixa de marcação com estado indeterminado. API e variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { Checkbox, Label } from \"@semec/ds/react\";\n\n<div className=\"flex items-center gap-2\">\n  <Checkbox id=\"termos\" />\n  <Label htmlFor=\"termos\">Aceito os termos</Label>\n</div>\n\n// Controlado, com envio em <form> e erro (checked/onCheckedChange = value/onValueChange)\n<div className=\"flex items-center gap-2\">\n  <Checkbox id=\"aceite\" name=\"aceite\" checked={aceito} onCheckedChange={(v) => setAceito(v === true)} invalid={!aceito && enviado} />\n  <Label htmlFor=\"aceite\">Li e aceito o regulamento</Label>\n</div>",
+      "prompt": "Use o componente `Checkbox` (Caixa de marcação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Caixa de marcação com estado indeterminado. Mantém a API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`. API e variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled · inválido (invalid) · contrato: checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/caixa-de-marcacao",
       "md": "/components/caixa-de-marcacao.md"
     },
@@ -245,15 +269,19 @@
       "exportName": "RadioGroup",
       "file": "src/components/radio-group.tsx",
       "category": "formularios",
-      "desc": "Escolha única entre duas ou mais opções.",
+      "desc": "Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`.",
       "variants": [
         {
           "prop": "composição",
           "values": "RadioGroup · RadioGroupItem + Label"
+        },
+        {
+          "prop": "contrato",
+          "values": "value · defaultValue · onValueChange · name · id · invalid · disabled · required"
         }
       ],
-      "usage": "import { RadioGroup, RadioGroupItem, Label } from \"@semec/ds/react\";\n\n<RadioGroup defaultValue=\"pessoa-fisica\">\n  <div className=\"flex items-center gap-2\">\n    <RadioGroupItem value=\"pessoa-fisica\" id=\"pf\" />\n    <Label htmlFor=\"pf\">Pessoa física</Label>\n  </div>\n</RadioGroup>",
-      "prompt": "Use o componente `RadioGroup` (Botão de opção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Escolha única entre duas ou mais opções. API e variantes: composição: RadioGroup · RadioGroupItem + Label. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { RadioGroup, RadioGroupItem, Label } from \"@semec/ds/react\";\n\n<RadioGroup name=\"tipoPessoa\" defaultValue=\"pessoa-fisica\" onValueChange={setTipoPessoa}>\n  <div className=\"flex items-center gap-2\">\n    <RadioGroupItem value=\"pessoa-fisica\" id=\"pf\" />\n    <Label htmlFor=\"pf\">Pessoa física</Label>\n  </div>\n</RadioGroup>",
+      "prompt": "Use o componente `RadioGroup` (Botão de opção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`. API e variantes: composição: RadioGroup · RadioGroupItem + Label · contrato: value · defaultValue · onValueChange · name · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/botao-de-opcao",
       "md": "/components/botao-de-opcao.md"
     },
@@ -264,15 +292,19 @@
       "exportName": "Switch",
       "file": "src/components/switch.tsx",
       "category": "formularios",
-      "desc": "Interruptor on/off para ativação imediata.",
+      "desc": "Interruptor on/off para ativação imediata. API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.",
       "variants": [
         {
           "prop": "estados",
-          "values": "off · on (checked) · disabled · inválido"
+          "values": "off · on (checked) · disabled · inválido (invalid)"
+        },
+        {
+          "prop": "contrato",
+          "values": "checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required"
         }
       ],
       "usage": "import { Switch, Label } from \"@semec/ds/react\";\n\n<div className=\"flex items-center gap-2\">\n  <Switch id=\"alertas\" defaultChecked />\n  <Label htmlFor=\"alertas\">Receber alertas</Label>\n</div>",
-      "prompt": "Use o componente `Switch` (Interruptor) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Interruptor on/off para ativação imediata. API e variantes: estados: off · on (checked) · disabled · inválido. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "prompt": "Use o componente `Switch` (Interruptor) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Interruptor on/off para ativação imediata. API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`. API e variantes: estados: off · on (checked) · disabled · inválido (invalid) · contrato: checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/interruptor",
       "md": "/components/interruptor.md"
     },
@@ -301,7 +333,7 @@
       "variants": [
         {
           "prop": "props",
-          "values": "label · htmlFor · required · hint · error · id (base dos ids <id>-hint/<id>-error)"
+          "values": "label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · id (base dos ids <id>-hint/<id>-error)"
         },
         {
           "prop": "hooks",
@@ -309,7 +341,7 @@
         }
       ],
       "usage": "import { FormField, Input, Button, useToast } from \"@semec/ds/react\";\n\n// Em formulários: erros ficam inline no FormField (+ ErrorSummary no topo).\n// Sucesso na submissão dispara notificação via toast:\nfunction Formulario() {\n  const { toast } = useToast();\n  return (\n    <form onSubmit={(e) => {\n      e.preventDefault();\n      toast({ variant: \"success\", title: \"Salvo com sucesso\", description: \"Alterações registradas.\" });\n    }}>\n      {/* id, aria-describedby (dica/erro) e aria-invalid chegam ao Input pelo contexto */}\n      <FormField label=\"E-mail\" required hint=\"Usado para o comprovante\" error={erro}>\n        <Input id=\"email\" type=\"email\" />\n      </FormField>\n      <Button type=\"submit\">Salvar</Button>\n    </form>\n  );\n}",
-      "prompt": "Use o componente `FormField` (Campo de formulário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role=\"alert\"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast. API e variantes: props: label · htmlFor · required · hint · error · id (base dos ids <id>-hint/<id>-error) · hooks: useFormField · useFormFieldControl (para campos próprios). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "prompt": "Use o componente `FormField` (Campo de formulário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role=\"alert\"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast. API e variantes: props: label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · id (base dos ids <id>-hint/<id>-error) · hooks: useFormField · useFormFieldControl (para campos próprios). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/campo-de-formulario",
       "md": "/components/campo-de-formulario.md"
     },
@@ -880,7 +912,7 @@
       "exportName": "Toggle",
       "file": "src/components/toggle.tsx",
       "category": "formularios",
-      "desc": "Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos.",
+      "desc": "Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos.",
       "variants": [
         {
           "prop": "variant",
@@ -892,7 +924,7 @@
         }
       ],
       "usage": "import { Toggle } from \"@semec/ds/react\";\nimport { Bold } from \"lucide-react\";\n\n<Toggle variant=\"outline\" aria-label=\"Negrito\">\n  <Bold />\n</Toggle>",
-      "prompt": "Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos. API e variantes: variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "prompt": "Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. API e variantes: variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/toggle",
       "md": "/components/toggle.md"
     },
@@ -936,10 +968,15 @@
       "exportName": "Slider",
       "file": "src/components/slider.tsx",
       "category": "formularios",
-      "desc": "Controle deslizante para faixas de valor.",
-      "variants": [],
+      "desc": "Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares.",
+      "variants": [
+        {
+          "prop": "contrato",
+          "values": "value · defaultValue · onValueChange(number[]) · name · id · invalid · disabled"
+        }
+      ],
       "usage": "import { Slider } from \"@semec/ds/react\";\n\n// Nome acessível obrigatório: aria-label (ou aria-labelledby) vai para o polegar\n<Slider defaultValue={[50]} max={100} step={1} aria-label=\"Raio de busca em km\" />\n\n// Faixa com 2 polegares: anunciados como \"Faixa de preço (1 de 2)\" e \"(2 de 2)\"; use getAriaLabel(i) para nomes próprios\n<Slider defaultValue={[100, 500]} max={1000} step={10} aria-label=\"Faixa de preço\" />",
-      "prompt": "Use o componente `Slider` (Slider) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle deslizante para faixas de valor. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "prompt": "Use o componente `Slider` (Slider) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares. API e variantes: contrato: value · defaultValue · onValueChange(number[]) · name · id · invalid · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/slider",
       "md": "/components/slider.md"
     },
@@ -958,11 +995,15 @@
         },
         {
           "prop": "props",
-          "values": "maxLength · disabled · labels (group · slot(index, total))"
+          "values": "value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total))"
+        },
+        {
+          "prop": "deprecadas",
+          "values": "onChange(value) (use onValueChange; sai na 4.0)"
         }
       ],
-      "usage": "import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from \"@semec/ds/react\";\n\n<InputOTP value={code} onChange={setCode} maxLength={6}>\n  <InputOTPGroup>\n    <InputOTPSlot index={0} />\n    <InputOTPSlot index={1} />\n    <InputOTPSlot index={2} />\n  </InputOTPGroup>\n  <InputOTPSeparator />\n  <InputOTPGroup>\n    <InputOTPSlot index={3} />\n    <InputOTPSlot index={4} />\n    <InputOTPSlot index={5} />\n  </InputOTPGroup>\n</InputOTP>",
-      "prompt": "Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de código OTP com foco automático entre dígitos. API e variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled · labels (group · slot(index, total)). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from \"@semec/ds/react\";\n\n// name gera um <input type=\"hidden\"> com o código: vai no FormData de um <form> nativo\n<InputOTP name=\"codigo\" value={code} onValueChange={setCode} maxLength={6}>\n  <InputOTPGroup>\n    <InputOTPSlot index={0} />\n    <InputOTPSlot index={1} />\n    <InputOTPSlot index={2} />\n  </InputOTPGroup>\n  <InputOTPSeparator />\n  <InputOTPGroup>\n    <InputOTPSlot index={3} />\n    <InputOTPSlot index={4} />\n    <InputOTPSlot index={5} />\n  </InputOTPGroup>\n</InputOTP>",
+      "prompt": "Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de código OTP com foco automático entre dígitos. API e variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · deprecadas: onChange(value) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/input-otp",
       "md": "/components/input-otp.md"
     },
@@ -977,7 +1018,11 @@
       "variants": [
         {
           "prop": "props",
-          "values": "value · onChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }>"
+          "values": "value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }>"
+        },
+        {
+          "prop": "deprecadas",
+          "values": "onChange(date) (use onValueChange; sai na 4.0)"
         },
         {
           "prop": "a11y",
@@ -988,8 +1033,8 @@
           "values": "←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona"
         }
       ],
-      "usage": "import { Calendar } from \"@semec/ds/react\";\n\n<Calendar value={data} onChange={setData} />\n\n<Calendar value={data} onChange={setData} min=\"2026-01-01\" max=\"2026-12-31\" />",
-      "prompt": "Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px. API e variantes: props: value · onChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome \"14 de outubro de 2026\" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { Calendar } from \"@semec/ds/react\";\n\n<Calendar value={data} onValueChange={setData} />\n\n<Calendar value={data} onValueChange={setData} min=\"2026-01-01\" max=\"2026-12-31\" />",
+      "prompt": "Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px. API e variantes: props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · deprecadas: onChange(date) (use onValueChange; sai na 4.0) · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome \"14 de outubro de 2026\" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/calendario",
       "md": "/components/calendario.md"
     },
