@@ -23,8 +23,10 @@ variants: "props: value · onValueChange · min · max (AAAA-MM-DD, data local) 
 ## Instalação (@semec/ds)
 
 ```bash
-npm install @semec/ds
+npm install @semec/ds lucide-react
 ```
+
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.
 
 ```css
 @import "tailwindcss";
@@ -95,6 +97,15 @@ const DEFAULT_LABELS: CalendarLabels = {
   nextMonth: "Próximo mês",
 };
 
+/**
+ * Tipo impossível de satisfazer, com nome que explica o erro: o `onChange`
+ * saiu na 4.0 (AUD-35). Com `never`, o `tsc` dizia só "not assignable to type
+ * 'undefined'"; com este tipo, a mensagem cita o `onValueChange`.
+ */
+interface OnChangeRemovidoUseOnValueChange {
+  readonly "onChange saiu na 4.0: use onValueChange": never;
+}
+
 export interface CalendarProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
   value?: Date | null;
@@ -106,7 +117,7 @@ export interface CalendarProps
    * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
    * (com um `console.error` único em desenvolvimento).
    */
-  onChange?: never;
+  onChange?: OnChangeRemovidoUseOnValueChange;
   disabled?: boolean;
   /** Data mínima selecionável (`AAAA-MM-DD`). */
   min?: string;

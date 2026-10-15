@@ -21,8 +21,10 @@ variants: "props: items: { label, href? }[] · a11y: aria-label=Trilha de navega
 ## Instalação (@semec/ds)
 
 ```bash
-npm install @semec/ds
+npm install @semec/ds lucide-react
 ```
+
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.
 
 ```css
 @import "tailwindcss";
@@ -69,17 +71,14 @@ export interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {
 const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
   ({ className, items, ...props }, ref) => (
     <nav ref={ref} aria-label="Trilha de navegação" className={className} {...props}>
-      <ol className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+      <ol className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
+          // O separador vem no fim do item anterior (dentro do mesmo `li`, que
+          // não quebra entre texto e separador): quando a trilha quebra no
+          // mobile, a linha nova começa pelo item, nunca por um "›" solto.
           return (
             <li key={`${item.label}-${index}`} className="flex items-center gap-4">
-              {index > 0 ? (
-                <ChevronRight
-                  className="h-3.5 w-3.5 shrink-0 opacity-50"
-                  aria-hidden="true"
-                />
-              ) : null}
               {isLast || !item.href ? (
                 <span aria-current={isLast ? "page" : undefined} className={cn(isLast && "font-medium text-foreground")}>
                   {item.label}
@@ -92,6 +91,12 @@ const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
                   {item.label}
                 </a>
               )}
+              {!isLast ? (
+                <ChevronRight
+                  className="h-3.5 w-3.5 shrink-0 opacity-50"
+                  aria-hidden="true"
+                />
+              ) : null}
             </li>
           );
         })}

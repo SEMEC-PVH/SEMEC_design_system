@@ -21,8 +21,10 @@ variants: "props: accept · maxSize · label · hint · error · invalid · onVa
 ## Instalação (@semec/ds)
 
 ```bash
-npm install @semec/ds
+npm install @semec/ds lucide-react
 ```
+
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.
 
 ```css
 @import "tailwindcss";
@@ -89,6 +91,15 @@ const defaultLabels: FileUploadLabels = {
   tooLarge: (maxSize) => `Arquivo excede o limite de ${maxSize}.`,
 };
 
+/**
+ * Tipo impossível de satisfazer, com nome que explica o erro: o `onChange`
+ * saiu na 4.0 (AUD-35). Com `never`, o `tsc` dizia só "not assignable to type
+ * 'undefined'"; com este tipo, a mensagem cita o `onValueChange`.
+ */
+interface OnChangeRemovidoUseOnValueChange {
+  readonly "onChange saiu na 4.0: use onValueChange": never;
+}
+
 export interface FileUploadProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
   accept?: string;
@@ -107,7 +118,7 @@ export interface FileUploadProps
    * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
    * (com um `console.error` único em desenvolvimento).
    */
-  onChange?: never;
+  onChange?: OnChangeRemovidoUseOnValueChange;
   /** `name` do `<input type="file">`. Atalho de `inputProps.name`. */
   name?: string;
   /** `required` do `<input type="file">`. Atalho de `inputProps.required`. */
@@ -310,7 +321,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             if (!disabled) inputRef.current?.click();
           }}
           className={cn(
-            "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background px-6 py-8 text-center transition-colors duration-fast ease-standard has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background hover:border-border-strong",
+            "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-surface px-6 py-8 text-center transition-colors duration-fast ease-standard has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background hover:border-border-strong",
             drag && "border-ring bg-tint",
             disabled && "cursor-not-allowed opacity-50",
             (message || invalid === true) && "border-destructive"

@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
   "version": "4.0.0",
-  "generatedAt": "2026-10-15T15:12:16.000Z",
+  "generatedAt": "2026-10-15T15:17:11.000Z",
   "componentCount": 55,
   "categories": [
     {
@@ -1381,6 +1381,8 @@
     }
   ],
   "install": {
+    "packages": "npm install @semec/ds lucide-react",
+    "peers": "lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.",
     "tokens": "import \"@semec/ds/react/tokens.css\";",
     "preset": "@source \"../node_modules/@semec/ds/dist/react\";",
     "utils": "import { cn } from \"@semec/ds/react\";"

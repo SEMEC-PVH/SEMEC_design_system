@@ -207,7 +207,13 @@ const FormField = React.forwardRef<HTMLDivElement, FormFieldProps>(
 
     return (
       <FormFieldContext.Provider value={contextValue}>
-        <div ref={ref} className={cn("grid gap-1.5", className)} {...props}>
+        {/*
+          `content-start`: num grid de colunas (ex.: `md:grid-cols-2`), a linha
+          estica o FormField mais curto até a altura do vizinho com dica/erro;
+          sem isso as linhas internas esticam e o controle desce. Fora desse
+          caso não muda nada: o espaçamento entre rótulo, campo e dica é o gap.
+        */}
+        <div ref={ref} className={cn("grid content-start gap-1.5", className)} {...props}>
           {label ? (
             <label
               id={labelId}

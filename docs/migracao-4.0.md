@@ -15,7 +15,7 @@ Ordem sugerida:
 2. Ainda na 3.2.0, rode o codemod da 4.0 em modo simulação. O `-p` baixa a 4.0 e o TypeScript 5 só para rodar o comando, sem mexer no `package.json`:
    `npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 src`
 3. Rode de novo com `--write`, revise o diff e resolva à mão as linhas marcadas como `revisar` e `utilitário`.
-4. Atualize para a 4.0 (`npm i @semec/ds@4`) e rode o typecheck. Ele é a rede de segurança do que o codemod não vê: no TypeScript, todo `onChange` que sobrou em `Calendar`, `Combobox`, `InputOTP` e `FileUpload` vira erro de compilação. Em JavaScript, o componente mostra um `console.error` em desenvolvimento ("onChange foi removido na 4.0; use onValueChange").
+4. Atualize para a 4.0 (`npm i @semec/ds@4`) e rode o typecheck. Com pnpm ou Yarn, confira que `lucide-react` está no `package.json` do app (`pnpm add lucide-react`, `yarn add lucide-react`): ele é peer do kit desde a 3.1.0, e esses gerenciadores não instalam peer sozinhos (o npm 7+ instala). O `zod`, se usar `@semec/ds/react/validacao`, pode ser o 3 (`^3.23.0`) ou o 4. Ele é a rede de segurança do que o codemod não vê: no TypeScript, todo `onChange` que sobrou em `Calendar`, `Combobox`, `InputOTP` e `FileUpload` vira erro de compilação. Em JavaScript, o componente mostra um `console.error` em desenvolvimento ("onChange foi removido na 4.0; use onValueChange").
 
 ## 1. `onChange(valor)` sai dos campos não nativos (AUD-35)
 
@@ -43,7 +43,7 @@ Depois (4.0):
 
 O que acontece com um `onChange` que sobrar:
 
-- **TypeScript:** a prop é tipada como `onChange?: never` nesses quatro componentes, então `onChange={setMunicipio}` não compila (`Type '…' is not assignable to type 'undefined'`); o JSDoc da prop, visível no editor, diz "Removido na 4.0 (AUD-35): use `onValueChange`".
+- **TypeScript:** a prop é tipada como `onChange?: OnChangeRemovidoUseOnValueChange` nesses quatro componentes (era `never` na 4.0.0), então `onChange={setMunicipio}` não compila (`Type '…' is not assignable to type 'OnChangeRemovidoUseOnValueChange'`; na 4.0.0 a mensagem dizia `'undefined'`); o JSDoc da prop, visível no editor, diz "Removido na 4.0 (AUD-35): use `onValueChange`".
 - **JavaScript:** o componente descarta a prop e ela não chega ao DOM. O handler nunca é chamado, nem com o valor nem com um evento, e a seleção para de atualizar. Para isso não passar em silêncio, em desenvolvimento (`process.env.NODE_ENV !== "production"`) o componente mostra uma vez um `console.error`: "onChange foi removido na 4.0; use onValueChange (ver guia de migração)". Em produção não há mensagem. Sem isso, o `onChange` iria parar na `<div>` raiz e receberia o evento `change` que borbulha dos `<input>` internos (dígitos do `InputOTP`, `<input type="file">` do `FileUpload`), e um handler escrito para o valor quebraria em silêncio.
 - **Por que não há `onChange` nativo nesses quatro:** nenhum deles é um único `<input>`. O `Calendar` é uma grade de botões, o `Combobox` é um botão com uma camada flutuante, o `InputOTP` são vários campos e o `FileUpload` é uma zona de arrastar. Um evento nativo da raiz não diria qual valor mudou. Para o `<input type="file">` do `FileUpload`, continua existindo `inputProps` (exceto `onChange`, `value`, `type`, `id`, `accept` e `multiple`, que são do componente).
 

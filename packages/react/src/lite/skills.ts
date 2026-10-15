@@ -6,7 +6,15 @@
  * estão em dist/lite/ e acessíveis via subpath exports.
  */
 
-export { dsCategories, dsPortal } from "../../manifest.js";
+import * as manifest from "../../manifest.js";
+import type { DsCategory, DsPortal } from "../skills/types";
+
+export type { DsCategory, DsPortal, DsPortalItem } from "../skills/types";
+
+/** Categorias do catálogo. */
+export const dsCategories: DsCategory[] = manifest.dsCategories;
+/** Estrutura de página do portal. */
+export const dsPortal: DsPortal = manifest.dsPortal;
 
 export const dsTokens = {
   colors: [

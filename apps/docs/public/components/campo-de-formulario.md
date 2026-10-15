@@ -21,8 +21,10 @@ variants: "props: label · htmlFor · required · hint · error (mensagem; impli
 ## Instalação (@semec/ds)
 
 ```bash
-npm install @semec/ds
+npm install @semec/ds lucide-react
 ```
+
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.
 
 ```css
 @import "tailwindcss";
@@ -273,7 +275,13 @@ const FormField = React.forwardRef<HTMLDivElement, FormFieldProps>(
 
     return (
       <FormFieldContext.Provider value={contextValue}>
-        <div ref={ref} className={cn("grid gap-1.5", className)} {...props}>
+        {/*
+          `content-start`: num grid de colunas (ex.: `md:grid-cols-2`), a linha
+          estica o FormField mais curto até a altura do vizinho com dica/erro;
+          sem isso as linhas internas esticam e o controle desce. Fora desse
+          caso não muda nada: o espaçamento entre rótulo, campo e dica é o gap.
+        */}
+        <div ref={ref} className={cn("grid content-start gap-1.5", className)} {...props}>
           {label ? (
             <label
               id={labelId}

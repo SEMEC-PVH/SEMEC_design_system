@@ -62,4 +62,4 @@ Não "corrija" isso no consumidor removendo `aria-hidden` à mão, aplicando `in
 
 ### Como tratar em testes automatizados
 
-Ao rodar o axe com Select, DropdownMenu ou NavigationMenu abertos, desative só a regra `aria-hidden-focus` nesse estado e registre o motivo (`EXC-01`). Não desative a regra globalmente.
+Ao rodar o axe com Select, DropdownMenu ou NavigationMenu abertos, desative só a regra `aria-hidden-focus` nesse estado e registre o motivo (`EXC-01`). Não desative a regra globalmente, e não use `exclude` no `#root` para contorná-la (isso tira a página inteira da análise). Analise a mesma tela também com a camada fechada e todas as regras ligadas. Para apps consumidores, o README do pacote (seção "Acessibilidade", [packages/react/README.md](../packages/react/README.md#acessibilidade)) tem o exemplo com `@axe-core/playwright` e `axe.run`.

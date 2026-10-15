@@ -12,7 +12,14 @@ const blocked = [
   "@semec/ds/react/button-loading",
   "@semec/ds/codemods/v4.mjs",
 ];
-const allowed = ["@semec/ds/react", "@semec/ds/react/button", "@semec/ds/react/validacao", "@semec/ds/react/pv-preset"];
+const allowed = [
+  "@semec/ds/react",
+  "@semec/ds/react/button",
+  "@semec/ds/react/validacao",
+  "@semec/ds/react/pv-preset",
+  "@semec/ds/skills",
+  "@semec/ds/lite/skills",
+];
 
 let failed = false;
 for (const spec of blocked) {
