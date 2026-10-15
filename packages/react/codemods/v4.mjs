@@ -1,7 +1,9 @@
 /**
  * Codemod da 4.0 do @semec/ds (docs/migracao-4.0.md).
  *
- *   npx @semec/ds codemod-4 <pasta ou arquivo>... [--write]
+ *   npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 <pasta>... [--write]
+ *   (funciona com a 3.x ainda instalada; com a 4.0 e o TS 5 no projeto,
+ *   basta `npx semec-ds codemod-4 <pasta>`)
  *   node node_modules/@semec/ds/codemods/v4.mjs <pasta>... [--write]
  *
  * Simulação por padrão (`--dry`): só relata. Com `--write`, grava.
@@ -14,11 +16,14 @@
  *    referência (`onChange={salvar}`), apenas relata a linha.
  * 2. AUD-55 — relata (nunca reescreve) cada utilitário `*-pv-*` e cada
  *    `--color-pv-*`, com a sugestão semântica da tabela do guia.
- * 3. AUD-20 — relata import por caminho de arquivo (`@semec/ds/dist/...`).
+ * 3. AUD-20 — relata import por caminho de arquivo (`@semec/ds/dist/...`) em
+ *    `import`/`require`/`import()`/`@import`; o `@source` do Tailwind fica de fora.
+ * 4. Relata re-export por barrel local (`export { Combobox } from "@semec/ds/react"`).
  *
  * Análise do JSX pelo compilador TypeScript (AST, sem regex no código). Sem
- * dependência nova: usa o `typescript` do projeto (peer opcional) ou, sem ele,
- * pede para instalar. A troca é só do nome do atributo; o resto do arquivo
+ * dependência declarada: carrega o `typescript` do projeto ou o que veio no
+ * `npx -p typescript@5`; precisa da API JS do compilador (TypeScript 4.7 a 5.x;
+ * o 7 não a tem). A troca é só do nome do atributo; o resto do arquivo
  * fica byte a byte igual.
  */
 import fs from "node:fs";
@@ -86,7 +91,12 @@ const kindOf = (prefix) => KIND[prefix] ?? "line";
 const UTIL_RE =
   /(?<![\w-])(bg|text|border(?:-[xytrblse])?|ring(?:-offset)?|outline|fill|stroke|from|via|to|divide|decoration|placeholder|caret|accent|shadow)-pv-((?:blue|green|yellow|red|gray)-(?:\d+|hero)|white|black)(\/[\w.%[\]-]+)?(?![\w-])/g;
 const COLOR_VAR_RE = /--color-pv-((?:blue|green|yellow|red|gray)-(?:\d+|hero)|white|black)\b/g;
-const DIST_RE = /@semec\/ds\/dist\/[\w./-]*/g;
+// Só especificadores de módulo: `from "…"`, `import "…"`, `import("…")`,
+// `require("…")` e `@import "…"` / `@import url("…")` em CSS. O `@source
+// "../node_modules/@semec/ds/dist/react"` do Tailwind é documentado e fica de
+// fora (não é import, e caminho com node_modules/ não casa).
+const DIST_RE =
+  /(?:\bfrom\s*|\bimport\s*\(\s*|\brequire\s*\(\s*|\bimport\s+|@import\s+(?:url\(\s*)?)(["'])(@semec\/ds\/dist\/[^"'\s]*)\1/g;
 
 /** Sugestão semântica para um utilitário `prefixo-pv-nome[/opacidade]`. */
 export function suggestUtility(prefix, name, opacity = "") {
@@ -98,18 +108,42 @@ export function suggestUtility(prefix, name, opacity = "") {
 
 /* ------------------------------------------------------------------------ */
 
-async function loadTypeScript() {
-  const bases = [path.join(process.cwd(), "package.json"), fileURLToPath(import.meta.url)];
+/** O codemod usa a API JS do compilador (TypeScript 4.7 a 5.x; a 7 não a expõe). */
+const hasCompilerApi = (ts) =>
+  !!ts && typeof ts.createSourceFile === "function" && !!ts.ScriptTarget && !!ts.ScriptKind;
+
+export const TS_INSTALL_HINT =
+  "Instale o TypeScript 5 no projeto (npm i -D typescript@5) ou rode sem instalar: npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 <pasta>";
+
+/**
+ * Carrega o `typescript` do projeto (cwd) ou, no `npx -p`, o que veio ao lado
+ * do pacote. Sem dependência declarada: nada é instalado junto com o kit.
+ * Devolve `{ ts }` ou `{ error }` com a explicação para o usuário.
+ */
+export async function loadTypeScript(bases = [path.join(process.cwd(), "package.json"), fileURLToPath(import.meta.url)]) {
+  const incompatible = [];
   for (const base of bases) {
+    let resolved;
     try {
-      const resolved = createRequire(base).resolve("typescript");
-      const mod = await import(pathToFileURL(resolved).href);
-      return mod.default ?? mod;
+      resolved = createRequire(base).resolve("typescript");
     } catch {
-      /* tenta o próximo */
+      continue;
+    }
+    try {
+      const mod = await import(pathToFileURL(resolved).href);
+      const ts = mod.default ?? mod;
+      if (hasCompilerApi(ts)) return { ts };
+      incompatible.push(`${ts?.version ?? "versão desconhecida"} em ${resolved}`);
+    } catch (err) {
+      incompatible.push(`${resolved} (${err?.message ?? err})`);
     }
   }
-  return null;
+  if (incompatible.length) {
+    return {
+      error: `o typescript encontrado não expõe a API JS do compilador (${[...new Set(incompatible)].join("; ")}). O codemod precisa do TypeScript 5 (o 7 não tem essa API). ${TS_INSTALL_HINT}`,
+    };
+  }
+  return { error: `o codemod precisa do pacote typescript para ler o JSX. ${TS_INSTALL_HINT}` };
 }
 
 function scriptKind(ts, file) {
@@ -211,6 +245,28 @@ export function transformSource(ts, file, text) {
   const edits = [];
   const sf = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, scriptKind(ts, file));
   const imports = collectImports(ts, sf);
+  // Re-export por barrel local: quem importa do barrel não é visto aqui.
+  for (const stmt of sf.statements) {
+    if (!ts.isExportDeclaration(stmt) || !stmt.moduleSpecifier || !ts.isStringLiteral(stmt.moduleSpecifier)) continue;
+    if (!ROOT_MODULES.has(stmt.moduleSpecifier.text) || stmt.isTypeOnly) continue;
+    const clause = stmt.exportClause;
+    let reexported = [];
+    if (!clause) {
+      reexported = ["*"];
+    } else if (ts.isNamedExports(clause)) {
+      reexported = clause.elements
+        .filter((el) => !el.isTypeOnly && COMPONENTS.has((el.propertyName ?? el.name).text))
+        .map((el) => (el.propertyName ? `${el.propertyName.text} as ${el.name.text}` : el.name.text));
+    } else {
+      reexported = [`* as ${clause.name.text}`];
+    }
+    if (reexported.length) {
+      findings.push({
+        index: stmt.getStart(sf), kind: "revisar",
+        message: `re-export de ${stmt.moduleSpecifier.text} (${reexported.join(", ")}): os arquivos que importam deste barrel não são reescritos; confira o onChange deles à mão ou pelo typecheck.`,
+      });
+    }
+  }
   if (imports.named.size || imports.namespaces.size) {
     const visit = (node) => {
       if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
@@ -282,8 +338,8 @@ export function scanText(text) {
   }
   for (const m of text.matchAll(DIST_RE)) {
     findings.push({
-      index: m.index, kind: "import",
-      message: `${m[0]}: caminho de arquivo em dist/ não é contrato e o "exports" já bloqueia; use @semec/ds/react ou @semec/ds/react/<componente>`,
+      index: m.index + m[0].indexOf(m[2]), kind: "import",
+      message: `${m[2]}: caminho de arquivo em dist/ não é contrato e o "exports" já bloqueia; use @semec/ds/react ou @semec/ds/react/<componente>`,
     });
   }
   return findings;
@@ -307,11 +363,11 @@ function* walk(target) {
 
 /** Roda o codemod. Devolve o resumo (usado nos testes). */
 export async function run(targets, { write = false, log = console.log, ts: tsArg } = {}) {
-  const ts = tsArg ?? (await loadTypeScript());
+  let ts = tsArg;
   if (!ts) {
-    throw new Error(
-      "o codemod precisa do pacote `typescript` para ler o JSX. Instale no projeto (npm i -D typescript) ou rode com: npx -p typescript -p @semec/ds semec-ds codemod-4 <pasta>"
-    );
+    const loaded = await loadTypeScript();
+    if (loaded.error) throw new Error(loaded.error);
+    ts = loaded.ts;
   }
   const summary = { files: 0, rewritten: 0, written: 0, review: 0, utilities: 0, imports: 0 };
   const header = write
@@ -355,7 +411,8 @@ export async function run(targets, { write = false, log = console.log, ts: tsArg
   return summary;
 }
 
-export const USAGE = `Uso: npx @semec/ds codemod-4 <pasta ou arquivo>... [--write]
+export const USAGE = `Uso: npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 <pasta ou arquivo>... [--write]
+     (com a 4.0 e o TypeScript 5 já instalados: npx semec-ds codemod-4 <pasta>)
 
   --dry    só relata (padrão)
   --write  grava as trocas onChange → onValueChange

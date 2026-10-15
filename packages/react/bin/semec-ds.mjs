@@ -2,7 +2,7 @@
 /**
  * CLI do @semec/ds. Hoje só tem o codemod da 4.0:
  *
- *   npx @semec/ds codemod-4 <pasta>... [--write]
+ *   npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 <pasta>... [--write]
  */
 const [command, ...rest] = process.argv.slice(2);
 

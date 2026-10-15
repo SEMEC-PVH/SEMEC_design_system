@@ -1,3 +1,8 @@
+@import "tailwindcss";
+@import "@semec/ds/react/tokens.css";
+/* @source documentado do Tailwind: não pode gerar relato. */
+@source "../node_modules/@semec/ds/dist/react";
+
 .destaque {
   @apply bg-pv-green-50 text-pv-green-800;
   border-color: var(--color-pv-gray-400);
