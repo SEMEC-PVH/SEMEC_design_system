@@ -5,6 +5,24 @@ import { cn } from "../lib/utils";
 
 type SortDirection = "asc" | "desc" | null;
 
+export interface DataTableLabels {
+  /** Rótulo do botão de ordenação. Padrão: `Ordenar por ${header}`. */
+  sortBy: (header: string) => string;
+  /** Texto da paginação. Padrão: `Página ${page} de ${pageCount}`. */
+  pageOf: (page: number, pageCount: number) => string;
+  /** Padrão: "Anterior". */
+  previous: string;
+  /** Padrão: "Próximo". */
+  next: string;
+}
+
+const defaultDataTableLabels: DataTableLabels = {
+  sortBy: (header) => `Ordenar por ${header}`,
+  pageOf: (page, pageCount) => `Página ${page} de ${pageCount}`,
+  previous: "Anterior",
+  next: "Próximo",
+};
+
 interface Column<T> {
   key: string;
   header: string;
@@ -31,6 +49,8 @@ interface DataTableProps<T> extends React.HTMLAttributes<HTMLDivElement> {
    */
   onRowClick?: (row: T, index: number) => void;
   caption?: string;
+  /** Textos embutidos (PT-BR por padrão), sobrescrevíveis um a um. */
+  labels?: Partial<DataTableLabels>;
 }
 
 function DataTableInner<T extends Record<string, unknown>>(
@@ -47,11 +67,14 @@ function DataTableInner<T extends Record<string, unknown>>(
     rowKey,
     onRowClick,
     caption,
+    labels: labelsProp,
     className,
     ...props
   }: DataTableProps<T>,
   _ref: React.Ref<HTMLDivElement>
 ) {
+  const labels = { ...defaultDataTableLabels, ...labelsProp };
+
   const handleSort = (key: string) => {
     onSort?.(key);
   };
@@ -111,7 +134,7 @@ function DataTableInner<T extends Record<string, unknown>>(
                     <button
                       type="button"
                       onClick={() => handleSort(col.key)}
-                      aria-label={`Ordenar por ${col.header}`}
+                      aria-label={labels.sortBy(col.header)}
                       className="inline-flex items-center gap-2 rounded-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     >
                       {col.header}
@@ -174,7 +197,7 @@ function DataTableInner<T extends Record<string, unknown>>(
       {page !== undefined && pageCount !== undefined && pageCount > 1 && (
         <div className="flex items-center justify-between px-2 py-4">
           <div className="text-sm text-muted-foreground">
-            Página {page} de {pageCount}
+            {labels.pageOf(page, pageCount)}
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -184,7 +207,7 @@ function DataTableInner<T extends Record<string, unknown>>(
               className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-              Anterior
+              {labels.previous}
             </button>
             <button
               type="button"
@@ -192,7 +215,7 @@ function DataTableInner<T extends Record<string, unknown>>(
               disabled={page >= pageCount}
               className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              Próximo
+              {labels.next}
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>

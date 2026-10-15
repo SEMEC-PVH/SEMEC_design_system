@@ -4,7 +4,7 @@ code: "file-upload"
 slug: "envio-de-arquivos"
 file: "src/components/file-upload.tsx"
 category: "formularios"
-variants: "props: accept · maxSize · label · hint · error · onChange"
+variants: "props: accept · maxSize · label · hint · error · onChange · value · multiple · id · inputProps · labels"
 ---
 
 # Envio de arquivos — `file-upload`
@@ -15,7 +15,7 @@ variants: "props: accept · maxSize · label · hint · error · onChange"
 
 ## Variantes
 
-- **props**: accept · maxSize · label · hint · error · onChange
+- **props**: accept · maxSize · label · hint · error · onChange · value · multiple · id · inputProps · labels
 
 ## Instalação (@semec/ds)
 
@@ -25,6 +25,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -41,12 +42,15 @@ import { FileUpload } from "@semec/ds/react";
   maxSize={5 * 1024 * 1024}
   hint="PDF ou imagem, até 5 MB"
 />
+
+// Textos fixos sobrescrevíveis (padrão PT-BR)
+<FileUpload label="Anexo" labels={{ invalidType: "Envie só PDF.", tooLarge: (max) => `Máximo de ${max}.` }} />
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um file-upload (Envio de arquivos) usando @semec/ds/react (`src/components/file-upload.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: accept · maxSize · label · hint · error · onChange. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.
+Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. API e variantes: props: accept · maxSize · label · hint · error · onChange · value · multiple · id · inputProps · labels. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -56,6 +60,28 @@ import * as React from "react";
 import { UploadCloud } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import { useFormField } from "./form-field";
+
+export interface FileUploadLabels {
+  /** Nome do campo quando não há `label` nem FormField. Padrão: "Escolher arquivo". */
+  chooseFile: string;
+  /** Texto da zona antes do destaque. Padrão: "Arraste um arquivo ou". */
+  dropzone: string;
+  /** Destaque da zona. Padrão: "clique para escolher". */
+  dropzoneAction: string;
+  /** Erro de tipo não aceito. Padrão: "Tipo de arquivo não permitido.". */
+  invalidType: string;
+  /** Erro de tamanho; recebe o limite já formatado (ex.: "5.0 MB"). */
+  tooLarge: (maxSize: string) => string;
+}
+
+const defaultLabels: FileUploadLabels = {
+  chooseFile: "Escolher arquivo",
+  dropzone: "Arraste um arquivo ou",
+  dropzoneAction: "clique para escolher",
+  invalidType: "Tipo de arquivo não permitido.",
+  tooLarge: (maxSize) => `Arquivo excede o limite de ${maxSize}.`,
+};
 
 export interface FileUploadProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
@@ -76,6 +102,8 @@ export interface FileUploadProps
     React.InputHTMLAttributes<HTMLInputElement>,
     "type" | "id" | "accept" | "multiple" | "onChange" | "value"
   >;
+  /** Textos fixos (PT-BR por padrão). */
+  labels?: Partial<FileUploadLabels>;
 }
 
 const formatBytes = (bytes: number) => {
@@ -115,6 +143,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       multiple = true,
       id: idProp,
       inputProps,
+      labels,
       ...props
     },
     ref
@@ -124,10 +153,21 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
     const [drag, setDrag] = React.useState(false);
     const [localError, setLocalError] = React.useState<string | undefined>(undefined);
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const text = { ...defaultLabels, ...labels };
     const generatedId = React.useId();
-    const id = idProp ?? generatedId;
-    const hintId = `${id}-hint`;
-    const errorId = `${id}-error`;
+    // Dentro de um FormField, o input usa o id do campo (alvo do <label for>).
+    const field = useFormField();
+    const id = idProp ?? field?.controlId ?? generatedId;
+    const registerControl = field?.registerControl;
+    React.useEffect(() => {
+      if (!registerControl) return;
+      return registerControl({ id: idProp, labelable: true });
+    }, [registerControl, idProp]);
+    // Dentro de um FormField, `<id>-hint`/`<id>-error` já são do FormField:
+    // a dica e o erro próprios usam outra base para não repetir ids.
+    const idBase = field ? `${generatedId}-upload` : id;
+    const hintId = `${idBase}-hint`;
+    const errorId = `${idBase}-error`;
     const message = localError ?? error;
 
     const acceptFiles = (list: FileList | null) => {
@@ -136,15 +176,13 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       if (next.length === 0) return;
       if (!multiple) next = next.slice(0, 1);
       if (next.some((f) => !matchesAccept(f, accept))) {
-        setLocalError("Tipo de arquivo não permitido.");
+        setLocalError(text.invalidType);
         return;
       }
       if (maxSize) {
         const oversized = next.filter((f) => f.size > maxSize);
         if (oversized.length > 0) {
-          setLocalError(
-            `Arquivo excede o limite de ${formatBytes(maxSize)}.`
-          );
+          setLocalError(text.tooLarge(formatBytes(maxSize)));
           return;
         }
       }
@@ -154,9 +192,21 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
     };
 
     const describedBy =
-      [inputProps?.["aria-describedby"], hint ? hintId : null, message ? errorId : null]
-        .filter(Boolean)
-        .join(" ") || undefined;
+      Array.from(
+        new Set(
+          [
+            inputProps?.["aria-describedby"],
+            hint ? hintId : null,
+            message ? errorId : null,
+            field?.describedBy,
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .split(/\s+/)
+            .filter(Boolean)
+        )
+      ).join(" ") || undefined;
+    const invalid = message ? true : inputProps?.["aria-invalid"] ?? (field?.invalid ? true : undefined);
 
     return (
       <div
@@ -184,11 +234,11 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
           className={cn(
             "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background px-6 py-8 text-center transition-colors duration-fast ease-standard has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background hover:border-border-strong",
             drag && "border-ring bg-tint",
-            message && "border-destructive"
+            (message || invalid === true) && "border-destructive"
           )}
         >
           <input
-            aria-label={label ? undefined : "Escolher arquivo"}
+            aria-label={label || field?.labelId ? undefined : text.chooseFile}
             {...inputProps}
             ref={inputRef}
             id={id}
@@ -196,7 +246,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             accept={accept}
             multiple={multiple}
             aria-describedby={describedBy}
-            aria-invalid={message ? true : inputProps?.["aria-invalid"]}
+            aria-invalid={invalid}
             className={cn("sr-only", inputProps?.className)}
             onClick={(e) => {
               // O clique na zona já abre o seletor; evita reabrir pela propagação.
@@ -210,7 +260,8 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
           />
           <UploadCloud className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
           <p className="text-sm text-foreground">
-            Arraste um arquivo ou <span className="font-medium text-primary">clique para escolher</span>
+            {text.dropzone}{" "}
+            <span className="font-medium text-primary">{text.dropzoneAction}</span>
           </p>
           {hint ? (
             <p id={hintId} className="text-xs text-muted-foreground">{hint}</p>
@@ -231,11 +282,18 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             ))}
           </ul>
         ) : null}
-        {message ? (
-          <p id={errorId} role="alert" className="text-xs text-destructive">
-            {message}
-          </p>
-        ) : null}
+        {/*
+          Região polite sempre montada (sem role="alert"): o erro da validação
+          local (tipo/tamanho) é anunciado sem interromper, e o texto também
+          fica ligado ao input por aria-describedby (AUD-22).
+        */}
+        <p
+          id={errorId}
+          aria-live="polite"
+          className={cn("text-xs text-destructive", !message && "sr-only")}
+        >
+          {message}
+        </p>
       </div>
     );
   }

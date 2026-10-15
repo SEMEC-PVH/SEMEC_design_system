@@ -1,41 +1,64 @@
 "use client";
 
 import * as React from "react";
-import { useEffect, useRef } from "react";
 
 import { cn } from "../lib/utils";
 
-interface ErrorSummaryProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ErrorSummaryItem {
+  /** `id` do campo com erro (ou `name`, como recuo). */
+  id: string;
+  message: string;
+}
+
+export interface ErrorSummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
-  errors?: Array<{ id: string; message: string }>;
+  errors?: ErrorSummaryItem[];
   autoFocus?: boolean;
   focusKey?: unknown;
 }
 
-const ErrorSummary = React.forwardRef<HTMLDivElement, ErrorSummaryProps>(
-  ({ title = "Há um problema", errors = [], autoFocus = true, focusKey, className, ...props }, ref) => {
-    const internalRef = useRef<HTMLDivElement>(null);
-    const resolvedRef = (ref as React.RefObject<HTMLDivElement>) || internalRef;
+// Primeiro elemento focável dentro do alvo (input hidden não conta).
+const FOCUSABLE =
+  'input:not([type="hidden"]), select, textarea, button, [tabindex]:not([tabindex="-1"])';
 
-    useEffect(() => {
+const ErrorSummary = React.forwardRef<HTMLDivElement, ErrorSummaryProps>(
+  (
+    { title = "Há um problema", errors = [], autoFocus = true, focusKey, className, id, ...props },
+    ref
+  ) => {
+    const internalRef = React.useRef<HTMLDivElement | null>(null);
+    const generatedId = React.useId();
+    const titleId = `${id ?? generatedId}-title`;
+
+    const setRefs = React.useCallback(
+      (el: HTMLDivElement | null) => {
+        internalRef.current = el;
+        if (typeof ref === "function") ref(el);
+        else if (ref) ref.current = el;
+      },
+      [ref]
+    );
+
+    React.useEffect(() => {
       if (autoFocus && errors.length > 0) {
-        resolvedRef.current?.focus();
+        internalRef.current?.focus();
       }
-    }, [autoFocus, errors.length, focusKey, resolvedRef]);
+    }, [autoFocus, errors.length, focusKey]);
 
     if (errors.length === 0) return null;
 
-    function irParaCampo(event: React.MouseEvent<HTMLAnchorElement>, id: string) {
+    function irParaCampo(event: React.MouseEvent<HTMLAnchorElement>, alvoId: string) {
+      const doc = event.currentTarget.ownerDocument;
       const alvo =
-        document.getElementById(id) ??
-        document.querySelector(`[name="${id}"]`);
+        doc.getElementById(alvoId) ??
+        doc.querySelector(`[name="${CSS.escape(alvoId)}"]:not([type="hidden"])`);
       if (!alvo) return;
 
       event.preventDefault();
 
-      const focavel = alvo.matches("input, select, textarea, button")
+      const focavel = alvo.matches(FOCUSABLE)
         ? alvo
-        : alvo.querySelector("input, select, textarea, button") ?? alvo;
+        : alvo.querySelector(FOCUSABLE) ?? alvo;
 
       (focavel as HTMLElement).focus({ preventScroll: true });
 
@@ -50,27 +73,28 @@ const ErrorSummary = React.forwardRef<HTMLDivElement, ErrorSummaryProps>(
 
     return (
       <div
-        ref={resolvedRef}
+        ref={setRefs}
+        id={id}
         role="alert"
         tabIndex={-1}
-        aria-labelledby="ds-error-summary-title"
+        aria-labelledby={titleId}
         className={cn(
-          "border-2 border-l-[3px] border-destructive rounded-md bg-destructive/5 p-4 px-6 mb-6",
+          "border-2 border-l-[3px] border-destructive rounded-md bg-destructive/5 p-4 px-6",
           "focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-1",
           className
         )}
         {...props}
       >
         <h2
-          id="ds-error-summary-title"
+          id={titleId}
           className="text-xl font-semibold text-destructive mb-3"
         >
           {title}
         </h2>
 
         <ul className="space-y-2 ml-0 pl-6 text-base">
-          {errors.map((erro) => (
-            <li key={erro.id}>
+          {errors.map((erro, index) => (
+            <li key={erro.id || index}>
               <a
                 href={`#${erro.id}`}
                 onClick={(event) => irParaCampo(event, erro.id)}

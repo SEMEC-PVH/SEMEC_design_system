@@ -3,118 +3,362 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import { useFormField, useFormFieldControl } from "./form-field";
 
 export interface ComboboxOption {
   value: string;
   label: string;
 }
 
-interface ComboboxProps {
+export interface ComboboxLabels {
+  /**
+   * Nome do campo de busca quando o Combobox não tem rótulo
+   * (`<Label htmlFor>`, FormField ou `aria-labelledby`). Padrão: "Buscar opção".
+   */
+  search: string;
+  /** Nome da camada flutuante quando não há rótulo. Padrão: "Opções". */
+  list: string;
+}
+
+const defaultLabels: ComboboxLabels = {
+  search: "Buscar opção",
+  list: "Opções",
+};
+
+export interface ComboboxProps
+  extends Omit<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    "onChange" | "value" | "defaultValue" | "name"
+  > {
   options: ComboboxOption[];
+  /** Valor selecionado (modo controlado). */
   value?: string;
+  /** Valor inicial (modo não controlado). */
+  defaultValue?: string;
   onChange?: (value: string) => void;
+  /** Texto do gatilho sem seleção. Padrão: "Selecione…". */
   placeholder?: string;
+  /** Placeholder do campo de busca. Padrão: "Buscar…". */
+  searchPlaceholder?: string;
+  /** Texto quando a busca não encontra nada. Padrão: "Nenhum resultado.". */
+  emptyText?: string;
+  /** @deprecated Use `emptyText`. Mantida por compatibilidade. */
   emptyMessage?: string;
-  disabled?: boolean;
+  /**
+   * @deprecated Prefira rótulo visível (`<Label htmlFor={id}>` ou `FormField`)
+   * ou `aria-labelledby`. Quando usada, vira um rótulo oculto somado ao texto
+   * visível do gatilho (o nome acessível continua contendo o que se vê, 2.5.3).
+   */
   ariaLabel?: string;
-  className?: string;
+  /** Gera um `<input type="hidden" name>` com o valor, para envio em `<form>`. */
+  name?: string;
+  /**
+   * Campo obrigatório: vira `aria-required` no campo de busca (o gatilho é um
+   * botão, que não aceita `aria-required`). Mostre a obrigatoriedade no rótulo
+   * (ex.: `FormField required`).
+   */
+  required?: boolean;
+  /** Textos fixos (PT-BR por padrão). */
+  labels?: Partial<ComboboxLabels>;
   /** Elemento onde o popover é portalado (ex.: body de um iframe de preview). */
   portalContainer?: HTMLElement | null;
 }
 
+const joinIds = (...ids: Array<string | undefined | null | false>) =>
+  ids.filter(Boolean).join(" ") || undefined;
+
+/**
+ * Combobox no padrão APG "combobox com listbox popup": o gatilho (uma parada
+ * de Tab) abre uma camada com o campo de busca (`role="combobox"`) e a lista
+ * (`role="listbox"`). Setas ↑/↓, Home/End movem a opção ativa
+ * (`aria-activedescendant`), Enter seleciona, Esc fecha e devolve o foco ao
+ * gatilho, Tab fecha e segue para o próximo campo.
+ */
 const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
   (
     {
       options,
       value,
+      defaultValue,
       onChange,
       placeholder = "Selecione…",
-      emptyMessage = "Nenhum resultado.",
+      searchPlaceholder = "Buscar…",
+      emptyText,
+      emptyMessage,
       disabled,
-      ariaLabel = "Selecionar",
+      ariaLabel,
+      name,
+      required,
+      labels,
       className,
       portalContainer,
+      onKeyDown,
+      form,
+      "aria-label": ariaLabelAttr,
+      ...props
     },
     ref
   ) => {
+    const text = { ...defaultLabels, ...labels };
+    const empty = emptyText ?? emptyMessage ?? "Nenhum resultado.";
+    const hiddenLabel = ariaLabel ?? ariaLabelAttr;
+
+    const uid = React.useId();
+    const valueId = `${uid}-value`;
+    const hiddenLabelId = `${uid}-label`;
+    const listboxId = `${uid}-listbox`;
+    const optionId = (index: number) => `${uid}-option-${index}`;
+
+    const ctx = useFormField();
+    const field = useFormFieldControl(props);
+    const triggerId = field.id ?? props.id;
+
     const [open, setOpen] = React.useState(false);
     const [query, setQuery] = React.useState("");
+    const [activeIndex, setActiveIndex] = React.useState(0);
+    const [internalValue, setInternalValue] = React.useState(defaultValue ?? "");
+    const current = value !== undefined ? value : internalValue;
 
-    const selected = options.find((o) => o.value === value);
+    const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+    const inputRef = React.useRef<HTMLInputElement | null>(null);
+    const listRef = React.useRef<HTMLUListElement | null>(null);
+    const closingByTab = React.useRef(false);
+
+    const setTriggerRef = React.useCallback(
+      (el: HTMLButtonElement | null) => {
+        triggerRef.current = el;
+        if (typeof ref === "function") ref(el);
+        else if (ref) ref.current = el;
+      },
+      [ref]
+    );
+
+    // <Label htmlFor={id}> fora de FormField: o rótulo nativo vira
+    // aria-labelledby, para o nome somar o texto visível do gatilho.
+    const [nativeLabelIds, setNativeLabelIds] = React.useState<string | undefined>(undefined);
+    const explicitLabelledBy = props["aria-labelledby"];
+    const needsNativeLabel = !explicitLabelledBy && !ctx?.labelId && !hiddenLabel;
+    React.useEffect(() => {
+      const el = triggerRef.current;
+      if (!needsNativeLabel || !el?.labels?.length) {
+        setNativeLabelIds(undefined);
+        return;
+      }
+      const ids = Array.from(el.labels).map((label, i) => {
+        if (!label.id) label.id = `${uid}-native-label-${i}`;
+        return label.id;
+      });
+      setNativeLabelIds(ids.join(" "));
+    }, [needsNativeLabel, triggerId, uid]);
+
+    const labelIds =
+      explicitLabelledBy ??
+      ctx?.labelId ??
+      nativeLabelIds ??
+      (hiddenLabel ? hiddenLabelId : undefined);
+
+    const selected = options.find((o) => o.value === current);
     const filtered = React.useMemo(() => {
       const q = query.trim().toLowerCase();
-      if (!q) return options;
-      return options.filter((o) => o.label.toLowerCase().includes(q));
+      const indexed = options.map((option, index) => ({ option, index }));
+      if (!q) return indexed;
+      return indexed.filter(({ option }) => option.label.toLowerCase().includes(q));
     }, [options, query]);
 
+    const active = filtered.length ? Math.min(activeIndex, filtered.length - 1) : -1;
+    const activeItem = active >= 0 ? filtered[active] : undefined;
+    const activeId = activeItem ? optionId(activeItem.index) : undefined;
+
+    const handleOpenChange = (next: boolean) => {
+      if (next) {
+        setQuery("");
+        const selectedIndex = options.findIndex((o) => o.value === current);
+        setActiveIndex(selectedIndex >= 0 ? selectedIndex : 0);
+      }
+      setOpen(next);
+    };
+
+    const choose = (option: ComboboxOption) => {
+      if (value === undefined) setInternalValue(option.value);
+      onChange?.(option.value);
+      setOpen(false);
+    };
+
+    React.useEffect(() => {
+      if (!open || !activeId) return;
+      const el = listRef.current?.querySelector<HTMLElement>(`[id="${activeId}"]`);
+      el?.scrollIntoView?.({ block: "nearest" });
+    }, [open, activeId]);
+
+    const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      onKeyDown?.(event);
+      if (event.defaultPrevented || disabled) return;
+      if (!open && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
+        event.preventDefault();
+        handleOpenChange(true);
+      }
+    };
+
+    const handleSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      const last = filtered.length - 1;
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          if (last >= 0) setActiveIndex(Math.min(active + 1, last));
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          if (last >= 0) setActiveIndex(Math.max(active - 1, 0));
+          break;
+        case "Home":
+          event.preventDefault();
+          if (last >= 0) setActiveIndex(0);
+          break;
+        case "End":
+          event.preventDefault();
+          if (last >= 0) setActiveIndex(last);
+          break;
+        case "Enter":
+          // Não envia o formulário; seleciona a opção ativa.
+          event.preventDefault();
+          if (activeItem) choose(activeItem.option);
+          break;
+        case "Tab":
+          // Uma parada de Tab: fecha e deixa o Tab seguir a partir do gatilho.
+          closingByTab.current = true;
+          triggerRef.current?.focus();
+          setOpen(false);
+          break;
+        default:
+          break;
+      }
+    };
+
     return (
-      <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
+      <PopoverPrimitive.Root open={open} onOpenChange={handleOpenChange}>
+        {hiddenLabel && !explicitLabelledBy && !ctx?.labelId ? (
+          <span id={hiddenLabelId} className="sr-only">
+            {hiddenLabel}
+          </span>
+        ) : null}
         <PopoverPrimitive.Trigger asChild>
           <button
-            ref={ref}
             type="button"
             disabled={disabled}
-            aria-label={ariaLabel}
-            aria-expanded={open}
             className={cn(
-              "flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50",
+              "flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive",
               className
             )}
+            {...props}
+            {...field}
+            ref={setTriggerRef}
+            // Nome = rótulo + texto visível (valor ou placeholder): nunca
+            // substitui o que se vê (WCAG 2.5.3).
+            aria-labelledby={labelIds ? joinIds(labelIds, valueId) : undefined}
+            onKeyDown={handleTriggerKeyDown}
           >
-            <span className={cn("truncate", !selected && "text-muted-foreground")}>
+            <span
+              id={valueId}
+              className={cn("truncate", !selected && "text-muted-foreground")}
+            >
               {selected ? selected.label : placeholder}
             </span>
             <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" aria-hidden="true" />
           </button>
         </PopoverPrimitive.Trigger>
+        {name ? (
+          <input type="hidden" name={name} value={current ?? ""} form={form} />
+        ) : null}
         <PopoverPrimitive.Portal container={portalContainer}>
           <PopoverPrimitive.Content
             align="start"
             sideOffset={4}
+            aria-labelledby={labelIds}
+            aria-label={labelIds ? undefined : hiddenLabel ?? text.list}
+            onOpenAutoFocus={(event) => {
+              event.preventDefault();
+              inputRef.current?.focus();
+            }}
+            onCloseAutoFocus={(event) => {
+              // Saída por Tab: o foco já seguiu para o próximo campo.
+              if (closingByTab.current) {
+                closingByTab.current = false;
+                event.preventDefault();
+              }
+            }}
             className="z-50 w-[var(--radix-popover-trigger-width)] min-w-[12rem] rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 outline-none data-[state=open]:animate-in"
           >
             <div className="border-b border-border p-2">
               <input
+                ref={inputRef}
+                type="text"
+                role="combobox"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar…"
-                aria-label={`Buscar em ${ariaLabel}`}
-                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setActiveIndex(0);
+                }}
+                onKeyDown={handleSearchKeyDown}
+                placeholder={searchPlaceholder}
+                autoComplete="off"
+                aria-expanded={filtered.length > 0}
+                aria-controls={listboxId}
+                aria-autocomplete="list"
+                aria-activedescendant={activeId}
+                aria-required={required || ctx?.required ? true : undefined}
+                aria-labelledby={labelIds}
+                aria-label={labelIds ? undefined : hiddenLabel ?? text.search}
+                className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               />
             </div>
-            <div className="max-h-64 overflow-y-auto p-1" role="listbox" aria-label={ariaLabel}>
-              {filtered.length > 0 ? (
-                filtered.map((option) => {
-                  const active = option.value === value;
+            {filtered.length > 0 ? (
+              <ul
+                ref={listRef}
+                id={listboxId}
+                role="listbox"
+                aria-labelledby={labelIds}
+                aria-label={labelIds ? undefined : hiddenLabel ?? text.list}
+                className="max-h-64 overflow-y-auto p-1"
+              >
+                {filtered.map(({ option, index }, position) => {
+                  const isActive = position === active;
+                  const isChosen = option.value === current;
                   return (
-                    <button
+                    <li
                       key={option.value}
-                      type="button"
+                      id={optionId(index)}
                       role="option"
-                      aria-selected={active}
-                      onClick={() => {
-                        onChange?.(option.value);
-                        setOpen(false);
-                        setQuery("");
+                      // APG: aria-selected marca a opção ativa (a que Enter escolhe).
+                      aria-selected={isActive}
+                      // Mantém o foco no campo de busca ao clicar.
+                      onMouseDown={(e) => e.preventDefault()}
+                      onMouseMove={() => {
+                        if (!isActive) setActiveIndex(position);
                       }}
+                      onClick={() => choose(option)}
                       className={cn(
-                        "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-sm text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        active && "bg-accent text-accent-foreground"
+                        "flex min-h-11 w-full cursor-pointer select-none items-center justify-between rounded-sm px-2 py-2 text-sm text-foreground",
+                        isActive && "bg-tint ring-2 ring-inset ring-ring",
+                        isChosen && "font-medium"
                       )}
                     >
                       {option.label}
-                      {active ? (
-                        <Check className="h-4 w-4" aria-hidden="true" />
-                      ) : null}
-                    </button>
+                      {isChosen ? <Check className="h-4 w-4 shrink-0" aria-hidden="true" /> : null}
+                    </li>
                   );
-                })
-              ) : (
-                <p className="px-2 py-1.5 text-sm text-muted-foreground">
-                  {emptyMessage}
-                </p>
+                })}
+              </ul>
+            ) : null}
+            {/* Sempre montado: anuncia "Nenhum resultado." ao filtrar. */}
+            <p
+              role="status"
+              className={cn(
+                "px-3 py-2 text-sm text-muted-foreground",
+                filtered.length > 0 && "sr-only"
               )}
-            </div>
+            >
+              {filtered.length > 0 ? "" : empty}
+            </p>
           </PopoverPrimitive.Content>
         </PopoverPrimitive.Portal>
       </PopoverPrimitive.Root>

@@ -44,7 +44,7 @@ const toastVariants = cva(
       variant: {
         default: "border-border bg-card text-card-foreground",
         success:
-          "border-none bg-pv-green-500 text-pv-blue-900 px-5 py-4 [&_[toast-close]]:text-pv-blue-900 [&_[toast-close]]:opacity-80 [&_[toast-close]]:hover:opacity-100",
+          "border-none bg-pv-green-500 text-pv-blue-900 px-5 py-4 [&_[toast-close]]:text-pv-blue-900 [&_[toast-close]]:hover:bg-pv-blue-900/10",
         warning: "border-warning/40 bg-warning-surface text-foreground",
         destructive: "border-destructive/40 bg-destructive-surface text-destructive",
       },
@@ -75,7 +75,7 @@ const ToastAction = React.forwardRef<
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      "inline-flex h-9 shrink-0 items-center justify-center rounded-full border border-border bg-transparent px-4 text-sm font-medium transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+      "inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-border bg-transparent px-4 text-sm font-medium transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
       className
     )}
     {...props}
@@ -90,7 +90,7 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      "shrink-0 rounded-lg p-1.5 text-muted-foreground opacity-60 transition-opacity duration-fast ease-standard hover:text-foreground hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      "-m-2 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
       className
     )}
     toast-close=""
@@ -247,7 +247,7 @@ function useToast() {
   };
 }
 
-interface ToasterProps {
+export interface ToasterProps {
   /** Prefixo anunciado pelo leitor de tela em cada aviso. Padrão: "Notificação". */
   label?: string;
   /** Nome da região de avisos; `{hotkey}` vira o atalho (F8). Padrão: "Notificações ({hotkey})". */
@@ -292,5 +292,4 @@ export {
   ToastAction,
   Toaster,
   useToast,
-  type ToasterProps,
 };

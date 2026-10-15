@@ -25,6 +25,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -42,7 +43,7 @@ import { Badge } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Crie um badge (Etiqueta) usando @semec/ds/react (`src/components/badge.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · secondary · outline · success · warning · danger · info. Etiqueta curta de status ou contagem.
+Use o componente `Badge` (Etiqueta) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Etiqueta curta de status ou contagem. API e variantes: variant: default · secondary · outline · success · warning · danger · info. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte

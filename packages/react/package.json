@@ -14,6 +14,8 @@
       "import": "./dist/react/validacao.js"
     },
     "./react/tokens.css": "./dist/react/tokens.css",
+    "./react/fonts.css": "./dist/react/fonts.css",
+    "./react/fonts/*": "./dist/react/fonts/*",
     "./react/pv-preset": {
       "types": "./dist/react/pv-preset.d.ts",
       "import": "./dist/react/pv-preset.js"
@@ -32,6 +34,7 @@
     "./skills/semec-ds": "./dist/skills/semec-ds/SKILL.md",
     "./skills/ds-semec-skill": "./dist/skills/semec-ds/SKILL.md",
     "./lite/tokens.css": "./dist/react/tokens.css",
+    "./lite/fonts.css": "./dist/react/fonts.css",
     "./lite/pv-preset": {
       "types": "./dist/react/pv-preset.d.ts",
       "import": "./dist/react/pv-preset.js"
@@ -41,33 +44,37 @@
     "./lite/skills/llms.txt": "./dist/lite/llms.txt",
     "./lite/skills/manifest.json": "./dist/lite/manifest.json",
     "./lite/skills/semec-ds-lite": "./dist/lite/semec-ds-lite/SKILL.md",
-    "./lite/skills/ds-semec-skill": "./dist/lite/semec-ds-lite/SKILL.md"
+    "./lite/skills/ds-semec-skill": "./dist/lite/semec-ds-lite/SKILL.md",
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
-    "src",
     "tokens.css",
     "pv-preset.ts",
-    "manifest.js",
-    "server.js"
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "sideEffects": [
     "**/*.css"
   ],
   "scripts": {
-    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsup && tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/build-artifacts.mjs",
+    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsup && npm run build:types && node scripts/build-artifacts.mjs",
     "build:react": "tsup",
-    "build:types": "tsc --emitDeclarationOnly --rootDir src --outDir dist/react",
+    "build:types": "tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/fix-dts-extensions.mjs",
     "build:skills": "node scripts/build-artifacts.mjs",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build",
-    "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\""
+    "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "peerDependencies": {
+    "lucide-react": ">=0.468.0 <2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "zod": "^3.23.0"
+    "tailwindcss": "^4.0.0",
+    "zod": "^3.23.0 || ^4.0.0"
   },
   "peerDependenciesMeta": {
     "zod": {
@@ -76,6 +83,7 @@
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.20",
+    "@radix-ui/react-alert-dialog": "^1.2.1",
     "@radix-ui/react-avatar": "^1.2.6",
     "@radix-ui/react-checkbox": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.0",
@@ -98,14 +106,30 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "get-nonce": "^1.0.0",
-    "lucide-react": "^0.468.0",
-    "tailwind-merge": "^2.6.0"
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
     "@types/node": "^22.20.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "axe-core": "^4.14.0",
+    "jsdom": "^30.1.2",
+    "lucide-react": "^1.38.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "tailwindcss": "^4.0.0",
     "tsup": "^8.5.1",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "^5.0.4",
+    "zod": "^4.6.2",
+    "zod3": "npm:zod@^3.25.76"
+  },
+  "engines": {
+    "node": ">=22"
   },
   "publishConfig": {
     "access": "public"

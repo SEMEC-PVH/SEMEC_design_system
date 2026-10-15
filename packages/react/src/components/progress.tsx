@@ -3,14 +3,23 @@ import * as ProgressPrimitive from "@radix-ui/react-progress";
 
 import { cn } from "../lib/utils";
 
+export interface ProgressProps
+  extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> {}
+
+/**
+ * Barra de progresso determinada. A trilha tem contorno `border-strong`
+ * (3,77:1 sobre `surface`, 3,49:1 sobre `bg`) para ser percebida como
+ * componente gráfico (WCAG 1.4.11); o indicador `primary` tem 5,42:1 sobre a
+ * trilha `surface`. Dê nome com `aria-label` ou `aria-labelledby`.
+ */
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
+  ProgressProps
 >(({ className, value, ...props }, ref) => (
   <ProgressPrimitive.Root
     ref={ref}
     className={cn(
-      "relative h-3 w-full overflow-hidden rounded-full bg-secondary",
+      "relative h-3 w-full overflow-hidden rounded-full border border-border-strong bg-surface",
       className
     )}
     value={value}

@@ -6,7 +6,7 @@ import * as ds from "../../packages/react/dist/react/index.js";
 import { dsComponents } from "../../packages/react/manifest.js";
 
 // Mocks/fixtures seguros para renderização smoke e a11y de cada componente do design system
-function getComponentElement(code) {
+export function getComponentElement(code) {
   switch (code) {
     case "accordion":
       return React.createElement(
@@ -22,10 +22,25 @@ function getComponentElement(code) {
 
     case "alert":
       return React.createElement(
-        ds.Alert,
+        React.Fragment,
         null,
-        React.createElement(ds.AlertTitle, null, "Atenção"),
-        React.createElement(ds.AlertDescription, null, "Mensagem informativa")
+        React.createElement(
+          ds.Alert,
+          null,
+          React.createElement(ds.AlertTitle, null, "Atenção"),
+          React.createElement(ds.AlertDescription, null, "Mensagem informativa")
+        ),
+        React.createElement(
+          ds.Alert,
+          { variant: "destructive" },
+          React.createElement(ds.AlertTitle, { as: "h2" }, "Pagamento recusado"),
+          React.createElement(ds.AlertDescription, null, "Confira os dados.")
+        ),
+        React.createElement(
+          ds.Alert,
+          { variant: "warning", announce: "off" },
+          React.createElement(ds.AlertDescription, null, "Aviso estático")
+        )
       );
 
     case "alert-dialog":
@@ -75,7 +90,7 @@ function getComponentElement(code) {
       return React.createElement(
         ds.Card,
         null,
-        React.createElement(ds.CardHeader, null, React.createElement(ds.CardTitle, null, "Título do Card")),
+        React.createElement(ds.CardHeader, null, React.createElement(ds.CardTitle, { as: "h2" }, "Título do Card")),
         React.createElement(ds.CardContent, null, "Conteúdo do card.")
       );
 
@@ -96,11 +111,16 @@ function getComponentElement(code) {
 
     case "data-table":
       return React.createElement(ds.DataTable, {
+        caption: "Serviços",
         columns: [
-          { header: "Nome", accessorKey: "name" },
-          { header: "Status", accessorKey: "status" },
+          { header: "Nome", key: "name", sortable: true },
+          { header: "Status", key: "status" },
         ],
         data: [{ name: "Serviço A", status: "Ativo" }],
+        page: 1,
+        pageCount: 2,
+        onPageChange: () => {},
+        labels: { previous: "Página anterior" },
       });
 
     case "date-picker":
@@ -179,10 +199,52 @@ function getComponentElement(code) {
       return React.createElement(
         ds.Header,
         null,
-        React.createElement(ds.HeaderBrand, { title: "SEMEC" }),
+        React.createElement(ds.HeaderBrand, {
+          orgName: "SEMEC",
+          serviceName: "Matrícula",
+          logo: React.createElement("img", { src: "data:,", alt: "Prefeitura de Porto Velho" }),
+        }),
         React.createElement(ds.HeaderNav, null,
           React.createElement(ds.HeaderNavLink, { href: "/" }, "Início")
         )
+      );
+
+    case "heading":
+      return React.createElement(
+        React.Fragment,
+        null,
+        React.createElement(ds.Heading, { level: 1 }, "Requerimento"),
+        React.createElement(ds.Heading, { level: 2 }, "Dados do estudante"),
+        React.createElement(ds.Heading, { level: 3, size: 2 }, "Documentos")
+      );
+
+    case "footer":
+      return React.createElement(
+        ds.Footer,
+        null,
+        React.createElement(
+          ds.FooterContent,
+          null,
+          React.createElement(
+            ds.FooterSection,
+            { title: "Serviços" },
+            React.createElement(
+              ds.FooterLinks,
+              null,
+              React.createElement(ds.FooterLink, { href: "/matricula" }, "Matrícula"),
+              React.createElement(ds.FooterLink, { href: "/transporte" }, "Transporte escolar")
+            )
+          )
+        ),
+        React.createElement(ds.FooterBottom, null, React.createElement("p", null, "© 2026 SEMEC"))
+      );
+
+    case "skip-link":
+      return React.createElement(
+        React.Fragment,
+        null,
+        React.createElement(ds.SkipLink, null),
+        React.createElement("div", { id: "conteudo" }, "Conteúdo principal")
       );
 
     case "icon-button":
@@ -236,7 +298,7 @@ function getComponentElement(code) {
         ds.Popover,
         { open: true },
         React.createElement(ds.PopoverTrigger, { asChild: true }, React.createElement("button", null, "Abrir")),
-        React.createElement(ds.PopoverContent, null, "Conteúdo do popover")
+        React.createElement(ds.PopoverContent, { "aria-label": "Filtros" }, "Conteúdo do popover")
       );
 
     case "progress":
@@ -321,13 +383,13 @@ function getComponentElement(code) {
       );
 
     case "skeleton":
-      return React.createElement(ds.Skeleton, { style: { width: "100px", height: "20px" } });
+      return React.createElement(ds.Skeleton, { className: "h-5 w-24" });
 
     case "slider":
-      return React.createElement(ds.Slider, { defaultValue: [50], max: 100, step: 1 });
+      return React.createElement(ds.Slider, { defaultValue: [50], max: 100, step: 1, "aria-label": "Raio de busca em km" });
 
     case "spinner":
-      return React.createElement(ds.Spinner, { "aria-label": "Carregando" });
+      return React.createElement(ds.Spinner, { label: "Carregando protocolos" });
 
     case "switch":
       return React.createElement(ds.Switch, { "aria-label": "Notificações por e-mail" });
@@ -374,12 +436,41 @@ function getComponentElement(code) {
       return React.createElement(ds.Textarea, { "aria-label": "Observações", placeholder: "Observações..." });
 
     case "timeline":
-      return React.createElement(ds.Timeline, {
-        items: [
-          { title: "Protocolo aberto", description: "Requerimento recebido", date: "10/10/2026" },
-          { title: "Em análise", description: "Aguardando parecer", active: true },
-        ],
-      });
+      return React.createElement(
+        ds.Timeline,
+        null,
+        React.createElement(
+          ds.TimelineItem,
+          null,
+          React.createElement(
+            ds.TimelineSeparator,
+            null,
+            React.createElement(ds.TimelineDot, { variant: "success", srLabel: "Concluído" }),
+            React.createElement(ds.TimelineConnector)
+          ),
+          React.createElement(
+            ds.TimelineContent,
+            null,
+            React.createElement(ds.TimelineTitle, null, "Protocolo aberto"),
+            React.createElement(ds.TimelineDescription, null, "10/10/2026")
+          )
+        ),
+        React.createElement(
+          ds.TimelineItem,
+          null,
+          React.createElement(
+            ds.TimelineSeparator,
+            null,
+            React.createElement(ds.TimelineDot, { srLabel: "Em andamento" })
+          ),
+          React.createElement(
+            ds.TimelineContent,
+            null,
+            React.createElement(ds.TimelineTitle, null, "Em análise"),
+            React.createElement(ds.TimelineDescription, null, "Aguardando parecer")
+          )
+        )
+      );
 
     case "toast":
       return React.createElement(

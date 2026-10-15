@@ -23,7 +23,9 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        sm: "h-9 px-4 text-sm",
+        // AUD-10: o visual compacto (36px) é mantido, mas a área clicável é
+        // estendida a 44×44px por um pseudo-elemento centralizado.
+        sm: "h-9 px-4 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2",
         md: "h-11 px-5 text-sm",
         lg: "h-12 px-6 text-base",
         icon: "h-11 w-11",

@@ -4,18 +4,19 @@ code: "navigation-menu"
 slug: "menu-de-navegacao"
 file: "src/components/navigation-menu.tsx"
 category: "navegacao"
-variants: "composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator"
+variants: "composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · a11y: aria-label padrão 'Menu principal' · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix)"
 ---
 
 # Menu de navegação — `navigation-menu`
 
-> Navegação principal com mega-menu e viewport animado.
+> Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px.
 
 **Arquivo:** `src/components/navigation-menu.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/menu-de-navegacao`
 
 ## Variantes
 
 - **composição**: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator
+- **a11y**: aria-label padrão "Menu principal" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix)
 
 ## Instalação (@semec/ds)
 
@@ -25,6 +26,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -50,7 +52,7 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuT
 ## Prompt para IA
 
 ```text
-Crie um navigation-menu (Menu de navegação) usando @semec/ds/react (`src/components/navigation-menu.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator. Navegação principal com mega-menu e viewport animado.
+Use o componente `NavigationMenu` (Menu de navegação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. API e variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · a11y: aria-label padrão "Menu principal" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -66,9 +68,12 @@ import { cn } from "../lib/utils";
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, "aria-label": ariaLabel = "Menu principal", ...props }, ref) => (
+  // AUD-31: o Radix rotula o <nav> como "Main" (inglês). O padrão aqui é
+  // "Menu principal"; passe `aria-label` para sobrescrever (ex.: "Menu do servidor").
   <NavigationMenuPrimitive.Root
     ref={ref}
+    aria-label={ariaLabel}
     className={cn(
       "relative z-10 flex max-w-max flex-1 items-center justify-center",
       className
@@ -99,7 +104,7 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+  "group inline-flex h-11 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
 );
 
 const NavigationMenuTrigger = React.forwardRef<
@@ -167,7 +172,7 @@ const NavigationMenuIndicator = React.forwardRef<
     )}
     {...props}
   >
-    <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md" />
+    <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-elevation-1" />
   </NavigationMenuPrimitive.Indicator>
 ));
 NavigationMenuIndicator.displayName =

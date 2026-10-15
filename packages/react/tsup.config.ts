@@ -1,4 +1,16 @@
+import { cpSync, mkdirSync } from "node:fs";
 import { defineConfig } from "tsup";
+
+/**
+ * Poppins auto-hospedada (AUD-26): `fonts.css` + `fonts/*.woff2` + OFL vão
+ * para `dist/react/`, onde `@semec/ds/react/fonts.css` resolve as URLs
+ * relativas `./fonts/Poppins-*.woff2`.
+ */
+async function copyFonts() {
+  mkdirSync("dist/react", { recursive: true });
+  cpSync("fonts.css", "dist/react/fonts.css");
+  cpSync("fonts", "dist/react/fonts", { recursive: true });
+}
 
 export default defineConfig([
   {
@@ -51,6 +63,7 @@ export default defineConfig([
     format: "esm",
     dts: false,
     external: ["tailwindcss"],
+    onSuccess: copyFonts,
   },
   {
     entry: {

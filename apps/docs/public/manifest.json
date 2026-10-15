@@ -1,7 +1,8 @@
 {
   "name": "SEMEC Design System",
   "version": "3.0.0",
-  "generatedAt": "2026-10-14T18:06:14.000Z",
+  "generatedAt": "2026-10-14T18:58:49.000Z",
+  "componentCount": 52,
   "categories": [
     {
       "key": "acoes",
@@ -39,9 +40,10 @@
       "code": "button",
       "slug": "botoes",
       "label": "Botões",
+      "exportName": "Button",
       "file": "src/components/button.tsx",
       "category": "acoes",
-      "desc": "Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.",
+      "desc": "Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida.",
       "variants": [
         {
           "prop": "variant",
@@ -49,11 +51,11 @@
         },
         {
           "prop": "size",
-          "values": "sm · md · lg · icon"
+          "values": "sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px)"
         }
       ],
       "usage": "import { Button } from \"@semec/ds/react\";\nimport Link from \"next/link\";\nimport { Plus } from \"lucide-react\";\n\n<Button variant=\"primary\">Emitir boleto</Button>\n<Button variant=\"outline\">Salvar rascunho</Button>\n<Button variant=\"ghost\">Cancelar</Button>\n\n<Button variant=\"destructive\">Excluir requerimento</Button>\n\n<Button><Plus /> Adicionar serviço</Button>\n\n<Button asChild>\n  <Link href=\"/iptu\">Ver meu IPTU</Link>\n</Button>",
-      "prompt": "Crie um button (Botões) usando @semec/ds/react (`src/components/button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm · md · lg · icon. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link.",
+      "prompt": "Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/botoes",
       "md": "/components/botoes.md"
     },
@@ -61,6 +63,7 @@
       "code": "icon-button",
       "slug": "botao-de-icone",
       "label": "Botão de ícone",
+      "exportName": "IconButton",
       "file": "src/components/icon-button.tsx",
       "category": "acoes",
       "desc": "Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).",
@@ -71,7 +74,7 @@
         }
       ],
       "usage": "import { IconButton } from \"@semec/ds/react\";\nimport { Download, Search, Trash2 } from \"lucide-react\";\n\n<IconButton label=\"Buscar requerimento\"><Search /></IconButton>\n<IconButton label=\"Baixar carnê\"><Download /></IconButton>\n<IconButton label=\"Excluir requerimento\" variant=\"destructive\"><Trash2 /></IconButton>",
-      "prompt": "Crie um icon-button (Botão de ícone) usando @semec/ds/react (`src/components/icon-button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).",
+      "prompt": "Use o componente `IconButton` (Botão de ícone) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). API e variantes: variant: primary · secondary · outline · ghost · destructive · link. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/botao-de-icone",
       "md": "/components/botao-de-icone.md"
     },
@@ -79,17 +82,22 @@
       "code": "link",
       "slug": "link",
       "label": "Link",
+      "exportName": "Link",
       "file": "src/components/link.tsx",
       "category": "acoes",
-      "desc": "Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.",
+      "desc": "Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas.",
       "variants": [
         {
           "prop": "variant",
           "values": "primary · onSurface · muted"
+        },
+        {
+          "prop": "underline",
+          "values": "true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido)"
         }
       ],
-      "usage": "import { Link } from \"@semec/ds/react\";\n\n<Link href=\"/iptu\">Acessar guia do IPTU 2026</Link>\n<Link href=\"/protocolo\" variant=\"onSurface\">Acompanhar protocolo</Link>\n<Link href=\"/ajuda\" variant=\"muted\">Saiba mais sobre prazos</Link>",
-      "prompt": "Crie um link (Link) usando @semec/ds/react (`src/components/link.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · onSurface · muted. Link tipográfico com variantes de cor. `onSurface` para links sobre superfícies elevadas.",
+      "usage": "import { Link } from \"@semec/ds/react\";\n\n<p>Consulte o <Link href=\"/iptu\">guia do IPTU 2026</Link> antes de emitir a guia.</p>\n<Link href=\"/protocolo\" variant=\"onSurface\">Acompanhar protocolo</Link>\n<Link href=\"/ajuda\" variant=\"muted\">Saiba mais sobre prazos</Link>\n\n// Só em contexto de navegação, em que a posição já identifica o link:\n<Link href=\"/servicos\" underline={false}>Serviços</Link>",
+      "prompt": "Use o componente `Link` (Link) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas. API e variantes: variant: primary · onSurface · muted · underline: true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/link",
       "md": "/components/link.md"
     },
@@ -97,17 +105,18 @@
       "code": "input",
       "slug": "caixa-de-texto",
       "label": "Caixa de texto",
+      "exportName": "Input",
       "file": "src/components/input.tsx",
       "category": "formularios",
-      "desc": "Campo de texto. Estado de erro via `aria-invalid`.",
+      "desc": "Campo de texto. Estado de erro via `aria-invalid`. Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente.",
       "variants": [
         {
           "prop": "estados",
           "values": "padrão · inválido (aria-invalid) · disabled"
         }
       ],
-      "usage": "import { FormField, Input } from \"@semec/ds/react\";\n\n// Todo campo precisa de rótulo visível (placeholder não substitui o rótulo)\n<FormField label=\"Nome completo\" htmlFor=\"nome-completo\">\n  <Input id=\"nome-completo\" autoComplete=\"name\" />\n</FormField>\n\n// Estado inválido: aria-invalid + mensagem ligada por aria-describedby (`<id do FormField>-error`)\n<FormField id=\"cpf-campo\" label=\"CPF\" htmlFor=\"cpf\" error=\"Informe os 11 dígitos do CPF.\">\n  <Input id=\"cpf\" inputMode=\"numeric\" aria-invalid=\"true\" aria-describedby=\"cpf-campo-error\" />\n</FormField>",
-      "prompt": "Crie um input (Caixa de texto) usando @semec/ds/react (`src/components/input.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido (aria-invalid) · disabled. Campo de texto. Estado de erro via `aria-invalid`.",
+      "usage": "import { FormField, Input } from \"@semec/ds/react\";\n\n// Todo campo precisa de rótulo visível (placeholder não substitui o rótulo).\n// Dentro do FormField, id, aria-describedby e aria-invalid são ligados sozinhos.\n<FormField label=\"Nome completo\" hint=\"Como no documento\">\n  <Input autoComplete=\"name\" />\n</FormField>\n\n// Com id próprio (ex.: alvo do ErrorSummary): o rótulo e a mensagem seguem o id\n<FormField label=\"CPF\" error=\"Informe os 11 dígitos do CPF.\">\n  <Input id=\"cpf\" inputMode=\"numeric\" />\n</FormField>\n// → <label for=\"cpf\">, aria-invalid=\"true\", aria-describedby=\"cpf-error\"",
+      "prompt": "Use o componente `Input` (Caixa de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de texto. Estado de erro via `aria-invalid`. Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. API e variantes: estados: padrão · inválido (aria-invalid) · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/caixa-de-texto",
       "md": "/components/caixa-de-texto.md"
     },
@@ -115,6 +124,7 @@
       "code": "textarea",
       "slug": "area-de-texto",
       "label": "Área de texto",
+      "exportName": "Textarea",
       "file": "src/components/textarea.tsx",
       "category": "formularios",
       "desc": "Campo multilinha com as mesmas variantes visuais do campo de texto.",
@@ -124,8 +134,8 @@
           "values": "padrão · inválido · disabled"
         }
       ],
-      "usage": "import { FormField, Textarea } from \"@semec/ds/react\";\n\n<FormField label=\"Descreva a demanda\" htmlFor=\"demanda\">\n  <Textarea id=\"demanda\" rows={4} />\n</FormField>",
-      "prompt": "Crie um textarea (Área de texto) usando @semec/ds/react (`src/components/textarea.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido · disabled. Campo multilinha com as mesmas variantes visuais do campo de texto.",
+      "usage": "import { FormField, Textarea } from \"@semec/ds/react\";\n\n<FormField label=\"Descreva a demanda\" hint=\"Até 500 caracteres\">\n  <Textarea id=\"demanda\" rows={4} />\n</FormField>",
+      "prompt": "Use o componente `Textarea` (Área de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo multilinha com as mesmas variantes visuais do campo de texto. API e variantes: estados: padrão · inválido · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/area-de-texto",
       "md": "/components/area-de-texto.md"
     },
@@ -133,6 +143,7 @@
       "code": "select",
       "slug": "menu-de-selecao",
       "label": "Menu de seleção",
+      "exportName": "Select",
       "file": "src/components/select.tsx",
       "category": "formularios",
       "desc": "Seleção fechada com gatilho, conteúdo e itens compostos.",
@@ -142,8 +153,8 @@
           "values": "Select · SelectTrigger · SelectValue · SelectContent · SelectItem"
         }
       ],
-      "usage": "import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from \"@semec/ds/react\";\n\n<Select defaultValue=\"pbh\">\n  <SelectTrigger aria-label=\"Município\"><SelectValue placeholder=\"Município\" /></SelectTrigger>\n  <SelectContent>\n    <SelectItem value=\"pbh\">Porto Velho</SelectItem>\n    <SelectItem value=\"riob\">Rio Branco</SelectItem>\n  </SelectContent>\n</Select>",
-      "prompt": "Crie um select (Menu de seleção) usando @semec/ds/react (`src/components/select.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem. Seleção fechada com gatilho, conteúdo e itens compostos.",
+      "usage": "import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from \"@semec/ds/react\";\n\n<Select defaultValue=\"pbh\">\n  <SelectTrigger aria-label=\"Município\"><SelectValue placeholder=\"Município\" /></SelectTrigger>\n  <SelectContent>\n    <SelectItem value=\"pbh\">Porto Velho</SelectItem>\n    <SelectItem value=\"riob\">Rio Branco</SelectItem>\n  </SelectContent>\n</Select>\n\n// Dentro de FormField, o SelectTrigger recebe id, aria-describedby e aria-invalid\n<FormField label=\"Município\" error={erro}>\n  <Select>\n    <SelectTrigger><SelectValue placeholder=\"Selecione\" /></SelectTrigger>\n    <SelectContent>\n      <SelectItem value=\"pbh\">Porto Velho</SelectItem>\n    </SelectContent>\n  </Select>\n</FormField>",
+      "prompt": "Use o componente `Select` (Menu de seleção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção fechada com gatilho, conteúdo e itens compostos. API e variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/menu-de-selecao",
       "md": "/components/menu-de-selecao.md"
     },
@@ -151,17 +162,22 @@
       "code": "combobox",
       "slug": "combobox",
       "label": "Combobox",
+      "exportName": "Combobox",
       "file": "src/components/combobox.tsx",
       "category": "formularios",
-      "desc": "Campo com busca e lista filtrada. Opções via `options`.",
+      "desc": "Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.",
       "variants": [
         {
           "prop": "props",
-          "values": "options · value · onChange · placeholder · emptyMessage · disabled · ariaLabel"
+          "values": "options · value · defaultValue · onChange · placeholder · searchPlaceholder · emptyText · name · required · disabled · labels · portalContainer"
+        },
+        {
+          "prop": "deprecadas",
+          "values": "ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)"
         }
       ],
-      "usage": "import { Combobox } from \"@semec/ds/react\";\n\n// ariaLabel dá o nome acessível do campo (o padrão genérico \"Selecionar\" não diz o que se escolhe)\n<Combobox\n  ariaLabel=\"Tipo de documento\"\n  placeholder=\"Selecione o tipo de documento\"\n  options={[{ value: \"cnpj\", label: \"CNPJ\" }, { value: \"cpf\", label: \"CPF\" }]}\n  value={valor}\n  onChange={setValor}\n/>",
-      "prompt": "Crie um combobox (Combobox) usando @semec/ds/react (`src/components/combobox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: options · value · onChange · placeholder · emptyMessage · disabled · ariaLabel. Campo com busca e lista filtrada. Opções via `options`.",
+      "usage": "import { Combobox, FormField, Label } from \"@semec/ds/react\";\n\n// Rótulo visível pelo FormField: nome acessível = rótulo + texto do gatilho (WCAG 2.5.3)\n<FormField label=\"Tipo de documento\" error={erro}>\n  <Combobox\n    name=\"tipoDocumento\"\n    placeholder=\"Selecione o tipo de documento\"\n    searchPlaceholder=\"Buscar tipo…\"\n    emptyText=\"Nenhum tipo encontrado.\"\n    options={[{ value: \"cnpj\", label: \"CNPJ\" }, { value: \"cpf\", label: \"CPF\" }]}\n    value={valor}\n    onChange={setValor}\n  />\n</FormField>\n\n// Ou com <Label htmlFor> + id (também aceita aria-labelledby)\n<Label htmlFor=\"orgao\">Órgão emissor</Label>\n<Combobox id=\"orgao\" options={orgaos} />",
+      "prompt": "Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField. API e variantes: props: options · value · defaultValue · onChange · placeholder · searchPlaceholder · emptyText · name · required · disabled · labels · portalContainer · deprecadas: ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/combobox",
       "md": "/components/combobox.md"
     },
@@ -169,17 +185,18 @@
       "code": "date-picker",
       "slug": "seletor-de-data",
       "label": "Seletor de data",
+      "exportName": "DatePicker",
       "file": "src/components/date-picker.tsx",
       "category": "formularios",
-      "desc": "Data com `<input type=\"date\">` nativo — sem biblioteca de calendário.",
+      "desc": "Data com `<input type=\"date\">` nativo — sem biblioteca de calendário. Um só indicador: botão \"Abrir calendário\" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).",
       "variants": [
         {
           "prop": "props",
-          "values": "nativo HTML (min · max · disabled) + variantes visuais do campo"
+          "values": "nativo HTML (min · max · disabled) + labels.openCalendar + variantes visuais do campo"
         }
       ],
-      "usage": "import { DatePicker, FormField } from \"@semec/ds/react\";\n\n<FormField label=\"Data de vencimento\" htmlFor=\"vencimento\">\n  <DatePicker id=\"vencimento\" defaultValue=\"2026-08-31\" />\n</FormField>",
-      "prompt": "Crie um date-picker (Seletor de data) usando @semec/ds/react (`src/components/date-picker.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: nativo HTML (min · max · disabled) + variantes visuais do campo. Data com `<input type=\"date\">` nativo — sem biblioteca de calendário.",
+      "usage": "import { DatePicker, FormField } from \"@semec/ds/react\";\n\n<FormField label=\"Data de vencimento\" hint=\"dd/mm/aaaa\">\n  <DatePicker id=\"vencimento\" defaultValue=\"2026-08-31\" />\n</FormField>",
+      "prompt": "Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type=\"date\">` nativo — sem biblioteca de calendário. Um só indicador: botão \"Abrir calendário\" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). API e variantes: props: nativo HTML (min · max · disabled) + labels.openCalendar + variantes visuais do campo. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/seletor-de-data",
       "md": "/components/seletor-de-data.md"
     },
@@ -187,17 +204,18 @@
       "code": "file-upload",
       "slug": "envio-de-arquivos",
       "label": "Envio de arquivos",
+      "exportName": "FileUpload",
       "file": "src/components/file-upload.tsx",
       "category": "formularios",
       "desc": "Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.",
       "variants": [
         {
           "prop": "props",
-          "values": "accept · maxSize · label · hint · error · onChange"
+          "values": "accept · maxSize · label · hint · error · onChange · value · multiple · id · inputProps · labels"
         }
       ],
-      "usage": "import { FileUpload } from \"@semec/ds/react\";\n\n// `label` é o rótulo do campo de arquivo — não omita\n<FileUpload\n  label=\"Documento de identidade\"\n  accept=\".pdf,image/*\"\n  maxSize={5 * 1024 * 1024}\n  hint=\"PDF ou imagem, até 5 MB\"\n/>",
-      "prompt": "Crie um file-upload (Envio de arquivos) usando @semec/ds/react (`src/components/file-upload.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: accept · maxSize · label · hint · error · onChange. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.",
+      "usage": "import { FileUpload } from \"@semec/ds/react\";\n\n// `label` é o rótulo do campo de arquivo — não omita\n<FileUpload\n  label=\"Documento de identidade\"\n  accept=\".pdf,image/*\"\n  maxSize={5 * 1024 * 1024}\n  hint=\"PDF ou imagem, até 5 MB\"\n/>\n\n// Textos fixos sobrescrevíveis (padrão PT-BR)\n<FileUpload label=\"Anexo\" labels={{ invalidType: \"Envie só PDF.\", tooLarge: (max) => `Máximo de ${max}.` }} />",
+      "prompt": "Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. API e variantes: props: accept · maxSize · label · hint · error · onChange · value · multiple · id · inputProps · labels. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/envio-de-arquivos",
       "md": "/components/envio-de-arquivos.md"
     },
@@ -205,6 +223,7 @@
       "code": "checkbox",
       "slug": "caixa-de-marcacao",
       "label": "Caixa de marcação",
+      "exportName": "Checkbox",
       "file": "src/components/checkbox.tsx",
       "category": "formularios",
       "desc": "Caixa de marcação com estado indeterminado.",
@@ -215,7 +234,7 @@
         }
       ],
       "usage": "import { Checkbox, Label } from \"@semec/ds/react\";\n\n<div className=\"flex items-center gap-2\">\n  <Checkbox id=\"termos\" />\n  <Label htmlFor=\"termos\">Aceito os termos</Label>\n</div>",
-      "prompt": "Crie um checkbox (Caixa de marcação) usando @semec/ds/react (`src/components/checkbox.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled. Caixa de marcação com estado indeterminado.",
+      "prompt": "Use o componente `Checkbox` (Caixa de marcação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Caixa de marcação com estado indeterminado. API e variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/caixa-de-marcacao",
       "md": "/components/caixa-de-marcacao.md"
     },
@@ -223,6 +242,7 @@
       "code": "radio-group",
       "slug": "botao-de-opcao",
       "label": "Botão de opção",
+      "exportName": "RadioGroup",
       "file": "src/components/radio-group.tsx",
       "category": "formularios",
       "desc": "Escolha única entre duas ou mais opções.",
@@ -233,7 +253,7 @@
         }
       ],
       "usage": "import { RadioGroup, RadioGroupItem, Label } from \"@semec/ds/react\";\n\n<RadioGroup defaultValue=\"pessoa-fisica\">\n  <div className=\"flex items-center gap-2\">\n    <RadioGroupItem value=\"pessoa-fisica\" id=\"pf\" />\n    <Label htmlFor=\"pf\">Pessoa física</Label>\n  </div>\n</RadioGroup>",
-      "prompt": "Crie um radio-group (Botão de opção) usando @semec/ds/react (`src/components/radio-group.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: RadioGroup · RadioGroupItem + Label. Escolha única entre duas ou mais opções.",
+      "prompt": "Use o componente `RadioGroup` (Botão de opção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Escolha única entre duas ou mais opções. API e variantes: composição: RadioGroup · RadioGroupItem + Label. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/botao-de-opcao",
       "md": "/components/botao-de-opcao.md"
     },
@@ -241,6 +261,7 @@
       "code": "switch",
       "slug": "interruptor",
       "label": "Interruptor",
+      "exportName": "Switch",
       "file": "src/components/switch.tsx",
       "category": "formularios",
       "desc": "Interruptor on/off para ativação imediata.",
@@ -251,7 +272,7 @@
         }
       ],
       "usage": "import { Switch, Label } from \"@semec/ds/react\";\n\n<div className=\"flex items-center gap-2\">\n  <Switch id=\"alertas\" defaultChecked />\n  <Label htmlFor=\"alertas\">Receber alertas</Label>\n</div>",
-      "prompt": "Crie um switch (Interruptor) usando @semec/ds/react (`src/components/switch.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: off · on (checked) · disabled · inválido. Interruptor on/off para ativação imediata.",
+      "prompt": "Use o componente `Switch` (Interruptor) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Interruptor on/off para ativação imediata. API e variantes: estados: off · on (checked) · disabled · inválido. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/interruptor",
       "md": "/components/interruptor.md"
     },
@@ -259,12 +280,13 @@
       "code": "label",
       "slug": "rotulo",
       "label": "Rótulo",
+      "exportName": "Label",
       "file": "src/components/label.tsx",
       "category": "formularios",
       "desc": "Rótulo acessível vinculado ao campo.",
       "variants": [],
       "usage": "import { Label, Input } from \"@semec/ds/react\";\n\n<Label htmlFor=\"nome\">Nome</Label>\n<Input id=\"nome\" />",
-      "prompt": "Crie um label (Rótulo) usando @semec/ds/react (`src/components/label.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Rótulo acessível vinculado ao campo.",
+      "prompt": "Use o componente `Label` (Rótulo) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Rótulo acessível vinculado ao campo. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/rotulo",
       "md": "/components/rotulo.md"
     },
@@ -272,17 +294,22 @@
       "code": "form-field",
       "slug": "campo-de-formulario",
       "label": "Campo de formulário",
+      "exportName": "FormField",
       "file": "src/components/form-field.tsx",
       "category": "formularios",
-      "desc": "Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Para feedback de sucesso após envio, use Toast; para erros de validação, mantenha no FormField com aria-invalid e ErrorSummary.",
+      "desc": "Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role=\"alert\"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast.",
       "variants": [
         {
           "prop": "props",
-          "values": "label · htmlFor · required · hint · error"
+          "values": "label · htmlFor · required · hint · error · id (base dos ids <id>-hint/<id>-error)"
+        },
+        {
+          "prop": "hooks",
+          "values": "useFormField · useFormFieldControl (para campos próprios)"
         }
       ],
-      "usage": "import { FormField, Input, Button, useToast } from \"@semec/ds/react\";\n\n// Em formulários: erros ficam inline no FormField (+ ErrorSummary no topo).\n// Sucesso na submissão dispara notificação via toast:\nfunction Formulario() {\n  const { toast } = useToast();\n  return (\n    <form onSubmit={(e) => {\n      e.preventDefault();\n      toast({ variant: \"success\", title: \"Salvo com sucesso\", description: \"Alterações registradas.\" });\n    }}>\n      <FormField label=\"E-mail\" htmlFor=\"email\" required hint=\"Usado para o comprovante\" error={erro}>\n        <Input id=\"email\" aria-invalid={!!erro} />\n      </FormField>\n      <Button type=\"submit\">Salvar</Button>\n    </form>\n  );\n}",
-      "prompt": "Crie um form-field (Campo de formulário) usando @semec/ds/react (`src/components/form-field.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: label · htmlFor · required · hint · error. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Para feedback de sucesso após envio, use Toast; para erros de validação, mantenha no FormField com aria-invalid e ErrorSummary.",
+      "usage": "import { FormField, Input, Button, useToast } from \"@semec/ds/react\";\n\n// Em formulários: erros ficam inline no FormField (+ ErrorSummary no topo).\n// Sucesso na submissão dispara notificação via toast:\nfunction Formulario() {\n  const { toast } = useToast();\n  return (\n    <form onSubmit={(e) => {\n      e.preventDefault();\n      toast({ variant: \"success\", title: \"Salvo com sucesso\", description: \"Alterações registradas.\" });\n    }}>\n      {/* id, aria-describedby (dica/erro) e aria-invalid chegam ao Input pelo contexto */}\n      <FormField label=\"E-mail\" required hint=\"Usado para o comprovante\" error={erro}>\n        <Input id=\"email\" type=\"email\" />\n      </FormField>\n      <Button type=\"submit\">Salvar</Button>\n    </form>\n  );\n}",
+      "prompt": "Use o componente `FormField` (Campo de formulário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role=\"alert\"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast. API e variantes: props: label · htmlFor · required · hint · error · id (base dos ids <id>-hint/<id>-error) · hooks: useFormField · useFormFieldControl (para campos próprios). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/campo-de-formulario",
       "md": "/components/campo-de-formulario.md"
     },
@@ -290,9 +317,10 @@
       "code": "error-summary",
       "slug": "error-summary",
       "label": "ErrorSummary",
+      "exportName": "ErrorSummary",
       "file": "src/components/error-summary.tsx",
       "category": "formularios",
-      "desc": "Resumo de erros de validação no topo do formulário, com links para cada campo. A11y: `role=\"alert\"`, foco automático.",
+      "desc": "Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role=\"alert\"`, foco automático, título ligado por id gerado. Sem margem externa: espace pelo layout (ex.: `className=\"mb-6\"`).",
       "variants": [
         {
           "prop": "props",
@@ -300,7 +328,7 @@
         }
       ],
       "usage": "import { ErrorSummary } from \"@semec/ds/react\";\n\n<ErrorSummary\n  errors={[\n    { id: \"cpf\", message: \"O CPF precisa ter 11 dígitos.\" },\n    { id: \"email\", message: \"O e-mail precisa conter @.\" },\n  ]}\n  focusKey={tentativa}\n/>",
-      "prompt": "Crie um error-summary (ErrorSummary) usando @semec/ds/react (`src/components/error-summary.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: title · errors [{ id, message }] · autoFocus · focusKey. Resumo de erros de validação no topo do formulário, com links para cada campo. A11y: `role=\"alert\"`, foco automático.",
+      "prompt": "Use o componente `ErrorSummary` (ErrorSummary) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role=\"alert\"`, foco automático, título ligado por id gerado. Sem margem externa: espace pelo layout (ex.: `className=\"mb-6\"`). API e variantes: props: title · errors [{ id, message }] · autoFocus · focusKey. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/error-summary",
       "md": "/components/error-summary.md"
     },
@@ -308,24 +336,53 @@
       "code": "card",
       "slug": "cartao",
       "label": "Cartão",
+      "exportName": "Card",
       "file": "src/components/card.tsx",
       "category": "conteudo-dados",
-      "desc": "Superfície de conteúdo com header, corpo e footer.",
+      "desc": "Superfície de conteúdo com header, corpo e footer. Sombra pelo token `shadow-elevation-1`.",
       "variants": [
         {
           "prop": "composição",
           "values": "Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader"
+        },
+        {
+          "prop": "títulos",
+          "values": "CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2)"
         }
       ],
-      "usage": "import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from \"@semec/ds/react\";\n\n<Card>\n  <CardHeader><CardTitle>IPTU 2026</CardTitle></CardHeader>\n  <CardContent>Parcela em dia.</CardContent>\n  <CardFooter><Button>Emitir boleto</Button></CardFooter>\n</Card>",
-      "prompt": "Crie um card (Cartão) usando @semec/ds/react (`src/components/card.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader. Superfície de conteúdo com header, corpo e footer.",
+      "usage": "import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from \"@semec/ds/react\";\n\n// \"as\" escolhe o nível do título conforme a hierarquia da página\n<Card>\n  <CardHeader><CardTitle as=\"h2\">IPTU 2026</CardTitle></CardHeader>\n  <CardContent>Parcela em dia.</CardContent>\n  <CardFooter><Button>Emitir boleto</Button></CardFooter>\n</Card>",
+      "prompt": "Use o componente `Card` (Cartão) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Superfície de conteúdo com header, corpo e footer. Sombra pelo token `shadow-elevation-1`. API e variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader · títulos: CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/cartao",
       "md": "/components/cartao.md"
+    },
+    {
+      "code": "heading",
+      "slug": "titulo",
+      "label": "Título",
+      "exportName": "Heading",
+      "file": "src/components/heading.tsx",
+      "category": "conteudo-dados",
+      "desc": "Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual.",
+      "variants": [
+        {
+          "prop": "level",
+          "values": "1 · 2 (padrão) · 3 · 4 · 5 · 6"
+        },
+        {
+          "prop": "size",
+          "values": "1–6 (padrão: igual ao level)"
+        }
+      ],
+      "usage": "import { Heading } from \"@semec/ds/react\";\n\n<Heading level={1}>Requerimento de matrícula</Heading>\n<Heading level={2}>Dados do estudante</Heading>\n\n// Nível semântico 3 com visual de nível 2\n<Heading level={3} size={2}>Documentos</Heading>",
+      "prompt": "Use o componente `Heading` (Título) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual. API e variantes: level: 1 · 2 (padrão) · 3 · 4 · 5 · 6 · size: 1–6 (padrão: igual ao level). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "url": "/componentes/titulo",
+      "md": "/components/titulo.md"
     },
     {
       "code": "badge",
       "slug": "etiqueta",
       "label": "Etiqueta",
+      "exportName": "Badge",
       "file": "src/components/badge.tsx",
       "category": "conteudo-dados",
       "desc": "Etiqueta curta de status ou contagem.",
@@ -336,7 +393,7 @@
         }
       ],
       "usage": "import { Badge } from \"@semec/ds/react\";\n\n<Badge>Pendente</Badge>\n<Badge variant=\"success\">Deferido</Badge>\n<Badge variant=\"danger\">Indeferido</Badge>",
-      "prompt": "Crie um badge (Etiqueta) usando @semec/ds/react (`src/components/badge.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · secondary · outline · success · warning · danger · info. Etiqueta curta de status ou contagem.",
+      "prompt": "Use o componente `Badge` (Etiqueta) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Etiqueta curta de status ou contagem. API e variantes: variant: default · secondary · outline · success · warning · danger · info. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/etiqueta",
       "md": "/components/etiqueta.md"
     },
@@ -344,6 +401,7 @@
       "code": "table",
       "slug": "tabela",
       "label": "Tabela",
+      "exportName": "Table",
       "file": "src/components/table.tsx",
       "category": "conteudo-dados",
       "desc": "Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.",
@@ -358,7 +416,7 @@
         }
       ],
       "usage": "import { Table, TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell } from \"@semec/ds/react\";\n\n// Básico\n<Table>\n  <TableCaption>Serviços solicitados</TableCaption>\n  <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>\n  <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>\n</Table>\n\n// Avançado: ordenação + filtro + paginação + seleção\n// Ver padroes/dados-relatorios/tabelas → demo com TableAdvanced",
-      "prompt": "Crie um table (Tabela) usando @semec/ds/react (`src/components/table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.",
+      "prompt": "Use o componente `Table` (Tabela) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas. API e variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/tabela",
       "md": "/components/tabela.md"
     },
@@ -366,12 +424,18 @@
       "code": "skeleton",
       "slug": "esqueleto",
       "label": "Esqueleto",
+      "exportName": "Skeleton",
       "file": "src/components/skeleton.tsx",
       "category": "feedback",
-      "desc": "Placeholder pulsante de carregamento.",
-      "variants": [],
-      "usage": "import { Skeleton } from \"@semec/ds/react\";\n\n<Skeleton className=\"h-4 w-3/4\" />\n<Skeleton className=\"h-4 w-1/2\" />",
-      "prompt": "Crie um skeleton (Esqueleto) usando @semec/ds/react (`src/components/skeleton.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Placeholder pulsante de carregamento.",
+      "desc": "Placeholder pulsante de carregamento, decorativo (aria-hidden). Fundo `surface-sunken`. Anuncie o carregamento no contêiner com aria-busy e um texto ou Spinner.",
+      "variants": [
+        {
+          "prop": "a11y",
+          "values": "aria-hidden=true (padrão) · aria-busy no contêiner"
+        }
+      ],
+      "usage": "import { Skeleton } from \"@semec/ds/react\";\n\n<div aria-busy=\"true\">\n  <p className=\"sr-only\">Carregando protocolos…</p>\n  <Skeleton className=\"h-4 w-3/4\" />\n  <Skeleton className=\"h-4 w-1/2\" />\n</div>",
+      "prompt": "Use o componente `Skeleton` (Esqueleto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Placeholder pulsante de carregamento, decorativo (aria-hidden). Fundo `surface-sunken`. Anuncie o carregamento no contêiner com aria-busy e um texto ou Spinner. API e variantes: a11y: aria-hidden=true (padrão) · aria-busy no contêiner. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/esqueleto",
       "md": "/components/esqueleto.md"
     },
@@ -379,17 +443,18 @@
       "code": "empty-state",
       "slug": "estado-vazio",
       "label": "Estado vazio",
+      "exportName": "EmptyState",
       "file": "src/components/empty-state.tsx",
       "category": "feedback",
       "desc": "Estado vazio com ícone, título, descrição e ação opcional.",
       "variants": [
         {
           "prop": "props",
-          "values": "icon · title · description · action"
+          "values": "icon · title · description · action · titleAs (padrão h3)"
         }
       ],
-      "usage": "import { EmptyState, Button } from \"@semec/ds/react\";\nimport { Inbox } from \"lucide-react\";\n\n<EmptyState\n  icon={<Inbox />}\n  title=\"Nenhum protocolo encontrado\"\n  description=\"Ajuste os filtros ou abra um novo requerimento.\"\n  action={<Button>Abrir requerimento</Button>}\n/>",
-      "prompt": "Crie um empty-state (Estado vazio) usando @semec/ds/react (`src/components/empty-state.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: icon · title · description · action. Estado vazio com ícone, título, descrição e ação opcional.",
+      "usage": "import { EmptyState, Button } from \"@semec/ds/react\";\nimport { Inbox } from \"lucide-react\";\n\n<EmptyState\n  icon={<Inbox />}\n  title=\"Nenhum protocolo encontrado\"\n  titleAs=\"h2\"\n  description=\"Ajuste os filtros ou abra um novo requerimento.\"\n  action={<Button>Abrir requerimento</Button>}\n/>",
+      "prompt": "Use o componente `EmptyState` (Estado vazio) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Estado vazio com ícone, título, descrição e ação opcional. API e variantes: props: icon · title · description · action · titleAs (padrão h3). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/estado-vazio",
       "md": "/components/estado-vazio.md"
     },
@@ -397,6 +462,7 @@
       "code": "error-state",
       "slug": "estado-de-erro",
       "label": "Estado de erro",
+      "exportName": "ErrorState",
       "file": "src/components/error-state.tsx",
       "category": "feedback",
       "desc": "Estado de erro com anúncio acessível (role=alert), mensagem explicativa e ação de recuperação (onRetry ou ação personalizada).",
@@ -407,7 +473,7 @@
         },
         {
           "prop": "props",
-          "values": "title · description · icon · action · onRetry · retryLabel · variant"
+          "values": "title · description · icon · action · onRetry · retryLabel · variant · titleAs (padrão h3; p no inline)"
         },
         {
           "prop": "a11y",
@@ -415,7 +481,7 @@
         }
       ],
       "usage": "import { ErrorState, Button } from \"@semec/ds/react\";\n\n// Variante padrão com atalho onRetry\n<ErrorState\n  title=\"Não foi possível carregar os protocolos\"\n  description=\"Houve uma falha na conexão com o servidor. Verifique sua rede e tente novamente.\"\n  onRetry={() => recarregarDados()}\n/>\n\n// Variante inline para seções menores\n<ErrorState\n  variant=\"inline\"\n  title=\"Falha ao atualizar indicador\"\n  description=\"Serviço temporariamente indisponível.\"\n  onRetry={() => atualizar()}\n/>",
-      "prompt": "Crie um error-state (Estado de erro) usando @semec/ds/react (`src/components/error-state.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · inline · props: title · description · icon · action · onRetry · retryLabel · variant · a11y: role=alert · aria-live=assertive · ícones com aria-hidden. Estado de erro com anúncio acessível (role=alert), mensagem explicativa e ação de recuperação (onRetry ou ação personalizada).",
+      "prompt": "Use o componente `ErrorState` (Estado de erro) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Estado de erro com anúncio acessível (role=alert), mensagem explicativa e ação de recuperação (onRetry ou ação personalizada). API e variantes: variant: default · inline · props: title · description · icon · action · onRetry · retryLabel · variant · titleAs (padrão h3; p no inline) · a11y: role=alert · aria-live=assertive · ícones com aria-hidden. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/estado-de-erro",
       "md": "/components/estado-de-erro.md"
     },
@@ -423,6 +489,7 @@
       "code": "breadcrumb",
       "slug": "trilha-de-navegacao",
       "label": "Trilha de navegação",
+      "exportName": "Breadcrumb",
       "file": "src/components/breadcrumb.tsx",
       "category": "navegacao",
       "desc": "Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.",
@@ -437,7 +504,7 @@
         }
       ],
       "usage": "import { Breadcrumb } from \"@semec/ds/react\";\n\n<Breadcrumb items={[\n  { label: \"Início\", href: \"/\" },\n  { label: \"Serviços\", href: \"/servicos\" },\n  { label: \"IPTU\" },\n]} />",
-      "prompt": "Crie um breadcrumb (Trilha de navegação) usando @semec/ds/react (`src/components/breadcrumb.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores. Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.",
+      "prompt": "Use o componente `Breadcrumb` (Trilha de navegação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela. API e variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/trilha-de-navegacao",
       "md": "/components/trilha-de-navegacao.md"
     },
@@ -445,6 +512,7 @@
       "code": "header",
       "slug": "cabecalho",
       "label": "Cabeçalho",
+      "exportName": "Header",
       "file": "src/components/header.tsx",
       "category": "navegacao",
       "desc": "Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.",
@@ -455,21 +523,76 @@
         },
         {
           "prop": "props",
-          "values": "HeaderBrand: orgName · serviceName · logo · href · HeaderNavLink: current"
+          "values": "HeaderBrand: orgName · serviceName · logo · href (\"\" = sem link) · truncate · homeLabel · HeaderNavLink: current"
+        },
+        {
+          "prop": "a11y",
+          "values": "sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional)"
         }
       ],
-      "usage": "import { Header, HeaderBrand, HeaderNav, HeaderNavLink } from \"@semec/ds/react\";\nimport { Button } from \"@semec/ds/react\";\n\n<Header>\n  <HeaderBrand orgName=\"SEMEC\" serviceName=\"Nome do serviço\" />\n  <div className=\"flex items-center gap-2\">\n    <HeaderNav>\n      <HeaderNavLink href=\"/prefeitura\" current>Prefeitura</HeaderNavLink>\n      <HeaderNavLink href=\"/servicos\">Serviços</HeaderNavLink>\n    </HeaderNav>\n    <Button asChild>\n      <a href=\"/contato\">Fale Conosco</a>\n    </Button>\n  </div>\n</Header>",
-      "prompt": "Crie um header (Cabeçalho) usando @semec/ds/react (`src/components/header.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href · HeaderNavLink: current. Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.",
+      "usage": "import { Header, HeaderBrand, HeaderNav, HeaderNavLink } from \"@semec/ds/react\";\nimport { Button } from \"@semec/ds/react\";\n\n<Header>\n  <HeaderBrand\n    orgName=\"SEMEC\"\n    serviceName=\"Nome do serviço\"\n    logo={<img src=\"/logo-prefeitura.svg\" alt=\"Prefeitura de Porto Velho\" className=\"h-9 w-auto\" />}\n  />\n  <div className=\"flex items-center gap-2\">\n    <HeaderNav>\n      <HeaderNavLink href=\"/prefeitura\" current>Prefeitura</HeaderNavLink>\n      <HeaderNavLink href=\"/servicos\">Serviços</HeaderNavLink>\n    </HeaderNav>\n    <Button asChild>\n      <a href=\"/contato\">Fale Conosco</a>\n    </Button>\n  </div>\n</Header>",
+      "prompt": "Use o componente `Header` (Cabeçalho) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav. API e variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href (\"\" = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/cabecalho",
       "md": "/components/cabecalho.md"
+    },
+    {
+      "code": "skip-link",
+      "slug": "link-para-o-conteudo",
+      "label": "Link para o conteúdo",
+      "exportName": "SkipLink",
+      "file": "src/components/skip-link.tsx",
+      "category": "navegacao",
+      "desc": "Link \"Pular para o conteúdo principal\" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo).",
+      "variants": [
+        {
+          "prop": "props",
+          "values": "href (padrão #conteudo) · children (padrão \"Pular para o conteúdo principal\")"
+        },
+        {
+          "prop": "a11y",
+          "values": "visível no foco · foco movido ao alvo (tabindex=-1 aplicado se preciso) · alvo de 44px"
+        }
+      ],
+      "usage": "import { SkipLink, Header } from \"@semec/ds/react\";\n\n<body>\n  <SkipLink />\n  <Header>…</Header>\n  <main id=\"conteudo\">…</main>\n</body>",
+      "prompt": "Use o componente `SkipLink` (Link para o conteúdo) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Link \"Pular para o conteúdo principal\" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo). API e variantes: props: href (padrão #conteudo) · children (padrão \"Pular para o conteúdo principal\") · a11y: visível no foco · foco movido ao alvo (tabindex=-1 aplicado se preciso) · alvo de 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "url": "/componentes/link-para-o-conteudo",
+      "md": "/components/link-para-o-conteudo.md"
+    },
+    {
+      "code": "footer",
+      "slug": "rodape",
+      "label": "Rodapé",
+      "exportName": "Footer",
+      "file": "src/components/footer.tsx",
+      "category": "navegacao",
+      "desc": "Rodapé institucional (<footer>, landmark contentinfo) com seções de links e faixa final. Use um por página, fora do <main>.",
+      "variants": [
+        {
+          "prop": "composição",
+          "values": "Footer · FooterContent · FooterSection · FooterLinks · FooterLink · FooterBottom"
+        },
+        {
+          "prop": "props",
+          "values": "FooterSection: title · titleAs (padrão h2)"
+        },
+        {
+          "prop": "a11y",
+          "values": "landmark contentinfo · FooterLinks envolve cada filho em <li> · links com alvo de 44px e sublinhado"
+        }
+      ],
+      "usage": "import { Footer, FooterContent, FooterSection, FooterLinks, FooterLink, FooterBottom } from \"@semec/ds/react\";\n\n<Footer>\n  <FooterContent>\n    <FooterSection title=\"Atendimento\">\n      <p>Rua Exemplo, 100 · Centro · Porto Velho/RO</p>\n    </FooterSection>\n    <FooterSection title=\"Serviços\">\n      <FooterLinks>\n        <FooterLink href=\"/matricula\">Matrícula</FooterLink>\n        <FooterLink href=\"/transporte\">Transporte escolar</FooterLink>\n      </FooterLinks>\n    </FooterSection>\n  </FooterContent>\n  <FooterBottom>\n    <p>© 2026 Prefeitura de Porto Velho · SEMEC</p>\n  </FooterBottom>\n</Footer>",
+      "prompt": "Use o componente `Footer` (Rodapé) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Rodapé institucional (<footer>, landmark contentinfo) com seções de links e faixa final. Use um por página, fora do <main>. API e variantes: composição: Footer · FooterContent · FooterSection · FooterLinks · FooterLink · FooterBottom · props: FooterSection: title · titleAs (padrão h2) · a11y: landmark contentinfo · FooterLinks envolve cada filho em <li> · links com alvo de 44px e sublinhado. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "url": "/componentes/rodape",
+      "md": "/components/rodape.md"
     },
     {
       "code": "tabs",
       "slug": "abas",
       "label": "Abas",
+      "exportName": "Tabs",
       "file": "src/components/tabs.tsx",
       "category": "navegacao",
-      "desc": "Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.",
+      "desc": "Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix. A aba ativa tem barra inferior de 3px em `primary` (≥4,97:1) e peso semibold, além do fundo: não depende só de cor. Alvo de 44px.",
       "variants": [
         {
           "prop": "composição",
@@ -477,11 +600,11 @@
         },
         {
           "prop": "a11y",
-          "values": "role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas)"
+          "values": "role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas, Home/End) · indicador não cromático da aba ativa"
         }
       ],
       "usage": "import { Tabs, TabsList, TabsTrigger, TabsContent } from \"@semec/ds/react\";\n\n<Tabs defaultValue=\"resumo\">\n  <TabsList>\n    <TabsTrigger value=\"resumo\">Resumo</TabsTrigger>\n    <TabsTrigger value=\"debitos\">Débitos</TabsTrigger>\n  </TabsList>\n  <TabsContent value=\"resumo\">…</TabsContent>\n  <TabsContent value=\"debitos\">…</TabsContent>\n</Tabs>",
-      "prompt": "Crie um tabs (Abas) usando @semec/ds/react (`src/components/tabs.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y: role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas). Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix.",
+      "prompt": "Use o componente `Tabs` (Abas) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix. A aba ativa tem barra inferior de 3px em `primary` (≥4,97:1) e peso semibold, além do fundo: não depende só de cor. Alvo de 44px. API e variantes: composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y: role=tablist · role=tab · aria-selected · role=tabpanel · navegação teclado (setas, Home/End) · indicador não cromático da aba ativa. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/abas",
       "md": "/components/abas.md"
     },
@@ -489,21 +612,22 @@
       "code": "pagination",
       "slug": "paginacao",
       "label": "Paginação",
+      "exportName": "Pagination",
       "file": "src/components/pagination.tsx",
       "category": "navegacao",
-      "desc": "Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.",
+      "desc": "Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px. Textos em PT-BR, sobrescrevíveis por `labels`.",
       "variants": [
         {
           "prop": "props",
-          "values": "page · pageCount · onPageChange · siblingCount"
+          "values": "page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }>"
         },
         {
           "prop": "a11y",
-          "values": "role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses"
+          "values": "role=navigation · aria-label=Paginação · aria-current=page · aria-label \"Página N\" nos números · aria-label nos botões prev/next · aria-hidden nos elipses"
         }
       ],
-      "usage": "import { Pagination } from \"@semec/ds/react\";\n\n<Pagination page={pagina} pageCount={42} onPageChange={setPagina} />",
-      "prompt": "Crie um pagination (Paginação) usando @semec/ds/react (`src/components/pagination.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: page · pageCount · onPageChange · siblingCount · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.",
+      "usage": "import { Pagination } from \"@semec/ds/react\";\n\n<Pagination page={pagina} pageCount={42} onPageChange={setPagina} />\n\n<Pagination\n  page={pagina}\n  pageCount={42}\n  onPageChange={setPagina}\n  labels={{ navigation: \"Paginação dos protocolos\" }}\n/>",
+      "prompt": "Use o componente `Pagination` (Paginação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px. Textos em PT-BR, sobrescrevíveis por `labels`. API e variantes: props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label \"Página N\" nos números · aria-label nos botões prev/next · aria-hidden nos elipses. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/paginacao",
       "md": "/components/paginacao.md"
     },
@@ -511,6 +635,7 @@
       "code": "sidebar-trigger",
       "slug": "gatilho-da-barra-lateral",
       "label": "Gatilho da barra lateral",
+      "exportName": "SidebarToggleButton",
       "file": "src/components/sidebar-trigger.tsx",
       "category": "navegacao",
       "desc": "`SidebarToggleButton`: botão controlado (`open` + `onToggle`) para colapsar/expandir uma sidebar cujo estado vive no seu layout (ex.: Header). Alterna entre ícones PanelLeftOpen e PanelLeftClose. Dentro de `SidebarProvider`, use `SidebarTrigger` (ver Barra lateral), que não recebe `open`/`onToggle`.",
@@ -525,7 +650,7 @@
         }
       ],
       "usage": "import { SidebarToggleButton } from \"@semec/ds/react\";\n\n// Estado no seu layout; o rótulo acessível vem de labelOpen/labelClosed\n<SidebarToggleButton open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />\n\n// Com SidebarProvider (componente Barra lateral), use <SidebarTrigger /> — sem open/onToggle",
-      "prompt": "Crie um sidebar-trigger (Gatilho da barra lateral) usando @semec/ds/react (`src/components/sidebar-trigger.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). `SidebarToggleButton`: botão controlado (`open` + `onToggle`) para colapsar/expandir uma sidebar cujo estado vive no seu layout (ex.: Header). Alterna entre ícones PanelLeftOpen e PanelLeftClose. Dentro de `SidebarProvider`, use `SidebarTrigger` (ver Barra lateral), que não recebe `open`/`onToggle`.",
+      "prompt": "Use o componente `SidebarToggleButton` (Gatilho da barra lateral) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. `SidebarToggleButton`: botão controlado (`open` + `onToggle`) para colapsar/expandir uma sidebar cujo estado vive no seu layout (ex.: Header). Alterna entre ícones PanelLeftOpen e PanelLeftClose. Dentro de `SidebarProvider`, use `SidebarTrigger` (ver Barra lateral), que não recebe `open`/`onToggle`. API e variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/gatilho-da-barra-lateral",
       "md": "/components/gatilho-da-barra-lateral.md"
     },
@@ -533,6 +658,7 @@
       "code": "dialog",
       "slug": "modal",
       "label": "Modal",
+      "exportName": "Dialog",
       "file": "src/components/dialog.tsx",
       "category": "feedback",
       "desc": "Diálogo modal acessível com overlay, header, título, descrição e footer.",
@@ -540,10 +666,14 @@
         {
           "prop": "composição",
           "values": "Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose"
+        },
+        {
+          "prop": "closeLabel",
+          "values": "nome acessível do X de 44×44px (padrão \"Fechar\")"
         }
       ],
-      "usage": "import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from \"@semec/ds/react\";\n\n<Dialog>\n  <DialogTrigger asChild><Button variant=\"destructive\">Excluir</Button></DialogTrigger>\n  <DialogContent>\n    <DialogHeader>\n      <DialogTitle>Excluir requerimento?</DialogTitle>\n      <DialogDescription>Esta ação não pode ser desfeita.</DialogDescription>\n    </DialogHeader>\n    <DialogFooter><DialogClose asChild><Button variant=\"outline\">Cancelar</Button></DialogClose></DialogFooter>\n  </DialogContent>\n</Dialog>",
-      "prompt": "Crie um dialog (Modal) usando @semec/ds/react (`src/components/dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose. Diálogo modal acessível com overlay, header, título, descrição e footer.",
+      "usage": "import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from \"@semec/ds/react\";\n\n// Para confirmação destrutiva use AlertDialog (role=\"alertdialog\").\n<Dialog>\n  <DialogTrigger asChild><Button>Editar contato</Button></DialogTrigger>\n  <DialogContent closeLabel=\"Fechar edição\">\n    <DialogHeader>\n      <DialogTitle>Editar contato</DialogTitle>\n      <DialogDescription>Atualize o telefone do responsável.</DialogDescription>\n    </DialogHeader>\n    <DialogFooter><DialogClose asChild><Button variant=\"outline\">Cancelar</Button></DialogClose></DialogFooter>\n  </DialogContent>\n</Dialog>\n\n// Controlado SEM DialogTrigger: o Radix não sabe para onde devolver o foco.\n// Guarde o elemento de origem e devolva o foco em onCloseAutoFocus.\nconst origemRef = React.useRef(null);\n<Button ref={origemRef} onClick={() => setAberto(true)}>Editar</Button>\n<Dialog open={aberto} onOpenChange={setAberto}>\n  <DialogContent onCloseAutoFocus={(e) => { e.preventDefault(); origemRef.current?.focus(); }}>…</DialogContent>\n</Dialog>",
+      "prompt": "Use o componente `Dialog` (Modal) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Diálogo modal acessível com overlay, header, título, descrição e footer. API e variantes: composição: Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose · closeLabel: nome acessível do X de 44×44px (padrão \"Fechar\"). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/modal",
       "md": "/components/modal.md"
     },
@@ -551,6 +681,7 @@
       "code": "toast",
       "slug": "notificacao",
       "label": "Notificação",
+      "exportName": "Toaster",
       "file": "src/components/toast.tsx",
       "category": "feedback",
       "desc": "Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.",
@@ -562,10 +693,18 @@
         {
           "prop": "uso",
           "values": "<Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos"
+        },
+        {
+          "prop": "Toaster",
+          "values": "label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis)"
+        },
+        {
+          "prop": "alvos",
+          "values": "X e ToastAction com 44px"
         }
       ],
       "usage": "import { Toaster, useToast, Button } from \"@semec/ds/react\";\n\n// Dispare de qualquer componente com useToast():\nfunction Acao() {\n  const { toast } = useToast();\n  return <Button onClick={() => toast({ variant: \"success\", title: \"Protocolo enviado\" })}>Enviar</Button>;\n}\n\n// Monte <Toaster /> UMA vez no root do app (ex.: app/layout.tsx).\n// Não use ToastProvider/ToastViewport soltos: sem o Toaster nenhum toast aparece.\n<Acao />\n<Toaster />",
-      "prompt": "Crie um toast (Notificação) usando @semec/ds/react (`src/components/toast.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.",
+      "prompt": "Use o componente `Toaster` (Notificação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`. API e variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos · Toaster: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis) · alvos: X e ToastAction com 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/notificacao",
       "md": "/components/notificacao.md"
     },
@@ -573,6 +712,7 @@
       "code": "tooltip",
       "slug": "dica",
       "label": "Dica",
+      "exportName": "Tooltip",
       "file": "src/components/tooltip.tsx",
       "category": "feedback",
       "desc": "Dica curta ao passar o ponteiro ou focar o elemento.",
@@ -583,7 +723,7 @@
         }
       ],
       "usage": "import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } from \"@semec/ds/react\";\nimport { HelpCircle } from \"lucide-react\";\n\n<TooltipProvider>\n  <Tooltip>\n    <TooltipTrigger asChild><IconButton label=\"Ajuda\"><HelpCircle /></IconButton></TooltipTrigger>\n    <TooltipContent>Explica o campo ao lado</TooltipContent>\n  </Tooltip>\n</TooltipProvider>",
-      "prompt": "Crie um tooltip (Dica) usando @semec/ds/react (`src/components/tooltip.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: TooltipProvider · Tooltip · TooltipTrigger · TooltipContent. Dica curta ao passar o ponteiro ou focar o elemento.",
+      "prompt": "Use o componente `Tooltip` (Dica) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Dica curta ao passar o ponteiro ou focar o elemento. API e variantes: composição: TooltipProvider · Tooltip · TooltipTrigger · TooltipContent. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/dica",
       "md": "/components/dica.md"
     },
@@ -591,17 +731,26 @@
       "code": "alert",
       "slug": "aviso",
       "label": "Aviso",
+      "exportName": "Alert",
       "file": "src/components/alert.tsx",
       "category": "feedback",
-      "desc": "Mensagem de feedback em linha, com ícone automático por variante.",
+      "desc": "Mensagem de feedback em linha, com ícone automático por variante. Só destructive interrompe o leitor de tela (role=alert); as demais usam role=status.",
       "variants": [
         {
           "prop": "variant",
           "values": "default · success · warning · destructive"
+        },
+        {
+          "prop": "announce",
+          "values": "assertive (role=alert) · polite (role=status) · off (sem região viva) — padrão: destructive → assertive, demais → polite; role explícito tem precedência"
+        },
+        {
+          "prop": "AlertTitle as",
+          "values": "div (padrão) · p · h1–h6"
         }
       ],
-      "usage": "import { Alert, AlertTitle, AlertDescription } from \"@semec/ds/react\";\n\n<Alert variant=\"warning\">\n  <AlertTitle>Carnê indisponível</AlertTitle>\n  <AlertDescription>O sistema volta às 14h.</AlertDescription>\n</Alert>",
-      "prompt": "Crie um alert (Aviso) usando @semec/ds/react (`src/components/alert.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · success · warning · destructive. Mensagem de feedback em linha, com ícone automático por variante.",
+      "usage": "import { Alert, AlertTitle, AlertDescription } from \"@semec/ds/react\";\n\n<Alert variant=\"warning\">\n  <AlertTitle>Carnê indisponível</AlertTitle>\n  <AlertDescription>O sistema volta às 14h.</AlertDescription>\n</Alert>\n\n// Erro que pede ação imediata: role=alert automático\n<Alert variant=\"destructive\">\n  <AlertTitle>Pagamento recusado</AlertTitle>\n  <AlertDescription>Confira os dados do cartão.</AlertDescription>\n</Alert>\n\n// Aviso estático, presente desde o carregamento: sem região viva\n<Alert announce=\"off\">\n  <AlertTitle as=\"h2\">Como funciona</AlertTitle>\n  <AlertDescription>O protocolo é analisado em até 5 dias úteis.</AlertDescription>\n</Alert>",
+      "prompt": "Use o componente `Alert` (Aviso) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Mensagem de feedback em linha, com ícone automático por variante. Só destructive interrompe o leitor de tela (role=alert); as demais usam role=status. API e variantes: variant: default · success · warning · destructive · announce: assertive (role=alert) · polite (role=status) · off (sem região viva) — padrão: destructive → assertive, demais → polite; role explícito tem precedência · AlertTitle as: div (padrão) · p · h1–h6. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/aviso",
       "md": "/components/aviso.md"
     },
@@ -609,6 +758,7 @@
       "code": "accordion",
       "slug": "acordeao",
       "label": "Acordeão",
+      "exportName": "Accordion",
       "file": "src/components/accordion.tsx",
       "category": "conteudo-dados",
       "desc": "Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`).",
@@ -623,7 +773,7 @@
         }
       ],
       "usage": "import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from \"@semec/ds/react\";\n\n<Accordion type=\"single\" collapsible>\n  <AccordionItem value=\"item-1\">\n    <AccordionTrigger>Pergunta frequente</AccordionTrigger>\n    <AccordionContent>Resposta aqui.</AccordionContent>\n  </AccordionItem>\n</Accordion>",
-      "prompt": "Crie um accordion (Acordeão) usando @semec/ds/react (`src/components/accordion.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: type: single · multiple · composição: Accordion · AccordionItem · AccordionTrigger · AccordionContent. Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`).",
+      "prompt": "Use o componente `Accordion` (Acordeão) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`). API e variantes: type: single · multiple · composição: Accordion · AccordionItem · AccordionTrigger · AccordionContent. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/acordeao",
       "md": "/components/acordeao.md"
     },
@@ -631,17 +781,26 @@
       "code": "alert-dialog",
       "slug": "dialogo-de-alerta",
       "label": "Diálogo de alerta",
+      "exportName": "AlertDialog",
       "file": "src/components/alert-dialog.tsx",
       "category": "feedback",
-      "desc": "Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.",
+      "desc": "Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role=\"alertdialog\", sempre modal, não fecha por clique fora e abre com o foco no Cancelar.",
       "variants": [
         {
           "prop": "composição",
           "values": "AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel"
+        },
+        {
+          "prop": "variant (Action/Cancel)",
+          "values": "as do Button; padrão primary (Action) e outline (Cancel), 44px"
+        },
+        {
+          "prop": "regras",
+          "values": "inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action"
         }
       ],
-      "usage": "import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from \"@semec/ds/react\";\n\n<AlertDialog>\n  <AlertDialogTrigger asChild>\n    <Button variant=\"destructive\">Excluir</Button>\n  </AlertDialogTrigger>\n  <AlertDialogContent>\n    <AlertDialogHeader>\n      <AlertDialogTitle>Excluir requerimento?</AlertDialogTitle>\n      <AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription>\n    </AlertDialogHeader>\n    <AlertDialogFooter>\n      <AlertDialogCancel>Cancelar</AlertDialogCancel>\n      <AlertDialogAction>Excluir</AlertDialogAction>\n    </AlertDialogFooter>\n  </AlertDialogContent>\n</AlertDialog>",
-      "prompt": "Crie um alert-dialog (Diálogo de alerta) usando @semec/ds/react (`src/components/alert-dialog.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir.",
+      "usage": "import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from \"@semec/ds/react\";\n\n<AlertDialog>\n  <AlertDialogTrigger asChild>\n    <Button variant=\"destructive\">Excluir</Button>\n  </AlertDialogTrigger>\n  <AlertDialogContent>\n    <AlertDialogHeader>\n      <AlertDialogTitle>Excluir requerimento?</AlertDialogTitle>\n      <AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription>\n    </AlertDialogHeader>\n    <AlertDialogFooter>\n      <AlertDialogCancel>Cancelar</AlertDialogCancel>\n      <AlertDialogAction variant=\"destructive\">Excluir</AlertDialogAction>\n    </AlertDialogFooter>\n  </AlertDialogContent>\n</AlertDialog>\n\n// Validar antes de fechar (ação assíncrona): controle open e impeça o fechamento automático\n<AlertDialog open={aberto} onOpenChange={setAberto}>\n  <AlertDialogContent>\n    …\n    <AlertDialogAction\n      variant=\"destructive\"\n      onClick={async (e) => { e.preventDefault(); await excluir(); setAberto(false); }}\n    >Excluir</AlertDialogAction>\n  </AlertDialogContent>\n</AlertDialog>",
+      "prompt": "Use o componente `AlertDialog` (Diálogo de alerta) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role=\"alertdialog\", sempre modal, não fecha por clique fora e abre com o foco no Cancelar. API e variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel · variant (Action/Cancel): as do Button; padrão primary (Action) e outline (Cancel), 44px · regras: inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/dialogo-de-alerta",
       "md": "/components/dialogo-de-alerta.md"
     },
@@ -649,6 +808,7 @@
       "code": "popover",
       "slug": "popover",
       "label": "Popover",
+      "exportName": "Popover",
       "file": "src/components/popover.tsx",
       "category": "feedback",
       "desc": "Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.",
@@ -663,7 +823,7 @@
         }
       ],
       "usage": "import { Popover, PopoverTrigger, PopoverContent, Button } from \"@semec/ds/react\";\n\n<Popover>\n  <PopoverTrigger asChild>\n    <Button variant=\"outline\">Filtros</Button>\n  </PopoverTrigger>\n  {/* PopoverContent é role=dialog: dê um nome com aria-label ou aria-labelledby */}\n  <PopoverContent aria-label=\"Filtros\">\n    <p>Opções de filtro aqui.</p>\n  </PopoverContent>\n</Popover>",
-      "prompt": "Crie um popover (Popover) usando @semec/ds/react (`src/components/popover.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Popover · PopoverTrigger · PopoverContent · PopoverAnchor · props: sideOffset · align · side (top/right/bottom/left). Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.",
+      "prompt": "Use o componente `Popover` (Popover) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus. API e variantes: composição: Popover · PopoverTrigger · PopoverContent · PopoverAnchor · props: sideOffset · align · side (top/right/bottom/left). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/popover",
       "md": "/components/popover.md"
     },
@@ -671,6 +831,7 @@
       "code": "separator",
       "slug": "separador",
       "label": "Separador",
+      "exportName": "Separator",
       "file": "src/components/separator.tsx",
       "category": "conteudo-dados",
       "desc": "Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.",
@@ -685,7 +846,7 @@
         }
       ],
       "usage": "import { Separator } from \"@semec/ds/react\";\n\n<Separator />\n<Separator orientation=\"vertical\" className=\"h-6\" />",
-      "prompt": "Crie um separator (Separador) usando @semec/ds/react (`src/components/separator.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: orientation: horizontal · vertical · decorative: true (role=none) · false (role=separator). Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.",
+      "prompt": "Use o componente `Separator` (Separador) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico. API e variantes: orientation: horizontal · vertical · decorative: true (role=none) · false (role=separator). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/separador",
       "md": "/components/separador.md"
     },
@@ -693,6 +854,7 @@
       "code": "avatar",
       "slug": "avatar",
       "label": "Avatar",
+      "exportName": "Avatar",
       "file": "src/components/avatar.tsx",
       "category": "conteudo-dados",
       "desc": "Foto de perfil com fallback automático (iniciais).",
@@ -707,7 +869,7 @@
         }
       ],
       "usage": "import { Avatar, AvatarImage, AvatarFallback } from \"@semec/ds/react\";\n\n<Avatar>\n  <AvatarImage src=\"/foto.jpg\" alt=\"João Silva\" />\n  <AvatarFallback>JS</AvatarFallback>\n</Avatar>",
-      "prompt": "Crie um avatar (Avatar) usando @semec/ds/react (`src/components/avatar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className. Foto de perfil com fallback automático (iniciais).",
+      "prompt": "Use o componente `Avatar` (Avatar) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Foto de perfil com fallback automático (iniciais). API e variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/avatar",
       "md": "/components/avatar.md"
     },
@@ -715,9 +877,10 @@
       "code": "toggle",
       "slug": "toggle",
       "label": "Toggle",
+      "exportName": "Toggle",
       "file": "src/components/toggle.tsx",
       "category": "formularios",
-      "desc": "Botão binário para estados on/off em toolbars.",
+      "desc": "Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos.",
       "variants": [
         {
           "prop": "variant",
@@ -725,11 +888,11 @@
         },
         {
           "prop": "size",
-          "values": "sm · md · lg"
+          "values": "sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)"
         }
       ],
       "usage": "import { Toggle } from \"@semec/ds/react\";\nimport { Bold } from \"lucide-react\";\n\n<Toggle variant=\"outline\" aria-label=\"Negrito\">\n  <Bold />\n</Toggle>",
-      "prompt": "Crie um toggle (Toggle) usando @semec/ds/react (`src/components/toggle.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · outline · size: sm · md · lg. Botão binário para estados on/off em toolbars.",
+      "prompt": "Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos. API e variantes: variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/toggle",
       "md": "/components/toggle.md"
     },
@@ -737,12 +900,18 @@
       "code": "spinner",
       "slug": "spinner",
       "label": "Spinner",
+      "exportName": "Spinner",
       "file": "src/components/spinner.tsx",
       "category": "feedback",
-      "desc": "Indicador de carregamento inline.",
-      "variants": [],
-      "usage": "import { Spinner } from \"@semec/ds/react\";\n\n<Spinner />\n<p className=\"text-muted-foreground\">Carregando dados…</p>",
-      "prompt": "Crie um spinner (Spinner) usando @semec/ds/react (`src/components/spinner.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Indicador de carregamento inline.",
+      "desc": "Indicador de carregamento inline (role=status).",
+      "variants": [
+        {
+          "prop": "label",
+          "values": "texto anunciado (padrão \"Carregando\")"
+        }
+      ],
+      "usage": "import { Spinner } from \"@semec/ds/react\";\n\n<Spinner label=\"Carregando protocolos\" />\n<p className=\"text-muted-foreground\">Carregando dados…</p>",
+      "prompt": "Use o componente `Spinner` (Spinner) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Indicador de carregamento inline (role=status). API e variantes: label: texto anunciado (padrão \"Carregando\"). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/spinner",
       "md": "/components/spinner.md"
     },
@@ -750,12 +919,13 @@
       "code": "progress",
       "slug": "progress",
       "label": "Progresso",
+      "exportName": "Progress",
       "file": "src/components/progress.tsx",
       "category": "feedback",
-      "desc": "Barra de progresso determinada.",
+      "desc": "Barra de progresso determinada. Trilha com contorno border-strong (3,77:1 sobre surface) e indicador primary.",
       "variants": [],
       "usage": "import { Progress } from \"@semec/ds/react\";\n\n// Nome acessível obrigatório: aria-label ou aria-labelledby\n<p id=\"envio-progresso\" className=\"text-sm text-muted-foreground\">Envio dos documentos: 60% concluído</p>\n<Progress value={60} aria-labelledby=\"envio-progresso\" />",
-      "prompt": "Crie um progress (Progresso) usando @semec/ds/react (`src/components/progress.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Barra de progresso determinada.",
+      "prompt": "Use o componente `Progress` (Progresso) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Barra de progresso determinada. Trilha com contorno border-strong (3,77:1 sobre surface) e indicador primary. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/progress",
       "md": "/components/progress.md"
     },
@@ -763,12 +933,13 @@
       "code": "slider",
       "slug": "slider",
       "label": "Slider",
+      "exportName": "Slider",
       "file": "src/components/slider.tsx",
       "category": "formularios",
       "desc": "Controle deslizante para faixas de valor.",
       "variants": [],
       "usage": "import { Slider } from \"@semec/ds/react\";\n\n// Nome acessível obrigatório: aria-label (ou aria-labelledby) vai para o polegar\n<Slider defaultValue={[50]} max={100} step={1} aria-label=\"Raio de busca em km\" />\n\n// Faixa com 2 polegares: anunciados como \"Faixa de preço (1 de 2)\" e \"(2 de 2)\"; use getAriaLabel(i) para nomes próprios\n<Slider defaultValue={[100, 500]} max={1000} step={10} aria-label=\"Faixa de preço\" />",
-      "prompt": "Crie um slider (Slider) usando @semec/ds/react (`src/components/slider.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Controle deslizante para faixas de valor.",
+      "prompt": "Use o componente `Slider` (Slider) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle deslizante para faixas de valor. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/slider",
       "md": "/components/slider.md"
     },
@@ -776,6 +947,7 @@
       "code": "input-otp",
       "slug": "input-otp",
       "label": "Input OTP",
+      "exportName": "InputOTP",
       "file": "src/components/input-otp.tsx",
       "category": "formularios",
       "desc": "Campo de código OTP com foco automático entre dígitos.",
@@ -786,11 +958,11 @@
         },
         {
           "prop": "props",
-          "values": "maxLength · disabled"
+          "values": "maxLength · disabled · labels (group · slot(index, total))"
         }
       ],
       "usage": "import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from \"@semec/ds/react\";\n\n<InputOTP value={code} onChange={setCode} maxLength={6}>\n  <InputOTPGroup>\n    <InputOTPSlot index={0} />\n    <InputOTPSlot index={1} />\n    <InputOTPSlot index={2} />\n  </InputOTPGroup>\n  <InputOTPSeparator />\n  <InputOTPGroup>\n    <InputOTPSlot index={3} />\n    <InputOTPSlot index={4} />\n    <InputOTPSlot index={5} />\n  </InputOTPGroup>\n</InputOTP>",
-      "prompt": "Crie um input-otp (Input OTP) usando @semec/ds/react (`src/components/input-otp.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled. Campo de código OTP com foco automático entre dígitos.",
+      "prompt": "Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de código OTP com foco automático entre dígitos. API e variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled · labels (group · slot(index, total)). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/input-otp",
       "md": "/components/input-otp.md"
     },
@@ -798,17 +970,26 @@
       "code": "calendar",
       "slug": "calendario",
       "label": "Calendário",
+      "exportName": "Calendar",
       "file": "src/components/calendar.tsx",
       "category": "formularios",
-      "desc": "Calendário visual para seleção de data.",
+      "desc": "Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px.",
       "variants": [
         {
           "prop": "props",
-          "values": "value · onChange · min · max · disabled"
+          "values": "value · onChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }>"
+        },
+        {
+          "prop": "a11y",
+          "values": "role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome \"14 de outubro de 2026\""
+        },
+        {
+          "prop": "teclado",
+          "values": "←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona"
         }
       ],
-      "usage": "import { Calendar } from \"@semec/ds/react\";\n\n<Calendar value={data} onChange={setData} />",
-      "prompt": "Crie um calendar (Calendário) usando @semec/ds/react (`src/components/calendar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: value · onChange · min · max · disabled. Calendário visual para seleção de data.",
+      "usage": "import { Calendar } from \"@semec/ds/react\";\n\n<Calendar value={data} onChange={setData} />\n\n<Calendar value={data} onChange={setData} min=\"2026-01-01\" max=\"2026-12-31\" />",
+      "prompt": "Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px. API e variantes: props: value · onChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome \"14 de outubro de 2026\" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/calendario",
       "md": "/components/calendario.md"
     },
@@ -816,6 +997,7 @@
       "code": "scroll-area",
       "slug": "scroll-area",
       "label": "Área de scroll",
+      "exportName": "ScrollArea",
       "file": "src/components/scroll-area.tsx",
       "category": "navegacao",
       "desc": "Scroll customizado e consistente entre navegadores.",
@@ -830,7 +1012,7 @@
         }
       ],
       "usage": "import { ScrollArea } from \"@semec/ds/react\";\n\n<ScrollArea className=\"h-48\">\n  <div className=\"p-4\">Conteúdo longo aqui…</div>\n</ScrollArea>",
-      "prompt": "Crie um scroll-area (Área de scroll) usando @semec/ds/react (`src/components/scroll-area.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal. Scroll customizado e consistente entre navegadores.",
+      "prompt": "Use o componente `ScrollArea` (Área de scroll) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Scroll customizado e consistente entre navegadores. API e variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/scroll-area",
       "md": "/components/scroll-area.md"
     },
@@ -838,6 +1020,7 @@
       "code": "dropdown-menu",
       "slug": "menu-suspenso",
       "label": "Menu suspenso",
+      "exportName": "DropdownMenu",
       "file": "src/components/dropdown-menu.tsx",
       "category": "navegacao",
       "desc": "Menu flutuante com itens, checkbox, radio, sub-menus e separadores.",
@@ -848,7 +1031,7 @@
         }
       ],
       "usage": "import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, IconButton } from \"@semec/ds/react\";\nimport { MoreHorizontal } from \"lucide-react\";\n\n// Gatilho só com ícone: use IconButton (label obrigatório vira o nome acessível)\n<DropdownMenu>\n  <DropdownMenuTrigger asChild>\n    <IconButton variant=\"ghost\" label=\"Mais ações do protocolo\"><MoreHorizontal /></IconButton>\n  </DropdownMenuTrigger>\n  <DropdownMenuContent>\n    <DropdownMenuItem>Editar</DropdownMenuItem>\n    <DropdownMenuItem>Duplicar</DropdownMenuItem>\n    <DropdownMenuSeparator />\n    <DropdownMenuItem className=\"text-destructive\">Excluir</DropdownMenuItem>\n  </DropdownMenuContent>\n</DropdownMenu>",
-      "prompt": "Crie um dropdown-menu (Menu suspenso) usando @semec/ds/react (`src/components/dropdown-menu.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: DropdownMenu · Trigger · Content · Item · CheckboxItem · RadioItem · Label · Separator · Sub · SubTrigger · SubContent. Menu flutuante com itens, checkbox, radio, sub-menus e separadores.",
+      "prompt": "Use o componente `DropdownMenu` (Menu suspenso) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Menu flutuante com itens, checkbox, radio, sub-menus e separadores. API e variantes: composição: DropdownMenu · Trigger · Content · Item · CheckboxItem · RadioItem · Label · Separator · Sub · SubTrigger · SubContent. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/menu-suspenso",
       "md": "/components/menu-suspenso.md"
     },
@@ -856,6 +1039,7 @@
       "code": "drawer",
       "slug": "drawer",
       "label": "Drawer",
+      "exportName": "Drawer",
       "file": "src/components/drawer.tsx",
       "category": "feedback",
       "desc": "Painel deslizante de qualquer lado da tela.",
@@ -867,10 +1051,18 @@
         {
           "prop": "composição",
           "values": "Drawer · Trigger · Content · Header · Footer · Title · Description · Close"
+        },
+        {
+          "prop": "closeLabel",
+          "values": "nome acessível do X de 44×44px (padrão \"Fechar\")"
+        },
+        {
+          "prop": "rolagem",
+          "values": "overflow-y-auto; top/bottom com max-h 85dvh"
         }
       ],
       "usage": "import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, Button } from \"@semec/ds/react\";\n\n<Drawer>\n  <DrawerTrigger asChild><Button>Abrir painel</Button></DrawerTrigger>\n  <DrawerContent side=\"right\">\n    <DrawerHeader>\n      <DrawerTitle>Detalhes</DrawerTitle>\n      <DrawerDescription>Informações do protocolo.</DrawerDescription>\n    </DrawerHeader>\n    <div className=\"p-6\">Conteúdo aqui</div>\n    <DrawerFooter>\n      <DrawerClose asChild><Button variant=\"outline\">Fechar</Button></DrawerClose>\n    </DrawerFooter>\n  </DrawerContent>\n</Drawer>",
-      "prompt": "Crie um drawer (Drawer) usando @semec/ds/react (`src/components/drawer.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: bottom (padrão) · top · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close. Painel deslizante de qualquer lado da tela.",
+      "prompt": "Use o componente `Drawer` (Drawer) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Painel deslizante de qualquer lado da tela. API e variantes: side: bottom (padrão) · top · left · right · composição: Drawer · Trigger · Content · Header · Footer · Title · Description · Close · closeLabel: nome acessível do X de 44×44px (padrão \"Fechar\") · rolagem: overflow-y-auto; top/bottom com max-h 85dvh. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/drawer",
       "md": "/components/drawer.md"
     },
@@ -878,6 +1070,7 @@
       "code": "sheet",
       "slug": "sheet",
       "label": "Sheet",
+      "exportName": "Sheet",
       "file": "src/components/sheet.tsx",
       "category": "feedback",
       "desc": "Painel lateral modal com overlay. Variantes left/right/top/bottom.",
@@ -889,10 +1082,18 @@
         {
           "prop": "composição",
           "values": "Sheet · Trigger · Content · Header · Footer · Title · Description · Close"
+        },
+        {
+          "prop": "closeLabel",
+          "values": "nome acessível do X de 44×44px (padrão \"Fechar\")"
+        },
+        {
+          "prop": "rolagem",
+          "values": "overflow-y-auto; top/bottom com max-h 85dvh"
         }
       ],
-      "usage": "import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from \"@semec/ds/react\";\n\n<Sheet>\n  <SheetTrigger asChild><Button variant=\"outline\">Abrir filtros</Button></SheetTrigger>\n  <SheetContent side=\"left\">\n    <SheetHeader>\n      <SheetTitle>Filtros</SheetTitle>\n      <SheetDescription>Refine sua busca.</SheetDescription>\n    </SheetHeader>\n    <div className=\"p-6\">Filtros aqui</div>\n    <SheetFooter>\n      <SheetClose asChild><Button>Aplicar</Button></SheetClose>\n    </SheetFooter>\n  </SheetContent>\n</Sheet>",
-      "prompt": "Crie um sheet (Sheet) usando @semec/ds/react (`src/components/sheet.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: left · right · top · bottom · composição: Sheet · Trigger · Content · Header · Footer · Title · Description · Close. Painel lateral modal com overlay. Variantes left/right/top/bottom.",
+      "usage": "import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from \"@semec/ds/react\";\n\n<Sheet>\n  <SheetTrigger asChild><Button variant=\"outline\">Abrir filtros</Button></SheetTrigger>\n  <SheetContent side=\"left\">\n    <SheetHeader>\n      <SheetTitle>Filtros</SheetTitle>\n      <SheetDescription>Refine sua busca.</SheetDescription>\n    </SheetHeader>\n    <div className=\"p-6\">Filtros aqui</div>\n    <SheetFooter>\n      <SheetClose asChild><Button>Aplicar</Button></SheetClose>\n    </SheetFooter>\n  </SheetContent>\n</Sheet>\n\n// Controlado SEM SheetTrigger (ex.: aberto por um item de tabela): o Radix\n// não sabe para onde devolver o foco. Guarde a origem e devolva em onCloseAutoFocus.\nfunction FiltrosControlados() {\n  const [aberto, setAberto] = React.useState(false);\n  const origemRef = React.useRef(null);\n  return (\n    <>\n      <Button ref={origemRef} onClick={() => setAberto(true)}>Filtros</Button>\n      <Sheet open={aberto} onOpenChange={setAberto}>\n        <SheetContent\n          closeLabel=\"Fechar filtros\"\n          onCloseAutoFocus={(e) => { e.preventDefault(); origemRef.current?.focus(); }}\n        >\n          <SheetHeader><SheetTitle>Filtros</SheetTitle></SheetHeader>\n          {/* conteúdo longo rola dentro do painel (overflow-y-auto) */}\n        </SheetContent>\n      </Sheet>\n    </>\n  );\n}",
+      "prompt": "Use o componente `Sheet` (Sheet) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Painel lateral modal com overlay. Variantes left/right/top/bottom. API e variantes: side: left · right · top · bottom · composição: Sheet · Trigger · Content · Header · Footer · Title · Description · Close · closeLabel: nome acessível do X de 44×44px (padrão \"Fechar\") · rolagem: overflow-y-auto; top/bottom com max-h 85dvh. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/sheet",
       "md": "/components/sheet.md"
     },
@@ -900,13 +1101,14 @@
       "code": "data-table",
       "slug": "tabela-de-dados",
       "label": "Tabela de dados",
+      "exportName": "DataTable",
       "file": "src/components/data-table.tsx",
       "category": "conteudo-dados",
       "desc": "Tabela com ordenação, paginação e estados vazios.",
       "variants": [
         {
           "prop": "props",
-          "values": "columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption"
+          "values": "columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · labels (sortBy · pageOf · previous · next)"
         },
         {
           "prop": "a11y",
@@ -914,7 +1116,7 @@
         }
       ],
       "usage": "import { DataTable, Button } from \"@semec/ds/react\";\n\n// Quando a linha tem várias ações, prefira uma coluna de ações com render + Button a onRowClick\n<DataTable\n  caption=\"Protocolos do contribuinte\"\n  columns={[\n    { key: \"nome\", header: \"Nome\", sortable: true },\n    { key: \"status\", header: \"Status\" },\n    {\n      key: \"acoes\",\n      header: \"Ações\",\n      render: (row) => (\n        <Button variant=\"outline\" onClick={() => abrirProtocolo(row)}>Ver detalhes</Button>\n      ),\n    },\n  ]}\n  data={registros}\n  sortKey={sortField}\n  sortDir={sortDir}\n  onSort={handleSort}\n  page={pagina}\n  pageCount={totalPaginas}\n  onPageChange={setPagina}\n/>",
-      "prompt": "Crie um data-table (Tabela de dados) usando @semec/ds/react (`src/components/data-table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px. Tabela com ordenação, paginação e estados vazios.",
+      "prompt": "Use o componente `DataTable` (Tabela de dados) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Tabela com ordenação, paginação e estados vazios. API e variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · labels (sortBy · pageOf · previous · next) · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/tabela-de-dados",
       "md": "/components/tabela-de-dados.md"
     },
@@ -922,9 +1124,10 @@
       "code": "timeline",
       "slug": "timeline",
       "label": "Linha do tempo",
+      "exportName": "Timeline",
       "file": "src/components/timeline.tsx",
       "category": "conteudo-dados",
-      "desc": "Sequência temporal com dots, conectores e conteúdo.",
+      "desc": "Sequência temporal em lista ordenada (ol/li), com pontos, conectores visíveis e conteúdo. O status vai em texto (srLabel), não só na cor.",
       "variants": [
         {
           "prop": "composição",
@@ -933,10 +1136,18 @@
         {
           "prop": "dot variant",
           "values": "default · success · warning · destructive · info"
+        },
+        {
+          "prop": "props",
+          "values": "TimelineDot srLabel · TimelineTitle as (padrão div)"
+        },
+        {
+          "prop": "a11y",
+          "values": "ol/li · srLabel com o status por item · conector border-strong (3,77:1)"
         }
       ],
-      "usage": "import { Timeline, TimelineItem, TimelineSeparator, TimelineDot, TimelineConnector, TimelineContent, TimelineTitle, TimelineDescription } from \"@semec/ds/react\";\n\n<Timeline>\n  <TimelineItem>\n    <TimelineSeparator>\n      <TimelineDot variant=\"success\" />\n      <TimelineConnector />\n    </TimelineSeparator>\n    <TimelineContent>\n      <TimelineTitle>Protocolo recebido</TimelineTitle>\n      <TimelineDescription>12/08/2026 às 14:30</TimelineDescription>\n    </TimelineContent>\n  </TimelineItem>\n  <TimelineItem>\n    <TimelineSeparator>\n      <TimelineDot />\n    </TimelineSeparator>\n    <TimelineContent>\n      <TimelineTitle>Em análise</TimelineTitle>\n      <TimelineDescription>Aguardando parecer</TimelineDescription>\n    </TimelineContent>\n  </TimelineItem>\n</Timeline>",
-      "prompt": "Crie um timeline (Linha do tempo) usando @semec/ds/react (`src/components/timeline.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Timeline · TimelineItem · TimelineSeparator · TimelineDot · TimelineConnector · TimelineContent · TimelineTitle · TimelineDescription · dot variant: default · success · warning · destructive · info. Sequência temporal com dots, conectores e conteúdo.",
+      "usage": "import { Timeline, TimelineItem, TimelineSeparator, TimelineDot, TimelineConnector, TimelineContent, TimelineTitle, TimelineDescription } from \"@semec/ds/react\";\n\n<Timeline>\n  <TimelineItem>\n    <TimelineSeparator>\n      <TimelineDot variant=\"success\" srLabel=\"Concluído\" />\n      <TimelineConnector />\n    </TimelineSeparator>\n    <TimelineContent>\n      <TimelineTitle>Protocolo recebido</TimelineTitle>\n      <TimelineDescription>12/08/2026 às 14:30</TimelineDescription>\n    </TimelineContent>\n  </TimelineItem>\n  <TimelineItem>\n    <TimelineSeparator>\n      <TimelineDot srLabel=\"Em andamento\" />\n    </TimelineSeparator>\n    <TimelineContent>\n      <TimelineTitle>Em análise</TimelineTitle>\n      <TimelineDescription>Aguardando parecer</TimelineDescription>\n    </TimelineContent>\n  </TimelineItem>\n</Timeline>",
+      "prompt": "Use o componente `Timeline` (Linha do tempo) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Sequência temporal em lista ordenada (ol/li), com pontos, conectores visíveis e conteúdo. O status vai em texto (srLabel), não só na cor. API e variantes: composição: Timeline · TimelineItem · TimelineSeparator · TimelineDot · TimelineConnector · TimelineContent · TimelineTitle · TimelineDescription · dot variant: default · success · warning · destructive · info · props: TimelineDot srLabel · TimelineTitle as (padrão div) · a11y: ol/li · srLabel com o status por item · conector border-strong (3,77:1). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/timeline",
       "md": "/components/timeline.md"
     },
@@ -944,17 +1155,22 @@
       "code": "navigation-menu",
       "slug": "menu-de-navegacao",
       "label": "Menu de navegação",
+      "exportName": "NavigationMenu",
       "file": "src/components/navigation-menu.tsx",
       "category": "navegacao",
-      "desc": "Navegação principal com mega-menu e viewport animado.",
+      "desc": "Navegação principal com mega-menu e viewport animado. O `<nav>` se chama \"Menu principal\" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px.",
       "variants": [
         {
           "prop": "composição",
           "values": "NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator"
+        },
+        {
+          "prop": "a11y",
+          "values": "aria-label padrão \"Menu principal\" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix)"
         }
       ],
       "usage": "import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from \"@semec/ds/react\";\n\n<NavigationMenu>\n  <NavigationMenuList>\n    <NavigationMenuItem>\n      <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>\n      <NavigationMenuContent>\n        <NavigationMenuLink href=\"/iptu\">IPTU</NavigationMenuLink>\n        <NavigationMenuLink href=\"/alvara\">Alvará</NavigationMenuLink>\n      </NavigationMenuContent>\n    </NavigationMenuItem>\n  </NavigationMenuList>\n</NavigationMenu>",
-      "prompt": "Crie um navigation-menu (Menu de navegação) usando @semec/ds/react (`src/components/navigation-menu.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator. Navegação principal com mega-menu e viewport animado.",
+      "prompt": "Use o componente `NavigationMenu` (Menu de navegação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Navegação principal com mega-menu e viewport animado. O `<nav>` se chama \"Menu principal\" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. API e variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · a11y: aria-label padrão \"Menu principal\" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/menu-de-navegacao",
       "md": "/components/menu-de-navegacao.md"
     },
@@ -962,9 +1178,10 @@
       "code": "sidebar",
       "slug": "sidebar",
       "label": "Barra lateral",
+      "exportName": "Sidebar",
       "file": "src/components/sidebar.tsx",
       "category": "navegacao",
-      "desc": "Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile.",
+      "desc": "Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile. Abaixo de 768px (48rem, via `matchMedia`) a Sidebar vira gaveta modal (Radix Dialog): foco preso, Esc fecha, conteúdo de trás inerte, foco volta a quem abriu e botão visível \"Fechar menu\" (44×44). No desktop renderiza um landmark `<nav aria-label=\"Menu lateral\">`. `SidebarMenuButton isActive` gera `aria-current=\"page\"`; `tooltip` aparece só no modo recolhido (`collapsible=\"icon\"`). `SidebarTrigger` (44×44) expõe `aria-expanded` e `aria-controls`.",
       "variants": [
         {
           "prop": "side",
@@ -979,12 +1196,36 @@
           "values": "offcanvas · icon · none"
         },
         {
+          "prop": "as (Sidebar)",
+          "values": "nav (padrão) · aside · div"
+        },
+        {
+          "prop": "labels (Sidebar)",
+          "values": "navigation (\"Menu lateral\") · mobileTitle (\"Menu de navegação\") · close (\"Fechar menu\")"
+        },
+        {
+          "prop": "as (SidebarInset)",
+          "values": "main (padrão) · div · section"
+        },
+        {
+          "prop": "label (SidebarTrigger)",
+          "values": "padrão \"Alternar barra lateral\""
+        },
+        {
+          "prop": "SidebarMenuButton",
+          "values": "isActive (aria-current=page) · tooltip (string ou props do TooltipContent) · asChild"
+        },
+        {
+          "prop": "a11y",
+          "values": "landmark nav/aside com aria-label · gaveta mobile com focus trap, Esc e retorno de foco · aria-expanded/aria-controls no gatilho · aria-current=page no item ativo · alvos de 44px · barra offcanvas recolhida fica inert"
+        },
+        {
           "prop": "composição",
           "values": "SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail"
         }
       ],
-      "usage": "import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from \"@semec/ds/react\";\n\n<SidebarProvider>\n  <Sidebar>\n    <SidebarHeader>Logo</SidebarHeader>\n    <SidebarContent>\n      <SidebarGroup>\n        <SidebarGroupLabel>Menu</SidebarGroupLabel>\n        <SidebarGroupContent>\n          <SidebarMenu>\n            <SidebarMenuItem>\n              <SidebarMenuButton isActive>Dashboard</SidebarMenuButton>\n            </SidebarMenuItem>\n            <SidebarMenuItem>\n              <SidebarMenuButton>Protocolos</SidebarMenuButton>\n            </SidebarMenuItem>\n          </SidebarMenu>\n        </SidebarGroupContent>\n      </SidebarGroup>\n    </SidebarContent>\n    <SidebarFooter>Footer</SidebarFooter>\n  </Sidebar>\n  {/* SidebarInset já renderiza <main>: não aninhe outro <main> dentro dele */}\n  <SidebarInset>\n    <SidebarTrigger />\n    <div className=\"p-4\">Conteúdo</div>\n  </SidebarInset>\n</SidebarProvider>",
-      "prompt": "Crie um sidebar (Barra lateral) usando @semec/ds/react (`src/components/sidebar.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: left · right · variant: sidebar · floating · inset · collapsible: offcanvas · icon · none · composição: SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail. Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile.",
+      "usage": "import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from \"@semec/ds/react\";\nimport { LayoutDashboard } from \"lucide-react\";\n\n<SidebarProvider>\n  <Sidebar>\n    <SidebarHeader>Logo</SidebarHeader>\n    <SidebarContent>\n      <SidebarGroup>\n        <SidebarGroupLabel>Menu</SidebarGroupLabel>\n        <SidebarGroupContent>\n          <SidebarMenu>\n            <SidebarMenuItem>\n              <SidebarMenuButton isActive>Dashboard</SidebarMenuButton>\n            </SidebarMenuItem>\n            <SidebarMenuItem>\n              <SidebarMenuButton>Protocolos</SidebarMenuButton>\n            </SidebarMenuItem>\n          </SidebarMenu>\n        </SidebarGroupContent>\n      </SidebarGroup>\n    </SidebarContent>\n    <SidebarFooter>Footer</SidebarFooter>\n  </Sidebar>\n  {/* SidebarInset renderiza <main> por padrão: não aninhe outro <main> dentro dele.\n      Se o layout já tem o próprio <main>, use <SidebarInset as=\"div\">. */}\n  <SidebarInset>\n    <SidebarTrigger />\n    <div className=\"p-4\">Conteúdo</div>\n  </SidebarInset>\n</SidebarProvider>\n\n// Item ativo com link (aria-current=\"page\" vem de isActive) e tooltip no modo recolhido\n<Sidebar collapsible=\"icon\" labels={{ navigation: \"Menu do servidor\" }}>\n  <SidebarContent>\n    <SidebarMenu>\n      <SidebarMenuItem>\n        <SidebarMenuButton asChild isActive tooltip=\"Painel\">\n          <a href=\"/painel\"><LayoutDashboard aria-hidden=\"true\" /><span>Painel</span></a>\n        </SidebarMenuButton>\n      </SidebarMenuItem>\n    </SidebarMenu>\n  </SidebarContent>\n</Sidebar>",
+      "prompt": "Use o componente `Sidebar` (Barra lateral) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile. Abaixo de 768px (48rem, via `matchMedia`) a Sidebar vira gaveta modal (Radix Dialog): foco preso, Esc fecha, conteúdo de trás inerte, foco volta a quem abriu e botão visível \"Fechar menu\" (44×44). No desktop renderiza um landmark `<nav aria-label=\"Menu lateral\">`. `SidebarMenuButton isActive` gera `aria-current=\"page\"`; `tooltip` aparece só no modo recolhido (`collapsible=\"icon\"`). `SidebarTrigger` (44×44) expõe `aria-expanded` e `aria-controls`. API e variantes: side: left · right · variant: sidebar · floating · inset · collapsible: offcanvas · icon · none · as (Sidebar): nav (padrão) · aside · div · labels (Sidebar): navigation (\"Menu lateral\") · mobileTitle (\"Menu de navegação\") · close (\"Fechar menu\") · as (SidebarInset): main (padrão) · div · section · label (SidebarTrigger): padrão \"Alternar barra lateral\" · SidebarMenuButton: isActive (aria-current=page) · tooltip (string ou props do TooltipContent) · asChild · a11y: landmark nav/aside com aria-label · gaveta mobile com focus trap, Esc e retorno de foco · aria-expanded/aria-controls no gatilho · aria-current=page no item ativo · alvos de 44px · barra offcanvas recolhida fica inert · composição: SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/sidebar",
       "md": "/components/sidebar.md"
     }

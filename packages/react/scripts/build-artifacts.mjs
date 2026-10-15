@@ -6,6 +6,10 @@
  * Skills canônicas: packages/react/skills/semec-ds/SKILL.md
  *                    packages/react/skills/semec-ds-lite/SKILL.md
  *
+ * Contagem e lista de componentes nunca são escritas à mão (AUD-49): a SKILL usa
+ * `{{ds:component-count}}` / `<!-- ds:component-list -->` e o README do pacote tem um
+ * bloco `<!-- ds:component-list:start/end -->`, preenchidos a partir de dsComponents.
+ *
  * Targets:
  *   dist          → packages/react/dist/skills/* + dist/lite/*  (npm)
  *   docs-public   → apps/docs/public/{llms.txt,llms-full.txt,manifest.json,components/*,skills/*}
@@ -76,7 +80,7 @@ function readPkgRootBase(rel) {
 // --- load manifest + version ---
 const manifestSrc = path.join(pkgRoot, "manifest.js");
 const manifestUrl = pathToFileURL(manifestSrc).href;
-const { dsComponents, dsCategories, dsPrompt } = await import(manifestUrl);
+const { dsComponents, dsCategories, dsPrompt, dsExportName } = await import(manifestUrl);
 
 const pkgJson = JSON.parse(readPkgRootBase("package.json") || '{"version":"0.0.0"}');
 const version = pkgJson.version || "0.0.0";
@@ -128,16 +132,123 @@ function componentSource(c) {
   return readBase(`${COMPONENT_SOURCE_PREFIX}${c.file}`) ?? "";
 }
 
+// --- contagem e lista de componentes geradas do manifest (AUD-49) ---
+// Nenhum documento cita número fixo: a SKILL usa placeholders e o README do pacote
+// tem um bloco entre marcadores, os dois preenchidos a partir de dsComponents.
+const componentCount = dsComponents.length;
+const homepage = (pkgJson.homepage || "https://semec-pvh.github.io/SEMEC_design_system/").replace(/\/?$/, "/");
+
+function componentsByCategory() {
+  const known = new Set(dsCategories.map((cat) => cat.key));
+  const groups = dsCategories
+    .map((cat) => ({ cat, items: dsComponents.filter((c) => c.category === cat.key) }))
+    .filter((g) => g.items.length > 0);
+  const orphans = dsComponents.filter((c) => !known.has(c.category));
+  if (orphans.length) {
+    groups.push({
+      cat: { key: "outros", label: "Outros", desc: "Sem categoria no manifest." },
+      items: orphans,
+    });
+  }
+  return groups;
+}
+
+/** Lista Markdown por categoria, para a SKILL (`<!-- ds:component-list -->`). */
+function skillComponentList() {
+  const out = [];
+  for (const { cat, items } of componentsByCategory()) {
+    out.push(`### ${cat.label} (${items.length})`, "");
+    for (const c of items) {
+      out.push(`- \`${dsExportName(c)}\` (\`${c.code}\`) — ${c.desc}`);
+    }
+    out.push("");
+  }
+  return out.join("\n").trimEnd();
+}
+
+/** Tabela por categoria, para o README do pacote (bloco entre marcadores). */
+function readmeComponentBlock() {
+  const rows = componentsByCategory().map(
+    ({ cat, items }) =>
+      `| **${cat.label}** (${items.length}) | ${items.map((c) => dsExportName(c)).join(", ")} |`
+  );
+  return [
+    `**${componentCount} componentes** no manifest (\`manifest.js\`), pelo export principal de cada um. Lista e contagem geradas por \`scripts/build-artifacts.mjs\`; não edite à mão.`,
+    "",
+    "| Categoria | Componentes |",
+    "|---|---|",
+    ...rows,
+  ].join("\n");
+}
+
+const MAINTAINER_BLOCK = /<!-- ds:maintainer:start -->[\s\S]*?<!-- ds:maintainer:end -->\n?/g;
+const INTEGRATOR_NOTE = /[ \t]*<!-- INTEGRADOR:[\s\S]*?-->[ \t]*\n?/g;
+
+/**
+ * Renderiza uma SKILL canônica para um destino.
+ * - `{{ds:component-count}}` e `<!-- ds:component-list -->` → gerados do manifest;
+ * - `{{ds:homepage}}` → URL do site de documentação;
+ * - blocos `<!-- ds:maintainer:start -->…<!-- ds:maintainer:end -->` (caminhos do
+ *   monorepo, scripts de manutenção) só ficam na cópia do repositório
+ *   (`.claude/`, `.opencode/`); saem da SKILL publicada no npm e no site (AUD-67);
+ * - notas `<!-- INTEGRADOR: … -->` nunca vão para os artefatos.
+ */
+function renderSkill(src, { maintainer = false } = {}) {
+  let out = fs.readFileSync(src, "utf8");
+  out = out
+    .replaceAll("{{ds:component-count}}", String(componentCount))
+    .replaceAll("{{ds:homepage}}", homepage)
+    .replace("<!-- ds:component-list -->", skillComponentList());
+  out = maintainer
+    ? out.replace(/<!-- ds:maintainer:(start|end) -->\n?/g, "")
+    : out.replace(MAINTAINER_BLOCK, "");
+  out = out.replace(INTEGRATOR_NOTE, "").replace(/\n{3,}/g, "\n\n");
+  const leftover = out.match(/\{\{ds:[^}]*\}\}|<!-- ds:[^>]*-->/);
+  if (leftover) {
+    console.error(`Placeholder não resolvido em ${path.relative(repoRoot, src)}: ${leftover[0]}`);
+    process.exit(1);
+  }
+  return out;
+}
+
+function writeSkill(src, dest, opts) {
+  mkdirp(path.dirname(dest));
+  fs.writeFileSync(dest, renderSkill(src, opts), "utf8");
+}
+
+/**
+ * Atualiza, no próprio README do pacote, o bloco entre
+ * `<!-- ds:component-list:start -->` e `<!-- ds:component-list:end -->`.
+ * Determinístico: só escreve se o conteúdo mudou.
+ */
+function syncPackageReadme() {
+  const readmePath = path.join(pkgRoot, "README.md");
+  if (!fs.existsSync(readmePath)) return;
+  const current = fs.readFileSync(readmePath, "utf8");
+  const re = /(<!-- ds:component-list:start -->\n)[\s\S]*?(\n<!-- ds:component-list:end -->)/;
+  if (!re.test(current)) {
+    console.warn("  README.md sem marcadores ds:component-list; lista não sincronizada");
+    return;
+  }
+  const next = current.replace(re, `$1${readmeComponentBlock()}$2`);
+  if (next !== current) {
+    fs.writeFileSync(readmePath, next, "utf8");
+    console.log("  synced README.md (lista e contagem de componentes)");
+  }
+}
+
 function buildManifest({ site = false } = {}) {
   return {
     name: "SEMEC Design System",
     version,
     generatedAt,
+    componentCount,
     categories: dsCategories,
     components: dsComponents.map((c) => ({
       code: c.code,
       slug: c.slug,
       label: c.label,
+      exportName: dsExportName(c),
       file: c.file,
       category: c.category,
       desc: c.desc,
@@ -194,6 +305,7 @@ npm install @semec/ds
 
 \`\`\`css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 \`\`\`
@@ -276,9 +388,10 @@ function llmsIndex({ site = false, lite = false } = {}) {
       "",
       "```css",
       '@import "tailwindcss";',
-      '@import "@semec/ds/react/tokens.css";',
-      '@source "../node_modules/@semec/ds/dist/react";',
+      '@import "@semec/ds/lite/tokens.css";',
       "```",
+      "",
+      "Sem `@source` para `dist/react`: a variante lite não usa os componentes React, então o Tailwind só precisa varrer o código do próprio app.",
       "",
       "## Inclui",
       "",
@@ -321,6 +434,7 @@ function llmsIndex({ site = false, lite = false } = {}) {
     "",
     "```css",
     '@import "tailwindcss";',
+    '@import "@semec/ds/react/fonts.css";',
     '@import "@semec/ds/react/tokens.css";',
     '@source "../node_modules/@semec/ds/dist/react";',
     "```",
@@ -336,10 +450,7 @@ function llmsIndex({ site = false, lite = false } = {}) {
   lines.push("", `## Componentes (${dsComponents.length})`, "");
 
   for (const c of dsComponents) {
-    const importName =
-      c.usage?.match(/import\s*\{\s*([^,\s}]+)/)?.[1] ??
-      c.code.charAt(0).toUpperCase() +
-        c.code.slice(1).replace(/-([a-z])/g, (_, l) => l.toUpperCase());
+    const importName = dsExportName(c);
     if (site) {
       lines.push(
         `- [${c.label} (\`${c.code}\`) — ${c.desc}](/componentes/${c.slug}) — \`${c.file}\` — md: \`/components/${c.slug}.md\``
@@ -358,7 +469,7 @@ function llmsIndex({ site = false, lite = false } = {}) {
     "",
     site
       ? "Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback, acessibilidade). Exemplos interativos em `/components/demos/examples/*` e `/components/demos/patterns/*`."
-      : "Padrões documentados no site de documentação; skills em `semec-ds/` e `semec-ds-lite/`.",
+      : `Padrões de tela (esqueleto de página, landmarks, formulários, tabelas, feedback) em ${homepage}padroes/ e resumidos na skill \`semec-ds/SKILL.md\` (seção "Padrões de tela").`,
     "",
     "## Tokens",
     "",
@@ -408,8 +519,9 @@ function llmsFullDump() {
     full += `Uso:\n\`\`\`tsx\n${c.usage}\n\`\`\`\n\nPrompt:\n\`\`\`text\n${dsPrompt(c)}\n\`\`\`\n\nFonte:\n\`\`\`tsx\n${src}\n\`\`\`\n\n---\n`;
   }
 
-  if (baseReadme) {
-    full += `\n## packages/react/README.md\n\n\`\`\`md\n${baseReadme}\n\`\`\`\n`;
+  const readmeNow = readPkgRoot("README.md") ?? baseReadme;
+  if (readmeNow) {
+    full += `\n## packages/react/README.md\n\n\`\`\`md\n${readmeNow}\n\`\`\`\n`;
   }
 
   return full;
@@ -427,6 +539,7 @@ function writeLlmsFullForTarget(outDir, { lite = false } = {}) {
 // --- dist (npm) ---
 function buildDist() {
   console.log("→ dist (npm)");
+  syncPackageReadme();
 
   // CSS + preset em dist/react
   const cssFiles = ["tokens.css"];
@@ -475,8 +588,8 @@ function buildDist() {
   }
   console.log(`  generated ${dsComponents.length} dist/skills/components/*.md`);
 
-  copyFile(fullSkillSrc, path.join(skillsDir, "semec-ds", "SKILL.md"));
-  console.log("  copied skills/semec-ds/SKILL.md");
+  writeSkill(fullSkillSrc, path.join(skillsDir, "semec-ds", "SKILL.md"));
+  console.log("  rendered skills/semec-ds/SKILL.md");
 
   // lite surface
   const liteDir = path.join(distDir, "lite");
@@ -496,8 +609,8 @@ function buildDist() {
           "Tokens, acessibilidade, responsive e padrões visuais. Sem componentes React.",
         categories: dsCategories,
         install: {
-          tokens: 'import "@semec/ds/react/tokens.css";',
-          preset: '@source "../node_modules/@semec/ds/dist/react";',
+          css: '@import "tailwindcss"; @import "@semec/ds/lite/tokens.css";',
+          note: "Sem @source para dist/react: a variante lite não usa componentes React.",
         },
         tokens: {
           files: ["tokens.css", "pv-preset.ts"],
@@ -506,15 +619,17 @@ function buildDist() {
         },
         accessibility: {
           standard: "WCAG 2.1 AA (ADR-014)",
-          contrast: "4.5:1 texto normal, 3:1 texto grande/UI",
+          contrast:
+            "4.5:1 texto normal; 3:1 texto grande (≥ 24px regular ou ≥ 18,66px bold) e componentes de interface",
           focus: ":focus-visible com --focus-ring (2px solid, 2px offset)",
           keyboard: "Tab, Enter, Escape, setas",
-          touchTargets: "44px mínimo",
+          touchTargets:
+            "44×44px é regra do DS (decisão do projeto), acima do WCAG 2.1 AA; o critério WCAG de 44px (2.5.5) é AAA",
         },
         responsive: {
           breakpoints: "sm:640 md:768 lg:1024 xl:1280 2xl:1536",
+          container: "mx-auto w-full max-w-[75rem] px-4",
           sidebar: "drawer off-canvas + inert em mobile",
-          density: "data-density='compact' para admin",
         },
         credit: {
           required: true,
@@ -529,8 +644,8 @@ function buildDist() {
   );
   console.log("  generated dist/lite/manifest.json");
 
-  copyFile(liteSkillSrc, path.join(liteDir, "semec-ds-lite", "SKILL.md"));
-  console.log("  copied dist/lite/semec-ds-lite/SKILL.md");
+  writeSkill(liteSkillSrc, path.join(liteDir, "semec-ds-lite", "SKILL.md"));
+  console.log("  rendered dist/lite/semec-ds-lite/SKILL.md");
 }
 
 // --- docs-public ---
@@ -562,9 +677,9 @@ function buildDocsPublic() {
   }
   console.log(`  generated ${dsComponents.length} public/components/*.md`);
 
-  copyFile(fullSkillSrc, path.join(publicDir, "skills", "semec-ds", "SKILL.md"));
-  copyFile(liteSkillSrc, path.join(publicDir, "skills", "semec-ds-lite", "SKILL.md"));
-  console.log("  copied public/skills/semec-ds + semec-ds-lite");
+  writeSkill(fullSkillSrc, path.join(publicDir, "skills", "semec-ds", "SKILL.md"));
+  writeSkill(liteSkillSrc, path.join(publicDir, "skills", "semec-ds-lite", "SKILL.md"));
+  console.log("  rendered public/skills/semec-ds + semec-ds-lite");
 }
 
 // --- agent-dirs ---
@@ -572,10 +687,11 @@ function buildAgentDirs() {
   console.log("→ agent-dirs (.claude / .opencode)");
   const claudeDest = path.join(repoRoot, ".claude", "skills", "semec-ds", "SKILL.md");
   const opencodeDest = path.join(repoRoot, ".opencode", "skills", "semec-ds", "SKILL.md");
-  copyFile(fullSkillSrc, claudeDest);
-  copyFile(fullSkillSrc, opencodeDest);
-  console.log("  copied .claude/skills/semec-ds/SKILL.md");
-  console.log("  copied .opencode/skills/semec-ds/SKILL.md");
+  // Cópia do repositório: mantém as seções de mantenedor (caminhos do monorepo).
+  writeSkill(fullSkillSrc, claudeDest, { maintainer: true });
+  writeSkill(fullSkillSrc, opencodeDest, { maintainer: true });
+  console.log("  rendered .claude/skills/semec-ds/SKILL.md (com seções de mantenedor)");
+  console.log("  rendered .opencode/skills/semec-ds/SKILL.md (com seções de mantenedor)");
 }
 
 // --- run ---

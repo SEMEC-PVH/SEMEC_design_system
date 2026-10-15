@@ -9,7 +9,7 @@ variants: "—"
 
 # Progresso — `progress`
 
-> Barra de progresso determinada.
+> Barra de progresso determinada. Trilha com contorno border-strong (3,77:1 sobre surface) e indicador primary.
 
 **Arquivo:** `src/components/progress.tsx` | **Categoria:** Feedback e estados | **Rota:** `/componentes/progress`
 
@@ -25,6 +25,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -42,7 +43,7 @@ import { Progress } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Crie um progress (Progresso) usando @semec/ds/react (`src/components/progress.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Barra de progresso determinada.
+Use o componente `Progress` (Progresso) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Barra de progresso determinada. Trilha com contorno border-strong (3,77:1 sobre surface) e indicador primary. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -53,14 +54,23 @@ import * as ProgressPrimitive from "@radix-ui/react-progress";
 
 import { cn } from "../lib/utils";
 
+export interface ProgressProps
+  extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> {}
+
+/**
+ * Barra de progresso determinada. A trilha tem contorno `border-strong`
+ * (3,77:1 sobre `surface`, 3,49:1 sobre `bg`) para ser percebida como
+ * componente gráfico (WCAG 1.4.11); o indicador `primary` tem 5,42:1 sobre a
+ * trilha `surface`. Dê nome com `aria-label` ou `aria-labelledby`.
+ */
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
+  ProgressProps
 >(({ className, value, ...props }, ref) => (
   <ProgressPrimitive.Root
     ref={ref}
     className={cn(
-      "relative h-3 w-full overflow-hidden rounded-full bg-secondary",
+      "relative h-3 w-full overflow-hidden rounded-full border border-border-strong bg-surface",
       className
     )}
     value={value}

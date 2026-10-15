@@ -4,19 +4,19 @@ code: "toggle"
 slug: "toggle"
 file: "src/components/toggle.tsx"
 category: "formularios"
-variants: "variant: default · outline · size: sm · md · lg"
+variants: "variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)"
 ---
 
 # Toggle — `toggle`
 
-> Botão binário para estados on/off em toolbars.
+> Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos.
 
 **Arquivo:** `src/components/toggle.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/toggle`
 
 ## Variantes
 
 - **variant**: default · outline
-- **size**: sm · md · lg
+- **size**: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)
 
 ## Instalação (@semec/ds)
 
@@ -26,6 +26,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -44,7 +45,7 @@ import { Bold } from "lucide-react";
 ## Prompt para IA
 
 ```text
-Crie um toggle (Toggle) usando @semec/ds/react (`src/components/toggle.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · outline · size: sm · md · lg. Botão binário para estados on/off em toolbars.
+Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos. API e variantes: variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -66,9 +67,11 @@ const toggleVariants = cva(
           "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
       },
       size: {
-        sm: "h-9 px-3",
-        md: "h-10 px-3",
-        lg: "h-11 px-5",
+        // AUD-10: `md` (padrão) e `lg` têm 44px. `sm` mantém o visual de 36px,
+        // com área clicável estendida a 44×44px por pseudo-elemento.
+        sm: "h-9 px-3 relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2",
+        md: "h-11 min-w-11 px-3",
+        lg: "h-12 min-w-12 px-5",
       },
     },
     defaultVariants: {

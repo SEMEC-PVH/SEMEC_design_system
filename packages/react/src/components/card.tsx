@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { cn } from "../lib/utils";
+import type { HeadingTag } from "./heading";
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -9,7 +10,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border border-border bg-card text-card-foreground shadow-md ring-1 ring-foreground/5",
+      "rounded-lg border border-border bg-card text-card-foreground shadow-elevation-1 ring-1 ring-foreground/5",
       className
     )}
     {...props}
@@ -29,16 +30,24 @@ const CardHeader = React.forwardRef<
 ));
 CardHeader.displayName = "CardHeader";
 
-const CardTitle = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("text-lg font-semibold leading-none tracking-tight", className)}
-    {...props}
-  />
-));
+export interface CardTitleProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Elemento do título. Padrão: `div` (mantém o comportamento anterior e não
+   * entra no sumário de títulos). Passe `h2`/`h3` conforme a hierarquia da
+   * página quando o cartão representar uma seção.
+   */
+  as?: HeadingTag;
+}
+
+const CardTitle = React.forwardRef<HTMLDivElement, CardTitleProps>(
+  ({ className, as: Tag = "div", ...props }, ref) => (
+    <Tag
+      ref={ref}
+      className={cn("text-lg font-semibold leading-none tracking-tight", className)}
+      {...props}
+    />
+  )
+);
 CardTitle.displayName = "CardTitle";
 
 const CardDescription = React.forwardRef<
@@ -92,19 +101,21 @@ export interface SectionHeaderProps extends React.HTMLAttributes<HTMLDivElement>
   title: string;
   description?: string;
   badge?: React.ReactNode;
+  /** Elemento do título. Padrão: `h2`. */
+  titleAs?: HeadingTag;
 }
 
 const SectionHeader = React.forwardRef<HTMLDivElement, SectionHeaderProps>(
-  ({ className, title, description, badge, children, ...props }, ref) => (
+  ({ className, title, description, badge, titleAs: TitleTag = "h2", children, ...props }, ref) => (
     <div
       ref={ref}
       className={cn("pb-2 border-b border-border mb-6", className)}
       {...props}
     >
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-xl font-bold text-pv-blue-900 uppercase tracking-wide">
+        <TitleTag className="text-xl font-bold text-pv-blue-900 uppercase tracking-wide">
           {title}
-        </h2>
+        </TitleTag>
         {badge}
       </div>
       {description ? (

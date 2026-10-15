@@ -25,6 +25,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -45,7 +46,7 @@ import { RadioGroup, RadioGroupItem, Label } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Crie um radio-group (Botão de opção) usando @semec/ds/react (`src/components/radio-group.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: RadioGroup · RadioGroupItem + Label. Escolha única entre duas ou mais opções.
+Use o componente `RadioGroup` (Botão de opção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Escolha única entre duas ou mais opções. API e variantes: composição: RadioGroup · RadioGroupItem + Label. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -56,15 +57,20 @@ import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Circle } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import { useFormFieldControl } from "./form-field";
 
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
 >(({ className, ...props }, ref) => {
+  // Dentro de um FormField: o grupo (div) não é rotulável por <label for>,
+  // então recebe aria-labelledby do rótulo, além de describedby/invalid/required.
+  const field = useFormFieldControl(props, { labelable: false, supportsRequired: true });
   return (
     <RadioGroupPrimitive.Root
       className={cn("grid gap-2", className)}
       {...props}
+      {...field}
       ref={ref}
     />
   );
@@ -79,13 +85,13 @@ const RadioGroupItem = React.forwardRef<
     <RadioGroupPrimitive.Item
       ref={ref}
       className={cn(
-        "aspect-square h-5 w-5 rounded-full border border-input text-primary shadow-sm transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive",
+        "aspect-square h-5 w-5 rounded-full border border-input text-primary shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive",
         className
       )}
       {...props}
     >
       <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-        <Circle className="h-3 w-3 fill-current" />
+        <Circle className="h-3 w-3 fill-current" aria-hidden="true" />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   );

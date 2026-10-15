@@ -1,0 +1,51 @@
+/* =========================================================================
+   Design System SEMEC — Poppins auto-hospedada (AUD-26)
+   =========================================================================
+
+   Pesos 400, 500, 600 e 700 (especificação-alvo: não existem 800/900 no
+   sistema). Subconjunto latino (Latin-1, aspas tipográficas, travessões,
+   reticências, €), suficiente para PT-BR. Sem dependência de Google Fonts.
+
+   Uso, antes de tokens.css:
+     @import "tailwindcss";
+     @import "@semec/ds/react/fonts.css";
+     @import "@semec/ds/react/tokens.css";
+
+   Os woff2 ficam em ./fonts/ ao lado deste arquivo; o bundler (Next, Vite)
+   resolve as URLs relativas e copia os arquivos para o build.
+
+   Licença: SIL Open Font License 1.1 — ./fonts/OFL.txt
+   Copyright 2020 The Poppins Project Authors.
+   ========================================================================= */
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/Poppins-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./fonts/Poppins-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./fonts/Poppins-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./fonts/Poppins-700.woff2") format("woff2");
+}

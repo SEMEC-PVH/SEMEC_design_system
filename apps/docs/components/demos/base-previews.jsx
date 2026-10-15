@@ -109,6 +109,7 @@ import {
   SidebarProvider,
   SidebarToggleButton,
   Skeleton,
+  SkipLink,
   Slider,
   Spinner,
   Switch,
@@ -137,6 +138,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
   useToast,
+  Footer,
+  FooterBottom,
+  FooterContent,
+  FooterLink,
+  FooterLinks,
+  FooterSection,
+  Heading,
 } from "semec-ds/react";
 import { Bell, Download, HelpCircle, Inbox, MoreHorizontal, Plus, Printer, Search, Trash2 } from "lucide-react";
 import PreviewFrame, { usePreviewPortalContainer } from "@/components/docs/PreviewFrame";
@@ -1153,6 +1161,44 @@ function ErrorSummaryPreview() {
   );
 }
 
+function HeadingPreview() {
+  return (
+    <div className="flex flex-col gap-2">
+      <Heading level={2} size={1}>Matrícula escolar</Heading>
+      <Heading level={3}>Documentos necessários</Heading>
+    </div>
+  );
+}
+
+function SkipLinkPreview() {
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <p className="text-sm text-muted-foreground">Pressione Tab dentro do preview para ver o link.</p>
+      <SkipLink href="#preview-conteudo" />
+      <div id="preview-conteudo" className="text-sm">Conteúdo principal</div>
+    </div>
+  );
+}
+
+function FooterPreview() {
+  return (
+    <Footer className="w-full">
+      <FooterContent>
+        <FooterSection title="Atendimento">
+          <p>Rua Exemplo, 100 · Centro · Porto Velho/RO</p>
+        </FooterSection>
+        <FooterSection title="Serviços">
+          <FooterLinks>
+            <FooterLink href="#">Matrícula</FooterLink>
+            <FooterLink href="#">Transporte escolar</FooterLink>
+          </FooterLinks>
+        </FooterSection>
+      </FooterContent>
+      <FooterBottom>© 2026 Prefeitura de Porto Velho</FooterBottom>
+    </Footer>
+  );
+}
+
 const PREVIEWS = {
   button: ButtonPreview,
   "icon-button": IconButtonPreview,
@@ -1203,6 +1249,9 @@ const PREVIEWS = {
   "dropdown-menu": DropdownMenuPreview,
   "data-table": DataTablePreview,
   "error-summary": ErrorSummaryPreview,
+  heading: HeadingPreview,
+  "skip-link": SkipLinkPreview,
+  footer: FooterPreview,
 };
 
 export default function BasePreview({ slug }) {

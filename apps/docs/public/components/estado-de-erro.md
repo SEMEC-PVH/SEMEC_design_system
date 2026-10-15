@@ -4,7 +4,7 @@ code: "error-state"
 slug: "estado-de-erro"
 file: "src/components/error-state.tsx"
 category: "feedback"
-variants: "variant: default · inline · props: title · description · icon · action · onRetry · retryLabel · variant · a11y: role=alert · aria-live=assertive · ícones com aria-hidden"
+variants: "variant: default · inline · props: title · description · icon · action · onRetry · retryLabel · variant · titleAs (padrão h3; p no inline) · a11y: role=alert · aria-live=assertive · ícones com aria-hidden"
 ---
 
 # Estado de erro — `error-state`
@@ -16,7 +16,7 @@ variants: "variant: default · inline · props: title · description · icon · 
 ## Variantes
 
 - **variant**: default · inline
-- **props**: title · description · icon · action · onRetry · retryLabel · variant
+- **props**: title · description · icon · action · onRetry · retryLabel · variant · titleAs (padrão h3; p no inline)
 - **a11y**: role=alert · aria-live=assertive · ícones com aria-hidden
 
 ## Instalação (@semec/ds)
@@ -27,6 +27,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -55,7 +56,7 @@ import { ErrorState, Button } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Crie um error-state (Estado de erro) usando @semec/ds/react (`src/components/error-state.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: default · inline · props: title · description · icon · action · onRetry · retryLabel · variant · a11y: role=alert · aria-live=assertive · ícones com aria-hidden. Estado de erro com anúncio acessível (role=alert), mensagem explicativa e ação de recuperação (onRetry ou ação personalizada).
+Use o componente `ErrorState` (Estado de erro) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Estado de erro com anúncio acessível (role=alert), mensagem explicativa e ação de recuperação (onRetry ou ação personalizada). API e variantes: variant: default · inline · props: title · description · icon · action · onRetry · retryLabel · variant · titleAs (padrão h3; p no inline) · a11y: role=alert · aria-live=assertive · ícones com aria-hidden. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -66,6 +67,7 @@ import { AlertCircle, RotateCcw } from "lucide-react";
 
 import { cn } from "../lib/utils";
 import { Button } from "./button";
+import type { HeadingTag } from "./heading";
 
 export interface ErrorStateProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -75,6 +77,11 @@ export interface ErrorStateProps extends React.HTMLAttributes<HTMLDivElement> {
   onRetry?: () => void;
   retryLabel?: string;
   variant?: "default" | "inline";
+  /**
+   * Elemento do título. Padrão: `h3` na variante `default` e `p` na `inline`
+   * (comportamento anterior). Ajuste ao nível da página.
+   */
+  titleAs?: HeadingTag;
 }
 
 const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
@@ -88,6 +95,7 @@ const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
       onRetry,
       retryLabel = "Tentar novamente",
       variant = "default",
+      titleAs,
       ...props
     },
     ref
@@ -130,11 +138,15 @@ const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
           {...props}
         >
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 shrink-0">
+            <div className="mt-0.5 shrink-0" aria-hidden="true">
               {icon ?? defaultIcon}
             </div>
             <div className="space-y-0.5 text-left">
-              <p className="text-sm font-semibold text-foreground leading-tight">{title}</p>
+              {React.createElement(
+                titleAs ?? "p",
+                { className: "text-sm font-semibold text-foreground leading-tight" },
+                title
+              )}
               {description ? (
                 <p className="text-xs text-muted-foreground">{description}</p>
               ) : null}
@@ -158,11 +170,18 @@ const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
         )}
         {...props}
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive-surface text-destructive [&>svg]:h-6 [&>svg]:w-6">
+        <div
+          aria-hidden="true"
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive-surface text-destructive [&>svg]:h-6 [&>svg]:w-6"
+        >
           {icon ?? <AlertCircle aria-hidden="true" />}
         </div>
         <div className="space-y-1 max-w-md">
-          <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+          {React.createElement(
+            titleAs ?? "h3",
+            { className: "text-lg font-semibold text-foreground" },
+            title
+          )}
           {description ? (
             <p className="text-sm text-muted-foreground">{description}</p>
           ) : null}

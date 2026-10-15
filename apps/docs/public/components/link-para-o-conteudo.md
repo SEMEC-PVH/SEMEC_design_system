@@ -1,0 +1,113 @@
+---
+title: "Link para o conteúdo"
+code: "skip-link"
+slug: "link-para-o-conteudo"
+file: "src/components/skip-link.tsx"
+category: "navegacao"
+variants: "props: href (padrão #conteudo) · children (padrão 'Pular para o conteúdo principal') · a11y: visível no foco · foco movido ao alvo (tabindex=-1 aplicado se preciso) · alvo de 44px"
+---
+
+# Link para o conteúdo — `skip-link`
+
+> Link "Pular para o conteúdo principal" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo).
+
+**Arquivo:** `src/components/skip-link.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/link-para-o-conteudo`
+
+## Variantes
+
+- **props**: href (padrão #conteudo) · children (padrão "Pular para o conteúdo principal")
+- **a11y**: visível no foco · foco movido ao alvo (tabindex=-1 aplicado se preciso) · alvo de 44px
+
+## Instalação (@semec/ds)
+
+```bash
+npm install @semec/ds
+```
+
+```css
+@import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
+@import "@semec/ds/react/tokens.css";
+@source "../node_modules/@semec/ds/dist/react";
+```
+
+## Uso
+
+```tsx
+import { SkipLink, Header } from "@semec/ds/react";
+
+<body>
+  <SkipLink />
+  <Header>…</Header>
+  <main id="conteudo">…</main>
+</body>
+```
+
+## Prompt para IA
+
+```text
+Use o componente `SkipLink` (Link para o conteúdo) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Link "Pular para o conteúdo principal" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo). API e variantes: props: href (padrão #conteudo) · children (padrão "Pular para o conteúdo principal") · a11y: visível no foco · foco movido ao alvo (tabindex=-1 aplicado se preciso) · alvo de 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+```
+
+## Fonte
+
+```tsx
+import * as React from "react";
+
+import { cn } from "../lib/utils";
+
+export interface SkipLinkProps
+  extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  /** Âncora do conteúdo principal. Padrão: `#conteudo`. */
+  href?: string;
+}
+
+/**
+ * Link "Pular para o conteúdo principal" (WCAG 2.4.1). Fica oculto até receber
+ * foco pelo teclado e deve ser o primeiro elemento focável da página.
+ * O alvo (ex.: `<main id="conteudo">`) recebe o foco ao ativar o link; se ele
+ * não for focável, o componente aplica `tabindex="-1"` antes de focar.
+ */
+const SkipLink = React.forwardRef<HTMLAnchorElement, SkipLinkProps>(
+  ({ className, href = "#conteudo", children, onClick, ...props }, ref) => {
+    const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+      onClick?.(event);
+      if (event.defaultPrevented || !href.startsWith("#") || href.length < 2) {
+        return;
+      }
+      const target = document.getElementById(decodeURIComponent(href.slice(1)));
+      if (!target) return;
+      if (!target.hasAttribute("tabindex")) {
+        target.setAttribute("tabindex", "-1");
+      }
+      target.focus();
+    };
+
+    return (
+      <a
+        ref={ref}
+        href={href}
+        onClick={handleClick}
+        className={cn(
+          "sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:inline-flex focus:min-h-11 focus:items-center focus:rounded-md focus:bg-surface focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-brand-hero focus:underline focus:shadow-elevation-2 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
+          className
+        )}
+        {...props}
+      >
+        {children ?? "Pular para o conteúdo principal"}
+      </a>
+    );
+  }
+);
+SkipLink.displayName = "SkipLink";
+
+export { SkipLink };
+
+```
+
+## Tokens relacionados
+
+Tokens semânticos: `--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`, `--action-primary` etc. Ver `tokens.css` no dump completo.
+
+---
+Gerado a partir de `packages/react/manifest.js` — não edite manualmente. Conteúdo PT-BR, código EN (ADR-016).

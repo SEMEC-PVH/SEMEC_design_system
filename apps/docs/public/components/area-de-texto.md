@@ -25,6 +25,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -34,7 +35,7 @@ npm install @semec/ds
 ```tsx
 import { FormField, Textarea } from "@semec/ds/react";
 
-<FormField label="Descreva a demanda" htmlFor="demanda">
+<FormField label="Descreva a demanda" hint="Até 500 caracteres">
   <Textarea id="demanda" rows={4} />
 </FormField>
 ```
@@ -42,7 +43,7 @@ import { FormField, Textarea } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Crie um textarea (Área de texto) usando @semec/ds/react (`src/components/textarea.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: estados: padrão · inválido · disabled. Campo multilinha com as mesmas variantes visuais do campo de texto.
+Use o componente `Textarea` (Área de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo multilinha com as mesmas variantes visuais do campo de texto. API e variantes: estados: padrão · inválido · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -51,23 +52,31 @@ Crie um textarea (Área de texto) usando @semec/ds/react (`src/components/textar
 import * as React from "react";
 
 import { cn } from "../lib/utils";
+import { useFormFieldControl } from "./form-field";
 
-const Textarea = React.forwardRef<
-  HTMLTextAreaElement,
-  React.TextareaHTMLAttributes<HTMLTextAreaElement>
->(({ className, ...props }, ref) => (
-  <textarea
-    className={cn(
-      "flex min-h-[80px] w-full rounded-md border border-input bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
-      className
-    )}
-    ref={ref}
-    {...props}
-  />
-));
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+
+/** Campo multilinha. Dentro de um `FormField`, recebe `id`, `aria-describedby` e `aria-invalid`. */
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ className, ...props }, ref) => {
+    const field = useFormFieldControl(props, { supportsRequired: true });
+    return (
+      <textarea
+        className={cn(
+          "flex min-h-[80px] w-full rounded-md border border-input bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive",
+          className
+        )}
+        ref={ref}
+        {...props}
+        {...field}
+      />
+    );
+  }
+);
 Textarea.displayName = "Textarea";
 
 export { Textarea };
+
 ```
 
 ## Tokens relacionados

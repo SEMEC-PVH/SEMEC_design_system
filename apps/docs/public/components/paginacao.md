@@ -4,19 +4,19 @@ code: "pagination"
 slug: "paginacao"
 file: "src/components/pagination.tsx"
 category: "navegacao"
-variants: "props: page · pageCount · onPageChange · siblingCount · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses"
+variants: "props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label 'Página N' nos números · aria-label nos botões prev/next · aria-hidden nos elipses"
 ---
 
 # Paginação — `pagination`
 
-> Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.
+> Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px. Textos em PT-BR, sobrescrevíveis por `labels`.
 
 **Arquivo:** `src/components/pagination.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/paginacao`
 
 ## Variantes
 
-- **props**: page · pageCount · onPageChange · siblingCount
-- **a11y**: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses
+- **props**: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }>
+- **a11y**: role=navigation · aria-label=Paginação · aria-current=page · aria-label "Página N" nos números · aria-label nos botões prev/next · aria-hidden nos elipses
 
 ## Instalação (@semec/ds)
 
@@ -26,6 +26,7 @@ npm install @semec/ds
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
@@ -36,12 +37,19 @@ npm install @semec/ds
 import { Pagination } from "@semec/ds/react";
 
 <Pagination page={pagina} pageCount={42} onPageChange={setPagina} />
+
+<Pagination
+  page={pagina}
+  pageCount={42}
+  onPageChange={setPagina}
+  labels={{ navigation: "Paginação dos protocolos" }}
+/>
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um pagination (Paginação) usando @semec/ds/react (`src/components/pagination.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: page · pageCount · onPageChange · siblingCount · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label nos botões prev/next · aria-hidden nos elipses. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa.
+Use o componente `Pagination` (Paginação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px. Textos em PT-BR, sobrescrevíveis por `labels`. API e variantes: props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label "Página N" nos números · aria-label nos botões prev/next · aria-hidden nos elipses. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -52,18 +60,40 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { cn } from "../lib/utils";
 
+/** Textos anunciados pela Pagination. Todos têm padrão em PT-BR (AUD-31). */
+export interface PaginationLabels {
+  /** Nome do `<nav>`. Padrão: "Paginação". */
+  navigation: string;
+  /** Botão de voltar. Padrão: "Página anterior". */
+  previous: string;
+  /** Botão de avançar. Padrão: "Próxima página". */
+  next: string;
+  /** Nome de cada botão numérico. Padrão: `Página N`. */
+  page: (page: number) => string;
+}
+
+const DEFAULT_LABELS: PaginationLabels = {
+  navigation: "Paginação",
+  previous: "Página anterior",
+  next: "Próxima página",
+  page: (n) => `Página ${n}`,
+};
+
 export interface PaginationProps extends React.HTMLAttributes<HTMLElement> {
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
   siblingCount?: number;
+  /** Sobrescreve os textos anunciados. */
+  labels?: Partial<PaginationLabels>;
 }
 
 const range = (start: number, end: number) =>
   Array.from({ length: end - start + 1 }, (_, i) => start + i);
 
 const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
-  ({ className, page, pageCount, onPageChange, siblingCount = 1, ...props }, ref) => {
+  ({ className, page, pageCount, onPageChange, siblingCount = 1, labels, ...props }, ref) => {
+    const text = { ...DEFAULT_LABELS, ...labels };
     const go = (p: number) => {
       if (p >= 1 && p <= pageCount && p !== page) onPageChange(p);
     };
@@ -97,7 +127,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
       <nav
         ref={ref}
         role="navigation"
-        aria-label="Paginação"
+        aria-label={text.navigation}
         className={cn("flex items-center justify-center gap-1", className)}
         {...props}
       >
@@ -105,7 +135,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
           type="button"
           onClick={() => go(page - 1)}
           disabled={page <= 1}
-          aria-label="Página anterior"
+          aria-label={text.previous}
           className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
         >
           <ChevronLeft className="h-4 w-4" aria-hidden="true" />
@@ -125,6 +155,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
               type="button"
               onClick={() => go(p)}
               aria-current={p === page ? "page" : undefined}
+              aria-label={text.page(p)}
               className={cn(
                 "inline-flex h-11 min-w-11 items-center justify-center rounded-md border border-input px-2 text-sm text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 p === page && "border-transparent bg-primary text-primary-foreground hover:bg-primary"
@@ -138,7 +169,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
           type="button"
           onClick={() => go(page + 1)}
           disabled={page >= pageCount}
-          aria-label="Próxima página"
+          aria-label={text.next}
           className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
         >
           <ChevronRight className="h-4 w-4" aria-hidden="true" />
