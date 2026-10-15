@@ -3,7 +3,6 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { warnDeprecated } from "../lib/deprecation";
 import { cn } from "../lib/utils";
 
 const LOCALE = "pt-BR";
@@ -46,8 +45,12 @@ export interface CalendarProps
   value?: Date | null;
   /** Recebe a data escolhida (contrato de formulário, ADR-015). */
   onValueChange?: (date: Date) => void;
-  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
-  onChange?: (date: Date) => void;
+  /**
+   * Removido na 4.0 (AUD-35): use `onValueChange`. O Calendar não tem
+   * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado.
+   */
+  onChange?: never;
   disabled?: boolean;
   /** Data mínima selecionável (`AAAA-MM-DD`). */
   min?: string;
@@ -106,14 +109,8 @@ const navButtonClass =
  * (`Shift` + `PageUp`/`PageDown` trocam o ano) e `Enter`/`Espaço` selecionam.
  */
 const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
-  ({ className, value, onChange, onValueChange, disabled, min, max, labels, ...props }, ref) => {
+  ({ className, value, onChange: _removedOnChange, onValueChange, disabled, min, max, labels, ...props }, ref) => {
     const text = { ...DEFAULT_LABELS, ...labels };
-    if (onChange) {
-      warnDeprecated(
-        "Calendar.onChange",
-        "Calendar: `onChange(date)` está obsoleto e sai na 4.0. Use `onValueChange(date)`."
-      );
-    }
     const headingId = React.useId();
     const today = startOfDay(new Date());
 
@@ -154,7 +151,6 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
     const select = (date: Date) => {
       if (isDisabled(date)) return;
       onValueChange?.(date);
-      onChange?.(date);
     };
 
     const moveFocus = (date: Date) => {

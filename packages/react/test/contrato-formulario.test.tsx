@@ -29,8 +29,9 @@ import { severeViolations } from "./axe";
 /**
  * Contrato único de formulário (ADR-015, emenda de 15/10/2026, AUD-35):
  * `value`/`defaultValue`, `onValueChange(value)`, `name`, `id`, `invalid`,
- * `disabled`, `required`. A API antiga (`onChange(value)`) segue funcionando
- * até a 4.0, com aviso em desenvolvimento.
+ * `disabled`, `required`. Na 4.0 o `onChange(value)` da 3.x saiu: `Calendar`,
+ * `Combobox`, `InputOTP` e `FileUpload` não chamam mais um `onChange`, e no
+ * `DatePicker` ele é o evento nativo do `<input>`.
  */
 
 afterEach(() => {
@@ -62,25 +63,35 @@ describe("onValueChange", () => {
     expect(onValueChange).toHaveBeenLastCalledWith("ok");
   });
 
-  it("DatePicker: onValueChange recebe o ISO; onChange(value) obsoleto continua e avisa uma vez", () => {
+  it("DatePicker: onValueChange recebe o ISO e onChange recebe o evento nativo (4.0), sem aviso", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const onValueChange = vi.fn();
     const onChange = vi.fn();
-    const { container, rerender } = render(
+    const { container } = render(
       <DatePicker aria-label="Vencimento" onValueChange={onValueChange} onChange={onChange} />
     );
     const input = container.querySelector('input[type="date"]') as HTMLInputElement;
     fireEvent.change(input, { target: { value: "2026-10-15" } });
     expect(onValueChange).toHaveBeenCalledWith("2026-10-15");
-    expect(onChange).toHaveBeenCalledWith("2026-10-15");
-    rerender(<DatePicker aria-label="Vencimento" onValueChange={onValueChange} onChange={onChange} />);
-    const avisos = warn.mock.calls.filter(([msg]) => String(msg).includes("DatePicker"));
-    expect(avisos).toHaveLength(1);
-    expect(String(avisos[0][0])).toContain("onValueChange");
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const event = onChange.mock.calls[0]![0];
+    expect(typeof event).not.toBe("string");
+    expect(event).toHaveProperty("type", "change");
+    expect(event.target).toBe(input);
+    expect(event.target.value).toBe("2026-10-15");
+    expect(warn).not.toHaveBeenCalled();
   });
 
-  it("Combobox: onValueChange recebe o valor da opção; onChange obsoleto continua", async () => {
-    vi.spyOn(console, "warn").mockImplementation(() => {});
+  it("DatePicker: só o onChange nativo (sem onValueChange) também funciona", () => {
+    const onChange = vi.fn((e: { target: HTMLInputElement }) => e.target.value);
+    const { container } = render(<DatePicker aria-label="Vencimento" onChange={onChange} />);
+    const input = container.querySelector('input[type="date"]') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: "2026-01-02" } });
+    expect(onChange).toHaveReturnedWith("2026-01-02");
+  });
+
+  it("Combobox: onValueChange recebe o valor da opção; o onChange da 3.x não é mais chamado (4.0)", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const onValueChange = vi.fn();
     const onChange = vi.fn();
     render(
@@ -88,7 +99,7 @@ describe("onValueChange", () => {
         <Combobox
           options={[{ value: "pvh", label: "Porto Velho" }]}
           onValueChange={onValueChange}
-          onChange={onChange}
+          {...({ onChange } as unknown as object)}
         />
       </FormField>
     );
@@ -96,7 +107,8 @@ describe("onValueChange", () => {
     await user.click(screen.getByRole("button", { name: /^Município/ }));
     await user.click(within(await screen.findByRole("listbox")).getByRole("option", { name: "Porto Velho" }));
     expect(onValueChange).toHaveBeenCalledWith("pvh");
-    expect(onChange).toHaveBeenCalledWith("pvh");
+    expect(onChange).not.toHaveBeenCalled();
+    expect(warn).not.toHaveBeenCalled();
   });
 
   it("InputOTP: onValueChange recebe os dígitos; defaultValue preenche no modo não controlado", async () => {
@@ -115,15 +127,53 @@ describe("onValueChange", () => {
     expect(onValueChange).toHaveBeenLastCalledWith("123");
   });
 
-  it("FileUpload: onValueChange recebe os arquivos; onChange(files) obsoleto continua", async () => {
-    vi.spyOn(console, "warn").mockImplementation(() => {});
+  it("InputOTP: o onChange(value) da 3.x não é mais chamado (4.0), nem com o evento dos dígitos", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const onValueChange = vi.fn();
     const onChange = vi.fn();
-    render(<FileUpload label="Anexo" onValueChange={onValueChange} onChange={onChange} />);
+    render(
+      <InputOTP maxLength={4} onValueChange={onValueChange} {...({ onChange } as unknown as object)}>
+        <InputOTPGroup>
+          {[0, 1, 2, 3].map((i) => (
+            <InputOTPSlot key={i} index={i} />
+          ))}
+        </InputOTPGroup>
+      </InputOTP>
+    );
+    await userEvent.setup().type(screen.getByRole("textbox", { name: "Dígito 1 de 4" }), "7");
+    expect(onValueChange).toHaveBeenLastCalledWith("7");
+    expect(onChange).not.toHaveBeenCalled();
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it("Calendar: o onChange(date) da 3.x não é mais chamado (4.0)", async () => {
+    const onValueChange = vi.fn();
+    const onChange = vi.fn();
+    render(
+      <Calendar
+        value={new Date(2026, 9, 14)}
+        onValueChange={onValueChange}
+        {...({ onChange } as unknown as object)}
+      />
+    );
+    await userEvent.setup().click(screen.getByRole("gridcell", { name: "15 de outubro de 2026" }));
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("FileUpload: onValueChange recebe os arquivos; o onChange(files) da 3.x não é mais chamado (4.0)", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const onValueChange = vi.fn();
+    const onChange = vi.fn();
+    render(
+      <FileUpload label="Anexo" onValueChange={onValueChange} {...({ onChange } as unknown as object)} />
+    );
     const file = new File(["%PDF"], "rg.pdf", { type: "application/pdf" });
     await userEvent.setup().upload(screen.getByLabelText("Anexo"), file);
     expect(onValueChange).toHaveBeenCalledWith([file]);
-    expect(onChange).toHaveBeenCalledWith([file]);
+    // Nem com os arquivos, nem com o evento do <input type="file"> que borbulha.
+    expect(onChange).not.toHaveBeenCalled();
+    expect(warn).not.toHaveBeenCalled();
   });
 
   it("FileUpload: disabled não aceita arquivo", async () => {

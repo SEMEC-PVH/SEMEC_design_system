@@ -112,8 +112,8 @@ describe("Combobox (AUD-03)", () => {
   });
 
   it("abre com role=combobox + listbox, filtra, Enter seleciona, fecha e devolve o foco", async () => {
-    const onChange = vi.fn();
-    const { container } = renderCombobox({ onChange });
+    const onValueChange = vi.fn();
+    const { container } = renderCombobox({ onValueChange });
     const user = userEvent.setup();
     const trigger = screen.getByRole("button", { name: /^Município/ });
 
@@ -132,7 +132,7 @@ describe("Combobox (AUD-03)", () => {
     expect(option).toHaveAttribute("aria-selected", "true");
 
     await user.keyboard("{Enter}");
-    expect(onChange).toHaveBeenCalledWith("jpr");
+    expect(onValueChange).toHaveBeenCalledWith("jpr");
     await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull());
     expect(trigger).toHaveFocus();
     expect(container.querySelector('input[type="hidden"][name="municipio"]')).toHaveValue("jpr");
@@ -170,8 +170,8 @@ describe("Combobox (AUD-03)", () => {
 
 describe("Calendar (AUD-37)", () => {
   it("é uma grade com uma parada de Tab, setas movem o foco e Enter seleciona", async () => {
-    const onChange = vi.fn();
-    render(<Calendar value={new Date(2026, 9, 14)} onChange={onChange} />);
+    const onValueChange = vi.fn();
+    render(<Calendar value={new Date(2026, 9, 14)} onValueChange={onValueChange} />);
     const user = userEvent.setup();
     const grid = screen.getByRole("grid", { name: /outubro de 2026/i });
     const tabbable = grid.querySelectorAll('[tabindex="0"]');
@@ -183,7 +183,7 @@ describe("Calendar (AUD-37)", () => {
     await user.keyboard("{ArrowRight}");
     expect(within(grid).getByRole("gridcell", { name: "15 de outubro de 2026" })).toHaveFocus();
     await user.keyboard("{Enter}");
-    const picked: Date = onChange.mock.calls.at(-1)![0];
+    const picked: Date = onValueChange.mock.calls.at(-1)![0];
     expect([picked.getFullYear(), picked.getMonth(), picked.getDate()]).toEqual([2026, 9, 15]);
   });
 
@@ -197,16 +197,16 @@ describe("Calendar (AUD-37)", () => {
     expect(screen.getByRole("grid", { name: /setembro de 2026/i })).toBeInTheDocument();
   });
 
-  it("dias fora de min/max ficam aria-disabled e não disparam onChange", async () => {
-    const onChange = vi.fn();
-    render(<Calendar value={new Date(2026, 9, 14)} min="2026-10-10" max="2026-10-20" onChange={onChange} />);
+  it("dias fora de min/max ficam aria-disabled e não disparam onValueChange", async () => {
+    const onValueChange = vi.fn();
+    render(<Calendar value={new Date(2026, 9, 14)} min="2026-10-10" max="2026-10-20" onValueChange={onValueChange} />);
     const user = userEvent.setup();
     const before = screen.getByRole("gridcell", { name: "5 de outubro de 2026" });
     expect(before).toHaveAttribute("aria-disabled", "true");
     expect(screen.getByRole("gridcell", { name: "25 de outubro de 2026" })).toHaveAttribute("aria-disabled", "true");
     expect(screen.getByRole("gridcell", { name: "15 de outubro de 2026" })).not.toHaveAttribute("aria-disabled");
     await user.click(before);
-    expect(onChange).not.toHaveBeenCalled();
+    expect(onValueChange).not.toHaveBeenCalled();
   });
 });
 
