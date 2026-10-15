@@ -85,7 +85,7 @@ const WALKERS = [
   },
   {
     // Zé Carlos + livro, no gramado ao sul da SEMEC que era do Leo antes de
-    // ele virar chefe (x 7–10, y 10–13). Sem esqueleto: anda gingando.
+    // ele virar chefe (x 7–10, y 10–13). Esqueleto e clipes do Rafa/Leo.
     id: "ze-carlos",
     petId: "livro",
     owner: "ze-carlos.glb",
@@ -97,11 +97,12 @@ const WALKERS = [
     restAt: new Map([[2, "sabio"], [8, "cambalhota"]]),
     restSeconds: 3.0, // cobre o "sábio" de 2,4 s
     talkShow: "sabio",
+    ownerWalkScale: 1.2,
     pet: () => livroPet({}),
   },
   {
     // Emily + microfone, na praça do Front-End (x 17–20, y 17–20), livre
-    // desde que o Rafa virou chefe. Sem esqueleto: anda gingando.
+    // desde que o Rafa virou chefe. Esqueleto e clipes do Rafa/Leo.
     id: "emily",
     petId: "microfone",
     owner: "emily.glb",
@@ -113,6 +114,7 @@ const WALKERS = [
     restAt: new Map([[2, "cantar"], [8, "giro"]]),
     restSeconds: 3.6, // cobre o canto de 3,2 s
     talkShow: "cantar",
+    ownerWalkScale: 1.2,
     pet: () => microfonePet({}),
   },
 ];
