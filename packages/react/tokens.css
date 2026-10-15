@@ -6,11 +6,17 @@
 
    L0 — PRIMITIVOS (`--pv-*`)
         Valores brutos. Invariantes de tema. Nunca use primitivo direto
-        em componente.
+        em componente nem em tela: nem a variável `--pv-*`, nem utilitário.
+        Os utilitários `bg-pv-*`, `text-pv-*`, `border-pv-*` (gerados de
+        `--color-pv-*` no @theme abaixo) estão DEPRECIADOS desde a 3.1.0 e
+        saem na 4.0 (AUD-55, ADR-013); as variáveis `--pv-*` continuam.
+        Primitivo novo não ganha utilitário.
 
    L1 — SEMÂNTICOS (`--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`,
         `--feedback-*`, `--space-*`, `--text-*`, `--radius-*`, `--elevation-*`)
         Camada do dia a dia. Diz o papel, não a cor.
+        `--pv-radius-*` e `--pv-duration-*` são L1 com nome próprio: guardam
+        o valor que o @theme expõe, sem autorreferência (AUD-57).
 
    Uso no globals.css do site novo:
      @import "tailwindcss";
@@ -105,6 +111,7 @@
   --pv-blue-900:  #26325B;
 
   /* ---- Amarelo — feedback ---------------------------------------------- */
+  --pv-yellow-50:  #fdf6e3;
   --pv-yellow-800: #8a5a00;
 
   /* ---- Vermelho — feedback --------------------------------------------- */
@@ -177,7 +184,7 @@
   --feedback-info:    var(--pv-blue-600);
 
   --feedback-success-surface: var(--pv-green-50);
-  --feedback-warning-surface: #fdf6e3;
+  --feedback-warning-surface: var(--pv-yellow-50);
   --feedback-danger-surface:  var(--pv-red-50);
   --feedback-info-surface:    var(--pv-blue-50);
 
@@ -233,19 +240,35 @@
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Forma
+     Escala decidida em 15/10/2026 (AUD-57): sm 2px · md 8px · lg 12px ·
+     full. Papel: controle rounded-md, cartão rounded-lg, pílula
+     rounded-full. O valor mora em --pv-radius-*; --radius-* é o nome
+     público (var(--radius-md), rounded-md) e aponta para ele. Assim o
+     @theme não declara `--radius-sm: var(--radius-sm)`, que vira ciclo
+     (valor inválido) se este arquivo for importado dentro de @layer.
+     rounded-xs, rounded-xl, rounded-2xl… são o padrão do Tailwind, fora
+     da escala (rounded-xl = 12px, igual a rounded-lg): não use.
      ======================================================================= */
-  --radius-sm:   2px;
-  --radius-md:   8px;
-  --radius-lg:   12px;
-  --radius-full: 9999px;
+  --pv-radius-sm:   2px;
+  --pv-radius-md:   8px;
+  --pv-radius-lg:   12px;
+  --pv-radius-full: 9999px;
+
+  --radius-sm:   var(--pv-radius-sm);
+  --radius-md:   var(--pv-radius-md);
+  --radius-lg:   var(--pv-radius-lg);
+  --radius-full: var(--pv-radius-full);
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Elevação
+     A sombra usa o azul-escuro do sistema (--pv-gray-900, rgb 20 35 58),
+     nunca preto puro. color-mix com transparent dá exatamente
+     rgba(20, 35, 58, .08 / .10 / .14), os valores anteriores (AUD-56).
      ======================================================================= */
   --elevation-0: none;
-  --elevation-1: 0 1px 2px rgba(20, 35, 58, .08);
-  --elevation-2: 0 4px 12px rgba(20, 35, 58, .10);
-  --elevation-3: 0 12px 32px rgba(20, 35, 58, .14);
+  --elevation-1: 0 1px 2px color-mix(in srgb, var(--pv-gray-900) 8%, transparent);
+  --elevation-2: 0 4px 12px color-mix(in srgb, var(--pv-gray-900) 10%, transparent);
+  --elevation-3: 0 12px 32px color-mix(in srgb, var(--pv-gray-900) 14%, transparent);
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Movimento
@@ -265,7 +288,11 @@
    valores: as utilities leem as custom properties acima em runtime.
    ========================================================================== */
 @theme inline {
-  /* -- Primitivos (uso direto: bg-pv-blue-600, text-pv-gray-900, etc.) -- */
+  /* -- Primitivos: @deprecated desde a 3.1.0, saem na 4.0 (AUD-55) ------
+     Geram bg-pv-*, text-pv-*, border-pv-*. NÃO são para uso direto: use o
+     semântico do papel (bg-primary, bg-brand-hero, text-foreground,
+     bg-success-surface…). Ficam aqui só para não quebrar quem já usa;
+     primitivo novo (ex.: --pv-yellow-50) não entra nesta lista. -- */
   --color-pv-blue-50:   var(--pv-blue-50);
   --color-pv-blue-600:  var(--pv-blue-600);
   --color-pv-blue-700:  var(--pv-blue-700);
@@ -392,11 +419,11 @@
   --spacing-space-12: var(--space-12);
   --spacing-space-16: var(--space-16);
 
-  /* -- Forma -- */
-  --radius-sm:   var(--radius-sm);
-  --radius-md:   var(--radius-md);
-  --radius-lg:   var(--radius-lg);
-  --radius-full: var(--radius-full);
+  /* -- Forma (AUD-57): aponta para --pv-radius-*, nunca para si mesmo -- */
+  --radius-sm:   var(--pv-radius-sm);
+  --radius-md:   var(--pv-radius-md);
+  --radius-lg:   var(--pv-radius-lg);
+  --radius-full: var(--pv-radius-full);
 
   /* -- Elevação -- */
   --shadow-elevation-1: var(--elevation-1);
