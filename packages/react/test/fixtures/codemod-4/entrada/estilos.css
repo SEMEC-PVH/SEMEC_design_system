@@ -1,0 +1,6 @@
+.destaque {
+  @apply bg-pv-green-50 text-pv-green-800;
+  border-color: var(--color-pv-gray-400);
+  /* variável de primitivo continua valendo: */
+  outline-color: var(--pv-blue-hero);
+}
