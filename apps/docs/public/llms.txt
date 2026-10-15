@@ -33,9 +33,9 @@ npm install @semec/ds
   Uso: `import { Link } from "@semec/ds/react";`
 - [Caixa de texto (`input`) — Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string.](/componentes/caixa-de-texto) — `src/components/input.tsx` — md: `/components/caixa-de-texto.md`
   Uso: `import { Input } from "@semec/ds/react";`
-- [Campo de senha (`password-input`) — Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Repassa todas as props do `Input`, inclusive `autoComplete`.](/componentes/campo-de-senha) — `src/components/password-input.tsx` — md: `/components/campo-de-senha.md`
+- [Campo de senha (`password-input`) — Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Desliga corretor e maiúscula automática (`spellCheck={false}`, `autoCapitalize="none"`, `autoCorrect="off"`, sobrescrevíveis), que alterariam a senha visível. Repassa todas as props do `Input`, inclusive `autoComplete`.](/componentes/campo-de-senha) — `src/components/password-input.tsx` — md: `/components/campo-de-senha.md`
   Uso: `import { PasswordInput } from "@semec/ds/react";`
-- [Campo com máscara (`input-mask`) — Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio, colar valor com outra pontuação funciona e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.](/componentes/campo-com-mascara) — `src/components/input-mask.tsx` — md: `/components/campo-com-mascara.md`
+- [Campo com máscara (`input-mask`) — Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho; colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.](/componentes/campo-com-mascara) — `src/components/input-mask.tsx` — md: `/components/campo-com-mascara.md`
   Uso: `import { InputMask } from "@semec/ds/react";`
 - [Área de texto (`textarea`) — Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`).](/componentes/area-de-texto) — `src/components/textarea.tsx` — md: `/components/area-de-texto.md`
   Uso: `import { Textarea } from "@semec/ds/react";`
@@ -162,4 +162,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--action-primary` etc.), nunca hex solto
 
-> Gerado 2026-10-15T12:30:36.000Z a partir de packages/react/manifest.js. Versão 3.1.0.
+> Gerado 2026-10-15T12:33:56.000Z a partir de packages/react/manifest.js. Versão 3.1.0.

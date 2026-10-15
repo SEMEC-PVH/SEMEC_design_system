@@ -9,7 +9,7 @@ variants: "visibilidade: defaultVisible · visible + onVisibleChange (controlado
 
 # Campo de senha — `password-input`
 
-> Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Repassa todas as props do `Input`, inclusive `autoComplete`.
+> Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Desliga corretor e maiúscula automática (`spellCheck={false}`, `autoCapitalize="none"`, `autoCorrect="off"`, sobrescrevíveis), que alterariam a senha visível. Repassa todas as props do `Input`, inclusive `autoComplete`.
 
 **Arquivo:** `src/components/password-input.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/campo-de-senha`
 
@@ -49,7 +49,7 @@ import { FormField, PasswordInput } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `PasswordInput` (Campo de senha) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Repassa todas as props do `Input`, inclusive `autoComplete`. API e variantes: visibilidade: defaultVisible · visible + onVisibleChange (controlado) · labels: show (padrão "Mostrar senha") · autoComplete: current-password (login) · new-password (cadastro e troca de senha). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `PasswordInput` (Campo de senha) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Desliga corretor e maiúscula automática (`spellCheck={false}`, `autoCapitalize="none"`, `autoCorrect="off"`, sobrescrevíveis), que alterariam a senha visível. Repassa todas as props do `Input`, inclusive `autoComplete`. API e variantes: visibilidade: defaultVisible · visible + onVisibleChange (controlado) · labels: show (padrão "Mostrar senha") · autoComplete: current-password (login) · new-password (cadastro e troca de senha). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -132,6 +132,11 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
           type={visible ? "text" : "password"}
           disabled={disabled}
           className={cn("pr-12 [&::-ms-reveal]:hidden", className)}
+          // Com a senha visível (type="text"), corretor e maiúscula automática
+          // alterariam a senha. Sobrescrevíveis por props.
+          spellCheck={false}
+          autoCapitalize="none"
+          autoCorrect="off"
           {...props}
         />
         <button

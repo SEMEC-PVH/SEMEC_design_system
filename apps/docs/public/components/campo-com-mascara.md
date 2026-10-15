@@ -9,7 +9,7 @@ variants: "mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo n�
 
 # Campo com máscara — `input-mask`
 
-> Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio, colar valor com outra pontuação funciona e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
+> Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho; colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
 
 **Arquivo:** `src/components/input-mask.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/campo-com-mascara`
 
@@ -58,7 +58,7 @@ import { FormField, InputMask } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `InputMask` (Campo com máscara) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio, colar valor com outra pontuação funciona e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara. API e variantes: mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: "AAA-9*99") · valor: defaultValue · value + onValueChange(masked, raw) · inputMode: numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `InputMask` (Campo com máscara) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho; colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara. API e variantes: mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: "AAA-9*99") · valor: defaultValue · value + onValueChange(masked, raw) · inputMode: numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -114,17 +114,43 @@ export interface InputMaskResult {
   raw: string;
 }
 
+const TELEFONE_PRESETS = new Set(["telefone", "telefone-fixo", "celular"]);
+
+/**
+ * Telefone colado com código do país (`+55 69 99999-1234` ou
+ * `5569999991234`): descarta o `55` inicial. Não mexe em valor já formatado
+ * pela máscara (`(55) …`, DDD 55), para não comer o DDD de quem digita.
+ */
+function stripCountryCode(value: string, mask: InputMaskPreset | string): string {
+  if (!TELEFONE_PRESETS.has(mask)) return value;
+  const digits = value.replace(/\D/g, "");
+  const trimmed = value.trimStart();
+  const hasPlus = trimmed.startsWith("+55");
+  const looksInternational =
+    digits.startsWith("55") && digits.length >= 12 && digits.length <= 13 && !trimmed.startsWith("(");
+  return hasPlus || looksInternational ? digits.slice(2) : value;
+}
+
+const isAlphanumeric = (ch: string) => /[0-9A-Za-zÀ-ÖØ-öø-ÿ]/.test(ch);
+
 /**
  * Formata `value` com uma máscara pronta ou um padrão próprio, em que `9` é
  * dígito, `A` é letra, `*` é letra ou dígito e o resto é literal
- * (ex.: `"AAA-9999"`). Aceita valor já formatado, sem formatação ou colado
- * com outra pontuação. Literais só aparecem quando há caractere depois deles.
+ * (ex.: `"AAA-9999"`, `"+55 (99) 99999-9999"`). Aceita valor já formatado,
+ * sem formatação ou colado com outra pontuação. Literais só aparecem quando
+ * há caractere depois deles. Nos telefones, um `+55`/`55` de país colado é
+ * descartado.
  */
 export function applyInputMask(value: string, mask: InputMaskPreset | string): InputMaskResult {
-  const digitCount = value.replace(/\D/g, "").length;
+  const normalized = stripCountryCode(value, mask);
+  const digitCount = normalized.replace(/\D/g, "").length;
   const pattern = resolvePattern(mask, digitCount);
+  // Pontuação do próprio padrão no valor: ele já veio formatado, e um
+  // caractere igual a um literal (ex.: o "5" de "+55") é o literal.
+  const punctuation = new Set([...pattern].filter((ch) => !isSlot(ch) && !isAlphanumeric(ch)));
+  const looksFormatted = [...normalized].some((ch) => punctuation.has(ch));
   // Padrão só de dígitos: descarta a pontuação de quem colou ("(69) 3216-0000").
-  const source = isNumericPattern(pattern) ? value.replace(/\D/g, "") : value;
+  const source = isNumericPattern(pattern) ? normalized.replace(/\D/g, "") : normalized;
 
   let masked = "";
   let raw = "";
@@ -134,15 +160,21 @@ export function applyInputMask(value: string, mask: InputMaskPreset | string): I
   for (const ch of source) {
     if (p >= pattern.length) break;
     if (!isSlot(pattern.charAt(p))) {
-      // Valor já formatado: o caractere é um dos literais à frente; consome até ele.
+      let nextSlot = p;
+      while (nextSlot < pattern.length && !isSlot(pattern.charAt(nextSlot))) nextSlot++;
+      const canFill =
+        nextSlot < pattern.length && Boolean(SLOT_TESTS[pattern.charAt(nextSlot)]?.test(ch));
       let q = p;
-      while (q < pattern.length && !isSlot(pattern.charAt(q)) && pattern.charAt(q) !== ch) q++;
-      if (q < pattern.length && !isSlot(pattern.charAt(q))) {
+      while (q < nextSlot && pattern.charAt(q) !== ch) q++;
+      // Só consome como literal se o valor parece formatado ou se o
+      // caractere não cabe na próxima posição editável.
+      if (q < nextSlot && (looksFormatted || !canFill)) {
         pending += pattern.slice(p, q + 1);
         p = q + 1;
         continue;
       }
-      while (p < pattern.length && !isSlot(pattern.charAt(p))) pending += pattern[p++];
+      pending += pattern.slice(p, nextSlot);
+      p = nextSlot;
       if (p >= pattern.length) break;
     }
     if (SLOT_TESTS[pattern.charAt(p)]?.test(ch)) {
@@ -205,7 +237,7 @@ export interface InputMaskProps
  * e pode ser sobrescrito. Sem dependência externa.
  */
 const InputMask = React.forwardRef<HTMLInputElement, InputMaskProps>(
-  ({ mask, value, defaultValue, onValueChange, onChange, inputMode, ...props }, ref) => {
+  ({ mask, value, defaultValue, onValueChange, onChange, onKeyDown, inputMode, ...props }, ref) => {
     const isControlled = value !== undefined;
     const [inner, setInner] = React.useState(
       () => applyInputMask(defaultValue ?? "", mask).masked
@@ -235,6 +267,46 @@ const InputMask = React.forwardRef<HTMLInputElement, InputMaskProps>(
       onChange?.(event);
     };
 
+    /**
+     * Backspace logo depois de um literal (ou Delete logo antes) apagaria só
+     * a pontuação, que a máscara repõe: o cursor andaria sem apagar nada.
+     * Aqui o literal é pulado e o caractere editável vizinho é apagado.
+     */
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      onKeyDown?.(event);
+      if (event.defaultPrevented) return;
+      if (event.key !== "Backspace" && event.key !== "Delete") return;
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+      const el = event.currentTarget;
+      const start = el.selectionStart;
+      if (start === null || start !== el.selectionEnd) return;
+      const current = el.value;
+      const pattern = resolvePattern(mask, current.replace(/\D/g, "").length);
+      const literalAt = (i: number) => i >= 0 && i < current.length && !isSlot(pattern.charAt(i));
+
+      let target = -1;
+      if (event.key === "Backspace" && literalAt(start - 1)) {
+        target = start - 1;
+        while (target >= 0 && literalAt(target)) target--;
+      } else if (event.key === "Delete" && literalAt(start)) {
+        target = start;
+        while (target < current.length && literalAt(target)) target++;
+        if (target >= current.length) target = -1;
+      }
+      if (target < 0) return;
+
+      event.preventDefault();
+      const next = current.slice(0, target) + current.slice(target + 1);
+      const caret = event.key === "Backspace" ? target : start;
+      // Setter nativo + evento "input": o React trata como digitação (onChange).
+      const view = el.ownerDocument.defaultView ?? window;
+      const setter = Object.getOwnPropertyDescriptor(view.HTMLInputElement.prototype, "value")?.set;
+      if (setter) setter.call(el, next);
+      else el.value = next;
+      el.setSelectionRange(caret, caret);
+      el.dispatchEvent(new view.Event("input", { bubbles: true }));
+    };
+
     const fallbackMode =
       (presetInputMode as Record<string, React.HTMLAttributes<HTMLInputElement>["inputMode"]>)[mask] ??
       (isNumericPattern(mask) ? "numeric" : "text");
@@ -246,6 +318,7 @@ const InputMask = React.forwardRef<HTMLInputElement, InputMaskProps>(
         inputMode={inputMode ?? fallbackMode}
         value={display}
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
         {...props}
       />
     );

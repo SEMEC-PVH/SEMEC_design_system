@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-15T12:30:36.000Z — packages/react/manifest.js + packages/react/* — versão 3.1.0
+> Gerado 2026-10-15T12:33:56.000Z — packages/react/manifest.js + packages/react/* — versão 3.1.0
 
 ## Instalação
 
@@ -1001,7 +1001,7 @@ export default {
 
 Desc: Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.
 
-Variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento)
+Variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento) · com asChild, o spinner entra no link
 
 Uso:
 ```tsx
@@ -1029,17 +1029,17 @@ import { Plus } from "lucide-react";
 
 Prompt:
 ```text
-Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento) · com asChild, o spinner entra no link. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
 ```tsx
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
+import { Slot, Slottable } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
-import { Spinner } from "./spinner";
+import { ButtonLoadingIndicator } from "./button-loading";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
@@ -1109,34 +1109,29 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const Comp = asChild ? Slot : "button";
-    const handleClick = loading
-      ? (event: React.MouseEvent<HTMLButtonElement>) => {
-          // aria-disabled não bloqueia a ativação: o bloqueio é aqui.
-          event.preventDefault();
-        }
-      : onClick;
-    const content =
-      loading && !asChild ? (
-        <>
-          <Spinner decorative />
-          {loadingText ?? children}
-        </>
-      ) : (
-        children
-      );
+    // O elemento é o mesmo com e sem loading (sem remontar: o foco fica).
+    // O bloqueio do clique mora no ButtonLoadingIndicator ("use client"),
+    // para o Button seguir renderizando no servidor; o onClick de quem usa
+    // não é repassado enquanto carrega.
     return (
       <Comp
-        className={cn(
-          buttonVariants({ variant, size, className }),
-          loading && "cursor-progress"
-        )}
+        className={cn(buttonVariants({ variant, size, className }), loading && "cursor-progress")}
         ref={ref}
+        onClick={loading ? undefined : onClick}
         {...props}
         aria-busy={loading ? true : props["aria-busy"]}
         aria-disabled={loading ? true : props["aria-disabled"]}
-        onClick={handleClick}
       >
-        {content}
+        {!loading ? (
+          children
+        ) : asChild ? (
+          [<ButtonLoadingIndicator key="loading" />, <Slottable key="child">{children}</Slottable>]
+        ) : (
+          <>
+            <ButtonLoadingIndicator />
+            {loadingText ?? children}
+          </>
+        )}
       </Comp>
     );
   }
@@ -1400,7 +1395,7 @@ export { Input };
 
 ### Campo de senha (`password-input`) — `src/components/password-input.tsx` — slug: campo-de-senha
 
-Desc: Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Repassa todas as props do `Input`, inclusive `autoComplete`.
+Desc: Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Desliga corretor e maiúscula automática (`spellCheck={false}`, `autoCapitalize="none"`, `autoCorrect="off"`, sobrescrevíveis), que alterariam a senha visível. Repassa todas as props do `Input`, inclusive `autoComplete`.
 
 Variantes: visibilidade: defaultVisible · visible + onVisibleChange (controlado) · labels: show (padrão "Mostrar senha") · autoComplete: current-password (login) · new-password (cadastro e troca de senha)
 
@@ -1419,7 +1414,7 @@ import { FormField, PasswordInput } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `PasswordInput` (Campo de senha) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Repassa todas as props do `Input`, inclusive `autoComplete`. API e variantes: visibilidade: defaultVisible · visible + onVisibleChange (controlado) · labels: show (padrão "Mostrar senha") · autoComplete: current-password (login) · new-password (cadastro e troca de senha). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `PasswordInput` (Campo de senha) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Desliga corretor e maiúscula automática (`spellCheck={false}`, `autoCapitalize="none"`, `autoCorrect="off"`, sobrescrevíveis), que alterariam a senha visível. Repassa todas as props do `Input`, inclusive `autoComplete`. API e variantes: visibilidade: defaultVisible · visible + onVisibleChange (controlado) · labels: show (padrão "Mostrar senha") · autoComplete: current-password (login) · new-password (cadastro e troca de senha). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -1501,6 +1496,11 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
           type={visible ? "text" : "password"}
           disabled={disabled}
           className={cn("pr-12 [&::-ms-reveal]:hidden", className)}
+          // Com a senha visível (type="text"), corretor e maiúscula automática
+          // alterariam a senha. Sobrescrevíveis por props.
+          spellCheck={false}
+          autoCapitalize="none"
+          autoCorrect="off"
           {...props}
         />
         <button
@@ -1528,7 +1528,7 @@ export { PasswordInput };
 
 ### Campo com máscara (`input-mask`) — `src/components/input-mask.tsx` — slug: campo-com-mascara
 
-Desc: Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio, colar valor com outra pontuação funciona e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
+Desc: Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho; colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
 
 Variantes: mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: "AAA-9*99") · valor: defaultValue · value + onValueChange(masked, raw) · inputMode: numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível
 
@@ -1556,7 +1556,7 @@ import { FormField, InputMask } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `InputMask` (Campo com máscara) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio, colar valor com outra pontuação funciona e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara. API e variantes: mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: "AAA-9*99") · valor: defaultValue · value + onValueChange(masked, raw) · inputMode: numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `InputMask` (Campo com máscara) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho; colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara. API e variantes: mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: "AAA-9*99") · valor: defaultValue · value + onValueChange(masked, raw) · inputMode: numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -1611,17 +1611,43 @@ export interface InputMaskResult {
   raw: string;
 }
 
+const TELEFONE_PRESETS = new Set(["telefone", "telefone-fixo", "celular"]);
+
+/**
+ * Telefone colado com código do país (`+55 69 99999-1234` ou
+ * `5569999991234`): descarta o `55` inicial. Não mexe em valor já formatado
+ * pela máscara (`(55) …`, DDD 55), para não comer o DDD de quem digita.
+ */
+function stripCountryCode(value: string, mask: InputMaskPreset | string): string {
+  if (!TELEFONE_PRESETS.has(mask)) return value;
+  const digits = value.replace(/\D/g, "");
+  const trimmed = value.trimStart();
+  const hasPlus = trimmed.startsWith("+55");
+  const looksInternational =
+    digits.startsWith("55") && digits.length >= 12 && digits.length <= 13 && !trimmed.startsWith("(");
+  return hasPlus || looksInternational ? digits.slice(2) : value;
+}
+
+const isAlphanumeric = (ch: string) => /[0-9A-Za-zÀ-ÖØ-öø-ÿ]/.test(ch);
+
 /**
  * Formata `value` com uma máscara pronta ou um padrão próprio, em que `9` é
  * dígito, `A` é letra, `*` é letra ou dígito e o resto é literal
- * (ex.: `"AAA-9999"`). Aceita valor já formatado, sem formatação ou colado
- * com outra pontuação. Literais só aparecem quando há caractere depois deles.
+ * (ex.: `"AAA-9999"`, `"+55 (99) 99999-9999"`). Aceita valor já formatado,
+ * sem formatação ou colado com outra pontuação. Literais só aparecem quando
+ * há caractere depois deles. Nos telefones, um `+55`/`55` de país colado é
+ * descartado.
  */
 export function applyInputMask(value: string, mask: InputMaskPreset | string): InputMaskResult {
-  const digitCount = value.replace(/\D/g, "").length;
+  const normalized = stripCountryCode(value, mask);
+  const digitCount = normalized.replace(/\D/g, "").length;
   const pattern = resolvePattern(mask, digitCount);
+  // Pontuação do próprio padrão no valor: ele já veio formatado, e um
+  // caractere igual a um literal (ex.: o "5" de "+55") é o literal.
+  const punctuation = new Set([...pattern].filter((ch) => !isSlot(ch) && !isAlphanumeric(ch)));
+  const looksFormatted = [...normalized].some((ch) => punctuation.has(ch));
   // Padrão só de dígitos: descarta a pontuação de quem colou ("(69) 3216-0000").
-  const source = isNumericPattern(pattern) ? value.replace(/\D/g, "") : value;
+  const source = isNumericPattern(pattern) ? normalized.replace(/\D/g, "") : normalized;
 
   let masked = "";
   let raw = "";
@@ -1631,15 +1657,21 @@ export function applyInputMask(value: string, mask: InputMaskPreset | string): I
   for (const ch of source) {
     if (p >= pattern.length) break;
     if (!isSlot(pattern.charAt(p))) {
-      // Valor já formatado: o caractere é um dos literais à frente; consome até ele.
+      let nextSlot = p;
+      while (nextSlot < pattern.length && !isSlot(pattern.charAt(nextSlot))) nextSlot++;
+      const canFill =
+        nextSlot < pattern.length && Boolean(SLOT_TESTS[pattern.charAt(nextSlot)]?.test(ch));
       let q = p;
-      while (q < pattern.length && !isSlot(pattern.charAt(q)) && pattern.charAt(q) !== ch) q++;
-      if (q < pattern.length && !isSlot(pattern.charAt(q))) {
+      while (q < nextSlot && pattern.charAt(q) !== ch) q++;
+      // Só consome como literal se o valor parece formatado ou se o
+      // caractere não cabe na próxima posição editável.
+      if (q < nextSlot && (looksFormatted || !canFill)) {
         pending += pattern.slice(p, q + 1);
         p = q + 1;
         continue;
       }
-      while (p < pattern.length && !isSlot(pattern.charAt(p))) pending += pattern[p++];
+      pending += pattern.slice(p, nextSlot);
+      p = nextSlot;
       if (p >= pattern.length) break;
     }
     if (SLOT_TESTS[pattern.charAt(p)]?.test(ch)) {
@@ -1702,7 +1734,7 @@ export interface InputMaskProps
  * e pode ser sobrescrito. Sem dependência externa.
  */
 const InputMask = React.forwardRef<HTMLInputElement, InputMaskProps>(
-  ({ mask, value, defaultValue, onValueChange, onChange, inputMode, ...props }, ref) => {
+  ({ mask, value, defaultValue, onValueChange, onChange, onKeyDown, inputMode, ...props }, ref) => {
     const isControlled = value !== undefined;
     const [inner, setInner] = React.useState(
       () => applyInputMask(defaultValue ?? "", mask).masked
@@ -1732,6 +1764,46 @@ const InputMask = React.forwardRef<HTMLInputElement, InputMaskProps>(
       onChange?.(event);
     };
 
+    /**
+     * Backspace logo depois de um literal (ou Delete logo antes) apagaria só
+     * a pontuação, que a máscara repõe: o cursor andaria sem apagar nada.
+     * Aqui o literal é pulado e o caractere editável vizinho é apagado.
+     */
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      onKeyDown?.(event);
+      if (event.defaultPrevented) return;
+      if (event.key !== "Backspace" && event.key !== "Delete") return;
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+      const el = event.currentTarget;
+      const start = el.selectionStart;
+      if (start === null || start !== el.selectionEnd) return;
+      const current = el.value;
+      const pattern = resolvePattern(mask, current.replace(/\D/g, "").length);
+      const literalAt = (i: number) => i >= 0 && i < current.length && !isSlot(pattern.charAt(i));
+
+      let target = -1;
+      if (event.key === "Backspace" && literalAt(start - 1)) {
+        target = start - 1;
+        while (target >= 0 && literalAt(target)) target--;
+      } else if (event.key === "Delete" && literalAt(start)) {
+        target = start;
+        while (target < current.length && literalAt(target)) target++;
+        if (target >= current.length) target = -1;
+      }
+      if (target < 0) return;
+
+      event.preventDefault();
+      const next = current.slice(0, target) + current.slice(target + 1);
+      const caret = event.key === "Backspace" ? target : start;
+      // Setter nativo + evento "input": o React trata como digitação (onChange).
+      const view = el.ownerDocument.defaultView ?? window;
+      const setter = Object.getOwnPropertyDescriptor(view.HTMLInputElement.prototype, "value")?.set;
+      if (setter) setter.call(el, next);
+      else el.value = next;
+      el.setSelectionRange(caret, caret);
+      el.dispatchEvent(new view.Event("input", { bubbles: true }));
+    };
+
     const fallbackMode =
       (presetInputMode as Record<string, React.HTMLAttributes<HTMLInputElement>["inputMode"]>)[mask] ??
       (isNumericPattern(mask) ? "numeric" : "text");
@@ -1743,6 +1815,7 @@ const InputMask = React.forwardRef<HTMLInputElement, InputMaskProps>(
         inputMode={inputMode ?? fallbackMode}
         value={display}
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
         {...props}
       />
     );
