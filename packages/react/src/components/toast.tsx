@@ -44,7 +44,7 @@ const toastVariants = cva(
       variant: {
         default: "border-border bg-card text-card-foreground",
         success:
-          "border-none bg-pv-green-500 text-pv-blue-900 px-5 py-4 [&_[toast-close]]:text-pv-blue-900 [&_[toast-close]]:hover:bg-pv-blue-900/10",
+          "border-none bg-success-emphasis text-success-emphasis-foreground px-5 py-4 [&_[toast-close]]:text-success-emphasis-foreground [&_[toast-close]]:hover:bg-success-emphasis-foreground/10",
         warning: "border-warning/40 bg-warning-surface text-foreground",
         destructive: "border-destructive/40 bg-destructive-surface text-destructive",
       },
