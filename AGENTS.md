@@ -92,4 +92,4 @@ Regenerate: `npm run generate:llms` (alias of `build:skills` on `@semec/ds`; als
 - Keyboard navigation verified end-to-end
 - Contrast calculated for any new colors
 - No new hex, `rgba()`, or inline `style` outside existing tokens
-- Reviewed by someone other than the author
+- Reviewed by someone other than the author when a reviewer is available (not required by branch protection since 2026-10-15; green CI is)

@@ -24,5 +24,5 @@ Closes #
 
 ## Revisão
 
-A aprovação precisa vir de um code owner que **não** seja o autor (`.github/CODEOWNERS`).
-O revisor confirma teclado, foco e contraste — não só o código.
+Quando houver revisor, de preferência um code owner que **não** seja o autor (`.github/CODEOWNERS`). A aprovação não é obrigatória; a CI verde é.
+Quem revisa (ou o próprio autor, sem revisor) confirma teclado, foco e contraste — não só o código.
