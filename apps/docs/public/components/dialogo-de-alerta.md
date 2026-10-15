@@ -4,7 +4,7 @@ code: "alert-dialog"
 slug: "dialogo-de-alerta"
 file: "src/components/alert-dialog.tsx"
 category: "feedback"
-variants: "composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel · variant (Action/Cancel): as do Button; padrão primary (Action) e outline (Cancel), 44px · regras: inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action"
+variants: "composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel · variant (Action/Cancel): as do Button; padrão primary (Action) e outline (Cancel), 44px · regras: inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action · deprecadas: modal (AlertDialog) · onPointerDownOutside · onInteractOutside (AlertDialogContent): ignoradas desde a 3.1.0; anunciadas na 4.0, saem na 5.0"
 ---
 
 # Diálogo de alerta — `alert-dialog`
@@ -18,6 +18,7 @@ variants: "composição: AlertDialog · AlertDialogTrigger · AlertDialogContent
 - **composição**: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel
 - **variant (Action/Cancel)**: as do Button; padrão primary (Action) e outline (Cancel), 44px
 - **regras**: inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action
+- **deprecadas**: modal (AlertDialog) · onPointerDownOutside · onInteractOutside (AlertDialogContent): ignoradas desde a 3.1.0; anunciadas na 4.0, saem na 5.0
 
 ## Instalação (@semec/ds)
 
@@ -68,7 +69,7 @@ import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader,
 ## Prompt para IA
 
 ```text
-Use o componente `AlertDialog` (Diálogo de alerta) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role="alertdialog", sempre modal, não fecha por clique fora e abre com o foco no Cancelar. API e variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel · variant (Action/Cancel): as do Button; padrão primary (Action) e outline (Cancel), 44px · regras: inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `AlertDialog` (Diálogo de alerta) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role="alertdialog", sempre modal, não fecha por clique fora e abre com o foco no Cancelar. API e variantes: composição: AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel · variant (Action/Cancel): as do Button; padrão primary (Action) e outline (Cancel), 44px · regras: inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action · deprecadas: modal (AlertDialog) · onPointerDownOutside · onInteractOutside (AlertDialogContent): ignoradas desde a 3.1.0; anunciadas na 4.0, saem na 5.0. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -92,7 +93,7 @@ import { buttonVariants } from "./button";
 export interface AlertDialogProps extends AlertDialogPrimitive.AlertDialogProps {
   /**
    * @deprecated Ignorado: o AlertDialog é sempre modal. Mantido só por
-   * compatibilidade com a versão anterior.
+   * compatibilidade com a versão anterior; sai na 5.0 (anunciado na 4.0).
    */
   modal?: boolean;
 }
@@ -125,12 +126,12 @@ export interface AlertDialogContentProps
   extends AlertDialogPrimitive.AlertDialogContentProps {
   /**
    * @deprecated Ignorado: o AlertDialog não fecha por clique fora. Mantido só
-   * por compatibilidade com a versão anterior.
+   * por compatibilidade com a versão anterior; sai na 5.0 (anunciado na 4.0).
    */
   onPointerDownOutside?: DialogPrimitive.DialogContentProps["onPointerDownOutside"];
   /**
    * @deprecated Ignorado: o AlertDialog não fecha por interação fora. Mantido
-   * só por compatibilidade com a versão anterior.
+   * só por compatibilidade com a versão anterior; sai na 5.0 (anunciado na 4.0).
    */
   onInteractOutside?: DialogPrimitive.DialogContentProps["onInteractOutside"];
 }

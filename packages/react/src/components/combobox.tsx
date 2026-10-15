@@ -4,8 +4,8 @@ import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
-import { warnDeprecated } from "../lib/deprecation";
 import { useFormField, useFormFieldControl } from "./form-field";
 
 export interface ComboboxOption {
@@ -40,8 +40,13 @@ export interface ComboboxProps
   defaultValue?: string;
   /** Recebe o valor da opção escolhida (contrato de formulário, ADR-015). */
   onValueChange?: (value: string) => void;
-  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
-  onChange?: (value: string) => void;
+  /**
+   * Removido na 4.0 (AUD-35): use `onValueChange`. O Combobox não tem
+   * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
+   */
+  onChange?: never;
   /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
   invalid?: boolean;
   /** Texto do gatilho sem seleção. Padrão: "Selecione…". */
@@ -50,12 +55,13 @@ export interface ComboboxProps
   searchPlaceholder?: string;
   /** Texto quando a busca não encontra nada. Padrão: "Nenhum resultado.". */
   emptyText?: string;
-  /** @deprecated Use `emptyText`. Mantida por compatibilidade. */
+  /** @deprecated Use `emptyText`. Mantida por compatibilidade; sai na 5.0 (anunciado na 4.0). */
   emptyMessage?: string;
   /**
    * @deprecated Prefira rótulo visível (`<Label htmlFor={id}>` ou `FormField`)
    * ou `aria-labelledby`. Quando usada, vira um rótulo oculto somado ao texto
    * visível do gatilho (o nome acessível continua contendo o que se vê, 2.5.3).
+   * Sai na 5.0 (anunciado na 4.0); o atributo `aria-label` continua aceito.
    */
   ariaLabel?: string;
   /** Gera um `<input type="hidden" name>` com o valor, para envio em `<form>`. */
@@ -88,7 +94,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
       options,
       value,
       defaultValue,
-      onChange,
+      onChange: _removedOnChange,
       onValueChange,
       invalid,
       placeholder = "Selecione…",
@@ -109,6 +115,8 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
     },
     ref
   ) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("Combobox");
     const text = { ...defaultLabels, ...labels };
     const empty = emptyText ?? emptyMessage ?? "Nenhum resultado.";
     const hiddenLabel = ariaLabel ?? ariaLabelAttr;
@@ -121,12 +129,6 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
 
     const ctx = useFormField();
     const field = useFormFieldControl({ ...props, invalid });
-    if (onChange) {
-      warnDeprecated(
-        "Combobox.onChange",
-        "Combobox: `onChange(value)` está obsoleto e sai na 4.0. Use `onValueChange(value)`."
-      );
-    }
     const triggerId = field.id ?? props.id;
 
     const [open, setOpen] = React.useState(false);
@@ -197,7 +199,6 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
     const choose = (option: ComboboxOption) => {
       if (value === undefined) setInternalValue(option.value);
       onValueChange?.(option.value);
-      onChange?.(option.value);
       setOpen(false);
     };
 

@@ -12,7 +12,7 @@ O repositório do **Design System da SEMEC** (Secretaria Municipal de Economia d
 
 ## Fase atual
 
-O kit é **publicado no npm público** desde 17/09/2026 ([ADR-022](adr/0022-publicacao-npm-publico.md)), sob o nome `@semec/ds`; a versão publicada em 15/10/2026 é a **3.1.0** (onda 2 da auditoria de 14/10/2026); a 3.2.0, aditiva, está em preparação com a onda 3. A versão vigente está sempre em `packages/react/package.json` e no [CHANGELOG](../packages/react/CHANGELOG.md). O consumo é via `npm install @semec/ds` (subpath exports: `/react`, `/react/validacao`, `/skills`, `/lite/skills`, tokens CSS e preset Tailwind).
+O kit é **publicado no npm público** desde 17/09/2026 ([ADR-022](adr/0022-publicacao-npm-publico.md)), sob o nome `@semec/ds`; a versão publicada em 15/10/2026 é a **3.2.0** (ondas 2 e 3 da auditoria de 14/10/2026, aditiva); a 4.0.0, que remove o que a 3.1.0 e a 3.2.0 anunciaram como depreciado, está em preparação ([guia de migração](migracao-4.0.md)). A versão vigente está sempre em `packages/react/package.json` e no [CHANGELOG](../packages/react/CHANGELOG.md). O consumo é via `npm install @semec/ds` (subpath exports: `/react`, `/react/validacao`, `/skills`, `/lite/skills`, tokens CSS e preset Tailwind).
 
 Não há Storybook nem regressão visual. O kit tem testes com Vitest + Testing Library + axe (`npm test`, em `packages/react/test/`), e a CI ([ci.yml](../.github/workflows/ci.yml)) roda `lint`, `typecheck`, `test` (com zod 3 e 4), `build` (com conferência de deriva dos artefatos de agentes), `changeset` e o `gate` de qualidade (`npm run gate`: tokens, exports, smoke de acessibilidade com axe e estados abertos em Chromium). O site é export estático e a publicação é via GitHub Pages ([workflow](../.github/workflows/deploy-pages.yml)).
 

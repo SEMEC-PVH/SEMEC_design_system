@@ -2,8 +2,8 @@
 
 import * as React from "react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
-import { warnDeprecated } from "../lib/deprecation";
 import { useFormField, useFormFieldControl } from "./form-field";
 
 interface InputOTPContextValue {
@@ -54,8 +54,13 @@ export interface InputOTPProps
    * Contrato de formulário (ADR-015).
    */
   onValueChange?: (value: string) => void;
-  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
-  onChange?: (value: string) => void;
+  /**
+   * Removido na 4.0 (AUD-35): use `onValueChange`. O InputOTP não tem
+   * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
+   */
+  onChange?: never;
   /** Gera um `<input type="hidden" name>` com o código, para envio em `<form>`. */
   name?: string;
   /** `id` do `<form>` do input oculto, quando o InputOTP fica fora dele. */
@@ -81,7 +86,7 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
       className,
       value,
       defaultValue,
-      onChange,
+      onChange: _removedOnChange,
       onValueChange,
       name,
       form,
@@ -95,6 +100,8 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
     },
     ref
   ) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("InputOTP");
     const isControlled = value !== undefined;
     const slotsRef = React.useRef<(HTMLInputElement | null)[]>([]);
     const [internalSlots, setSlots] = React.useState<string[]>(() =>
@@ -108,12 +115,6 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
         maxLength
       )
     );
-    if (onChange) {
-      warnDeprecated(
-        "InputOTP.onChange",
-        "InputOTP: `onChange(value)` está obsoleto e sai na 4.0. Use `onValueChange(value)`."
-      );
-    }
 
     // Modo controlado: a tela reflete sempre o `value` do pai. O array interno
     // só é usado enquanto o pai aceitar o que foi emitido (value === join), o
@@ -137,9 +138,8 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
       (next: string[]) => {
         setSlots(next);
         onValueChange?.(next.join(""));
-        onChange?.(next.join(""));
       },
-      [onChange, onValueChange]
+      [onValueChange]
     );
 
     const fillFrom = React.useCallback(

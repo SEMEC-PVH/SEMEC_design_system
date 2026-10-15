@@ -4,7 +4,7 @@ code: "calendar"
 slug: "calendario"
 file: "src/components/calendar.tsx"
 category: "formularios"
-variants: "props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · deprecadas: onChange(date) (use onValueChange; sai na 4.0) · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome '14 de outubro de 2026' · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona"
+variants: "props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · removidas na 4.0: onChange(date) → use onValueChange · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome '14 de outubro de 2026' · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona"
 ---
 
 # Calendário — `calendar`
@@ -16,7 +16,7 @@ variants: "props: value · onValueChange · min · max (AAAA-MM-DD, data local) 
 ## Variantes
 
 - **props**: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }>
-- **deprecadas**: onChange(date) (use onValueChange; sai na 4.0)
+- **removidas na 4.0**: onChange(date) → use onValueChange
 - **a11y**: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome "14 de outubro de 2026"
 - **teclado**: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona
 
@@ -46,7 +46,7 @@ import { Calendar } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px. API e variantes: props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · deprecadas: onChange(date) (use onValueChange; sai na 4.0) · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome "14 de outubro de 2026" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px. API e variantes: props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · removidas na 4.0: onChange(date) → use onValueChange · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome "14 de outubro de 2026" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -57,7 +57,7 @@ Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não r
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { warnDeprecated } from "../lib/deprecation";
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
 
 const LOCALE = "pt-BR";
@@ -100,8 +100,13 @@ export interface CalendarProps
   value?: Date | null;
   /** Recebe a data escolhida (contrato de formulário, ADR-015). */
   onValueChange?: (date: Date) => void;
-  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
-  onChange?: (date: Date) => void;
+  /**
+   * Removido na 4.0 (AUD-35): use `onValueChange`. O Calendar não tem
+   * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
+   */
+  onChange?: never;
   disabled?: boolean;
   /** Data mínima selecionável (`AAAA-MM-DD`). */
   min?: string;
@@ -160,14 +165,10 @@ const navButtonClass =
  * (`Shift` + `PageUp`/`PageDown` trocam o ano) e `Enter`/`Espaço` selecionam.
  */
 const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
-  ({ className, value, onChange, onValueChange, disabled, min, max, labels, ...props }, ref) => {
+  ({ className, value, onChange: _removedOnChange, onValueChange, disabled, min, max, labels, ...props }, ref) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("Calendar");
     const text = { ...DEFAULT_LABELS, ...labels };
-    if (onChange) {
-      warnDeprecated(
-        "Calendar.onChange",
-        "Calendar: `onChange(date)` está obsoleto e sai na 4.0. Use `onValueChange(date)`."
-      );
-    }
     const headingId = React.useId();
     const today = startOfDay(new Date());
 
@@ -208,7 +209,6 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
     const select = (date: Date) => {
       if (isDisabled(date)) return;
       onValueChange?.(date);
-      onChange?.(date);
     };
 
     const moveFocus = (date: Date) => {

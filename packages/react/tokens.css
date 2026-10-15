@@ -7,10 +7,10 @@
    L0 — PRIMITIVOS (`--pv-*`)
         Valores brutos. Invariantes de tema. Nunca use primitivo direto
         em componente nem em tela: nem a variável `--pv-*`, nem utilitário.
-        Os utilitários `bg-pv-*`, `text-pv-*`, `border-pv-*` (gerados de
-        `--color-pv-*` no @theme abaixo) estão DEPRECIADOS desde a 3.1.0 e
-        saem na 4.0 (AUD-55, ADR-013); as variáveis `--pv-*` continuam.
-        Primitivo novo não ganha utilitário.
+        Desde a 4.0 (AUD-55) o @theme não expõe primitivo: os utilitários
+        `bg-pv-*`, `text-pv-*`, `border-pv-*` deixaram de existir. As
+        variáveis `--pv-*` continuam aqui no :root, como base dos L1.
+        Tabela primitivo → semântico: docs/migracao-4.0.md.
 
    L1 — SEMÂNTICOS (`--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`,
         `--feedback-*`, `--space-*`, `--text-*`, `--radius-*`, `--elevation-*`)
@@ -174,6 +174,16 @@
   --text-on-brand:     var(--pv-white);
   --tint:              var(--pv-blue-50);
 
+  /* Título de seção em azul institucional escuro (SectionHeader). Criado
+     na 4.0 (AUD-55) para substituir `text-pv-blue-900`. 12,43:1 sobre
+     --surface e 11,48:1 sobre --bg.
+     Atenção: é COR, mas divide o prefixo --text-* com os TAMANHOS
+     (--text-xs … --text-display). Por isso fica só aqui no :root, como
+     --text-muted/--text-strong, e o @theme o expõe como --color-text-brand
+     (utilitário text-text-brand). Nunca declare --text-brand no @theme:
+     viraria o utilitário de tamanho text-brand. */
+  --text-brand:        var(--pv-blue-900);
+
   /* ---- Marca ----------------------------------------------------------- */
   --brand-hero:        var(--pv-blue-hero);
 
@@ -192,6 +202,13 @@
   --feedback-warning-surface: var(--pv-yellow-50);
   --feedback-danger-surface:  var(--pv-red-50);
   --feedback-info-surface:    var(--pv-blue-50);
+
+  /* Sucesso em destaque: fundo verde cheio do Toast `success` com texto
+     azul institucional escuro (5,85:1). Criados na 4.0 (AUD-55) para
+     substituir `bg-pv-green-500` / `text-pv-blue-900`. Não use o verde
+     cheio como cor de texto (2,13:1 sobre --surface). */
+  --feedback-success-emphasis:    var(--pv-green-500);
+  --text-on-success-emphasis:     var(--pv-blue-900);
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Tipografia
@@ -317,38 +334,8 @@
    valores: as utilities leem as custom properties acima em runtime.
    ========================================================================== */
 @theme inline {
-  /* -- Primitivos: @deprecated desde a 3.1.0, saem na 4.0 (AUD-55) ------
-     Geram bg-pv-*, text-pv-*, border-pv-*. NÃO são para uso direto: use o
-     semântico do papel (bg-primary, bg-brand-hero, text-foreground,
-     bg-success-surface…). Ficam aqui só para não quebrar quem já usa;
-     primitivo novo (ex.: --pv-yellow-50) não entra nesta lista. -- */
-  --color-pv-blue-50:   var(--pv-blue-50);
-  --color-pv-blue-600:  var(--pv-blue-600);
-  --color-pv-blue-700:  var(--pv-blue-700);
-  --color-pv-blue-800:  var(--pv-blue-800);
-  --color-pv-blue-hero: var(--pv-blue-hero);
-
-  --color-pv-green-50:  var(--pv-green-50);
-  --color-pv-green-500: var(--pv-green-500);
-  --color-pv-green-800: var(--pv-green-800);
-  --color-pv-blue-900:  var(--pv-blue-900);
-
-  --color-pv-yellow-800: var(--pv-yellow-800);
-
-  --color-pv-red-50:  var(--pv-red-50);
-  --color-pv-red-700: var(--pv-red-700);
-
-  --color-pv-gray-50:  var(--pv-gray-50);
-  --color-pv-gray-100: var(--pv-gray-100);
-  --color-pv-gray-200: var(--pv-gray-200);
-  --color-pv-gray-300: var(--pv-gray-300);
-  --color-pv-gray-400: var(--pv-gray-400);
-  --color-pv-gray-600: var(--pv-gray-600);
-  --color-pv-gray-700: var(--pv-gray-700);
-  --color-pv-gray-900: var(--pv-gray-900);
-
-  --color-pv-white: var(--pv-white);
-  --color-pv-black: var(--pv-black);
+  /* -- Primitivos: nenhum. Desde a 4.0 (AUD-55) o @theme só expõe
+     semânticos; não há bg-pv-*, text-pv-*, border-pv-*. -- */
 
   /* -- Semânticos (uso shadcn: bg-card, text-muted-foreground, etc.) -- */
   --color-background:           var(--bg);
@@ -384,6 +371,7 @@
   --color-text-secondary:       var(--text-secondary);
   --color-text-strong:          var(--text-strong);
   --color-text-on-brand:        var(--text-on-brand);
+  --color-text-brand:           var(--text-brand);
 
   --color-destructive-surface: var(--feedback-danger-surface);
   --color-primary-hover:      var(--action-primary-hover);
@@ -391,6 +379,8 @@
 
   --color-success:            var(--feedback-success);
   --color-success-surface:    var(--feedback-success-surface);
+  --color-success-emphasis:   var(--feedback-success-emphasis);
+  --color-success-emphasis-foreground: var(--text-on-success-emphasis);
   --color-warning:            var(--feedback-warning);
   --color-warning-surface:    var(--feedback-warning-surface);
   --color-info:               var(--feedback-info);

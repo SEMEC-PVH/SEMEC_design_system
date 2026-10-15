@@ -325,7 +325,7 @@ function ComboboxPreview() {
           { value: "os", label: "Ordem bancária" },
         ]}
         value={value}
-        onChange={setValue}
+        onValueChange={setValue}
       />
       <p className="mt-2 text-xs text-muted-foreground">Selecionado: {value || "—"}</p>
     </div>

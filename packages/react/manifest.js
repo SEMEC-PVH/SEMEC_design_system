@@ -253,7 +253,8 @@ import { Download, Search, Trash2 } from "lucide-react";
     desc: "Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.",
     variants: [
       { prop: "props", values: "options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer" },
-      { prop: "deprecadas", values: "onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)" },
+      { prop: "removidas na 4.0", values: "onChange(value) → use onValueChange (guia docs/migracao-4.0.md; codemod codemod-4)" },
+      { prop: "deprecadas", values: "ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText); anunciadas na 4.0, saem na 5.0" },
     ],
     usage: `import { Combobox, FormField, Label } from "@semec/ds/react";
 
@@ -283,8 +284,8 @@ import { Download, Search, Trash2 } from "lucide-react";
     category: "formularios",
     desc: 'Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).',
     variants: [
-      { prop: "props", values: "nativo HTML (min · max · disabled · name · required) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar" },
-      { prop: "deprecadas", values: "onChange(value) (use onValueChange; na 4.0 o onChange passa a receber o evento nativo)" },
+      { prop: "props", values: "nativo HTML (min · max · disabled · name · required · onChange(evento)) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar" },
+      { prop: "mudou na 4.0", values: "onChange é o evento nativo do <input> (até a 3.x recebia a string); para o valor, use onValueChange" },
     ],
     usage: `import { DatePicker, FormField } from "@semec/ds/react";
 
@@ -306,7 +307,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     desc: "Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio.",
     variants: [
       { prop: "props", values: "accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels" },
-      { prop: "deprecadas", values: "onChange(files) (use onValueChange; sai na 4.0)" },
+      { prop: "removidas na 4.0", values: "onChange(files) → use onValueChange" },
     ],
     usage: `import { FileUpload } from "@semec/ds/react";
 
@@ -962,6 +963,7 @@ import { HelpCircle } from "lucide-react";
       { prop: "composição", values: "AlertDialog · AlertDialogTrigger · AlertDialogContent · AlertDialogHeader · AlertDialogTitle · AlertDialogDescription · AlertDialogFooter · AlertDialogAction · AlertDialogCancel" },
       { prop: "variant (Action/Cancel)", values: "as do Button; padrão primary (Action) e outline (Cancel), 44px" },
       { prop: "regras", values: "inclua sempre AlertDialogCancel (recebe o foco inicial) · Esc fecha · para validar antes de fechar, controle open e use event.preventDefault() no onClick do Action" },
+      { prop: "deprecadas", values: "modal (AlertDialog) · onPointerDownOutside · onInteractOutside (AlertDialogContent): ignoradas desde a 3.1.0; anunciadas na 4.0, saem na 5.0" },
     ],
     usage: `import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, Button } from "@semec/ds/react";
 
@@ -1126,7 +1128,7 @@ import { Bold } from "lucide-react";
     variants: [
       { prop: "composição", values: "InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator" },
       { prop: "props", values: "value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total))" },
-      { prop: "deprecadas", values: "onChange(value) (use onValueChange; sai na 4.0)" },
+      { prop: "removidas na 4.0", values: "onChange(value) → use onValueChange" },
     ],
     usage: `import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec/ds/react";
 
@@ -1154,7 +1156,7 @@ import { Bold } from "lucide-react";
     desc: "Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px.",
     variants: [
       { prop: "props", values: "value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }>" },
-      { prop: "deprecadas", values: "onChange(date) (use onValueChange; sai na 4.0)" },
+      { prop: "removidas na 4.0", values: "onChange(date) → use onValueChange" },
       { prop: "a11y", values: "role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome \"14 de outubro de 2026\"" },
       { prop: "teclado", values: "←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona" },
     ],

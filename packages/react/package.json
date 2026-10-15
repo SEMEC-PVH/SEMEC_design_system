@@ -1,9 +1,12 @@
 {
   "name": "@semec/ds",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "private": false,
   "description": "Design System SEMEC: componentes React + tokens CSS + artefatos para agentes IA.",
   "type": "module",
+  "bin": {
+    "semec-ds": "bin/semec-ds.mjs"
+  },
   "exports": {
     "./react": {
       "types": "./dist/react/index.d.ts",
@@ -54,6 +57,8 @@
   },
   "files": [
     "dist",
+    "bin",
+    "codemods",
     "tokens.css",
     "pv-preset.ts",
     "CHANGELOG.md",
@@ -73,7 +78,7 @@
     "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-dts.mjs"
+    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs"
   },
   "peerDependencies": {
     "lucide-react": ">=0.468.0 <2",

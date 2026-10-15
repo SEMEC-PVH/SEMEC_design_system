@@ -3,8 +3,8 @@
 import * as React from "react";
 import { UploadCloud } from "lucide-react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
-import { warnDeprecated } from "../lib/deprecation";
 import { useFormField } from "./form-field";
 
 export interface FileUploadLabels {
@@ -40,8 +40,13 @@ export interface FileUploadProps
   invalid?: boolean;
   /** Recebe os arquivos aceitos (contrato de formulário, ADR-015). */
   onValueChange?: (files: File[]) => void;
-  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
-  onChange?: (files: File[]) => void;
+  /**
+   * Removido na 4.0 (AUD-35): use `onValueChange`. O FileUpload não tem
+   * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
+   */
+  onChange?: never;
   /** `name` do `<input type="file">`. Atalho de `inputProps.name`. */
   name?: string;
   /** `required` do `<input type="file">`. Atalho de `inputProps.required`. */
@@ -114,7 +119,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       hint,
       error,
       invalid: invalidProp,
-      onChange,
+      onChange: _removedOnChange,
       onValueChange,
       name,
       required,
@@ -128,6 +133,8 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
     },
     ref
   ) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("FileUpload");
     const [internalFiles, setInternalFiles] = React.useState<File[]>([]);
     const files = value ?? internalFiles;
     const [drag, setDrag] = React.useState(false);
@@ -149,12 +156,6 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
     const hintId = `${idBase}-hint`;
     const errorId = `${idBase}-error`;
     const message = localError ?? error;
-    if (onChange) {
-      warnDeprecated(
-        "FileUpload.onChange",
-        "FileUpload: `onChange(files)` está obsoleto e sai na 4.0. Use `onValueChange(files)`."
-      );
-    }
 
     // `input.files` acompanha a lista mostrada (seleção, soltar, `value` do
     // pai), para o envio nativo e o `required` funcionarem (D1).
@@ -194,7 +195,6 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       setLocalError(undefined);
       if (value === undefined) setInternalFiles(next);
       onValueChange?.(next);
-      onChange?.(next);
       return next;
     };
 

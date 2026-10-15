@@ -5,12 +5,12 @@ export const metadata = { title: "Componente ServiceCard" };
 
 const CODE = `<article className="bg-white rounded-2xl p-6 shadow-[0_4px_16px_rgba(0,0,0,0.12)]">
   <span className="tag">IPTU</span>
-  <span className="badge bg-pv-yellow-500 text-pv-blue-950">Novo</span>
-  <h3 className="font-bold text-pv-blue-900">Restituição de IPTU</h3>
+  <span className="badge bg-warning-surface text-warning">Novo</span>
+  <h3 className="font-bold text-text-brand">Restituição de IPTU</h3>
   <p>Solicite a restituição de valores pagos a maior no IPTU.</p>
   <div className="foot">
     <span>Acessar serviço</span>
-    <span className="bg-pv-green-50 hover:bg-pv-green-600 hover:text-white">→</span>
+    <span className="bg-success-surface text-success hover:bg-success hover:text-text-on-brand">→</span>
   </div>
 </article>`;
 
@@ -51,9 +51,9 @@ export default function ServiceCardPage() {
         Card: <code>bg-white rounded-2xl p-6</code> sem borda, sombra{" "}
         <code>0 4px 16px rgba(0,0,0,0.12)</code> · hover whisper{" "}
         <code>0 8px 24px rgba(0,0,0,0.16)</code> · selo{" "}
-        <code>bg-pv-yellow-500 text-pv-blue-950</code> · seta{" "}
-        <code>bg-pv-green-50</code> → hover{" "}
-        <code>bg-pv-green-600 text-white</code> · &quot;Em breve&quot;{" "}
+        <code>bg-warning-surface text-warning</code> · seta{" "}
+        <code>bg-success-surface text-success</code> → hover{" "}
+        <code>bg-success text-text-on-brand</code> · &quot;Em breve&quot;{" "}
         <code>bg-#efefef</code>.
       </p>
 

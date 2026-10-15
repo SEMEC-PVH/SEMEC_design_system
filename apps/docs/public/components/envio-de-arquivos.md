@@ -4,7 +4,7 @@ code: "file-upload"
 slug: "envio-de-arquivos"
 file: "src/components/file-upload.tsx"
 category: "formularios"
-variants: "props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · deprecadas: onChange(files) (use onValueChange; sai na 4.0)"
+variants: "props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · removidas na 4.0: onChange(files) → use onValueChange"
 ---
 
 # Envio de arquivos — `file-upload`
@@ -16,7 +16,7 @@ variants: "props: accept · maxSize · label · hint · error · invalid · onVa
 ## Variantes
 
 - **props**: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels
-- **deprecadas**: onChange(files) (use onValueChange; sai na 4.0)
+- **removidas na 4.0**: onChange(files) → use onValueChange
 
 ## Instalação (@semec/ds)
 
@@ -53,7 +53,7 @@ import { FileUpload } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio. API e variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · deprecadas: onChange(files) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio. API e variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · removidas na 4.0: onChange(files) → use onValueChange. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -64,8 +64,8 @@ Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`
 import * as React from "react";
 import { UploadCloud } from "lucide-react";
 
+import { reportRemovedOnChange } from "../lib/removed-prop";
 import { cn } from "../lib/utils";
-import { warnDeprecated } from "../lib/deprecation";
 import { useFormField } from "./form-field";
 
 export interface FileUploadLabels {
@@ -101,8 +101,13 @@ export interface FileUploadProps
   invalid?: boolean;
   /** Recebe os arquivos aceitos (contrato de formulário, ADR-015). */
   onValueChange?: (files: File[]) => void;
-  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
-  onChange?: (files: File[]) => void;
+  /**
+   * Removido na 4.0 (AUD-35): use `onValueChange`. O FileUpload não tem
+   * `onChange` próprio nem repassa `onChange` ao DOM; o tipo recusa a prop
+   * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
+   * (com um `console.error` único em desenvolvimento).
+   */
+  onChange?: never;
   /** `name` do `<input type="file">`. Atalho de `inputProps.name`. */
   name?: string;
   /** `required` do `<input type="file">`. Atalho de `inputProps.required`. */
@@ -175,7 +180,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       hint,
       error,
       invalid: invalidProp,
-      onChange,
+      onChange: _removedOnChange,
       onValueChange,
       name,
       required,
@@ -189,6 +194,8 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
     },
     ref
   ) => {
+    // onChange saiu na 4.0 (AUD-35): descartado, com erro único em dev.
+    if (_removedOnChange !== undefined) reportRemovedOnChange("FileUpload");
     const [internalFiles, setInternalFiles] = React.useState<File[]>([]);
     const files = value ?? internalFiles;
     const [drag, setDrag] = React.useState(false);
@@ -210,12 +217,6 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
     const hintId = `${idBase}-hint`;
     const errorId = `${idBase}-error`;
     const message = localError ?? error;
-    if (onChange) {
-      warnDeprecated(
-        "FileUpload.onChange",
-        "FileUpload: `onChange(files)` está obsoleto e sai na 4.0. Use `onValueChange(files)`."
-      );
-    }
 
     // `input.files` acompanha a lista mostrada (seleção, soltar, `value` do
     // pai), para o envio nativo e o `required` funcionarem (D1).
@@ -255,7 +256,6 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       setLocalError(undefined);
       if (value === undefined) setInternalFiles(next);
       onValueChange?.(next);
-      onChange?.(next);
       return next;
     };
 

@@ -113,7 +113,7 @@ const SectionHeader = React.forwardRef<HTMLDivElement, SectionHeaderProps>(
       {...props}
     >
       <div className="flex items-center justify-between gap-2">
-        <TitleTag className="text-xl font-bold text-pv-blue-900 uppercase tracking-wide">
+        <TitleTag className="text-xl font-bold text-text-brand uppercase tracking-wide">
           {title}
         </TitleTag>
         {badge}
