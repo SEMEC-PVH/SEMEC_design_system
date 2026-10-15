@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-15T15:17:11.000Z — packages/react/manifest.js + packages/react/* — versão 4.0.0
+> Gerado 2026-10-15T16:02:39.000Z — packages/react/manifest.js + packages/react/* — versão 4.0.0
 
 ## Instalação
 
@@ -10702,7 +10702,8 @@ Com `Select`, `DropdownMenu` ou `NavigationMenu` **abertos**, o axe acusa `aria-
 
 Configure o axe para não falhar por isso **sem** esconder outros problemas:
 
-- desligue **só** a regra `aria-hidden-focus`, **só** na análise feita com uma dessas camadas aberta. As outras regras continuam valendo nesse estado;
+- desligue **só** a regra `aria-hidden-focus`, **só** na análise feita com uma dessas camadas aberta. As outras regras WCAG continuam valendo nesse estado;
+- com a camada aberta, analise só as regras WCAG (`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`). O `aria-hidden` do Radix esconde também o `main` e o `h1`, e as regras de *best practice* `landmark-one-main`, `page-has-heading-one` e `region` (moderate) disparam por isso. Elas valem na análise da tela fechada;
 - rode a mesma tela também com a camada fechada e a regra ligada, e não desligue a regra em `Dialog`, `AlertDialog`, `Sheet` ou `Drawer` (eles não disparam);
 - não use `exclude` para tirar o `#root` (ou a camada) da análise: isso tira do axe a página inteira, não só a regra;
 - não "corrija" removendo o `aria-hidden` ou aplicando `inert` por fora: quebra o isolamento que o Radix garante.
@@ -10716,17 +10717,20 @@ import { expect, test } from "@playwright/test";
 test("formulário sem violações do axe", async ({ page }) => {
   await page.goto("/requerimento");
 
-  // Camadas fechadas: todas as regras, inclusive aria-hidden-focus.
+  // Camadas fechadas: todas as regras, inclusive aria-hidden-focus e best practices.
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
-  // Select aberto: só a aria-hidden-focus sai, e só aqui (EXC-01 do @semec/ds).
+  // Select aberto: só regras WCAG, sem a aria-hidden-focus (EXC-01 do @semec/ds).
   await page.getByRole("combobox", { name: "Município" }).click();
-  const aberto = await new AxeBuilder({ page }).disableRules(["aria-hidden-focus"]).analyze();
+  const aberto = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .disableRules(["aria-hidden-focus"])
+    .analyze();
   expect(aberto.violations).toEqual([]);
 });
 ```
 
-Com `axe-core` direto (ou `jest-axe`/`vitest-axe`), o equivalente é passar `{ rules: { "aria-hidden-focus": { enabled: false } } }` só na chamada feita com a camada aberta. O próprio kit testa assim (`packages/react/test/open-states.test.tsx` e o gate em Chromium).
+Com `axe-core` direto (ou `jest-axe`/`vitest-axe`), o equivalente é passar `{ runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] }, rules: { "aria-hidden-focus": { enabled: false } } }` só na chamada feita com a camada aberta. O próprio kit testa assim (`packages/react/test/open-states.test.tsx` e o gate em Chromium).
 
 ## Dependências
 
