@@ -28,6 +28,15 @@ const defaultLabels: ComboboxLabels = {
   list: "Opções",
 };
 
+/**
+ * Tipo impossível de satisfazer, com nome que explica o erro: o `onChange`
+ * saiu na 4.0 (AUD-35). Com `never`, o `tsc` dizia só "not assignable to type
+ * 'undefined'"; com este tipo, a mensagem cita o `onValueChange`.
+ */
+interface OnChangeRemovidoUseOnValueChange {
+  readonly "onChange saiu na 4.0: use onValueChange": never;
+}
+
 export interface ComboboxProps
   extends Omit<
     React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -46,7 +55,7 @@ export interface ComboboxProps
    * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
    * (com um `console.error` único em desenvolvimento).
    */
-  onChange?: never;
+  onChange?: OnChangeRemovidoUseOnValueChange;
   /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
   invalid?: boolean;
   /** Texto do gatilho sem seleção. Padrão: "Selecione…". */
@@ -264,7 +273,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
             type="button"
             disabled={disabled}
             className={cn(
-              "flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive",
+              "flex h-11 w-full items-center justify-between rounded-md border border-input bg-surface px-3 py-2 text-sm text-foreground shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive",
               className
             )}
             {...props}
@@ -326,7 +335,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
                 aria-required={required || ctx?.required ? true : undefined}
                 aria-labelledby={labelIds}
                 aria-label={labelIds ? undefined : hiddenLabel ?? text.search}
-                className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="flex h-11 w-full rounded-md border border-input bg-surface px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               />
             </div>
             {filtered.length > 0 ? (

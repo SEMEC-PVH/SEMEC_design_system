@@ -6,6 +6,8 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 # SEMEC Design System — skill completa
 
+> Gerado para `@semec/ds@{{ds:version}}` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
+
 Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
 **Regra número 1: use os componentes do kit, não os reimplemente.** Importe de `@semec/ds/react`. Não copie o código-fonte de um componente para o app, não recrie um componente existente com `div` + classes e não troque o estilo dele por outro. Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
@@ -16,13 +18,18 @@ Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailw
 
 ## Instalação
 
-Peer deps: `react ^19.0.0`, `react-dom ^19.0.0` e Tailwind CSS v4 no app. Peer **opcional**: `zod ^3.23.0` (só se usar schemas em `@semec/ds/react/validacao`).
+Peer deps obrigatórios: `react ^19.0.0`, `react-dom ^19.0.0`, `tailwindcss ^4.0.0` e `lucide-react >=0.468.0 <2`. Peer **opcional**: `zod ^3.23.0 || ^4.0.0` (só se usar schemas em `@semec/ds/react/validacao`).
 
 ```bash
-npm install @semec/ds
+npm install @semec/ds lucide-react   # pnpm add / yarn add: mesmos pacotes
 ```
 
-Os pacotes `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react` e `get-nonce` são dependências do `@semec/ds` e vêm automaticamente. **Não** instale lista de Radix à mão.
+Instale `lucide-react` **sempre** junto: é peer (os componentes importam os ícones), e sem ele o build quebra. O npm 7+ instala peer ausente sozinho; o pnpm só com `auto-install-peers=true`; o Yarn (clássico e Berry) nunca. Os pacotes `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge` e `get-nonce` são dependências do `@semec/ds` e vêm automaticamente. **Não** instale lista de Radix à mão.
+
+**Tailwind v4 no bundler:**
+
+- **Vite:** `npm install -D tailwindcss @tailwindcss/vite`, `plugins: [react(), tailwindcss()]` no `vite.config.ts` (`import tailwindcss from "@tailwindcss/vite"`). O CSS global é o `src/index.css`: troque o conteúdo do template pelas linhas abaixo e apague o `import "./App.css"`.
+- **Next.js (`create-next-app`):** o Tailwind já vem (`@tailwindcss/postcss`, ou `@tailwindcss/turbopack` sem `postcss.config` no `create-next-app` 16.4; os dois funcionam igual). Em `app/globals.css`, **apague** o que o template gerou (`:root`, `@theme inline` com `--font-sans: var(--font-geist-sans)`, `@media (prefers-color-scheme: dark)`, `body { font-family: Arial… }`): fora de camada, eles vencem o `@layer base` do `tokens.css` e o app fica com Arial e as cores do template. Em `app/layout.tsx`, apague o `next/font/google` Geist e as classes `geist*.variable` do `<body>`, e use `<html lang="pt-BR">`.
 
 No CSS global do app (não via `import` em JS):
 
@@ -33,6 +40,8 @@ No CSS global do app (não via `import` em JS):
 ```
 
 O `@source` é obrigatório no Tailwind v4: sem ele o CSS não gera as classes das peças (`bg-card`, `shadow-elevation-*`, `animate-in`…). O caminho é **relativo ao arquivo CSS**: `src/index.css` e `app/globals.css` usam `../node_modules/...`; `src/app/globals.css` usa `../../node_modules/...`. Se o Tailwind varrer pastas demais (monorepo), limite com `@import "tailwindcss" source("../src");` (também relativo ao CSS) e mantenha o `@source` do pacote.
+
+O CSS não sofre poda: o `@source` varre o `dist` inteiro, então o CSS do kit é um custo fixo (~68 kB, ~12 kB com gzip) mesmo usando um componente só. O JS é podado (um `Button` custa ~35 kB com as dependências).
 
 **Fonte:** o pacote publica a Poppins (400/500/600/700, licença SIL OFL). Importe **antes** do `tokens.css`:
 
@@ -306,7 +315,8 @@ Nunca `outline: none` sem alternativa visível com 3:1.
 
 ### Exceção conhecida (não corrigir)
 
-- `aria-hidden-focus` (axe) com `Select` ou `DropdownMenu` **abertos** é exceção aceita (EXC-01, `docs/excecoes-acessibilidade.md` no repositório do DS): vem do `hideOthers` do Radix sem `inert`, e o foco fica preso na camada, então o impacto é nulo. Não remova `aria-hidden`, não aplique `inert` por fora e não desative a regra globalmente.
+- `aria-hidden-focus` (axe, serious) com `Select` ou `DropdownMenu` **abertos** é exceção aceita (EXC-01, `docs/excecoes-acessibilidade.md` no repositório do DS): vem do `hideOthers` do Radix sem `inert`, e o foco fica preso na camada (`Tab` não sai, `Esc` fecha e devolve o foco ao gatilho), então o impacto é nulo. O `NavigationMenu` aberto também está na EXC-01, por outra causa (sentinela de foco do Radix, que repassa o foco na hora). Não remova `aria-hidden`, não aplique `inert` por fora e não desative a regra globalmente.
+- **axe na CI do app:** desligue só `aria-hidden-focus` e só na análise feita com uma dessas camadas aberta (`new AxeBuilder({ page }).disableRules(["aria-hidden-focus"])` ou `{ rules: { "aria-hidden-focus": { enabled: false } } }` no `axe.run`); analise a mesma tela fechada com todas as regras. Não use `exclude` no `#root` (tira a página inteira da análise). Exemplo completo no README do pacote, seção "Acessibilidade".
 
 ### Labels e semântica
 

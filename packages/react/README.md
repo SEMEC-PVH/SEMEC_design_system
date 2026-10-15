@@ -11,16 +11,63 @@ São 5 passos. Pular qualquer um deles faz os componentes saírem sem estilo, se
 ### 1. Instalar
 
 ```bash
-npm install @semec/ds
+npm install @semec/ds lucide-react
+# pnpm add @semec/ds lucide-react
+# yarn add @semec/ds lucide-react
 ```
 
-Só isso. As dependências Radix UI, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react` e `get-nonce` são **dependências do pacote** e vêm automaticamente — não instale a lista de `@radix-ui/*` à mão.
+`lucide-react` é **peer dependency** (`>=0.468.0 <2`), não dependência: os componentes importam os ícones dele, e sem ele o build do app quebra. Instale-o junto, sempre, com qualquer gerenciador:
 
-Peers: `react` e `react-dom` 19+, e Tailwind CSS v4 no seu app. Peer opcional: `zod` ^3.23, só se usar `@semec/ds/react/validacao`.
+- **npm 7+** instala peers ausentes sozinho (exceto com `--legacy-peer-deps`); listar `lucide-react` no comando só o deixa explícito no `package.json`;
+- **pnpm** só instala peers com `auto-install-peers=true` (padrão desde o pnpm 8, mas muitos projetos e monorepos usam `false`);
+- **Yarn** (clássico e Berry) **não** instala peers: só avisa.
+
+Os peers obrigatórios são `react` e `react-dom` ^19 (o app já tem), `tailwindcss` ^4 (entra no passo 2, com o plugin do seu bundler) e `lucide-react`. Peer opcional: `zod` `^3.23.0 || ^4.0.0`, só se usar `@semec/ds/react/validacao`. Os pacotes Radix UI, `class-variance-authority`, `clsx`, `tailwind-merge` e `get-nonce` são **dependências** do `@semec/ds` e vêm automaticamente: não instale a lista de `@radix-ui/*` à mão.
 
 ### 2. CSS global (Tailwind v4)
 
-No arquivo CSS global do app (não via `import` em JS):
+Primeiro, o Tailwind v4 precisa estar ligado ao bundler do app. Depois, as linhas do kit vão no CSS global.
+
+**Vite** (`npm create vite@latest`, template React):
+
+```bash
+npm install -D tailwindcss @tailwindcss/vite
+```
+
+```ts
+// vite.config.ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+});
+```
+
+O CSS global é o `src/index.css` (importado em `src/main.tsx`). **Troque o conteúdo inteiro** pelas linhas do kit (abaixo) e apague o `import "./App.css"` do `App.tsx`: os estilos do template ficam fora de camada e vencem os do kit.
+
+**Next.js** (`create-next-app` com Tailwind): o Tailwind v4 já vem configurado. O `create-next-app` 16.4 gera o plugin `@tailwindcss/turbopack`, sem `postcss.config.mjs`; ele funciona igual ao `@tailwindcss/postcss` dos templates anteriores, e as linhas do kit são as mesmas nos dois. Sem Tailwind no projeto: `npm install -D tailwindcss @tailwindcss/postcss` e um `postcss.config.mjs` com `export default { plugins: { "@tailwindcss/postcss": {} } };`.
+
+O template do Next traz estilos que **vencem** os do kit. Só acrescentar as linhas do kit ao `globals.css` deixa o app com Arial, as cores do template e fundo escuro quando o sistema está em modo escuro: o `body { font-family: Arial… }`, o `:root`, o `@theme inline { --font-sans: var(--font-geist-sans) … }` e o `@media (prefers-color-scheme: dark)` do template ficam fora de camada e ganham do `@layer base` do `tokens.css`. Então:
+
+1. em `app/globals.css`, **apague tudo** o que o template gerou (`:root`, `@theme inline`, `@media (prefers-color-scheme: dark)`, `body`) e deixe só as linhas do kit;
+2. em `app/layout.tsx`, apague o `next/font/google` (`Geist`, `Geist_Mono`) e as classes `geistSans.variable` / `geistMono.variable` do `<body>`; a fonte vem do passo 3. Aproveite para trocar `lang="en"` por `lang="pt-BR"`:
+
+```tsx
+// app/layout.tsx
+import "./globals.css";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="pt-BR">
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+**As linhas do kit**, no arquivo CSS global (`src/index.css` no Vite, `app/globals.css` no Next), não via `import` em JS:
 
 ```css
 @import "tailwindcss";
@@ -196,6 +243,8 @@ import { cn } from "@semec/ds/react";
 
 **Poda (tree-shaking).** Desde a 3.2 cada componente é um módulo ESM próprio em `dist/react/components/` e o pacote declara `"sideEffects": ["**/*.css"]`, então o bundler do app descarta o que não é importado: `import { Button } from "@semec/ds/react"` custa cerca de 35 kB minificado com as dependências (quase tudo `tailwind-merge`); o código do kit fica em ~3 kB, em vez do kit inteiro (~340 kB na 3.1). Importar pela raiz ou pelo subpath dá o mesmo resultado num bundler com poda; o subpath ajuda ferramentas sem poda (ex.: `next dev` sem `optimizePackageImports`) e testes. A CI mede isso (`npm run test:dist`).
 
+**O CSS não sofre poda.** A poda vale para o JS. O `@source "…/node_modules/@semec/ds/dist/react"` faz o Tailwind varrer o `dist` inteiro, então o CSS gera as classes de todos os componentes, use o app um ou todos: cerca de 68 kB de CSS do kit (~12 kB com gzip), um custo fixo medido num app novo com a 4.0.0. O JS, sim, cai para o que é importado (os ~35 kB do `Button` acima).
+
 Metadados de componente (o que versões anteriores deste README chamavam de `getComponentMetadata()`, função que nunca existiu) vêm de `@semec/ds/skills`: `dsBySlug["botoes"]`, `dsComponents`.
 
 ## Componentes
@@ -239,7 +288,7 @@ Os tokens do pacote (`tokens.css`) são tema **claro**. Não há `shadcn.css` no
 
 ## Validação (Zod)
 
-Schemas Zod ficam no entry **`@semec/ds/react/validacao`** — o entry principal não importa `zod`:
+Schemas Zod ficam no entry **`@semec/ds/react/validacao`** — o entry principal não importa `zod`. O `zod` é peer opcional, `^3.23.0 || ^4.0.0` (o kit é testado com o 3 e o 4): instale-o (`npm install zod`) só se usar esse entry.
 
 ```ts
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
@@ -272,12 +321,55 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 - **ScrollArea, Select** — 1 violação cada, mesmo com nonce (continuam com scrollbar CSS estático no `tokens.css`).
 - **Dialog, AlertDialog, Drawer, Sheet, DropdownMenu** — scroll locking do body; use `SemecProvider` com nonce.
 
+## Acessibilidade
+
+Os componentes seguem o WCAG 2.1 AA (ADR-014): teclado, foco visível, contraste e nomes acessíveis já vêm prontos. O que o app monta em volta (rótulos, títulos, ordem da página) é responsabilidade dele; a skill `semec-ds` traz os padrões de tela.
+
+### axe na CI do seu app
+
+Com `Select`, `DropdownMenu` ou `NavigationMenu` **abertos**, o axe acusa `aria-hidden-focus` (serious). É a exceção aceita **EXC-01** ([docs/excecoes-acessibilidade.md](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/excecoes-acessibilidade.md#exc-01-aria-hidden-focus-com-select-ou-dropdownmenu-abertos-aud-19)), não um defeito do seu app:
+
+- no `Select` e no `DropdownMenu`, o Radix chama `hideOthers` ao abrir e marca o resto da página (`#root`, por exemplo) com `aria-hidden="true"`, sem `inert`. O axe vê elementos focáveis dentro dessa árvore e acusa a regra. Mas, enquanto a camada está aberta, o foco fica preso nela (`Tab` não sai do listbox ou do menu, `Esc` fecha e devolve o foco ao gatilho), o `body` recebe `pointer-events: none` e, ao fechar, o `aria-hidden` sai. Ninguém alcança o que está escondido;
+- no `NavigationMenu` a causa é outra: o sentinela de foco do Radix (`<span aria-hidden="true" tabindex="0">`), que repassa o foco na hora para o primeiro ou o último link do conteúdo e nunca fica com ele.
+
+Configure o axe para não falhar por isso **sem** esconder outros problemas:
+
+- desligue **só** a regra `aria-hidden-focus`, **só** na análise feita com uma dessas camadas aberta. As outras regras WCAG continuam valendo nesse estado;
+- com a camada aberta, analise só as regras WCAG (`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`). O `aria-hidden` do Radix esconde também o `main` e o `h1`, e as regras de *best practice* `landmark-one-main`, `page-has-heading-one` e `region` (moderate) disparam por isso. Elas valem na análise da tela fechada;
+- rode a mesma tela também com a camada fechada e a regra ligada, e não desligue a regra em `Dialog`, `AlertDialog`, `Sheet` ou `Drawer` (eles não disparam);
+- não use `exclude` para tirar o `#root` (ou a camada) da análise: isso tira do axe a página inteira, não só a regra;
+- não "corrija" removendo o `aria-hidden` ou aplicando `inert` por fora: quebra o isolamento que o Radix garante.
+
+Com `@axe-core/playwright`:
+
+```ts
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test } from "@playwright/test";
+
+test("formulário sem violações do axe", async ({ page }) => {
+  await page.goto("/requerimento");
+
+  // Camadas fechadas: todas as regras, inclusive aria-hidden-focus e best practices.
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+
+  // Select aberto: só regras WCAG, sem a aria-hidden-focus (EXC-01 do @semec/ds).
+  await page.getByRole("combobox", { name: "Município" }).click();
+  const aberto = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .disableRules(["aria-hidden-focus"])
+    .analyze();
+  expect(aberto.violations).toEqual([]);
+});
+```
+
+Com `axe-core` direto (ou `jest-axe`/`vitest-axe`), o equivalente é passar `{ runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] }, rules: { "aria-hidden-focus": { enabled: false } } }` só na chamada feita com a camada aberta. O próprio kit testa assim (`packages/react/test/open-states.test.tsx` e o gate em Chromium).
+
 ## Dependências
 
-- **Peer**: React 19+, React DOM 19+
-- **Peer opcional**: `zod` ^3.23 — só se usar `@semec/ds/react/validacao`
-- **Tailwind CSS**: v4+ no app (com `@source` apontando para `node_modules/@semec/ds/dist/react`, caminho relativo ao CSS)
-- **Instaladas automaticamente**: todos os `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`, `get-nonce`
+- **Peers obrigatórios**: `react` ^19, `react-dom` ^19, `tailwindcss` ^4 e `lucide-react` `>=0.468.0 <2`. O npm 7+ instala peer ausente sozinho; o pnpm só com `auto-install-peers=true`; o Yarn (clássico e Berry) nunca. Por isso o passo 1 instala `lucide-react` explicitamente
+- **Peer opcional**: `zod` `^3.23.0 || ^4.0.0` (testado com o 3 e o 4) — só se usar `@semec/ds/react/validacao`
+- **Plugin do Tailwind** (do seu build, não do kit): `@tailwindcss/vite` no Vite; `@tailwindcss/postcss` ou `@tailwindcss/turbopack` no Next. O `@source` aponta para `node_modules/@semec/ds/dist/react`, com caminho relativo ao CSS
+- **Dependências (vêm automaticamente)**: todos os `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `get-nonce`
 
 ## Limitações conhecidas
 

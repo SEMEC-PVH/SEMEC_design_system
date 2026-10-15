@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
  * Confere os `.d.ts` publicados como um consumidor ESM puro os vê (D12):
- * `module`/`moduleResolution: nodenext`, `skipLibCheck: false`, importando
- * `@semec/ds/react` e subpaths por componente (`@semec/ds/react/<nome>`).
+ * `module`/`moduleResolution: nodenext` (e `bundler`), `skipLibCheck: false`, importando
+ * `@semec/ds/react`, subpaths por componente (`@semec/ds/react/<nome>`) e os
+ * entries de dados `@semec/ds/skills` e `@semec/ds/lite/skills`.
  * Pega extensão faltando em import relativo dos `.d.ts`, subpath sem tipos e
  * tipo quebrado que o `typecheck` do `src/` (moduleResolution bundler) não vê.
  *
@@ -41,6 +42,9 @@ import type {
   FileUploadProps,
   InputOTPProps,
 } from "@semec/ds/react";
+// 4.0.1: os entries de dados para agentes também têm tipos (antes: TS7016).
+import { dsComponents, dsBySlug, dsByCategory, dsCategories, dsPrompt, dsPortal, type DsComponent } from "@semec/ds/skills";
+import { dsCategories as liteCategories, dsPortal as litePortal, dsTokens } from "@semec/ds/lite/skills";
 // Módulo interno do loading: fica fora dos exports e não pode resolver.
 // @ts-expect-error
 import { ButtonLoadingIndicator } from "@semec/ds/react/button-loading";
@@ -97,14 +101,29 @@ const newProps: [CalendarProps, ComboboxProps, InputOTPProps, FileUploadProps, D
   },
 ];
 
+const firstComponent: DsComponent | undefined = dsComponents[0];
+const bySlug: DsComponent | undefined = dsBySlug["botoes"];
+const forms: DsComponent[] = dsByCategory("formularios");
+const prompt: string = firstComponent ? dsPrompt(firstComponent) : "";
+const categoryKeys: string[] = [...dsCategories, ...liteCategories].map((c) => c.key);
+const portalHrefs: string[] = [...dsPortal.items, ...litePortal.items].map((i) => i.href);
+const semanticTokens: string[] = dsTokens.semantic;
+// @ts-expect-error o código do componente é string, não número
+const wrongCode: number = bySlug?.code;
+
+export { forms, prompt, categoryKeys, portalHrefs, semanticTokens, wrongCode };
 export { oldCalendar, oldCombobox, oldOtp, oldUpload, oldDatePicker, newProps };
 export { same, masked, pattern, classes, useFormFieldControl, React };
 `;
 
-const tsconfig = {
+// O mesmo consumidor em nodenext (ESM puro do Node) e em bundler (Vite, Next).
+const resolutions = [
+  { module: "nodenext", moduleResolution: "nodenext" },
+  { module: "esnext", moduleResolution: "bundler" },
+];
+const tsconfigFor = (resolution) => ({
   compilerOptions: {
-    module: "nodenext",
-    moduleResolution: "nodenext",
+    ...resolution,
     target: "es2022",
     jsx: "react-jsx",
     strict: true,
@@ -113,22 +132,45 @@ const tsconfig = {
     types: [],
   },
   files: ["consumer.tsx"],
-};
+});
+
+// 4.0.1: o erro do onChange removido tem de citar o onValueChange (antes, com
+// `never`, o tsc dizia só "not assignable to type 'undefined'").
+const removedOnChange = `import { Calendar, Combobox, FileUpload, InputOTP } from "@semec/ds/react";
+export const a = <Calendar onChange={(date: Date) => date} />;
+export const b = <Combobox options={[]} onChange={(value: string) => value} />;
+export const c = <InputOTP onChange={(value: string) => value} />;
+export const d = <FileUpload onChange={(files: File[]) => files} />;
+`;
 
 let status = 1;
 try {
   fs.writeFileSync(path.join(dir, "consumer.tsx"), consumer);
-  fs.writeFileSync(path.join(dir, "tsconfig.json"), JSON.stringify(tsconfig, null, 2));
-  const result = spawnSync(process.execPath, [tsc, "-p", path.join(dir, "tsconfig.json")], {
-    cwd: dir,
-    encoding: "utf8",
-  });
-  status = result.status ?? 1;
-  if (status !== 0) {
-    console.error("check-dts: os .d.ts publicados não compilam como consumidor nodenext:");
-    console.error((result.stdout || "") + (result.stderr || ""));
-  } else {
-    console.log("check-dts: ok (@semec/ds/react e subpaths button, stepper, input-mask, password-input, form-field; button-loading fechado; onChange(valor) da 3.x recusado; nodenext, skipLibCheck false).");
+  status = 0;
+  for (const resolution of resolutions) {
+    fs.writeFileSync(path.join(dir, "tsconfig.json"), JSON.stringify(tsconfigFor(resolution), null, 2));
+    const result = spawnSync(process.execPath, [tsc, "-p", path.join(dir, "tsconfig.json")], {
+      cwd: dir,
+      encoding: "utf8",
+    });
+    if ((result.status ?? 1) !== 0) {
+      status = 1;
+      console.error(`check-dts: os .d.ts publicados não compilam como consumidor ${resolution.moduleResolution}:`);
+      console.error((result.stdout || "") + (result.stderr || ""));
+    }
+  }
+  fs.writeFileSync(path.join(dir, "consumer.tsx"), removedOnChange);
+  fs.writeFileSync(path.join(dir, "tsconfig.json"), JSON.stringify(tsconfigFor(resolutions[0]), null, 2));
+  const msg = spawnSync(process.execPath, [tsc, "-p", path.join(dir, "tsconfig.json")], { cwd: dir, encoding: "utf8" });
+  const out = (msg.stdout || "") + (msg.stderr || "");
+  const cited = out.match(/not assignable to type 'OnChangeRemovidoUseOnValueChange'/g)?.length ?? 0;
+  if (cited !== 4) {
+    status = 1;
+    console.error(`check-dts: o erro do onChange removido devia citar OnChangeRemovidoUseOnValueChange 4 vezes (Calendar, Combobox, InputOTP, FileUpload); citou ${cited}:`);
+    console.error(out);
+  }
+  if (status === 0) {
+    console.log("check-dts: ok (@semec/ds/react e subpaths button, stepper, input-mask, password-input, form-field; @semec/ds/skills e @semec/ds/lite/skills tipados; button-loading fechado; onChange(valor) da 3.x recusado com erro que cita onValueChange; nodenext e bundler, skipLibCheck false).");
   }
 } finally {
   fs.rmSync(dir, { recursive: true, force: true });

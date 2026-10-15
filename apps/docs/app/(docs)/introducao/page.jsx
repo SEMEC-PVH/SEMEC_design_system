@@ -258,10 +258,22 @@ export default function IntroPage() {
       </p>
 
       <h2>Instalação</h2>
-      <p>Instale o pacote no seu projeto:</p>
-      <MdxPre><code>npm install @semec/ds</code></MdxPre>
+      <p>
+        Instale o pacote junto com o <code>lucide-react</code>, que é peer dependency do kit
+        (o npm 7+ instala peers sozinho; o pnpm com <code>auto-install-peers=false</code> e o
+        Yarn não):
+      </p>
+      <MdxPre><code>npm install @semec/ds lucide-react</code></MdxPre>
       <p>Ou, se preferir yarn:</p>
-      <MdxPre><code>yarn add @semec/ds</code></MdxPre>
+      <MdxPre><code>yarn add @semec/ds lucide-react</code></MdxPre>
+      <p>
+        Tailwind CSS v4 no bundler (Vite ou Next.js), o CSS global e a fonte: veja o passo a
+        passo no{" "}
+        <a href="https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/README.md#comece-aqui">
+          README do pacote
+        </a>
+        .
+      </p>
 
       <h2>Copiar skill</h2>
       <p>

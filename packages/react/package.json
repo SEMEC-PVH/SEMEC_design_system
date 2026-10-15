@@ -33,7 +33,10 @@
       "types": "./dist/react/components/*.d.ts",
       "import": "./dist/react/components/*.js"
     },
-    "./skills": "./dist/skills/index.js",
+    "./skills": {
+      "types": "./dist/skills/index.d.ts",
+      "import": "./dist/skills/index.js"
+    },
     "./skills/llms.txt": "./dist/skills/llms.txt",
     "./skills/llms-full.txt": "./dist/skills/llms-full.txt",
     "./skills/manifest.json": "./dist/skills/manifest.json",
@@ -48,7 +51,10 @@
       "import": "./dist/react/pv-preset.js"
     },
     "./lite/pv-preset.ts": "./pv-preset.ts",
-    "./lite/skills": "./dist/lite/skills.js",
+    "./lite/skills": {
+      "types": "./dist/lite/skills.d.ts",
+      "import": "./dist/lite/skills.js"
+    },
     "./lite/skills/llms.txt": "./dist/lite/llms.txt",
     "./lite/skills/manifest.json": "./dist/lite/manifest.json",
     "./lite/skills/semec-ds-lite": "./dist/lite/semec-ds-lite/SKILL.md",
@@ -70,10 +76,10 @@
   "scripts": {
     "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsup && npm run build:types && node scripts/build-artifacts.mjs",
     "build:react": "tsup",
-    "build:types": "tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/fix-dts-extensions.mjs",
+    "build:types": "tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/fix-dts-extensions.mjs && node scripts/build-skills-types.mjs",
     "build:skills": "node scripts/build-artifacts.mjs",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.skills.json --noEmit",
     "prepublishOnly": "npm run build",
     "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
     "test": "vitest run",
