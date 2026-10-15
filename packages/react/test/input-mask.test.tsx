@@ -35,6 +35,13 @@ describe("applyInputMask", () => {
     ["telefone", "5569999991234", "(69) 99999-1234", "69999991234"],
     ["telefone", "+55 69 3216-0000", "(69) 3216-0000", "6932160000"],
     ["celular", "+55 (69) 99216-0000", "(69) 99216-0000", "69992160000"],
+    // N3: entrada que começa com toda a sequência literal inicial.
+    ["0800-999-9999", "08001234567", "0800-123-4567", "1234567"],
+    ["0800-999-9999", "0800 123 4567", "0800-123-4567", "1234567"],
+    ["0800-999-9999", "0800-123-4567", "0800-123-4567", "1234567"],
+    ["0800-999-9999", "1234567", "0800-123-4567", "1234567"],
+    ["0800-999-9999", "0", "0800-0", "0"],
+    ["0800-999-9999", "", "", ""],
     // DDD 55 digitado na máscara não vira código de país.
     ["telefone", "(55) 99999-12345", "(55) 99999-1234", "55999991234"],
     ["telefone", "5599999123", "(55) 9999-9123", "5599999123"],
@@ -161,6 +168,64 @@ describe("InputMask (AUD-36)", () => {
     await user.keyboard("{Delete}");
     expect(input).toHaveValue("123.567.890-1");
     expect(input.selectionStart).toBe(3);
+  });
+
+  it("Android: beforeinput deleteContentBackward junto de literal apaga o dígito anterior", async () => {
+    const { user, input, onValueChange } = setup({ defaultValue: "12345678901" });
+    await user.click(input);
+    input.setSelectionRange(4, 4);
+    // Teclado virtual: keydown com key "Unidentified" (229) não faz nada.
+    fireEvent.keyDown(input, { key: "Unidentified", keyCode: 229 });
+    expect(input).toHaveValue("123.456.789-01");
+    const event = new InputEvent("beforeinput", {
+      inputType: "deleteContentBackward",
+      bubbles: true,
+      cancelable: true,
+    });
+    input.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(input).toHaveValue("124.567.890-1");
+    expect(input.selectionStart).toBe(2);
+    expect(onValueChange).toHaveBeenLastCalledWith("124.567.890-1", "1245678901");
+  });
+
+  it("Android: beforeinput deleteContentForward antes de literal apaga o dígito seguinte", async () => {
+    const { user, input } = setup({ defaultValue: "12345678901" });
+    await user.click(input);
+    input.setSelectionRange(3, 3);
+    const event = new InputEvent("beforeinput", {
+      inputType: "deleteContentForward",
+      bubbles: true,
+      cancelable: true,
+    });
+    input.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(input).toHaveValue("123.567.890-1");
+    expect(input.selectionStart).toBe(3);
+  });
+
+  it("beforeinput longe de literal não é interceptado", async () => {
+    const { user, input } = setup({ defaultValue: "12345678901" });
+    await user.click(input);
+    input.setSelectionRange(2, 2);
+    const event = new InputEvent("beforeinput", {
+      inputType: "deleteContentBackward",
+      bubbles: true,
+      cancelable: true,
+    });
+    input.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(false);
+    expect(input).toHaveValue("123.456.789-01");
+  });
+
+  it("Backspace físico junto de literal apaga uma vez só (keydown + beforeinput)", async () => {
+    const onChange = vi.fn();
+    const { user, input } = setup({ defaultValue: "12345678901", onChange });
+    await user.click(input);
+    input.setSelectionRange(4, 4);
+    await user.keyboard("{Backspace}");
+    expect(input).toHaveValue("124.567.890-1");
+    expect(onChange).toHaveBeenCalledTimes(1);
   });
 
   it("Backspace e Delete longe de literal seguem o padrão", async () => {

@@ -12,3 +12,5 @@ Componentes novos e estado de carregamento no botão (AUD-36, AUD-63), sem remov
 - `Button` com `loading` (e `IconButton` com `loading`, `Button asChild loading`) renderiza num React Server Component: o bloqueio do clique fica num filho `"use client"`, e o elemento é o mesmo com e sem `loading` (o foco não se perde). Com `asChild`, o spinner entra dentro do link.
 - `InputMask`: dígito igual a literal do padrão (ex.: o `5` de `+55`) não é mais engolido; nos telefones, `+55`/`55` de país colado é descartado; Backspace logo depois de um literal e Delete logo antes apagam o dígito vizinho.
 - `PasswordInput`: `spellCheck={false}`, `autoCapitalize="none"` e `autoCorrect="off"` por padrão (sobrescrevíveis).
+- `Button` com `loading`: o clique cancela só envio e navegação e continua subindo aos ancestrais; com `asChild`, o `onClick` do filho também não dispara.
+- `InputMask`: valor que começa com o prefixo fixo do padrão (ex.: `08001234567` em `0800-999-9999`) não repete o prefixo; Backspace/Delete junto de literal funcionam no teclado virtual do Android (`beforeinput`).
