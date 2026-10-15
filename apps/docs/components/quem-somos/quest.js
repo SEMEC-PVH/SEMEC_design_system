@@ -1,4 +1,4 @@
-// Quest "A ocarina perdida": o Pedro, na frente da SEMEC, perdeu a ocarina
+// Quest "A ocarina perdida": o Pedro, na frente da SEMFAZ, perdeu a ocarina
 // no mato alto. Separada das batalhas (não precisa de linguagem) e salva só
 // neste navegador (localStorage), como o progresso da jornada.
 //
@@ -16,9 +16,9 @@ export const QUEST = {
   recompensa: { id: "ocarina", nome: "Stack da Ocarina", sigla: "♪" },
   // Objetivo mostrado no painel do canto da tela, por etapa.
   objetivo: {
-    nova: "Fale com o Pedro, na frente da SEMEC.",
+    nova: "Fale com o Pedro, na frente da SEMFAZ.",
     procurando: "Procure a ocarina do Pedro no mato alto. Dica: ele passou pelo parque perto do Back-End.",
-    achou: "Você achou a ocarina! Devolva para o Pedro, na frente da SEMEC.",
+    achou: "Você achou a ocarina! Devolva para o Pedro, na frente da SEMFAZ.",
     concluida: "Quest concluída! Você ganhou a Stack da Ocarina.",
   },
 };

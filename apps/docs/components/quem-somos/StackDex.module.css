@@ -1,0 +1,762 @@
+/* StackDex: coleção das insígnias em tela cheia, num aparelho de RPG próprio
+   da Vila SEMEC. Carcaça azul-hero com moldura grossa, lente, luzinhas e
+   alto-falante; duas telas claras (lista e detalhe) ligadas por uma
+   dobradiça. Paleta fixa e clara nos dois temas do site (como a batalha).
+   Só tokens. Contrastes (WCAG AA):
+   - texto gray-950 sobre blue-50 ≈ 17:1; gray-700 sobre blue-50 ≈ 9,6:1;
+   - branco sobre blue-hero ≈ 10:1 (topo, opção selecionada);
+   - gray-950 sobre yellow-400 ≈ 13:1 (botão Fechar, contador);
+   - bordas das opções gray-600 sobre branco/blue-50 ≈ 7:1 (componente);
+   - foco: blue-hero sobre blue-50 ≈ 9:1 (telas); branco sobre blue-hero
+     ≈ 10:1 (carcaça).
+   Tamanhos crescem com a área da Vila: --u depende da largura E da altura
+   do contêiner (container query units). */
+
+.fundo {
+  --casco: var(--pv-blue-hero);
+  --casco-escuro: color-mix(in srgb, var(--pv-blue-hero) 55%, var(--pv-blue-950));
+  --casco-claro: color-mix(in srgb, var(--pv-blue-hero) 70%, var(--pv-blue-400));
+  --moldura: var(--pv-gray-950);
+  --tela: var(--pv-blue-50);
+  --tinta: var(--pv-gray-950);
+  --tinta-suave: var(--pv-gray-700);
+  --foco: var(--pv-blue-hero);
+  --foco-casco: var(--pv-white);
+  --cor: var(--pv-blue-500);
+  color-scheme: light;
+  container: dex / size;
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  font-family: var(--font-family-sans);
+  line-height: 1.45;
+  color: var(--tinta);
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--pv-blue-300) 35%, transparent) 0 2px, transparent 3px) 0 0 / 2.25rem 2.25rem,
+    linear-gradient(160deg, var(--pv-blue-950) 0%, var(--pv-gray-950) 100%);
+}
+
+/* Cores por insígnia (data-cor = token de FICHAS_INSIGNIAS[id].cor). */
+.fundo [data-cor="blue-400"] { --cor: var(--pv-blue-400); }
+.fundo [data-cor="blue-500"] { --cor: var(--pv-blue-500); }
+.fundo [data-cor="blue-800"] { --cor: var(--pv-blue-800); }
+.fundo [data-cor="green-500"] { --cor: var(--pv-green-500); }
+.fundo [data-cor="yellow-500"] { --cor: var(--pv-yellow-500); }
+.fundo [data-cor="yellow-800"] { --cor: var(--pv-yellow-800); }
+.fundo [data-cor="red-400"] { --cor: var(--pv-red-400); }
+.fundo [data-cor="red-500"] { --cor: var(--pv-red-500); }
+
+/* O site aplica margens e larguras máximas em p/h2/h3/h4 dentro de .content;
+   a classe dobrada devolve o controle ao módulo. */
+.dex.dex :is(p, h2, h3, h4) {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.dex {
+  --u: clamp(0.75rem, min(1.05cqw, 1.85cqh), 1.6rem);
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: calc(var(--u) * 0.9);
+}
+
+.srOnly {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Carcaça ---------------------------------------------------------------- */
+.aparelho {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: calc(var(--u) * 0.9);
+  width: min(100%, calc(var(--u) * 100));
+  height: 100%;
+  padding: calc(var(--u) * 0.9) calc(var(--u) * 1.2) calc(var(--u) * 1.4);
+  border: 4px solid var(--moldura);
+  border-radius: calc(var(--u) * 2) calc(var(--u) * 2) calc(var(--u) * 1.2) calc(var(--u) * 1.2);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--pv-white) 14%, transparent) 0, transparent calc(var(--u) * 4)),
+    var(--casco);
+  box-shadow:
+    inset 0 0 0 calc(var(--u) * 0.3) var(--casco-claro),
+    inset 0 calc(var(--u) * -0.6) 0 calc(var(--u) * 0.3) var(--casco-escuro),
+    0 calc(var(--u) * 0.8) 0 var(--moldura),
+    0 calc(var(--u) * 1.6) calc(var(--u) * 3) color-mix(in srgb, var(--pv-black) 55%, transparent);
+  perspective: 1400px;
+}
+
+/* ---- Topo ------------------------------------------------------------------- */
+.topo {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 0.9);
+  min-width: 0;
+  color: var(--pv-white);
+}
+.lente {
+  flex-shrink: 0;
+  width: calc(var(--u) * 3.6);
+  height: calc(var(--u) * 3.6);
+  border: calc(var(--u) * 0.3) solid var(--pv-white);
+  border-radius: var(--radius-full);
+  outline: 3px solid var(--moldura);
+  background:
+    radial-gradient(circle at 32% 30%, var(--pv-white) 0 12%, transparent 13%),
+    radial-gradient(circle at 50% 55%, var(--pv-blue-300) 0, var(--pv-blue-500) 45%, var(--pv-blue-800) 100%);
+}
+.luzes {
+  display: flex;
+  align-self: flex-start;
+  gap: calc(var(--u) * 0.4);
+  padding-top: calc(var(--u) * 0.2);
+}
+.luz {
+  width: calc(var(--u) * 0.95);
+  height: calc(var(--u) * 0.95);
+  border: 2px solid var(--moldura);
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle at 35% 30%, var(--pv-white) 0 18%, var(--l) 22%);
+}
+.luz[data-luz="vermelha"] { --l: var(--pv-red-500); }
+.luz[data-luz="amarela"] { --l: var(--pv-yellow-400); }
+.luz[data-luz="verde"] { --l: var(--pv-green-500); }
+
+.marca {
+  flex: 1;
+  min-width: 0;
+}
+.dex .titulo {
+  font-size: max(var(--font-size-lg), calc(var(--u) * 1.9));
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pv-white);
+  text-shadow: 0 3px 0 var(--moldura);
+}
+.titulo:focus {
+  outline: none;
+}
+.titulo:focus-visible {
+  outline: 3px solid var(--foco-casco);
+  outline-offset: 3px;
+  border-radius: var(--radius-md);
+}
+.dex .subtitulo {
+  font-size: max(var(--font-size-xs), calc(var(--u) * 0.8));
+  font-weight: 600;
+  color: var(--pv-blue-100);
+}
+.dex.dex .contador {
+  flex-shrink: 0;
+  padding: calc(var(--u) * 0.3) calc(var(--u) * 0.8);
+  border: 3px solid var(--moldura);
+  border-radius: var(--radius-full);
+  background: var(--moldura);
+  color: var(--pv-white);
+  font-size: max(var(--font-size-sm), calc(var(--u) * 0.95));
+  font-weight: 600;
+  white-space: nowrap;
+}
+.contador strong {
+  color: var(--pv-yellow-400);
+  font-weight: 800;
+}
+.fechar {
+  flex-shrink: 0;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: calc(var(--u) * 0.35) calc(var(--u) * 1.1);
+  border: 3px solid var(--moldura);
+  border-radius: var(--radius-md);
+  background: var(--pv-yellow-400);
+  color: var(--tinta);
+  font: inherit;
+  font-size: max(var(--font-size-sm), calc(var(--u) * 0.95));
+  font-weight: 800;
+  box-shadow: 0 4px 0 var(--moldura);
+  cursor: pointer;
+}
+.fechar:hover {
+  background: var(--pv-yellow-500);
+}
+.fechar:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--moldura);
+}
+.fechar:focus-visible {
+  outline: 3px solid var(--foco-casco);
+  outline-offset: 3px;
+}
+
+/* ---- Corpo: duas telas e a dobradiça --------------------------------------- */
+.corpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) calc(var(--u) * 1.3) minmax(0, 1.1fr);
+  min-height: 0;
+}
+.tela {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: calc(var(--u) * 1.1);
+  border: calc(var(--u) * 0.55) solid var(--pv-gray-900);
+  border-radius: calc(var(--u) * 1.1);
+  background:
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--pv-blue-200) 30%, transparent) 0 1px, transparent 1px 4px),
+    var(--tela);
+  box-shadow:
+    inset 0 0 0 2px var(--moldura),
+    0 0 0 3px var(--moldura);
+  scrollbar-gutter: stable;
+}
+.tela:focus-visible {
+  outline: 3px solid var(--foco-casco);
+  outline-offset: 4px;
+}
+.dobradica {
+  align-self: stretch;
+  margin: calc(var(--u) * 2) calc(var(--u) * 0.3);
+  border: 3px solid var(--moldura);
+  border-radius: var(--radius-full);
+  background:
+    repeating-linear-gradient(180deg, transparent 0 calc(var(--u) * 2.4), var(--moldura) calc(var(--u) * 2.4) calc(var(--u) * 2.4 + 3px)),
+    linear-gradient(90deg, var(--casco-escuro), var(--casco-claro) 50%, var(--casco-escuro));
+}
+.altoFalante {
+  position: absolute;
+  right: calc(var(--u) * 1.6);
+  bottom: calc(var(--u) * 0.25);
+  width: calc(var(--u) * 6);
+  height: calc(var(--u) * 0.9);
+  background: radial-gradient(circle, var(--moldura) 0 32%, transparent 38%) 0 0 / calc(var(--u) * 0.6) calc(var(--u) * 0.45);
+  opacity: 0.85;
+}
+
+/* ---- Lista (listbox em grade) ------------------------------------------------ */
+.telaLista {
+  display: grid;
+  align-content: safe center;
+}
+.listbox {
+  display: grid;
+  gap: calc(var(--u) * 0.9);
+}
+.grupo {
+  display: grid;
+  gap: calc(var(--u) * 0.5);
+}
+.grupoTitulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--u) * 0.5);
+  padding-bottom: calc(var(--u) * 0.2);
+  border-bottom: 3px solid var(--pv-gray-900);
+  font-size: max(var(--font-size-xs), calc(var(--u) * 0.85));
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tinta);
+}
+.grupoConta {
+  color: var(--tinta-suave);
+  letter-spacing: 0.02em;
+}
+.grade {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: calc(var(--u) * 0.6);
+}
+.opcao {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  justify-items: center;
+  gap: calc(var(--u) * 0.25);
+  min-width: 0;
+  padding: calc(var(--u) * 0.45) calc(var(--u) * 0.35) calc(var(--u) * 0.55);
+  border: 2px solid var(--pv-gray-600);
+  border-radius: calc(var(--u) * 0.8);
+  background: var(--pv-white);
+  color: var(--tinta);
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+.opcao:not([data-ok]) {
+  border-style: dashed;
+  background: var(--pv-gray-100);
+}
+.opcao:hover {
+  border-color: var(--pv-blue-hero);
+}
+.opcao[aria-selected="true"] {
+  border: 2px solid var(--moldura);
+  background: var(--pv-blue-hero);
+  color: var(--pv-white);
+  box-shadow: 0 4px 0 var(--moldura);
+}
+.opcao:focus {
+  outline: none;
+}
+.opcao:focus-visible {
+  outline: 3px solid var(--foco);
+  outline-offset: 3px;
+}
+.opcaoNum {
+  justify-self: start;
+  font-size: max(var(--font-size-2xs), calc(var(--u) * 0.7));
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--tinta-suave);
+}
+.opcao[aria-selected="true"] .opcaoNum {
+  color: var(--pv-blue-100);
+}
+.opcaoArte {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: calc(var(--u) * 7);
+  max-width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle, var(--pv-white) 55%, color-mix(in srgb, var(--cor) 25%, var(--pv-white)));
+}
+.opcao:not([data-ok]) .opcaoArte {
+  background: var(--pv-white);
+}
+.opcaoImg {
+  display: block;
+  width: 88%;
+  height: 88%;
+  object-fit: contain;
+}
+.opcaoNome {
+  align-self: center;
+  max-width: 100%;
+  font-size: max(var(--font-size-2xs), calc(var(--u) * 0.78));
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.opcao:not([data-ok]) .opcaoNome {
+  letter-spacing: 0.15em;
+  color: var(--tinta-suave);
+}
+.opcao[aria-selected="true"] .opcaoNome {
+  color: var(--pv-white);
+}
+
+/* Silhueta: a arte vira uma sombra escura sólida (o alfa da imagem continua
+   recortando a forma; não há fundo transparente aparecendo). */
+.opcao:not([data-ok]) .opcaoImg,
+.telaDetalhe:not([data-ok]) .figuraImg {
+  filter: brightness(0);
+  opacity: 0.88;
+}
+
+/* ---- Detalhe ----------------------------------------------------------------- */
+.telaDetalhe {
+  display: grid;
+  /* topo fixo no alto; pedestal + ficha centrados no espaço que sobra */
+  grid-template-rows: auto minmax(0, 1fr) auto auto minmax(0, 1fr);
+
+  gap: calc(var(--u) * 0.6);
+}
+.detalheTopo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--u) * 0.5);
+}
+.detalheNum {
+  font-size: max(var(--font-size-md), calc(var(--u) * 1.3));
+  font-weight: 800;
+  line-height: 1;
+  color: var(--tinta);
+}
+.selo,
+.estado {
+  padding: calc(var(--u) * 0.15) calc(var(--u) * 0.6);
+  border: 2px solid var(--moldura);
+  border-radius: var(--radius-full);
+  font-size: max(var(--font-size-xs), calc(var(--u) * 0.75));
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.selo {
+  background: var(--pv-white);
+  color: var(--tinta);
+}
+.estado {
+  margin-left: auto;
+  background: var(--pv-gray-200);
+  color: var(--tinta);
+}
+.telaDetalhe[data-ok] .estado {
+  background: var(--pv-green-800);
+  color: var(--pv-white);
+}
+
+.palco {
+  grid-row: 3;
+  display: grid;
+  justify-items: center;
+  padding-top: calc(var(--u) * 0.4);
+}
+.pedestal {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: calc(var(--u) * 15);
+  max-width: 70%;
+  aspect-ratio: 1;
+  border: calc(var(--u) * 0.35) solid var(--moldura);
+  border-radius: var(--radius-full);
+  background:
+    radial-gradient(circle at 34% 28%, var(--pv-white) 0 18%, transparent 55%),
+    radial-gradient(circle, color-mix(in srgb, var(--cor) 22%, var(--pv-white)) 0 58%, color-mix(in srgb, var(--cor) 55%, var(--pv-white)) 100%);
+  box-shadow:
+    0 0 0 calc(var(--u) * 0.45) color-mix(in srgb, var(--cor) 70%, var(--pv-white)),
+    0 0 calc(var(--u) * 2.5) calc(var(--u) * 0.6) var(--cor);
+}
+.telaDetalhe:not([data-ok]) .pedestal {
+  background:
+    radial-gradient(circle at 34% 28%, var(--pv-white) 0 18%, transparent 55%),
+    radial-gradient(circle, var(--pv-gray-100) 0 58%, var(--pv-gray-200) 100%);
+  box-shadow: 0 0 0 calc(var(--u) * 0.45) var(--pv-gray-400);
+}
+.figura {
+  display: grid;
+  place-items: center;
+  width: 82%;
+  height: 82%;
+}
+.figuraImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 calc(var(--u) * 0.3) 0 color-mix(in srgb, var(--moldura) 45%, transparent));
+}
+.base {
+  width: calc(var(--u) * 10);
+  max-width: 56%;
+  height: calc(var(--u) * 1.6);
+  margin-top: calc(var(--u) * -0.9);
+  border: 3px solid var(--moldura);
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--pv-gray-600), var(--pv-gray-900));
+}
+
+.ficha {
+  grid-row: 4;
+  display: grid;
+  align-content: start;
+  gap: calc(var(--u) * 0.55);
+  font-size: max(var(--font-size-sm), calc(var(--u) * 0.92));
+}
+.dex .nome {
+  font-size: max(var(--font-size-lg), calc(var(--u) * 1.6));
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--tinta);
+  text-align: center;
+}
+.telaDetalhe:not([data-ok]) .nome {
+  letter-spacing: 0.2em;
+}
+.dex .forma {
+  font-style: italic;
+  color: var(--tinta-suave);
+  text-align: center;
+}
+.bloco {
+  display: grid;
+  gap: calc(var(--u) * 0.15);
+  padding: calc(var(--u) * 0.55) calc(var(--u) * 0.8);
+  border: 2px solid var(--pv-gray-900);
+  border-left: calc(var(--u) * 0.45) solid var(--cor);
+  border-radius: calc(var(--u) * 0.6);
+  background: var(--pv-white);
+}
+.telaDetalhe:not([data-ok]) .bloco {
+  border-left-color: var(--pv-gray-600);
+}
+.dex .blocoTitulo {
+  font-size: max(var(--font-size-xs), calc(var(--u) * 0.75));
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+.bloqueado {
+  position: relative;
+  display: grid;
+  min-height: calc(var(--u) * 3.2);
+}
+.borrao {
+  grid-area: 1 / 1;
+  background: repeating-linear-gradient(180deg, var(--pv-gray-200) 0 calc(var(--u) * 0.6), transparent calc(var(--u) * 0.6) calc(var(--u) * 1));
+  filter: blur(3px);
+}
+.dex.dex .bloqueadoTexto {
+  /* posicionado: o .borrao (com filter) pintaria por cima do texto */
+  position: relative;
+  z-index: 1;
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  align-self: center;
+  justify-self: center;
+  gap: calc(var(--u) * 0.45);
+  padding: calc(var(--u) * 0.2) calc(var(--u) * 0.9);
+  border: 2px solid var(--pv-gray-600);
+  border-radius: var(--radius-full);
+  background: var(--pv-white);
+  font-weight: 800;
+  color: var(--tinta);
+}
+.cadeado {
+  position: relative;
+  width: calc(var(--u) * 0.85);
+  height: calc(var(--u) * 0.7);
+  margin-top: calc(var(--u) * 0.35);
+  border-radius: 2px;
+  background: var(--tinta);
+}
+.cadeado::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: calc(var(--u) * 0.55);
+  height: calc(var(--u) * 0.45);
+  translate: -50% 1px;
+  border: 2px solid var(--tinta);
+  border-bottom: 0;
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
+}
+.vazio {
+  font-weight: 700;
+}
+
+/* ---- Tampa (só aparece animando na abertura) -------------------------------- */
+.tampa {
+  display: none;
+}
+
+/* ---- Animações --------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .aparelho {
+    animation: dex-entrar 320ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  }
+  .tampa {
+    position: absolute;
+    inset: -4px;
+    z-index: 5;
+    display: grid;
+    place-items: center;
+    border: 4px solid var(--moldura);
+    border-radius: inherit;
+    background:
+      repeating-linear-gradient(135deg, transparent 0 calc(var(--u) * 1.5), color-mix(in srgb, var(--pv-white) 6%, transparent) calc(var(--u) * 1.5) calc(var(--u) * 3)),
+      var(--casco-escuro);
+    transform-origin: 50% 0;
+    pointer-events: none;
+    backface-visibility: hidden;
+    animation: dex-tampa 620ms 140ms cubic-bezier(0.5, 0, 0.75, 0) both;
+  }
+  .tampaSelo {
+    padding: calc(var(--u) * 0.4) calc(var(--u) * 1.4);
+    border: 3px solid var(--moldura);
+    border-radius: var(--radius-full);
+    background: var(--pv-yellow-400);
+    color: var(--tinta);
+    font-size: max(var(--font-size-lg), calc(var(--u) * 1.6));
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .figura {
+    animation: dex-giro 420ms cubic-bezier(0.2, 0.8, 0.3, 1.1) both;
+  }
+  .telaDetalhe[data-ok] .pedestal {
+    animation: dex-brilho 2.4s ease-in-out infinite;
+  }
+  .opcao[data-ok] .opcaoArte::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 35%, color-mix(in srgb, var(--pv-white) 75%, transparent) 50%, transparent 65%);
+    translate: -110% 0;
+    animation: dex-reflexo 3.2s ease-in-out infinite;
+  }
+  .grade .opcao:nth-child(2) .opcaoArte::after { animation-delay: 0.4s; }
+  .grade .opcao:nth-child(3) .opcaoArte::after { animation-delay: 0.8s; }
+  .grade .opcao:nth-child(4) .opcaoArte::after { animation-delay: 1.2s; }
+  .grade .opcao:nth-child(5) .opcaoArte::after { animation-delay: 1.6s; }
+  .luz[data-luz="verde"] {
+    animation: dex-pisca 1.8s steps(2, jump-none) infinite;
+  }
+}
+
+@keyframes dex-entrar {
+  from {
+    opacity: 0;
+    transform: translateY(4%) scale(0.94);
+  }
+}
+@keyframes dex-tampa {
+  0% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotateX(-100deg);
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes dex-giro {
+  from {
+    opacity: 0;
+    transform: rotateY(-200deg) scale(0.6);
+  }
+}
+@keyframes dex-brilho {
+  50% {
+    box-shadow:
+      0 0 0 calc(var(--u) * 0.45) color-mix(in srgb, var(--cor) 70%, var(--pv-white)),
+      0 0 calc(var(--u) * 3.6) calc(var(--u) * 1.1) var(--cor);
+  }
+}
+@keyframes dex-reflexo {
+  0%,
+  55% {
+    translate: -110% 0;
+  }
+  80%,
+  100% {
+    translate: 110% 0;
+  }
+}
+@keyframes dex-pisca {
+  50% {
+    filter: brightness(1.35);
+  }
+}
+
+/* ---- Responsivo --------------------------------------------------------------- */
+
+/* Notebook baixo: telas mais compactas. */
+@container dex (max-height: 720px) {
+  .aparelho {
+    gap: calc(var(--u) * 0.7);
+    padding-block: calc(var(--u) * 0.7) calc(var(--u) * 1.2);
+  }
+  .lente {
+    width: calc(var(--u) * 3);
+    height: calc(var(--u) * 3);
+  }
+  .tela {
+    padding: calc(var(--u) * 0.8);
+  }
+}
+
+/* Celular / estreito: uma coluna, lista em cima (4 colunas), detalhe
+   embaixo; o corpo rola por dentro. */
+@container dex (max-width: 760px) {
+  .dex {
+    --u: 0.75rem;
+    padding: 0.5rem;
+  }
+  .aparelho {
+    padding: 0.6rem 0.6rem 1.1rem;
+    border-radius: 1.25rem 1.25rem 0.9rem 0.9rem;
+  }
+  .topo {
+    flex-wrap: wrap;
+    gap: 0.4rem 0.6rem;
+  }
+  .lente {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-width: 3px;
+  }
+  .marca {
+    flex: 1 1 8rem;
+  }
+  .dex .subtitulo {
+    display: none;
+  }
+  .dex.dex .contador {
+    order: 3;
+    flex-basis: 100%;
+    padding: 0.15rem 0.6rem;
+    text-align: center;
+  }
+  .corpo {
+    display: block;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 4px;
+    margin: -4px;
+  }
+  .tela {
+    overflow: visible;
+    padding: 0.6rem;
+    border-width: 0.35rem;
+  }
+  .telaDetalhe {
+    margin-top: 0.75rem;
+    scroll-margin-top: 4px;
+  }
+  .dobradica {
+    display: none;
+  }
+  .grade {
+    gap: 0.4rem;
+  }
+  .opcaoArte {
+    width: 100%;
+  }
+  .pedestal {
+    width: 9.5rem;
+  }
+  .base {
+    width: 7.5rem;
+  }
+}
+
+/* Paisagem baixa (celular deitado): deixa o corpo rolar. */
+@container dex (max-height: 460px) and (min-width: 761px) {
+  .corpo {
+    overflow-y: auto;
+  }
+}
