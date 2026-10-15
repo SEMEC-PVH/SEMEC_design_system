@@ -8,10 +8,11 @@
 //   - frustum de sombra justo, centrado no que a câmera vê e "grudado" na
 //     grade de texels (sem tremer quando a câmera anda);
 //   - oclusão de ambiente (GTAO) opcional via EffectComposer, com queda
-//     automática de qualidade se o quadro ficar lento.
+//     automática de qualidade se o quadro ficar lento (níveis e detecção da
+//     placa em scene/qualidade.js).
 //
 // Uso no motor:
-//   const lighting = createLighting({ renderer, scene, camera, pal, track, dayNight });
+//   const lighting = createLighting({ renderer, scene, camera, pal, track, dayNight, quality, onQualityDrop });
 //   // fim do tick:
 //   lighting.update(camTarget, camera.userData.far || 1);
 //   lighting.render(ts);
@@ -34,13 +35,16 @@ const SHADOW_HALF = 12.5;
 // O centro do que a câmera vê fica um pouco ao norte do alvo (perspectiva).
 const VIEW_AHEAD = 1.6;
 
-// Níveis de qualidade, do mais caro ao mais barato.
+// Níveis de qualidade, do mais caro ao mais barato (scene/qualidade.js).
+// `ratio` < 1 desenha abaixo da resolução da tela e o navegador amplia: é o
+// que mais alivia vídeo integrado antigo, que sofre com preenchimento.
 const QUALITY = {
-  high: { ao: true, aoScale: 1, maxRatio: 1.5, shadowSize: 2048, shadowRadius: 3 },
-  medium: { ao: false, maxRatio: 2, shadowSize: 2048, shadowRadius: 3 },
-  low: { ao: false, maxRatio: 1, shadowSize: 1024, shadowRadius: 2 },
+  high: { ao: true, aoScale: 1, maxRatio: 1.5, shadows: true, shadowSize: 2048, shadowRadius: 3 },
+  medium: { ao: false, maxRatio: 2, shadows: true, shadowSize: 2048, shadowRadius: 3 },
+  low: { ao: false, maxRatio: 1, shadows: true, shadowSize: 1024, shadowRadius: 1 },
+  minimal: { ao: false, maxRatio: 1, ratio: 0.75, shadows: false, shadowSize: 1024, shadowRadius: 1 },
 };
-const ORDER = ["high", "medium", "low"];
+const ORDER = ["high", "medium", "low", "minimal"];
 
 // Cores da luz a partir dos tokens (nada de hex).
 function lightPalette(pal) {
@@ -57,16 +61,20 @@ function lightPalette(pal) {
   };
 }
 
-function pickInitialQuality() {
-  const dpr = window.devicePixelRatio || 1;
-  const coarse = window.matchMedia?.("(pointer: coarse)").matches;
-  const cores = navigator.hardwareConcurrency || 4;
-  if (coarse || cores <= 2) return "low";
-  if (dpr > 1.5 || cores <= 4) return "medium";
-  return "high";
-}
-
-export function createLighting({ renderer, scene, camera, pal, track, dayNight = null }) {
+// `quality`: nível inicial (scene/qualidade.js). `autoDrop`: desce de nível
+// sozinho se o quadro ficar lento (desligado quando o jogador escolheu o
+// nível no menu); `onQualityDrop(level)` avisa quem guarda o aprendizado.
+export function createLighting({
+  renderer,
+  scene,
+  camera,
+  pal,
+  track,
+  dayNight = null,
+  quality = "medium",
+  autoDrop = true,
+  onQualityDrop = () => {},
+}) {
   const lp = lightPalette(pal);
 
   // ---- Renderer -------------------------------------------------------------
@@ -174,12 +182,18 @@ export function createLighting({ renderer, scene, camera, pal, track, dayNight =
   }
 
   // ---- Qualidade ----------------------------------------------------------------
-  let level = pickInitialQuality();
+  let level = QUALITY[quality] ? quality : "medium";
 
   function applyQuality() {
     const q = QUALITY[level];
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, q.maxRatio));
-    if (sun.shadow.mapSize.x !== q.shadowSize) {
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, q.maxRatio) * (q.ratio ?? 1));
+    // Sem sombras: os materiais recompilam sozinhos (o estado das luzes muda).
+    renderer.shadowMap.enabled = q.shadows;
+    sun.castShadow = q.shadows;
+    if (!q.shadows) {
+      sun.shadow.map?.dispose();
+      sun.shadow.map = null;
+    } else if (sun.shadow.mapSize.x !== q.shadowSize) {
       sun.shadow.mapSize.set(q.shadowSize, q.shadowSize);
       sun.shadow.map?.dispose();
       sun.shadow.map = null;
@@ -203,7 +217,7 @@ export function createLighting({ renderer, scene, camera, pal, track, dayNight =
     const now = performance.now();
     const gap = now - prevNow;
     prevNow = now;
-    if (automated || level === "low") return;
+    if (automated || !autoDrop || level === ORDER[ORDER.length - 1]) return;
     if (typeof ts !== "number" || Math.abs(now - ts) > 100 || gap > 250) return;
     // Média móvel exponencial do intervalo entre quadros (~1,5 s de memória).
     sampled++;
@@ -214,6 +228,7 @@ export function createLighting({ renderer, scene, camera, pal, track, dayNight =
       level = ORDER[ORDER.indexOf(level) + 1];
       sampled = 0;
       applyQuality();
+      onQualityDrop(level);
     }
   }
 

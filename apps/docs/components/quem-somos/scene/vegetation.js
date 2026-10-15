@@ -138,9 +138,10 @@ function windDepthFor(material, track) {
 // ---- Geometrias -------------------------------------------------------------
 
 // Copa redonda: quatro lóbulos facetados, centro do lóbulo principal na origem.
-function roundCrownGeo() {
+// `detail` 1 = 80 triângulos por lobo; 0 (versão leve) = 20.
+function roundCrownGeo(detail = 1) {
   const lobe = (r, x, y, z, sy = 1) => {
-    const g = new THREE.IcosahedronGeometry(r, 1);
+    const g = new THREE.IcosahedronGeometry(r, detail);
     g.scale(1, sy, 1);
     jitter(g, r * 0.32);
     g.translate(x, y, z);
@@ -283,9 +284,9 @@ function palmGeos(colors, rand) {
 }
 
 // Arbusto: três lóbulos baixos.
-function bushGeo() {
+function bushGeo(detail = 1) {
   const lobe = (r, x, y, z) => {
-    const g = new THREE.IcosahedronGeometry(r, 1);
+    const g = new THREE.IcosahedronGeometry(r, detail);
     g.scale(1, 0.82, 1);
     jitter(g, r * 0.35);
     g.translate(x, y, z);
@@ -310,12 +311,13 @@ function rockGeo(colors) {
 }
 
 // Tufo de mato: lâminas afinando e curvando para fora, em leque.
-function tuftGeo(colors) {
+// Versão leve: 5 lâminas de 2 segmentos (20 triângulos em vez de 54).
+function tuftGeo(colors, lite = false) {
   const pos = [];
   const col = [];
   const c = new THREE.Color();
-  const blades = 9;
-  const SEG = 3;
+  const blades = lite ? 5 : 9;
+  const SEG = lite ? 2 : 3;
   for (let b = 0; b < blades; b++) {
     const a = (b / blades) * Math.PI * 2 + b * 0.7;
     const h = 0.28 + ((b * 37) % 7) * 0.03;
@@ -386,7 +388,10 @@ function stemGeo() {
 
 // ---- Construção ---------------------------------------------------------------
 
-export function buildVegetation({ scene, map, pal, track, tileToWorld, W, H, tiles, reducedMotion = false }) {
+// `lite` (níveis gráficos baixos, scene/qualidade.js): copas, arbustos e mato
+// com menos triângulos e sem sombra nos miúdos. Mesmos lugares e cores.
+export function buildVegetation({ scene, map, pal, track, tileToWorld, W, H, tiles, reducedMotion = false, lite = false }) {
+  const detail = lite ? 0 : 1;
   const { TREE, TALL, FLOWER, WATER, FENCE, BUILDING } = tiles;
   // Tile onde o jogador pode estar (andável ou mato/flor).
   const isOpen = (x, y) => {
@@ -589,7 +594,7 @@ export function buildVegetation({ scene, map, pal, track, tileToWorld, W, H, til
   const ROUND_TRUNK = 0.62;
   instanced(track(trunkGeo(ROUND_TRUNK)), leafMat({ flatShading: false }), specs.round, (it) => placeAt(it), () => colors.wood);
   instanced(
-    track(roundCrownGeo()),
+    track(roundCrownGeo(detail)),
     addWind(leafMat(), windTime, { amp: 0.035, base: -0.2 }),
     specs.round,
     (it) => placeAt(it, 0.88),
@@ -619,7 +624,7 @@ export function buildVegetation({ scene, map, pal, track, tileToWorld, W, H, til
   );
 
   // Arbustos e pedras.
-  instanced(track(bushGeo()), addWind(leafMat(), windTime, { amp: 0.02, base: 0.1 }), specs.bush, (it) => placeAt(it), (it) => it.color);
+  instanced(track(bushGeo(detail)), addWind(leafMat(), windTime, { amp: 0.02, base: 0.1 }), specs.bush, (it) => placeAt(it), (it) => it.color);
   instanced(track(rockGeo(colors)), leafMat({ roughness: 0.95 }), specs.rock, (it) => placeAt(it), (it) => it.color);
 
   // ---- Mato alto (tufos que balançam quando o jogador passa) -----------------
@@ -629,7 +634,7 @@ export function buildVegetation({ scene, map, pal, track, tileToWorld, W, H, til
   // aparecendo entre as touceiras.
   const TUFTS = 9;
   const tufts = new THREE.InstancedMesh(
-    track(tuftGeo(colors)),
+    track(tuftGeo(colors, lite)),
     addWind(leafMat({ side: THREE.DoubleSide }), windTime, { amp: 0.09, base: 0, freq: 2.1 }),
     Math.max(tallTiles.length * TUFTS, 1)
   );
@@ -657,7 +662,7 @@ export function buildVegetation({ scene, map, pal, track, tileToWorld, W, H, til
       tufts.setColorAt(i, c.copy(white).lerp(r < 0.5 ? warm : cool, rand()));
     }
   });
-  tufts.castShadow = true;
+  tufts.castShadow = !lite;
   tufts.receiveShadow = true;
   tufts.customDepthMaterial = windDepthFor(tufts.material, track);
   tufts.computeBoundingSphere();
@@ -698,7 +703,7 @@ export function buildVegetation({ scene, map, pal, track, tileToWorld, W, H, til
         }
       }
   const leafClumps = new THREE.InstancedMesh(
-    track(bushGeo()),
+    track(bushGeo(detail)),
     addWind(leafMat(), windTime, { amp: 0.03, base: 0.05 }),
     Math.max(clumps.length, 1)
   );
@@ -736,7 +741,7 @@ export function buildVegetation({ scene, map, pal, track, tileToWorld, W, H, til
     centers.setMatrixAt(i, m4);
     centers.setColorAt(i, f.ci === 1 ? colors.flowerCenterDark : colors.flowerCenter);
   });
-  petals.castShadow = true;
+  petals.castShadow = !lite;
   for (const m of [stems, petals, centers]) {
     m.receiveShadow = true;
     m.computeBoundingSphere();

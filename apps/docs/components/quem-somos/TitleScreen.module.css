@@ -230,6 +230,16 @@
   outline: none;
   box-shadow: inset 4px 0 0 var(--pv-blue-700);
 }
+/* Valor do seletor de gráficos (troca com Enter ou ←/→). */
+.root .valor {
+  color: var(--pv-blue-700);
+}
+.root .nota {
+  margin: 0.4rem 0 0;
+  padding-left: 2rem;
+  font-size: var(--font-size-xs);
+  color: var(--pv-gray-700);
+}
 
 .root .helpTitle {
   margin: 0 0 0.6rem;

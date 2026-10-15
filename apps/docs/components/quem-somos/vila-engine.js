@@ -29,6 +29,7 @@ import { createWalkers, WALKER_IDS } from "./scene/walkers";
 import { buildVegetation } from "./scene/vegetation";
 import { buildGround } from "./scene/ground";
 import { areaOf } from "./areas";
+import { ehLeve, arquivoLeve } from "./scene/qualidade";
 
 const W = 30;
 const H = 24;
@@ -339,7 +340,7 @@ function makeScreenTexture(pal, seed) {
 // quina, lâmina azul-marinho na lateral, marquise sobre a entrada e
 // interior iluminado (mesas e monitores) visível pelo vidro.
 // Coordenadas locais: centro do footprint na origem, fachada em +z.
-function buildFrontEnd(group, b, { pal, track, unitBox }) {
+function buildFrontEnd(group, b, { pal, track, unitBox, lite }) {
   const hw = b.w / 2 - 0.05;
   const hd = b.h / 2 - 0.05;
   const mats = {
@@ -513,10 +514,13 @@ function buildFrontEnd(group, b, { pal, track, unitBox }) {
   shrub(round, hw - 0.2, hd - 0.18, 1);
   shrub(round, hw - 0.45, hd - 0.15, 0.8);
 
-  // Luz quente interna (sem sombra, alcance curto).
-  const warm = new THREE.PointLight(pal.lamp, 2.5, 3.5, 2);
-  warm.position.set(0, slabTop + 0.5, 0);
-  group.add(warm);
+  // Luz quente interna (sem sombra, alcance curto). Nos níveis leves fica de
+  // fora: cada luz pontual pesa em todos os pixels da cena.
+  if (!lite) {
+    const warm = new THREE.PointLight(pal.lamp, 2.5, 3.5, 2);
+    warm.position.set(0, slabTop + 0.5, 0);
+    group.add(warm);
+  }
 
   return { labelPos: new THREE.Vector3(-0.35, (groundTop + slabTop) / 2, upperFront + 0.07), labelBg: pal.navy };
 }
@@ -529,6 +533,13 @@ export function createVila(host, options) {
     leaders = new Set(),
     reducedMotion = false,
     modelUrl,
+    // Nível gráfico (scene/qualidade.js): "high" | "medium" | "low" | "minimal".
+    // Sombras, antialias e resolução seguem o nível; nos dois mais baixos a
+    // cena já nasce com modelos e vegetação leves. `autoQuality`: pode descer
+    // de nível sozinho se o quadro ficar lento (onQualityDrop avisa).
+    quality = "medium",
+    autoQuality = true,
+    onQualityDrop = () => {},
     onInteract = () => {},
     onFacing = () => {},
     // Ficha de um personagem 3D ou mascote ({ id }): clique nele ou conversa de
@@ -557,7 +568,12 @@ export function createVila(host, options) {
   };
 
   // ---- Renderer, cena, câmera ---------------------------------------------
-  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+  const lite = ehLeve(quality);
+  // Antialias só nos níveis altos: em vídeo integrado o MSAA custa caro.
+  const renderer = new THREE.WebGLRenderer({
+    antialias: !lite,
+    powerPreference: "high-performance",
+  });
   renderer.domElement.setAttribute("aria-hidden", "true");
   host.appendChild(renderer.domElement);
 
@@ -573,7 +589,17 @@ export function createVila(host, options) {
   // scene/lighting.js (pixel ratio também, conforme o nível de qualidade).
   // Ciclo dia/noite acelerado (parado de manhã com prefers-reduced-motion).
   const dayNight = createDayNight({ pal, reducedMotion });
-  const lighting = createLighting({ renderer, scene, camera, pal, track, dayNight });
+  const lighting = createLighting({
+    renderer,
+    scene,
+    camera,
+    pal,
+    track,
+    dayNight,
+    quality,
+    autoDrop: autoQuality,
+    onQualityDrop,
+  });
 
   // ---- Chão -----------------------------------------------------------------
   const unitBox = track(new THREE.BoxGeometry(1, 1, 1));
@@ -581,6 +607,7 @@ export function createVila(host, options) {
 
   // Terreno contínuo, calçadas com meio-fio e lago (scene/ground.js).
   const groundFx = buildGround({
+    lite,
     scene,
     map,
     pal,
@@ -598,6 +625,7 @@ export function createVila(host, options) {
   // Copa redonda, coníferas na borda, açaizeiros perto do rio, ipês de
   // destaque, arbustos e pedras só em tiles de árvore e no anel externo.
   const veg = buildVegetation({
+    lite,
     scene,
     map,
     pal,
@@ -626,6 +654,7 @@ export function createVila(host, options) {
   // prefers-reduced-motion.
   const frameUpdaters = [];
   const buildCtx = {
+    lite,
     pal,
     track,
     unitBox,
@@ -797,7 +826,7 @@ export function createVila(host, options) {
       ? createPedro({
           scene,
           loader,
-          url: modelUrl.replace(/gava\.glb$/, "pedro.glb"),
+          url: modelUrl.replace(/gava\.glb$/, arquivoLeve("pedro.glb", lite)),
           tileToWorld,
           spot: { ...QUEST_SPOT, rot: DIRS[QUEST_SPOT.dir].rot },
           index: questIndex,
@@ -812,7 +841,7 @@ export function createVila(host, options) {
     ? createOcarinaHideout({
         scene,
         loader,
-        url: modelUrl.replace(/gava\.glb$/, "ocarina.glb"),
+        url: modelUrl.replace(/gava\.glb$/, arquivoLeve("ocarina.glb", lite)),
         pos: tileToWorld(OCARINA_SPOT.x, OCARINA_SPOT.y),
         pal,
         track,
@@ -825,6 +854,7 @@ export function createVila(host, options) {
         scene,
         loader,
         baseUrl: modelUrl.replace(/gava\.glb$/, ""),
+        lite,
         tileToWorld,
         isFree: (x, y) => passable(x, y) && !(player.x === x && player.y === y),
         occupied,
@@ -838,7 +868,7 @@ export function createVila(host, options) {
     : [];
   if (modelUrl) {
     loader
-      .loadAsync(modelUrl)
+      .loadAsync(modelUrl.replace(/gava\.glb$/, arquivoLeve("gava.glb", lite)))
       .then((gltf) => {
         if (disposed) return;
         const model = gltf.scene;
@@ -1296,6 +1326,10 @@ export function createVila(host, options) {
     setPaused(p) {
       paused = p;
       if (p) held.length = 0;
+    },
+    // Nível gráfico em uso agora (pode ter descido sozinho).
+    get quality() {
+      return lighting.quality;
     },
     // Etapa da quest da ocarina (quest.js): símbolo, esconderijo e o Pedro.
     // celebrar: acabou de devolver (o Pedro dança na hora).

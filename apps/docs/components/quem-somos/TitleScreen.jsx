@@ -4,16 +4,19 @@
 //   1. "Pressione Start" — logo sobre a vila em modo vitrine (o motor
 //      sobrevoa o mapa ao fundo);
 //   2. menu em caixa de RPG (moldura dupla, cursor ▶) — Novo jogo, Como
-//      jogar, Ver equipe em lista. Setas movem o cursor, Enter escolhe, Esc
-//      volta.
+//      jogar, Gráficos, Ver equipe em lista. Setas movem o cursor, Enter
+//      escolhe (em Gráficos, troca o nível; ←/→ também), Esc volta.
 // O VilaSemec controla `started`; aqui só chamamos onStart().
 import { useCallback, useEffect, useRef, useState } from "react";
 import FullscreenButton from "./FullscreenButton";
+import { OPCOES, ROTULO } from "./scene/qualidade";
 import styles from "./TitleScreen.module.css";
 
 const YEAR = 2026;
 
-export default function TitleScreen({ onStart }) {
+// graficos: preferência atual ("auto" ou nível, scene/qualidade.js);
+// nivelAtual: o nível que o motor está usando; onGraficos(nova) salva.
+export default function TitleScreen({ onStart, graficos = "auto", nivelAtual = null, semAceleracao = false, onGraficos }) {
   const [stage, setStage] = useState("press"); // "press" | "menu" | "help"
   const menuRef = useRef(null);
   const pressRef = useRef(null);
@@ -56,11 +59,22 @@ export default function TitleScreen({ onStart }) {
     if (stage !== "press") menuRef.current?.querySelector("button, a")?.focus({ preventScroll: true });
   }, [stage]);
 
+  // Próximo (ou anterior) nível gráfico, em volta.
+  const trocarGraficos = (passo) => {
+    const i = OPCOES.indexOf(graficos);
+    onGraficos?.(OPCOES[(i + passo + OPCOES.length) % OPCOES.length]);
+  };
+  const rotuloGraficos =
+    graficos === "auto" && nivelAtual ? `${ROTULO.auto} (${ROTULO[nivelAtual]})` : ROTULO[graficos];
+
   // Navegação do menu como em console: setas sobem/descem, Esc volta.
   const onMenuKey = (e) => {
     const items = [...(menuRef.current?.querySelectorAll("button, a") ?? [])];
     const i = items.indexOf(document.activeElement);
-    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && e.target.dataset.graficos) {
+      e.preventDefault();
+      trocarGraficos(e.key === "ArrowRight" ? 1 : -1);
+    } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
       const next = (i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
       items[next]?.focus({ preventScroll: true });
@@ -109,11 +123,27 @@ export default function TitleScreen({ onStart }) {
                   </button>
                 </li>
                 <li>
+                  <button
+                    type="button"
+                    className={styles.item}
+                    data-graficos="true"
+                    aria-describedby="vila-graficos-dica"
+                    onClick={() => trocarGraficos(1)}
+                  >
+                    Gráficos: <span className={styles.valor}>{rotuloGraficos}</span>
+                  </button>
+                </li>
+                <li>
                   <a className={styles.item} href="#equipe">
                     Ver equipe em lista
                   </a>
                 </li>
               </ul>
+              <p id="vila-graficos-dica" className={styles.nota}>
+                {semAceleracao
+                  ? "Este navegador está sem aceleração de vídeo: o jogo usa o modo mais leve."
+                  : "Computador lento? Escolha Baixo ou Mínimo."}
+              </p>
             </nav>
           ) : (
             <div ref={menuRef}>

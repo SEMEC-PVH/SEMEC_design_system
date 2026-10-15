@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
 import TitleScreen from "./TitleScreen";
 import FullscreenButton from "./FullscreenButton";
@@ -16,6 +16,14 @@ import Retrato, { bocaAberta, useDigitacao } from "./Retrato";
 import FichaPersonagem from "./FichaPersonagem";
 import { FICHAS, ehFicha } from "./fichas";
 import { QUEST, useQuest } from "./quest";
+import {
+  assinarPreferencia,
+  ehLeve,
+  lembrarNivelAuto,
+  lerPreferencia,
+  resolverNivel,
+  salvarPreferencia,
+} from "./scene/qualidade";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
@@ -118,6 +126,12 @@ export default function VilaSemec({ members }) {
   // Índices dos líderes vencidos, para marcar um engine recém-criado.
   const leadersDoneRef = useRef([]);
   const [status, setStatus] = useState("loading");
+  // Gráficos (scene/qualidade.js): preferência do menu ("auto" ou um nível) e
+  // o nível que o motor está usando agora (o automático pode descer sozinho).
+  const graficos = useSyncExternalStore(assinarPreferencia, lerPreferencia, () => "auto");
+  const [nivelAtual, setNivelAtual] = useState(null);
+  // O Chrome está desenhando pela CPU (sem aceleração de vídeo).
+  const [semAceleracao, setSemAceleracao] = useState(false);
   // Tela de título ("Começar"): o jogo só abre depois dela; a vila aparece
   // ao fundo em modo vitrine.
   const [started, setStarted] = useState(false);
@@ -521,10 +535,26 @@ export default function VilaSemec({ members }) {
     import("./vila-engine")
       .then(({ createVila }) => {
         if (cancelled || !hostRef.current) return;
+        const { nivel, auto, gpu } = resolverNivel(graficos);
+        // Sem WebGL2 (vídeo muito antigo ou driver sem suporte) o three.js não
+        // roda: fica a equipe em lista, com o aviso.
+        if (!gpu.webgl2) {
+          setStatus("sem-webgl");
+          return;
+        }
+        setSemAceleracao(gpu.software);
+        setNivelAtual(nivel);
         engine = createVila(hostRef.current, {
           members,
           leaders: new Set(mapaDeLideres(members).keys()),
           reducedMotion,
+          quality: nivel,
+          autoQuality: auto,
+          onQualityDrop: (novo) => {
+            setNivelAtual(novo);
+            // Só guarda as quedas que mudam a cena (modelos e mato leves).
+            if (auto && ehLeve(novo)) lembrarNivelAuto(novo);
+          },
           modelUrl: `${basePath}/quem-somos/gava.glb`,
           onInteract: (ev) => onInteractRef.current?.(ev),
           onInspect: (ev) => onInspectRef.current?.(ev),
@@ -552,7 +582,7 @@ export default function VilaSemec({ members }) {
       engineRef.current = null;
       engine?.dispose();
     };
-  }, [members]);
+  }, [members, graficos]);
 
   useEffect(() => {
     engineRef.current?.setPaused(!started || Boolean(dialog) || Boolean(modal) || Boolean(ficha));
@@ -864,7 +894,15 @@ export default function VilaSemec({ members }) {
         listada logo abaixo do mapa.
       </p>
 
-      {!started && <TitleScreen onStart={startGame} />}
+      {!started && (
+        <TitleScreen
+          onStart={startGame}
+          graficos={graficos}
+          nivelAtual={nivelAtual}
+          semAceleracao={semAceleracao}
+          onGraficos={salvarPreferencia}
+        />
+      )}
 
       {started && !cena && (
         <div className="vila-hud vila-hud--top">
@@ -955,6 +993,12 @@ export default function VilaSemec({ members }) {
       {status === "error" && (
         <p className="vila-status" role="alert">
           Não foi possível carregar o mapa 3D neste navegador. A equipe está
+          listada logo abaixo.
+        </p>
+      )}
+      {status === "sem-webgl" && (
+        <p className="vila-status" role="alert">
+          A placa de vídeo deste computador não roda o mapa 3D. A equipe está
           listada logo abaixo.
         </p>
       )}

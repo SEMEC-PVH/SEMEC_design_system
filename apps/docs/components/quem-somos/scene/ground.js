@@ -76,7 +76,9 @@ function bevelSlab(w, h, d, b) {
  * @returns {{ update(t: number): void }} — update só é chamado sem
  *   prefers-reduced-motion (ondulação da água e reflexos).
  */
-export function buildGround({ scene, map, pal, track, W, H, tiles, unitBox }) {
+// `lite` (níveis gráficos baixos): terreno e lago com menos subdivisões e
+// pedrinhas sem sombra.
+export function buildGround({ scene, map, pal, track, W, H, tiles, unitBox, lite = false }) {
   const { PATH, WATER, TALL, FLOWER, TREE, BUILDING } = tiles;
   const { pv, mix } = pal;
   const white = pv("white");
@@ -223,7 +225,7 @@ export function buildGround({ scene, map, pal, track, W, H, tiles, unitBox }) {
 
   // ---- Terreno ------------------------------------------------------------------
   const EXT = 8; // tiles além da borda do mapa
-  const SUB = 5; // subdivisões por tile
+  const SUB = lite ? 3 : 5; // subdivisões por tile
   const cols = (W + EXT * 2) * SUB;
   const rows = (H + EXT * 2) * SUB;
   const terrainGeo = track(new THREE.PlaneGeometry(W + EXT * 2, H + EXT * 2, cols, rows));
@@ -438,7 +440,7 @@ export function buildGround({ scene, map, pal, track, W, H, tiles, unitBox }) {
 
   const lakeW = lx1 + 1 - lx0;
   const lakeH = ly1 + 1 - ly0;
-  const WSUB = 6;
+  const WSUB = lite ? 3 : 6;
   const waterGeo = track(new THREE.PlaneGeometry(lakeW, lakeH, lakeW * WSUB, lakeH * WSUB));
   waterGeo.rotateX(-Math.PI / 2);
   waterGeo.translate(tileX(lx0) + lakeW / 2, WATER_Y, tileZ(ly0) + lakeH / 2);
@@ -515,7 +517,7 @@ export function buildGround({ scene, map, pal, track, W, H, tiles, unitBox }) {
     stones.setMatrixAt(i, m4);
     stones.setColorAt(i, tmp.copy(c.stone[Math.floor(hash2(i, 13) * c.stone.length)]).offsetHSL(0, 0, (r - 0.5) * 0.04));
   });
-  stones.castShadow = true;
+  stones.castShadow = !lite;
   stones.receiveShadow = true;
   scene.add(stones);
 

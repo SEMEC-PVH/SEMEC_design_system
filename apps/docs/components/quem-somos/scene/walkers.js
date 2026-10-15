@@ -11,6 +11,7 @@
 
 import { createCompanion } from "./companion";
 import { bunnyPet, livroPet, microfonePet, renaPet, samuraiPet, wafflePet } from "./pets";
+import { arquivoLeve } from "./qualidade";
 
 const WALKERS = [
   {
@@ -119,7 +120,7 @@ const WALKERS = [
 // Ids com boneco 3D (o motor usa para saber quais líderes trocar).
 export const WALKER_IDS = new Set(WALKERS.map((w) => w.id));
 
-export function createWalkers({ baseUrl, slashColor, bubble, anchors = new Map(), ...ctx }) {
+export function createWalkers({ baseUrl, lite = false, slashColor, bubble, anchors = new Map(), ...ctx }) {
   return WALKERS.map((w) =>
     createCompanion({
       ...ctx,
@@ -129,9 +130,9 @@ export function createWalkers({ baseUrl, slashColor, bubble, anchors = new Map()
       restAt: w.restAt,
       restSeconds: w.restSeconds,
       talkShow: w.talkShow,
-      ownerUrl: baseUrl + w.owner,
+      ownerUrl: baseUrl + arquivoLeve(w.owner, lite),
       ownerWalkScale: w.ownerWalkScale,
-      petUrl: baseUrl + w.petFile,
+      petUrl: baseUrl + arquivoLeve(w.petFile, lite),
       pet: w.pet({ slashColor }),
       quote: w.quote && bubble ? { text: w.quote, ...bubble } : null,
       anchor: anchors.get(w.id) ?? null,
