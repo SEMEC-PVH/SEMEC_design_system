@@ -9,6 +9,7 @@ import {
   Checkbox,
   FormField,
   Input,
+  InputMask,
   Label,
   RadioGroup,
   RadioGroupItem,
@@ -18,9 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
   Textarea,
-  maskCPF,
-  maskCNPJ,
-  maskCEP,
+  applyInputMask,
   maskCurrency,
   validateEmail,
 } from "semec-ds/react";
@@ -37,7 +36,8 @@ export function FormAdvanced() {
   const [touched, setTouched] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
-  const docMasked = tipo === "pf" ? maskCPF(doc) : maskCNPJ(doc);
+  // doc e cep guardam o valor sem máscara; o InputMask formata na tela.
+  const docMasked = applyInputMask(doc, tipo === "pf" ? "cpf" : "cnpj").masked;
   const emailError = touched.email && !validateEmail(email) ? "Informe um e-mail válido (ex: nome@semec.pvh.br)." : undefined;
   const nomeError = touched.nome && nome.trim().length < 3 ? "Informe o nome com ao menos 3 caracteres." : undefined;
   const docError = touched.doc && (tipo === "pf" ? doc.replace(/\D/g, "").length !== 11 : doc.replace(/\D/g, "").length !== 14) ? `Informe ${tipo === "pf" ? "CPF" : "CNPJ"} completo.` : undefined;
@@ -103,15 +103,12 @@ export function FormAdvanced() {
         hint={tipo === "pf" ? "000.000.000-00" : "00.000.000/0000-00"}
         error={docError}
       >
-        <Input
+        <InputMask
           id="f-doc"
-          inputMode="numeric"
-          placeholder={tipo === "pf" ? "000.000.000-00" : "00.000.000/0000-00"}
-          value={docMasked}
-          onChange={(e) => setDoc(e.target.value)}
+          mask={tipo === "pf" ? "cpf" : "cnpj"}
+          value={doc}
+          onValueChange={(_masked, raw) => setDoc(raw)}
           onBlur={() => setTouched((s) => ({ ...s, doc: true }))}
-          aria-invalid={!!docError}
-          aria-describedby={docError ? "f-doc-error" : undefined}
         />
       </FormField>
 
@@ -140,7 +137,7 @@ export function FormAdvanced() {
 
       <div className="grid grid-cols-2 gap-4">
         <FormField label="CEP" htmlFor="f-cep" hint="00000-000">
-          <Input id="f-cep" inputMode="numeric" placeholder="00000-000" value={maskCEP(cep)} onChange={(e) => setCep(e.target.value)} />
+          <InputMask id="f-cep" mask="cep" autoComplete="postal-code" value={cep} onValueChange={(_masked, raw) => setCep(raw)} />
         </FormField>
         <FormField label="Valor estimado" htmlFor="f-valor" hint="Máscara moeda">
           <Input id="f-valor" inputMode="numeric" placeholder="R$ 0,00" value={valor} onChange={(e) => setValor(maskCurrency(e.target.value))} />
@@ -171,7 +168,7 @@ export function FormAdvanced() {
 
       <div className="flex gap-3 pt-2">
         <Button type="submit">Enviar requerimento</Button>
-        <Button type="button" variant="outline" onClick={() => { setDoc(""); setEmail(""); setNome(""); setMensagem(""); setTermos(false); setTouched({}); setSubmitted(false); }}>Limpar</Button>
+        <Button type="button" variant="outline" onClick={() => { setDoc(""); setCep(""); setEmail(""); setNome(""); setMensagem(""); setTermos(false); setTouched({}); setSubmitted(false); }}>Limpar</Button>
       </div>
     </form>
   );

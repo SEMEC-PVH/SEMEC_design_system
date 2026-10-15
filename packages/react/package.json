@@ -72,7 +72,7 @@
     "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs"
+    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-dts.mjs"
   },
   "peerDependencies": {
     "lucide-react": ">=0.468.0 <2",

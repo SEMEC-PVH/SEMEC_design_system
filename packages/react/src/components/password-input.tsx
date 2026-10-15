@@ -75,6 +75,11 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
           type={visible ? "text" : "password"}
           disabled={disabled}
           className={cn("pr-12 [&::-ms-reveal]:hidden", className)}
+          // Com a senha visível (type="text"), corretor e maiúscula automática
+          // alterariam a senha. Sobrescrevíveis por props.
+          spellCheck={false}
+          autoCapitalize="none"
+          autoCorrect="off"
           {...props}
         />
         <button

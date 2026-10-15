@@ -1,9 +1,9 @@
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
+import { Slot, Slottable } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
-import { Spinner } from "./spinner";
+import { ButtonLoadingIndicator } from "./button-loading";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
@@ -73,34 +73,29 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const Comp = asChild ? Slot : "button";
-    const handleClick = loading
-      ? (event: React.MouseEvent<HTMLButtonElement>) => {
-          // aria-disabled não bloqueia a ativação: o bloqueio é aqui.
-          event.preventDefault();
-        }
-      : onClick;
-    const content =
-      loading && !asChild ? (
-        <>
-          <Spinner decorative />
-          {loadingText ?? children}
-        </>
-      ) : (
-        children
-      );
+    // O elemento é o mesmo com e sem loading (sem remontar: o foco fica).
+    // O bloqueio do clique mora no ButtonLoadingIndicator ("use client"),
+    // para o Button seguir renderizando no servidor; o onClick de quem usa
+    // não é repassado enquanto carrega.
     return (
       <Comp
-        className={cn(
-          buttonVariants({ variant, size, className }),
-          loading && "cursor-progress"
-        )}
+        className={cn(buttonVariants({ variant, size, className }), loading && "cursor-progress")}
         ref={ref}
+        onClick={loading ? undefined : onClick}
         {...props}
         aria-busy={loading ? true : props["aria-busy"]}
         aria-disabled={loading ? true : props["aria-disabled"]}
-        onClick={handleClick}
       >
-        {content}
+        {!loading ? (
+          children
+        ) : asChild ? (
+          [<ButtonLoadingIndicator key="loading" />, <Slottable key="child">{children}</Slottable>]
+        ) : (
+          <>
+            <ButtonLoadingIndicator />
+            {loadingText ?? children}
+          </>
+        )}
       </Comp>
     );
   }
