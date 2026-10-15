@@ -24,6 +24,20 @@ describe("applyInputMask", () => {
     ["AAA-9*99", "abc1d23", "abc-1d23", "abc1d23"],
     ["AAA-9*99", "ABC-1D23", "ABC-1D23", "ABC1D23"],
     ["AAA-9*99", "1abc", "abc", "abc"],
+    // D4: dígito igual a literal do padrão ("+55") não é engolido.
+    ["+55 (99) 99999-9999", "5", "+55 (5", "5"],
+    ["+55 (99) 99999-9999", "569", "+55 (56) 9", "569"],
+    ["+55 (99) 99999-9999", "+55 (69", "+55 (69", "69"],
+    ["+55 (99) 99999-9999", "+55 69 99999-1234", "+55 (69) 99999-1234", "69999991234"],
+    ["+55 (99) 99999-9999", "+55 (69) 99999-1234", "+55 (69) 99999-1234", "69999991234"],
+    // Telefone colado com código do país.
+    ["telefone", "+55 69 99999-1234", "(69) 99999-1234", "69999991234"],
+    ["telefone", "5569999991234", "(69) 99999-1234", "69999991234"],
+    ["telefone", "+55 69 3216-0000", "(69) 3216-0000", "6932160000"],
+    ["celular", "+55 (69) 99216-0000", "(69) 99216-0000", "69992160000"],
+    // DDD 55 digitado na máscara não vira código de país.
+    ["telefone", "(55) 99999-12345", "(55) 99999-1234", "55999991234"],
+    ["telefone", "5599999123", "(55) 9999-9123", "5599999123"],
   ])("%s: %s → %s", (mask, value, masked, raw) => {
     expect(applyInputMask(value, mask)).toEqual({ masked, raw });
   });
@@ -117,6 +131,45 @@ describe("InputMask (AUD-36)", () => {
     await user.keyboard("{Backspace}");
     expect(input).toHaveValue("123.467.890-1");
     expect(input.selectionStart).toBe(5);
+  });
+
+  it("colar telefone com +55 no preset telefone", async () => {
+    render(<InputMask aria-label="Telefone" mask="telefone" />);
+    const input = screen.getByLabelText("Telefone") as HTMLInputElement;
+    const user = userEvent.setup();
+    await user.click(input);
+    await user.paste("+55 69 99999-1234");
+    expect(input).toHaveValue("(69) 99999-1234");
+  });
+
+  it("Backspace logo depois de um literal apaga o dígito anterior", async () => {
+    const { user, input, onValueChange } = setup({ defaultValue: "12345678901" });
+    await user.click(input);
+    // "123.|456.789-01": o literal "." fica antes do cursor.
+    input.setSelectionRange(4, 4);
+    await user.keyboard("{Backspace}");
+    expect(input).toHaveValue("124.567.890-1");
+    expect(input.selectionStart).toBe(2);
+    expect(onValueChange).toHaveBeenLastCalledWith("124.567.890-1", "1245678901");
+  });
+
+  it("Delete logo antes de um literal apaga o dígito seguinte", async () => {
+    const { user, input } = setup({ defaultValue: "12345678901" });
+    await user.click(input);
+    // "123|.456.789-01": o literal "." fica depois do cursor.
+    input.setSelectionRange(3, 3);
+    await user.keyboard("{Delete}");
+    expect(input).toHaveValue("123.567.890-1");
+    expect(input.selectionStart).toBe(3);
+  });
+
+  it("Backspace e Delete longe de literal seguem o padrão", async () => {
+    const { user, input } = setup({ defaultValue: "12345678901" });
+    await user.click(input);
+    input.setSelectionRange(2, 2);
+    await user.keyboard("{Delete}");
+    expect(input).toHaveValue("124.567.890-1");
+    expect(input.selectionStart).toBe(2);
   });
 
   it("modo controlado formata o value recebido", () => {
