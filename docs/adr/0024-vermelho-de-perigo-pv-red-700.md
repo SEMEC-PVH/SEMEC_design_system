@@ -10,6 +10,8 @@ responde: [QA-07]
 
 **Status:** Aceito (07/10/2026).
 
+> **Errata (15/10/2026, AUD-47; não altera a decisão).** `--pv-red-400` **não existe no pacote** `@semec/ds`: o tema escuro saiu do `tokens.css` do pacote na 2.0.0 (ver [ADR-025](0025-tema-unico-claro.md), tema único claro). O primitivo e a troca de L1 descritos na linha "no tema escuro" da tabela e no item 2 abaixo valem só para o CSS do site de documentação (`apps/docs/app/tokens.css`, `[data-theme="dark"]`). No pacote, o perigo é `--pv-red-700` (`--feedback-danger`), com superfície `--pv-red-50`, sem troca por tema.
+
 **Contexto.** A [QA-07](../questoes-abertas.md) (antiga `D3` do documento de identidade) registrava que a paleta institucional declarada tem azul, verde, amarelo e neutros — **não tem vermelho**. Sem token de perigo, estados de erro, bordas inválidas, toasts e diálogos destrutivos ficariam com cor improvisada em cada tela. O [ADR-014](0014-wcag-21-aa-criterio-bloqueante.md) torna WCAG 2.1 AA critério bloqueante, ou seja, o valor precisava passar no cálculo de contraste *antes* de ser adotado, não depois.
 
 Enquanto a questão ficou aberta, `apps/docs/app/tokens.css` manteve a escala `--pv-red-*` marcada como **provisória** ("escolhida por contraste, não por identidade") e o mesmo par de valores foi espelhado em `packages/react/tokens.css`, no fallback do `PreviewFrame` e nos previews — sempre com `#b91c1c`, nunca declarado como decisão.

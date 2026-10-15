@@ -4,7 +4,7 @@ Este documento descreve a governança do Design System da SEMEC. Ele deriva de d
 
 Essas duas fontes descrevem o processo de uma **biblioteca de componentes publicada** — com pacotes em registry, Storybook, testes automatizados de acessibilidade, regressão visual e changesets. Este repositório **publica** o pacote `@semec/ds` no npm público, com subpath exports (`@semec/ds/react` para componentes, `@semec/ds/skills` para artefatos de agentes). O site de documentação vive em `apps/docs/` (Next.js 16, `output: 'export'`) e os artefatos para agentes são gerados a partir de `packages/react/manifest.js`. Ver [objetivo.md](docs/objetivo.md), [ADR-022](docs/adr/0022-publicacao-npm-publico.md) e o [veredito da auditoria](docs/auditoria/2026-08-21-repositorio.md).
 
-Por isso a governança está dividida em duas partes. A **Parte 1** vale hoje e só cita ferramenta que existe. A **Parte 2** é o processo previsto para quando a biblioteca existir, e nenhum item dela é exigível agora. Exigir hoje um `axe` que ninguém configurou seria pedir a quem contribui que finja — e documentação que finge é o problema que este repositório está tentando corrigir.
+Por isso a governança está dividida em duas partes. A **Parte 1** vale hoje e só cita ferramenta que existe. A **Parte 2** é o processo previsto para quando a biblioteca existir, e só é exigível o que a Parte 1 já cobra. Desde a onda 2 da auditoria de 14/10/2026 o kit tem testes com Vitest + Testing Library + axe (`npm test`) e a CI os roda; Storybook e regressão visual continuam não existindo, e exigi-los seria pedir a quem contribui que finja — documentação que finge é o problema que este repositório está tentando corrigir.
 
 ---
 
@@ -50,7 +50,7 @@ Duas regras que o próprio site publica e que valem para quem edita o site:
 
 Todo pull request é revisado por **pessoa diferente de quem implementou**. A revisão cobre código e acessibilidade.
 
-Sem `axe` configurado, a verificação de acessibilidade **é manual** — e precisa ser feita de fato, porque o [ADR-014](docs/adr/0014-wcag-21-aa-criterio-bloqueante.md) trata WCAG 2.1 AA como critério bloqueante e a auditoria encontrou seis falhas de contraste em componentes já publicados como oficiais:
+O axe roda nos testes do kit (`npm test`, em `packages/react/test/`) e no `gate` da CI, mas cobre só o que os testes montam; páginas do site, composições novas e contraste de cor nova continuam com verificação **manual** — e ela precisa ser feita de fato, porque o [ADR-014](docs/adr/0014-wcag-21-aa-criterio-bloqueante.md) trata WCAG 2.1 AA como critério bloqueante e a auditoria encontrou seis falhas de contraste em componentes já publicados como oficiais:
 
 - percorrer a página inteira **só com o teclado** — Tab, Shift+Tab, Enter, Espaço, Esc e setas onde houver grupo;
 - confirmar que o **foco é visível** em todo elemento interativo;
@@ -72,6 +72,7 @@ O template de PR (`.github/pull_request_template.md`) repete esta lista.
 - [ ] `npm run build:ds` passando — roda tsup + build-artifacts, verifica se o pacote compila sem erros
 - [ ] `npm run typecheck` passando — verifica tipos
 - [ ] `npm run build` passando — roda next build com output: 'export' e verifica se o site compila
+- [ ] `npm test` passando — Vitest + Testing Library + axe do kit
 - [ ] `npm run lint` passando
 - [ ] Artefatos de agentes (`apps/docs/public`) regenerados e commitados quando `packages/react/manifest.js` mudar — **a CI falha se estiverem desatualizados** (`npm run check:artifacts` confere localmente)
 - [ ] Página conferida com teclado, foco visível ponta a ponta
@@ -80,7 +81,7 @@ O template de PR (`.github/pull_request_template.md`) repete esta lista.
 - [ ] Revisão de outra pessoa
 - [ ] Mensagens de commit na convenção abaixo
 
-**Scripts que existem hoje** (na raiz, delegando para `apps/docs` e `packages/react`): `dev`, `build`, `build:ds`, `start`, `lint`, `typecheck`, `generate:llms`, `check:artifacts`, `proto:css`, `gate`, `changeset`, `changeset:check`, `version-packages`, `release`.
+**Scripts que existem hoje** (na raiz, delegando para `apps/docs` e `packages/react`): `dev`, `build`, `build:ds`, `start`, `lint`, `typecheck`, `test`, `generate:llms`, `check:artifacts`, `proto:css`, `gate`, `changeset`, `changeset:check`, `version-packages`, `release`.
 
 ## O que a CI verifica
 
@@ -92,9 +93,10 @@ O template de PR (`.github/pull_request_template.md`) repete esta lista.
 | `lint` | `npm run lint` | eslint (`eslint-config-next` + `jsx-a11y`) acusa erro em `apps/docs` |
 | `typecheck` | `npm run typecheck` | `tsc --noEmit` do kit falha |
 | `build` | `npm run build:ds`, build do site (`next build`, export estático) e conferência de `apps/docs/public` | o pacote ou o site não compilam, ou os artefatos de agentes estão desatualizados |
+| `test` | `npm test` (Vitest + Testing Library + axe, com zod 3 e 4) | um teste do `@semec/ds` falha, inclusive violação do axe |
 | `gate` | `npm run gate` | o gate de qualidade e regressão reprova |
 
-Para rodar o mesmo localmente, na ordem: `npm run build:ds`, `npm run typecheck`, `npm run build`, `npm run lint`, `npm run changeset:check`, `npm run check:artifacts`.
+Para rodar o mesmo localmente, na ordem: `npm run build:ds`, `npm run typecheck`, `npm test`, `npm run build`, `npm run lint`, `npm run changeset:check`, `npm run check:artifacts`.
 
 **Deriva dos artefatos.** `build:ds` e o `prebuild` do site regeneram `llms.txt`, `llms-full.txt`, `manifest.json`, `components/*.md` e `skills/` em `apps/docs/public` a partir de `packages/react/manifest.js`. A CI regenera tudo e falha se o resultado for diferente do commitado. O carimbo de data (`"generatedAt"` e `> Gerado <data>`) é determinístico — `SOURCE_DATE_EPOCH`, se definido, senão a data do último commit em `packages/react` — então dois builds do mesmo commit geram arquivos idênticos. Mesmo assim essas duas linhas ficam fora da comparação: o commit que muda o pacote ganha data nova depois que os artefatos foram gerados, e a CI usa checkout raso.
 
@@ -119,11 +121,11 @@ O `CODEOWNERS` e os checks da CI só obrigam alguma coisa quando o `main` está 
 
 - PR obrigatório para entrar no `main` (sem push direto, inclusive para admins);
 - 1 aprovação, de code owner, descartada se chegarem commits novos, e a aprovação precisa vir de alguém que não fez o último push;
-- checks obrigatórios e branch atualizada: `changeset`, `lint`, `typecheck`, `build`, `gate`;
+- checks obrigatórios e branch atualizada: `changeset`, `lint`, `typecheck`, `test`, `build`, `gate`;
 - conversas resolvidas antes do merge;
 - sem force push e sem apagar o `main`.
 
-**Passo a passo (Settings).** Settings → Branches → Add branch protection rule → Branch name pattern `main` → marcar "Require a pull request before merging" (Required approvals: 1; "Dismiss stale pull request approvals when new commits are pushed"; "Require review from Code Owners"; "Require approval of the most recent reviewable push") → "Require status checks to pass before merging" ("Require branches to be up to date"; adicionar `changeset`, `lint`, `typecheck`, `build`, `gate` — eles só aparecem na busca depois de rodarem uma vez) → "Require conversation resolution before merging" → "Do not allow bypassing the above settings" → Create.
+**Passo a passo (Settings).** Settings → Branches → Add branch protection rule → Branch name pattern `main` → marcar "Require a pull request before merging" (Required approvals: 1; "Dismiss stale pull request approvals when new commits are pushed"; "Require review from Code Owners"; "Require approval of the most recent reviewable push") → "Require status checks to pass before merging" ("Require branches to be up to date"; adicionar `changeset`, `lint`, `typecheck`, `test`, `build`, `gate` — eles só aparecem na busca depois de rodarem uma vez) → "Require conversation resolution before merging" → "Do not allow bypassing the above settings" → Create.
 
 **O mesmo pela API** (admin autenticado no `gh`):
 
@@ -137,6 +139,7 @@ gh api -X PUT repos/SEMEC-PVH/SEMEC_design_system/branches/main/protection \
       { "context": "changeset" },
       { "context": "lint" },
       { "context": "typecheck" },
+      { "context": "test" },
       { "context": "build" },
       { "context": "gate" }
     ]
@@ -166,8 +169,6 @@ gh api repos/SEMEC-PVH/SEMEC_design_system/codeowners/errors   # deve devolver {
 
 O job `changeset` só roda em PR; em push no `main` e no PR de versão (branch `changeset-release/*`) ele aparece como *skipped*, o que conta como aprovado para a proteção.
 
-> **Sobre o `lint`.** O script `lint` (`eslint .`, com `eslint-config-next` e `eslint-plugin-jsx-a11y`) já existe e roda em `apps/docs`. Ainda há uma violação conhecida de `react-hooks/set-state-in-effect` em `apps/docs/components/docs/Sidebar.jsx`, herdada antes da migração.
-
 ## Convenção de commits
 
 Mensagens em **português**, no formato `tipo(escopo): descrição no imperativo`. O escopo é opcional. Tipos observados no histórico:
@@ -189,7 +190,7 @@ Todo arquivo de texto usa **LF**. O `.gitattributes` da raiz (`* text=auto eol=l
 
 # Parte 2 — O processo previsto, para quando a biblioteca existir
 
-Nesta parte, apenas a **publicação e versionamento** já está ativa (ver Parte 1). Os demais itens dependem de infraestrutura que ainda não foi construída: o Storybook, a suíte de testes e a parte da integração contínua que roda testes, descritos na [arquitetura](docs/arquitetura.md). Esta parte existe para que, quando a infraestrutura chegar, a régua já esteja escrita — e para deixar explícito o que **não** está sendo cobrado enquanto isso.
+Nesta parte, já estão ativos a **publicação e versionamento** e os **testes do kit com axe** na CI (ver Parte 1). Os demais itens dependem de infraestrutura que ainda não foi construída: o Storybook e a regressão visual, descritos na [arquitetura](docs/arquitetura.md). Esta parte existe para que, quando a infraestrutura chegar, a régua já esteja escrita — e para deixar explícito o que **não** está sendo cobrado enquanto isso.
 
 ## Fluxo completo de entrada de um componente
 
@@ -204,7 +205,7 @@ Nesta parte, apenas a **publicação e versionamento** já está ativa (ver Part
 - [ ] API tipada e documentada
 - [ ] Estados cobertos: padrão, hover, foco, ativo, desabilitado, erro, carregando, vazio
 - [ ] Responsivo nos pontos de quebra definidos
-- [ ] Tema claro e tema escuro
+- [ ] Tema claro (o pacote tem tema único claro: [ADR-025](docs/adr/0025-tema-unico-claro.md))
 - [ ] Navegação por teclado documentada e testada
 - [ ] `axe` sem violações
 - [ ] Story no Storybook com exemplo de uso e de mau uso
@@ -214,9 +215,9 @@ Nesta parte, apenas a **publicação e versionamento** já está ativa (ver Part
 
 | Item | Depende de |
 |---|---|
-| API tipada | Pacote com TypeScript — hoje o repositório é JSX sem tipos |
-| Tema claro e escuro | Camada L0 de tokens e a resposta de [QA-01](docs/questoes-abertas.md) |
-| `axe` sem violações | Vitest + Testing Library + axe, do [ADR-009](docs/adr/0009-testes-vitest-testing-library-axe-regressao-visual.md); nada disso está instalado |
+| API tipada | Já exigível: o kit é TypeScript (`npm run typecheck` na CI) |
+| Tema claro | Já exigível. Tema escuro saiu do escopo do pacote ([ADR-025](docs/adr/0025-tema-unico-claro.md)); a paleta final depende de [QA-01](docs/questoes-abertas.md) |
+| `axe` sem violações | Vitest + Testing Library + axe, do [ADR-009](docs/adr/0009-testes-vitest-testing-library-axe-regressao-visual.md): já instalado e na CI (`npm test`, job `test`). Exigível para o que o componente monta nos testes; violação aceita só com registro em [excecoes-acessibilidade.md](docs/excecoes-acessibilidade.md) |
 | Story no Storybook | Storybook, do [ADR-008](docs/adr/0008-storybook-documentacao-viva.md); não existe no repositório |
 | Regressão visual | Suíte de snapshot e um job na CI para rodá-la; a CI existe, a suíte não |
 
@@ -328,10 +329,10 @@ Conta com 2FA no npm: use token granular com bypass 2FA, ou `npx changeset publi
 npm install @semec/ds
 
 # Versão específica
-npm install @semec/ds@2.1.0
+npm install @semec/ds@3.1.0
 
 # Dentro do range semver
-npm install @semec/ds@^2.0.0
+npm install @semec/ds@^3.0.0
 ```
 
 ### Versionamento semântico
@@ -357,9 +358,9 @@ Anúncio na **3.1.0** (onda 2 da auditoria de 14/10/2026), remoção ou mudança
 |---|---|---|
 | **Saída por módulo e subpaths por componente.** O `dist/react` deixa de ser um bundle único; os componentes ganham `"use client"` e subpaths `@semec/ds/react/*`. O caminho interno de arquivos em `dist/` muda (e, com ele, possivelmente o `@source` do Tailwind, que vai constar no guia de migração). | Importe só pelos subpaths do `exports` (`@semec/ds/react`, `@semec/ds/react/validacao`, `@semec/ds/react/tokens.css`…), nunca por caminho de arquivo (`@semec/ds/dist/react/index.js`). | AUD-20 |
 | **Contrato único de formulário** (ADR-015): `value` / `onValueChange` / `name` / `id` / `invalid`. Os `onChange(value)` de `Calendar`, `Combobox`, `DatePicker` e `InputOTP` e o `onChange(files)` de `FileUpload` saem; `onChange` passa a significar só o evento nativo. | Desde a **3.2.0** todos têm `onValueChange` (mesma assinatura) e `invalid`: troque `onChange(value)` por `onValueChange`. O `onChange(value)` avisa em desenvolvimento e continua valendo até a 4.0. Tabela por componente na emenda do [ADR-015](docs/adr/0015-formularios-api-controlada.md). | AUD-35 |
-| **Primitivos L0 fora do `@theme`.** Os utilitários `bg-pv-*`, `text-pv-*`, `border-pv-*` (gerados de `--color-pv-*`) deixam de existir; as variáveis `--pv-*` continuam no `:root`. | Use os utilitários semânticos (`bg-primary`, `bg-brand-hero`, `text-foreground`, `bg-success-surface`…). Primitivo não é para uso direto. | AUD-55 |
-| **Escala de raio decidida.** Os valores de `rounded-sm` (hoje 2px) e `rounded-lg` (hoje 12px, igual ao `rounded-xl` do Tailwind) podem mudar, e os nomes L1 deixam de ser autorreferentes. | Escolha o raio pelo papel (`rounded-md` em controles, `rounded-lg` em cartões, `rounded-full` em pílulas), não pelo valor em px, e não fixe `rounded-[12px]`. | AUD-57 |
-| **Button `loading` e estado desabilitado.** O `Button` ganha `loading` (`aria-busy`) e o desabilitado pode passar de `disabled` nativo para `aria-disabled` (o botão continua focável e o componente bloqueia o clique). | Não dependa de `:disabled` em CSS nem de `button.disabled` em testes para o `Button` do kit; teste pelo papel e pelo nome acessível. | AUD-63 |
+| **Primitivos L0 fora do `@theme`.** Os utilitários `bg-pv-*`, `text-pv-*`, `border-pv-*` (gerados de `--color-pv-*`) deixam de existir; as variáveis `--pv-*` continuam no `:root`. Desde a 3.2.0 o `tokens.css` e o `pv-preset` marcam esses utilitários com `@deprecated` no comentário, e primitivo novo (como `--pv-yellow-50`) não ganha utilitário. | Use os utilitários semânticos (`bg-primary`, `bg-brand-hero`, `text-foreground`, `bg-success-surface`…). Primitivo não é para uso direto. | AUD-55 |
+| ~~**Escala de raio decidida.** Os valores de `rounded-sm` e `rounded-lg` podem mudar.~~ **Cancelado em 15/10/2026:** a escala do código fica (`rounded-sm` 2px · `rounded-md` 8px · `rounded-lg` 12px · `rounded-full`), e a autorreferência `--radius-sm: var(--radius-sm)` foi resolvida na 3.2.0 sem quebra (valor em `--pv-radius-*`, nomes `--radius-*` e `rounded-*` mantidos). Nada muda na 4.0. | Continue escolhendo o raio pelo papel (`rounded-md` em controles, `rounded-lg` em cartões, `rounded-full` em pílulas). Não use `rounded-xl` e acima: são o padrão do Tailwind, fora da escala. | AUD-57 |
+| **Button `loading`.** O `Button` ganha `loading` (mudança aditiva): `aria-busy="true"` e `aria-disabled="true"`, focalizável, só durante o carregamento. ~~O desabilitado pode passar de `disabled` nativo para `aria-disabled`.~~ **Cancelado em 15/10/2026:** o desabilitado continua `disabled` nativo. | Para estado de carregamento, use `loading` em vez de `disabled`. Teste o `Button` pelo papel e pelo nome acessível; `:disabled` continua valendo para o desabilitado. | AUD-63 |
 
 Se você mantém um desses pontos no código, o `@deprecated` (JSDoc) e o aviso em desenvolvimento entram no PR que fizer a mudança aditiva correspondente; esta tabela é o registro oficial do aviso até lá.
 

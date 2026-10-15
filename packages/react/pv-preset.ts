@@ -66,6 +66,9 @@ export default {
         },
         tint: "var(--tint)",
         "brand-hero": "var(--brand-hero)",
+        // @deprecated desde a 3.1.0, sai na 4.0 (AUD-55): cores de primitivo
+        // (`bg-pv-*`, `text-pv-*`). Use o semântico do papel (`bg-primary`,
+        // `bg-brand-hero`, `text-foreground`…). Primitivo novo não entra aqui.
         "pv-blue": {
           50: "var(--pv-blue-50)",
           600: "var(--pv-blue-600)",

@@ -294,6 +294,19 @@ O que a 2.0.0 removeu sem aviso está na errata do [CHANGELOG](https://github.co
 - [ADRs](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/adr/README.md)
 - [Issues](https://github.com/SEMEC-PVH/SEMEC_design_system/issues)
 
-## Licença
+## Licença e crédito
 
-MIT
+[MIT](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/LICENSE) — © 2026 Prefeitura de Porto Velho, Secretaria Municipal de Economia (SEMEC). Use, modifique e redistribua mantendo o aviso de copyright e a licença nas cópias do código do pacote.
+
+O crédito no seu projeto **não é obrigatório**, mas é apreciado. Se quiser, inclua no README:
+
+```markdown
+## Créditos
+
+Identidade visual e tokens fornecidos pelo
+[SEMEC Design System](https://github.com/SEMEC-PVH/SEMEC_design_system),
+desenvolvido pela equipe de desenvolvimento da Secretaria Municipal de
+Economia de Porto Velho (DevSemec).
+```
+
+A fonte Poppins (`@semec/ds/react/fonts.css`) tem licença própria, SIL OFL 1.1 (o `OFL.txt` acompanha os arquivos da fonte no pacote).
