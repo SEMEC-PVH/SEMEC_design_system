@@ -257,7 +257,7 @@ describe("FormField (AUD-21, AUD-22)", () => {
     expect(screen.getByText("*")).toBeInTheDocument();
   });
 
-  it("liga dica e erro ao controle sozinho, sem role=alert", () => {
+  it("liga dica e erro ao controle sozinho, sem role=alert por padrão", () => {
     const { rerender } = render(
       <FormField label="CPF" hint="Só números">
         <Input />
@@ -276,6 +276,13 @@ describe("FormField (AUD-21, AUD-22)", () => {
     expect(input).toHaveAccessibleDescription("CPF inválido");
     expect(screen.queryByText("Só números")).toBeNull();
     expect(screen.queryByRole("alert")).toBeNull();
+
+    rerender(
+      <FormField label="CPF" error="CPF inválido" errorRole="alert">
+        <Input />
+      </FormField>
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent("CPF inválido");
   });
 
   it("o aria-describedby explícito do consumidor é somado, não substituído", () => {

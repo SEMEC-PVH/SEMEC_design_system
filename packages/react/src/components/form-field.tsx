@@ -169,10 +169,32 @@ export interface FormFieldProps extends React.HTMLAttributes<HTMLDivElement> {
    * base é o `id` do controle (ex.: `cpf-error`). Não vai para a `div`.
    */
   id?: string;
+  /**
+   * Papel ARIA do elemento de mensagem de erro. Por padrão é `undefined` (sem `role="alert"`),
+   * pois o erro é anunciado ao focar o campo via `aria-describedby` + `aria-invalid`, e o anúncio
+   * assertivo inicial em formulários consolidados fica a cargo do `ErrorSummary` (AUD-22).
+   * Em campos isolados onde se deseje anúncio imediato, passe `errorRole="alert"`.
+   */
+  errorRole?: "alert";
 }
 
 const FormField = React.forwardRef<HTMLDivElement, FormFieldProps>(
-  ({ className, label, htmlFor, required, error, invalid, hint, id, children, ...props }, ref) => {
+  (
+    {
+      className,
+      label,
+      htmlFor,
+      required,
+      error,
+      invalid,
+      hint,
+      id,
+      errorRole,
+      children,
+      ...props
+    },
+    ref
+  ) => {
     const generatedId = React.useId();
     const [control, setControl] = React.useState<FormFieldControlInfo | null>(null);
 
@@ -225,11 +247,12 @@ const FormField = React.forwardRef<HTMLDivElement, FormFieldProps>(
             </p>
           ) : null}
           {/*
-            Sem role="alert": o erro é lido ao focar o campo (aria-describedby +
+            Sem role="alert" por padrão: o erro é lido ao focar o campo (aria-describedby +
             aria-invalid). O anúncio imediato fica com o ErrorSummary (AUD-22).
+            Pode ser ativado com errorRole="alert" em campos isolados.
           */}
           {errorId ? (
-            <p id={errorId} className="text-xs text-destructive">
+            <p id={errorId} role={errorRole} className="text-xs text-destructive">
               {error}
             </p>
           ) : null}

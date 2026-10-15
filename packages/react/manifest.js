@@ -404,27 +404,74 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Campo de formulário",
     file: "src/components/form-field.tsx",
     category: "formularios",
-    desc: "Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role=\"alert\"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast.",
+    desc: "Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio.",
     variants: [
-      { prop: "props", values: "label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · id (base dos ids <id>-hint/<id>-error)" },
+      { prop: "props", values: "label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · errorRole (\"alert\" | undefined) · id" },
       { prop: "hooks", values: "useFormField · useFormFieldControl (para campos próprios)" },
+      { prop: "padrões", values: "1. Inline (FormField error) · 2. Resumo topo (ErrorSummary) · 3. Servidor (Alert destructive) · Legenda de ação no botão" },
     ],
-    usage: `import { FormField, Input, Button, useToast } from "@semec/ds/react";
+    usage: `import { FormField, Input, ErrorSummary, Alert, AlertTitle, AlertDescription, Button, useToast } from "@semec/ds/react";
+import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
-// Em formulários: erros ficam inline no FormField (+ ErrorSummary no topo).
-// Sucesso na submissão dispara notificação via toast:
-function Formulario() {
+const formSchema = z.object({
+  nome: z.string().min(3, "Nome deve ter ao menos 3 caracteres"),
+  email: emailSchema,
+  cpf: cpfSchema,
+});
+
+export function FormularioExemplo() {
   const { toast } = useToast();
+  const { register, control, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(formSchema),
+  });
+
+  // Padrão 2: Resumo consolidado no topo
+  const errorSummaryItems = Object.entries(errors).map(([id, err]) => ({
+    id,
+    message: String(err?.message || "Campo inválido"),
+  }));
+
+  const onSubmit = async (data) => {
+    // Padrão de sucesso via Toast:
+    toast({ variant: "success", title: "Sucesso!", description: "Dados gravados com sucesso." });
+  };
+
   return (
-    <form onSubmit={(e) => {
-      e.preventDefault();
-      toast({ variant: "success", title: "Salvo com sucesso", description: "Alterações registradas." });
-    }}>
-      {/* id, aria-describedby (dica/erro) e aria-invalid chegam ao Input pelo contexto */}
-      <FormField label="E-mail" required hint="Usado para o comprovante" error={erro}>
-        <Input id="email" type="email" />
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="max-w-xl space-y-4">
+      {errorSummaryItems.length > 0 && (
+        <ErrorSummary title="Corrija os erros destacados" errors={errorSummaryItems} />
+      )}
+
+      {/* Padrão 1: Erro inline ligado via aria-describedby e aria-invalid */}
+      <FormField label="Nome completo" htmlFor="nome" required error={errors.nome?.message}>
+        <Input id="nome" {...register("nome")} />
       </FormField>
-      <Button type="submit">Salvar</Button>
+
+      <FormField label="E-mail" htmlFor="email" required error={errors.email?.message}>
+        <Input id="email" type="email" {...register("email")} />
+      </FormField>
+
+      {/* Uso canônico com Controller para componentes controlados ou máscaras */}
+      <Controller
+        name="cpf"
+        control={control}
+        render={({ field }) => (
+          <FormField label="CPF" htmlFor="cpf" required error={errors.cpf?.message}>
+            <Input id="cpf" {...field} />
+          </FormField>
+        )}
+      />
+
+      {/* Padrão de Ação com Legenda Auxiliar de Ação / Download */}
+      <div className="pt-2 space-y-2">
+        <Button type="submit" variant="primary">Gerar requerimento</Button>
+        <p className="text-xs text-text-muted">
+          Ao clicar, o arquivo PDF do requerimento será gerado e baixado automaticamente.
+        </p>
+      </div>
     </form>
   );
 }`,
