@@ -45,7 +45,7 @@ Os subpaths `@semec/ds/lite/*.css` só resolvem **num bundler** (Vite, Next, web
 <link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/tokens.css" />
 ```
 
-Se o servidor não publica `node_modules`, copie `dist/react/tokens.css`, `dist/react/fonts.css` e a pasta `dist/react/fonts/` para a pasta estática, mantendo `fonts/` ao lado do `fonts.css` (as URLs dos `.woff2` são relativas a ele).
+O caminho em `dist/` não é contrato público (o `exports` não o expõe) e pode mudar numa versão futura: fixe a versão do pacote (`"@semec/ds": "4.0.1"`, sem `^`) ou copie os arquivos. Se o servidor não publica `node_modules`, copie `dist/react/tokens.css`, `dist/react/fonts.css` e a pasta `dist/react/fonts/` para a pasta estática, mantendo `fonts/` ao lado do `fonts.css` (as URLs dos `.woff2` são relativas a ele).
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0).
 
