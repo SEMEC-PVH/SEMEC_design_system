@@ -319,15 +319,17 @@ Conta com 2FA no npm: use token granular com bypass 2FA, ou `npx changeset publi
 ### Consumidores do pacote
 
 ```bash
-# Última versão (latest)
-npm install @semec/ds
+# Última versão (latest); lucide-react é peer e vai junto
+npm install @semec/ds lucide-react
 
 # Versão específica
-npm install @semec/ds@3.1.0
+npm install @semec/ds@4.0.0 lucide-react
 
 # Dentro do range semver
-npm install @semec/ds@^3.0.0
+npm install @semec/ds@^4.0.0 lucide-react
 ```
+
+`lucide-react` é **peer** do kit (como `react`, `react-dom` e `tailwindcss`); o npm 7+ instala peer ausente sozinho, mas o pnpm com `auto-install-peers=false` e o Yarn não, e o build do app quebra sem ele. Passo a passo de instalação (Vite e Next), peers e axe na CI do app: [packages/react/README.md](packages/react/README.md#comece-aqui).
 
 ### Versionamento semântico
 

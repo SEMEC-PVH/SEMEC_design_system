@@ -15,7 +15,7 @@ Ordem sugerida:
 2. Ainda na 3.2.0, rode o codemod da 4.0 em modo simulação. O `-p` baixa a 4.0 e o TypeScript 5 só para rodar o comando, sem mexer no `package.json`:
    `npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 src`
 3. Rode de novo com `--write`, revise o diff e resolva à mão as linhas marcadas como `revisar` e `utilitário`.
-4. Atualize para a 4.0 (`npm i @semec/ds@4`) e rode o typecheck. Ele é a rede de segurança do que o codemod não vê: no TypeScript, todo `onChange` que sobrou em `Calendar`, `Combobox`, `InputOTP` e `FileUpload` vira erro de compilação. Em JavaScript, o componente mostra um `console.error` em desenvolvimento ("onChange foi removido na 4.0; use onValueChange").
+4. Atualize para a 4.0 (`npm i @semec/ds@4`) e rode o typecheck. Com pnpm ou Yarn, confira que `lucide-react` está no `package.json` do app (`pnpm add lucide-react`, `yarn add lucide-react`): ele é peer do kit desde a 3.1.0, e esses gerenciadores não instalam peer sozinhos (o npm 7+ instala). O `zod`, se usar `@semec/ds/react/validacao`, pode ser o 3 (`^3.23.0`) ou o 4. Ele é a rede de segurança do que o codemod não vê: no TypeScript, todo `onChange` que sobrou em `Calendar`, `Combobox`, `InputOTP` e `FileUpload` vira erro de compilação. Em JavaScript, o componente mostra um `console.error` em desenvolvimento ("onChange foi removido na 4.0; use onValueChange").
 
 ## 1. `onChange(valor)` sai dos campos não nativos (AUD-35)
 
