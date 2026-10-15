@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-15T15:12:16.000Z — packages/react/manifest.js + packages/react/* — versão 4.0.0
+> Gerado 2026-10-15T15:17:11.000Z — packages/react/manifest.js + packages/react/* — versão 4.0.0
 
 ## Instalação
 
@@ -2222,6 +2222,15 @@ const defaultLabels: ComboboxLabels = {
   list: "Opções",
 };
 
+/**
+ * Tipo impossível de satisfazer, com nome que explica o erro: o `onChange`
+ * saiu na 4.0 (AUD-35). Com `never`, o `tsc` dizia só "not assignable to type
+ * 'undefined'"; com este tipo, a mensagem cita o `onValueChange`.
+ */
+interface OnChangeRemovidoUseOnValueChange {
+  readonly "onChange saiu na 4.0: use onValueChange": never;
+}
+
 export interface ComboboxProps
   extends Omit<
     React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -2240,7 +2249,7 @@ export interface ComboboxProps
    * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
    * (com um `console.error` único em desenvolvimento).
    */
-  onChange?: never;
+  onChange?: OnChangeRemovidoUseOnValueChange;
   /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
   invalid?: boolean;
   /** Texto do gatilho sem seleção. Padrão: "Selecione…". */
@@ -2458,7 +2467,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
             type="button"
             disabled={disabled}
             className={cn(
-              "flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive",
+              "flex h-11 w-full items-center justify-between rounded-md border border-input bg-surface px-3 py-2 text-sm text-foreground shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive",
               className
             )}
             {...props}
@@ -2520,7 +2529,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
                 aria-required={required || ctx?.required ? true : undefined}
                 aria-labelledby={labelIds}
                 aria-label={labelIds ? undefined : hiddenLabel ?? text.search}
-                className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="flex h-11 w-full rounded-md border border-input bg-surface px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               />
             </div>
             {filtered.length > 0 ? (
@@ -2699,7 +2708,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
             onValueChange?.(e.target.value);
           }}
           className={cn(
-            "flex h-11 w-full appearance-none rounded-md border border-input bg-background px-3 py-2 pr-12 text-sm text-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&::-webkit-calendar-picker-indicator]:hidden",
+            "flex h-11 w-full appearance-none rounded-md border border-input bg-surface px-3 py-2 pr-12 text-sm text-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&::-webkit-calendar-picker-indicator]:hidden",
             className
           )}
           {...props}
@@ -2787,6 +2796,15 @@ const defaultLabels: FileUploadLabels = {
   tooLarge: (maxSize) => `Arquivo excede o limite de ${maxSize}.`,
 };
 
+/**
+ * Tipo impossível de satisfazer, com nome que explica o erro: o `onChange`
+ * saiu na 4.0 (AUD-35). Com `never`, o `tsc` dizia só "not assignable to type
+ * 'undefined'"; com este tipo, a mensagem cita o `onValueChange`.
+ */
+interface OnChangeRemovidoUseOnValueChange {
+  readonly "onChange saiu na 4.0: use onValueChange": never;
+}
+
 export interface FileUploadProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
   accept?: string;
@@ -2805,7 +2823,7 @@ export interface FileUploadProps
    * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
    * (com um `console.error` único em desenvolvimento).
    */
-  onChange?: never;
+  onChange?: OnChangeRemovidoUseOnValueChange;
   /** `name` do `<input type="file">`. Atalho de `inputProps.name`. */
   name?: string;
   /** `required` do `<input type="file">`. Atalho de `inputProps.required`. */
@@ -3008,7 +3026,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             if (!disabled) inputRef.current?.click();
           }}
           className={cn(
-            "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background px-6 py-8 text-center transition-colors duration-fast ease-standard has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background hover:border-border-strong",
+            "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-surface px-6 py-8 text-center transition-colors duration-fast ease-standard has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background hover:border-border-strong",
             drag && "border-ring bg-tint",
             disabled && "cursor-not-allowed opacity-50",
             (message || invalid === true) && "border-destructive"
@@ -3148,7 +3166,7 @@ const Checkbox = React.forwardRef<
   <CheckboxPrimitive.Root
     ref={ref}
     className={cn(
-      "peer h-5 w-5 shrink-0 rounded-md border border-input shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground aria-[invalid=true]:border-destructive",
+      "peer h-5 w-5 shrink-0 rounded-md border border-input bg-surface shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground aria-[invalid=true]:border-destructive",
       className
     )}
     {...props}
@@ -3218,7 +3236,7 @@ const RadioGroup = React.forwardRef<
   );
   return (
     <RadioGroupPrimitive.Root
-      className={cn("grid gap-2", className)}
+      className={cn("group/radio-group grid gap-2", className)}
       {...props}
       {...field}
       ref={ref}
@@ -3231,11 +3249,13 @@ const RadioGroupItem = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
 >(({ className, ...props }, ref) => {
+  // O `aria-invalid` fica no grupo (radiogroup), não no item: o estilo de erro
+  // vem do grupo nomeado `group/radio-group`, como no Checkbox inválido.
   return (
     <RadioGroupPrimitive.Item
       ref={ref}
       className={cn(
-        "aspect-square h-5 w-5 rounded-full border border-input text-primary shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive",
+        "aspect-square h-5 w-5 rounded-full border border-input bg-surface text-primary shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive group-aria-[invalid=true]/radio-group:border-destructive",
         className
       )}
       {...props}
@@ -3609,7 +3629,13 @@ const FormField = React.forwardRef<HTMLDivElement, FormFieldProps>(
 
     return (
       <FormFieldContext.Provider value={contextValue}>
-        <div ref={ref} className={cn("grid gap-1.5", className)} {...props}>
+        {/*
+          `content-start`: num grid de colunas (ex.: `md:grid-cols-2`), a linha
+          estica o FormField mais curto até a altura do vizinho com dica/erro;
+          sem isso as linhas internas esticam e o controle desce. Fora desse
+          caso não muda nada: o espaçamento entre rótulo, campo e dica é o gap.
+        */}
+        <div ref={ref} className={cn("grid content-start gap-1.5", className)} {...props}>
           {label ? (
             <label
               id={labelId}
@@ -4612,17 +4638,14 @@ export interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {
 const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
   ({ className, items, ...props }, ref) => (
     <nav ref={ref} aria-label="Trilha de navegação" className={className} {...props}>
-      <ol className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+      <ol className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
+          // O separador vem no fim do item anterior (dentro do mesmo `li`, que
+          // não quebra entre texto e separador): quando a trilha quebra no
+          // mobile, a linha nova começa pelo item, nunca por um "›" solto.
           return (
             <li key={`${item.label}-${index}`} className="flex items-center gap-4">
-              {index > 0 ? (
-                <ChevronRight
-                  className="h-3.5 w-3.5 shrink-0 opacity-50"
-                  aria-hidden="true"
-                />
-              ) : null}
               {isLast || !item.href ? (
                 <span aria-current={isLast ? "page" : undefined} className={cn(isLast && "font-medium text-foreground")}>
                   {item.label}
@@ -4635,6 +4658,12 @@ const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
                   {item.label}
                 </a>
               )}
+              {!isLast ? (
+                <ChevronRight
+                  className="h-3.5 w-3.5 shrink-0 opacity-50"
+                  aria-hidden="true"
+                />
+              ) : null}
             </li>
           );
         })}
@@ -7407,6 +7436,15 @@ function useInputOTP() {
   return ctx;
 }
 
+/**
+ * Tipo impossível de satisfazer, com nome que explica o erro: o `onChange`
+ * saiu na 4.0 (AUD-35). Com `never`, o `tsc` dizia só "not assignable to type
+ * 'undefined'"; com este tipo, a mensagem cita o `onValueChange`.
+ */
+interface OnChangeRemovidoUseOnValueChange {
+  readonly "onChange saiu na 4.0: use onValueChange": never;
+}
+
 export interface InputOTPProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue"> {
   /** Valor controlado. Sem ele, o componente guarda o estado sozinho. */
@@ -7428,7 +7466,7 @@ export interface InputOTPProps
    * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
    * (com um `console.error` único em desenvolvimento).
    */
-  onChange?: never;
+  onChange?: OnChangeRemovidoUseOnValueChange;
   /** Gera um `<input type="hidden" name>` com o código, para envio em `<form>`. */
   name?: string;
   /** `id` do `<form>` do input oculto, quando o InputOTP fica fora dele. */
@@ -7680,7 +7718,7 @@ const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
       <div
         ref={ref}
         className={cn(
-          "relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-md border border-input bg-background text-lg font-medium text-foreground shadow-elevation-1 transition-colors duration-fast ease-standard focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
+          "relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-md border border-input bg-surface text-lg font-medium text-foreground shadow-elevation-1 transition-colors duration-fast ease-standard focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
           disabled && "opacity-50 cursor-not-allowed",
           invalid && "border-destructive",
           className
@@ -7799,6 +7837,15 @@ const DEFAULT_LABELS: CalendarLabels = {
   nextMonth: "Próximo mês",
 };
 
+/**
+ * Tipo impossível de satisfazer, com nome que explica o erro: o `onChange`
+ * saiu na 4.0 (AUD-35). Com `never`, o `tsc` dizia só "not assignable to type
+ * 'undefined'"; com este tipo, a mensagem cita o `onValueChange`.
+ */
+interface OnChangeRemovidoUseOnValueChange {
+  readonly "onChange saiu na 4.0: use onValueChange": never;
+}
+
 export interface CalendarProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
   value?: Date | null;
@@ -7810,7 +7857,7 @@ export interface CalendarProps
    * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
    * (com um `console.error` único em desenvolvimento).
    */
-  onChange?: never;
+  onChange?: OnChangeRemovidoUseOnValueChange;
   disabled?: boolean;
   /** Data mínima selecionável (`AAAA-MM-DD`). */
   min?: string;

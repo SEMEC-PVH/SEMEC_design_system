@@ -39,6 +39,15 @@ function useInputOTP() {
   return ctx;
 }
 
+/**
+ * Tipo impossível de satisfazer, com nome que explica o erro: o `onChange`
+ * saiu na 4.0 (AUD-35). Com `never`, o `tsc` dizia só "not assignable to type
+ * 'undefined'"; com este tipo, a mensagem cita o `onValueChange`.
+ */
+interface OnChangeRemovidoUseOnValueChange {
+  readonly "onChange saiu na 4.0: use onValueChange": never;
+}
+
 export interface InputOTPProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue"> {
   /** Valor controlado. Sem ele, o componente guarda o estado sozinho. */
@@ -60,7 +69,7 @@ export interface InputOTPProps
    * e, em JavaScript, um handler passado aqui é descartado e nunca é chamado
    * (com um `console.error` único em desenvolvimento).
    */
-  onChange?: never;
+  onChange?: OnChangeRemovidoUseOnValueChange;
   /** Gera um `<input type="hidden" name>` com o código, para envio em `<form>`. */
   name?: string;
   /** `id` do `<form>` do input oculto, quando o InputOTP fica fora dele. */
@@ -312,7 +321,7 @@ const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
       <div
         ref={ref}
         className={cn(
-          "relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-md border border-input bg-background text-lg font-medium text-foreground shadow-elevation-1 transition-colors duration-fast ease-standard focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
+          "relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-md border border-input bg-surface text-lg font-medium text-foreground shadow-elevation-1 transition-colors duration-fast ease-standard focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
           disabled && "opacity-50 cursor-not-allowed",
           invalid && "border-destructive",
           className
