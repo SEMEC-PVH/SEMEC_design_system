@@ -400,6 +400,8 @@ Extraídos do `ServiceCard` e do `Header`:
 
 O portal já pratica acessibilidade — falta formalizar como regra.
 
+> **Nota (15/10/2026, AUD-63; o levantamento acima segue congelado em 20/08/2026).** O `aria-disabled="true"` é prática do portal, não regra do design system. Decisão do mantenedor para o `Button` do kit: o desabilitado usa `disabled` nativo (sai da ordem de Tab); o `aria-disabled="true"`, com o botão ainda focalizável, vale só durante o carregamento (`loading`, junto com `aria-busy="true"`). Ao migrar o portal, troque o `aria-disabled` do desabilitado comum pela prop `disabled` do `Button`. Ver [especificacao-alvo.md](especificacao-alvo.md) § Button.
+
 ---
 
 ## 10. Catálogo e taxonomia
