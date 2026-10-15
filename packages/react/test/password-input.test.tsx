@@ -79,6 +79,23 @@ describe("PasswordInput (AUD-36)", () => {
     expect(input).toHaveAttribute("type", "text");
   });
 
+  it("desliga corretor e maiúscula automática (D6), sobrescrevíveis", async () => {
+    const { user, input, toggle } = setup();
+    await user.click(toggle);
+    expect(input).toHaveAttribute("type", "text");
+    expect(input).toHaveAttribute("spellcheck", "false");
+    expect(input).toHaveAttribute("autocapitalize", "none");
+    expect(input).toHaveAttribute("autocorrect", "off");
+  });
+
+  it("spellCheck/autoCapitalize/autoCorrect aceitam outro valor", () => {
+    render(<PasswordInput aria-label="Senha" spellCheck autoCapitalize="sentences" autoCorrect="on" />);
+    const input = screen.getByLabelText("Senha");
+    expect(input).toHaveAttribute("spellcheck", "true");
+    expect(input).toHaveAttribute("autocapitalize", "sentences");
+    expect(input).toHaveAttribute("autocorrect", "on");
+  });
+
   it("desabilitado desabilita também o botão", () => {
     render(<PasswordInput aria-label="Senha" disabled />);
     expect(screen.getByRole("button", { name: "Mostrar senha" })).toBeDisabled();
