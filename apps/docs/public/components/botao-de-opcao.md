@@ -4,18 +4,19 @@ code: "radio-group"
 slug: "botao-de-opcao"
 file: "src/components/radio-group.tsx"
 category: "formularios"
-variants: "composição: RadioGroup · RadioGroupItem + Label"
+variants: "composição: RadioGroup · RadioGroupItem + Label · contrato: value · defaultValue · onValueChange · name · id · invalid · disabled · required"
 ---
 
 # Botão de opção — `radio-group`
 
-> Escolha única entre duas ou mais opções.
+> Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`.
 
 **Arquivo:** `src/components/radio-group.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/botao-de-opcao`
 
 ## Variantes
 
 - **composição**: RadioGroup · RadioGroupItem + Label
+- **contrato**: value · defaultValue · onValueChange · name · id · invalid · disabled · required
 
 ## Instalação (@semec/ds)
 
@@ -35,7 +36,7 @@ npm install @semec/ds
 ```tsx
 import { RadioGroup, RadioGroupItem, Label } from "@semec/ds/react";
 
-<RadioGroup defaultValue="pessoa-fisica">
+<RadioGroup name="tipoPessoa" defaultValue="pessoa-fisica" onValueChange={setTipoPessoa}>
   <div className="flex items-center gap-2">
     <RadioGroupItem value="pessoa-fisica" id="pf" />
     <Label htmlFor="pf">Pessoa física</Label>
@@ -46,7 +47,7 @@ import { RadioGroup, RadioGroupItem, Label } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `RadioGroup` (Botão de opção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Escolha única entre duas ou mais opções. API e variantes: composição: RadioGroup · RadioGroupItem + Label. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `RadioGroup` (Botão de opção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`. API e variantes: composição: RadioGroup · RadioGroupItem + Label · contrato: value · defaultValue · onValueChange · name · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -61,11 +62,17 @@ import { useFormFieldControl } from "./form-field";
 
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root> & {
+  /** Contrato de formulário (ADR-015): `true` vira `aria-invalid="true"` e o estilo de erro. */
+  invalid?: boolean;
+  }
+>(({ className, invalid, ...props }, ref) => {
   // Dentro de um FormField: o grupo (div) não é rotulável por <label for>,
   // então recebe aria-labelledby do rótulo, além de describedby/invalid/required.
-  const field = useFormFieldControl(props, { labelable: false, supportsRequired: true });
+  const field = useFormFieldControl(
+    { ...props, invalid },
+    { labelable: false, supportsRequired: true }
+  );
   return (
     <RadioGroupPrimitive.Root
       className={cn("grid gap-2", className)}

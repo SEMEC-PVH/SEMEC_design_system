@@ -4,7 +4,7 @@ code: "date-picker"
 slug: "seletor-de-data"
 file: "src/components/date-picker.tsx"
 category: "formularios"
-variants: "props: nativo HTML (min · max · disabled) + labels.openCalendar + variantes visuais do campo"
+variants: "props: nativo HTML (min · max · disabled · name · required) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · deprecadas: onChange(value) (use onValueChange; na 4.0 o onChange passa a receber o evento nativo)"
 ---
 
 # Seletor de data — `date-picker`
@@ -15,7 +15,8 @@ variants: "props: nativo HTML (min · max · disabled) + labels.openCalendar + v
 
 ## Variantes
 
-- **props**: nativo HTML (min · max · disabled) + labels.openCalendar + variantes visuais do campo
+- **props**: nativo HTML (min · max · disabled · name · required) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar
+- **deprecadas**: onChange(value) (use onValueChange; na 4.0 o onChange passa a receber o evento nativo)
 
 ## Instalação (@semec/ds)
 
@@ -36,14 +37,19 @@ npm install @semec/ds
 import { DatePicker, FormField } from "@semec/ds/react";
 
 <FormField label="Data de vencimento" hint="dd/mm/aaaa">
-  <DatePicker id="vencimento" defaultValue="2026-08-31" />
+  <DatePicker id="vencimento" name="vencimento" defaultValue="2026-08-31" />
+</FormField>
+
+// Controlado: onValueChange recebe o ISO (AAAA-MM-DD)
+<FormField label="Data de início" error={erroData}>
+  <DatePicker value={inicio} onValueChange={setInicio} />
 </FormField>
 ```
 
 ## Prompt para IA
 
 ```text
-Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). API e variantes: props: nativo HTML (min · max · disabled) + labels.openCalendar + variantes visuais do campo. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). API e variantes: props: nativo HTML (min · max · disabled · name · required) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · deprecadas: onChange(value) (use onValueChange; na 4.0 o onChange passa a receber o evento nativo). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -53,6 +59,7 @@ import * as React from "react";
 import { Calendar as CalendarIcon } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import { warnDeprecated } from "../lib/deprecation";
 import { useFormFieldControl } from "./form-field";
 
 export interface DatePickerLabels {
@@ -66,8 +73,17 @@ const defaultLabels: DatePickerLabels = {
 
 export interface DatePickerProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "onChange"> {
+  /** Valor ISO (`AAAA-MM-DD`), modo controlado. Para não controlado, use `defaultValue`. */
   value?: string;
+  /** Recebe o valor ISO (`AAAA-MM-DD`, ou `""` ao limpar) a cada mudança (ADR-015). */
+  onValueChange?: (value: string) => void;
+  /**
+   * @deprecated Use `onValueChange`. Recebe o valor (string), não o evento;
+   * na 4.0, `onChange` passa a receber o evento nativo do `<input>` (AUD-35).
+   */
   onChange?: (value: string) => void;
+  /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
+  invalid?: boolean;
   /** Textos fixos (PT-BR por padrão). */
   labels?: Partial<DatePickerLabels>;
 }
@@ -82,9 +98,18 @@ export interface DatePickerProps
  * nativo, o ícone do kit sai e fica só o nativo.
  */
 const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
-  ({ className, value, onChange, disabled, readOnly, labels, ...props }, ref) => {
+  (
+    { className, value, onChange, onValueChange, invalid, disabled, readOnly, labels, ...props },
+    ref
+  ) => {
     const text = { ...defaultLabels, ...labels };
-    const field = useFormFieldControl(props, { supportsRequired: true });
+    const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
+    if (onChange) {
+      warnDeprecated(
+        "DatePicker.onChange",
+        "DatePicker: `onChange(value)` está obsoleto e muda na 4.0 (passa a receber o evento nativo). Use `onValueChange(value)`."
+      );
+    }
     const inputRef = React.useRef<HTMLInputElement | null>(null);
     const setRefs = React.useCallback(
       (el: HTMLInputElement | null) => {
@@ -116,7 +141,10 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
           value={value}
           disabled={disabled}
           readOnly={readOnly}
-          onChange={(e) => onChange?.(e.target.value)}
+          onChange={(e) => {
+            onValueChange?.(e.target.value);
+            onChange?.(e.target.value);
+          }}
           className={cn(
             "flex h-11 w-full appearance-none rounded-md border border-input bg-background px-3 py-2 pr-12 text-sm text-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&::-webkit-calendar-picker-indicator]:hidden",
             className

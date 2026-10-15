@@ -4,7 +4,7 @@ code: "combobox"
 slug: "combobox"
 file: "src/components/combobox.tsx"
 category: "formularios"
-variants: "props: options · value · defaultValue · onChange · placeholder · searchPlaceholder · emptyText · name · required · disabled · labels · portalContainer · deprecadas: ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)"
+variants: "props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · deprecadas: onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)"
 ---
 
 # Combobox — `combobox`
@@ -15,8 +15,8 @@ variants: "props: options · value · defaultValue · onChange · placeholder ·
 
 ## Variantes
 
-- **props**: options · value · defaultValue · onChange · placeholder · searchPlaceholder · emptyText · name · required · disabled · labels · portalContainer
-- **deprecadas**: ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)
+- **props**: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer
+- **deprecadas**: onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)
 
 ## Instalação (@semec/ds)
 
@@ -45,9 +45,10 @@ import { Combobox, FormField, Label } from "@semec/ds/react";
     emptyText="Nenhum tipo encontrado."
     options={[{ value: "cnpj", label: "CNPJ" }, { value: "cpf", label: "CPF" }]}
     value={valor}
-    onChange={setValor}
+    onValueChange={setValor}
   />
 </FormField>
+// name gera um <input type="hidden"> com o valor: vai no FormData de um <form> nativo
 
 // Ou com <Label htmlFor> + id (também aceita aria-labelledby)
 <Label htmlFor="orgao">Órgão emissor</Label>
@@ -57,7 +58,7 @@ import { Combobox, FormField, Label } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField. API e variantes: props: options · value · defaultValue · onChange · placeholder · searchPlaceholder · emptyText · name · required · disabled · labels · portalContainer · deprecadas: ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField. API e variantes: props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · deprecadas: onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -68,6 +69,7 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import { warnDeprecated } from "../lib/deprecation";
 import { useFormField, useFormFieldControl } from "./form-field";
 
 export interface ComboboxOption {
@@ -100,7 +102,12 @@ export interface ComboboxProps
   value?: string;
   /** Valor inicial (modo não controlado). */
   defaultValue?: string;
+  /** Recebe o valor da opção escolhida (contrato de formulário, ADR-015). */
+  onValueChange?: (value: string) => void;
+  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
   onChange?: (value: string) => void;
+  /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
+  invalid?: boolean;
   /** Texto do gatilho sem seleção. Padrão: "Selecione…". */
   placeholder?: string;
   /** Placeholder do campo de busca. Padrão: "Buscar…". */
@@ -146,6 +153,8 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
       value,
       defaultValue,
       onChange,
+      onValueChange,
+      invalid,
       placeholder = "Selecione…",
       searchPlaceholder = "Buscar…",
       emptyText,
@@ -175,7 +184,13 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
     const optionId = (index: number) => `${uid}-option-${index}`;
 
     const ctx = useFormField();
-    const field = useFormFieldControl(props);
+    const field = useFormFieldControl({ ...props, invalid });
+    if (onChange) {
+      warnDeprecated(
+        "Combobox.onChange",
+        "Combobox: `onChange(value)` está obsoleto e sai na 4.0. Use `onValueChange(value)`."
+      );
+    }
     const triggerId = field.id ?? props.id;
 
     const [open, setOpen] = React.useState(false);
@@ -245,6 +260,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
 
     const choose = (option: ComboboxOption) => {
       if (value === undefined) setInternalValue(option.value);
+      onValueChange?.(option.value);
       onChange?.(option.value);
       setOpen(false);
     };

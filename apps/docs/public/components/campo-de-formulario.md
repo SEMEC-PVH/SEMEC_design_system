@@ -4,7 +4,7 @@ code: "form-field"
 slug: "campo-de-formulario"
 file: "src/components/form-field.tsx"
 category: "formularios"
-variants: "props: label · htmlFor · required · hint · error · id (base dos ids <id>-hint/<id>-error) · hooks: useFormField · useFormFieldControl (para campos próprios)"
+variants: "props: label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · id (base dos ids <id>-hint/<id>-error) · hooks: useFormField · useFormFieldControl (para campos próprios)"
 ---
 
 # Campo de formulário — `form-field`
@@ -15,7 +15,7 @@ variants: "props: label · htmlFor · required · hint · error · id (base dos 
 
 ## Variantes
 
-- **props**: label · htmlFor · required · hint · error · id (base dos ids <id>-hint/<id>-error)
+- **props**: label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · id (base dos ids <id>-hint/<id>-error)
 - **hooks**: useFormField · useFormFieldControl (para campos próprios)
 
 ## Instalação (@semec/ds)
@@ -58,7 +58,7 @@ function Formulario() {
 ## Prompt para IA
 
 ```text
-Use o componente `FormField` (Campo de formulário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role="alert"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast. API e variantes: props: label · htmlFor · required · hint · error · id (base dos ids <id>-hint/<id>-error) · hooks: useFormField · useFormFieldControl (para campos próprios). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `FormField` (Campo de formulário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role="alert"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast. API e variantes: props: label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · id (base dos ids <id>-hint/<id>-error) · hooks: useFormField · useFormFieldControl (para campos próprios). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -136,6 +136,12 @@ export interface UseFormFieldControlProps {
   "aria-label"?: string;
   "aria-required"?: React.AriaAttributes["aria-required"];
   required?: boolean;
+  /**
+   * Contrato de formulário (ADR-015, AUD-35): `true` vira `aria-invalid="true"`
+   * (e o estilo de erro do campo). Passado explicitamente, vence o estado do
+   * FormField; `aria-invalid` passado à mão vence os dois.
+   */
+  invalid?: boolean;
 }
 
 /** Atributos que `useFormFieldControl` devolve (só as chaves com valor). */
@@ -174,6 +180,7 @@ export function useFormFieldControl(
 ): FormFieldControlAttributes {
   const ctx = React.useContext(FormFieldContext);
   const explicitId = props.id;
+  const ownInvalid = props.invalid ? true : undefined;
   const register = ctx?.registerControl;
 
   useIsomorphicLayoutEffect(() => {
@@ -181,14 +188,16 @@ export function useFormFieldControl(
     return register({ id: explicitId, labelable });
   }, [register, explicitId, labelable]);
 
-  // Fora de um FormField não há nada a acrescentar.
-  if (!ctx) return {} as FormFieldControlAttributes;
+  // Fora de um FormField, só o `invalid` próprio vira atributo.
+  if (!ctx) return withoutUndefined({ "aria-invalid": props["aria-invalid"] ?? ownInvalid });
 
   const hasOwnName = props["aria-label"] !== undefined || props["aria-labelledby"] !== undefined;
   return withoutUndefined({
     id: props.id ?? ctx.controlId,
     "aria-describedby": joinIds(props["aria-describedby"], ctx.describedBy),
-    "aria-invalid": props["aria-invalid"] ?? (ctx.invalid ? true : undefined),
+    "aria-invalid":
+      props["aria-invalid"] ??
+      (props.invalid !== undefined ? ownInvalid : ctx.invalid ? true : undefined),
     // Elemento não rotulável por <label for>: o nome vem do rótulo do FormField.
     "aria-labelledby":
       props["aria-labelledby"] ?? (!labelable && !hasOwnName ? ctx.labelId : undefined),
@@ -206,7 +215,13 @@ export interface FormFieldProps extends React.HTMLAttributes<HTMLDivElement> {
    */
   htmlFor?: string;
   required?: boolean;
+  /** Mensagem de erro. Com ela, o campo fica inválido (`invalid` implícito). */
   error?: string;
+  /**
+   * Marca o campo filho como inválido sem mensagem própria (ex.: erro mostrado
+   * em outro lugar). `error="..."` equivale a `invalid` + mensagem.
+   */
+  invalid?: boolean;
   hint?: string;
   /**
    * Base dos ids da dica (`<id>-hint`) e do erro (`<id>-error`). Sem ela, a
@@ -216,7 +231,7 @@ export interface FormFieldProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const FormField = React.forwardRef<HTMLDivElement, FormFieldProps>(
-  ({ className, label, htmlFor, required, error, hint, id, children, ...props }, ref) => {
+  ({ className, label, htmlFor, required, error, invalid, hint, id, children, ...props }, ref) => {
     const generatedId = React.useId();
     const [control, setControl] = React.useState<FormFieldControlInfo | null>(null);
 
@@ -242,11 +257,11 @@ const FormField = React.forwardRef<HTMLDivElement, FormFieldProps>(
         hintId,
         errorId,
         describedBy: joinIds(hintId, errorId),
-        invalid: Boolean(error),
+        invalid: Boolean(error) || Boolean(invalid),
         required: Boolean(required),
         registerControl,
       }),
-      [controlId, labelId, hintId, errorId, error, required, registerControl]
+      [controlId, labelId, hintId, errorId, error, invalid, required, registerControl]
     );
 
     return (

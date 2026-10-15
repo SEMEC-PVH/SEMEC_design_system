@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-14T19:05:44.000Z — packages/react/manifest.js + packages/react/* — versão 3.1.0
+> Gerado 2026-10-15T12:22:40.000Z — packages/react/manifest.js + packages/react/* — versão 3.1.0
 
 ## Instalação
 
@@ -1213,9 +1213,9 @@ export { Link, linkVariants };
 
 ### Caixa de texto (`input`) — `src/components/input.tsx` — slug: caixa-de-texto
 
-Desc: Campo de texto. Estado de erro via `aria-invalid`. Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente.
+Desc: Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string.
 
-Variantes: estados: padrão · inválido (aria-invalid) · disabled
+Variantes: estados: padrão · inválido (invalid / aria-invalid) · disabled · contrato: value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required
 
 Uso:
 ```tsx
@@ -1232,11 +1232,16 @@ import { FormField, Input } from "@semec/ds/react";
   <Input id="cpf" inputMode="numeric" />
 </FormField>
 // → <label for="cpf">, aria-invalid="true", aria-describedby="cpf-error"
+
+// Controlado: onValueChange recebe a string (onChange continua recebendo o evento)
+<FormField label="E-mail">
+  <Input type="email" name="email" value={email} onValueChange={setEmail} invalid={emailInvalido} />
+</FormField>
 ```
 
 Prompt:
 ```text
-Use o componente `Input` (Caixa de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de texto. Estado de erro via `aria-invalid`. Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. API e variantes: estados: padrão · inválido (aria-invalid) · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Input` (Caixa de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string. API e variantes: estados: padrão · inválido (invalid / aria-invalid) · disabled · contrato: value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -1246,12 +1251,28 @@ import * as React from "react";
 import { cn } from "../lib/utils";
 import { useFormFieldControl } from "./form-field";
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  /**
+   * Recebe o valor (string) a cada mudança, junto com o `onChange` nativo, que
+   * continua recebendo o evento (contrato de formulário, ADR-015).
+   */
+  onValueChange?: (value: string) => void;
+  /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
+  invalid?: boolean;
+}
 
 /** Campo de texto. Dentro de um `FormField`, recebe `id`, `aria-describedby` e `aria-invalid`. */
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
-    const field = useFormFieldControl(props, { supportsRequired: true });
+  ({ className, type, invalid, onValueChange, ...props }, ref) => {
+    const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
+    const { onChange } = props;
+    const handleChange =
+      onChange || onValueChange
+        ? (event: React.ChangeEvent<HTMLInputElement>) => {
+            onChange?.(event);
+            onValueChange?.(event.target.value);
+          }
+        : undefined;
     return (
       <input
         type={type}
@@ -1262,6 +1283,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         ref={ref}
         {...props}
         {...field}
+        onChange={handleChange}
       />
     );
   }
@@ -1276,22 +1298,22 @@ export { Input };
 
 ### Área de texto (`textarea`) — `src/components/textarea.tsx` — slug: area-de-texto
 
-Desc: Campo multilinha com as mesmas variantes visuais do campo de texto.
+Desc: Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`).
 
-Variantes: estados: padrão · inválido · disabled
+Variantes: estados: padrão · inválido (invalid) · disabled · contrato: value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required
 
 Uso:
 ```tsx
 import { FormField, Textarea } from "@semec/ds/react";
 
 <FormField label="Descreva a demanda" hint="Até 500 caracteres">
-  <Textarea id="demanda" rows={4} />
+  <Textarea id="demanda" name="demanda" rows={4} value={demanda} onValueChange={setDemanda} />
 </FormField>
 ```
 
 Prompt:
 ```text
-Use o componente `Textarea` (Área de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo multilinha com as mesmas variantes visuais do campo de texto. API e variantes: estados: padrão · inválido · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Textarea` (Área de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`). API e variantes: estados: padrão · inválido (invalid) · disabled · contrato: value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -1301,12 +1323,28 @@ import * as React from "react";
 import { cn } from "../lib/utils";
 import { useFormFieldControl } from "./form-field";
 
-export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  /**
+   * Recebe o valor (string) a cada mudança, junto com o `onChange` nativo, que
+   * continua recebendo o evento (contrato de formulário, ADR-015).
+   */
+  onValueChange?: (value: string) => void;
+  /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
+  invalid?: boolean;
+}
 
 /** Campo multilinha. Dentro de um `FormField`, recebe `id`, `aria-describedby` e `aria-invalid`. */
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, ...props }, ref) => {
-    const field = useFormFieldControl(props, { supportsRequired: true });
+  ({ className, invalid, onValueChange, ...props }, ref) => {
+    const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
+    const { onChange } = props;
+    const handleChange =
+      onChange || onValueChange
+        ? (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+            onChange?.(event);
+            onValueChange?.(event.target.value);
+          }
+        : undefined;
     return (
       <textarea
         className={cn(
@@ -1316,6 +1354,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         ref={ref}
         {...props}
         {...field}
+        onChange={handleChange}
       />
     );
   }
@@ -1330,9 +1369,9 @@ export { Textarea };
 
 ### Menu de seleção (`select`) — `src/components/select.tsx` — slug: menu-de-selecao
 
-Desc: Seleção fechada com gatilho, conteúdo e itens compostos.
+Desc: Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`).
 
-Variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem
+Variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem · contrato: Select: value · defaultValue · onValueChange · name · required · disabled — SelectTrigger: id · invalid
 
 Uso:
 ```tsx
@@ -1348,7 +1387,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 
 // Dentro de FormField, o SelectTrigger recebe id, aria-describedby e aria-invalid
 <FormField label="Município" error={erro}>
-  <Select>
+  <Select name="municipio" value={municipio} onValueChange={setMunicipio}>
     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
     <SelectContent>
       <SelectItem value="pbh">Porto Velho</SelectItem>
@@ -1359,7 +1398,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 
 Prompt:
 ```text
-Use o componente `Select` (Menu de seleção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção fechada com gatilho, conteúdo e itens compostos. API e variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Select` (Menu de seleção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`). API e variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem · contrato: Select: value · defaultValue · onValueChange · name · required · disabled — SelectTrigger: id · invalid. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -1379,10 +1418,17 @@ const SelectValue = SelectPrimitive.Value;
 
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+    /**
+     * Contrato de formulário (ADR-015): `true` vira `aria-invalid="true"` e o
+     * estilo de erro. Fica no gatilho; `value`/`onValueChange`/`name`/`required`
+     * ficam no `Select` (raiz Radix).
+     */
+    invalid?: boolean;
+  }
+>(({ className, children, invalid, ...props }, ref) => {
   // Dentro de um FormField: id, aria-describedby, aria-invalid e aria-required.
-  const field = useFormFieldControl(props, { supportsRequired: true });
+  const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
   return (
   <SelectPrimitive.Trigger
     ref={ref}
@@ -1528,7 +1574,7 @@ export {
 
 Desc: Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.
 
-Variantes: props: options · value · defaultValue · onChange · placeholder · searchPlaceholder · emptyText · name · required · disabled · labels · portalContainer · deprecadas: ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)
+Variantes: props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · deprecadas: onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText)
 
 Uso:
 ```tsx
@@ -1543,9 +1589,10 @@ import { Combobox, FormField, Label } from "@semec/ds/react";
     emptyText="Nenhum tipo encontrado."
     options={[{ value: "cnpj", label: "CNPJ" }, { value: "cpf", label: "CPF" }]}
     value={valor}
-    onChange={setValor}
+    onValueChange={setValor}
   />
 </FormField>
+// name gera um <input type="hidden"> com o valor: vai no FormData de um <form> nativo
 
 // Ou com <Label htmlFor> + id (também aceita aria-labelledby)
 <Label htmlFor="orgao">Órgão emissor</Label>
@@ -1554,7 +1601,7 @@ import { Combobox, FormField, Label } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField. API e variantes: props: options · value · defaultValue · onChange · placeholder · searchPlaceholder · emptyText · name · required · disabled · labels · portalContainer · deprecadas: ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Combobox` (Combobox) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField. API e variantes: props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · deprecadas: onChange(value) (use onValueChange; sai na 4.0) · ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -1564,6 +1611,7 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import { warnDeprecated } from "../lib/deprecation";
 import { useFormField, useFormFieldControl } from "./form-field";
 
 export interface ComboboxOption {
@@ -1596,7 +1644,12 @@ export interface ComboboxProps
   value?: string;
   /** Valor inicial (modo não controlado). */
   defaultValue?: string;
+  /** Recebe o valor da opção escolhida (contrato de formulário, ADR-015). */
+  onValueChange?: (value: string) => void;
+  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
   onChange?: (value: string) => void;
+  /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
+  invalid?: boolean;
   /** Texto do gatilho sem seleção. Padrão: "Selecione…". */
   placeholder?: string;
   /** Placeholder do campo de busca. Padrão: "Buscar…". */
@@ -1642,6 +1695,8 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
       value,
       defaultValue,
       onChange,
+      onValueChange,
+      invalid,
       placeholder = "Selecione…",
       searchPlaceholder = "Buscar…",
       emptyText,
@@ -1671,7 +1726,13 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
     const optionId = (index: number) => `${uid}-option-${index}`;
 
     const ctx = useFormField();
-    const field = useFormFieldControl(props);
+    const field = useFormFieldControl({ ...props, invalid });
+    if (onChange) {
+      warnDeprecated(
+        "Combobox.onChange",
+        "Combobox: `onChange(value)` está obsoleto e sai na 4.0. Use `onValueChange(value)`."
+      );
+    }
     const triggerId = field.id ?? props.id;
 
     const [open, setOpen] = React.useState(false);
@@ -1741,6 +1802,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
 
     const choose = (option: ComboboxOption) => {
       if (value === undefined) setInternalValue(option.value);
+      onValueChange?.(option.value);
       onChange?.(option.value);
       setOpen(false);
     };
@@ -1938,20 +2000,25 @@ export { Combobox };
 
 Desc: Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).
 
-Variantes: props: nativo HTML (min · max · disabled) + labels.openCalendar + variantes visuais do campo
+Variantes: props: nativo HTML (min · max · disabled · name · required) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · deprecadas: onChange(value) (use onValueChange; na 4.0 o onChange passa a receber o evento nativo)
 
 Uso:
 ```tsx
 import { DatePicker, FormField } from "@semec/ds/react";
 
 <FormField label="Data de vencimento" hint="dd/mm/aaaa">
-  <DatePicker id="vencimento" defaultValue="2026-08-31" />
+  <DatePicker id="vencimento" name="vencimento" defaultValue="2026-08-31" />
+</FormField>
+
+// Controlado: onValueChange recebe o ISO (AAAA-MM-DD)
+<FormField label="Data de início" error={erroData}>
+  <DatePicker value={inicio} onValueChange={setInicio} />
 </FormField>
 ```
 
 Prompt:
 ```text
-Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). API e variantes: props: nativo HTML (min · max · disabled) + labels.openCalendar + variantes visuais do campo. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). API e variantes: props: nativo HTML (min · max · disabled · name · required) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · deprecadas: onChange(value) (use onValueChange; na 4.0 o onChange passa a receber o evento nativo). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -1960,6 +2027,7 @@ import * as React from "react";
 import { Calendar as CalendarIcon } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import { warnDeprecated } from "../lib/deprecation";
 import { useFormFieldControl } from "./form-field";
 
 export interface DatePickerLabels {
@@ -1973,8 +2041,17 @@ const defaultLabels: DatePickerLabels = {
 
 export interface DatePickerProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "onChange"> {
+  /** Valor ISO (`AAAA-MM-DD`), modo controlado. Para não controlado, use `defaultValue`. */
   value?: string;
+  /** Recebe o valor ISO (`AAAA-MM-DD`, ou `""` ao limpar) a cada mudança (ADR-015). */
+  onValueChange?: (value: string) => void;
+  /**
+   * @deprecated Use `onValueChange`. Recebe o valor (string), não o evento;
+   * na 4.0, `onChange` passa a receber o evento nativo do `<input>` (AUD-35).
+   */
   onChange?: (value: string) => void;
+  /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
+  invalid?: boolean;
   /** Textos fixos (PT-BR por padrão). */
   labels?: Partial<DatePickerLabels>;
 }
@@ -1989,9 +2066,18 @@ export interface DatePickerProps
  * nativo, o ícone do kit sai e fica só o nativo.
  */
 const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
-  ({ className, value, onChange, disabled, readOnly, labels, ...props }, ref) => {
+  (
+    { className, value, onChange, onValueChange, invalid, disabled, readOnly, labels, ...props },
+    ref
+  ) => {
     const text = { ...defaultLabels, ...labels };
-    const field = useFormFieldControl(props, { supportsRequired: true });
+    const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
+    if (onChange) {
+      warnDeprecated(
+        "DatePicker.onChange",
+        "DatePicker: `onChange(value)` está obsoleto e muda na 4.0 (passa a receber o evento nativo). Use `onValueChange(value)`."
+      );
+    }
     const inputRef = React.useRef<HTMLInputElement | null>(null);
     const setRefs = React.useCallback(
       (el: HTMLInputElement | null) => {
@@ -2023,7 +2109,10 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
           value={value}
           disabled={disabled}
           readOnly={readOnly}
-          onChange={(e) => onChange?.(e.target.value)}
+          onChange={(e) => {
+            onValueChange?.(e.target.value);
+            onChange?.(e.target.value);
+          }}
           className={cn(
             "flex h-11 w-full appearance-none rounded-md border border-input bg-background px-3 py-2 pr-12 text-sm text-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&::-webkit-calendar-picker-indicator]:hidden",
             className
@@ -2054,9 +2143,9 @@ export { DatePicker };
 
 ### Envio de arquivos (`file-upload`) — `src/components/file-upload.tsx` — slug: envio-de-arquivos
 
-Desc: Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro.
+Desc: Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio.
 
-Variantes: props: accept · maxSize · label · hint · error · onChange · value · multiple · id · inputProps · labels
+Variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · deprecadas: onChange(files) (use onValueChange; sai na 4.0)
 
 Uso:
 ```tsx
@@ -2068,6 +2157,8 @@ import { FileUpload } from "@semec/ds/react";
   accept=".pdf,image/*"
   maxSize={5 * 1024 * 1024}
   hint="PDF ou imagem, até 5 MB"
+  value={arquivos}
+  onValueChange={setArquivos}
 />
 
 // Textos fixos sobrescrevíveis (padrão PT-BR)
@@ -2076,7 +2167,7 @@ import { FileUpload } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. API e variantes: props: accept · maxSize · label · hint · error · onChange · value · multiple · id · inputProps · labels. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. API e variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · deprecadas: onChange(files) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -2085,6 +2176,7 @@ import * as React from "react";
 import { UploadCloud } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import { warnDeprecated } from "../lib/deprecation";
 import { useFormField } from "./form-field";
 
 export interface FileUploadLabels {
@@ -2114,8 +2206,20 @@ export interface FileUploadProps
   maxSize?: number;
   label?: string;
   hint?: string;
+  /** Mensagem de erro. Equivale a `invalid` + mensagem (ver ADR-015). */
   error?: string;
+  /** Marca o campo como inválido sem mensagem própria (ex.: erro no FormField). */
+  invalid?: boolean;
+  /** Recebe os arquivos aceitos (contrato de formulário, ADR-015). */
+  onValueChange?: (files: File[]) => void;
+  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
   onChange?: (files: File[]) => void;
+  /** `name` do `<input type="file">`. Atalho de `inputProps.name`. */
+  name?: string;
+  /** `required` do `<input type="file">`. Atalho de `inputProps.required`. */
+  required?: boolean;
+  /** Desabilita o campo e a zona de soltar. */
+  disabled?: boolean;
   /** Arquivos selecionados (modo controlado). Mantém a seleção ao voltar de etapa. */
   value?: File[];
   /** Permite selecionar mais de um arquivo. Padrão: `true`. */
@@ -2163,7 +2267,12 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       label,
       hint,
       error,
+      invalid: invalidProp,
       onChange,
+      onValueChange,
+      name,
+      required,
+      disabled,
       value,
       multiple = true,
       id: idProp,
@@ -2194,9 +2303,15 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
     const hintId = `${idBase}-hint`;
     const errorId = `${idBase}-error`;
     const message = localError ?? error;
+    if (onChange) {
+      warnDeprecated(
+        "FileUpload.onChange",
+        "FileUpload: `onChange(files)` está obsoleto e sai na 4.0. Use `onValueChange(files)`."
+      );
+    }
 
     const acceptFiles = (list: FileList | null) => {
-      if (!list) return;
+      if (!list || disabled) return;
       let next = Array.from(list);
       if (next.length === 0) return;
       if (!multiple) next = next.slice(0, 1);
@@ -2213,6 +2328,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
       }
       setLocalError(undefined);
       if (value === undefined) setInternalFiles(next);
+      onValueChange?.(next);
       onChange?.(next);
     };
 
@@ -2231,7 +2347,14 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             .filter(Boolean)
         )
       ).join(" ") || undefined;
-    const invalid = message ? true : inputProps?.["aria-invalid"] ?? (field?.invalid ? true : undefined);
+    const invalid = message
+      ? true
+      : inputProps?.["aria-invalid"] ??
+        (invalidProp !== undefined
+          ? invalidProp || undefined
+          : field?.invalid
+            ? true
+            : undefined);
 
     return (
       <div
@@ -2255,16 +2378,22 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
             setDrag(false);
             acceptFiles(e.dataTransfer.files);
           }}
-          onClick={() => inputRef.current?.click()}
+          onClick={() => {
+            if (!disabled) inputRef.current?.click();
+          }}
           className={cn(
             "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-input bg-background px-6 py-8 text-center transition-colors duration-fast ease-standard has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background hover:border-border-strong",
             drag && "border-ring bg-tint",
+            disabled && "cursor-not-allowed opacity-50",
             (message || invalid === true) && "border-destructive"
           )}
         >
           <input
             aria-label={label || field?.labelId ? undefined : text.chooseFile}
             {...inputProps}
+            name={name ?? inputProps?.name}
+            required={required ?? inputProps?.required}
+            disabled={disabled ?? inputProps?.disabled}
             ref={inputRef}
             id={id}
             type="file"
@@ -2333,9 +2462,9 @@ export { FileUpload };
 
 ### Caixa de marcação (`checkbox`) — `src/components/checkbox.tsx` — slug: caixa-de-marcacao
 
-Desc: Caixa de marcação com estado indeterminado.
+Desc: Caixa de marcação com estado indeterminado. Mantém a API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.
 
-Variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled
+Variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled · inválido (invalid) · contrato: checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required
 
 Uso:
 ```tsx
@@ -2345,11 +2474,17 @@ import { Checkbox, Label } from "@semec/ds/react";
   <Checkbox id="termos" />
   <Label htmlFor="termos">Aceito os termos</Label>
 </div>
+
+// Controlado, com envio em <form> e erro (checked/onCheckedChange = value/onValueChange)
+<div className="flex items-center gap-2">
+  <Checkbox id="aceite" name="aceite" checked={aceito} onCheckedChange={(v) => setAceito(v === true)} invalid={!aceito && enviado} />
+  <Label htmlFor="aceite">Li e aceito o regulamento</Label>
+</div>
 ```
 
 Prompt:
 ```text
-Use o componente `Checkbox` (Caixa de marcação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Caixa de marcação com estado indeterminado. API e variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Checkbox` (Caixa de marcação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Caixa de marcação com estado indeterminado. Mantém a API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`. API e variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled · inválido (invalid) · contrato: checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -2363,10 +2498,13 @@ import { useFormFieldControl } from "./form-field";
 
 const Checkbox = React.forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> & {
+  /** Contrato de formulário (ADR-015): `true` vira `aria-invalid="true"` e o estilo de erro. */
+  invalid?: boolean;
+  }
+>(({ className, invalid, ...props }, ref) => {
   // Dentro de um FormField: id, aria-describedby, aria-invalid e aria-required.
-  const field = useFormFieldControl(props, { supportsRequired: true });
+  const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
   return (
   <CheckboxPrimitive.Root
     ref={ref}
@@ -2394,15 +2532,15 @@ export { Checkbox };
 
 ### Botão de opção (`radio-group`) — `src/components/radio-group.tsx` — slug: botao-de-opcao
 
-Desc: Escolha única entre duas ou mais opções.
+Desc: Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`.
 
-Variantes: composição: RadioGroup · RadioGroupItem + Label
+Variantes: composição: RadioGroup · RadioGroupItem + Label · contrato: value · defaultValue · onValueChange · name · id · invalid · disabled · required
 
 Uso:
 ```tsx
 import { RadioGroup, RadioGroupItem, Label } from "@semec/ds/react";
 
-<RadioGroup defaultValue="pessoa-fisica">
+<RadioGroup name="tipoPessoa" defaultValue="pessoa-fisica" onValueChange={setTipoPessoa}>
   <div className="flex items-center gap-2">
     <RadioGroupItem value="pessoa-fisica" id="pf" />
     <Label htmlFor="pf">Pessoa física</Label>
@@ -2412,7 +2550,7 @@ import { RadioGroup, RadioGroupItem, Label } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `RadioGroup` (Botão de opção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Escolha única entre duas ou mais opções. API e variantes: composição: RadioGroup · RadioGroupItem + Label. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `RadioGroup` (Botão de opção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`. API e variantes: composição: RadioGroup · RadioGroupItem + Label · contrato: value · defaultValue · onValueChange · name · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -2426,11 +2564,17 @@ import { useFormFieldControl } from "./form-field";
 
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root> & {
+  /** Contrato de formulário (ADR-015): `true` vira `aria-invalid="true"` e o estilo de erro. */
+  invalid?: boolean;
+  }
+>(({ className, invalid, ...props }, ref) => {
   // Dentro de um FormField: o grupo (div) não é rotulável por <label for>,
   // então recebe aria-labelledby do rótulo, além de describedby/invalid/required.
-  const field = useFormFieldControl(props, { labelable: false, supportsRequired: true });
+  const field = useFormFieldControl(
+    { ...props, invalid },
+    { labelable: false, supportsRequired: true }
+  );
   return (
     <RadioGroupPrimitive.Root
       className={cn("grid gap-2", className)}
@@ -2470,9 +2614,9 @@ export { RadioGroup, RadioGroupItem };
 
 ### Interruptor (`switch`) — `src/components/switch.tsx` — slug: interruptor
 
-Desc: Interruptor on/off para ativação imediata.
+Desc: Interruptor on/off para ativação imediata. API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.
 
-Variantes: estados: off · on (checked) · disabled · inválido
+Variantes: estados: off · on (checked) · disabled · inválido (invalid) · contrato: checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required
 
 Uso:
 ```tsx
@@ -2486,7 +2630,7 @@ import { Switch, Label } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Switch` (Interruptor) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Interruptor on/off para ativação imediata. API e variantes: estados: off · on (checked) · disabled · inválido. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Switch` (Interruptor) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Interruptor on/off para ativação imediata. API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`. API e variantes: estados: off · on (checked) · disabled · inválido (invalid) · contrato: checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -2499,10 +2643,13 @@ import { useFormFieldControl } from "./form-field";
 
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> & {
+  /** Contrato de formulário (ADR-015): `true` vira `aria-invalid="true"` e o estilo de erro. */
+  invalid?: boolean;
+  }
+>(({ className, invalid, ...props }, ref) => {
   // Dentro de um FormField: id, aria-describedby, aria-invalid e aria-required.
-  const field = useFormFieldControl(props, { supportsRequired: true });
+  const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
   return (
   <SwitchPrimitives.Root
     className={cn(
@@ -2576,7 +2723,7 @@ export { Label };
 
 Desc: Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role="alert"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast.
 
-Variantes: props: label · htmlFor · required · hint · error · id (base dos ids <id>-hint/<id>-error) · hooks: useFormField · useFormFieldControl (para campos próprios)
+Variantes: props: label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · id (base dos ids <id>-hint/<id>-error) · hooks: useFormField · useFormFieldControl (para campos próprios)
 
 Uso:
 ```tsx
@@ -2603,7 +2750,7 @@ function Formulario() {
 
 Prompt:
 ```text
-Use o componente `FormField` (Campo de formulário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role="alert"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast. API e variantes: props: label · htmlFor · required · hint · error · id (base dos ids <id>-hint/<id>-error) · hooks: useFormField · useFormFieldControl (para campos próprios). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `FormField` (Campo de formulário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Casaco do campo: label, obrigatório, dica e mensagem de erro na ordem certa. Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid` com erro, sem sobrescrever o que for passado. Funciona com Input, Textarea, SelectTrigger, Combobox, DatePicker, Checkbox, RadioGroup, Switch, InputOTP, FileUpload e Slider. O erro não usa `role="alert"`: é lido ao focar o campo, e o anúncio fica com o ErrorSummary. Para sucesso após envio, use Toast. API e variantes: props: label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · id (base dos ids <id>-hint/<id>-error) · hooks: useFormField · useFormFieldControl (para campos próprios). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -2680,6 +2827,12 @@ export interface UseFormFieldControlProps {
   "aria-label"?: string;
   "aria-required"?: React.AriaAttributes["aria-required"];
   required?: boolean;
+  /**
+   * Contrato de formulário (ADR-015, AUD-35): `true` vira `aria-invalid="true"`
+   * (e o estilo de erro do campo). Passado explicitamente, vence o estado do
+   * FormField; `aria-invalid` passado à mão vence os dois.
+   */
+  invalid?: boolean;
 }
 
 /** Atributos que `useFormFieldControl` devolve (só as chaves com valor). */
@@ -2718,6 +2871,7 @@ export function useFormFieldControl(
 ): FormFieldControlAttributes {
   const ctx = React.useContext(FormFieldContext);
   const explicitId = props.id;
+  const ownInvalid = props.invalid ? true : undefined;
   const register = ctx?.registerControl;
 
   useIsomorphicLayoutEffect(() => {
@@ -2725,14 +2879,16 @@ export function useFormFieldControl(
     return register({ id: explicitId, labelable });
   }, [register, explicitId, labelable]);
 
-  // Fora de um FormField não há nada a acrescentar.
-  if (!ctx) return {} as FormFieldControlAttributes;
+  // Fora de um FormField, só o `invalid` próprio vira atributo.
+  if (!ctx) return withoutUndefined({ "aria-invalid": props["aria-invalid"] ?? ownInvalid });
 
   const hasOwnName = props["aria-label"] !== undefined || props["aria-labelledby"] !== undefined;
   return withoutUndefined({
     id: props.id ?? ctx.controlId,
     "aria-describedby": joinIds(props["aria-describedby"], ctx.describedBy),
-    "aria-invalid": props["aria-invalid"] ?? (ctx.invalid ? true : undefined),
+    "aria-invalid":
+      props["aria-invalid"] ??
+      (props.invalid !== undefined ? ownInvalid : ctx.invalid ? true : undefined),
     // Elemento não rotulável por <label for>: o nome vem do rótulo do FormField.
     "aria-labelledby":
       props["aria-labelledby"] ?? (!labelable && !hasOwnName ? ctx.labelId : undefined),
@@ -2750,7 +2906,13 @@ export interface FormFieldProps extends React.HTMLAttributes<HTMLDivElement> {
    */
   htmlFor?: string;
   required?: boolean;
+  /** Mensagem de erro. Com ela, o campo fica inválido (`invalid` implícito). */
   error?: string;
+  /**
+   * Marca o campo filho como inválido sem mensagem própria (ex.: erro mostrado
+   * em outro lugar). `error="..."` equivale a `invalid` + mensagem.
+   */
+  invalid?: boolean;
   hint?: string;
   /**
    * Base dos ids da dica (`<id>-hint`) e do erro (`<id>-error`). Sem ela, a
@@ -2760,7 +2922,7 @@ export interface FormFieldProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const FormField = React.forwardRef<HTMLDivElement, FormFieldProps>(
-  ({ className, label, htmlFor, required, error, hint, id, children, ...props }, ref) => {
+  ({ className, label, htmlFor, required, error, invalid, hint, id, children, ...props }, ref) => {
     const generatedId = React.useId();
     const [control, setControl] = React.useState<FormFieldControlInfo | null>(null);
 
@@ -2786,11 +2948,11 @@ const FormField = React.forwardRef<HTMLDivElement, FormFieldProps>(
         hintId,
         errorId,
         describedBy: joinIds(hintId, errorId),
-        invalid: Boolean(error),
+        invalid: Boolean(error) || Boolean(invalid),
         required: Boolean(required),
         registerControl,
       }),
-      [controlId, labelId, hintId, errorId, error, required, registerControl]
+      [controlId, labelId, hintId, errorId, error, invalid, required, registerControl]
     );
 
     return (
@@ -5888,7 +6050,7 @@ export { Avatar, AvatarImage, AvatarFallback };
 
 ### Toggle (`toggle`) — `src/components/toggle.tsx` — slug: toggle
 
-Desc: Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos.
+Desc: Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos.
 
 Variantes: variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)
 
@@ -5904,7 +6066,7 @@ import { Bold } from "lucide-react";
 
 Prompt:
 ```text
-Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão binário para estados on/off em toolbars. Alvo de toque de 44px em todos os tamanhos. API e variantes: variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. API e variantes: variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -6097,7 +6259,9 @@ export { Progress };
 
 ### Slider (`slider`) — `src/components/slider.tsx` — slug: slider
 
-Desc: Controle deslizante para faixas de valor.
+Desc: Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares.
+
+Variantes: contrato: value · defaultValue · onValueChange(number[]) · name · id · invalid · disabled
 
 Uso:
 ```tsx
@@ -6112,7 +6276,7 @@ import { Slider } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Slider` (Slider) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle deslizante para faixas de valor. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Slider` (Slider) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares. API e variantes: contrato: value · defaultValue · onValueChange(number[]) · name · id · invalid · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -6131,6 +6295,8 @@ export interface SliderProps
    * Sem ela, `aria-label`/`aria-labelledby` do Slider vão para os polegares.
    */
   getAriaLabel?: (index: number) => string;
+  /** Contrato de formulário (ADR-015): `true` vira `aria-invalid="true"` nos polegares. */
+  invalid?: boolean;
 }
 
 const Slider = React.forwardRef<
@@ -6145,6 +6311,7 @@ const Slider = React.forwardRef<
       "aria-describedby": ariaDescribedBy,
       "aria-invalid": ariaInvalid,
       getAriaLabel,
+      invalid,
       ...props
     },
     ref
@@ -6158,6 +6325,7 @@ const Slider = React.forwardRef<
         "aria-labelledby": ariaLabelledByProp,
         "aria-describedby": ariaDescribedBy,
         "aria-invalid": ariaInvalid,
+        invalid,
       },
       { labelable: false }
     );
@@ -6191,7 +6359,7 @@ const Slider = React.forwardRef<
             aria-labelledby={getAriaLabel ? undefined : ariaLabelledBy}
             aria-describedby={field["aria-describedby"] ?? ariaDescribedBy}
             aria-invalid={field["aria-invalid"] ?? ariaInvalid}
-            className="relative block h-5 w-5 rounded-full after:absolute after:-inset-3 after:content-[''] after:rounded-full border-2 border-primary bg-background shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50"
+            className="relative block h-5 w-5 rounded-full after:absolute after:-inset-3 after:content-[''] after:rounded-full border-2 border-primary bg-background shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 aria-[invalid=true]:border-destructive"
           />
         ))}
       </SliderPrimitive.Root>
@@ -6210,13 +6378,14 @@ export { Slider };
 
 Desc: Campo de código OTP com foco automático entre dígitos.
 
-Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled · labels (group · slot(index, total))
+Variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · deprecadas: onChange(value) (use onValueChange; sai na 4.0)
 
 Uso:
 ```tsx
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec/ds/react";
 
-<InputOTP value={code} onChange={setCode} maxLength={6}>
+// name gera um <input type="hidden"> com o código: vai no FormData de um <form> nativo
+<InputOTP name="codigo" value={code} onValueChange={setCode} maxLength={6}>
   <InputOTPGroup>
     <InputOTPSlot index={0} />
     <InputOTPSlot index={1} />
@@ -6233,7 +6402,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@semec
 
 Prompt:
 ```text
-Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de código OTP com foco automático entre dígitos. API e variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: maxLength · disabled · labels (group · slot(index, total)). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `InputOTP` (Input OTP) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de código OTP com foco automático entre dígitos. API e variantes: composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · deprecadas: onChange(value) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -6241,7 +6410,8 @@ Fonte:
 import * as React from "react";
 
 import { cn } from "../lib/utils";
-import { useFormFieldControl } from "./form-field";
+import { warnDeprecated } from "../lib/deprecation";
+import { useFormField, useFormFieldControl } from "./form-field";
 
 interface InputOTPContextValue {
   slots: string[];
@@ -6252,6 +6422,7 @@ interface InputOTPContextValue {
   maxLength: number;
   disabled?: boolean;
   invalid?: boolean;
+  required?: boolean;
   labels: InputOTPLabels;
 }
 
@@ -6275,14 +6446,28 @@ function useInputOTP() {
   return ctx;
 }
 
-export interface InputOTPProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
+export interface InputOTPProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue"> {
   /** Valor controlado. Sem ele, o componente guarda o estado sozinho. */
   value?: string;
+  /** Valor inicial (modo não controlado). */
+  defaultValue?: string;
   /**
    * Recebe os dígitos preenchidos concatenados, sem lacunas: com "1" no slot 1
    * e "6" no slot 6, o valor emitido é "16" (a tela mantém as posições).
+   * Contrato de formulário (ADR-015).
    */
+  onValueChange?: (value: string) => void;
+  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
   onChange?: (value: string) => void;
+  /** Gera um `<input type="hidden" name>` com o código, para envio em `<form>`. */
+  name?: string;
+  /** `id` do `<form>` do input oculto, quando o InputOTP fica fora dele. */
+  form?: string;
+  /** Vira `aria-required` em cada dígito (o grupo não aceita `aria-required`). */
+  required?: boolean;
+  /** `true` vira `aria-invalid="true"` e o estilo de erro. Dentro de FormField, vence o estado dele. */
+  invalid?: boolean;
   maxLength?: number;
   disabled?: boolean;
   /** Textos fixos (PT-BR por padrão). */
@@ -6295,12 +6480,36 @@ const toSlots = (str: string, length: number) =>
   Array.from({ length }, (_, i) => str[i] ?? "");
 
 const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
-  ({ className, value, onChange, maxLength = 6, disabled, labels, children, ...props }, ref) => {
+  (
+    {
+      className,
+      value,
+      defaultValue,
+      onChange,
+      onValueChange,
+      name,
+      form,
+      required,
+      invalid: invalidProp,
+      maxLength = 6,
+      disabled,
+      labels,
+      children,
+      ...props
+    },
+    ref
+  ) => {
     const isControlled = value !== undefined;
     const slotsRef = React.useRef<(HTMLInputElement | null)[]>([]);
     const [internalSlots, setSlots] = React.useState<string[]>(() =>
-      toSlots(value ?? "", maxLength)
+      toSlots(value ?? defaultValue ?? "", maxLength)
     );
+    if (onChange) {
+      warnDeprecated(
+        "InputOTP.onChange",
+        "InputOTP: `onChange(value)` está obsoleto e sai na 4.0. Use `onValueChange(value)`."
+      );
+    }
 
     // Modo controlado: a tela reflete sempre o `value` do pai. O array interno
     // só é usado enquanto o pai aceitar o que foi emitido (value === join), o
@@ -6323,9 +6532,10 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
     const commit = React.useCallback(
       (next: string[]) => {
         setSlots(next);
+        onValueChange?.(next.join(""));
         onChange?.(next.join(""));
       },
-      [onChange]
+      [onChange, onValueChange]
     );
 
     const fillFrom = React.useCallback(
@@ -6414,7 +6624,8 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
 
     // Dentro de um FormField: o grupo (div) não é rotulável por <label for>,
     // então recebe aria-labelledby do rótulo, mais describedby/invalid.
-    const field = useFormFieldControl(props, { labelable: false });
+    const field = useFormFieldControl({ ...props, invalid: invalidProp }, { labelable: false });
+    const fieldCtx = useFormField();
     const text = { ...defaultLabels, ...labels };
     const invalid = field["aria-invalid"] ?? props["aria-invalid"];
 
@@ -6427,6 +6638,7 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
       maxLength,
       disabled,
       invalid: invalid === true || invalid === "true",
+      required: required ?? Boolean(fieldCtx?.required),
       labels: text,
     };
 
@@ -6447,6 +6659,9 @@ const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(
         >
           {children}
         </div>
+        {name ? (
+          <input type="hidden" name={name} value={slots.join("")} form={form} />
+        ) : null}
       </InputOTPContext.Provider>
     );
   }
@@ -6480,6 +6695,7 @@ const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
       maxLength,
       disabled,
       invalid,
+      required,
       labels,
     } = useInputOTP();
     const value = slots[index] || "";
@@ -6513,6 +6729,7 @@ const InputOTPSlot = React.forwardRef<HTMLDivElement, InputOTPSlotProps>(
           className="absolute inset-0 h-full w-full cursor-pointer appearance-none rounded-[inherit] border-0 bg-transparent text-center text-lg font-medium text-foreground caret-transparent outline-none"
           aria-label={labels.slot(index, maxLength)}
           aria-invalid={invalid || undefined}
+          aria-required={required || undefined}
         />
         <span aria-hidden="true" className="pointer-events-none">
           {value || ""}
@@ -6549,20 +6766,20 @@ export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator };
 
 Desc: Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px.
 
-Variantes: props: value · onChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome "14 de outubro de 2026" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona
+Variantes: props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · deprecadas: onChange(date) (use onValueChange; sai na 4.0) · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome "14 de outubro de 2026" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona
 
 Uso:
 ```tsx
 import { Calendar } from "@semec/ds/react";
 
-<Calendar value={data} onChange={setData} />
+<Calendar value={data} onValueChange={setData} />
 
-<Calendar value={data} onChange={setData} min="2026-01-01" max="2026-12-31" />
+<Calendar value={data} onValueChange={setData} min="2026-01-01" max="2026-12-31" />
 ```
 
 Prompt:
 ```text
-Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px. API e variantes: props: value · onChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome "14 de outubro de 2026" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Calendar` (Calendário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px. API e variantes: props: value · onValueChange · min · max (AAAA-MM-DD, data local) · disabled · labels?: Partial<{ previousMonth, nextMonth }> · deprecadas: onChange(date) (use onValueChange; sai na 4.0) · a11y: role=grid rotulado pelo mês (aria-live=polite) · roving tabindex · aria-selected · aria-current=date no dia de hoje · aria-disabled fora de min/max · nome "14 de outubro de 2026" · teclado: ←/→ dia · ↑/↓ semana · Home/End início/fim da semana · PageUp/PageDown mês · Shift+PageUp/PageDown ano · Enter/Espaço seleciona. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -6570,6 +6787,7 @@ Fonte:
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import { warnDeprecated } from "../lib/deprecation";
 import { cn } from "../lib/utils";
 
 const LOCALE = "pt-BR";
@@ -6610,6 +6828,9 @@ const DEFAULT_LABELS: CalendarLabels = {
 export interface CalendarProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
   value?: Date | null;
+  /** Recebe a data escolhida (contrato de formulário, ADR-015). */
+  onValueChange?: (date: Date) => void;
+  /** @deprecated Use `onValueChange` (mesma assinatura). Sai na 4.0 (AUD-35). */
   onChange?: (date: Date) => void;
   disabled?: boolean;
   /** Data mínima selecionável (`AAAA-MM-DD`). */
@@ -6669,8 +6890,14 @@ const navButtonClass =
  * (`Shift` + `PageUp`/`PageDown` trocam o ano) e `Enter`/`Espaço` selecionam.
  */
 const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
-  ({ className, value, onChange, disabled, min, max, labels, ...props }, ref) => {
+  ({ className, value, onChange, onValueChange, disabled, min, max, labels, ...props }, ref) => {
     const text = { ...DEFAULT_LABELS, ...labels };
+    if (onChange) {
+      warnDeprecated(
+        "Calendar.onChange",
+        "Calendar: `onChange(date)` está obsoleto e sai na 4.0. Use `onValueChange(date)`."
+      );
+    }
     const headingId = React.useId();
     const today = startOfDay(new Date());
 
@@ -6710,6 +6937,7 @@ const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(
 
     const select = (date: Date) => {
       if (isDisabled(date)) return;
+      onValueChange?.(date);
       onChange?.(date);
     };
 
@@ -9384,7 +9612,7 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 Avisadas a partir da 3.1.0 e válidas até a 4.0 (política de duas minors, ADR-013). Lista completa, com o que usar no lugar: [CONTRIBUTING.md § Depreciações anunciadas](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/CONTRIBUTING.md#depreciações-anunciadas).
 
 - Importar por caminho de arquivo em `dist/` (o bundle único vira saída por módulo e subpaths `@semec/ds/react/*`).
-- `onChange(value)` / `onChange(files)` nos campos não nativos (contrato passa a ser `value` / `onValueChange` / `name` / `id` / `invalid`).
+- `onChange(value)` / `onChange(files)` nos campos não nativos (`Combobox`, `InputOTP`, `DatePicker`, `FileUpload`, `Calendar`): use `onValueChange`, com a mesma assinatura, disponível em todos desde a 3.2.0 (contrato `value` / `onValueChange` / `name` / `id` / `invalid`, ADR-015).
 - Utilitários de primitivo `bg-pv-*` / `text-pv-*` (use os semânticos).
 - Valores atuais de `rounded-sm` e `rounded-lg` (escolha o raio pelo papel, não pelo px).
 - `Button` desabilitado por `disabled` nativo (pode virar `aria-disabled`; não dependa de `:disabled`).

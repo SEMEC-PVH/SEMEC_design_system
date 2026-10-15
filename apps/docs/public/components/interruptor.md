@@ -4,18 +4,19 @@ code: "switch"
 slug: "interruptor"
 file: "src/components/switch.tsx"
 category: "formularios"
-variants: "estados: off · on (checked) · disabled · inválido"
+variants: "estados: off · on (checked) · disabled · inválido (invalid) · contrato: checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required"
 ---
 
 # Interruptor — `switch`
 
-> Interruptor on/off para ativação imediata.
+> Interruptor on/off para ativação imediata. API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.
 
 **Arquivo:** `src/components/switch.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/interruptor`
 
 ## Variantes
 
-- **estados**: off · on (checked) · disabled · inválido
+- **estados**: off · on (checked) · disabled · inválido (invalid)
+- **contrato**: checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required
 
 ## Instalação (@semec/ds)
 
@@ -44,7 +45,7 @@ import { Switch, Label } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `Switch` (Interruptor) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Interruptor on/off para ativação imediata. API e variantes: estados: off · on (checked) · disabled · inválido. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Switch` (Interruptor) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Interruptor on/off para ativação imediata. API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`. API e variantes: estados: off · on (checked) · disabled · inválido (invalid) · contrato: checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -58,10 +59,13 @@ import { useFormFieldControl } from "./form-field";
 
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> & {
+  /** Contrato de formulário (ADR-015): `true` vira `aria-invalid="true"` e o estilo de erro. */
+  invalid?: boolean;
+  }
+>(({ className, invalid, ...props }, ref) => {
   // Dentro de um FormField: id, aria-describedby, aria-invalid e aria-required.
-  const field = useFormFieldControl(props, { supportsRequired: true });
+  const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
   return (
   <SwitchPrimitives.Root
     className={cn(

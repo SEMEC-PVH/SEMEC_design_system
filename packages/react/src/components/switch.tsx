@@ -6,10 +6,13 @@ import { useFormFieldControl } from "./form-field";
 
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> & {
+  /** Contrato de formulário (ADR-015): `true` vira `aria-invalid="true"` e o estilo de erro. */
+  invalid?: boolean;
+  }
+>(({ className, invalid, ...props }, ref) => {
   // Dentro de um FormField: id, aria-describedby, aria-invalid e aria-required.
-  const field = useFormFieldControl(props, { supportsRequired: true });
+  const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
   return (
   <SwitchPrimitives.Root
     className={cn(

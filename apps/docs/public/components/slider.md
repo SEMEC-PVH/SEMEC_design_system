@@ -4,18 +4,18 @@ code: "slider"
 slug: "slider"
 file: "src/components/slider.tsx"
 category: "formularios"
-variants: "—"
+variants: "contrato: value · defaultValue · onValueChange(number[]) · name · id · invalid · disabled"
 ---
 
 # Slider — `slider`
 
-> Controle deslizante para faixas de valor.
+> Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares.
 
 **Arquivo:** `src/components/slider.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/slider`
 
 ## Variantes
 
-_Sem variantes_
+- **contrato**: value · defaultValue · onValueChange(number[]) · name · id · invalid · disabled
 
 ## Instalação (@semec/ds)
 
@@ -45,7 +45,7 @@ import { Slider } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `Slider` (Slider) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle deslizante para faixas de valor. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Slider` (Slider) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares. API e variantes: contrato: value · defaultValue · onValueChange(number[]) · name · id · invalid · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -65,6 +65,8 @@ export interface SliderProps
    * Sem ela, `aria-label`/`aria-labelledby` do Slider vão para os polegares.
    */
   getAriaLabel?: (index: number) => string;
+  /** Contrato de formulário (ADR-015): `true` vira `aria-invalid="true"` nos polegares. */
+  invalid?: boolean;
 }
 
 const Slider = React.forwardRef<
@@ -79,6 +81,7 @@ const Slider = React.forwardRef<
       "aria-describedby": ariaDescribedBy,
       "aria-invalid": ariaInvalid,
       getAriaLabel,
+      invalid,
       ...props
     },
     ref
@@ -92,6 +95,7 @@ const Slider = React.forwardRef<
         "aria-labelledby": ariaLabelledByProp,
         "aria-describedby": ariaDescribedBy,
         "aria-invalid": ariaInvalid,
+        invalid,
       },
       { labelable: false }
     );
@@ -125,7 +129,7 @@ const Slider = React.forwardRef<
             aria-labelledby={getAriaLabel ? undefined : ariaLabelledBy}
             aria-describedby={field["aria-describedby"] ?? ariaDescribedBy}
             aria-invalid={field["aria-invalid"] ?? ariaInvalid}
-            className="relative block h-5 w-5 rounded-full after:absolute after:-inset-3 after:content-[''] after:rounded-full border-2 border-primary bg-background shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50"
+            className="relative block h-5 w-5 rounded-full after:absolute after:-inset-3 after:content-[''] after:rounded-full border-2 border-primary bg-background shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 aria-[invalid=true]:border-destructive"
           />
         ))}
       </SliderPrimitive.Root>

@@ -4,18 +4,19 @@ code: "checkbox"
 slug: "caixa-de-marcacao"
 file: "src/components/checkbox.tsx"
 category: "formularios"
-variants: "estados: desmarcado · marcado (checked) · indeterminado · disabled"
+variants: "estados: desmarcado · marcado (checked) · indeterminado · disabled · inválido (invalid) · contrato: checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required"
 ---
 
 # Caixa de marcação — `checkbox`
 
-> Caixa de marcação com estado indeterminado.
+> Caixa de marcação com estado indeterminado. Mantém a API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.
 
 **Arquivo:** `src/components/checkbox.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/caixa-de-marcacao`
 
 ## Variantes
 
-- **estados**: desmarcado · marcado (checked) · indeterminado · disabled
+- **estados**: desmarcado · marcado (checked) · indeterminado · disabled · inválido (invalid)
+- **contrato**: checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required
 
 ## Instalação (@semec/ds)
 
@@ -39,12 +40,18 @@ import { Checkbox, Label } from "@semec/ds/react";
   <Checkbox id="termos" />
   <Label htmlFor="termos">Aceito os termos</Label>
 </div>
+
+// Controlado, com envio em <form> e erro (checked/onCheckedChange = value/onValueChange)
+<div className="flex items-center gap-2">
+  <Checkbox id="aceite" name="aceite" checked={aceito} onCheckedChange={(v) => setAceito(v === true)} invalid={!aceito && enviado} />
+  <Label htmlFor="aceite">Li e aceito o regulamento</Label>
+</div>
 ```
 
 ## Prompt para IA
 
 ```text
-Use o componente `Checkbox` (Caixa de marcação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Caixa de marcação com estado indeterminado. API e variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Checkbox` (Caixa de marcação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Caixa de marcação com estado indeterminado. Mantém a API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`. API e variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled · inválido (invalid) · contrato: checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -59,10 +66,13 @@ import { useFormFieldControl } from "./form-field";
 
 const Checkbox = React.forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> & {
+  /** Contrato de formulário (ADR-015): `true` vira `aria-invalid="true"` e o estilo de erro. */
+  invalid?: boolean;
+  }
+>(({ className, invalid, ...props }, ref) => {
   // Dentro de um FormField: id, aria-describedby, aria-invalid e aria-required.
-  const field = useFormFieldControl(props, { supportsRequired: true });
+  const field = useFormFieldControl({ ...props, invalid }, { supportsRequired: true });
   return (
   <CheckboxPrimitive.Root
     ref={ref}
