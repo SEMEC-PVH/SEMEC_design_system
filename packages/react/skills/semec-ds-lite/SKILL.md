@@ -215,9 +215,15 @@ Complementar com ícone, texto ou padrão. Link em texto corrido é sublinhado.
 - **Container:** `mx-auto w-full max-w-[75rem] px-4` (1200px) em todas as telas; texto corrido `max-w-prose`; formulário `max-w-3xl`.
 - **Títulos:** um `h1` por página com o nome da tarefa (`text-3xl font-bold`, 32px), `h2` em `text-2xl`, `h3` em `text-xl`, sem pular nível; `text-display` só no hero da página inicial.
 - **Marca e ação:** marca = `bg-brand-hero text-text-on-brand`; ação principal = `bg-primary` (um botão principal por grupo). Não use a cor de marca em botão nem a de ação como faixa institucional.
-- **Formulários:** label associado ao campo (placeholder não é rótulo); erro visível em texto, nunca só cor; resumo de erros no topo com link para cada campo e foco nele ao enviar.
+- **Formulários e Validação:**
+  - Label associado ao campo (`<label for="id">`; placeholder não é rótulo).
+  - Três padrões de erro:
+    1. *Inline no campo:* mensagem em texto abaixo do campo (`text-xs text-destructive`, `--feedback-danger: #b91c1c`, 5,98:1), campo com `aria-invalid="true"` e `aria-describedby="[id]-hint [id]-error"`. Sem `role="alert"` em listas para não interromper leitores de tela.
+    2. *Resumo no topo:* contêiner com `role="alert"`, `tabindex="-1"`, foco automático ao submeter e links para cada campo com erro (`<a href="#id">`).
+    3. *Erro de servidor:* caixa de aviso (`role="alert"`, fundo `--pv-red-50`, texto `--pv-red-700`) com instruções claras de recuperação.
+  - *Legenda Auxiliar de Ação / Download:* botões que geram efeitos secundários (ex.: download de PDF gerado) devem conter legenda explicativa complementar abaixo (`text-xs text-text-muted`).
 - **Navegação:** página atual com `aria-current="page"`; sidebar vira gaveta no mobile.
-- **Feedback:** avisos com ícone + título + texto; erro no contexto do campo.
+- **Feedback:** avisos com ícone + título + texto; erro no contexto do campo. Sucesso pós-envio via notificação ou mensagem confirmando protocolo.
 - **Tabelas:** `<table>` com `<caption>` e `<th scope>`; no mobile, menos colunas ou lista de cartões. Se a tabela rolar na horizontal sem nenhum elemento focável dentro, o contêiner que rola precisa de `tabindex="0"`, `role="region"` e `aria-label`.
 - **Estados vazios:** título, descrição e ação.
 

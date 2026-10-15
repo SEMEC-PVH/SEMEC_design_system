@@ -11,6 +11,7 @@ import {
   ErrorStateExtras,
   ErrorSummaryExtras,
   FileUploadExtras,
+  FormFieldExtras,
   SheetExtras,
   SidebarTriggerExtras,
 } from "@/components/demos/kit-extras";
@@ -33,6 +34,7 @@ const EXTRAS = {
   "menu-suspenso": <DropdownMenuExtras />,
   "error-summary": <ErrorSummaryExtras />,
   "estado-de-erro": <ErrorStateExtras />,
+  "campo-de-formulario": <FormFieldExtras />,
 };
 
 export async function generateMetadata({ params }) {

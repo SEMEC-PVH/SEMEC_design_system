@@ -332,66 +332,168 @@ Complementar cor com ícone, texto ou padrão (erro com mensagem, status com ró
 
 ## Padrão de formulários e feedback (Validação + Toast)
 
-Nos formulários do SEMEC DS, o ciclo de feedback segue uma regra estrita de UX e Acessibilidade (WCAG 2.1 AA):
+Nos formulários do SEMEC DS, o ciclo de validação e feedback segue três padrões consolidados de UX e Acessibilidade (WCAG 2.1 AA):
 
-1. **Erros de Validação (Inline + Resumo)**:
-   - Nunca use `Toast` para erros de preenchimento ou campos inválidos.
-   - Use `<ErrorSummary>` no topo (foco automático por padrão) para listar os erros com link para cada campo.
-   - Use `<FormField>` com `error={...}`: ele aplica `aria-invalid` e `aria-describedby` no controle filho.
+### Os Três Padrões de Tratamento de Erro
 
-2. **Sucesso na Submissão (Notificação via Toast)**:
-   - Notificações de confirmação pós-envio usam `toast({ variant: "success", title: "...", description: "..." })`.
-   - Pré-requisito: `<Toaster />` montado **uma vez** no root do app. Sem ele, `toast()` não mostra nada e não dá erro.
-   - O toast de sucesso já aplica a identidade SEMEC (fundo `--pv-green-500`, texto `--pv-blue-900`, Poppins, título 16px bold e descrição 14px regular). Não sobrescreva as cores.
+1. **Padrão 1: Erro Inline no Campo (`FormField`)**:
+   - Erros de validação pontuais exibidos imediatamente abaixo do controle correspondente.
+   - O `<FormField error={erro}>` aplica `aria-invalid="true"` e vincula o erro ao campo via `aria-describedby` automaticamente.
+   - **A11y:** Por padrão, a mensagem inline não possui `role="alert"` (anúncio assertivo interromperia leitores de tela caso existissem múltiplos erros; o erro é anunciado de forma natural ao focar o controle — AUD-22). Em campos avulsos fora de formulários agrupados, use `errorRole="alert"`.
+   - **Contraste:** A cor do erro é sempre `--feedback-danger` (`--pv-red-700`, `#b91c1c`), atingindo 5,98:1 sobre branco (excede 4,5:1).
+
+2. **Padrão 2: Resumo Consolidado no Topo (`ErrorSummary`)**:
+   - Obrigatório quando houver múltiplos campos ou formulários longos.
+   - Posicionado no início do `<form>`, com `role="alert"` e foco programático automático (`autoFocus` e `focusKey={tentativa}`).
+   - Cada erro é um link (`<a href="#<id>">`) com scroll suave e transferência de foco direta ao primeiro campo inválido.
+
+3. **Padrão 3: Erro de Submissão do Servidor (`Alert variant="destructive"`)**:
+   - Falhas globais de comunicação (timeout, 500, indisponibilidade) não pertencem a um campo isolado.
+   - Utilize `<Alert variant="destructive">` no topo do formulário com título e explicação clara de como proceder ou tentar novamente.
+
+### Padrão de Legenda Auxiliar de Ação / Download
+
+Quando o botão de submissão do formulário disparar uma ação de efeito secundário (como download imediato de arquivo gerado, emissão de PDF ou protocolo assíncrono), é obrigatório fornecer uma **Legenda Auxiliar de Ação / Download**:
+- Posicionada logo abaixo do `<Button variant="primary">`.
+- Estilizada com tipografia auxiliar acessível: `text-xs text-text-muted` (ou `text-muted-foreground`), garantindo contraste mínimo de 4,5:1.
+- Exemplo textual: *"Ao clicar, o arquivo PDF do requerimento será gerado e baixado automaticamente."*
+
+### Exemplo Canônico: React Hook Form + Zod + SEMEC DS
 
 ```tsx
-import { FormField, Input, ErrorSummary, Button, useToast } from "@semec/ds/react";
+import { FormField, Input, ErrorSummary, Alert, AlertTitle, AlertDescription, Button, useToast } from "@semec/ds/react";
+import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useState } from "react";
 
-export function ExemploFormulario() {
+const requerimentoSchema = z.object({
+  nome: z.string().min(3, "Informe o nome completo (ao menos 3 caracteres)."),
+  email: emailSchema,
+  cpf: cpfSchema,
+});
+
+type RequerimentoForm = z.infer<typeof requerimentoSchema>;
+
+export function FormularioRequerimento() {
   const { toast } = useToast();
-  const [cpf, setCpf] = useState("");
-  const [errors, setErrors] = useState<{ id: string; message: string }[]>([]);
-  const erroCpf = errors.find((e) => e.id === "cpf")?.message;
+  const [erroServidor, setErroServidor] = useState<string | null>(null);
+  const [tentativa, setTentativa] = useState(0);
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const novosErros = [];
-    if (cpf.replace(/\D/g, "").length !== 11) novosErros.push({ id: "cpf", message: "Informe um CPF com 11 dígitos." });
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RequerimentoForm>({
+    resolver: zodResolver(requerimentoSchema),
+  });
 
-    if (novosErros.length > 0) {
-      setErrors(novosErros);
-      return;
+  // Padrão 2: Resumo de erros para o topo
+  const errorSummaryItems = Object.entries(errors).map(([id, err]) => ({
+    id,
+    message: String(err?.message || "Campo inválido"),
+  }));
+
+  const onSubmit = async (dados: RequerimentoForm) => {
+    try {
+      setErroServidor(null);
+      // Simulação de envio da API:
+      // await api.post("/requerimentos", dados);
+
+      // Sucesso na submissão pós-envio via Toast:
+      toast({
+        variant: "success",
+        title: "Requerimento enviado com sucesso!",
+        description: "O protocolo foi gerado e o PDF baixado.",
+      });
+    } catch {
+      // Padrão 3: Erro de servidor via Alert destructive
+      setErroServidor("Falha ao comunicar com o servidor. Verifique a conexão e tente novamente.");
     }
-
-    setErrors([]);
-    toast({
-      variant: "success",
-      title: "Requerimento enviado com sucesso!",
-      description: "O protocolo foi gerado e enviado para análise.",
-    });
-  }
+  };
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="max-w-3xl space-y-4">
-      {errors.length > 0 && <ErrorSummary errors={errors} />}
-
-      <FormField label="CPF" htmlFor="cpf" required error={erroCpf}>
-        <Input
-          id="cpf"
-          value={cpf}
-          onChange={(e) => setCpf(e.target.value)}
+    <form
+      onSubmit={(e) => {
+        setTentativa((t) => t + 1);
+        handleSubmit(onSubmit)(e);
+      }}
+      noValidate
+      className="max-w-3xl space-y-4"
+    >
+      {/* Padrão 2: Resumo consolidado no topo */}
+      {errorSummaryItems.length > 0 && (
+        <ErrorSummary
+          title="Há pendências a corrigir antes de prosseguir"
+          errors={errorSummaryItems}
+          focusKey={tentativa}
         />
+      )}
+
+      {/* Padrão 3: Alerta de erro de servidor */}
+      {erroServidor && (
+        <Alert variant="destructive">
+          <AlertTitle>Não foi possível enviar</AlertTitle>
+          <AlertDescription>{erroServidor}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Padrão 1: Campos com validação inline */}
+      <FormField
+        label="Nome completo"
+        htmlFor="nome"
+        required
+        hint="Como consta no documento oficial"
+        error={errors.nome?.message}
+      >
+        <Input id="nome" {...register("nome")} />
       </FormField>
 
-      <Button type="submit" variant="primary">Enviar requerimento</Button>
+      <FormField
+        label="E-mail"
+        htmlFor="email"
+        required
+        hint="Para envio do comprovante"
+        error={errors.email?.message}
+      >
+        <Input id="email" type="email" {...register("email")} />
+      </FormField>
+
+      {/* Controller para componentes controlados ou máscaras */}
+      <Controller
+        name="cpf"
+        control={control}
+        render={({ field }) => (
+          <FormField
+            label="CPF"
+            htmlFor="cpf"
+            required
+            hint="000.000.000-00"
+            error={errors.cpf?.message}
+          >
+            <Input id="cpf" inputMode="numeric" {...field} />
+          </FormField>
+        )}
+      />
+
+      {/* Ação principal com Legenda Auxiliar */}
+      <div className="pt-2 space-y-2">
+        <Button type="submit" variant="primary">
+          Gerar e baixar requerimento
+        </Button>
+        <p className="text-xs text-text-muted">
+          Ao clicar, o arquivo PDF do requerimento será gerado e baixado automaticamente.
+        </p>
+      </div>
     </form>
   );
 }
 ```
 
 - Labels sempre associados via `htmlFor`/`id`
-- Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`
+- Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`, `cpfCnpjSchema`
 
 ## Responsive / Mobile
 

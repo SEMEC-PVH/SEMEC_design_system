@@ -367,16 +367,150 @@ function LabelPreview() {
 }
 
 function FormFieldPreview() {
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [tentativa, setTentativa] = useState(0);
+  const [erros, setErros] = useState({});
+  const [erroServidor, setErroServidor] = useState(null);
+  const [sucesso, setSucesso] = useState(false);
+
+  function validar(valores) {
+    const novos = {};
+    if (!valores.nome.trim()) {
+      novos.nome = "O nome completo é obrigatório.";
+    } else if (valores.nome.trim().length < 3) {
+      novos.nome = "Informe ao menos 3 caracteres.";
+    }
+    if (!valores.email.trim()) {
+      novos.email = "O e-mail é obrigatório.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valores.email)) {
+      novos.email = "Informe um endereço de e-mail válido (ex: nome@semec.pvh.br).";
+    }
+    const cpfDigitos = valores.cpf.replace(/\D/g, "");
+    if (!cpfDigitos) {
+      novos.cpf = "O CPF é obrigatório.";
+    } else if (cpfDigitos.length !== 11) {
+      novos.cpf = "O CPF precisa conter 11 dígitos.";
+    }
+    return novos;
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    setSucesso(false);
+    setErroServidor(null);
+    setTentativa((t) => t + 1);
+
+    const listaErros = validar({ nome, email, cpf });
+    setErros(listaErros);
+
+    const keys = Object.keys(listaErros);
+    if (keys.length > 0) {
+      return;
+    }
+
+    if (email.includes("erro@")) {
+      setErroServidor("Não foi possível conectar ao servidor da SEMEC. Tente novamente mais tarde.");
+      return;
+    }
+
+    setSucesso(true);
+  }
+
+  const errorSummaryItems = [
+    erros.nome ? { id: "preview-nome", message: erros.nome } : null,
+    erros.email ? { id: "preview-email", message: erros.email } : null,
+    erros.cpf ? { id: "preview-cpf", message: erros.cpf } : null,
+  ].filter(Boolean);
+
   return (
-    <div className="w-full max-w-xs rounded-lg border border-border bg-surface p-4 text-left">
-      <div className="flex flex-col gap-5">
-        <FormField label="E-mail" htmlFor="p-email" required hint="Usado para enviar o comprovante">
-          <Input id="p-email" type="email" />
+    <div className="w-full max-w-lg rounded-lg border border-border bg-surface p-6 text-left shadow-elevation-1">
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
+        {/* Padrão 2: Resumo consolidado no topo */}
+        {errorSummaryItems.length > 0 && (
+          <ErrorSummary
+            title="Corrija os campos abaixo antes de enviar"
+            errors={errorSummaryItems}
+            focusKey={tentativa}
+          />
+        )}
+
+        {/* Padrão 3: Erro de submissão do servidor */}
+        {erroServidor && (
+          <Alert variant="destructive">
+            <AlertTitle>Falha na comunicação</AlertTitle>
+            <AlertDescription>{erroServidor}</AlertDescription>
+          </Alert>
+        )}
+
+        {sucesso && (
+          <Alert variant="success">
+            <AlertTitle>Requerimento protocolado!</AlertTitle>
+            <AlertDescription>
+              Os dados foram validados e o documento PDF foi gerado.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Padrão 1: Erros inline com FormField */}
+        <FormField
+          label="Nome completo"
+          htmlFor="preview-nome"
+          required
+          hint="Como consta no documento oficial"
+          error={erros.nome}
+        >
+          <Input
+            id="preview-nome"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            placeholder="Ex: Maria Pereira da Silva"
+          />
         </FormField>
-        <FormField label="Telefone" htmlFor="p-tel" error="Formato inválido. Use (RO) 90000-0000.">
-          <Input id="p-tel" aria-invalid="true" defaultValue="123" />
+
+        <FormField
+          label="E-mail para comprovante"
+          htmlFor="preview-email"
+          required
+          hint="Digite erro@... para simular falha no servidor"
+          error={erros.email}
+        >
+          <Input
+            id="preview-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="contribuinte@pvh.ro.gov.br"
+          />
         </FormField>
-      </div>
+
+        <FormField
+          label="CPF do titular"
+          htmlFor="preview-cpf"
+          required
+          hint="Apenas números (000.000.000-00)"
+          error={erros.cpf}
+        >
+          <Input
+            id="preview-cpf"
+            inputMode="numeric"
+            value={cpf}
+            onChange={(e) => setCpf(e.target.value)}
+            placeholder="000.000.000-00"
+          />
+        </FormField>
+
+        {/* Padrão de Ação + Legenda Auxiliar de Ação / Download */}
+        <div className="pt-2 space-y-2">
+          <Button type="submit" variant="primary">
+            Gerar e baixar requerimento
+          </Button>
+          <p className="text-xs text-text-muted">
+            Ao clicar, o arquivo PDF do requerimento será gerado e baixado automaticamente.
+          </p>
+        </div>
+      </form>
     </div>
   );
 }

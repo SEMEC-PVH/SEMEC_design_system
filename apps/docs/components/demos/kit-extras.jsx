@@ -208,6 +208,27 @@ export function DropdownMenuExtras() {
   );
 }
 
+export function FormFieldExtras() {
+  return (
+    <Prose
+      quandoUsar="Para estruturar todo campo interativo de formulário (Input, Textarea, Select, Combobox, DatePicker, Checkbox, RadioGroup, Switch, FileUpload, InputOTP, Slider). Ele garante que rótulo, indicador obrigatório (*), texto de apoio e mensagem de erro estejam na ordem semântica correta e ligados via acessibilidade sem esforço manual."
+      quandoNaoUsar="Para botões de ação isolados ou links de navegação avulsos fora do contexto de campo rotulável. Não use FormField para exibir alertas globais de página — para isso utilize Alert, ErrorSummary ou ErrorState."
+      a11y={[
+        "Associação semântica completa: id, label (htmlFor / aria-labelledby), hint e error (aria-describedby) e aria-invalid chegam automaticamente ao controle filho.",
+        "Três padrões de erro: 1. Erro inline no campo (via prop error, anunciado ao focar o campo); 2. Resumo consolidado no topo via ErrorSummary (com foco automático e links âncora para os campos); 3. Erro de submissão do servidor (Alert destructive no topo ou campos específicos).",
+        "role=\"alert\": por padrão a mensagem inline não usa role=\"alert\" para não poluir ou interromper leitores de tela quando há múltiplos campos inválidos (o resumo assume o anúncio imediato, AUD-22). Em campos avulsos, pode ser ativado com errorRole=\"alert\".",
+        "Contraste da mensagem de erro: utiliza var(--feedback-danger) / --pv-red-700 (#b91c1c), garantindo 5,98:1 sobre fundo branco (superando o critério WCAG AA de 4.5:1).",
+        "Legenda auxiliar de ação / download: botões de envio que geram efeitos secundários (ex.: download de PDF ou envio assíncrono) devem conter legenda explicativa complementar abaixo do botão (ex.: text-xs text-muted-foreground) associada ao botão ou visualmente orientada.",
+      ]}
+    >
+      <h3>Padrão Canônico com React Hook Form e Zod</h3>
+      <p className="text-sm text-muted-foreground">
+        O <code>FormField</code> integra-se de forma transparente com <code>react-hook-form</code> tanto via <code>register</code> quanto via <code>Controller</code>, recebendo a mensagem de erro direto de <code>errors[field]?.message</code>:
+      </p>
+    </Prose>
+  );
+}
+
 export function ErrorSummaryExtras() {
   return (
     <Prose
