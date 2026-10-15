@@ -303,7 +303,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Envio de arquivos",
     file: "src/components/file-upload.tsx",
     category: "formularios",
-    desc: "Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai).",
+    desc: "Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio.",
     variants: [
       { prop: "props", values: "accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels" },
       { prop: "deprecadas", values: "onChange(files) (use onValueChange; sai na 4.0)" },

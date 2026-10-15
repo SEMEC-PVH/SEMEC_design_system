@@ -25,6 +25,7 @@
       "types": "./dist/react/server.d.ts",
       "import": "./dist/react/server.js"
     },
+    "./react/button-loading": null,
     "./react/*": {
       "types": "./dist/react/components/*.d.ts",
       "import": "./dist/react/components/*.js"

@@ -45,7 +45,7 @@ npm install @semec/ds
   Uso: `import { Combobox } from "@semec/ds/react";`
 - [Seletor de data (`date-picker`) — Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).](/componentes/seletor-de-data) — `src/components/date-picker.tsx` — md: `/components/seletor-de-data.md`
   Uso: `import { DatePicker } from "@semec/ds/react";`
-- [Envio de arquivos (`file-upload`) — Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai).](/componentes/envio-de-arquivos) — `src/components/file-upload.tsx` — md: `/components/envio-de-arquivos.md`
+- [Envio de arquivos (`file-upload`) — Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio.](/componentes/envio-de-arquivos) — `src/components/file-upload.tsx` — md: `/components/envio-de-arquivos.md`
   Uso: `import { FileUpload } from "@semec/ds/react";`
 - [Caixa de marcação (`checkbox`) — Caixa de marcação com estado indeterminado. Mantém a API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.](/componentes/caixa-de-marcacao) — `src/components/checkbox.tsx` — md: `/components/caixa-de-marcacao.md`
   Uso: `import { Checkbox } from "@semec/ds/react";`
@@ -162,4 +162,4 @@ Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback
 3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`
 4. Aplique tokens L1 (`--action-primary` etc.), nunca hex solto
 
-> Gerado 2026-10-15T12:33:56.000Z a partir de packages/react/manifest.js. Versão 3.1.0.
+> Gerado 2026-10-15T13:07:01.000Z a partir de packages/react/manifest.js. Versão 3.1.0.

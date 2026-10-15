@@ -34,6 +34,9 @@ import { Stepper as SubStepper, type StepperProps } from "@semec/ds/react/steppe
 import { InputMask as SubInputMask, applyInputMask, inputMaskPatterns, type InputMaskPreset } from "@semec/ds/react/input-mask";
 import { PasswordInput as SubPasswordInput, type PasswordInputProps } from "@semec/ds/react/password-input";
 import { FormField as SubFormField, useFormFieldControl } from "@semec/ds/react/form-field";
+// Módulo interno do loading: fica fora dos exports e não pode resolver.
+// @ts-expect-error
+import { ButtonLoadingIndicator } from "@semec/ds/react/button-loading";
 
 // O subpath tem de expor o mesmo símbolo da raiz.
 const same: [typeof Button, typeof Stepper, typeof InputMask, typeof PasswordInput, typeof FormField] = [
@@ -94,7 +97,7 @@ try {
     console.error("check-dts: os .d.ts publicados não compilam como consumidor nodenext:");
     console.error((result.stdout || "") + (result.stderr || ""));
   } else {
-    console.log("check-dts: ok (@semec/ds/react e subpaths button, stepper, input-mask, password-input, form-field; nodenext, skipLibCheck false).");
+    console.log("check-dts: ok (@semec/ds/react e subpaths button, stepper, input-mask, password-input, form-field; button-loading fechado; nodenext, skipLibCheck false).");
   }
 } finally {
   fs.rmSync(dir, { recursive: true, force: true });

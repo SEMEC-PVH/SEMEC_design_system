@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
   "version": "3.1.0",
-  "generatedAt": "2026-10-15T12:33:56.000Z",
+  "generatedAt": "2026-10-15T13:07:01.000Z",
   "componentCount": 55,
   "categories": [
     {
@@ -285,7 +285,7 @@
       "exportName": "FileUpload",
       "file": "src/components/file-upload.tsx",
       "category": "formularios",
-      "desc": "Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai).",
+      "desc": "Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio.",
       "variants": [
         {
           "prop": "props",
@@ -297,7 +297,7 @@
         }
       ],
       "usage": "import { FileUpload } from \"@semec/ds/react\";\n\n// `label` é o rótulo do campo de arquivo — não omita\n<FileUpload\n  label=\"Documento de identidade\"\n  accept=\".pdf,image/*\"\n  maxSize={5 * 1024 * 1024}\n  hint=\"PDF ou imagem, até 5 MB\"\n  value={arquivos}\n  onValueChange={setArquivos}\n/>\n\n// Textos fixos sobrescrevíveis (padrão PT-BR)\n<FileUpload label=\"Anexo\" labels={{ invalidType: \"Envie só PDF.\", tooLarge: (max) => `Máximo de ${max}.` }} />",
-      "prompt": "Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). API e variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · deprecadas: onChange(files) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "prompt": "Use o componente `FileUpload` (Envio de arquivos) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio. API e variantes: props: accept · maxSize · label · hint · error · invalid · onValueChange(files) · value · multiple · id · name · required · disabled · inputProps · labels · deprecadas: onChange(files) (use onValueChange; sai na 4.0). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/envio-de-arquivos",
       "md": "/components/envio-de-arquivos.md"
     },
