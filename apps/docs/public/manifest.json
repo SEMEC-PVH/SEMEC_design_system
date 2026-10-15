@@ -1,8 +1,8 @@
 {
   "name": "SEMEC Design System",
   "version": "3.1.0",
-  "generatedAt": "2026-10-14T19:05:44.000Z",
-  "componentCount": 52,
+  "generatedAt": "2026-10-15T11:53:28.000Z",
+  "componentCount": 55,
   "categories": [
     {
       "key": "acoes",
@@ -43,7 +43,7 @@
       "exportName": "Button",
       "file": "src/components/button.tsx",
       "category": "acoes",
-      "desc": "Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida.",
+      "desc": "Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.",
       "variants": [
         {
           "prop": "variant",
@@ -52,10 +52,14 @@
         {
           "prop": "size",
           "values": "sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px)"
+        },
+        {
+          "prop": "loading",
+          "values": "false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento)"
         }
       ],
-      "usage": "import { Button } from \"@semec/ds/react\";\nimport Link from \"next/link\";\nimport { Plus } from \"lucide-react\";\n\n<Button variant=\"primary\">Emitir boleto</Button>\n<Button variant=\"outline\">Salvar rascunho</Button>\n<Button variant=\"ghost\">Cancelar</Button>\n\n<Button variant=\"destructive\">Excluir requerimento</Button>\n\n<Button><Plus /> Adicionar serviço</Button>\n\n<Button asChild>\n  <Link href=\"/iptu\">Ver meu IPTU</Link>\n</Button>",
-      "prompt": "Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { Button } from \"@semec/ds/react\";\nimport Link from \"next/link\";\nimport { Plus } from \"lucide-react\";\n\n<Button variant=\"primary\">Emitir boleto</Button>\n<Button variant=\"outline\">Salvar rascunho</Button>\n<Button variant=\"ghost\">Cancelar</Button>\n\n<Button variant=\"destructive\">Excluir requerimento</Button>\n\n<Button><Plus /> Adicionar serviço</Button>\n\n<Button asChild>\n  <Link href=\"/iptu\">Ver meu IPTU</Link>\n</Button>\n\n// Envio em andamento: o foco fica no botão e o clique é ignorado\n<Button type=\"submit\" loading={enviando} loadingText=\"Enviando…\">\n  Enviar requerimento\n</Button>",
+      "prompt": "Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/botoes",
       "md": "/components/botoes.md"
     },
@@ -66,15 +70,19 @@
       "exportName": "IconButton",
       "file": "src/components/icon-button.tsx",
       "category": "acoes",
-      "desc": "Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).",
+      "desc": "Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome.",
       "variants": [
         {
           "prop": "variant",
           "values": "primary · secondary · outline · ghost · destructive · link"
+        },
+        {
+          "prop": "loading",
+          "values": "false (padrão) · true (Spinner no lugar do ícone, aria-busy, aria-disabled, clique bloqueado)"
         }
       ],
-      "usage": "import { IconButton } from \"@semec/ds/react\";\nimport { Download, Search, Trash2 } from \"lucide-react\";\n\n<IconButton label=\"Buscar requerimento\"><Search /></IconButton>\n<IconButton label=\"Baixar carnê\"><Download /></IconButton>\n<IconButton label=\"Excluir requerimento\" variant=\"destructive\"><Trash2 /></IconButton>",
-      "prompt": "Use o componente `IconButton` (Botão de ícone) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). API e variantes: variant: primary · secondary · outline · ghost · destructive · link. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { IconButton } from \"@semec/ds/react\";\nimport { Download, Search, Trash2 } from \"lucide-react\";\n\n<IconButton label=\"Buscar requerimento\"><Search /></IconButton>\n<IconButton label=\"Baixar carnê\"><Download /></IconButton>\n<IconButton label=\"Excluir requerimento\" variant=\"destructive\"><Trash2 /></IconButton>\n<IconButton label=\"Baixar carnê\" loading={baixando}><Download /></IconButton>",
+      "prompt": "Use o componente `IconButton` (Botão de ícone) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome. API e variantes: variant: primary · secondary · outline · ghost · destructive · link · loading: false (padrão) · true (Spinner no lugar do ícone, aria-busy, aria-disabled, clique bloqueado). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/botao-de-icone",
       "md": "/components/botao-de-icone.md"
     },
@@ -119,6 +127,60 @@
       "prompt": "Use o componente `Input` (Caixa de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de texto. Estado de erro via `aria-invalid`. Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. API e variantes: estados: padrão · inválido (aria-invalid) · disabled. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/caixa-de-texto",
       "md": "/components/caixa-de-texto.md"
+    },
+    {
+      "code": "password-input",
+      "slug": "campo-de-senha",
+      "label": "Campo de senha",
+      "exportName": "PasswordInput",
+      "file": "src/components/password-input.tsx",
+      "category": "formularios",
+      "desc": "Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo (\"Mostrar senha\") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Repassa todas as props do `Input`, inclusive `autoComplete`.",
+      "variants": [
+        {
+          "prop": "visibilidade",
+          "values": "defaultVisible · visible + onVisibleChange (controlado)"
+        },
+        {
+          "prop": "labels",
+          "values": "show (padrão \"Mostrar senha\")"
+        },
+        {
+          "prop": "autoComplete",
+          "values": "current-password (login) · new-password (cadastro e troca de senha)"
+        }
+      ],
+      "usage": "import { FormField, PasswordInput } from \"@semec/ds/react\";\n\n<FormField label=\"Senha\" hint=\"Mínimo de 8 caracteres\">\n  <PasswordInput autoComplete=\"current-password\" />\n</FormField>\n\n<FormField label=\"Nova senha\">\n  <PasswordInput autoComplete=\"new-password\" />\n</FormField>",
+      "prompt": "Use o componente `PasswordInput` (Campo de senha) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo (\"Mostrar senha\") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Repassa todas as props do `Input`, inclusive `autoComplete`. API e variantes: visibilidade: defaultVisible · visible + onVisibleChange (controlado) · labels: show (padrão \"Mostrar senha\") · autoComplete: current-password (login) · new-password (cadastro e troca de senha). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "url": "/componentes/campo-de-senha",
+      "md": "/components/campo-de-senha.md"
+    },
+    {
+      "code": "input-mask",
+      "slug": "campo-com-mascara",
+      "label": "Campo com máscara",
+      "exportName": "InputMask",
+      "file": "src/components/input-mask.tsx",
+      "category": "formularios",
+      "desc": "Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio, colar valor com outra pontuação funciona e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.",
+      "variants": [
+        {
+          "prop": "mask",
+          "values": "cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: \"AAA-9*99\")"
+        },
+        {
+          "prop": "valor",
+          "values": "defaultValue · value + onValueChange(masked, raw)"
+        },
+        {
+          "prop": "inputMode",
+          "values": "numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível"
+        }
+      ],
+      "usage": "import { FormField, InputMask } from \"@semec/ds/react\";\n\n<FormField label=\"CPF\" hint=\"Somente números\">\n  <InputMask mask=\"cpf\" onValueChange={(masked, raw) => setCpf(raw)} />\n</FormField>\n\n<FormField label=\"Telefone\">\n  <InputMask mask=\"telefone\" autoComplete=\"tel-national\" />\n</FormField>\n\n<FormField label=\"CEP\">\n  <InputMask mask=\"cep\" autoComplete=\"postal-code\" />\n</FormField>\n\n// Padrão próprio: placa de veículo (9 dígito, A letra, * letra ou dígito)\n<FormField label=\"Placa do veículo\">\n  <InputMask mask=\"AAA-9*99\" />\n</FormField>",
+      "prompt": "Use o componente `InputMask` (Campo com máscara) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio, colar valor com outra pontuação funciona e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara. API e variantes: mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: \"AAA-9*99\") · valor: defaultValue · value + onValueChange(masked, raw) · inputMode: numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "url": "/componentes/campo-com-mascara",
+      "md": "/components/campo-com-mascara.md"
     },
     {
       "code": "textarea",
@@ -536,6 +598,37 @@
       "md": "/components/cabecalho.md"
     },
     {
+      "code": "stepper",
+      "slug": "etapas",
+      "label": "Etapas",
+      "exportName": "Stepper",
+      "file": "src/components/stepper.tsx",
+      "category": "navegacao",
+      "desc": "Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current=\"step\"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.",
+      "variants": [
+        {
+          "prop": "orientation",
+          "values": "horizontal (padrão; empilha abaixo de 768px) · vertical"
+        },
+        {
+          "prop": "estados",
+          "values": "concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only"
+        },
+        {
+          "prop": "interação",
+          "values": "onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual)"
+        },
+        {
+          "prop": "labels",
+          "values": "list · position(n, total) · complete · current · upcoming"
+        }
+      ],
+      "usage": "import { Stepper } from \"@semec/ds/react\";\n\nconst etapas = [\n  { label: \"Dados do estudante\" },\n  { label: \"Documentos\", description: \"RG, CPF e comprovante de residência\" },\n  { label: \"Revisão e envio\" },\n];\n\n<Stepper steps={etapas} currentStep={1} />\n\n// Voltar a uma etapa já preenchida\n<Stepper steps={etapas} currentStep={2} onStepClick={(i) => setEtapa(i)} />",
+      "prompt": "Use o componente `Stepper` (Etapas) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current=\"step\"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px. API e variantes: orientation: horizontal (padrão; empilha abaixo de 768px) · vertical · estados: concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only · interação: onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual) · labels: list · position(n, total) · complete · current · upcoming. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "url": "/componentes/etapas",
+      "md": "/components/etapas.md"
+    },
+    {
       "code": "skip-link",
       "slug": "link-para-o-conteudo",
       "label": "Link para o conteúdo",
@@ -903,15 +996,19 @@
       "exportName": "Spinner",
       "file": "src/components/spinner.tsx",
       "category": "feedback",
-      "desc": "Indicador de carregamento inline (role=status).",
+      "desc": "Indicador de carregamento inline (role=status). Com `decorative`, é só visual (sem role, aria-label nem texto sr-only), para quando outro elemento já anuncia o carregamento; é o que o `Button` com `loading` usa.",
       "variants": [
         {
           "prop": "label",
           "values": "texto anunciado (padrão \"Carregando\")"
+        },
+        {
+          "prop": "decorative",
+          "values": "false (padrão, role=status) · true (aria-hidden, sem nome; raiz <span>)"
         }
       ],
-      "usage": "import { Spinner } from \"@semec/ds/react\";\n\n<Spinner label=\"Carregando protocolos\" />\n<p className=\"text-muted-foreground\">Carregando dados…</p>",
-      "prompt": "Use o componente `Spinner` (Spinner) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Indicador de carregamento inline (role=status). API e variantes: label: texto anunciado (padrão \"Carregando\"). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { Spinner } from \"@semec/ds/react\";\n\n<Spinner label=\"Carregando protocolos\" />\n<p className=\"text-muted-foreground\">Carregando dados…</p>\n\n// Só visual: o texto ao lado já diz o que está acontecendo\n<p className=\"flex items-center gap-2\"><Spinner decorative /> Atualizando a lista…</p>",
+      "prompt": "Use o componente `Spinner` (Spinner) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Indicador de carregamento inline (role=status). Com `decorative`, é só visual (sem role, aria-label nem texto sr-only), para quando outro elemento já anuncia o carregamento; é o que o `Button` com `loading` usa. API e variantes: label: texto anunciado (padrão \"Carregando\") · decorative: false (padrão, role=status) · true (aria-hidden, sem nome; raiz <span>). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "/componentes/spinner",
       "md": "/components/spinner.md"
     },

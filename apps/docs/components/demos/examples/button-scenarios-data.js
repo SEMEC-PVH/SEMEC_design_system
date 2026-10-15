@@ -25,10 +25,11 @@ export const buttonDestructiveUsage = `import { Button, Dialog, DialogClose, Dia
 </Dialog>`;
 
 export const buttonLoadingUsage = `import { Button } from "semec-ds/react";
-import { Loader2, Send } from "lucide-react";
+import { Send } from "lucide-react";
 
-<Button disabled={loading}>
-  {loading ? (<><Loader2 className="animate-spin" /> Enviando…</>) : (<><Send /> Enviar requerimento</>)}
+// loading: Spinner decorativo, aria-busy e aria-disabled; o foco fica no botão
+<Button type="submit" loading={loading} loadingText="Enviando…">
+  <Send /> Enviar requerimento
 </Button>`;
 
 export const buttonAsLinkUsage = `import { Button } from "semec-ds/react";
