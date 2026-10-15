@@ -6,6 +6,8 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 # SEMEC Design System — skill lite
 
+> Gerado para `@semec/ds@4.0.0` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
+
 Tokens, acessibilidade, responsive e padrões visuais para interfaces da Prefeitura de Porto Velho. **Sem componentes React.**
 
 Para UI com o kit React (`@semec/ds`), use a skill `semec-ds`.
@@ -16,19 +18,34 @@ Para UI com o kit React (`@semec/ds`), use a skill `semec-ds`.
 npm install @semec/ds
 ```
 
+### Com Tailwind v4
+
 ```css
 @import "tailwindcss";
-@import "@semec/ds/react/fonts.css";
+@import "@semec/ds/lite/fonts.css";
 @import "@semec/ds/lite/tokens.css";
 ```
 
+O Tailwind v4 precisa estar ligado ao bundler (Vite: `npm install -D tailwindcss @tailwindcss/vite` e `tailwindcss()` nos `plugins` do `vite.config`; Next: o `create-next-app` já traz). Num template novo, troque o CSS global inteiro por essas linhas: estilos do template fora de camada (`body { font-family: Arial… }`, `:root`, `@theme inline`, `@media (prefers-color-scheme: dark)`) vencem o `@layer base` do `tokens.css`.
+
 **Sem `@source`.** A variante lite não usa os componentes React, então o Tailwind só precisa varrer o código do próprio app (detecção automática; para limitar: `@import "tailwindcss" source("../src");`, caminho relativo ao CSS). O `@source` para `dist/react` só é necessário com a skill `semec-ds`, que usa os componentes.
 
-O `npm install` traz junto as dependências do kit React (o pacote é um só); a variante lite não as importa, então elas não entram no seu bundle.
+O `npm install` traz junto as dependências do kit React (o pacote é um só) e, no npm 7+, também os peers dele (`react`, `react-dom`, `lucide-react`); a variante lite não os importa, então nada disso entra no seu bundle. No pnpm e no Yarn, o aviso de peer ausente desses pacotes pode ser ignorado na lite.
 
-**Fonte:** `@semec/ds/react/fonts.css` traz a Poppins 400/500/600/700 (SIL OFL) e vai **antes** do `tokens.css`. Sem ela, o texto cai em `system-ui`. Não existem pesos 800/900.
+**Fonte:** `@semec/ds/lite/fonts.css` (o mesmo arquivo de `@semec/ds/react/fonts.css`) traz a Poppins 400/500/600/700 (SIL OFL) e vai **antes** do `tokens.css`. Sem ela, o texto cai em `system-ui`. Não existem pesos 800/900.
 
-**Sem Tailwind:** as variáveis do `:root` (`--bg`, `--action-primary`…) e a camada base (foco visível, reduced motion) funcionam em CSS puro com `var()`; os utilitários da tabela abaixo dependem do Tailwind v4 processar o `tokens.css`.
+### Sem Tailwind
+
+As variáveis do `:root` (`--bg`, `--action-primary`…) e a camada base (foco visível, links, reduced motion) funcionam em CSS puro com `var()`; os blocos `@theme` e `@utility` são ignorados pelo navegador, e os utilitários da tabela abaixo só existem com o Tailwind v4 processando o `tokens.css`.
+
+Os subpaths `@semec/ds/lite/*.css` só resolvem **num bundler** (Vite, Next, webpack): `import "@semec/ds/lite/fonts.css"; import "@semec/ds/lite/tokens.css";` no JS de entrada, ou `@import` num CSS que o bundler processa. Num `<link>` (HTML estático, servidor sem bundler) o navegador não conhece o `exports` do pacote; aponte para os arquivos reais, `fonts.css` antes do `tokens.css`:
+
+```html
+<link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/fonts.css" />
+<link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/tokens.css" />
+```
+
+Se o servidor não publica `node_modules`, copie `dist/react/tokens.css`, `dist/react/fonts.css` e a pasta `dist/react/fonts/` para a pasta estática, mantendo `fonts/` ao lado do `fonts.css` (as URLs dos `.woff2` são relativas a ele).
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0).
 
