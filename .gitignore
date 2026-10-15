@@ -46,3 +46,6 @@ next-env.d.ts
 # agent dirs gerados no build (ADR-023)
 .claude/
 .opencode/
+
+# Consumidor temporário do check-dts (packages/react/scripts/check-dts.mjs)
+.check-dts-*/
