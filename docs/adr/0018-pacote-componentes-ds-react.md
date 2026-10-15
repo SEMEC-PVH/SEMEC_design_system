@@ -1,13 +1,16 @@
 ---
 adr: 18
 titulo: "Pacote de componentes @semec/ds-react, com tokens e config embutidos por ora"
-status: Aceito
+status: Substituído por 022
+substituido_por: 22
 data: 2026-09-15
 ---
 
 # ADR-018 — Pacote de componentes `@semec/ds-react`
 
-**Status:** Aceito (15/09/2026).
+**Status:** Substituído por [ADR-022](0022-publicacao-npm-publico.md). Aceito em 15/09/2026.
+
+> **Nota (15/10/2026, AUD-47; não altera o texto original).** O ADR-022 (17/09/2026) unificou os pacotes em `@semec/ds`, publicado no npm público; o nome `@semec/ds-react` e o `shadcn.css` citados abaixo não existem mais (o `shadcn.css` saiu na 2.0.0). Os componentes continuam em `packages/react/` e o `manifest.js` segue como fonte única dos artefatos para agentes.
 
 **Contexto.** O kit de componentes vivia em `base/` sob o nome `@semec/base`, enquanto o [ADR-002](0002-monorepo-pnpm-multiplos-pacotes.md) e o [ADR-006](0006-react-19-fronteira-cliente-rsc.md) já falavam em `@semec/ds-react` e `@semec/ds-react/button`. Essa divergência de nomes obrigava quem lia a documentação a traduzir entre o que estava escrito e o que existia.
 
