@@ -48,7 +48,7 @@ Duas regras que o próprio site publica e que valem para quem edita o site:
 
 ## 4. Revisão
 
-Todo pull request é revisado por **pessoa diferente de quem implementou**. A revisão cobre código e acessibilidade.
+Sempre que houver outra pessoa disponível, o pull request é revisado por **alguém diferente de quem implementou**. A revisão cobre código e acessibilidade. Desde 15/10/2026, a aprovação de outra pessoa **não é obrigatória na proteção do `main`**: a equipe ativa é pequena, e exigir aprovação travaria todo merge. O que é obrigatório é a CI verde (ver "Proteção do main"). Sem revisor, o próprio autor percorre o checklist abaixo antes do merge.
 
 O axe roda nos testes do kit (`npm test`, em `packages/react/test/`) e no `gate` da CI, mas cobre só o que os testes montam; páginas do site, composições novas e contraste de cor nova continuam com verificação **manual** — e ela precisa ser feita de fato, porque o [ADR-014](docs/adr/0014-wcag-21-aa-criterio-bloqueante.md) trata WCAG 2.1 AA como critério bloqueante e a auditoria encontrou seis falhas de contraste em componentes já publicados como oficiais:
 
@@ -57,11 +57,11 @@ O axe roda nos testes do kit (`npm test`, em `packages/react/test/`) e no `gate`
 - **calcular o contraste** de qualquer par de cores novo (4.5:1 para texto normal, 3:1 para texto grande e para elemento de interface);
 - conferir que imagem tem texto alternativo e que a hierarquia de títulos não pula nível.
 
-Quem revisa é um **code owner** (`.github/CODEOWNERS`) diferente do autor. Com a proteção do `main` aplicada (ver "Proteção do main" abaixo), o GitHub só libera o merge com essa aprovação e com a CI verde.
+Quando há revisão, quem revisa é preferencialmente um **code owner** (`.github/CODEOWNERS`) diferente do autor. O GitHub só libera o merge com a CI verde (ver "Proteção do main").
 
 ## 5. Merge
 
-Aprovado e com a CI verde, o pull request entra por merge no `main`. Nada entra no `main` por push direto. O que acontece depois com o pacote está em "Publicação e versionamento", abaixo: o merge de um PR com changeset **não publica sozinho**: os changesets se acumulam no `main` até um mantenedor abrir o PR de versão, e a publicação acontece quando esse PR é mergeado.
+Com a CI verde (e revisado, quando houver revisor), o pull request entra por merge no `main`. Nada entra no `main` por push direto: a proteção bloqueia, inclusive para admins. O que acontece depois com o pacote está em "Publicação e versionamento", abaixo: o merge de um PR com changeset **não publica sozinho**: os changesets se acumulam no `main` até um mantenedor abrir o PR de versão, e a publicação acontece quando esse PR é mergeado.
 
 ## O que um pull request precisa ter hoje
 
@@ -78,7 +78,7 @@ O template de PR (`.github/pull_request_template.md`) repete esta lista.
 - [ ] Página conferida com teclado, foco visível ponta a ponta
 - [ ] Contraste calculado para qualquer cor nova
 - [ ] Nenhum hex, `rgba()` ou `style` inline novo fora das variáveis existentes
-- [ ] Revisão de outra pessoa
+- [ ] Revisão de outra pessoa, quando houver revisor disponível (não obrigatória desde 15/10/2026)
 - [ ] Mensagens de commit na convenção abaixo
 
 **Scripts que existem hoje** (na raiz, delegando para `apps/docs` e `packages/react`): `dev`, `build`, `build:ds`, `start`, `lint`, `typecheck`, `test`, `generate:llms`, `check:artifacts`, `proto:css`, `gate`, `changeset`, `changeset:check`, `version-packages`, `release`.
@@ -113,25 +113,22 @@ Se a mudança em arquivo publicado realmente não precisa de versão nova (ex.: 
 
 ## Proteção do main
 
-O `CODEOWNERS` e os checks da CI só obrigam alguma coisa quando o `main` está protegido. Isso é **configuração do repositório no GitHub**, não arquivo — um admin precisa aplicar uma vez. Até lá, a regra da seção 4 ("revisão por pessoa diferente") depende só de disciplina.
-
-**Code owners.** A organização `SEMEC-PVH` não tem times (`gh api orgs/SEMEC-PVH/teams` devolve `[]`), então `.github/CODEOWNERS` lista usuários: `@Rug-gieri` e `@VgavaBR123`, os dois admins que mais contribuem. Como o GitHub não aceita que o autor aprove o próprio PR, o PR de um precisa da aprovação do outro. Para não depender de duas pessoas só, inclua mais gente com permissão de escrita (hoje: `pdrokbott`, `RomuloMaltez`, `LeonardoSeijiNakayama`, `MariMeng`, `ThiagoACNascimento`) ou crie o time `design-system` na organização e troque as linhas por `@SEMEC-PVH/design-system`.
+**Aplicada em 15/10/2026** (#32). A regra é configuração do repositório no GitHub, não arquivo.
 
 **O que a proteção exige:**
 
-- PR obrigatório para entrar no `main` (sem push direto, inclusive para admins);
-- 1 aprovação, de code owner, descartada se chegarem commits novos, e a aprovação precisa vir de alguém que não fez o último push;
+- PR obrigatório para entrar no `main`, sem push direto, inclusive para admins (`enforce_admins`);
+- **nenhuma aprovação obrigatória** (`required_approving_review_count: 0`). Decisão do mantenedor em 15/10/2026: sem um segundo revisor ativo, exigir aprovação impediria o próprio mantenedor de mergear. Aprovação já dada é descartada se chegarem commits novos;
 - checks obrigatórios e branch atualizada: `changeset`, `lint`, `typecheck`, `test`, `build`, `gate`;
 - conversas resolvidas antes do merge;
 - sem force push e sem apagar o `main`.
 
-**Passo a passo (Settings).** Settings → Branches → Add branch protection rule → Branch name pattern `main` → marcar "Require a pull request before merging" (Required approvals: 1; "Dismiss stale pull request approvals when new commits are pushed"; "Require review from Code Owners"; "Require approval of the most recent reviewable push") → "Require status checks to pass before merging" ("Require branches to be up to date"; adicionar `changeset`, `lint`, `typecheck`, `test`, `build`, `gate` — eles só aparecem na busca depois de rodarem uma vez) → "Require conversation resolution before merging" → "Do not allow bypassing the above settings" → Create.
+**Code owners.** `.github/CODEOWNERS` lista `@Rug-gieri` e `@VgavaBR123`. Hoje o arquivo só indica quem é chamado para revisar; ele não bloqueia o merge, porque `require_code_owner_reviews` está desligado. Para voltar a exigir revisão quando a equipe tiver dois revisores ativos, troque `required_approving_review_count` para `1` e `require_code_owner_reviews` para `true` no comando abaixo.
 
-**O mesmo pela API** (admin autenticado no `gh`):
+**Pela API** (admin autenticado no `gh`):
 
 ```bash
-gh api -X PUT repos/SEMEC-PVH/SEMEC_design_system/branches/main/protection \
-  -H "Accept: application/vnd.github+json" --input - <<'EOF'
+gh api -X PUT repos/SEMEC-PVH/SEMEC_design_system/branches/main/protection   -H "Accept: application/vnd.github+json" --input - <<'JSON'
 {
   "required_status_checks": {
     "strict": true,
@@ -146,25 +143,22 @@ gh api -X PUT repos/SEMEC-PVH/SEMEC_design_system/branches/main/protection \
   },
   "enforce_admins": true,
   "required_pull_request_reviews": {
-    "required_approving_review_count": 1,
-    "require_code_owner_reviews": true,
-    "dismiss_stale_reviews": true,
-    "require_last_push_approval": true
+    "required_approving_review_count": 0,
+    "require_code_owner_reviews": false,
+    "dismiss_stale_reviews": true
   },
   "required_conversation_resolution": true,
   "restrictions": null,
   "allow_force_pushes": false,
   "allow_deletions": false
 }
-EOF
+JSON
 ```
 
 Conferir depois:
 
 ```bash
-gh api repos/SEMEC-PVH/SEMEC_design_system/branches/main/protection \
-  --jq '{checks: [.required_status_checks.checks[].context], reviews: .required_pull_request_reviews.required_approving_review_count, codeowners: .required_pull_request_reviews.require_code_owner_reviews, admins: .enforce_admins.enabled}'
-gh api repos/SEMEC-PVH/SEMEC_design_system/codeowners/errors   # deve devolver {"errors":[]}
+gh api repos/SEMEC-PVH/SEMEC_design_system/branches/main/protection   --jq '{checks: [.required_status_checks.checks[].context], reviews: .required_pull_request_reviews.required_approving_review_count, admins: .enforce_admins.enabled, force: .allow_force_pushes.enabled}'
 ```
 
 O job `changeset` só roda em PR; em push no `main` e no PR de versão (branch `changeset-release/*`) ele aparece como *skipped*, o que conta como aprovado para a proteção.
@@ -294,7 +288,7 @@ O `RELEASE_TOKEN` (PAT cadastrado em 29/09/2026 para abrir os PRs de versão) **
 
    O `version-packages` consome os arquivos de `.changeset/`, faz o bump em `packages/react/package.json`, escreve o `packages/react/CHANGELOG.md` e atualiza o `package-lock.json`. Confira o diff: a versão tem de ser a que o `changeset status` previa e o CHANGELOG tem de listar todos os changesets.
 
-3. **Revisão e merge do PR de versão.** Outro mantenedor confere a versão e o CHANGELOG, aprova e mergeia, como qualquer PR, com CI verde e aprovação de code owner. Ninguém roda `version-packages` direto no `main`.
+3. **Revisão e merge do PR de versão.** Um mantenedor confere a versão e o CHANGELOG e mergeia, como qualquer PR, com a CI verde (com revisão de outra pessoa quando houver revisor). Ninguém roda `version-packages` direto no `main`.
 
 4. **Publicação.** Com a CI verde no commit do merge, o Release não encontra changesets pendentes, vê que a versão ainda não está no npm e publica (modo `publish`, tabela acima).
 
