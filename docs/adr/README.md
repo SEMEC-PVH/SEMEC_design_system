@@ -13,7 +13,7 @@ A regra deste repositório é simples: **decisão estrutural entra como ADR novo
 | [003](0003-design-tokens-tres-niveis-dtcg.md) | Tokens em três níveis, DTCG | Aceito (alvo; tokens ainda em CSS escrito à mão) |
 | [004](0004-tailwind-v4-cva-css-compilado.md) | Tailwind v4 + CVA, CSS compilado | Aceito (alvo; `ds-css` ainda não existe) |
 | [005](0005-radix-ui-base-comportamento-acessibilidade.md) | Radix UI como base | Aceito |
-| [006](0006-react-19-fronteira-cliente-rsc.md) | React 19 com fronteira RSC | Aceito (alvo; exports por subpath ainda não usados) |
+| [006](0006-react-19-fronteira-cliente-rsc.md) | React 19 com fronteira RSC | Aceito (implementado na 3.2.0: `"use client"` por componente e subpaths `@semec/ds/react/*`, AUD-20) |
 | [007](0007-distribuicao-registry-npm-gitea.md) | Registry npm do Gitea | Substituído por [022](0022-publicacao-npm-publico.md) |
 | [008](0008-storybook-documentacao-viva.md) | Storybook como documentação | Substituído por [019](0019-documentacao-no-site-storybook-adiado.md) |
 | [009](0009-testes-vitest-testing-library-axe-regressao-visual.md) | Vitest + axe + regressão visual | Aceito |

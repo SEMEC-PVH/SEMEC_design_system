@@ -355,7 +355,7 @@ Três níveis. Não cinco.
 | `elevation-2` | `0 4px 12px` · `gray-900` a 10% | Menu, popover, cartão em hover |
 | `elevation-3` | `0 12px 32px` · `gray-900` a 14% | Modal, painel lateral |
 
-A sombra sempre usa o azul-escuro neutro do sistema, nunca preto puro, e nunca cor. Em CSS, a opacidade sai do primitivo, não de um `rgba()` escrito à mão: `color-mix(in srgb, var(--pv-gray-900) 8%, transparent)`, que resulta exatamente em `rgba(20, 35, 58, .08)` (AUD-56).
+A sombra sempre usa o azul-escuro neutro do sistema, nunca preto puro, e nunca cor. Em CSS, a opacidade sai do primitivo, não de um `rgba()` escrito à mão: `rgb(var(--pv-gray-900-rgb) / 0.08)`, com `--pv-gray-900-rgb: 20 35 58` (canais de `--pv-gray-900`), que resulta exatamente em `rgba(20, 35, 58, .08)` (AUD-56). `color-mix()` foi descartado porque o Tailwind gera para ele um fallback de sombra opaca em navegadores sem suporte (Chrome < 111), comuns em PCs antigos.
 
 ---
 
@@ -363,14 +363,14 @@ A sombra sempre usa o azul-escuro neutro do sistema, nunca preto puro, e nunca c
 
 | Token | Valor | Uso |
 |---|---|---|
-| `radius-sm` | 2px | Chip, tag, campo pequeno |
-| `radius-md` | 8px | Botão, campo, cartão — **padrão** |
-| `radius-lg` | 12px | Cartão grande, modal |
-| `radius-full` | 9999px | Selo, avatar, botão circular |
+| `radius-sm` | 2px | Item de menu, marca pequena |
+| `radius-md` | 8px | Controle: campo, select, checkbox — **padrão** |
+| `radius-lg` | 12px | Cartão, modal, popover, alerta |
+| `radius-full` | 9999px | Botão, selo, avatar, pílula |
 
 Quatro valores. Qualquer outro é desvio. Os utilitários do Tailwind fora da escala (`rounded-xs`, `rounded-xl`, `rounded-2xl`…) também são desvio: `rounded-xl` dá os mesmos 12px de `rounded-lg` por coincidência do padrão do Tailwind, não por decisão do sistema.
 
-> **Nota (15/10/2026, AUD-57).** A versão 0.1 desta especificação dizia `radius-sm` 4px e `radius-lg` 16px. O código publicado sempre usou 2px e 12px, e o mantenedor decidiu manter os valores do código; a tabela acima foi corrigida. No `tokens.css`, o valor mora em `--pv-radius-*` e o nome público continua `--radius-*` / `rounded-*`.
+> **Nota (15/10/2026, AUD-57).** A versão 0.1 desta especificação dizia `radius-sm` 4px e `radius-lg` 16px. O código publicado sempre usou 2px e 12px, e o mantenedor decidiu manter os valores do código; a tabela acima foi corrigida. No `tokens.css`, o valor mora em `--pv-radius-*` e o nome público continua `--radius-*` / `rounded-*`. Os usos da tabela seguem o código do kit: `Button` e `Badge` usam `rounded-full`; `Card`, `Dialog`, `Popover` e `Alert`, `rounded-lg`; `Input`, `Textarea` e `Checkbox`, `rounded-md`; itens do `DropdownMenu`, `rounded-sm`.
 
 ---
 
