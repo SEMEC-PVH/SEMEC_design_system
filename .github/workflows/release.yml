@@ -175,10 +175,11 @@ jobs:
         env:
           EXPECTED: ${{ steps.plan.outputs.version }}
         run: |
-          # O registry pode levar alguns segundos para refletir a publicação.
+          # O registry pode levar alguns minutos para refletir a publicação
+          # (na 3.1.0 passou de 60s). Espera até 5 min e consulta sem cache.
           published=""
-          for attempt in 1 2 3 4 5 6; do
-            published=$(npm view "@semec/ds@${EXPECTED}" version 2>/dev/null || true)
+          for attempt in $(seq 1 30); do
+            published=$(npm view "@semec/ds@${EXPECTED}" version --prefer-online 2>/dev/null || true)
             [ "$published" = "$EXPECTED" ] && break
             echo "tentativa $attempt: registry ainda sem ${EXPECTED}; aguardando 10s"
             sleep 10
