@@ -54,3 +54,6 @@ export * from "./components/tooltip";
 export * from "./lib/masks";
 export * from "./lib/validators";
 export { cn } from "./lib/utils";
+export * from "./components/stepper";
+export * from "./components/password-input";
+export * from "./components/input-mask";

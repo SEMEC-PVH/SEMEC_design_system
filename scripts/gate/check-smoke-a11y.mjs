@@ -81,7 +81,36 @@ export function getComponentElement(code) {
       });
 
     case "button":
-      return React.createElement(ds.Button, null, "Salvar");
+      return React.createElement(
+        React.Fragment,
+        null,
+        React.createElement(ds.Button, null, "Salvar"),
+        React.createElement(ds.Button, { loading: true, loadingText: "Enviando…" }, "Enviar")
+      );
+
+    case "stepper":
+      return React.createElement(ds.Stepper, {
+        steps: [
+          { label: "Dados do estudante" },
+          { label: "Documentos", description: "RG e CPF" },
+          { label: "Revisão e envio" },
+        ],
+        currentStep: 1,
+        onStepClick: () => {},
+      });
+
+    case "password-input":
+      return React.createElement(ds.PasswordInput, {
+        "aria-label": "Senha",
+        autoComplete: "current-password",
+      });
+
+    case "input-mask":
+      return React.createElement(ds.InputMask, {
+        "aria-label": "CPF",
+        mask: "cpf",
+        defaultValue: "12345678901",
+      });
 
     case "calendar":
       return React.createElement(ds.Calendar);
