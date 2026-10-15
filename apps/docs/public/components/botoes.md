@@ -4,12 +4,12 @@ code: "button"
 slug: "botoes"
 file: "src/components/button.tsx"
 category: "acoes"
-variants: "variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px)"
+variants: "variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento)"
 ---
 
 # Botões — `button`
 
-> Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida.
+> Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.
 
 **Arquivo:** `src/components/button.tsx` | **Categoria:** Ações e links | **Rota:** `/componentes/botoes`
 
@@ -17,6 +17,7 @@ variants: "variant: primary · secondary · outline · ghost · destructive · s
 
 - **variant**: primary · secondary · outline · ghost · destructive · success · link
 - **size**: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px)
+- **loading**: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento)
 
 ## Instalação (@semec/ds)
 
@@ -49,12 +50,17 @@ import { Plus } from "lucide-react";
 <Button asChild>
   <Link href="/iptu">Ver meu IPTU</Link>
 </Button>
+
+// Envio em andamento: o foco fica no botão e o clique é ignorado
+<Button type="submit" loading={enviando} loadingText="Enviando…">
+  Enviar requerimento
+</Button>
 ```
 
 ## Prompt para IA
 
 ```text
-Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -65,6 +71,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
+import { Spinner } from "./spinner";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
@@ -104,17 +111,65 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  /**
+   * Ação em andamento (AUD-63): mostra um Spinner decorativo, aplica
+   * `aria-busy="true"` e `aria-disabled="true"` e ignora cliques (inclusive o
+   * envio do formulário). O botão continua focalizável: o foco não se perde
+   * durante o carregamento. O nome acessível segue sendo o texto do botão.
+   */
+  loading?: boolean;
+  /**
+   * Texto visível durante o `loading` (ex.: "Enviando…"), no lugar dos
+   * `children`. Sem ele, o texto original permanece.
+   */
+  loadingText?: React.ReactNode;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      loading = false,
+      loadingText,
+      onClick,
+      children,
+      ...props
+    },
+    ref
+  ) => {
     const Comp = asChild ? Slot : "button";
+    const handleClick = loading
+      ? (event: React.MouseEvent<HTMLButtonElement>) => {
+          // aria-disabled não bloqueia a ativação: o bloqueio é aqui.
+          event.preventDefault();
+        }
+      : onClick;
+    const content =
+      loading && !asChild ? (
+        <>
+          <Spinner decorative />
+          {loadingText ?? children}
+        </>
+      ) : (
+        children
+      );
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(
+          buttonVariants({ variant, size, className }),
+          loading && "cursor-progress"
+        )}
         ref={ref}
         {...props}
-      />
+        aria-busy={loading ? true : props["aria-busy"]}
+        aria-disabled={loading ? true : props["aria-disabled"]}
+        onClick={handleClick}
+      >
+        {content}
+      </Comp>
     );
   }
 );

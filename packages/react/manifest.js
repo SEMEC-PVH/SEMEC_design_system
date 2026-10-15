@@ -47,10 +47,11 @@ export const dsComponents = [
     label: "Botões",
     file: "src/components/button.tsx",
     category: "acoes",
-    desc: "Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida.",
+    desc: "Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.",
     variants: [
       { prop: "variant", values: "primary · secondary · outline · ghost · destructive · success · link" },
       { prop: "size", values: "sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px)" },
+      { prop: "loading", values: "false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento)" },
     ],
     usage: `import { Button } from "@semec/ds/react";
 import Link from "next/link";
@@ -66,6 +67,11 @@ import { Plus } from "lucide-react";
 
 <Button asChild>
   <Link href="/iptu">Ver meu IPTU</Link>
+</Button>
+
+// Envio em andamento: o foco fica no botão e o clique é ignorado
+<Button type="submit" loading={enviando} loadingText="Enviando…">
+  Enviar requerimento
 </Button>`,
   },
   {
@@ -74,14 +80,18 @@ import { Plus } from "lucide-react";
     label: "Botão de ícone",
     file: "src/components/icon-button.tsx",
     category: "acoes",
-    desc: "Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).",
-    variants: [{ prop: "variant", values: "primary · secondary · outline · ghost · destructive · link" }],
+    desc: "Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome.",
+    variants: [
+      { prop: "variant", values: "primary · secondary · outline · ghost · destructive · link" },
+      { prop: "loading", values: "false (padrão) · true (Spinner no lugar do ícone, aria-busy, aria-disabled, clique bloqueado)" },
+    ],
     usage: `import { IconButton } from "@semec/ds/react";
 import { Download, Search, Trash2 } from "lucide-react";
 
 <IconButton label="Buscar requerimento"><Search /></IconButton>
 <IconButton label="Baixar carnê"><Download /></IconButton>
-<IconButton label="Excluir requerimento" variant="destructive"><Trash2 /></IconButton>`,
+<IconButton label="Excluir requerimento" variant="destructive"><Trash2 /></IconButton>
+<IconButton label="Baixar carnê" loading={baixando}><Download /></IconButton>`,
   },
   {
     code: "link",
@@ -131,6 +141,59 @@ import { Download, Search, Trash2 } from "lucide-react";
 // Controlado: onValueChange recebe a string (onChange continua recebendo o evento)
 <FormField label="E-mail">
   <Input type="email" name="email" value={email} onValueChange={setEmail} invalid={emailInvalido} />
+</FormField>`,
+  },
+  {
+    code: "password-input",
+    slug: "campo-de-senha",
+    label: "Campo de senha",
+    file: "src/components/password-input.tsx",
+    category: "formularios",
+    desc: "Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo (\"Mostrar senha\") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Repassa todas as props do `Input`, inclusive `autoComplete`.",
+    variants: [
+      { prop: "visibilidade", values: "defaultVisible · visible + onVisibleChange (controlado)" },
+      { prop: "labels", values: "show (padrão \"Mostrar senha\")" },
+      { prop: "autoComplete", values: "current-password (login) · new-password (cadastro e troca de senha)" },
+    ],
+    usage: `import { FormField, PasswordInput } from "@semec/ds/react";
+
+<FormField label="Senha" hint="Mínimo de 8 caracteres">
+  <PasswordInput autoComplete="current-password" />
+</FormField>
+
+<FormField label="Nova senha">
+  <PasswordInput autoComplete="new-password" />
+</FormField>`,
+  },
+  {
+    code: "input-mask",
+    slug: "campo-com-mascara",
+    label: "Campo com máscara",
+    file: "src/components/input-mask.tsx",
+    category: "formularios",
+    desc: "Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio, colar valor com outra pontuação funciona e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.",
+    variants: [
+      { prop: "mask", values: "cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: \"AAA-9*99\")" },
+      { prop: "valor", values: "defaultValue · value + onValueChange(masked, raw)" },
+      { prop: "inputMode", values: "numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível" },
+    ],
+    usage: `import { FormField, InputMask } from "@semec/ds/react";
+
+<FormField label="CPF" hint="Somente números">
+  <InputMask mask="cpf" onValueChange={(masked, raw) => setCpf(raw)} />
+</FormField>
+
+<FormField label="Telefone">
+  <InputMask mask="telefone" autoComplete="tel-national" />
+</FormField>
+
+<FormField label="CEP">
+  <InputMask mask="cep" autoComplete="postal-code" />
+</FormField>
+
+// Padrão próprio: placa de veículo (9 dígito, A letra, * letra ou dígito)
+<FormField label="Placa do veículo">
+  <InputMask mask="AAA-9*99" />
 </FormField>`,
   },
   {
@@ -576,6 +639,32 @@ import { Button } from "@semec/ds/react";
 </Header>`,
   },
   {
+    code: "stepper",
+    slug: "etapas",
+    label: "Etapas",
+    file: "src/components/stepper.tsx",
+    category: "navegacao",
+    desc: "Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current=\"step\"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.",
+    variants: [
+      { prop: "orientation", values: "horizontal (padrão; empilha abaixo de 768px) · vertical" },
+      { prop: "estados", values: "concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only" },
+      { prop: "interação", values: "onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual)" },
+      { prop: "labels", values: "list · position(n, total) · complete · current · upcoming" },
+    ],
+    usage: `import { Stepper } from "@semec/ds/react";
+
+const etapas = [
+  { label: "Dados do estudante" },
+  { label: "Documentos", description: "RG, CPF e comprovante de residência" },
+  { label: "Revisão e envio" },
+];
+
+<Stepper steps={etapas} currentStep={1} />
+
+// Voltar a uma etapa já preenchida
+<Stepper steps={etapas} currentStep={2} onStepClick={(i) => setEtapa(i)} />`,
+  },
+  {
     code: "skip-link",
     slug: "link-para-o-conteudo",
     label: "Link para o conteúdo",
@@ -937,12 +1026,18 @@ import { Bold } from "lucide-react";
     label: "Spinner",
     file: "src/components/spinner.tsx",
     category: "feedback",
-    desc: "Indicador de carregamento inline (role=status).",
-    variants: [{ prop: "label", values: "texto anunciado (padrão \"Carregando\")" }],
+    desc: "Indicador de carregamento inline (role=status). Com `decorative`, é só visual (sem role, aria-label nem texto sr-only), para quando outro elemento já anuncia o carregamento; é o que o `Button` com `loading` usa.",
+    variants: [
+      { prop: "label", values: "texto anunciado (padrão \"Carregando\")" },
+      { prop: "decorative", values: "false (padrão, role=status) · true (aria-hidden, sem nome; raiz <span>)" },
+    ],
     usage: `import { Spinner } from "@semec/ds/react";
 
 <Spinner label="Carregando protocolos" />
-<p className="text-muted-foreground">Carregando dados…</p>`,
+<p className="text-muted-foreground">Carregando dados…</p>
+
+// Só visual: o texto ao lado já diz o que está acontecendo
+<p className="flex items-center gap-2"><Spinner decorative /> Atualizando a lista…</p>`,
   },
   {
     code: "progress",

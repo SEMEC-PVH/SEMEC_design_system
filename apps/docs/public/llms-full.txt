@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-15T12:30:10.000Z — packages/react/manifest.js + packages/react/* — versão 3.1.0
+> Gerado 2026-10-15T12:30:36.000Z — packages/react/manifest.js + packages/react/* — versão 3.1.0
 
 ## Instalação
 
@@ -67,6 +67,9 @@ export * from "./components/tooltip";
 export * from "./lib/masks";
 export * from "./lib/validators";
 export { cn } from "./lib/utils";
+export * from "./components/stepper";
+export * from "./components/password-input";
+export * from "./components/input-mask";
 
 ```
 
@@ -992,13 +995,13 @@ export default {
 }
 ```
 
-## Componentes — todos (52)
+## Componentes — todos (55)
 
 ### Botões (`button`) — `src/components/button.tsx` — slug: botoes
 
-Desc: Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida.
+Desc: Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.
 
-Variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px)
+Variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento)
 
 Uso:
 ```tsx
@@ -1017,11 +1020,16 @@ import { Plus } from "lucide-react";
 <Button asChild>
   <Link href="/iptu">Ver meu IPTU</Link>
 </Button>
+
+// Envio em andamento: o foco fica no botão e o clique é ignorado
+<Button type="submit" loading={enviando} loadingText="Enviando…">
+  Enviar requerimento
+</Button>
 ```
 
 Prompt:
 ```text
-Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -1031,6 +1039,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
+import { Spinner } from "./spinner";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
@@ -1070,17 +1079,65 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  /**
+   * Ação em andamento (AUD-63): mostra um Spinner decorativo, aplica
+   * `aria-busy="true"` e `aria-disabled="true"` e ignora cliques (inclusive o
+   * envio do formulário). O botão continua focalizável: o foco não se perde
+   * durante o carregamento. O nome acessível segue sendo o texto do botão.
+   */
+  loading?: boolean;
+  /**
+   * Texto visível durante o `loading` (ex.: "Enviando…"), no lugar dos
+   * `children`. Sem ele, o texto original permanece.
+   */
+  loadingText?: React.ReactNode;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      loading = false,
+      loadingText,
+      onClick,
+      children,
+      ...props
+    },
+    ref
+  ) => {
     const Comp = asChild ? Slot : "button";
+    const handleClick = loading
+      ? (event: React.MouseEvent<HTMLButtonElement>) => {
+          // aria-disabled não bloqueia a ativação: o bloqueio é aqui.
+          event.preventDefault();
+        }
+      : onClick;
+    const content =
+      loading && !asChild ? (
+        <>
+          <Spinner decorative />
+          {loadingText ?? children}
+        </>
+      ) : (
+        children
+      );
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(
+          buttonVariants({ variant, size, className }),
+          loading && "cursor-progress"
+        )}
         ref={ref}
         {...props}
-      />
+        aria-busy={loading ? true : props["aria-busy"]}
+        aria-disabled={loading ? true : props["aria-disabled"]}
+        onClick={handleClick}
+      >
+        {content}
+      </Comp>
     );
   }
 );
@@ -1093,9 +1150,9 @@ export { Button, buttonVariants };
 
 ### Botão de ícone (`icon-button`) — `src/components/icon-button.tsx` — slug: botao-de-icone
 
-Desc: Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).
+Desc: Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome.
 
-Variantes: variant: primary · secondary · outline · ghost · destructive · link
+Variantes: variant: primary · secondary · outline · ghost · destructive · link · loading: false (padrão) · true (Spinner no lugar do ícone, aria-busy, aria-disabled, clique bloqueado)
 
 Uso:
 ```tsx
@@ -1105,11 +1162,12 @@ import { Download, Search, Trash2 } from "lucide-react";
 <IconButton label="Buscar requerimento"><Search /></IconButton>
 <IconButton label="Baixar carnê"><Download /></IconButton>
 <IconButton label="Excluir requerimento" variant="destructive"><Trash2 /></IconButton>
+<IconButton label="Baixar carnê" loading={baixando}><Download /></IconButton>
 ```
 
 Prompt:
 ```text
-Use o componente `IconButton` (Botão de ícone) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). API e variantes: variant: primary · secondary · outline · ghost · destructive · link. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `IconButton` (Botão de ícone) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome. API e variantes: variant: primary · secondary · outline · ghost · destructive · link · loading: false (padrão) · true (Spinner no lugar do ícone, aria-busy, aria-disabled, clique bloqueado). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -1137,6 +1195,12 @@ export interface IconButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof iconButtonVariants> {
   label: string;
+  /**
+   * Ação em andamento: troca o ícone por um Spinner decorativo e repassa
+   * `loading` ao `Button` (`aria-busy`, `aria-disabled`, clique bloqueado,
+   * foco mantido). O nome acessível continua sendo `label`.
+   */
+  loading?: boolean;
 }
 
 /**
@@ -1144,7 +1208,10 @@ export interface IconButtonProps
  * (`label`) — sem ele, leitores de tela anunciam um botão vazio.
  */
 const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ className, label, variant = "outline", type = "button", ...props }, ref) => (
+  (
+    { className, label, variant = "outline", type = "button", loading = false, children, ...props },
+    ref
+  ) => (
     <Button
       ref={ref}
       type={type}
@@ -1153,8 +1220,11 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       aria-label={label}
       title={label}
       className={className}
+      loading={loading}
       {...props}
-    />
+    >
+      {loading ? null : children}
+    </Button>
   )
 );
 IconButton.displayName = "IconButton";
@@ -1323,6 +1393,364 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = "Input";
 
 export { Input };
+
+```
+
+---
+
+### Campo de senha (`password-input`) — `src/components/password-input.tsx` — slug: campo-de-senha
+
+Desc: Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Repassa todas as props do `Input`, inclusive `autoComplete`.
+
+Variantes: visibilidade: defaultVisible · visible + onVisibleChange (controlado) · labels: show (padrão "Mostrar senha") · autoComplete: current-password (login) · new-password (cadastro e troca de senha)
+
+Uso:
+```tsx
+import { FormField, PasswordInput } from "@semec/ds/react";
+
+<FormField label="Senha" hint="Mínimo de 8 caracteres">
+  <PasswordInput autoComplete="current-password" />
+</FormField>
+
+<FormField label="Nova senha">
+  <PasswordInput autoComplete="new-password" />
+</FormField>
+```
+
+Prompt:
+```text
+Use o componente `PasswordInput` (Campo de senha) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Repassa todas as props do `Input`, inclusive `autoComplete`. API e variantes: visibilidade: defaultVisible · visible + onVisibleChange (controlado) · labels: show (padrão "Mostrar senha") · autoComplete: current-password (login) · new-password (cadastro e troca de senha). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+```
+
+Fonte:
+```tsx
+"use client";
+
+import * as React from "react";
+import { Eye, EyeOff } from "lucide-react";
+
+import { cn } from "../lib/utils";
+import { Input } from "./input";
+
+export interface PasswordInputLabels {
+  /**
+   * Nome acessível do botão de alternar. Padrão: "Mostrar senha". O nome não
+   * muda com o estado: quem diz se a senha está visível é `aria-pressed`
+   * (padrão de botão alternável da APG: trocar o nome junto com o estado
+   * faria o leitor anunciar "Ocultar senha, pressionado").
+   */
+  show: string;
+}
+
+const defaultLabels: PasswordInputLabels = {
+  show: "Mostrar senha",
+};
+
+export interface PasswordInputProps
+  extends Omit<React.ComponentPropsWithoutRef<typeof Input>, "type"> {
+  /** Senha visível (controlado). */
+  visible?: boolean;
+  /** Senha visível no primeiro render (não controlado). Padrão: `false`. */
+  defaultVisible?: boolean;
+  /** Chamado quando o botão alterna a visibilidade. */
+  onVisibleChange?: (visible: boolean) => void;
+  /** Textos fixos (PT-BR por padrão). */
+  labels?: Partial<PasswordInputLabels>;
+}
+
+/**
+ * Campo de senha: o `Input` do kit com um botão de 44px que mostra ou oculta
+ * o texto. O botão tem `aria-pressed` (pressionado = senha visível) e
+ * `aria-controls` apontando para o campo. Todas as props do `Input` são
+ * repassadas (inclusive `autoComplete`; use `current-password` no login e
+ * `new-password` no cadastro).
+ */
+const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
+  (
+    {
+      className,
+      id,
+      visible: visibleProp,
+      defaultVisible = false,
+      onVisibleChange,
+      labels,
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
+    const text = { ...defaultLabels, ...labels };
+    const generatedId = React.useId();
+    const inputId = id ?? generatedId;
+    const [visibleState, setVisibleState] = React.useState(defaultVisible);
+    const visible = visibleProp ?? visibleState;
+
+    const toggle = () => {
+      const next = !visible;
+      if (visibleProp === undefined) setVisibleState(next);
+      onVisibleChange?.(next);
+    };
+
+    const Icon = visible ? EyeOff : Eye;
+
+    return (
+      <div className="relative w-full">
+        <Input
+          ref={ref}
+          id={inputId}
+          type={visible ? "text" : "password"}
+          disabled={disabled}
+          className={cn("pr-12 [&::-ms-reveal]:hidden", className)}
+          {...props}
+        />
+        <button
+          type="button"
+          onClick={toggle}
+          disabled={disabled}
+          aria-label={text.show}
+          aria-pressed={visible}
+          aria-controls={inputId}
+          className="absolute right-0 top-0 inline-flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground transition-colors duration-fast ease-standard hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none"
+        >
+          <Icon className="h-5 w-5" aria-hidden="true" />
+        </button>
+      </div>
+    );
+  }
+);
+PasswordInput.displayName = "PasswordInput";
+
+export { PasswordInput };
+
+```
+
+---
+
+### Campo com máscara (`input-mask`) — `src/components/input-mask.tsx` — slug: campo-com-mascara
+
+Desc: Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio, colar valor com outra pontuação funciona e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
+
+Variantes: mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: "AAA-9*99") · valor: defaultValue · value + onValueChange(masked, raw) · inputMode: numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível
+
+Uso:
+```tsx
+import { FormField, InputMask } from "@semec/ds/react";
+
+<FormField label="CPF" hint="Somente números">
+  <InputMask mask="cpf" onValueChange={(masked, raw) => setCpf(raw)} />
+</FormField>
+
+<FormField label="Telefone">
+  <InputMask mask="telefone" autoComplete="tel-national" />
+</FormField>
+
+<FormField label="CEP">
+  <InputMask mask="cep" autoComplete="postal-code" />
+</FormField>
+
+// Padrão próprio: placa de veículo (9 dígito, A letra, * letra ou dígito)
+<FormField label="Placa do veículo">
+  <InputMask mask="AAA-9*99" />
+</FormField>
+```
+
+Prompt:
+```text
+Use o componente `InputMask` (Campo com máscara) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio, colar valor com outra pontuação funciona e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara. API e variantes: mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: "AAA-9*99") · valor: defaultValue · value + onValueChange(masked, raw) · inputMode: numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+```
+
+Fonte:
+```tsx
+"use client";
+
+import * as React from "react";
+
+import { Input } from "./input";
+
+/** Máscaras prontas. `telefone` alterna entre fixo e celular pelo número de dígitos. */
+export type InputMaskPreset =
+  | "cpf"
+  | "cnpj"
+  | "cep"
+  | "data"
+  | "telefone"
+  | "telefone-fixo"
+  | "celular";
+
+/** Padrões das máscaras prontas (`9` = dígito). */
+export const inputMaskPatterns: Record<Exclude<InputMaskPreset, "telefone">, string> = {
+  cpf: "999.999.999-99",
+  cnpj: "99.999.999/9999-99",
+  cep: "99999-999",
+  data: "99/99/9999",
+  "telefone-fixo": "(99) 9999-9999",
+  celular: "(99) 99999-9999",
+};
+
+const SLOT_TESTS: Record<string, RegExp> = {
+  "9": /\d/,
+  A: /[A-Za-zÀ-ÖØ-öø-ÿ]/,
+  "*": /[0-9A-Za-zÀ-ÖØ-öø-ÿ]/,
+};
+
+const isSlot = (ch: string) => ch in SLOT_TESTS;
+
+const isNumericPattern = (pattern: string) =>
+  [...pattern].every((ch) => !isSlot(ch) || ch === "9");
+
+function resolvePattern(mask: InputMaskPreset | string, digits: number): string {
+  if (mask === "telefone") {
+    return digits > 10 ? inputMaskPatterns.celular : inputMaskPatterns["telefone-fixo"];
+  }
+  return (inputMaskPatterns as Record<string, string>)[mask] ?? mask;
+}
+
+/** Resultado de `applyInputMask`: valor formatado e só os caracteres digitados. */
+export interface InputMaskResult {
+  masked: string;
+  raw: string;
+}
+
+/**
+ * Formata `value` com uma máscara pronta ou um padrão próprio, em que `9` é
+ * dígito, `A` é letra, `*` é letra ou dígito e o resto é literal
+ * (ex.: `"AAA-9999"`). Aceita valor já formatado, sem formatação ou colado
+ * com outra pontuação. Literais só aparecem quando há caractere depois deles.
+ */
+export function applyInputMask(value: string, mask: InputMaskPreset | string): InputMaskResult {
+  const digitCount = value.replace(/\D/g, "").length;
+  const pattern = resolvePattern(mask, digitCount);
+  // Padrão só de dígitos: descarta a pontuação de quem colou ("(69) 3216-0000").
+  const source = isNumericPattern(pattern) ? value.replace(/\D/g, "") : value;
+
+  let masked = "";
+  let raw = "";
+  let pending = ""; // literais que só entram quando vier o próximo caractere
+  let p = 0;
+
+  for (const ch of source) {
+    if (p >= pattern.length) break;
+    if (!isSlot(pattern.charAt(p))) {
+      // Valor já formatado: o caractere é um dos literais à frente; consome até ele.
+      let q = p;
+      while (q < pattern.length && !isSlot(pattern.charAt(q)) && pattern.charAt(q) !== ch) q++;
+      if (q < pattern.length && !isSlot(pattern.charAt(q))) {
+        pending += pattern.slice(p, q + 1);
+        p = q + 1;
+        continue;
+      }
+      while (p < pattern.length && !isSlot(pattern.charAt(p))) pending += pattern[p++];
+      if (p >= pattern.length) break;
+    }
+    if (SLOT_TESTS[pattern.charAt(p)]?.test(ch)) {
+      masked += pending + ch;
+      raw += ch;
+      pending = "";
+      p++;
+    }
+  }
+  return { masked, raw };
+}
+
+/** Posição logo depois do `n`-ésimo caractere editável de `masked`. */
+function caretAfterRaw(masked: string, mask: InputMaskPreset | string, n: number): number {
+  if (n <= 0) return 0;
+  const pattern = resolvePattern(mask, masked.replace(/\D/g, "").length);
+  let count = 0;
+  for (let i = 0; i < masked.length; i++) {
+    if (isSlot(pattern.charAt(i))) {
+      count++;
+      if (count === n) return i + 1;
+    }
+  }
+  return masked.length;
+}
+
+const presetInputMode: Record<InputMaskPreset, React.HTMLAttributes<HTMLInputElement>["inputMode"]> = {
+  cpf: "numeric",
+  cnpj: "numeric",
+  cep: "numeric",
+  data: "numeric",
+  telefone: "tel",
+  "telefone-fixo": "tel",
+  celular: "tel",
+};
+
+export interface InputMaskProps
+  extends Omit<
+    React.ComponentPropsWithoutRef<typeof Input>,
+    "value" | "defaultValue" | "onValueChange"
+  > {
+  /**
+   * Máscara pronta (`cpf`, `cnpj`, `cep`, `data`, `telefone`,
+   * `telefone-fixo`, `celular`) ou padrão próprio com `9` (dígito), `A`
+   * (letra) e `*` (letra ou dígito).
+   */
+  mask: InputMaskPreset | string;
+  /** Valor controlado (formatado ou não; é formatado ao exibir). */
+  value?: string;
+  /** Valor inicial (não controlado). */
+  defaultValue?: string;
+  /** Chamado a cada mudança com o valor formatado e o valor sem máscara. */
+  onValueChange?: (masked: string, raw: string) => void;
+}
+
+/**
+ * Campo com máscara de digitação, sobre o `Input` do kit. O cursor fica no
+ * lugar ao digitar, apagar ou colar no meio do valor; colar um valor com
+ * outra pontuação funciona. `inputMode` vem da máscara (`numeric` ou `tel`)
+ * e pode ser sobrescrito. Sem dependência externa.
+ */
+const InputMask = React.forwardRef<HTMLInputElement, InputMaskProps>(
+  ({ mask, value, defaultValue, onValueChange, onChange, inputMode, ...props }, ref) => {
+    const isControlled = value !== undefined;
+    const [inner, setInner] = React.useState(
+      () => applyInputMask(defaultValue ?? "", mask).masked
+    );
+    const display = isControlled ? applyInputMask(value, mask).masked : inner;
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const el = event.currentTarget;
+      const typed = el.value;
+      const caret = el.selectionStart ?? typed.length;
+      const { masked, raw } = applyInputMask(typed, mask);
+      const rawBefore = Math.min(
+        applyInputMask(typed.slice(0, caret), mask).raw.length,
+        raw.length
+      );
+      const atEnd = caret >= typed.length;
+
+      if (el.value !== masked) el.value = masked;
+      // ownerDocument: o campo pode estar num iframe (portal).
+      if (el.ownerDocument.activeElement === el) {
+        const next = atEnd ? masked.length : caretAfterRaw(masked, mask, rawBefore);
+        el.setSelectionRange(next, next);
+      }
+
+      if (!isControlled) setInner(masked);
+      onValueChange?.(masked, raw);
+      onChange?.(event);
+    };
+
+    const fallbackMode =
+      (presetInputMode as Record<string, React.HTMLAttributes<HTMLInputElement>["inputMode"]>)[mask] ??
+      (isNumericPattern(mask) ? "numeric" : "text");
+
+    return (
+      <Input
+        ref={ref}
+        type="text"
+        inputMode={inputMode ?? fallbackMode}
+        value={display}
+        onChange={handleChange}
+        {...props}
+      />
+    );
+  }
+);
+InputMask.displayName = "InputMask";
+
+export { InputMask };
 
 ```
 
@@ -4261,6 +4689,254 @@ export { Header, HeaderBrand, HeaderNav, HeaderNavLink };
 
 ---
 
+### Etapas (`stepper`) — `src/components/stepper.tsx` — slug: etapas
+
+Desc: Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.
+
+Variantes: orientation: horizontal (padrão; empilha abaixo de 768px) · vertical · estados: concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only · interação: onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual) · labels: list · position(n, total) · complete · current · upcoming
+
+Uso:
+```tsx
+import { Stepper } from "@semec/ds/react";
+
+const etapas = [
+  { label: "Dados do estudante" },
+  { label: "Documentos", description: "RG, CPF e comprovante de residência" },
+  { label: "Revisão e envio" },
+];
+
+<Stepper steps={etapas} currentStep={1} />
+
+// Voltar a uma etapa já preenchida
+<Stepper steps={etapas} currentStep={2} onStepClick={(i) => setEtapa(i)} />
+```
+
+Prompt:
+```text
+Use o componente `Stepper` (Etapas) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px. API e variantes: orientation: horizontal (padrão; empilha abaixo de 768px) · vertical · estados: concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only · interação: onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual) · labels: list · position(n, total) · complete · current · upcoming. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+```
+
+Fonte:
+```tsx
+"use client";
+
+import * as React from "react";
+import { Check } from "lucide-react";
+
+import { cn } from "../lib/utils";
+
+/** Situação de uma etapa: anterior à atual, a atual ou posterior. */
+export type StepperStepStatus = "complete" | "current" | "upcoming";
+
+export interface StepperStep {
+  /** Nome curto da etapa (ex.: "Dados do estudante"). */
+  label: string;
+  /** Linha de apoio abaixo do nome. */
+  description?: string;
+}
+
+export interface StepperLabels {
+  /** Nome acessível da lista. Padrão: "Etapas do processo". */
+  list: string;
+  /** Posição da etapa. Padrão: "Etapa 1 de 3". */
+  position: (step: number, total: number) => string;
+  /** Situação "concluída" (texto para leitor de tela). */
+  complete: string;
+  /** Situação "atual" (texto para leitor de tela). */
+  current: string;
+  /** Situação "pendente" (texto para leitor de tela). */
+  upcoming: string;
+}
+
+const defaultLabels: StepperLabels = {
+  list: "Etapas do processo",
+  position: (step, total) => `Etapa ${step} de ${total}`,
+  complete: "concluída",
+  current: "etapa atual",
+  upcoming: "pendente",
+};
+
+export interface StepperProps
+  extends Omit<React.OlHTMLAttributes<HTMLOListElement>, "children"> {
+  /** Etapas, na ordem do processo. */
+  steps: StepperStep[];
+  /**
+   * Índice (base 0) da etapa atual. As anteriores contam como concluídas e as
+   * seguintes como pendentes. Use `steps.length` para marcar todas concluídas.
+   */
+  currentStep: number;
+  /**
+   * `horizontal` (padrão): em linha a partir de `md` (768px) e empilhado em
+   * telas estreitas. `vertical`: sempre empilhado.
+   */
+  orientation?: "horizontal" | "vertical";
+  /**
+   * Torna as etapas clicáveis (botões de 44px). Recebe o índice (base 0).
+   * Por padrão só as concluídas e a atual são clicáveis; ajuste com
+   * `isStepClickable`.
+   */
+  onStepClick?: (index: number) => void;
+  /** Decide quais etapas viram botão quando há `onStepClick`. */
+  isStepClickable?: (index: number, status: StepperStepStatus) => boolean;
+  /** Textos fixos (PT-BR por padrão). */
+  labels?: Partial<StepperLabels>;
+}
+
+function statusOf(index: number, currentStep: number): StepperStepStatus {
+  if (index < currentStep) return "complete";
+  if (index === currentStep) return "current";
+  return "upcoming";
+}
+
+const defaultIsStepClickable = (_index: number, status: StepperStepStatus) =>
+  status !== "upcoming";
+
+/**
+ * Etapas de um processo (ex.: requerimento em três passos). Lista ordenada
+ * (`ol`/`li`); a etapa atual tem `aria-current="step"` e a situação de cada
+ * etapa é dita em texto (sr-only), não só pela cor. Com `onStepClick`, as
+ * etapas permitidas viram botões.
+ */
+const Stepper = React.forwardRef<HTMLOListElement, StepperProps>(
+  (
+    {
+      className,
+      steps,
+      currentStep,
+      orientation = "horizontal",
+      onStepClick,
+      isStepClickable = defaultIsStepClickable,
+      labels,
+      "aria-label": ariaLabel,
+      ...props
+    },
+    ref
+  ) => {
+    const text = { ...defaultLabels, ...labels };
+    const horizontal = orientation === "horizontal";
+    const total = steps.length;
+
+    return (
+      <ol
+        ref={ref}
+        aria-label={props["aria-labelledby"] ? ariaLabel : (ariaLabel ?? text.list)}
+        className={cn(
+          "flex w-full flex-col gap-2",
+          horizontal && "md:flex-row md:items-start md:gap-4",
+          className
+        )}
+        {...props}
+      >
+        {steps.map((step, index) => {
+          const status = statusOf(index, currentStep);
+          const isLast = index === total - 1;
+          const clickable = Boolean(onStepClick) && isStepClickable(index, status);
+          const statusText =
+            status === "complete"
+              ? text.complete
+              : status === "current"
+                ? text.current
+                : text.upcoming;
+
+          const indicator = (
+            <span
+              aria-hidden="true"
+              className={cn(
+                "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold",
+                status === "complete" && "bg-primary text-primary-foreground",
+                status === "current" &&
+                  "border-2 border-primary bg-surface text-primary",
+                status === "upcoming" &&
+                  "border border-border-strong bg-surface text-muted-foreground"
+              )}
+            >
+              {status === "complete" ? (
+                <Check className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                index + 1
+              )}
+            </span>
+          );
+
+          const body = (
+            <>
+              {indicator}
+              <span className="flex min-w-0 flex-col text-left">
+                <span className="sr-only">{`${text.position(index + 1, total)}:`}</span>{" "}
+                <span
+                  className={cn(
+                    "text-sm leading-snug",
+                    status === "current"
+                      ? "font-semibold text-foreground"
+                      : status === "complete"
+                        ? "font-medium text-foreground"
+                        : "text-muted-foreground"
+                  )}
+                >
+                  {step.label}
+                </span>
+                <span className="sr-only">{`, ${statusText}`}</span>
+                {step.description ? (
+                  <span className="text-xs text-muted-foreground">
+                    {step.description}
+                  </span>
+                ) : null}
+              </span>
+            </>
+          );
+
+          const rowClasses = "flex min-h-11 items-start gap-3 py-1.5";
+
+          return (
+            <li
+              key={index}
+              aria-current={!clickable && status === "current" ? "step" : undefined}
+              className={cn(
+                "relative flex flex-col",
+                horizontal && "md:flex-1 md:flex-row md:items-start md:gap-4",
+                horizontal && isLast && "md:flex-none"
+              )}
+            >
+              {clickable ? (
+                <button
+                  type="button"
+                  aria-current={status === "current" ? "step" : undefined}
+                  onClick={() => onStepClick?.(index)}
+                  className={cn(
+                    rowClasses,
+                    "-mx-2 rounded-md px-2 transition-colors duration-fast ease-standard hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  )}
+                >
+                  {body}
+                </button>
+              ) : (
+                <div className={rowClasses}>{body}</div>
+              )}
+              {!isLast ? (
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "ml-4 h-4 w-0.5 shrink-0",
+                    horizontal && "md:ml-0 md:mt-5 md:h-0.5 md:w-auto md:min-w-4 md:flex-1",
+                    status === "complete" ? "bg-primary" : "bg-border-strong"
+                  )}
+                />
+              ) : null}
+            </li>
+          );
+        })}
+      </ol>
+    );
+  }
+);
+Stepper.displayName = "Stepper";
+
+export { Stepper };
+
+```
+
+---
+
 ### Link para o conteúdo (`skip-link`) — `src/components/skip-link.tsx` — slug: link-para-o-conteudo
 
 Desc: Link "Pular para o conteúdo principal" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo).
@@ -6203,9 +6879,9 @@ export { Toggle, toggleVariants };
 
 ### Spinner (`spinner`) — `src/components/spinner.tsx` — slug: spinner
 
-Desc: Indicador de carregamento inline (role=status).
+Desc: Indicador de carregamento inline (role=status). Com `decorative`, é só visual (sem role, aria-label nem texto sr-only), para quando outro elemento já anuncia o carregamento; é o que o `Button` com `loading` usa.
 
-Variantes: label: texto anunciado (padrão "Carregando")
+Variantes: label: texto anunciado (padrão "Carregando") · decorative: false (padrão, role=status) · true (aria-hidden, sem nome; raiz <span>)
 
 Uso:
 ```tsx
@@ -6213,11 +6889,14 @@ import { Spinner } from "@semec/ds/react";
 
 <Spinner label="Carregando protocolos" />
 <p className="text-muted-foreground">Carregando dados…</p>
+
+// Só visual: o texto ao lado já diz o que está acontecendo
+<p className="flex items-center gap-2"><Spinner decorative /> Atualizando a lista…</p>
 ```
 
 Prompt:
 ```text
-Use o componente `Spinner` (Spinner) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Indicador de carregamento inline (role=status). API e variantes: label: texto anunciado (padrão "Carregando"). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Spinner` (Spinner) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Indicador de carregamento inline (role=status). Com `decorative`, é só visual (sem role, aria-label nem texto sr-only), para quando outro elemento já anuncia o carregamento; é o que o `Button` com `loading` usa. API e variantes: label: texto anunciado (padrão "Carregando") · decorative: false (padrão, role=status) · true (aria-hidden, sem nome; raiz <span>). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -6229,41 +6908,67 @@ import { cn } from "../lib/utils";
 export interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Texto anunciado por leitor de tela. Padrão: "Carregando". */
   label?: string;
+  /**
+   * Só visual: sem `role="status"`, sem `aria-label` e sem texto `sr-only`
+   * (raiz `<span aria-hidden="true">`). Use quando outro elemento já comunica
+   * o carregamento, como o `Button` com `loading` (o nome do botão não ganha
+   * "Carregando"). Padrão: `false`.
+   */
+  decorative?: boolean;
 }
 
+const spinnerIcon = (
+  <svg
+    className="h-5 w-5 animate-spin text-current"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <circle
+      className="opacity-25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="4"
+    />
+    <path
+      className="opacity-75"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+    />
+  </svg>
+);
+
 const Spinner = React.forwardRef<HTMLDivElement, SpinnerProps>(
-  ({ className, label = "Carregando", ...props }, ref) => (
-    <div
-      ref={ref}
-      role="status"
-      aria-label={label}
-      className={cn("inline-flex items-center justify-center", className)}
-      {...props}
-    >
-      <svg
-        className="h-5 w-5 animate-spin text-current"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
+  ({ className, label = "Carregando", decorative = false, ...props }, ref) => {
+    if (decorative) {
+      // <span>: conteúdo fraseado, válido dentro de <button>.
+      return (
+        <span
+          ref={ref as React.Ref<HTMLSpanElement>}
+          aria-hidden="true"
+          className={cn("inline-flex items-center justify-center", className)}
+          {...props}
+        >
+          {spinnerIcon}
+        </span>
+      );
+    }
+    return (
+      <div
+        ref={ref}
+        role="status"
+        aria-label={label}
+        className={cn("inline-flex items-center justify-center", className)}
+        {...props}
       >
-        <circle
-          className="opacity-25"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="4"
-        />
-        <path
-          className="opacity-75"
-          fill="currentColor"
-          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-        />
-      </svg>
-      <span className="sr-only">{label}</span>
-    </div>
-  )
+        {spinnerIcon}
+        <span className="sr-only">{label}</span>
+      </div>
+    );
+  }
 );
 Spinner.displayName = "Spinner";
 
@@ -9632,14 +10337,14 @@ Metadados de componente (o que versões anteriores deste README chamavam de `get
 ## Componentes
 
 <!-- ds:component-list:start -->
-**52 componentes** no manifest (`manifest.js`), pelo export principal de cada um. Lista e contagem geradas por `scripts/build-artifacts.mjs`; não edite à mão.
+**55 componentes** no manifest (`manifest.js`), pelo export principal de cada um. Lista e contagem geradas por `scripts/build-artifacts.mjs`; não edite à mão.
 
 | Categoria | Componentes |
 |---|---|
 | **Ações e links** (3) | Button, IconButton, Link |
-| **Formulários** (16) | Input, Textarea, Select, Combobox, DatePicker, FileUpload, Checkbox, RadioGroup, Switch, Label, FormField, ErrorSummary, Toggle, Slider, InputOTP, Calendar |
+| **Formulários** (18) | Input, PasswordInput, InputMask, Textarea, Select, Combobox, DatePicker, FileUpload, Checkbox, RadioGroup, Switch, Label, FormField, ErrorSummary, Toggle, Slider, InputOTP, Calendar |
 | **Conteúdo e dados** (9) | Card, Heading, Badge, Table, Accordion, Separator, Avatar, DataTable, Timeline |
-| **Navegação** (11) | Breadcrumb, Header, SkipLink, Footer, Tabs, Pagination, SidebarToggleButton, ScrollArea, DropdownMenu, NavigationMenu, Sidebar |
+| **Navegação** (12) | Breadcrumb, Header, Stepper, SkipLink, Footer, Tabs, Pagination, SidebarToggleButton, ScrollArea, DropdownMenu, NavigationMenu, Sidebar |
 | **Feedback e estados** (13) | Skeleton, EmptyState, ErrorState, Dialog, Toaster, Tooltip, Alert, AlertDialog, Popover, Spinner, Progress, Drawer, Sheet |
 <!-- ds:component-list:end -->
 

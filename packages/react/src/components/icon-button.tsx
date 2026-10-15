@@ -21,6 +21,12 @@ export interface IconButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof iconButtonVariants> {
   label: string;
+  /**
+   * Ação em andamento: troca o ícone por um Spinner decorativo e repassa
+   * `loading` ao `Button` (`aria-busy`, `aria-disabled`, clique bloqueado,
+   * foco mantido). O nome acessível continua sendo `label`.
+   */
+  loading?: boolean;
 }
 
 /**
@@ -28,7 +34,10 @@ export interface IconButtonProps
  * (`label`) — sem ele, leitores de tela anunciam um botão vazio.
  */
 const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ className, label, variant = "outline", type = "button", ...props }, ref) => (
+  (
+    { className, label, variant = "outline", type = "button", loading = false, children, ...props },
+    ref
+  ) => (
     <Button
       ref={ref}
       type={type}
@@ -37,8 +46,11 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       aria-label={label}
       title={label}
       className={className}
+      loading={loading}
       {...props}
-    />
+    >
+      {loading ? null : children}
+    </Button>
   )
 );
 IconButton.displayName = "IconButton";

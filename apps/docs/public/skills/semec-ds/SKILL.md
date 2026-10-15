@@ -1,6 +1,6 @@
 ---
 name: semec-ds
-description: Use SEMEC Design System (@semec/ds) para construir UI em React. Tokens pv-*, 52 componentes Radix+CVA, a11y WCAG 2.1 AA e padrões de tela. Use quando criar ou editar UI com o kit, migrar portal ou montar telas a partir dos exemplos.
+description: Use SEMEC Design System (@semec/ds) para construir UI em React. Tokens pv-*, 55 componentes Radix+CVA, a11y WCAG 2.1 AA e padrões de tela. Use quando criar ou editar UI com o kit, migrar portal ou montar telas a partir dos exemplos.
 author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 ---
 
@@ -159,19 +159,21 @@ import { validateCPF, validateCNPJ, validateEmail } from "@semec/ds/react";
 import { cpfSchema, cnpjSchema, cpfCnpjSchema, emailSchema, cepSchema } from "@semec/ds/react/validacao";
 ```
 
-## Componentes (52)
+## Componentes (55)
 
 Lista gerada do manifest (export principal, `code` e descrição). Detalhes, variantes e exemplo de uso de cada um: `components/<slug>.md` ou `manifest.json`.
 
 ### Ações e links (3)
 
-- `Button` (`button`) — Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida.
-- `IconButton` (`icon-button`) — Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).
+- `Button` (`button`) — Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.
+- `IconButton` (`icon-button`) — Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome.
 - `Link` (`link`) — Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas.
 
-### Formulários (16)
+### Formulários (18)
 
 - `Input` (`input`) — Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string.
+- `PasswordInput` (`password-input`) — Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Repassa todas as props do `Input`, inclusive `autoComplete`.
+- `InputMask` (`input-mask`) — Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio, colar valor com outra pontuação funciona e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
 - `Textarea` (`textarea`) — Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`).
 - `Select` (`select`) — Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`).
 - `Combobox` (`combobox`) — Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.
@@ -200,10 +202,11 @@ Lista gerada do manifest (export principal, `code` e descrição). Detalhes, var
 - `DataTable` (`data-table`) — Tabela com ordenação, paginação e estados vazios.
 - `Timeline` (`timeline`) — Sequência temporal em lista ordenada (ol/li), com pontos, conectores visíveis e conteúdo. O status vai em texto (srLabel), não só na cor.
 
-### Navegação (11)
+### Navegação (12)
 
 - `Breadcrumb` (`breadcrumb`) — Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
 - `Header` (`header`) — Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.
+- `Stepper` (`stepper`) — Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.
 - `SkipLink` (`skip-link`) — Link "Pular para o conteúdo principal" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo).
 - `Footer` (`footer`) — Rodapé institucional (<footer>, landmark contentinfo) com seções de links e faixa final. Use um por página, fora do <main>.
 - `Tabs` (`tabs`) — Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix. A aba ativa tem barra inferior de 3px em `primary` (≥4,97:1) e peso semibold, além do fundo: não depende só de cor. Alvo de 44px.
@@ -225,7 +228,7 @@ Lista gerada do manifest (export principal, `code` e descrição). Detalhes, var
 - `Alert` (`alert`) — Mensagem de feedback em linha, com ícone automático por variante. Só destructive interrompe o leitor de tela (role=alert); as demais usam role=status.
 - `AlertDialog` (`alert-dialog`) — Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role="alertdialog", sempre modal, não fecha por clique fora e abre com o foco no Cancelar.
 - `Popover` (`popover`) — Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.
-- `Spinner` (`spinner`) — Indicador de carregamento inline (role=status).
+- `Spinner` (`spinner`) — Indicador de carregamento inline (role=status). Com `decorative`, é só visual (sem role, aria-label nem texto sr-only), para quando outro elemento já anuncia o carregamento; é o que o `Button` com `loading` usa.
 - `Progress` (`progress`) — Barra de progresso determinada. Trilha com contorno border-strong (3,77:1 sobre surface) e indicador primary.
 - `Drawer` (`drawer`) — Painel deslizante de qualquer lado da tela.
 - `Sheet` (`sheet`) — Painel lateral modal com overlay. Variantes left/right/top/bottom.

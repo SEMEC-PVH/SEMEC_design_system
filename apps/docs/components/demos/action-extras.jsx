@@ -64,10 +64,10 @@ export function BotoesExtras() {
       </Scenario>
       <Scenario
         title="Ação com carregamento"
-        desc="Enquanto processa, o botão desabilita e mostra um indicador — evita duplo envio."
+        desc="Com `loading`, o botão mostra o indicador, ignora novos cliques (evita duplo envio) e continua focalizável, sem perder o foco de quem usa teclado."
         code={buttonLoadingUsage}
         filename="ButtonLoading.jsx"
-        prompt="Crie botão com estado de carregamento (spinner Loader2 animate-spin + disabled) usando semec-ds-react Button"
+        prompt="Crie botão com estado de carregamento usando a prop loading (e loadingText) do Button do semec-ds-react"
       >
         <ButtonLoading />
       </Scenario>
