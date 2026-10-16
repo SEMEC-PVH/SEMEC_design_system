@@ -89,7 +89,10 @@ interface DataTableProps<T> extends React.HTMLAttributes<HTMLDivElement> {
   labels?: Partial<DataTableLabels>;
 }
 
-function DataTableInner<T extends Record<string, unknown>>(
+// NEXT42-03: `T extends object` (e não `Record<string, unknown>`) para aceitar
+// linhas tipadas com `interface`, que não têm assinatura de índice. Alargar a
+// restrição não quebra quem já passava `type`.
+function DataTableInner<T extends object>(
   {
     columns,
     data,
@@ -256,7 +259,7 @@ function DataTableInner<T extends Record<string, unknown>>(
                     >
                       {col.render
                         ? col.render(row, index)
-                        : String(row[col.key] ?? "")}
+                        : String((row as Record<string, unknown>)[col.key] ?? "")}
                     </td>
                   ))}
                 </tr>
@@ -305,7 +308,7 @@ function DataTableInner<T extends Record<string, unknown>>(
 }
 
 const DataTable = React.forwardRef(DataTableInner) as <
-  T extends Record<string, unknown>
+  T extends object
 >(
   props: DataTableProps<T> & { ref?: React.Ref<HTMLDivElement> }
 ) => React.ReactElement;

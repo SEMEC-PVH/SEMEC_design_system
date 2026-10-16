@@ -29,7 +29,7 @@ const tsc = createRequire(path.join(pkgRoot, "package.json")).resolve("typescrip
 const dir = fs.mkdtempSync(path.join(pkgRoot, ".check-dts-"));
 
 const consumer = `import * as React from "react";
-import { Button, IconButton, Spinner, Stepper, PasswordInput, InputMask, Input, FormField } from "@semec/ds/react";
+import { Button, IconButton, Spinner, Stepper, PasswordInput, InputMask, Input, FormField, DataTable } from "@semec/ds/react";
 import { Button as SubButton, buttonVariants, type ButtonProps } from "@semec/ds/react/button";
 import { Stepper as SubStepper, type StepperProps } from "@semec/ds/react/stepper";
 import { InputMask as SubInputMask, applyInputMask, inputMaskPatterns, type InputMaskPreset } from "@semec/ds/react/input-mask";
@@ -101,6 +101,31 @@ const newProps: [CalendarProps, ComboboxProps, InputOTPProps, FileUploadProps, D
   },
 ];
 
+// NEXT42-03: linha tipada com \`interface\` (sem assinatura de índice). Com
+// \`T extends Record<string, unknown>\` dava TS2344/TS2322; \`type\` já passava.
+interface ProtocoloI {
+  numero: string;
+  status: string;
+}
+type ProtocoloT = { numero: string; status: string };
+const protocolosI: ProtocoloI[] = [{ numero: "2026/1", status: "Aberto" }];
+const protocolosT: ProtocoloT[] = [{ numero: "2026/2", status: "Fechado" }];
+export const tabelas = (
+  <>
+    <DataTable<ProtocoloI>
+      columns={[{ key: "numero", header: "Número", render: (p: ProtocoloI) => p.numero }]}
+      data={protocolosI}
+      rowLabel={(p) => "Abrir protocolo " + p.numero}
+      onRowClick={(p) => p.status}
+    />
+    <DataTable
+      columns={[{ key: "status", header: "Situação", render: (p: ProtocoloI) => p.status.toUpperCase() }]}
+      data={protocolosI}
+    />
+    <DataTable columns={[{ key: "numero", header: "Número" }]} data={protocolosT} rowKey={(p) => p.numero} />
+  </>
+);
+
 const firstComponent: DsComponent | undefined = dsComponents[0];
 const bySlug: DsComponent | undefined = dsBySlug["botoes"];
 const forms: DsComponent[] = dsByCategory("formularios");
@@ -170,7 +195,7 @@ try {
     console.error(out);
   }
   if (status === 0) {
-    console.log("check-dts: ok (@semec/ds/react e subpaths button, stepper, input-mask, password-input, form-field; @semec/ds/skills e @semec/ds/lite/skills tipados; button-loading fechado; onChange(valor) da 3.x recusado com erro que cita onValueChange; nodenext e bundler, skipLibCheck false).");
+    console.log("check-dts: ok (@semec/ds/react e subpaths button, stepper, input-mask, password-input, form-field; DataTable com linha `interface`; @semec/ds/skills e @semec/ds/lite/skills tipados; button-loading fechado; onChange(valor) da 3.x recusado com erro que cita onValueChange; nodenext e bundler, skipLibCheck false).");
   }
 } finally {
   fs.rmSync(dir, { recursive: true, force: true });
