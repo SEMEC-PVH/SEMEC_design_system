@@ -348,10 +348,9 @@ describe("FileUpload", () => {
     expect(await severeViolations()).toEqual([]);
   });
 
-  // TST-F2-08: formatBytes (file-upload.tsx) usa toFixed(1) com ponto decimal:
-  // o erro sai "Arquivo excede o limite de 5.0 MB." e a lista mostra "1.5 MB".
-  // A régua do kit (PT-BR, ADR-016) pede vírgula decimal: "5 MB"/"5,0 MB", "1,5 MB".
-  it.fails("TST-F2-08: o limite de tamanho sai com vírgula decimal (PT-BR)", () => {
+  // TST-F2-08 / TST-13 (#54): formatBytes usava toFixed(1) com ponto decimal
+  // ("5.0 MB", "1.5 MB"). A régua do kit (PT-BR, ADR-016) pede vírgula decimal.
+  it("TST-F2-08: o limite de tamanho sai com vírgula decimal (PT-BR)", () => {
     const { container } = render(<FileUpload label="Anexo" maxSize={5 * 1024 * 1024} />);
     soltar(container.querySelector(".border-dashed")!, [arquivo("grande.pdf", 6 * 1024 * 1024, "application/pdf")]);
     expect(screen.getByText(/^Arquivo excede o limite de /)).toHaveTextContent(
@@ -359,9 +358,19 @@ describe("FileUpload", () => {
     );
   });
 
-  it.fails("TST-F2-08: o tamanho do arquivo na lista sai com vírgula decimal (PT-BR)", () => {
+  it("TST-F2-08: o tamanho do arquivo na lista sai com vírgula decimal (PT-BR)", () => {
     const { container } = render(<FileUpload label="Anexo" />);
     soltar(container.querySelector(".border-dashed")!, [arquivo("rg.pdf", 1.5 * 1024 * 1024, "application/pdf")]);
     expect(screen.getByText(/MB$/)).toHaveTextContent("1,5 MB");
+  });
+
+  it("TST-13: KB também sai com vírgula decimal e bytes ficam inteiros", () => {
+    const { container } = render(<FileUpload label="Anexo" multiple />);
+    soltar(container.querySelector(".border-dashed")!, [
+      arquivo("foto.png", 2.5 * 1024, "image/png"),
+      arquivo("nota.txt", 512, "text/plain"),
+    ]);
+    expect(screen.getByText(/KB$/)).toHaveTextContent("2,5 KB");
+    expect(screen.getByText(/ B$/)).toHaveTextContent("512 B");
   });
 });

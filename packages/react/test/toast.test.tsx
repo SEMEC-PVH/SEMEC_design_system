@@ -237,10 +237,10 @@ describe("Toast", () => {
     expect(await severeViolations()).toEqual([]);
   });
 
-  // TST-F2-01: `toast({ onOpenChange })` é aceito pelo tipo (ToastProps), mas o
-  // `toast()` sobrescreve o handler com o seu próprio (toast.tsx: `onOpenChange: (open) => ...`
-  // depois do `...props`), então o consumidor nunca é avisado do fechamento.
-  it.fails("TST-F2-01: onOpenChange passado a toast() é chamado ao fechar", async () => {
+  // TST-F2-01 / TST-24 (#54): `toast({ onOpenChange })` é aceito pelo tipo
+  // (ToastProps), mas o `toast()` sobrescrevia o handler com o seu próprio
+  // (depois do `...props`), então o consumidor nunca era avisado do fechamento.
+  it("TST-F2-01: onOpenChange passado a toast() é chamado ao fechar", async () => {
     const onOpenChange = vi.fn();
     const user = userEvent.setup();
     render(
@@ -252,5 +252,50 @@ describe("Toast", () => {
     await user.click(screen.getByRole("button", { name: "Disparar" }));
     await user.click(within(avisoCom("Com callback")).getByRole("button", { name: "Fechar notificação" }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("TST-24: com onOpenChange do consumidor, fechar ainda tira o aviso da tela", async () => {
+    const onOpenChange = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <>
+        <Disparador props={{ title: "Some ao fechar", onOpenChange }} />
+        <Toaster />
+      </>
+    );
+    await user.click(screen.getByRole("button", { name: "Disparar" }));
+    await user.click(within(avisoCom("Some ao fechar")).getByRole("button", { name: "Fechar notificação" }));
+    expect(onOpenChange).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(screen.queryByText("Some ao fechar")).not.toBeInTheDocument());
+  });
+
+  it("TST-24: update() com novo onOpenChange troca o do consumidor sem perder o interno", async () => {
+    const primeiro = vi.fn();
+    const segundo = vi.fn();
+    const user = userEvent.setup();
+    function Atualiza() {
+      const { toast } = useToast();
+      return (
+        <Button
+          onClick={() => {
+            const t = toast({ title: "Atualizável", onOpenChange: primeiro });
+            t.update({ id: t.id, title: "Atualizado", onOpenChange: segundo });
+          }}
+        >
+          Disparar
+        </Button>
+      );
+    }
+    render(
+      <>
+        <Atualiza />
+        <Toaster />
+      </>
+    );
+    await user.click(screen.getByRole("button", { name: "Disparar" }));
+    await user.click(within(avisoCom("Atualizado")).getByRole("button", { name: "Fechar notificação" }));
+    expect(primeiro).not.toHaveBeenCalled();
+    expect(segundo).toHaveBeenCalledWith(false);
+    await waitFor(() => expect(screen.queryByText("Atualizado")).not.toBeInTheDocument());
   });
 });

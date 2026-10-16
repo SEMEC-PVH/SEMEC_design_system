@@ -46,13 +46,20 @@ describe("Header", () => {
     expect(marca).toHaveAccessibleName(/^Prefeitura de Porto Velho.*Matrícula\s*— ir para o início$/);
   });
 
-  // TST-F2-05: o separador "|" é aria-hidden e não há espaço em texto entre
-  // `orgName` e `serviceName` (header.tsx: `{orgName}<span aria-hidden>|</span><span>…`).
-  // O nome acessível junta as palavras: no Chromium (CDP, getFullAXTree) o link
-  // se chama "Prefeitura de Porto Velho SEMECMatrícula — ir para o início".
-  it.fails("TST-F2-05: o nome da marca separa orgName e serviceName", () => {
+  // TST-F2-05 / TST-12 (#54): o separador "|" é aria-hidden; sem espaço em
+  // texto entre `orgName` e `serviceName` o nome acessível juntava as palavras
+  // ("…SEMECMatrícula— ir para o início", medido no Chromium via CDP).
+  it("TST-F2-05: o nome da marca separa orgName, serviceName e o travessão", () => {
     render(<HeaderBrand orgName="SEMEC" serviceName="Matrícula" logo={logo} />);
-    expect(screen.getByRole("link")).toHaveAccessibleName(/SEMEC\s+Matrícula/);
+    const marca = screen.getByRole("link");
+    expect(marca).toHaveAccessibleName(/SEMEC\s+Matrícula/);
+    expect(marca).toHaveAccessibleName(/^Prefeitura de Porto Velho\s+SEMEC\s+Matrícula\s+—\s+ir para o início$/);
+  });
+
+  // TST-10 (#54): a marca é alvo de toque; precisa de 44 px de altura no mobile.
+  it("TST-10: o link da marca tem altura mínima de 44 px (min-h-11)", () => {
+    render(<HeaderBrand orgName="SEMEC" serviceName="Matrícula" logo={logo} />);
+    expect(screen.getByRole("link")).toHaveClass("min-h-11");
   });
 
   it("o separador \"|\" e o placeholder do logo ficam fora da árvore de acessibilidade", () => {

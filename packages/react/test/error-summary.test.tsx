@@ -248,4 +248,113 @@ describe("ErrorSummary", () => {
     await userEvent.setup().click(screen.getByRole("link"));
     expect(screen.getByRole("radio", { name: "Tarde" })).toHaveFocus();
   });
+
+  // TST-01 (#48): depois de um envio inválido, a validação ao vivo (RHF,
+  // Formik) revalida a cada tecla e a contagem de erros muda. O resumo não pode
+  // roubar o foco do campo, senão as teclas seguintes se perdem: o celular
+  // "69999998888" era gravado com 10 dígitos e passava como número fixo.
+  describe("validação ao vivo depois do envio (TST-01)", () => {
+    function validar(celular: string, nome: string) {
+      const lista: { id: string; message: string }[] = [];
+      if (!nome) lista.push({ id: "nome", message: "Informe o nome." });
+      // Regras progressivas: cada faixa de dígitos muda a contagem de erros.
+      if (celular.length < 2) lista.push({ id: "celular", message: "Informe o DDD." });
+      if (celular.length < 6) lista.push({ id: "celular", message: "Informe o número." });
+      if (celular.length < 11) lista.push({ id: "celular", message: "O celular precisa ter 11 dígitos." });
+      if (celular.length % 2 === 1) lista.push({ id: "celular", message: "Revise o número." });
+      return lista;
+    }
+
+    function Formulario({ onGravar }: { onGravar: (v: string) => void }) {
+      const [celular, setCelular] = React.useState("");
+      const [envios, setEnvios] = React.useState(0);
+      const lista = envios > 0 ? validar(celular, "") : [];
+      return (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setEnvios((n) => n + 1);
+            onGravar(celular);
+          }}
+        >
+          <ErrorSummary errors={lista} focusKey={envios} />
+          <FormField label="Celular">
+            <Input
+              id="celular"
+              inputMode="numeric"
+              value={celular}
+              onChange={(e) => setCelular(e.target.value.replace(/\D/g, ""))}
+            />
+          </FormField>
+          <button type="submit">Enviar</button>
+        </form>
+      );
+    }
+
+    it("digitar no campo não move o foco para o resumo e grava os 11 dígitos", async () => {
+      const onGravar = vi.fn();
+      const user = userEvent.setup();
+      render(<Formulario onGravar={onGravar} />);
+      await user.click(screen.getByRole("button", { name: "Enviar" }));
+      expect(screen.getByRole("alert")).toHaveFocus();
+
+      const campo = screen.getByRole("textbox", { name: "Celular" });
+      await user.click(campo);
+      await user.keyboard("69999998888");
+      expect(campo).toHaveFocus();
+      expect(campo).toHaveValue("69999998888");
+
+      await user.click(screen.getByRole("button", { name: "Enviar" }));
+      expect(onGravar).toHaveBeenLastCalledWith("69999998888");
+    });
+
+    it("só a contagem mudar não refoca; 0 → N erros e focusKey novo refocam", () => {
+      const um = [erros[0]!];
+      const { rerender } = render(
+        <>
+          <input aria-label="Campo" />
+          <ErrorSummary errors={erros} focusKey={1} />
+        </>
+      );
+      expect(screen.getByRole("alert")).toHaveFocus();
+      const campo = screen.getByRole("textbox", { name: "Campo" });
+      campo.focus();
+      rerender(
+        <>
+          <input aria-label="Campo" />
+          <ErrorSummary errors={um} focusKey={1} />
+        </>
+      );
+      expect(campo).toHaveFocus();
+      rerender(
+        <>
+          <input aria-label="Campo" />
+          <ErrorSummary errors={erros} focusKey={1} />
+        </>
+      );
+      expect(campo).toHaveFocus();
+      // Some (0 erros) e volta: é um resumo novo na tela, então foca.
+      rerender(
+        <>
+          <input aria-label="Campo" />
+          <ErrorSummary errors={[]} focusKey={1} />
+        </>
+      );
+      rerender(
+        <>
+          <input aria-label="Campo" />
+          <ErrorSummary errors={um} focusKey={1} />
+        </>
+      );
+      expect(screen.getByRole("alert")).toHaveFocus();
+      campo.focus();
+      rerender(
+        <>
+          <input aria-label="Campo" />
+          <ErrorSummary errors={um} focusKey={2} />
+        </>
+      );
+      expect(screen.getByRole("alert")).toHaveFocus();
+    });
+  });
 });

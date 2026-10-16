@@ -220,13 +220,22 @@ describe("Progress", () => {
     expect(indicador.style.transform).toBe("translateX(-75%)");
   });
 
-  // TST-F2-06: o indicador usa `translateX(-${100 - (value || 0)}%)`
-  // (progress.tsx) sem considerar `max`. Com max=4 e value=3, a barra mostra 3%
-  // preenchido enquanto o leitor de tela anuncia 75% (aria-valuetext do Radix).
-  it.fails("TST-F2-06: com max=4 e value=3 o indicador mostra 75% (translateX(-25%))", () => {
+  // TST-F2-06 / TST-14 (#54): o indicador usava `translateX(-${100 - value}%)`
+  // sem considerar `max`. Com max=4 e value=3, a barra mostrava 3% preenchido
+  // enquanto o leitor de tela anunciava 75% (aria-valuetext do Radix).
+  it("TST-F2-06: com max=4 e value=3 o indicador mostra 75% (translateX(-25%))", () => {
     const { container } = render(<Progress value={3} max={4} aria-label="Etapas" />);
     const indicador = container.querySelector("[data-state] > div") as HTMLElement;
     expect(indicador.style.transform).toBe("translateX(-25%)");
+  });
+
+  it("TST-14: indeterminado (value=null) fica vazio e max inválido cai para 100", () => {
+    const { container, rerender } = render(<Progress value={null} max={4} aria-label="Etapas" />);
+    const indicador = () => container.querySelector("[data-state] > div") as HTMLElement;
+    expect(indicador().style.transform).toBe("translateX(-100%)");
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    rerender(<Progress value={40} max={0} aria-label="Etapas" />);
+    expect(indicador().style.transform).toBe("translateX(-60%)");
   });
 
   it("zero serious/critical", async () => {

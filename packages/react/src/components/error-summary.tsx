@@ -13,7 +13,16 @@ export interface ErrorSummaryItem {
 export interface ErrorSummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   errors?: ErrorSummaryItem[];
+  /**
+   * Foca o resumo quando ele aparece (de 0 para N erros) e a cada troca de
+   * `focusKey`. Mudanças só na lista de erros (validação ao vivo) não movem o
+   * foco. Padrão: `true`.
+   */
   autoFocus?: boolean;
+  /**
+   * Valor que muda a cada envio (ex.: `formState.submitCount`) para devolver o
+   * foco ao resumo mesmo quando os erros continuam os mesmos.
+   */
   focusKey?: unknown;
 }
 
@@ -39,11 +48,22 @@ const ErrorSummary = React.forwardRef<HTMLDivElement, ErrorSummaryProps>(
       [ref]
     );
 
+    // Foco só quando o resumo aparece (0 → N erros) ou quando o `focusKey`
+    // muda (novo envio). Mudar só a contagem — a validação ao vivo do RHF ou
+    // do Formik revalida a cada tecla — não pode tirar o foco do campo em que
+    // a pessoa digita (WCAG 3.2.2; TST-01).
+    const prevCount = React.useRef(0);
+    const prevFocusKey = React.useRef<unknown>(focusKey);
+    const count = errors.length;
     React.useEffect(() => {
-      if (autoFocus && errors.length > 0) {
+      const apareceu = prevCount.current === 0 && count > 0;
+      const novoEnvio = !Object.is(prevFocusKey.current, focusKey);
+      prevCount.current = count;
+      prevFocusKey.current = focusKey;
+      if (autoFocus && count > 0 && (apareceu || novoEnvio)) {
         internalRef.current?.focus();
       }
-    }, [autoFocus, errors.length, focusKey]);
+    }, [autoFocus, count, focusKey]);
 
     if (errors.length === 0) return null;
 
