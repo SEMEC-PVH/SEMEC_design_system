@@ -9,7 +9,7 @@ variants: "props: title · errors [{ id, message }] · autoFocus · focusKey"
 
 # ErrorSummary — `error-summary`
 
-> Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático ao passar de 0 para N erros e a cada mudança de `focusKey` (sem roubar o foco enquanto a pessoa digita), título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`).
+> Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco, título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`).
 
 **Arquivo:** `src/components/error-summary.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/error-summary`
 
@@ -49,7 +49,7 @@ import { ErrorSummary } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `ErrorSummary` (ErrorSummary) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático ao passar de 0 para N erros e a cada mudança de `focusKey` (sem roubar o foco enquanto a pessoa digita), título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`). API e variantes: props: title · errors [{ id, message }] · autoFocus · focusKey. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `ErrorSummary` (ErrorSummary) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco, título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`). API e variantes: props: title · errors [{ id, message }] · autoFocus · focusKey. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -71,17 +71,29 @@ export interface ErrorSummaryProps extends React.HTMLAttributes<HTMLDivElement> 
   title?: string;
   errors?: ErrorSummaryItem[];
   /**
-   * Foca o resumo quando ele aparece (de 0 para N erros) e a cada troca de
-   * `focusKey`. Mudanças só na lista de erros (validação ao vivo) não movem o
-   * foco. Padrão: `true`.
+   * Foca o resumo automaticamente. Com `focusKey`, o foco vem **só** quando o
+   * `focusKey` muda (inclusive na montagem, se for um valor ainda não focado
+   * naquele formulário). Sem `focusKey`, foca quando o resumo aparece (de 0
+   * para N erros). Mudanças só na lista de erros (validação ao vivo) nunca
+   * movem o foco. Padrão: `true`.
    */
   autoFocus?: boolean;
   /**
-   * Valor que muda a cada envio (ex.: `formState.submitCount`) para devolver o
-   * foco ao resumo mesmo quando os erros continuam os mesmos.
+   * Valor que muda a cada envio inválido (ex.: `tentativa`, somada no callback
+   * de envio inválido do `handleSubmit`). É o único gatilho de foco quando
+   * informado: o resumo que some e volta durante a digitação (0 → N erros) não
+   * rouba o foco do campo (WCAG 3.2.2; TST-01). O último valor focado fica
+   * guardado no `<form>` (ou no elemento pai) e sobrevive à desmontagem, então
+   * a renderização condicional (`erros.length > 0 && <ErrorSummary … />`)
+   * também funciona.
    */
   focusKey?: unknown;
 }
+
+// Último `focusKey` visto por âncora (o `<form>` ou o pai do resumo). Fica fora
+// do componente porque a receita monta o resumo só quando há erros: sem isso,
+// cada remontagem (0 → N erros na validação ao vivo) pareceria um envio novo.
+const focusKeyPorAncora = new WeakMap<Element, unknown>();
 
 // Primeiro elemento focável dentro do alvo (input hidden não conta).
 const FOCUSABLE =
@@ -105,22 +117,40 @@ const ErrorSummary = React.forwardRef<HTMLDivElement, ErrorSummaryProps>(
       [ref]
     );
 
-    // Foco só quando o resumo aparece (0 → N erros) ou quando o `focusKey`
-    // muda (novo envio). Mudar só a contagem — a validação ao vivo do RHF ou
-    // do Formik revalida a cada tecla — não pode tirar o foco do campo em que
-    // a pessoa digita (WCAG 3.2.2; TST-01).
+    // Gatilhos de foco (WCAG 3.2.2; TST-01, #48). Mudar só a contagem — a
+    // validação ao vivo do RHF ou do Formik revalida a cada tecla — nunca tira
+    // o foco do campo em que a pessoa digita.
+    // - Com `focusKey`: foca só quando ele difere do último valor visto naquela
+    //   âncora. O resumo que some e volta com o mesmo `focusKey` não foca.
+    // - Sem `focusKey`: foca na transição de 0 para N erros (comportamento
+    //   legado; com validação ao vivo, passe `focusKey`).
     const prevCount = React.useRef(0);
-    const prevFocusKey = React.useRef<unknown>(focusKey);
+    const ultimaChave = React.useRef<{ valor: unknown } | null>(null);
     const count = errors.length;
+    const temFocusKey = focusKey !== undefined;
     React.useEffect(() => {
-      const apareceu = prevCount.current === 0 && count > 0;
-      const novoEnvio = !Object.is(prevFocusKey.current, focusKey);
-      prevCount.current = count;
-      prevFocusKey.current = focusKey;
-      if (autoFocus && count > 0 && (apareceu || novoEnvio)) {
-        internalRef.current?.focus();
+      const el = internalRef.current;
+      let deveFocar = false;
+      if (temFocusKey) {
+        // A chave só é consumida com erros na tela: no Formik o `submitCount`
+        // muda antes de os erros chegarem, e o foco espera por eles.
+        if (count > 0) {
+          const ancora = el?.closest("form") ?? el?.parentElement ?? null;
+          const vista =
+            ancora && focusKeyPorAncora.has(ancora)
+              ? { valor: focusKeyPorAncora.get(ancora) }
+              : ultimaChave.current;
+          deveFocar = vista === null || !Object.is(vista.valor, focusKey);
+          ultimaChave.current = { valor: focusKey };
+          if (ancora) focusKeyPorAncora.set(ancora, focusKey);
+        }
+      } else {
+        deveFocar = prevCount.current === 0 && count > 0;
       }
-    }, [autoFocus, count, focusKey]);
+      prevCount.current = count;
+
+      if (autoFocus && deveFocar) el?.focus();
+    }, [autoFocus, count, focusKey, temFocusKey]);
 
     if (errors.length === 0) return null;
 
