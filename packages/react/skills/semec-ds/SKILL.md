@@ -418,6 +418,7 @@ Nunca `outline: none` sem alternativa visível com 3:1.
 - Estados: `aria-invalid`, `aria-expanded`, `aria-selected`, `aria-current="page"`
 - Textos auxiliares: classe `sr-only`
 - Idioma: `<html lang="pt-BR">`
+- Teste de teclado no Safari: no padrão do macOS o `Tab` não para em links nem botões. Ligue "Navegação por teclado" no macOS e "Pressionar Tab para destacar cada item" no Safari (ou use `Option+Tab`) antes de concluir que algo saiu da ordem de Tab
 
 ### Áreas clicáveis
 

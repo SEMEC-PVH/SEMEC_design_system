@@ -336,6 +336,8 @@ Medido na prova com política estrita (SEM-752/SEM-780):
 
 Os componentes seguem o WCAG 2.1 AA (ADR-014): teclado, foco visível, contraste e nomes acessíveis já vêm prontos. O que o app monta em volta (rótulos, títulos, ordem da página) é responsabilidade dele; a skill `semec-ds` traz os padrões de tela.
 
+**Teste de teclado no Safari:** com a configuração padrão do macOS, o `Tab` do Safari não para em links nem em botões (só em campos), então os links do `ErrorSummary`, o `SkipLink`, o `Breadcrumb`, o `Link` e os botões parecem "fora do Tab". Não é defeito do kit: ligue **Ajustes do Sistema › Teclado › Navegação por teclado** e, no Safari, **Ajustes › Avançado › Pressionar Tab para destacar cada item** (ou use `Option+Tab`). Mesmo sem isso o formulário continua utilizável, porque os campos do resumo de erros são alcançáveis direto pelo `Tab`.
+
 ### axe na CI do seu app
 
 Com `Select`, `DropdownMenu` ou `NavigationMenu` **abertos**, o axe acusa `aria-hidden-focus` (serious). É a exceção aceita **EXC-01** ([docs/excecoes-acessibilidade.md](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/excecoes-acessibilidade.md#exc-01-aria-hidden-focus-com-select-ou-dropdownmenu-abertos-aud-19)), não um defeito do seu app:
