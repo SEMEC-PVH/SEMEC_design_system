@@ -16,7 +16,7 @@ export interface FileUploadLabels {
   dropzoneAction: string;
   /** Erro de tipo não aceito. Padrão: "Tipo de arquivo não permitido.". */
   invalidType: string;
-  /** Erro de tamanho; recebe o limite já formatado (ex.: "5.0 MB"). */
+  /** Erro de tamanho; recebe o limite já formatado em PT-BR (ex.: "5 MB", "1,5 MB"). */
   tooLarge: (maxSize: string) => string;
 }
 
@@ -77,10 +77,14 @@ export interface FileUploadProps
   labels?: Partial<FileUploadLabels>;
 }
 
+// Vírgula decimal PT-BR e no máximo 1 casa (ADR-016; TST-13): "5 MB", "1,5 MB".
+const decimalPtBR = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
+
+/** Tamanho legível em PT-BR: `512 B`, `1,5 KB`, `5 MB`. */
 const formatBytes = (bytes: number) => {
   if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1024 * 1024) return `${decimalPtBR.format(bytes / 1024)} KB`;
+  return `${decimalPtBR.format(bytes / (1024 * 1024))} MB`;
 };
 
 // Mesma regra do atributo `accept`: extensões (".pdf"), MIME exato ou curinga ("image/*").
