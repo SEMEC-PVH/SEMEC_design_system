@@ -185,6 +185,31 @@ jobs:
             tests/visual/.report
           retention-days: 14
 
+  gate-browsers:
+    name: gate (webkit/firefox)
+    # Cobertura opcional (NAV-05): os checks com navegador do gate e o
+    # comportamento da suíte visual em WebKit e Firefox (sem baselines: pixel de
+    # fonte muda por motor). Não obrigatório: não entra nos checks exigidos da
+    # branch protection e não reprova o PR enquanto a cobertura amadurece.
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
+    env:
+      CI: "1"
+      HOME: /root
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install
+        run: npm ci
+
+      - name: Gate em WebKit e Firefox
+        run: npm run gate:browsers
+
+      - name: Comportamento da suíte visual em WebKit e Firefox
+        run: npm run test:visual:browsers
+
   gate:
     name: gate
     runs-on: ubuntu-latest
