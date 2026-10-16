@@ -6,10 +6,16 @@
 // textura opaca), placa de latão com nome e cargo e uma luminária de quadro
 // em cima. Nada no chão: os tiles `ver` ficam livres para o jogador.
 //
+// Realce: de frente para o quadro (setPerto), a luminária acende mais e uma
+// luz morna "lava" a pintura e a placa; no close (setDestaque) ela fica mais
+// forte e o spot do trilho que cobre o quadro (sala.js) aumenta. Nenhuma
+// luz nova: o brilho é um plano aditivo só, que vai para o quadro da vez.
+//
 // Coordenadas locais de cada quadro: origem no centro da moldura, no plano da
 // face da parede; +z aponta para dentro da sala (o `normal` do slot).
 
 import * as THREE from "three";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { QUADRO, SLOTS, centroQuadro } from "./layout";
 
 // Medidas da moldura (metade da largura/altura de cada contorno).
@@ -33,11 +39,15 @@ const FUNDOS = ["blue-300", "green-500", "red-300", "yellow-400", "blue-500", "r
 
 // Brilho (emissive) de cada parte: em repouso, perto e em destaque.
 const BRILHO = {
-  tela: [0.14, 0.2, 0.42],
-  moldura: [0, 0.04, 0.22],
-  placa: [0.06, 0.4, 0.3],
-  lampada: [0.7, 1.3, 1.6],
+  tela: [0.14, 0.24, 0.34],
+  moldura: [0, 0.06, 0.14],
+  placa: [0.06, 0.3, 0.3],
+  lampada: [0.7, 1.6, 1.9],
 };
+// Opacidade do plano de luz da luminária (perto, destaque) e reforço do
+// spot do trilho no destaque (× intensidade base).
+const LAVA = { perto: 0.38, destaque: 0.42 };
+const SPOT_REFORCO = 1.6;
 
 // Aleatório determinístico (mesmo quadro sempre com as mesmas pinceladas).
 function rng(seed) {
@@ -175,9 +185,40 @@ function desenharTela(canvas, q, i, pal, img) {
     ctx.drawImage(img, (w - lado) / 2, h - lado, lado, lado);
     ctx.restore();
   } else {
-    silhueta(ctx, cores, "sans-serif");
+    silhueta(ctx, cores, pal.font);
   }
   acabamento(ctx, pal, seed, cores.escuro);
+}
+
+// Luz da luminária de quadro: forte no alto, abre e some para baixo (vai
+// até a placa). Branco sobre preto, para mistura aditiva.
+function texturaLava(pal) {
+  const w = 128;
+  const h = 256;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = css(pal.black);
+  ctx.fillRect(0, 0, w, h);
+  ctx.save();
+  ctx.translate(w / 2, 0);
+  // Preto antes das bordas (a 90% do raio): nenhuma aresta visível.
+  ctx.scale(1, 4.2);
+  const g = ctx.createRadialGradient(0, 0, 0, 0, 0, w * 0.5);
+  g.addColorStop(0, css(pal.white));
+  g.addColorStop(0.45, css(pal.mix(pal.white, pal.black, 0.6)));
+  g.addColorStop(0.9, css(pal.black));
+  ctx.fillStyle = g;
+  ctx.fillRect(-w / 2, 0, w, h);
+  ctx.restore();
+  // E some também no alto (a luz nasce na luminária, sem linha reta).
+  const topo = ctx.createLinearGradient(0, 0, 0, h * 0.14);
+  topo.addColorStop(0, css(pal.black));
+  topo.addColorStop(1, css(pal.black, 0));
+  ctx.fillStyle = topo;
+  ctx.fillRect(0, 0, w, h * 0.14);
+  return canvasTex(canvas, false);
 }
 
 // ---- Placa de latão -------------------------------------------------------
@@ -341,12 +382,21 @@ function geometrias() {
     conchaTopo,
     conchaBase,
     placa: new THREE.BoxGeometry(PLACA.w, PLACA.h, 0.018),
+    placaFrente: new THREE.PlaneGeometry(PLACA.w - 0.004, PLACA.h - 0.004),
     suporte: new THREE.BoxGeometry(0.1, 0.06, 0.05),
     braco,
     cupula,
     lampada: new THREE.BoxGeometry(0.52, 0.012, 0.05),
     hit: new THREE.BoxGeometry(QUADRO.largura + 0.1, QUADRO.altura + 0.75, 0.3),
   };
+}
+
+// Junta geometrias num BufferGeometry só (todas viram não indexadas).
+function juntar(geos) {
+  const lista = geos.map((g) => (g.index ? g.toNonIndexed() : g));
+  const out = mergeGeometries(lista, false);
+  for (const g of new Set([...geos, ...lista])) g.dispose();
+  return out;
 }
 
 // ---- Construção -----------------------------------------------------------
@@ -378,17 +428,41 @@ export function buildQuadros({ scene, pal, track, lite, reducedMotion, quadros =
   const matLatao = metal(latao, 0.4);
   const matHit = reg(new THREE.MeshBasicMaterial({ visible: false }));
 
-  // Uma só luz real, que acompanha o quadro em destaque (fora do lite).
-  let spot = null;
-  if (!lite) {
-    spot = new THREE.SpotLight(luzQuente, 0, 4.5, 0.55, 0.65, 1.2);
-    spot.castShadow = false;
-    scene.add(spot, spot.target);
-  }
+  // Spots do trilho (sala.js, fora do lite): o do par do quadro em destaque
+  // é reforçado; nenhuma luz nova aqui.
+  const spots = [];
+  scene.traverse((o) => {
+    if (o.isSpotLight && Array.isArray(o.userData.slots)) spots.push(o);
+  });
+
+  // Plano de luz da luminária: um só, levado ao quadro perto/em destaque.
+  const lavaMat = reg(
+    new THREE.MeshBasicMaterial({
+      map: reg(texturaLava(pal)),
+      color: luzQuente,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
+  );
+  const lavaGeo = reg(new THREE.PlaneGeometry(QUADRO.largura + 0.5, QUADRO.altura + 0.7).translate(0, -0.1, 0));
+  const lava = new THREE.Mesh(lavaGeo, lavaMat);
+  lava.visible = false;
+  lava.renderOrder = 3;
 
   const raiz = new THREE.Group();
   raiz.name = "museu-quadros";
   scene.add(raiz);
+
+  // Lotes por material compartilhado (fechados depois do laço).
+  const porMat = new Map();
+  const lotes = {
+    add(mat, g) {
+      if (!porMat.has(mat)) porMat.set(mat, []);
+      porMat.get(mat).push(g);
+    },
+  };
 
   const loader = new THREE.TextureLoader();
   const hitMeshes = [];
@@ -444,54 +518,63 @@ export function buildQuadros({ scene, pal, track, lite, reducedMotion, quadros =
       new THREE.MeshStandardMaterial({ color: luzQuente, emissive: luzQuente, emissiveIntensity: BRILHO.lampada[0] }),
     );
 
-    const add = (geometria, mat, x, y, z, sombra = true) => {
+    // Peças de material compartilhado vão para os lotes (assadas na posição
+    // do mundo, um mesh por material para os 8 quadros); as de material
+    // próprio (ouro com brilho, tela, placa, lâmpada) ficam no grupo.
+    g.updateMatrix();
+    const m4 = new THREE.Matrix4();
+    const lote = (geometria, mat, x, y, z, rot) => {
+      m4.makeTranslation(x, y, z);
+      if (rot) m4.multiply(rot);
+      lotes.add(mat, geometria.clone().applyMatrix4(m4.premultiply(g.matrix)));
+    };
+    const add = (geometria, mat, x, y, z) => {
       const m = new THREE.Mesh(geometria, mat);
       m.position.set(x, y, z);
-      m.castShadow = sombra && !lite;
       m.receiveShadow = !lite;
       g.add(m);
       return m;
     };
 
-    // Moldura: fundo de madeira, três aros em degrau, rosetas e conchas.
-    add(geo.fundo, matFundo, 0, 0, 0.015, false);
-    add(geo.aro1, matOuro, 0, 0, 0);
-    add(geo.aro2, matOuroEscuro, 0, 0, 0);
-    add(geo.aro3, matOuroClaro, 0, 0, 0, false);
+    // Moldura: fundo de madeira, três aros em degrau, rosetas e conchas. O
+    // aro externo e os miolos das rosetas (ouro com brilho) viram um mesh só.
+    lote(geo.fundo, matFundo, 0, 0, 0.015);
+    lote(geo.aro2, matOuroEscuro, 0, 0, 0);
+    lote(geo.aro3, matOuroClaro, 0, 0, 0);
     const cx = MW2 - ARO1 / 2;
     const cy = MH2 - ARO1 / 2;
+    const ouroGeos = [geo.aro1.clone()];
     for (const [sx, sy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
-      add(geo.roseta, matOuroClaro, sx * cx, sy * cy, 0.14, false);
-      add(geo.miolo, matOuro, sx * cx, sy * cy, 0.16, false);
+      lote(geo.roseta, matOuroClaro, sx * cx, sy * cy, 0.14);
+      ouroGeos.push(geo.miolo.clone().translate(sx * cx, sy * cy, 0.16));
     }
-    add(geo.conchaTopo, matOuroClaro, 0, MH2 - 0.045, 0.125);
-    add(geo.conchaBase, matOuroClaro, 0, -MH2 + 0.045, 0.125, false);
+    const aroOuro = add(reg(juntar(ouroGeos)), matOuro, 0, 0, 0);
+    aroOuro.castShadow = !lite;
+    lote(geo.conchaTopo, matOuroClaro, 0, MH2 - 0.045, 0.125);
+    lote(geo.conchaBase, matOuroClaro, 0, -MH2 + 0.045, 0.125);
 
     // Passe-partout e tela.
-    add(geo.passe, matPasse, 0, 0, 0.042, false);
-    const tela = add(geo.tela, matTela, 0, 0, TELA_Z, false);
-    tela.castShadow = false;
+    lote(geo.passe, matPasse, 0, 0, 0.042);
+    add(geo.tela, matTela, 0, 0, TELA_Z);
 
-    // Placa de latão: faces laterais em latão, frente com a gravação.
-    add(geo.placa, [matLatao, matLatao, matLatao, matLatao, matPlaca, matLatao], 0, PLACA.y, 0.009, false);
+    // Placa de latão: bloco em latão e, na frente, a gravação.
+    lote(geo.placa, matLatao, 0, PLACA.y, 0.009);
+    add(geo.placaFrente, matPlaca, 0, PLACA.y, 0.019);
 
     // Luminária de quadro: suporte na parede, braço e cúpula inclinada
     // sobre a moldura, com a lâmpada (faixa que brilha) por baixo.
     const topo = MH2;
     const base = new THREE.Vector3(0, topo + 0.34, 0.05);
     const ponta = new THREE.Vector3(0, topo + 0.22, 0.3);
-    add(geo.suporte, matLatao, base.x, base.y, 0.025, false);
+    lote(geo.suporte, matLatao, base.x, base.y, 0.025);
     const d = ponta.clone().sub(base);
-    const braco = add(geo.braco, matLatao, 0, (base.y + ponta.y) / 2, (base.z + ponta.z) / 2);
-    braco.scale.y = d.length();
-    braco.rotation.x = Math.atan2(d.z, d.y);
+    const giroBraco = new THREE.Matrix4().makeRotationX(Math.atan2(d.z, d.y)).multiply(new THREE.Matrix4().makeScale(1, d.length(), 1));
+    lote(geo.braco, matLatao, 0, (base.y + ponta.y) / 2, (base.z + ponta.z) / 2, giroBraco);
+    lote(geo.cupula, matLatao, ponta.x, ponta.y, ponta.z, new THREE.Matrix4().makeRotationX(-0.35));
     const cupula = new THREE.Group();
     cupula.position.copy(ponta);
     cupula.rotation.x = -0.35;
     g.add(cupula);
-    const casco = new THREE.Mesh(geo.cupula, matLatao);
-    casco.castShadow = !lite;
-    cupula.add(casco);
     const lamp = new THREE.Mesh(geo.lampada, matLampada);
     lamp.position.y = -0.058;
     cupula.add(lamp);
@@ -539,6 +622,16 @@ export function buildQuadros({ scene, pal, track, lite, reducedMotion, quadros =
       );
     }
   }
+  // Fecha os lotes: sombra só nos aros e na luminária (fundo e passe-partout
+  // ficam colados na parede).
+  for (const [mat, geos] of porMat) {
+    const m = new THREE.Mesh(reg(juntar(geos)), mat);
+    m.castShadow = !lite && mat !== matFundo && mat !== matPasse;
+    m.receiveShadow = !lite;
+    raiz.add(m);
+  }
+  porMat.clear();
+  raiz.add(lava);
   raiz.updateMatrixWorld(true);
 
   // A fonte da página pode chegar depois: regrava as placas.
@@ -565,27 +658,42 @@ export function buildQuadros({ scene, pal, track, lite, reducedMotion, quadros =
     it.matLampada.emissiveIntensity = it.nivel.lampada;
   }
 
-  let spotNivel = 0;
-  const SPOT_MAX = 7;
-
-  function posicionarSpot() {
-    if (!spot) return;
-    const it = destaque ? itens.get(destaque) : null;
+  // Plano de luz: vai para o quadro em destaque (ou o de perto) e acende.
+  let lavaId = null;
+  let lavaNivel = 0;
+  const lavaAlvo = () => (destaque ? LAVA.destaque : perto ? LAVA.perto : 0);
+  function posicionarLava() {
+    const id = destaque ?? perto;
+    if (!id || id === lavaId) return;
+    const it = itens.get(id);
     if (!it) return;
-    spot.position.copy(it.g.localToWorld(new THREE.Vector3(0, MH2 + 0.2, 0.42)));
-    spot.target.position.copy(it.g.localToWorld(new THREE.Vector3(0, -0.15, 0)));
-    spot.target.updateMatrixWorld();
+    // Troca de quadro: começa apagado no novo (sem "pular" aceso).
+    if (lavaId) lavaNivel = 0;
+    lavaId = id;
+    lava.position.copy(it.g.position);
+    lava.rotation.copy(it.g.rotation);
+    // À frente da moldura e da placa (só as rosetas passam um tico dele).
+    lava.translateZ(0.17);
   }
+  function aplicarLava() {
+    lavaMat.opacity = lavaNivel;
+    lava.visible = lavaNivel > 0.002;
+  }
+
+  // Spot do trilho do quadro em destaque: sobe até SPOT_REFORCO × base.
+  const spotAlvo = (sp) => {
+    const i = destaque ? itens.get(destaque)?.i : -1;
+    return sp.userData.base * (sp.userData.slots.includes(i) ? SPOT_REFORCO : 1);
+  };
 
   function snap() {
     for (const it of itens.values()) {
       for (const parte of Object.keys(it.nivel)) it.nivel[parte] = alvo(it, parte);
       aplicar(it);
     }
-    if (spot) {
-      spotNivel = destaque ? SPOT_MAX : 0;
-      spot.intensity = spotNivel;
-    }
+    lavaNivel = lavaAlvo();
+    aplicarLava();
+    for (const sp of spots) sp.intensity = spotAlvo(sp);
   }
 
   function update(_t, dt) {
@@ -606,11 +714,15 @@ export function buildQuadros({ scene, pal, track, lite, reducedMotion, quadros =
       }
       if (mudou) aplicar(it);
     }
-    if (spot) {
-      const a = destaque ? SPOT_MAX : 0;
-      spotNivel += (a - spotNivel) * k;
-      if (Math.abs(a - spotNivel) < 0.01) spotNivel = a;
-      spot.intensity = spotNivel;
+    const la = lavaAlvo();
+    if (lavaNivel !== la) {
+      lavaNivel += (la - lavaNivel) * k;
+      if (Math.abs(la - lavaNivel) < 0.002) lavaNivel = la;
+      aplicarLava();
+    }
+    for (const sp of spots) {
+      const a = spotAlvo(sp);
+      if (sp.intensity !== a) sp.intensity = Math.abs(a - sp.intensity) < 0.01 ? a : sp.intensity + (a - sp.intensity) * k;
     }
   }
 
@@ -628,20 +740,20 @@ export function buildQuadros({ scene, pal, track, lite, reducedMotion, quadros =
 
   function setDestaque(id) {
     destaque = id && itens.has(id) ? id : null;
-    posicionarSpot();
+    posicionarLava();
     if (reducedMotion) snap();
   }
 
   function setPerto(id) {
     perto = id && itens.has(id) ? id : null;
+    posicionarLava();
     if (reducedMotion) snap();
   }
 
   function dispose() {
     vivo = false;
     scene.remove(raiz);
-    if (spot) scene.remove(spot, spot.target);
-    spot?.dispose();
+    for (const sp of spots) sp.intensity = sp.userData.base;
     for (const x of meus) x.dispose?.();
     meus.length = 0;
     hitMeshes.length = 0;

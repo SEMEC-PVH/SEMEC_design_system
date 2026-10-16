@@ -2279,6 +2279,154 @@ footer {
   font-weight: 600;
   line-height: 1.5;
 }
+/* "Preparando a Vila" (depois de escolher o personagem, se o motor ainda
+   não terminou de carregar e aquecer a cena). Caixa de RPG da tela de título,
+   paleta fixa: gray-950 sobre white ≈ 19:1; barra blue-700 sobre gray-100. */
+.vila-preparo {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--pv-blue-950) 55%, transparent);
+}
+.vila-preparo-caixa {
+  display: grid;
+  justify-items: center;
+  gap: 0.55rem;
+  width: min(22rem, 100%);
+  padding: 1rem 1.25rem 1.1rem;
+  border: 4px solid var(--pv-blue-950);
+  border-radius: var(--radius-md);
+  background: var(--pv-white);
+  color: var(--pv-gray-950);
+  box-shadow:
+    inset 0 0 0 3px var(--pv-white),
+    inset 0 0 0 6px var(--pv-blue-600),
+    0 6px 0 var(--pv-blue-950);
+  box-sizing: border-box;
+}
+.vila-preparo-caixa > * {
+  margin: 0;
+}
+.vila-preparo-titulo {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.vila-preparo-barra {
+  width: 100%;
+  height: 1rem;
+  border: 2px solid var(--pv-gray-950);
+  border-radius: var(--radius-sm);
+  background: var(--pv-gray-100);
+  appearance: none;
+  overflow: hidden;
+}
+.vila-preparo-barra::-webkit-progress-bar {
+  background: var(--pv-gray-100);
+}
+.vila-preparo-barra::-webkit-progress-value {
+  background: var(--pv-blue-700);
+  transition: width 0.2s ease;
+}
+.vila-preparo-barra::-moz-progress-bar {
+  background: var(--pv-blue-700);
+}
+.vila-preparo-fase {
+  font-size: var(--font-size-sm);
+  color: var(--pv-gray-700);
+}
+.vila-preparo-pular {
+  margin-top: 0.4rem;
+  padding: 0.45rem 1rem;
+  border: 3px solid var(--pv-gray-950);
+  border-bottom-width: 5px;
+  border-radius: var(--radius-md);
+  background: var(--pv-yellow-400);
+  color: var(--pv-gray-950);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.vila-preparo-pular:hover {
+  background: var(--pv-yellow-500);
+}
+.vila-preparo-pular:focus-visible {
+  outline: 3px solid var(--pv-white);
+  outline-offset: 3px;
+}
+.vila-preparo-pular-nota {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vila-preparo-barra::-webkit-progress-value {
+    transition: none;
+  }
+}
+
+/* Bicicleta (conquistada na oficina do bicicletário): acima da StackDex.
+   Paleta fixa como a da StackDex: gray-950 sobre yellow-400 ≈ 13:1; montado
+   (aria-pressed), white sobre blue-700 ≈ 7:1. */
+.vila-bike-icone {
+  position: absolute;
+  left: 1.4rem;
+  bottom: 8.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+}
+.vila-bike-icone-roda {
+  display: grid;
+  place-items: center;
+  width: 3.75rem;
+  height: 3.75rem;
+  border: 3px solid var(--pv-gray-950);
+  border-radius: 50%;
+  background: var(--pv-yellow-400);
+  color: var(--pv-gray-950);
+  box-shadow: 0 4px 0 var(--pv-gray-950);
+  transition: transform 0.15s ease;
+}
+.vila-bike-icone[aria-pressed="true"] .vila-bike-icone-roda {
+  background: var(--pv-blue-700);
+  color: var(--pv-white);
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--pv-gray-950);
+}
+.vila-bike-icone-nome {
+  padding: 0.05rem 0.45rem;
+  border: 2px solid var(--pv-gray-950);
+  border-radius: var(--radius-md);
+  background: var(--pv-gray-950);
+  color: var(--pv-white);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+.vila-bike-icone:hover .vila-bike-icone-roda {
+  transform: translateY(-2px);
+}
+.vila-bike-icone:focus-visible {
+  outline: 3px solid var(--pv-yellow-400);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vila-bike-icone-roda {
+    transition: none;
+  }
+}
+
 /* Ícone da StackDex no canto inferior esquerdo (abre a mesma coleção).
    Paleta fixa da StackDex nos dois temas: branco sobre blue-hero ≈ 10:1;
    gray-950 sobre yellow-400 ≈ 13:1; moldura gray-950 sobre o mapa. */
@@ -2466,90 +2614,46 @@ footer {
     opacity: 1;
   }
 }
-/* Viagem de elevador no prédio da SEMFAZ (VilaSemec.jsx): duas portas de
-   aço fecham sobre a tela, o display mostra o andar de destino e elas abrem
-   do outro lado. Durações casadas com TRANSICAO_ELEVADOR em vila-engine.js.
-   Display yellow-400 sobre gray-950 ≈ 13:1. */
+/* Viagem de elevador no prédio da SEMFAZ: toda no 3D (vila-engine.js,
+   ELEVADOR_IDA/_VOLTA). Aqui só o escurecer da troca de andar, uma cor
+   sólida: escurece em 0,24 s no fim da partida (ELEVADOR_ESCURECER) e clareia
+   em 0,3 s na chegada (ELEVADOR_CLAREAR), com a câmera deslizando. Com
+   movimento reduzido, corte seco: escuro e some. Decorativo (aria-hidden). */
 .vila-elevador {
   position: absolute;
   inset: 0;
   z-index: 40;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
   pointer-events: none;
-}
-.vila-elevador-porta {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 50%;
-  background: linear-gradient(90deg, var(--pv-gray-400), var(--pv-gray-200) 40%, var(--pv-gray-400));
-  border: 3px solid var(--pv-gray-700);
-}
-.vila-elevador-porta:first-child {
-  left: 0;
-  transform: translateX(-100%);
-}
-.vila-elevador-porta:nth-child(2) {
-  right: 0;
-  transform: translateX(100%);
-}
-.vila-elevador[data-fase="fechar"] .vila-elevador-porta {
-  animation: vila-elevador-fecha 0.45s ease-in 0.75s forwards;
-}
-.vila-elevador[data-fase="abrir"] .vila-elevador-porta {
-  transform: none;
-  animation: vila-elevador-abre 0.6s ease-out 0.1s forwards;
-}
-.vila .vila-elevador-display {
-  position: relative;
-  margin: 0;
-  max-width: none;
-  padding: 0.4rem 1rem;
-  border: 3px solid var(--pv-gray-700);
-  border-radius: var(--radius-md);
   background: var(--pv-gray-950);
-  color: var(--pv-yellow-400);
-  font-family: var(--font-family-mono, monospace);
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  letter-spacing: 0.05em;
   opacity: 0;
 }
-.vila-elevador[data-fase="fechar"] .vila-elevador-display {
-  animation: vila-iris-titulo 0.3s ease-out 1.15s both;
+.vila-elevador[data-fase="fechar"] {
+  animation: vila-elevador-escurece 0.24s ease-in both;
 }
-.vila-elevador[data-fase="abrir"] .vila-elevador-display {
-  opacity: 1;
-  animation: vila-iris-titulo 0.2s ease-in reverse both;
+.vila-elevador[data-fase="abrir"] {
+  animation: vila-elevador-clareia 0.3s ease-out both;
 }
-@keyframes vila-elevador-fecha {
-  to {
-    transform: none;
-  }
-}
-@keyframes vila-elevador-abre {
+@keyframes vila-elevador-escurece {
   from {
-    transform: none;
+    opacity: 0;
   }
   to {
-    transform: translateX(var(--vila-elevador-lado, -100%));
+    opacity: 1;
   }
 }
-.vila-elevador-porta:nth-child(2) {
-  --vila-elevador-lado: 100%;
+@keyframes vila-elevador-clareia {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .vila-elevador[data-fase] .vila-elevador-porta {
+  .vila-elevador[data-fase] {
     animation: none;
-    transform: none;
   }
-  .vila-elevador[data-fase="abrir"] .vila-elevador-porta {
-    visibility: hidden;
-  }
-  .vila-elevador[data-fase] .vila-elevador-display {
-    animation: none;
+  .vila-elevador[data-fase="fechar"] {
     opacity: 1;
   }
 }
@@ -3134,6 +3238,11 @@ footer {
 .vila-pad-btn--left { grid-area: 2 / 1; }
 .vila-pad-btn--right { grid-area: 2 / 3; }
 .vila-pad-btn--down { grid-area: 3 / 2; }
+.vila-pad-btn--b { grid-area: 1 / 3; }
+.vila-pad-btn--b[aria-pressed="true"] {
+  background: var(--text-strong);
+  color: var(--surface);
+}
 .vila-pad-btn--a {
   grid-area: 3 / 3;
   border-radius: 50%;

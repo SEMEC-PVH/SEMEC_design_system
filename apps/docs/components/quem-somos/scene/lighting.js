@@ -280,6 +280,11 @@ export function createLighting({
 
   function render(ts) {
     measure(ts);
+    desenhar();
+  }
+  // O mesmo render, sem contar para a medição de quadros (preparo da Vila:
+  // exercita o pós-processamento escondido, debaixo da tela de carregamento).
+  function desenhar() {
     if (composer) {
       syncComposerSize();
       composer.render();
@@ -298,6 +303,7 @@ export function createLighting({
 
   const api = {
     sun,
+    desenhar,
     hemi,
     update,
     render,

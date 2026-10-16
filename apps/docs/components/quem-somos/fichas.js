@@ -133,6 +133,16 @@ export const FICHAS = {
     alt: "Boneco da Emily",
     mascote: "microfone",
   },
+  gava: {
+    tipo: "personagem",
+    nome: "Vinicius",
+    nomeCompleto: "Vinicius Gava de Oliveira",
+    subtitulo: "Diretor de Tecnologia",
+    descricao:
+      "Engenheiro mecatrônico e diretor do Departamento de Tecnologia da SEMFAZ. Construiu a Vila SEMEC: o mapa 3D, as batalhas e as quests. Na porta da SEMEC, de notebook aberto, é quem entrega a sua primeira linguagem de programação.",
+    imagem: "gava.webp",
+    alt: "Boneco do Vinicius",
+  },
   livro: {
     tipo: "mascote",
     nome: "Livro Sábio",

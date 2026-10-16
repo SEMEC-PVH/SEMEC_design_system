@@ -65,7 +65,7 @@ const EXTRAS = {
   gava: {
     name: "Vinicius Gava de Oliveira",
     role: "Diretor de Tecnologia",
-    bio: "Engenheiro mecatrônico e diretor do Departamento de Tecnologia da SEMFAZ. Construiu a Vila SEMEC: o mapa 3D, as batalhas e as quests. É o personagem que você controla.",
+    bio: "Engenheiro mecatrônico e diretor do Departamento de Tecnologia da SEMFAZ. Construiu a Vila SEMEC: o mapa 3D, as batalhas e as quests. Lá fora, na porta da SEMEC, entrega a primeira linguagem de quem chega.",
     github: "https://github.com/VgavaBR123",
   },
 };

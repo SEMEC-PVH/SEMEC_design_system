@@ -737,7 +737,10 @@ export function criarPlacaZona({ pal, track, lite = false, nome = "", cor, bande
 // ---- Elevador -------------------------------------------------------------
 
 // Vão da porta e medidas (origem no chão, no meio da face da parede).
-const ELEV = { largura: 2, alto: 2.3, vaoW: 1.1, vaoH: 1.75, fundo: 0.6, curso: 0.55 };
+// `fundo`: profundidade da cabine atrás da face da parede (cabe o jogador,
+// ~0,5 de largura, de frente para a porta). `dentro`: onde ele para lá dentro
+// (mais raso que isso, a verga esconderia a cabeça na câmera alta do sul).
+const ELEV = { largura: 2, alto: 2.3, vaoW: 1.1, vaoH: 1.75, fundo: 0.95, curso: 0.55, dentro: 0.5 };
 
 // Aço escovado: riscos verticais finos num canvas pequeno (compartilhado).
 function texturaEscovada(pal, track, lite) {
@@ -754,22 +757,25 @@ function texturaEscovada(pal, track, lite) {
   return track(canvasTex(c, lite));
 }
 
-function desenharDisplay(canvas, pal, texto, cor) {
+// `seta`: 1 sobe, -1 desce (na viagem, em LED aceso), 0 parado (a seta de
+// cima na cor do andar clareada, como enfeite).
+function desenharDisplay(canvas, pal, texto, cor, seta = 0) {
   const ctx = canvas.getContext("2d");
   const { width: w, height: h } = canvas;
   ctx.fillStyle = css(pal.pv("gray-950"));
   ctx.fillRect(0, 0, w, h);
   const led = pal.mix(pal.pv("yellow-400"), pal.white, 0.15);
-  // Seta para cima (subindo) na cor do andar clareada.
-  ctx.fillStyle = css(pal.mix(cor, pal.white, 0.45));
+  ctx.fillStyle = css(seta ? led : pal.mix(cor, pal.white, 0.45));
+  // Desenhada para cima; descendo, espelha na vertical.
+  const y = (f) => (seta < 0 ? h * (1.02 - f) : h * f);
   ctx.beginPath();
-  ctx.moveTo(60, h * 0.22);
-  ctx.lineTo(100, h * 0.62);
-  ctx.lineTo(74, h * 0.62);
-  ctx.lineTo(74, h * 0.8);
-  ctx.lineTo(46, h * 0.8);
-  ctx.lineTo(46, h * 0.62);
-  ctx.lineTo(20, h * 0.62);
+  ctx.moveTo(60, y(0.22));
+  ctx.lineTo(100, y(0.62));
+  ctx.lineTo(74, y(0.62));
+  ctx.lineTo(74, y(0.8));
+  ctx.lineTo(46, y(0.8));
+  ctx.lineTo(46, y(0.62));
+  ctx.lineTo(20, y(0.62));
   ctx.closePath();
   ctx.fill();
   ctx.fillStyle = css(led);
@@ -794,6 +800,8 @@ export function criarElevador({ pal, track, lite = false, reducedMotion = false,
   const luzCor = pal.lamp;
   const matLuzCabine = track(new THREE.MeshStandardMaterial({ color: luzCor, emissive: luzCor, emissiveIntensity: 0.2 }));
   const matBotao = track(new THREE.MeshStandardMaterial({ color: pv("gray-200"), emissive: pv("yellow-400"), emissiveIntensity: 0, metalness: 0.4, roughness: 0.3 }));
+  // Lanterna de chegada (faixa acima das portas): acende no "ding".
+  const matLanterna = track(new THREE.MeshStandardMaterial({ color: pv("gray-300"), emissive: pv("yellow-400"), emissiveIntensity: 0, roughness: 0.4 }));
 
   const grupo = new THREE.Group();
   grupo.name = "elevador";
@@ -848,6 +856,10 @@ export function criarElevador({ pal, track, lite = false, reducedMotion = false,
   );
   add(caixa(-v2, v2, 0, 0.01, cz0, -0.03), matPiso, { cast: false });
   add(caixa(-0.3, 0.3, ELEV.vaoH - 0.012, ELEV.vaoH, cz0 + 0.12, -0.12), matLuzCabine, { cast: false, receive: false });
+  // Painel de botões na lateral de dentro (visto pela fresta) e rodapé.
+  add(caixa(v2 - 0.03, v2, 0.8, 1.15, -0.32, -0.14), matBatente, { cast: false });
+  add(caixa(-v2, v2, 0.01, 0.08, cz0, cz0 + 0.015), matPiso, { cast: false });
+  add(caixa(-0.26, 0.26, ELEV.vaoH + 0.08, ELEV.vaoH + 0.108, 0.03, 0.055), matLanterna, { cast: false });
 
   // Portas de aço escovado (deslizam para os lados, por trás do revestimento).
   const geoPorta = track(caixa(-v2 / 2 - 0.01, v2 / 2 + 0.01, 0.012, ELEV.vaoH, -0.028, -0.006));
@@ -861,14 +873,22 @@ export function criarElevador({ pal, track, lite = false, reducedMotion = false,
   // Display com o rótulo do andar e a seta.
   const dispCanvas = makeCanvas(512, 128);
   let texto = rotulo;
+  let seta = 0;
   desenharDisplay(dispCanvas, pal, texto, acento);
   const dispTex = track(canvasTex(dispCanvas, lite));
   const matDisp = track(new THREE.MeshStandardMaterial({ color: pal.white, map: dispTex, emissive: pal.white, emissiveMap: dispTex, emissiveIntensity: 0.9, roughness: 0.3 }));
   const disp = mesh(track(new THREE.PlaneGeometry(0.66, 0.165)), matDisp, lite, { cast: false });
   disp.position.set(0, ELEV.vaoH + 0.24, 0.052);
   grupo.add(disp);
+  function redesenhar(t, s) {
+    if (t === texto && s === seta) return;
+    texto = t;
+    seta = s;
+    desenharDisplay(dispCanvas, pal, texto, acento, seta);
+    dispTex.needsUpdate = true;
+  }
   document.fonts?.ready.then(() => {
-    desenharDisplay(dispCanvas, pal, texto, acento);
+    desenharDisplay(dispCanvas, pal, texto, acento, seta);
     dispTex.needsUpdate = true;
   });
 
@@ -883,36 +903,83 @@ export function criarElevador({ pal, track, lite = false, reducedMotion = false,
   let luz = null;
   if (!lite) {
     luz = new THREE.PointLight(luzCor, 0, 2.6, 1.6);
-    luz.position.set(0, ELEV.vaoH - 0.25, -0.25);
+    luz.position.set(0, ELEV.vaoH - 0.25, -0.4);
     luz.castShadow = false;
     grupo.add(luz);
   }
 
   let aberto = 0;
+  let eAberto = 0;
+  // Sinais da viagem (vila-engine.js): "chamando" (display e botão piscam até
+  // a cabine chegar), "ding" (lanterna e luz acendem e apagam devagar).
+  let chamando = false;
+  let ding = 0;
+  function luzes() {
+    matBotao.emissiveIntensity = chamando || aberto > 0 ? 0.9 : 0;
+    matLanterna.emissiveIntensity = ding * 2.2;
+    if (luz) luz.intensity = eAberto * 2.2 + ding * 1.2;
+  }
   function abrir(k) {
     aberto = THREE.MathUtils.clamp(k ?? 0, 0, 1);
-    // Suaviza o começo e o fim do curso.
-    const e = aberto * aberto * (3 - 2 * aberto);
-    for (const { p, lado } of portas) p.position.x = lado * (v2 / 2 + e * ELEV.curso);
-    matLuzCabine.emissiveIntensity = 0.2 + e * 1.4;
-    matBotao.emissiveIntensity = aberto > 0 ? 0.9 : 0;
-    if (luz) luz.intensity = e * 2.2;
+    // Suaviza o começo e o fim do curso (ease in-out).
+    eAberto = aberto * aberto * (3 - 2 * aberto);
+    for (const { p, lado } of portas) p.position.x = lado * (v2 / 2 + eAberto * ELEV.curso);
+    matLuzCabine.emissiveIntensity = 0.2 + eAberto * 1.4;
+    luzes();
   }
   abrir(0);
+  // `null` também devolve o display ao andar dele, parado.
+  let rotuloFixo = rotulo;
+  function sinal(estado) {
+    chamando = estado === "chamando";
+    if (estado === "ding") ding = 1;
+    else if (!estado) {
+      ding = 0;
+      redesenhar(rotuloFixo, 0);
+    }
+    if (!chamando) matDisp.emissiveIntensity = 0.9;
+    luzes();
+  }
 
   function setRotulo(t) {
-    texto = t ?? "";
-    desenharDisplay(dispCanvas, pal, texto, acento);
-    dispTex.needsUpdate = true;
+    rotuloFixo = t ?? "";
+    redesenhar(rotuloFixo, 0);
   }
 
-  // Display "pulsa" de leve enquanto a porta está aberta.
-  function update(t) {
+  // Viagem (vila-engine.js): o display conta os andares com a seta acesa no
+  // sentido (`sentido` 1/-1; 0 apaga a seta, já parado no destino).
+  function viagem(t, sentido) {
+    chamando = false;
+    redesenhar(t ?? rotuloFixo, Math.sign(sentido || 0));
+  }
+
+  // Display "pulsa" de leve enquanto a porta está aberta e pisca chamando;
+  // o "ding" apaga devagar. Com movimento reduzido nada pisca: o botão fica
+  // aceso e a lanterna acende e apaga sem pulsar.
+  function update(t, dt = 0) {
+    if (ding > 0) {
+      ding = Math.max(0, ding - dt * (reducedMotion ? 0.8 : 1.3));
+      luzes();
+    }
     if (reducedMotion) return;
-    matDisp.emissiveIntensity = aberto > 0 ? 0.85 + Math.sin(t * 5) * 0.15 : 0.9;
+    if (chamando) {
+      const pisca = Math.sin(t * 14) > 0;
+      matDisp.emissiveIntensity = pisca ? 1.3 : 0.45;
+      matBotao.emissiveIntensity = pisca ? 1.4 : 0.5;
+    } else matDisp.emissiveIntensity = aberto > 0 ? 0.85 + Math.sin(t * 5) * 0.15 : 0.9 + ding * 0.5;
   }
 
-  return { grupo, abrir, setRotulo, update, largura: ELEV.largura, vao: { largura: ELEV.vaoW, altura: ELEV.vaoH, fundo: ELEV.fundo } };
+  return {
+    grupo,
+    abrir,
+    sinal,
+    setRotulo,
+    viagem,
+    update,
+    largura: ELEV.largura,
+    dentro: ELEV.dentro,
+    vao: { largura: ELEV.vaoW, altura: ELEV.vaoH, fundo: ELEV.fundo },
+  };
 }
 
 // ---- Recepção -------------------------------------------------------------

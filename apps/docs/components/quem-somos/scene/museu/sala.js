@@ -3,29 +3,37 @@
 // personagens.js; os quadros e o time NÃO são desenhados aqui).
 //
 // Corte de maquete: paredes norte, oeste e leste altas (galeria clara com
-// lambri azul-acinzentado, rodapé marinho e sanca branca), parede sul como
-// mureta baixa com a porta dupla de vidro (abrirPorta anima as folhas). Piso
-// de tábuas de madeira com passadeira azul da porta até o pedestal central,
-// onde fica a escultura do Design System: camadas empilhadas (tokens,
-// componentes, padrões) com um card, um botão e um toggle em cima, cercada
-// por pedestais dourados com corda de veludo. Dois bancos de museu, vasos de
-// espada-de-são-jorge nos cantos, letreiro "GALERIA DA EQUIPE" acima dos
-// quadros e trilhos de luz no alto das paredes com spots mirando os quadros.
+// lambri baixo azul-acinzentado, rodapé marinho e sanca branca iluminada),
+// parede sul como mureta baixa contínua. No meio da parede norte fica o
+// elevador (o mesmo dos escritórios, predio/mobilia.js), com o letreiro em
+// cima, vasos altos dos dois lados e um totem de boas-vindas ao lado da
+// chegada. Piso de parquet em chevron com faixa de mármore nas bordas e duas
+// faixas ladeando o eixo; passadeira azul do elevador ao pedestal central e
+// dele até a exposição (exposicao.js). No pedestal, a escultura do Design
+// System: camadas empilhadas (tokens, componentes, padrões) com um card, um
+// botão e um toggle em cima, cercada por pedestais dourados com corda de
+// veludo. Cordões baixos na frente dos quadros da parede norte, dois bancos
+// de museu capitonê, plantas altas nos cantos do norte e baixas nos do sul
+// (tiles bloqueados em layout.js, DECOR) e trilhos de luz no alto das
+// paredes com spots mirando os quadros.
 //
 // Uso (motor do museu / prévia):
 //   const sala = buildSala({ scene, pal, track, lite, reducedMotion });
-//   sala.update(t, dt);      // animação da escultura (parada com reducedMotion)
-//   sala.abrirPorta(k);      // 0 = fechada, 1 = aberta (folhas abrem para fora)
+//   sala.update(t, dt);      // escultura e elevador (parados com reducedMotion)
+//   sala.elevador;           // criarElevador: abrir(k), sinal(), viagem(), dentro
 //   sala.dispose();          // tira tudo da cena (geometrias vão pelo track)
 //
 // Desempenho: peças repetidas são mescladas por material (lotes) e os spots
 // são instanciados; fica em poucas dezenas de draw calls. No `lite` não há
-// SpotLight nem sombra: a luz dos quadros vem de halos aditivos na parede.
+// SpotLight nem sombra: a luz dos quadros vem de halos aditivos na parede
+// (e a da sanca, de um plano aditivo em degradê, nos dois modos).
 
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { std } from "../../buildings/shared";
+import { andarPorId } from "../../predio/andares";
+import { criarElevador } from "../../predio/mobilia";
 import {
   FACE,
   PAREDE_ALTURA,
@@ -35,7 +43,8 @@ import {
   SLOTS,
   PEDESTAL,
   BANCOS,
-  PORTA,
+  EXPOSICAO,
+  DECOR,
   tileToWorld,
   centroQuadro,
 } from "./layout";
@@ -105,50 +114,188 @@ function criarLotes() {
 
 // ---- Texturas de canvas -----------------------------------------------------
 
-// Piso: tábuas corridas no sentido x, 8 por textura (0,25 u cada), emendas
-// desencontradas e veios suaves. Cada repetição cobre 2×2 unidades.
+// Piso: parquet em chevron (ponto húngaro, da família da espinha de peixe).
+// Colunas de 0,5 u (128 px) com tacos a 45°, que trocam de sentido a cada
+// coluna; cada taco tem um tom próprio, veios finos e junta escura. Cada
+// repetição cobre 2×2 unidades e emenda sem costura nas duas direções.
 function makePisoTexture(pal) {
   const S = 512;
   const canvas = makeCanvas(S, S);
   const g = canvas.getContext("2d");
   const { pv, mix } = pal;
-  const base = mix(pal.woodLight, pv("white"), 0.3);
-  const escuro = mix(base, pv("yellow-800"), 0.55);
+  const base = mix(pal.woodLight, pv("white"), 0.22);
+  const escuro = mix(base, pv("yellow-800"), 0.6);
+  const COL = 128; // largura da coluna
+  const PASSO = 32; // passo vertical entre tacos (largura do taco × √2)
+  const N = S / PASSO;
+  // Tons fixos por (coluna, taco) para a textura repetir sem costura.
   const rand = seeded(20261015);
-  const ROW = S / 8;
-  for (let r = 0; r < 8; r++) {
-    let x = Math.floor(rand() * S);
-    const fim = x + S;
-    while (x < fim) {
-      const len = Math.floor(S * (0.4 + rand() * 0.4));
-      const tom = rand() < 0.5
-        ? mix(base, pv("yellow-800"), rand() * 0.16)
-        : mix(base, pv("white"), rand() * 0.12);
-      for (const ox of [0, -S]) {
-        const px = x + ox;
-        g.fillStyle = tom.getStyle();
-        g.fillRect(px, r * ROW, len, ROW);
-        // Veios: linhas finas levemente mais escuras.
-        g.fillStyle = escuro.getStyle();
-        g.globalAlpha = 0.12;
-        for (let v = 0; v < 3; v++) {
-          const vy = r * ROW + 8 + rand() * (ROW - 16);
-          g.fillRect(px + 6, vy, len - 12, 1.5);
-        }
-        g.globalAlpha = 1;
-        // Emenda de topo.
-        g.fillStyle = escuro.getStyle();
-        g.fillRect(px + len - 1.5, r * ROW, 3, ROW);
-      }
-      x += len;
+  const tons = [];
+  for (let c = 0; c < S / COL; c++) {
+    tons.push([]);
+    for (let k = 0; k < N; k++) {
+      const r = rand();
+      tons[c].push(r < 0.5 ? mix(base, pv("yellow-800"), r * 0.32) : mix(base, pv("white"), (r - 0.5) * 0.22));
     }
-    // Junta longitudinal entre as fileiras.
-    g.fillStyle = escuro.getStyle();
-    g.globalAlpha = 0.8;
-    g.fillRect(0, r * ROW - 1, S, 2.5);
-    g.globalAlpha = 1;
+  }
+  g.fillStyle = escuro.getStyle();
+  g.fillRect(0, 0, S, S);
+  for (let c = 0; c < S / COL; c++) {
+    const x0 = c * COL;
+    const s = c % 2 ? -1 : 1; // sentido do taco nesta coluna
+    g.save();
+    g.beginPath();
+    g.rect(x0, 0, COL, S);
+    g.clip();
+    for (let k = -6; k < N + 6; k++) {
+      const y = k * PASSO;
+      const tom = tons[c][((k % N) + N) % N];
+      // Paralelogramo do taco (junta de 1,5 px aparecendo por baixo).
+      g.fillStyle = tom.getStyle();
+      g.beginPath();
+      g.moveTo(x0 + 0.8, y + 0.8);
+      g.lineTo(x0 + COL - 0.8, y - s * COL + 0.8);
+      g.lineTo(x0 + COL - 0.8, y - s * COL + PASSO - 0.8);
+      g.lineTo(x0 + 0.8, y + PASSO - 0.8);
+      g.closePath();
+      g.fill();
+      // Veios: dois riscos claros/escuros no sentido do taco.
+      const r2 = seeded(c * 97 + (((k % N) + N) % N) * 13 + 5);
+      for (let v = 0; v < 2; v++) {
+        const off = 7 + r2() * (PASSO - 14);
+        g.strokeStyle = (v ? escuro : mix(tom, pv("white"), 0.25)).getStyle();
+        g.globalAlpha = 0.16;
+        g.lineWidth = 1.2;
+        g.beginPath();
+        g.moveTo(x0 + 10, y + off - s * 10);
+        g.lineTo(x0 + COL - 10, y + off - s * (COL - 10));
+        g.stroke();
+      }
+      g.globalAlpha = 1;
+    }
+    g.restore();
   }
   return canvasTexture(canvas, true);
+}
+
+// Mármore claro da faixa das bordas: fundo levemente manchado e veios cinza
+// finos e sinuosos. Repetição de 2×2 unidades.
+function makeMarmoreTexture(pal) {
+  const S = 512;
+  const canvas = makeCanvas(S, S);
+  const g = canvas.getContext("2d");
+  const { pv, mix } = pal;
+  const base = mix(pv("gray-100"), pv("gray-50"), 0.5);
+  g.fillStyle = base.getStyle();
+  g.fillRect(0, 0, S, S);
+  const rand = seeded(5150);
+  // Manchas suaves.
+  for (let i = 0; i < 18; i++) {
+    const x = rand() * S;
+    const y = rand() * S;
+    const r = 40 + rand() * 90;
+    const grad = g.createRadialGradient(x, y, 0, x, y, r);
+    const cor = mix(base, pv("gray-200"), 0.5);
+    grad.addColorStop(0, cor.getStyle());
+    grad.addColorStop(1, base.getStyle());
+    g.globalAlpha = 0.35;
+    g.fillStyle = grad;
+    for (const ox of [-S, 0, S]) for (const oy of [-S, 0, S]) {
+      g.save();
+      g.translate(ox, oy);
+      g.fillRect(x - r, y - r, r * 2, r * 2);
+      g.restore();
+    }
+  }
+  g.globalAlpha = 1;
+  // Veios: curvas que atravessam a textura (copiadas nas 9 posições).
+  for (let i = 0; i < 7; i++) {
+    const pts = [];
+    let x = rand() * S;
+    let y = rand() * S;
+    const ang = rand() * Math.PI;
+    for (let k = 0; k < 6; k++) {
+      pts.push([x, y]);
+      x += Math.cos(ang) * 90 + (rand() - 0.5) * 70;
+      y += Math.sin(ang) * 90 + (rand() - 0.5) * 70;
+    }
+    g.strokeStyle = mix(pv("gray-400"), base, i % 2 ? 0.55 : 0.25).getStyle();
+    g.lineWidth = i % 2 ? 1 : 1.8;
+    g.globalAlpha = 0.5;
+    for (const ox of [-S, 0, S]) for (const oy of [-S, 0, S]) {
+      g.beginPath();
+      g.moveTo(pts[0][0] + ox, pts[0][1] + oy);
+      for (let k = 1; k < pts.length - 1; k++) {
+        const mx = (pts[k][0] + pts[k + 1][0]) / 2;
+        const my = (pts[k][1] + pts[k + 1][1]) / 2;
+        g.quadraticCurveTo(pts[k][0] + ox, pts[k][1] + oy, mx + ox, my + oy);
+      }
+      g.stroke();
+    }
+  }
+  g.globalAlpha = 1;
+  return canvasTexture(canvas, true);
+}
+
+// Luz da sanca na parede: forte junto da sanca, some para baixo.
+function makeSancaTexture(pal) {
+  const canvas = makeCanvas(4, 128);
+  const g = canvas.getContext("2d");
+  const grad = g.createLinearGradient(0, 0, 0, 128);
+  grad.addColorStop(0, pal.lamp.getStyle());
+  grad.addColorStop(0.35, pal.mix(pal.lamp, pal.pv("black"), 0.7).getStyle());
+  grad.addColorStop(1, pal.pv("black").getStyle());
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 4, 128);
+  return canvasTexture(canvas, false);
+}
+
+// Totem de boas-vindas (tampo inclinado): marinho com filete dourado, título,
+// subtítulo e um convite curto.
+function makeTotemTexture(pal, aspect) {
+  const W = 640;
+  const H = Math.round(W / aspect);
+  const canvas = makeCanvas(W, H);
+  const g = canvas.getContext("2d");
+  const { pv, mix } = pal;
+  g.fillStyle = pv("blue-900").getStyle();
+  g.fillRect(0, 0, W, H);
+  g.strokeStyle = pv("yellow-500").getStyle();
+  g.lineWidth = 6;
+  g.strokeRect(14, 14, W - 28, H - 28);
+  g.textAlign = "center";
+  g.textBaseline = "middle";
+  const caber = (texto, peso, max) => {
+    let size = max;
+    g.font = `${peso} ${size}px ${pal.font}`;
+    while (g.measureText(texto).width > W - 90 && size > 14) {
+      size -= 2;
+      g.font = `${peso} ${size}px ${pal.font}`;
+    }
+  };
+  g.fillStyle = pv("yellow-400").getStyle();
+  caber("BEM-VINDO(A) À", 600, 30);
+  g.fillText("BEM-VINDO(A) À", W / 2, H * 0.2);
+  g.fillStyle = pv("white").getStyle();
+  caber("Galeria da Equipe", 700, 78);
+  g.fillText("Galeria da Equipe", W / 2, H * 0.43);
+  g.fillStyle = pv("yellow-500").getStyle();
+  g.fillRect(W / 2 - 70, H * 0.585, 140, 4);
+  g.fillStyle = mix(pv("white"), pv("blue-200"), 0.35).getStyle();
+  caber("quem fez o SEMEC Design System", 500, 38);
+  g.fillText("quem fez o SEMEC Design System", W / 2, H * 0.73);
+  return canvasTexture(canvas, false);
+}
+
+// Plano horizontal (piso) pelos limites, com UV em coordenadas do mundo
+// (1 repetição a cada `escala` unidades): faixas separadas continuam a mesma
+// textura sem emenda.
+function planoXZ(x0, x1, z0, z1, y, escala) {
+  const geo = new THREE.PlaneGeometry(x1 - x0, z1 - z0).rotateX(-Math.PI / 2).translate((x0 + x1) / 2, y, (z0 + z1) / 2);
+  const pos = geo.attributes.position;
+  const uv = geo.attributes.uv;
+  for (let i = 0; i < pos.count; i++) uv.setXY(i, pos.getX(i) / escala, -pos.getZ(i) / escala);
+  return geo;
 }
 
 // Tapete/passadeira: campo marinho, faixa dourada e filete branco por dentro.
@@ -369,7 +516,7 @@ export function buildSala({ scene, pal, track, lite = false, reducedMotion = fal
     folha: track(std(pv("green-700"), { roughness: 0.75 })),
     folhaClara: track(std(mix(pv("green-600"), pv("yellow-400"), 0.25), { roughness: 0.75 })),
     trilho: track(std(pv("gray-900"), { roughness: 0.5, metalness: 0.3 })),
-    capacho: track(std(mix(pv("gray-700"), pv("gray-600"), 0.5), { roughness: 1 })),
+    led: track(new THREE.MeshBasicMaterial({ color: pal.lamp })),
   };
 
   // ---- Medidas ----------------------------------------------------------------
@@ -377,29 +524,62 @@ export function buildSala({ scene, pal, track, lite = false, reducedMotion = fal
   const HS = PAREDE_SUL_ALTURA;
   const T = PAREDE_ESPESSURA;
   const { norte: ZN, sul: ZS, oeste: XO, leste: XL } = FACE;
-  const portaC = tileToWorld(PORTA.tile[0], PORTA.tile[1]);
-  const PX0 = portaC.x - 0.5; // vão da porta (1 tile)
-  const PX1 = portaC.x + 0.5;
+  // Vão do elevador na parede norte (centrado em x = 0; a cabine fica atrás
+  // da face) e altura do revestimento de granito dele (mobilia.js).
+  const VAO = { x: 0.56, h: 1.76 };
+  const ELEV_ALTO = 2.3;
+  const ELEV_MEIA = 1.01; // meia-largura do revestimento, com folga
 
   // ---- Base da maquete e piso -----------------------------------------------
-  // Placa sob o salão (aparece como "calçada" do lado de fora da porta).
-  lotes.add(M.base, caixa(XO - T - 0.25, XL + T + 0.25, -0.3, -0.002, ZN - T - 0.25, ZS + T + 1.1), { cast: false });
+  // Placa sob o salão (uma borda fina em volta das paredes).
+  lotes.add(M.base, caixa(XO - T - 0.25, XL + T + 0.25, -0.3, -0.002, ZN - T - 0.25, ZS + T + 0.25), { cast: false });
 
+  // Piso: parquet em chevron no miolo, faixa de mármore junto das paredes
+  // (como nas galerias clássicas) e um filete marinho separando os dois.
+  const BORDA = 0.42;
+  const FILETE = 0.05;
   const pisoTex = track(makePisoTexture(pal));
-  pisoTex.repeat.set((XL - XO) / 2, (ZS - ZN) / 2);
-  const pisoMat = track(std(white, { map: pisoTex, roughness: 0.55 }));
-  const piso = new THREE.Mesh(track(new THREE.PlaneGeometry(XL - XO, ZS - ZN)), pisoMat);
-  piso.rotation.x = -Math.PI / 2;
-  piso.position.set((XO + XL) / 2, 0, (ZN + ZS) / 2);
+  const pisoMat = track(std(white, { map: pisoTex, roughness: 0.5 }));
+  const piso = new THREE.Mesh(track(planoXZ(XO + BORDA, XL - BORDA, ZN + BORDA, ZS - BORDA, 0, 2)), pisoMat);
   piso.receiveShadow = true;
   root.add(piso);
+  const marmoreTex = track(makeMarmoreTexture(pal));
+  const marmorePiso = track(std(white, { map: marmoreTex, roughness: 0.3 }));
+  for (const [x0, x1, z0, z1] of [
+    [XO, XL, ZN, ZN + BORDA],
+    [XO, XL, ZS - BORDA, ZS],
+    [XO, XO + BORDA, ZN + BORDA, ZS - BORDA],
+    [XL - BORDA, XL, ZN + BORDA, ZS - BORDA],
+  ]) lotes.add(marmorePiso, planoXZ(x0, x1, z0, z1, 0, 2), { cast: false });
+  {
+    // Filete marinho (por dentro da faixa de mármore, um tico acima do piso).
+    const b = BORDA;
+    const f = FILETE;
+    const y = 0.003;
+    for (const [x0, x1, z0, z1] of [
+      [XO + b - f, XL - b + f, ZN + b - f, ZN + b],
+      [XO + b - f, XL - b + f, ZS - b, ZS - b + f],
+      [XO + b - f, XO + b, ZN + b, ZS - b],
+      [XL - b, XL - b + f, ZN + b, ZS - b],
+    ]) lotes.add(M.marinho, planoXZ(x0, x1, z0, z1, y, 1), { cast: false });
+    // Duas faixas de mármore (com filetes) ladeando o eixo do salão, do
+    // norte ao sul: dividem o parquet em três campos, como nas galerias.
+    const FX = 2.65;
+    const FL = 0.09;
+    for (const sx of [-1, 1]) {
+      const xc = sx * FX;
+      lotes.add(marmorePiso, planoXZ(xc - FL, xc + FL, ZN + b, ZS - b, y, 2), { cast: false });
+      lotes.add(M.marinho, planoXZ(xc - FL - f * 0.6, xc - FL, ZN + b, ZS - b, y, 1), { cast: false });
+      lotes.add(M.marinho, planoXZ(xc + FL, xc + FL + f * 0.6, ZN + b, ZS - b, y, 1), { cast: false });
+    }
+  }
 
   // Pedestal: centro e meia-largura a partir dos tiles do contrato.
   const pedTiles = PEDESTAL.tiles.map(([x, y]) => tileToWorld(x, y));
   const pedC = pedTiles.reduce((s, p) => s.add(p), new THREE.Vector3()).multiplyScalar(1 / pedTiles.length);
   const pedHalf = Math.max(...pedTiles.map((p) => Math.abs(p.x - pedC.x))) + 0.5; // 1 para 2×2
 
-  // Tapete sob o pedestal e passadeira da porta até ele.
+  // Tapete sob o pedestal e passadeira do elevador até ele.
   const addTapete = (w, d, cx, cz, y) => {
     const tex = track(makeTapeteTexture(pal, w, d));
     const mat = track(std(white, { map: tex, roughness: 0.95 }));
@@ -410,115 +590,87 @@ export function buildSala({ scene, pal, track, lite = false, reducedMotion = fal
   };
   const tapeteLado = pedHalf * 2 + 0.9;
   addTapete(tapeteLado, tapeteLado, pedC.x, pedC.z, 0.01);
-  const passIni = pedC.z + tapeteLado / 2 - 0.15;
-  addTapete(1.1, ZS - passIni, portaC.x, (passIni + ZS) / 2, 0.012);
+  const passIni = ZN + 0.12; // depois da soleira do elevador
+  const passFim = pedC.z - tapeteLado / 2 + 0.15;
+  addTapete(1.1, passFim - passIni, 0, (passIni + passFim) / 2, 0.012);
+  // Continua do tapete do pedestal até a exposição do Design System (o eixo
+  // do salão: elevador → escultura → exposição).
+  const expoZ = Math.min(...EXPOSICAO.tiles.map(([x, y]) => tileToWorld(x, y).z)) - 0.5;
+  const contIni = pedC.z + tapeteLado / 2 - 0.15;
+  if (expoZ - contIni > 0.3) addTapete(1.1, expoZ - contIni, 0, (contIni + expoZ) / 2, 0.012);
 
   // ---- Paredes --------------------------------------------------------------
   // Corpo das paredes (sem sombra própria: a direcional faz papel de
   // claraboia e paredes projetando faixas escuras deixariam a sala triste).
   const parede = { cast: false };
-  lotes.add(M.parede, caixa(XO - T, XL + T, 0, H, ZN - T, ZN), parede);
+  lotes.add(M.parede, caixa(XO - T, -VAO.x, 0, H, ZN - T, ZN), parede);
+  lotes.add(M.parede, caixa(VAO.x, XL + T, 0, H, ZN - T, ZN), parede);
+  lotes.add(M.parede, caixa(-VAO.x, VAO.x, VAO.h, H, ZN - T, ZN), parede);
   lotes.add(M.parede, caixa(XO - T, XO, 0, H, ZN, ZS + T), parede);
   lotes.add(M.parede, caixa(XL, XL + T, 0, H, ZN, ZS + T), parede);
-  lotes.add(M.parede, caixa(XO, PX0, 0, HS, ZS, ZS + T), parede);
-  lotes.add(M.parede, caixa(PX1, XL, 0, HS, ZS, ZS + T), parede);
+  lotes.add(M.parede, caixa(XO, XL, 0, HS, ZS, ZS + T), parede);
   // Corte da maquete: tampa cinza no topo de cada parede.
   const C = 0.012;
   lotes.add(M.corte, caixa(XO - T, XL + T, H, H + C, ZN - T, ZN), parede);
   lotes.add(M.corte, caixa(XO - T, XO, H, H + C, ZN, ZS + T), parede);
   lotes.add(M.corte, caixa(XL, XL + T, H, H + C, ZN, ZS + T), parede);
-  lotes.add(M.corte, caixa(XO, PX0, HS, HS + C, ZS, ZS + T), parede);
-  lotes.add(M.corte, caixa(PX1, XL, HS, HS + C, ZS, ZS + T), parede);
+  lotes.add(M.corte, caixa(XO, XL, HS, HS + C, ZS, ZS + T), parede);
 
   // Acabamentos ao longo das faces internas: `faixa(mat, y0, y1, saliência)`
-  // nas paredes altas; o rodapé também corre pela mureta.
-  const LAMBRI = 0.6;
+  // nas paredes altas (na norte, abaixo do letreiro, param no revestimento
+  // do elevador); o rodapé também corre pela mureta.
+  // Lambri baixo: a placa de latão sob cada quadro (de 0,375 a 0,645 de
+  // altura) fica livre na parede, sem o guarda-cadeira atravessando.
+  const LAMBRI = 0.3;
   const faixa = (mat, y0, y1, e, comMureta = false) => {
-    lotes.add(mat, caixa(XO, XL, y0, y1, ZN, ZN + e), parede);
+    if (y0 < ELEV_ALTO) {
+      lotes.add(mat, caixa(XO, -ELEV_MEIA, y0, y1, ZN, ZN + e), parede);
+      lotes.add(mat, caixa(ELEV_MEIA, XL, y0, y1, ZN, ZN + e), parede);
+    } else lotes.add(mat, caixa(XO, XL, y0, y1, ZN, ZN + e), parede);
     lotes.add(mat, caixa(XO, XO + e, y0, y1, ZN + e, ZS), parede);
     lotes.add(mat, caixa(XL - e, XL, y0, y1, ZN + e, ZS), parede);
-    if (comMureta) {
-      lotes.add(mat, caixa(XO + e, PX0, y0, y1, ZS - e, ZS), parede);
-      lotes.add(mat, caixa(PX1, XL - e, y0, y1, ZS - e, ZS), parede);
-    }
+    if (comMureta) lotes.add(mat, caixa(XO + e, XL - e, y0, y1, ZS - e, ZS), parede);
   };
   faixa(M.lambri, 0, LAMBRI, 0.012);
   faixa(M.friso, LAMBRI - 0.02, LAMBRI + 0.04, 0.03); // guarda-cadeira
   faixa(M.rodape, 0, 0.14, 0.035, true);
   faixa(M.friso, H - 0.12, H - 0.04, 0.06); // sanca em dois degraus
   faixa(M.friso, H - 0.04, H, 0.1);
-  // Mureta sul: lambri por dentro até o topo e friso branco no alto.
-  lotes.add(M.friso, caixa(XO, PX0, HS - 0.04, HS, ZS - 0.03, ZS), parede);
-  lotes.add(M.friso, caixa(PX1, XL, HS - 0.04, HS, ZS - 0.03, ZS), parede);
-
-  // ---- Porta dupla (vidro com caixilho de madeira) -------------------------
-  // Cortada na altura da mureta, como o resto da parede sul (maquete): uma
-  // porta alta tapava o jogador na câmera que vem do sul.
-  const PH = PAREDE_SUL_ALTURA + 0.17;
-  const BAT = 0.08;
-  lotes.add(M.madeira, caixa(PX0, PX0 + BAT, 0, PH, ZS - 0.02, ZS + T + 0.02));
-  lotes.add(M.madeira, caixa(PX1 - BAT, PX1, 0, PH, ZS - 0.02, ZS + T + 0.02));
-  lotes.add(M.madeira, caixa(PX0 - 0.03, PX1 + 0.03, PH, PH + 0.07, ZS - 0.02, ZS + T + 0.02));
-  lotes.add(M.marmore, caixa(PX0 + BAT, PX1 - BAT, 0, 0.015, ZS, ZS + T), { cast: false });
-  // Capacho do lado de fora.
-  lotes.add(M.capacho, caixa(PX0 + 0.05, PX1 - 0.05, 0, 0.02, ZS + T + 0.06, ZS + T + 0.7), { cast: false });
-
-  const vidroMat = track(new THREE.MeshStandardMaterial({
-    color: pal.glass,
-    roughness: 0.08,
-    metalness: 0,
-    transparent: true,
-    opacity: 0.32,
-    depthWrite: false,
-  }));
-  const folhaW = (PX1 - PX0 - BAT * 2) / 2;
-  const folhaH = PH - 0.06;
-  const folhaZ = ZS + T / 2;
-  // Folha com a dobradiça na origem, crescendo para +x (lado = 1) ou -x (-1).
-  const folhaGeo = (() => {
-    const s = 0.05; // largura do caixilho
-    const e = 0.04;
-    const partes = [
-      caixa(0, s, 0, folhaH, -e / 2, e / 2),
-      caixa(folhaW - s, folhaW, 0, folhaH, -e / 2, e / 2),
-      caixa(s, folhaW - s, folhaH - s, folhaH, -e / 2, e / 2),
-      caixa(s, folhaW - s, 0, 0.16, -e / 2, e / 2),
-    ];
-    const g = track(mergeGeometries(partes, false));
-    partes.forEach((p) => p.dispose());
-    return g;
-  })();
-  const vidroGeo = track(new THREE.PlaneGeometry(folhaW - 0.1, folhaH - 0.21));
-  const puxadorGeo = track(caixa(-0.012, 0.012, folhaH * 0.45, folhaH * 0.8, -0.05, 0.05));
-  const folhas = [1, -1].map((lado) => {
-    const pivo = new THREE.Group();
-    pivo.position.set(lado > 0 ? PX0 + BAT : PX1 - BAT, 0.02, folhaZ);
-    const corpo = new THREE.Group();
-    corpo.scale.x = lado; // espelha a folha da direita
-    const quadro = new THREE.Mesh(folhaGeo, M.madeira);
-    quadro.castShadow = true;
-    const vidro = new THREE.Mesh(vidroGeo, vidroMat);
-    vidro.position.set(folhaW / 2, 0.16 + (folhaH - 0.21) / 2, 0);
-    vidro.material.side = THREE.DoubleSide;
-    const puxador = new THREE.Mesh(puxadorGeo, M.ouro);
-    puxador.position.x = folhaW - 0.07;
-    corpo.add(quadro, vidro, puxador);
-    pivo.add(corpo);
-    root.add(pivo);
-    pivo.userData.lado = lado;
-    return pivo;
-  });
-  // Abre para fora (para o sul, +z): k = 0 fechada, 1 aberta (~100°).
-  function abrirPorta(k) {
-    const a = THREE.MathUtils.clamp(k, 0, 1) * THREE.MathUtils.degToRad(100);
-    for (const f of folhas) f.rotation.y = -a * f.userData.lado;
+  // Sanca iluminada: fita de luz embaixo do degrau da sanca e o clarão que
+  // ela joga na parede (plano aditivo em degradê; não é luz de verdade).
+  const sancaY = H - 0.12;
+  faixa(M.led, sancaY - 0.016, sancaY, 0.055);
+  {
+    const glowMat = track(new THREE.MeshBasicMaterial({
+      map: track(makeSancaTexture(pal)),
+      transparent: true,
+      opacity: lite ? 0.42 : 0.34,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }));
+    const gh = 0.95;
+    const gy = sancaY - gh / 2;
+    const semNada = { cast: false, receive: false };
+    lotes.add(glowMat, new THREE.PlaneGeometry(XL - XO, gh).translate((XO + XL) / 2, gy, ZN + 0.004), semNada);
+    lotes.add(glowMat, new THREE.PlaneGeometry(ZS - ZN, gh).rotateY(Math.PI / 2).translate(XO + 0.004, gy, (ZN + ZS) / 2), semNada);
+    lotes.add(glowMat, new THREE.PlaneGeometry(ZS - ZN, gh).rotateY(-Math.PI / 2).translate(XL - 0.004, gy, (ZN + ZS) / 2), semNada);
   }
-  abrirPorta(0);
+  // Mureta sul: friso branco no alto.
+  lotes.add(M.friso, caixa(XO, XL, HS - 0.04, HS, ZS - 0.03, ZS), parede);
+
+  // ---- Elevador -------------------------------------------------------------------
+  // O mesmo dos escritórios (cabine funda, portas de aço, display e lanterna),
+  // na cor e com o rótulo do andar da Galeria (predio/andares.js).
+  const andar = andarPorId("galeria");
+  const elevador = criarElevador({ pal, track, lite, reducedMotion, rotulo: andar?.rotulo ?? "", cor: andar ? pv(andar.cor) : undefined });
+  elevador.grupo.position.set(0, 0, ZN);
+  root.add(elevador.grupo);
 
   // ---- Letreiro "GALERIA DA EQUIPE" -------------------------------------------
   const letW = 4.4;
   const letH = 0.36;
-  const letY = (QUADRO.centroY + QUADRO.altura / 2 + H - 0.12) / 2;
+  // Entre o revestimento do elevador e a sanca (e acima das molduras).
+  const letY = (Math.max(ELEV_ALTO, QUADRO.centroY + QUADRO.altura / 2) + H - 0.12) / 2;
   lotes.add(M.marinho, caixa(-letW / 2 - 0.03, letW / 2 + 0.03, letY - letH / 2 - 0.03, letY + letH / 2 + 0.03, ZN, ZN + 0.04), parede);
   // Emissivo pela própria textura: o letreiro "acende" um pouco sem lavar o fundo.
   const letTex = track(makeLetreiroTexture(pal, letW / letH));
@@ -624,55 +776,137 @@ export function buildSala({ scene, pal, track, lite = false, reducedMotion = fal
   topo.add(knob);
 
   // ---- Bancos -------------------------------------------------------------------
+  // Banco de museu: assento estofado capitonê (botões marinho), cinta de
+  // madeira e quatro pés torneados com ponteira de latão.
   for (const banco of BANCOS) {
     const ps = banco.tiles.map(([x, y]) => tileToWorld(x, y));
     const cx = (ps[0].x + ps[ps.length - 1].x) / 2;
     const cz = (ps[0].z + ps[ps.length - 1].z) / 2;
-    const comp = Math.abs(ps[ps.length - 1].x - ps[0].x) + 0.75;
-    const prof = 0.48;
+    const comp = Math.abs(ps[ps.length - 1].x - ps[0].x) + 0.8;
+    const prof = 0.5;
     const b = (g) => g.translate(cx, 0, cz);
-    lotes.add(M.estofado, b(new RoundedBoxGeometry(comp, 0.1, prof, seg, 0.04).translate(0, 0.43, 0)));
-    lotes.add(M.madeira, b(caixa(-comp / 2 - 0.02, comp / 2 + 0.02, 0.33, 0.39, -prof / 2 - 0.02, prof / 2 + 0.02)));
+    lotes.add(M.estofado, b(new RoundedBoxGeometry(comp, 0.12, prof, seg, 0.05).translate(0, 0.44, 0)));
+    lotes.add(M.madeira, b(new RoundedBoxGeometry(comp + 0.04, 0.07, prof + 0.04, seg, 0.015).translate(0, 0.35, 0)));
+    // Botões do capitonê em duas fileiras desencontradas.
+    if (!lite) {
+      const nb = Math.round(comp / 0.32);
+      for (let i = 0; i < nb; i++) {
+        for (const [fz, off] of [[-0.11, 0], [0.11, 0.5]]) {
+          const bx = -comp / 2 + ((i + 0.5 + off) * comp) / (nb + 0.5);
+          lotes.add(M.marinho, b(new THREE.SphereGeometry(0.018, 6, 4).scale(1, 0.5, 1).translate(bx, 0.5, fz)), { cast: false });
+        }
+      }
+    }
     for (const sx of [-1, 1]) {
-      const lx = sx * (comp / 2 - 0.16);
-      lotes.add(M.metal, b(caixa(lx - 0.025, lx + 0.025, 0.02, 0.33, -prof / 2 + 0.05, -prof / 2 + 0.1)));
-      lotes.add(M.metal, b(caixa(lx - 0.025, lx + 0.025, 0.02, 0.33, prof / 2 - 0.1, prof / 2 - 0.05)));
-      lotes.add(M.metal, b(caixa(lx - 0.03, lx + 0.03, 0, 0.03, -prof / 2 + 0.03, prof / 2 - 0.03)));
+      for (const sz of [-1, 1]) {
+        const lx = sx * (comp / 2 - 0.1);
+        const lz = sz * (prof / 2 - 0.08);
+        lotes.add(M.madeira, b(new THREE.CylinderGeometry(0.035, 0.022, 0.29, rad).translate(lx, 0.17, lz)));
+        lotes.add(M.ouro, b(new THREE.CylinderGeometry(0.024, 0.024, 0.03, rad).translate(lx, 0.015, lz)), { cast: false });
+      }
     }
   }
 
-  // ---- Vasos de espada-de-são-jorge nos cantos ---------------------------------
-  // Encostados no canto (centro a 0,2 das duas faces): o vaso é estreito e as
-  // folhas sobem quase retas, para não invadir o tile andável vizinho.
+  // ---- Plantas -----------------------------------------------------------------
+  // Espada-de-são-jorge num vaso de cerâmica (centro em x, z): vaso estreito e
+  // folhas quase retas, para não invadir o tile andável vizinho. Nos cantos
+  // do norte as plantas são altas; nos do sul (perto da câmera), baixas.
   const rand = seeded(744);
-  const cantos = [
-    [XO + 0.2, ZN + 0.2],
-    [XL - 0.2, ZN + 0.2],
-    [XO + 0.2, ZS - 0.2],
-    [XL - 0.2, ZS - 0.2],
-  ];
   const up = new THREE.Vector3(0, 1, 0);
-  cantos.forEach(([x, z], ci) => {
-    const baixo = ci >= 2; // perto da câmera: planta um pouco menor
-    const vh = baixo ? 0.3 : 0.36;
-    lotes.add(M.vaso, new THREE.CylinderGeometry(0.16, 0.12, vh, rad).translate(x, vh / 2, z));
-    lotes.add(M.marinho, new THREE.CylinderGeometry(0.163, 0.155, 0.05, rad).translate(x, vh - 0.06, z));
+  const espada = (x, z, { vh, vr, folhas, n }) => {
+    lotes.add(M.vaso, new THREE.CylinderGeometry(vr, vr * 0.75, vh, rad).translate(x, vh / 2, z));
+    lotes.add(M.marinho, new THREE.CylinderGeometry(vr + 0.003, vr * 0.97, 0.05, rad).translate(x, vh - 0.06, z));
     // Terra 6 mm acima da boca (no mesmo y da tampa do vaso ela piscava).
-    lotes.add(M.terra, new THREE.CylinderGeometry(0.14, 0.14, 0.016, rad).translate(x, vh - 0.002, z), { cast: false });
-    const n = lite ? 6 : 9;
-    for (let i = 0; i < n; i++) {
-      const a = (i / n) * Math.PI * 2 + rand() * 0.5;
-      const r = 0.03 + rand() * 0.07;
-      const alt = (baixo ? 0.42 : 0.55) + rand() * 0.35;
-      const g = new THREE.ConeGeometry(0.045, alt, 4).translate(0, alt / 2, 0);
+    lotes.add(M.terra, new THREE.CylinderGeometry(vr * 0.88, vr * 0.88, 0.016, rad).translate(x, vh - 0.002, z), { cast: false });
+    const k = lite ? Math.ceil(n * 0.65) : n;
+    for (let i = 0; i < k; i++) {
+      const a = (i / k) * Math.PI * 2 + rand() * 0.5;
+      const r = vr * (0.2 + rand() * 0.45);
+      const alt = folhas + rand() * folhas * 0.6;
+      const g = new THREE.ConeGeometry(0.045 * (vr / 0.16), alt, 4).translate(0, alt / 2, 0);
       g.scale(1, 1, 0.35);
       g.rotateY(-a);
-      const incl = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(Math.sin(a), 0, -Math.cos(a)).cross(up).normalize(), -(0.1 + rand() * 0.18));
-      g.applyQuaternion(incl);
+      const eixo = new THREE.Vector3(Math.sin(a), 0, -Math.cos(a)).cross(up).normalize();
+      g.applyQuaternion(new THREE.Quaternion().setFromAxisAngle(eixo, -(0.08 + rand() * 0.16)));
       g.translate(x + Math.cos(a) * r, vh - 0.02, z + Math.sin(a) * r);
       lotes.add(i % 3 === 0 ? M.folhaClara : M.folha, g);
     }
+  };
+  for (const [tx, ty] of DECOR.plantasNorte) {
+    const p = tileToWorld(tx, ty);
+    espada(p.x + Math.sign(p.x) * 0.16, p.z - 0.16, { vh: 0.5, vr: 0.21, folhas: 0.8, n: 13 });
+  }
+  for (const [tx, ty] of DECOR.plantasSul) {
+    const p = tileToWorld(tx, ty);
+    espada(p.x + Math.sign(p.x) * 0.2, p.z + 0.2, { vh: 0.3, vr: 0.16, folhas: 0.42, n: 9 });
+  }
+
+  // Vasos altos ladeando o elevador (como nos escritórios): cachepô de
+  // cerâmica branca com cinta marinho e uma árvore-da-felicidade em copa.
+  for (const [tx, ty] of DECOR.vasosElevador) {
+    const x = tileToWorld(tx, ty).x;
+    const z = ZN + 0.36;
+    const vh = 0.55;
+    lotes.add(M.vaso, new THREE.CylinderGeometry(0.21, 0.17, vh, rad).translate(x, vh / 2, z));
+    lotes.add(M.marinho, new THREE.CylinderGeometry(0.213, 0.2, 0.06, rad).translate(x, vh - 0.1, z));
+    lotes.add(M.ouro, new THREE.CylinderGeometry(0.175, 0.175, 0.025, rad).translate(x, 0.0125, z), { cast: false });
+    lotes.add(M.terra, new THREE.CylinderGeometry(0.19, 0.19, 0.016, rad).translate(x, vh - 0.002, z), { cast: false });
+    lotes.add(M.madeira, new THREE.CylinderGeometry(0.018, 0.026, 0.7, 5).translate(x, vh + 0.35, z));
+    const copa = lite ? 4 : 7;
+    for (let i = 0; i < copa; i++) {
+      const a = rand() * Math.PI * 2;
+      const r = i === 0 ? 0 : 0.08 + rand() * 0.08;
+      const y = vh + 0.55 + (i === 0 ? 0.32 : rand() * 0.5);
+      const raio = i === 0 ? 0.2 : 0.13 + rand() * 0.06;
+      lotes.add(i % 2 ? M.folhaClara : M.folha, new THREE.IcosahedronGeometry(raio, lite ? 0 : 1).translate(x + Math.cos(a) * r, y, z + Math.sin(a) * r * 0.6));
+    }
+  }
+
+  // ---- Cordões na frente dos quadros da parede norte ---------------------------
+  // Pedestais baixos de latão com corda de veludo, colados na parede (a 0,2
+  // da face): o jogador olha o quadro do tile "ver" logo em frente, sem
+  // pisar neles. Nas laterais não há cordão (as pessoas ficam bem ao lado).
+  const CORDAO = { d: 0.2, meia: 0.72, h: 0.46 };
+  SLOTS.forEach((s, i) => {
+    if (!s.normal[1]) return;
+    const c = centroQuadro(i);
+    const z = ZN + CORDAO.d;
+    const xs = [c.x - CORDAO.meia, c.x + CORDAO.meia];
+    for (const x of xs) {
+      lotes.add(M.ouro, new THREE.CylinderGeometry(0.05, 0.062, 0.025, rad).translate(x, 0.0125, z), { cast: false });
+      lotes.add(M.ouro, new THREE.CylinderGeometry(0.013, 0.013, CORDAO.h, rad).translate(x, CORDAO.h / 2, z));
+      lotes.add(M.ouro, new THREE.SphereGeometry(0.028, rad, lite ? 4 : 8).translate(x, CORDAO.h + 0.01, z), { cast: false });
+    }
+    const curva = new THREE.QuadraticBezierCurve3(
+      new THREE.Vector3(xs[0], CORDAO.h - 0.05, z),
+      new THREE.Vector3(c.x, CORDAO.h - 0.26, z),
+      new THREE.Vector3(xs[1], CORDAO.h - 0.05, z),
+    );
+    lotes.add(M.veludo, new THREE.TubeGeometry(curva, lite ? 8 : 14, 0.014, lite ? 4 : 6, false));
   });
+
+  // ---- Totem de boas-vindas ---------------------------------------------------------
+  // Púlpito baixo ao lado da chegada, de frente para o sul (quem sai do
+  // elevador e a câmera do jogo leem o tampo inclinado).
+  {
+    const p = tileToWorld(DECOR.totem[0], DECOR.totem[1]);
+    const tw = 0.9;
+    const td = 0.56;
+    const incl = 0.62; // inclinação do tampo (rad)
+    const yT = 0.86;
+    lotes.add(M.marmore, new RoundedBoxGeometry(0.56, 0.06, 0.4, seg, 0.015).translate(p.x, 0.03, p.z));
+    lotes.add(M.marinho, caixa(p.x - 0.18, p.x + 0.18, 0.06, yT - 0.14, p.z - 0.12, p.z + 0.12));
+    lotes.add(M.ouro, caixa(p.x - 0.185, p.x + 0.185, yT - 0.42, yT - 0.39, p.z - 0.125, p.z + 0.125), { cast: false });
+    lotes.add(M.marinho, new RoundedBoxGeometry(tw, 0.05, td, seg, 0.012).rotateX(incl).translate(p.x, yT, p.z));
+    const totemTex = track(makeTotemTexture(pal, (tw - 0.08) / (td - 0.08)));
+    const face = new THREE.Mesh(
+      track(new THREE.PlaneGeometry(tw - 0.08, td - 0.08)),
+      track(new THREE.MeshStandardMaterial({ map: totemTex, emissive: white, emissiveMap: totemTex, emissiveIntensity: 0.18, roughness: 0.55 })),
+    );
+    face.rotation.x = -Math.PI / 2 + incl;
+    face.position.set(p.x, yT, p.z).add(new THREE.Vector3(0, 0.026, 0).applyAxisAngle(new THREE.Vector3(1, 0, 0), incl));
+    root.add(face);
+  }
 
   // ---- Trilhos de luz e spots ------------------------------------------------------
   // Trilho preto em balanço sobre cada parede alta (mãos-francesas apoiadas no
@@ -681,14 +915,16 @@ export function buildSala({ scene, pal, track, lite = false, reducedMotion = fal
   const TY = H + 0.12; // altura do trilho
   const semSombra = { cast: false }; // sombra fina e comprida no piso: feia
   const centros = SLOTS.map((_, i) => centroQuadro(i));
-  const porParede = { norte: [], oeste: [], leste: [] };
+  // A norte tem dois grupos (um de cada lado do elevador e do letreiro).
+  const porParede = { norteO: [], norteL: [], oeste: [], leste: [] };
   SLOTS.forEach((s, i) => {
-    const w = s.normal[1] ? "norte" : s.normal[0] > 0 ? "oeste" : "leste";
+    const w = s.normal[1] ? (centros[i].x < 0 ? "norteO" : "norteL") : s.normal[0] > 0 ? "oeste" : "leste";
     porParede[w].push(i);
   });
   // Trilho de uma parede: do primeiro ao último quadro (com folga).
-  const trilho = (w, ids) => {
+  const trilho = (grupo, ids) => {
     if (!ids.length) return;
+    const w = grupo.startsWith("norte") ? "norte" : grupo;
     const ao = (i) => (w === "norte" ? centros[i].x : centros[i].z);
     const a0 = Math.min(...ids.map(ao)) - 1.2;
     const a1 = Math.max(...ids.map(ao)) + 1.2;
@@ -772,27 +1008,29 @@ export function buildSala({ scene, pal, track, lite = false, reducedMotion = fal
   root.add(cabecas, lentes, halos, feixes);
 
   // ---- Luzes ----------------------------------------------------------------------
-  const luzQuente = mix(white, pv("yellow-400"), 0.14);
+  // Salão um pouco mais suave (a sanca e os spots dão o clima); no lite,
+  // sem spots, a ambiente compensa.
+  const luzQuente = mix(white, pv("yellow-400"), 0.16);
   const hemi = new THREE.HemisphereLight(
     mix(white, pv("yellow-400"), 0.1),
     mix(pal.woodLight, white, 0.35),
-    lite ? 2.1 : 1.45,
+    lite ? 2.0 : 1.3,
   );
   root.add(hemi);
 
   // Claraboia: direcional suave, alta e vinda do sul (ilumina a parede norte
   // e não joga as paredes laterais na sombra).
-  const sol = new THREE.DirectionalLight(luzQuente, lite ? 1.3 : 1.25);
+  const sol = new THREE.DirectionalLight(luzQuente, lite ? 1.25 : 1.05);
   sol.position.set(-1.5, 12, 7);
   sol.target.position.set(0, 0, -0.5);
   if (!lite) {
     sol.castShadow = true;
     sol.shadow.mapSize.set(2048, 2048);
     const sc = sol.shadow.camera;
-    sc.left = -9;
-    sc.right = 9;
-    sc.top = 8;
-    sc.bottom = -8;
+    sc.left = -11;
+    sc.right = 11;
+    sc.top = 8.5;
+    sc.bottom = -8.5;
     sc.near = 1;
     sc.far = 30;
     sol.shadow.bias = -0.0004;
@@ -801,8 +1039,11 @@ export function buildSala({ scene, pal, track, lite = false, reducedMotion = fal
   }
   root.add(sol, sol.target);
 
-  // Destaque dos quadros: até 4 spots, cada um cobre um par de molduras.
+  // Destaque dos quadros: até 4 spots quentes, cada um cobre um par de
+  // molduras. Ficam marcados (userData.slots/base) para quadros.js reforçar
+  // o do quadro em destaque, sem criar outra luz.
   const spots = [];
+  const corSpot = mix(pal.lamp, pv("yellow-400"), 0.22);
   if (!lite) {
     const pares = [];
     for (const ids of Object.values(porParede)) {
@@ -813,7 +1054,9 @@ export function buildSala({ scene, pal, track, lite = false, reducedMotion = fal
       const s = SLOTS[par[0]];
       const n = new THREE.Vector3(s.normal[0], 0, s.normal[1]);
       const meia = par.length > 1 ? centros[par[0]].distanceTo(centros[par[1]]) / 2 + QUADRO.largura / 2 + 0.3 : 1;
-      const spot = new THREE.SpotLight(pal.lamp, 9, 0, 0.72, 0.8, 2);
+      const spot = new THREE.SpotLight(corSpot, 11, 0, 0.72, 0.8, 2);
+      spot.userData.slots = par;
+      spot.userData.base = spot.intensity;
       spot.position.copy(mid).addScaledVector(n, 2.1);
       spot.position.y = H + 0.5;
       spot.target.position.copy(mid);
@@ -838,7 +1081,8 @@ export function buildSala({ scene, pal, track, lite = false, reducedMotion = fal
   };
   setToggle(1);
 
-  function update(t) {
+  function update(t, dt) {
+    elevador.update(t, dt);
     if (reducedMotion) return;
     const onda = Math.sin((t * Math.PI * 2) / 3.2);
     setToggle(THREE.MathUtils.smoothstep(onda, -0.35, 0.35));
@@ -851,5 +1095,5 @@ export function buildSala({ scene, pal, track, lite = false, reducedMotion = fal
     if (scene.background && scene.background.isColor) scene.background = fundoAntes;
   }
 
-  return { update, dispose, abrirPorta, raiz: root };
+  return { update, dispose, elevador, raiz: root };
 }

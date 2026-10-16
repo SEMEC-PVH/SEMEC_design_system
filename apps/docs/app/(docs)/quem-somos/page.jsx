@@ -21,10 +21,15 @@ const directors = [
     photo: "/quem-somos/retratos/pedro.webp",
   },
   {
-    name: "Nome Sobrenome",
-    role: "Diretor(a) de Design",
-    linkedin: "https://linkedin.com/in/",
-    photo: null,
+    // Na Vila, é ele quem entrega a primeira linguagem (Diretoria), com o
+    // boneco 3D de notebook aberto (components/quem-somos/scene/vinicius.js).
+    // TODO: LinkedIn do Vinicius.
+    name: "Vinicius Gava de Oliveira",
+    role: "Diretor de Tecnologia",
+    bio: "Engenheiro mecatrônico e diretor do Departamento de Tecnologia da SEMFAZ. Construiu a Vila SEMEC: o mapa 3D, as batalhas e as quests.",
+    github: "https://github.com/VgavaBR123",
+    retrato: "gava",
+    photo: "/quem-somos/retratos/gava.webp",
   },
 ];
 
@@ -63,12 +68,6 @@ const interns = [
     github: "https://github.com/MariMeng",
     retrato: "mariana",
     photo: "/quem-somos/retratos/mariana.webp",
-  },
-  {
-    name: "Nome Sobrenome",
-    role: "Design UI/UX",
-    linkedin: "https://linkedin.com/in/",
-    photo: null,
   },
   {
     // TODO: nome completo, bio, fala e LinkedIn do Tiago.

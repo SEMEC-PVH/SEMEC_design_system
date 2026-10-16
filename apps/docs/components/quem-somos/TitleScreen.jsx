@@ -5,19 +5,29 @@
 //      sobrevoa o mapa ao fundo);
 //   2. menu em caixa de RPG (moldura dupla, cursor ▶) — Novo jogo, Como
 //      jogar, Gráficos, Ver equipe em lista. Setas movem o cursor, Enter
-//      escolhe (em Gráficos, troca o nível; ←/→ também), Esc volta.
-// O VilaSemec controla `started`; aqui só chamamos onStart().
+//      escolhe (em Gráficos, troca o nível; ←/→ também), Esc volta;
+//   3. "Novo jogo" abre a escolha de personagem (EscolhaPersonagem).
+// O VilaSemec controla `started`; aqui só chamamos onStart(jogador).
 import { useCallback, useEffect, useRef, useState } from "react";
+import EscolhaPersonagem from "./EscolhaPersonagem";
 import FullscreenButton from "./FullscreenButton";
-import { OPCOES, ROTULO } from "./scene/qualidade";
+import { OPCOES, ROTULO, ehLeve } from "./scene/qualidade";
 import styles from "./TitleScreen.module.css";
 
 const YEAR = 2026;
 
 // graficos: preferência atual ("auto" ou nível, scene/qualidade.js);
 // nivelAtual: o nível que o motor está usando; onGraficos(nova) salva.
-export default function TitleScreen({ onStart, graficos = "auto", nivelAtual = null, semAceleracao = false, onGraficos }) {
-  const [stage, setStage] = useState("press"); // "press" | "menu" | "help"
+// baseUrl: pasta dos GLBs (escolha de personagem).
+export default function TitleScreen({
+  onStart,
+  graficos = "auto",
+  nivelAtual = null,
+  semAceleracao = false,
+  onGraficos,
+  baseUrl = "",
+}) {
+  const [stage, setStage] = useState("press"); // "press" | "menu" | "help" | "personagem"
   const menuRef = useRef(null);
   const pressRef = useRef(null);
 
@@ -42,21 +52,25 @@ export default function TitleScreen({ onStart, graficos = "auto", nivelAtual = n
       } else if (e.key === "Escape") {
         e.preventDefault();
         e.stopImmediatePropagation();
-        setStage(stage === "help" ? "menu" : "press");
+        setStage(stage === "menu" ? "press" : "menu");
       } else if ((e.key === "Enter" || e.key === " ") && !inBox && !t.closest?.("a, button")) {
         e.preventDefault();
         e.stopImmediatePropagation();
-        menuRef.current?.querySelector("button, a")?.focus({ preventScroll: true });
+        (menuRef.current?.querySelector('[aria-checked="true"]') ?? menuRef.current?.querySelector("button, a"))?.focus({
+          preventScroll: true,
+        });
       }
     };
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
   }, [stage, openMenu]);
 
-  // Ao abrir o menu ou a ajuda (ação do usuário), o foco vai para o primeiro
-  // item ("Novo jogo" / "Voltar").
+  // Ao abrir o menu, a ajuda ou a escolha (ação do usuário), o foco vai para
+  // o primeiro item ("Novo jogo" / "Voltar" / o personagem marcado).
   useEffect(() => {
-    if (stage !== "press") menuRef.current?.querySelector("button, a")?.focus({ preventScroll: true });
+    if (stage === "press") return;
+    const alvo = menuRef.current?.querySelector('[aria-checked="true"]') ?? menuRef.current?.querySelector("button, a");
+    alvo?.focus({ preventScroll: true });
   }, [stage]);
 
   // Próximo (ou anterior) nível gráfico, em volta.
@@ -108,12 +122,21 @@ export default function TitleScreen({ onStart, graficos = "auto", nivelAtual = n
 
       {stage !== "press" && (
         // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- navegação por setas dentro do menu (os itens são botões/links)
-        <div className={styles.box} onKeyDown={onMenuKey}>
-          {stage === "menu" ? (
+        <div className={styles.box} data-largo={stage === "personagem" || undefined} onKeyDown={onMenuKey}>
+          {stage === "personagem" ? (
+            <div ref={menuRef}>
+              <EscolhaPersonagem
+                baseUrl={baseUrl}
+                leve={ehLeve(nivelAtual)}
+                onConfirm={onStart}
+                onVoltar={() => setStage("menu")}
+              />
+            </div>
+          ) : stage === "menu" ? (
             <nav aria-label="Menu do jogo">
               <ul ref={menuRef} className={styles.menu}>
                 <li>
-                  <button type="button" className={styles.item} onClick={onStart}>
+                  <button type="button" className={styles.item} onClick={() => setStage("personagem")}>
                     Novo jogo
                   </button>
                 </li>
@@ -160,6 +183,10 @@ export default function TitleScreen({ onStart, graficos = "auto", nivelAtual = n
                   <kbd>Shift</kbd>
                 </dt>
                 <dd>Correr</dd>
+                <dt>
+                  <kbd>B</kbd>
+                </dt>
+                <dd>Bicicleta (conserte a do bicicletário)</dd>
                 <dt>
                   <kbd>Espaço</kbd> / <kbd>Enter</kbd>
                 </dt>

@@ -1,11 +1,16 @@
 // Tema do 5º andar: Tecnologia e Administração (ver ./index.js).
 //
+// O andar não tem ilha de gabinete (`semIlha` em andares.js): no centro fica
+// a Central de Operações da cidade inteligente, uma mesa com a maquete de
+// uma cidade (prédios, ruas, rio) cheia de sensores com LEDs, feixes de dados
+// subindo até um holograma com painéis que gira devagar.
+//
 // O que caracteriza cada departamento:
-// - Tecnologia (ilha do centro e a ala leste, que era área comum): telão com
-//   terminal rolando, fileira de racks de servidores com LEDs e cabos
-//   organizados na eletrocalha, bancada de IoT (placa com microcontrolador,
-//   protoboard, sensores, multímetro) e uma esteira com braço robótico
-//   comandada por um painel de CLP.
+// - Tecnologia (lado leste, com a chefia virada para o sul): telão com terminal
+//   rolando, fileira de racks de servidores com LEDs e cabos organizados na
+//   eletrocalha, bancada de IoT (placa com microcontrolador, protoboard,
+//   sensores, multímetro) e uma esteira com braço robótico comandada por um
+//   painel de CLP.
 // - Inovação e Integração (faixa norte-oeste): impressora 3D imprimindo, painel
 //   de sensores na parede, quadro Kanban com post-its e pufes.
 // - Sistemas (faixa norte-leste): estação com três monitores e o quadro de
@@ -19,16 +24,22 @@
 //   x → 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
 // y 1   . I . P . K K R .  E  E  .  .  .  .  S  .  M  M  .    I impressora 3D, K Kanban+pufes
 //   …                                                         R relógio de ponto, M monitores
-//   5   o . . A A c . . .  .  .  .  T  T  .  r  r  r  .  .    A almoxarifado, c carrinho
-//   6   o . . . . . . . .  [ilha]  .  .  .  .  .  .  .  .  .    T telão, r racks
-//   7   o . . B B q . . .  .  .  .  b  b  .  e  e  L  .  .    B protocolo, q chaves e carro
-//                                                             b bancada IoT, e esteira, L CLP
+//   3   . . . . . . . . .  .  .  .  .  .  .  .  .  .  .  p    p planta
+//   4   o . . . . . . . .  .  .  .  .  .  .  x  x  x  .  .    x área técnica atrás dos racks
+//   5   o . . A A c . . C  C  C  C  T  T  .  r  r  r  .  .    A almoxarifado, c carrinho
+//   6   o . . . . . . . C  C  C  C  .  .  .  .  .  .  .  .    C Central de Operações, T telão
+//   7   o . . B B q . . .  .  .  .  b  b  .  e  e  L  d  d    B protocolo, q chaves e carro
+//   8   o . . . . . . . .  .  .  .  .  .  .  .  .  .  G  a    b bancada IoT, e esteira, L CLP
+//                                                             G Gava (chefia, virada para o
+//                                                             sul), d aparador, a arquivo
 //
 // Desempenho: a parte fixa vai nos `lotes` (cor lisa = mesmo draw call do
 // andar); os textos impressos (Kanban, arquitetura, placas) dividem UMA
 // textura; as telas dividem OUTRA (redesenhada poucas vezes por segundo). Os
-// LEDs são um InstancedMesh só. Animados: braço (2), impressora (3) e caixas
-// da esteira (1). Ao todo, uns 9 draw calls a mais.
+// LEDs (racks, CLP e sensores da maquete) são um InstancedMesh só. Animados:
+// braço (2), impressora (3) e caixas da esteira (1). A Central soma 4: mapa
+// com o letreiro (textura), holograma (um mesh), feixes e pacotes de dados.
+// Ao todo, uns 13 draw calls a mais.
 
 import * as THREE from "three";
 
@@ -47,6 +58,8 @@ const TILES = {
   carrinho: [[6, 5]],
   protocolo: [[4, 7], [5, 7]],
   chaves: [[6, 7]],
+  // Central de Operações: mesa de 4 × 2 tiles no meio do salão.
+  mesa: [[9, 5], [10, 5], [11, 5], [12, 5], [9, 6], [10, 6], [11, 6], [12, 6]],
 };
 
 // ---- Objetos que ensinam ------------------------------------------------------
@@ -69,6 +82,12 @@ const INFO_PROCESSO = [
   "Em Porto Velho, os processos tramitam no SEI (Sistema Eletrônico de Informações): em vez de pastas de papel indo de mesa em mesa, os documentos ficam no sistema, e dá para acompanhar em que setor o pedido está.",
 ];
 
+const INFO_CIDADE = [
+  "Numa cidade inteligente, sensores espalhados pelas ruas medem o que está acontecendo: postes que percebem quando há gente passando, semáforos que contam carros, lixeiras que avisam quando estão cheias e medidores do consumo de energia dos prédios públicos. Nesta maquete, cada luzinha é um desses sensores.",
+  "Os dados chegam a uma central de operações, como esta, e viram painéis. Com eles a Prefeitura decide melhor e gasta menos: acende a iluminação mais forte só onde e quando precisa, ajusta o tempo dos semáforos no horário de pico, manda o caminhão de lixo às lixeiras cheias e descobre prédios que gastam energia demais.",
+  "E a privacidade? Dados sobre pessoas são protegidos pela LGPD (Lei Geral de Proteção de Dados Pessoais). A Prefeitura deve coletar só o necessário para uma finalidade clara, guardar com segurança e, sempre que possível, usar dados agregados ou anonimizados: contar quantos carros passam, sem identificar quem dirige.",
+];
+
 // Gerador pseudoaleatório próprio (não mexe na sequência do escritório).
 function semente(s) {
   let a = s % 2147483647;
@@ -78,14 +97,19 @@ function semente(s) {
   };
 }
 
-// Plano com UV recortado de um atlas (px, py, pw, ph em pixels do canvas).
-function recorte(w, h, [px, py, pw, ph], CW, CH) {
-  const g = new THREE.PlaneGeometry(w, h);
+// Leva o UV (0..1) de uma geometria para um recorte do atlas (px, py, pw, ph
+// em pixels do canvas).
+function noRecorte(g, [px, py, pw, ph], CW, CH) {
   const uv = g.attributes.uv;
   for (let i = 0; i < uv.count; i++) {
     uv.setXY(i, (px + uv.getX(i) * pw) / CW, 1 - (py + (1 - uv.getY(i)) * ph) / CH);
   }
   return g;
+}
+
+// Plano com UV recortado de um atlas.
+function recorte(w, h, reg, CW, CH) {
+  return noRecorte(new THREE.PlaneGeometry(w, h), reg, CW, CH);
 }
 
 // ---- Atlas impresso (Kanban, arquitetura, placas) -----------------------------
@@ -508,6 +532,307 @@ function criarTelas(pal) {
   return { canvas, desenhar, desenharTudo };
 }
 
+// ---- Central de Operações: a cidade da maquete -------------------------------
+// Coordenadas (u, v) de 0 a 1 sobre o tampo (u: oeste → leste, v: norte →
+// sul). O mapa (textura) e as peças 3D (prédios, sensores) usam as mesmas.
+
+const CIDADE = {
+  ruasU: [0.2, 0.4, 0.6, 0.8],
+  ruasV: [0.28, 0.87],
+  largU: 0.034,
+  largV: 0.06,
+  colunas: [[0.03, 0.18], [0.22, 0.38], [0.42, 0.58], [0.62, 0.78], [0.82, 0.97]],
+  // [v0, v1, tipo]: centro (prédios altos), bairro (médios), casas (telhado).
+  filas: [[0.04, 0.25, "centro"], [0.32, 0.47, "bairro"], [0.69, 0.84, "casas"]],
+  parques: ["1,0", "2,3"],
+  praca: "1,2", // onde fica o projetor do holograma
+  prefeitura: "0,2",
+};
+const rioV = (u) => 0.58 + 0.035 * Math.sin(u * Math.PI * 2.4 + 0.6);
+const RIO_MEIA = 0.06;
+// Sensores: [tipo, u, v, feixe (manda dados ao holograma)].
+const SENSORES = [
+  ["poste", 0.1, 0.236, true],
+  ["poste", 0.5, 0.236, false],
+  ["poste", 0.9, 0.236, true],
+  ["poste", 0.3, 0.912, true],
+  ["poste", 0.7, 0.912, false],
+  ["semaforo", 0.428, 0.322, true],
+  ["semaforo", 0.628, 0.83, true],
+  ["lixeira", 0.244, 0.336, true],
+  ["lixeira", 0.756, 0.336, false],
+  ["lixeira", 0.54, 0.915, true],
+  ["medidor", 0.405, 0.07, true],
+  ["medidor", 0.16, 0.71, false],
+  ["rio", 0.425, rioV(0.4), true],
+  ["rio", 0.825, rioV(0.8), false],
+];
+
+const MESA = { W: 1024, H: 560 };
+const R_MAPA = [0, 0, 1024, 460]; // proporção do tampo (3,56 × 1,6)
+const R_LETREIRO = [0, 472, 1024, 78];
+
+// Mapa da maquete (quadras, parques, rio, ruas, anéis dos sensores) e o
+// letreiro da frente da mesa.
+function desenharMesa(canvas, pal, caberFonte) {
+  const g = canvas.getContext("2d");
+  const { pv, mix } = pal;
+  const css = (c) => c.getStyle();
+  const [x0, y0, w, h] = R_MAPA;
+  const X = (u) => x0 + u * w;
+  const Y = (v) => y0 + v * h;
+  const base = mix(pv("blue-950"), pv("gray-900"), 0.35);
+  g.setLineDash([]);
+  g.globalAlpha = 1;
+  g.fillStyle = css(base);
+  g.fillRect(0, 0, MESA.W, MESA.H);
+  // Grade holográfica.
+  g.strokeStyle = css(mix(base, pv("blue-500"), 0.22));
+  g.lineWidth = 1;
+  for (let x = 16; x < w; x += 32) {
+    g.beginPath();
+    g.moveTo(x0 + x, y0);
+    g.lineTo(x0 + x, y0 + h);
+    g.stroke();
+  }
+  for (let y = 14; y < h; y += 32) {
+    g.beginPath();
+    g.moveTo(x0, y0 + y);
+    g.lineTo(x0 + w, y0 + y);
+    g.stroke();
+  }
+  // Quadras, parques e a praça do projetor.
+  CIDADE.filas.forEach(([v0, v1], fi) => {
+    CIDADE.colunas.forEach(([u0, u1], ci) => {
+      const k = `${fi},${ci}`;
+      const parque = CIDADE.parques.includes(k);
+      g.fillStyle = css(parque ? mix(pv("green-800"), base, 0.3) : k === CIDADE.praca ? mix(base, pv("gray-500"), 0.35) : mix(base, pv("blue-800"), 0.5));
+      g.fillRect(X(u0), Y(v0), X(u1) - X(u0), Y(v1) - Y(v0));
+      if (k === CIDADE.praca) {
+        g.strokeStyle = css(pv("blue-300"));
+        g.lineWidth = 3;
+        g.beginPath();
+        g.arc(X((u0 + u1) / 2), Y((v0 + v1) / 2), 28, 0, Math.PI * 2);
+        g.stroke();
+      }
+    });
+  });
+  // Rio, com a margem acesa.
+  const passo = 0.02;
+  g.beginPath();
+  for (let u = 0; u <= 1.0001; u += passo) g.lineTo(X(u), Y(rioV(u) - RIO_MEIA));
+  for (let u = 1; u >= -0.0001; u -= passo) g.lineTo(X(u), Y(rioV(u) + RIO_MEIA));
+  g.closePath();
+  g.fillStyle = css(mix(pv("blue-600"), base, 0.25));
+  g.fill();
+  g.strokeStyle = css(pv("blue-300"));
+  g.lineWidth = 2;
+  for (const s of [-1, 1]) {
+    g.beginPath();
+    for (let u = 0; u <= 1.0001; u += passo) g.lineTo(X(u), Y(rioV(u) + s * RIO_MEIA));
+    g.stroke();
+  }
+  // Ruas (por cima do rio, viram pontes) com a faixa tracejada.
+  const asfalto = mix(pv("gray-700"), pv("blue-900"), 0.4);
+  const faixa = mix(pv("blue-300"), pv("white"), 0.3);
+  for (const v of CIDADE.ruasV) {
+    g.fillStyle = css(asfalto);
+    g.fillRect(x0, Y(v - CIDADE.largV / 2), w, h * CIDADE.largV);
+  }
+  for (const u of CIDADE.ruasU) {
+    g.fillStyle = css(asfalto);
+    g.fillRect(X(u - CIDADE.largU / 2), y0, w * CIDADE.largU, h);
+    // Guarda-corpo da ponte.
+    g.fillStyle = css(pv("yellow-400"));
+    for (const s of [-1, 1]) g.fillRect(X(u + (s * CIDADE.largU) / 2) - 1.5, Y(rioV(u) - RIO_MEIA), 3, h * RIO_MEIA * 2);
+  }
+  g.strokeStyle = css(faixa);
+  g.lineWidth = 2;
+  g.setLineDash([10, 8]);
+  for (const v of CIDADE.ruasV) {
+    g.beginPath();
+    g.moveTo(x0, Y(v));
+    g.lineTo(x0 + w, Y(v));
+    g.stroke();
+  }
+  for (const u of CIDADE.ruasU) {
+    g.beginPath();
+    g.moveTo(X(u), y0);
+    g.lineTo(X(u), y0 + h);
+    g.stroke();
+  }
+  g.setLineDash([]);
+  // Anéis de sinal em volta de cada sensor.
+  g.strokeStyle = css(pv("green-500"));
+  g.lineWidth = 2;
+  for (const [, u, v] of SENSORES) {
+    for (const [r, a] of [[9, 0.9], [16, 0.45]]) {
+      g.globalAlpha = a;
+      g.beginPath();
+      g.arc(X(u), Y(v), r, 0, Math.PI * 2);
+      g.stroke();
+    }
+  }
+  g.globalAlpha = 1;
+  g.strokeStyle = css(pv("blue-400"));
+  g.lineWidth = 4;
+  g.strokeRect(x0 + 2, y0 + 2, w - 4, h - 4);
+
+  // Letreiro.
+  {
+    const [lx, ly, lw, lh] = R_LETREIRO;
+    g.fillStyle = css(mix(pv("gray-950"), pv("blue-950"), 0.5));
+    g.fillRect(lx, ly, lw, lh);
+    g.fillStyle = css(pv("blue-400"));
+    g.fillRect(lx, ly, lw, 4);
+    g.fillRect(lx, ly + lh - 4, lw, 4);
+    g.fillStyle = css(pv("green-500"));
+    for (const cx of [lx + 26, lx + lw - 26]) {
+      g.beginPath();
+      g.arc(cx, ly + lh / 2, 7, 0, Math.PI * 2);
+      g.fill();
+    }
+    const texto = "CENTRAL DE OPERAÇÕES · CIDADE INTELIGENTE";
+    g.fillStyle = css(pv("white"));
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+    caberFonte(g, texto, 700, 44, 20, lw - 110, pal.font);
+    g.fillText(texto, lx + lw / 2, ly + lh / 2 + 1);
+  }
+}
+
+const HO = { W: 512, H: 352 };
+const R_HOLO = [[0, 0, 256, 160], [256, 0, 256, 160], [0, 176, 256, 160]];
+const R_SOLIDO = [280, 200, 24, 24];
+const R_FACHO = [320, 176, 64, 160];
+
+// Holograma (fundo transparente): três painéis com gráficos, um recorte de
+// cor cheia (anéis) e o degradê do facho de luz do projetor.
+function desenharHolo(canvas, pal, caberFonte) {
+  const g = canvas.getContext("2d");
+  const { pv, mix } = pal;
+  const css = (c) => c.getStyle();
+  const r = semente(4242);
+  const linha = pv("blue-300");
+  const texto = mix(pv("blue-100"), pv("white"), 0.5);
+  g.clearRect(0, 0, HO.W, HO.H);
+  const titulos = ["ILUMINAÇÃO", "TRÂNSITO", "COLETA DE LIXO"];
+  R_HOLO.forEach(([x0, y0, w, h], k) => {
+    g.globalAlpha = 0.5;
+    g.fillStyle = css(mix(pv("blue-900"), pv("blue-700"), 0.3));
+    g.beginPath();
+    g.roundRect(x0 + 4, y0 + 4, w - 8, h - 8, 12);
+    g.fill();
+    g.globalAlpha = 1;
+    g.strokeStyle = css(linha);
+    g.lineWidth = 4;
+    g.stroke();
+    g.fillStyle = css(texto);
+    g.textAlign = "left";
+    g.textBaseline = "middle";
+    caberFonte(g, titulos[k], 700, 22, 12, w - 40, pal.font);
+    g.fillText(titulos[k], x0 + 18, y0 + 26);
+    const gx = x0 + 18;
+    const gy = y0 + 46;
+    const gw = w - 36;
+    const gh = h - 64;
+    if (k === 0) {
+      // Consumo por bairro (barras).
+      for (let i = 0; i < 8; i++) {
+        const bh = gh * (0.3 + r() * 0.7);
+        g.fillStyle = css(i % 3 ? pv("yellow-400") : pv("green-500"));
+        g.fillRect(gx + i * (gw / 8) + 3, gy + gh - bh, gw / 8 - 8, bh);
+      }
+    } else if (k === 1) {
+      // Carros por hora (linha), com o pico da manhã e o da tarde.
+      g.strokeStyle = css(pv("green-500"));
+      g.lineWidth = 4;
+      g.beginPath();
+      for (let i = 0; i <= 24; i++) {
+        const pico = Math.exp(-((i - 7.5) ** 2) / 3) + Math.exp(-((i - 18) ** 2) / 4);
+        const py = gy + gh - gh * (0.12 + 0.8 * pico + r() * 0.06);
+        if (i) g.lineTo(gx + (gw * i) / 24, py);
+        else g.moveTo(gx, py);
+      }
+      g.stroke();
+      g.fillStyle = css(linha);
+      g.fillRect(gx, gy + gh - 2, gw, 2);
+    } else {
+      // Lixeiras: quanto cada uma está cheia (rosquinhas).
+      [[0.35, pv("green-500")], [0.7, pv("yellow-400")], [0.95, pv("red-400")]].forEach(([f, c], i) => {
+        const cx = gx + gw / 6 + (i * gw) / 3;
+        const cy = gy + gh / 2;
+        g.lineWidth = 10;
+        g.strokeStyle = css(mix(pv("blue-900"), linha, 0.35));
+        g.beginPath();
+        g.arc(cx, cy, 26, 0, Math.PI * 2);
+        g.stroke();
+        g.strokeStyle = css(c);
+        g.beginPath();
+        g.arc(cx, cy, 26, -Math.PI / 2, -Math.PI / 2 + f * Math.PI * 2);
+        g.stroke();
+        g.fillStyle = css(texto);
+        g.textAlign = "center";
+        g.font = `700 16px ${pal.font}`;
+        g.fillText(`${Math.round(f * 100)}%`, cx, cy + 1);
+      });
+    }
+  });
+  {
+    const [x0, y0, w, h] = R_SOLIDO;
+    g.fillStyle = css(linha);
+    g.fillRect(x0, y0, w, h);
+  }
+  {
+    // Facho: aceso embaixo (no projetor), sumindo para cima.
+    const [x0, y0, w, h] = R_FACHO;
+    g.fillStyle = css(linha);
+    for (let i = 0; i < h; i++) {
+      g.globalAlpha = 0.65 * (i / h) ** 1.4;
+      g.fillRect(x0, y0 + i, w, 1);
+    }
+    g.globalAlpha = 1;
+  }
+}
+
+// ---- Chefia do Departamento de Tecnologia ------------------------------------------
+// Na faixa leste do escritório a estação fica encostada na parede, virada
+// para oeste: de perfil para a câmera (que vem do sul), a foto e o nome quase
+// somem. Aqui ela sai da parede e fica no próprio departamento, junto do CLP,
+// virada para o sul (de frente para a câmera), com um aparador baixo atrás,
+// um arquivo ao lado e a placa do departamento suspensa logo acima (no lugar
+// da bandeira da faixa, desenhada em `construir`). O aparador também tranca o
+// cantinho atrás da estação, onde a placa esconderia o jogador.
+const GAVA = { codigo: "6.1.6", tile: [19, 8], aparador: [19, 7], arquivo: [20, 8], planta: [20, 3] };
+
+function chefiaTecnologia({ plano, removerDecor, reservar, tileToWorld }) {
+  const ep = plano.estacoes.find((e) => e.pessoa.codigo === GAVA.codigo);
+  if (!ep) return;
+  // Sem a zona da faixa: o escritório não desenha tapete, divisórias nem a
+  // bandeira lá no norte; as peças da faixa (plantas e arquivos) saem também.
+  const zd = plano.zonas.find((z) => z.zona === ep.zona);
+  if (zd) {
+    removerDecor((d) => d.seg === zd.seg);
+    plano.zonas.splice(plano.zonas.indexOf(zd), 1);
+  }
+  for (const [x, y] of ep.tiles) plano.bloq.delete(`${x},${y}`);
+  const [tx, ty] = GAVA.tile;
+  const p = tileToWorld(tx, ty);
+  Object.assign(ep, { x: p.x, z: p.z, rot: 0, tiles: [[tx, ty]], ver: [[tx, ty + 1]], dir: "up" });
+  reservar(tx, ty);
+  const [ax, ay] = GAVA.aparador;
+  plano.decor.push({ tipo: "aparador", x: ax, y: ay, rot: 0 });
+  reservar(ax, ay);
+  reservar(ax + 1, ay);
+  const [qx, qy] = GAVA.arquivo;
+  plano.decor.push({ tipo: "arquivo", x: qx, y: qy, rot: 0 });
+  reservar(qx, qy);
+  // A planta do canto norte da faixa volta (saiu com as peças da zona).
+  const [px, py] = GAVA.planta;
+  plano.decor.push({ tipo: "planta", x: px, y: py, rot: 0 });
+  reservar(px, py);
+}
+
 // ---- Tema -----------------------------------------------------------------------
 
 export const tecnologia = {
@@ -520,15 +845,17 @@ export const tecnologia = {
     // Corredor atrás dos racks (2 m de altura): área técnica, fora do caminho,
     // senão os racks escondem o jogador na câmera do jogo.
     for (const [x, y] of TILES.racks) reservar(x, y - 1);
+    chefiaTecnologia(ctx);
     info("iot", [...TILES.bancada, ...TILES.esteira, ...TILES.clp], "Internet das Coisas (IoT)", INFO_IOT);
     info("integracao", TILES.sistemas, "Integração de sistemas", INFO_INTEGRACAO);
     info("processo", TILES.protocolo, "Processo administrativo", INFO_PROCESSO);
+    info("cidade-inteligente", TILES.mesa, "Cidade inteligente", INFO_CIDADE);
     const falhas = alcancavel();
     if (falhas.length) console.warn("Tema tecnologia: inalcançável", falhas);
   },
 
   construir(ctx) {
-    const { root, lotes, M, pal, track, lite, reducedMotion, tileToWorld, caixa, std, makeCanvas, canvasTexture, caberFonte, FACE } = ctx;
+    const { root, lotes, M, pal, track, lite, reducedMotion, tileToWorld, caixa, std, makeCanvas, canvasTexture, caberFonte, FACE, plano, cor, H, criarPlacaZona } = ctx;
     const { pv, mix } = pal;
     const white = pv("white");
     const rad = lite ? 6 : 10;
@@ -568,6 +895,13 @@ export const tecnologia = {
       ponto: mat(mix(pv("gray-700"), pv("gray-600"), 0.3), { roughness: 0.45 }),
       canaleta: mat(pv("gray-500"), { roughness: 0.8 }),
       faixaAmarela: mat(pv("yellow-500"), { roughness: 0.8 }),
+      // Central de Operações.
+      pisoTec: mat(mix(pv("gray-900"), pv("blue-950"), 0.5), { roughness: 0.9 }),
+      frisoTec: mat(pv("blue-400"), { roughness: 0.6 }),
+      predios: [mix(white, pv("blue-100"), 0.35), mix(pv("blue-200"), pv("gray-200"), 0.5), mix(pv("gray-300"), pv("blue-300"), 0.35)].map((c) => mat(c, { roughness: 0.5 })),
+      torre: mat(mix(pv("blue-400"), pv("blue-700"), 0.4), { roughness: 0.3 }),
+      telhado: mat(mix(pv("red-500"), pv("yellow-800"), 0.45), { roughness: 0.8 }),
+      lixeira: mat(pv("green-700"), { roughness: 0.6 }),
     };
 
     const add = (m, g, sombra = true) => lotes.add(m, g, sombra ? undefined : { cast: false });
@@ -663,7 +997,7 @@ export const tecnologia = {
         add(C.servidor, caixa(p.x - 0.02, p.x + 0.02, 2.04, 2.32, z - 0.02, z + 0.02), false);
         add(C.cabos[0], caixa(p.x + 0.06, p.x + 0.12, 2.04, 2.36, z - 0.03, z + 0.03), false);
       }
-      // Canaleta de piso levando os cabos até a ilha do chefe.
+      // Canaleta de piso levando os cabos até a mesa da Central de Operações.
       const zc = racks[0].z + 0.52;
       add(C.canaleta, caixa(1.98, a.x - 0.25, 0, 0.022, zc - 0.07, zc + 0.07), false);
       for (const s of [-1, 1]) add(C.faixaAmarela, caixa(1.98, a.x - 0.25, 0, 0.024, zc + s * 0.06 - 0.012, zc + s * 0.06 + 0.012), false);
@@ -1017,24 +1351,274 @@ export const tecnologia = {
       for (const wx of [-0.15, 0.15]) for (const wz of [-0.095, 0.095]) cil(M.escuro, p, 0.042, 0.042, 0.03, cx + wx, 0.782, cz + wz, "z", rad, false);
     }
 
+    // ---- Tecnologia: chefia (ver chefiaTecnologia) ----------------------------------
+    // Tapete com borda na cor do andar sob a estação e a frente dela (como o do
+    // gabinete) e a placa do departamento suspensa acima da divisória, presa
+    // por cabos ao "teto". A placa fica no plano da divisória, acima do
+    // porta-retrato: vista do sul, alta, não tapa a foto nem a plaquinha.
+    {
+      const ep = plano.estacoes.find((e) => e.pessoa.codigo === GAVA.codigo);
+      if (ep) {
+        const cx = ep.x;
+        const cz = ep.z + 0.45;
+        add(M.passadeira, caixa(cx - 1.1, cx + 1.1, 0.004, 0.012, cz - 1.0, cz + 1.0), false);
+        add(M.tapeteChefe, caixa(cx - 0.97, cx + 0.97, 0.012, 0.02, cz - 0.88, cz + 0.88), false);
+        const placa = criarPlacaZona({ pal, track, lite, nome: ep.zona.nome, cor, max: 1.7 });
+        const larg = 1.7;
+        const esc = placa.largura > larg ? larg / placa.largura : 1;
+        placa.grupo.scale.setScalar(esc);
+        const yP = 2.02;
+        const zP = ep.z - 0.5;
+        placa.grupo.position.set(cx, yP, zP);
+        root.add(placa.grupo);
+        const topo = yP + (placa.altura * esc) / 2;
+        const lw = (placa.largura * esc) / 2 - 0.15;
+        for (const s of [-1, 1]) add(M.caixilho, caixa(cx + s * lw - 0.006, cx + s * lw + 0.006, topo, H, zP - 0.006, zP + 0.006), false);
+      }
+    }
+
+    // ---- Centro: Central de Operações da cidade inteligente --------------------------
+    // Mesa com a maquete: o mapa e o letreiro numa textura que brilha (um draw
+    // call); prédios, postes e sensores de cor lisa nos lotes; os LEDs dos
+    // sensores no InstancedMesh dos LEDs. Feixes, pacotes e o holograma são
+    // peças vivas (mais abaixo).
+    const mc = centro(TILES.mesa);
+    const MX = 1.78; // meia largura do tampo (maquete)
+    const MZ = 0.8; // meia profundidade
+    const TOPO = 0.845;
+    const wx = (u) => mc.x + (u - 0.5) * 2 * MX;
+    const wz = (v) => mc.z + (v - 0.5) * 2 * MZ;
+    // Projetor no meio da praça; o holograma flutua acima dele.
+    const praca = (() => {
+      const [fi, ci] = CIDADE.praca.split(",").map(Number);
+      const [u0, u1] = CIDADE.colunas[ci];
+      const [v0, v1] = CIDADE.filas[fi];
+      return new THREE.Vector3(wx((u0 + u1) / 2), 0, wz((v0 + v1) / 2));
+    })();
+    const HOLO_Y = 1.42; // base do holograma
+    const feixes = []; // [origem, destino] dos dados até o holograma
+    {
+      const p = mc;
+      // Piso técnico: borda na cor da passadeira (que vem do elevador e passa
+      // por baixo) e miolo escuro com friso azul.
+      const zSul = p.z + 2.1;
+      add(M.passadeira, caixa(p.x - 2.25, p.x + 2.25, 0.003, 0.014, p.z - 1.35, zSul), false);
+      add(C.pisoTec, caixa(p.x - 2.1, p.x + 2.1, 0.014, 0.022, p.z - 1.2, zSul - 0.15), false);
+      for (const s of [-1, 1]) {
+        add(C.frisoTec, caixa(p.x - 2.0, p.x + 2.0, 0.022, 0.025, (s < 0 ? p.z - 1.1 : zSul - 0.25) - 0.015, (s < 0 ? p.z - 1.1 : zSul - 0.25) + 0.015), false);
+        add(C.frisoTec, caixa(p.x + s * 2.0 - 0.015, p.x + s * 2.0 + 0.015, 0.022, 0.025, p.z - 1.1, zSul - 0.25), false);
+      }
+      // Móvel: rodapé recuado, corpo escuro, aro metálico e beiral do tampo.
+      bx(M.escuro, p, -1.66, 1.66, 0.02, 0.08, -0.7, 0.7, false);
+      bx(C.plastico, p, -1.74, 1.74, 0.08, 0.72, -0.78, 0.78);
+      bx(C.rack, p, -1.84, 1.84, 0.72, 0.84, -0.86, 0.86);
+      for (const s of [-1, 1]) {
+        bx(M.metal, p, -1.84, 1.84, 0.84, 0.87, s * 0.83 - 0.03, s * 0.83 + 0.03, false);
+        bx(M.metal, p, s * 1.81 - 0.03, s * 1.81 + 0.03, 0.84, 0.87, -0.8, 0.8, false);
+      }
+      // Mapa (em cima) e letreiro (na frente, abaixo do beiral).
+      const mesaCanvas = makeCanvas(MESA.W, MESA.H);
+      desenharMesa(mesaCanvas, pal, caberFonte);
+      const mesaTex = track(canvasTexture(mesaCanvas));
+      document.fonts?.ready.then(() => {
+        desenharMesa(mesaCanvas, pal, caberFonte);
+        mesaTex.needsUpdate = true;
+      });
+      const mesaMat = track(new THREE.MeshStandardMaterial({ map: mesaTex, emissive: white, emissiveMap: mesaTex, emissiveIntensity: lite ? 0.55 : 0.45, roughness: 0.45 }));
+      add(mesaMat, recorte(MX * 2, MZ * 2, R_MAPA, MESA.W, MESA.H).rotateX(-Math.PI / 2).translate(p.x, TOPO, p.z), false);
+      add(mesaMat, recorte(2.9, 0.221, R_LETREIRO, MESA.W, MESA.H).translate(p.x, 0.445, p.z + 0.783), false);
+    }
+    // Prédios low-poly nas quadras, árvores nos parques, prefeitura no centro.
+    {
+      const r = semente(1709);
+      CIDADE.filas.forEach(([v0, v1, tipo], fi) => {
+        CIDADE.colunas.forEach(([u0, u1], ci) => {
+          const k = `${fi},${ci}`;
+          if (k === CIDADE.praca) return;
+          if (CIDADE.parques.includes(k)) {
+            const n = lite ? 3 : 5;
+            for (let i = 0; i < n; i++) {
+              const x = wx(u0 + 0.025 + ((u1 - u0 - 0.05) * (i + 0.5)) / n);
+              const z = wz(v0 + 0.03 + (v1 - v0 - 0.06) * (i % 2 ? 0.72 : 0.28));
+              add(M.madeira, caixa(x - 0.008, x + 0.008, TOPO, TOPO + 0.05, z - 0.008, z + 0.008), false);
+              add(i % 2 ? M.folhaClara : M.folha, new THREE.IcosahedronGeometry(0.045 + r() * 0.015, 0).translate(x, TOPO + 0.08, z));
+            }
+            return;
+          }
+          const z0 = wz(v0 + 0.03);
+          const z1 = wz(v1 - 0.03);
+          if (k === CIDADE.prefeitura) {
+            // Prefeitura: bloco largo e baixo com a torre do relógio no meio.
+            const xm = wx((u0 + u1) / 2);
+            add(C.predios[0], caixa(wx(u0 + 0.02), wx(u1 - 0.02), TOPO, TOPO + 0.09, z0, z1));
+            add(C.predios[1], caixa(xm - 0.07, xm + 0.07, TOPO + 0.09, TOPO + 0.2, z0 + 0.05, z1 - 0.05));
+            add(C.telhado, new THREE.CylinderGeometry(0, 0.09, 0.06, 4).rotateY(Math.PI / 4).translate(xm, TOPO + 0.23, (z0 + z1) / 2));
+            return;
+          }
+          const n = tipo === "casas" ? (lite ? 2 : 3) : 2;
+          const du = (u1 - u0 - 0.03) / n;
+          for (let i = 0; i < n; i++) {
+            const xa = wx(u0 + 0.015 + i * du + 0.004);
+            const xb = wx(u0 + 0.015 + (i + 1) * du - 0.004);
+            if (tipo === "casas") {
+              const hh = 0.045 + r() * 0.025;
+              const zm = (z0 + z1) / 2;
+              add(C.predios[i % 3], caixa(xa, xb, TOPO, TOPO + hh, zm - 0.06, zm + 0.06));
+              const tw = Math.min(xb - xa, 0.12) / 2 + 0.015;
+              const telh = new THREE.CylinderGeometry(0, tw * Math.SQRT2, 0.05, 4).rotateY(Math.PI / 4).scale(1, 1, 0.07 / tw);
+              add(C.telhado, telh.translate((xa + xb) / 2, TOPO + hh + 0.025, zm));
+            } else {
+              const alta = tipo === "centro";
+              const hh = alta ? 0.14 + r() * 0.24 : 0.07 + r() * 0.1;
+              const torre = alta && r() < 0.4;
+              add(torre ? C.torre : C.predios[Math.floor(r() * 3)], caixa(xa, xb, TOPO, TOPO + hh, z0, z1));
+              // Laje com a casa de máquinas.
+              if (!lite || alta) add(M.metal, caixa(xa + 0.03, xa + 0.07, TOPO + hh, TOPO + hh + 0.025, z0 + 0.03, z0 + 0.07), false);
+            }
+          }
+        });
+      });
+      // Guarda-corpo das pontes.
+      for (const u of CIDADE.ruasU) {
+        for (const s of [-1, 1]) {
+          const x = wx(u + (s * CIDADE.largU) / 2);
+          add(M.metal, caixa(x - 0.006, x + 0.006, TOPO, TOPO + 0.025, wz(rioV(u) - RIO_MEIA), wz(rioV(u) + RIO_MEIA)), false);
+        }
+      }
+      // Projetor do holograma.
+      cil(C.rack, praca, 0.12, 0.14, 0.05, 0, TOPO + 0.025, 0);
+      cil(C.frisoTec, praca, 0.07, 0.07, 0.012, 0, TOPO + 0.056, 0, "y", rad, false);
+    }
+    // Sensores (postes, semáforos, lixeiras, medidores de energia e de nível do
+    // rio), cada um com o seu LED; alguns mandam dados ao holograma.
+    {
+      const lampada = [1.5, 1.5, 2.6]; // LED maior (visto de cima)
+      SENSORES.forEach(([tipo, u, v, temFeixe], i) => {
+        const x = wx(u);
+        const z = wz(v);
+        let topo;
+        if (tipo === "poste") {
+          add(M.metal, new THREE.CylinderGeometry(0.006, 0.008, 0.16, 5).translate(x, TOPO + 0.08, z), false);
+          add(M.metal, caixa(x, x + 0.045, TOPO + 0.155, TOPO + 0.165, z - 0.005, z + 0.005), false);
+          topo = new THREE.Vector3(x + 0.04, TOPO + 0.145, z);
+          leds.push([topo.x, topo.y, topo.z, COR_LED.ambar, 0, 0, lampada]);
+        } else if (tipo === "semaforo") {
+          add(M.metal, new THREE.CylinderGeometry(0.006, 0.007, 0.11, 5).translate(x, TOPO + 0.055, z), false);
+          add(C.plastico, caixa(x - 0.018, x + 0.018, TOPO + 0.1, TOPO + 0.17, z - 0.014, z + 0.014));
+          // Vermelho e verde se revezam (fases opostas).
+          leds.push([x, TOPO + 0.152, z + 0.016, COR_LED.vermelho, 0.12, 0, [1.1, 1.1, 1]]);
+          leds.push([x, TOPO + 0.118, z + 0.016, COR_LED.verde, 0.12, Math.PI, [1.1, 1.1, 1]]);
+          topo = new THREE.Vector3(x, TOPO + 0.17, z);
+        } else if (tipo === "lixeira") {
+          add(C.lixeira, new THREE.CylinderGeometry(0.022, 0.018, 0.05, rad).translate(x, TOPO + 0.025, z));
+          add(C.plastico, new THREE.CylinderGeometry(0.025, 0.025, 0.008, rad).translate(x, TOPO + 0.054, z), false);
+          topo = new THREE.Vector3(x, TOPO + 0.065, z);
+          leds.push([topo.x, topo.y, topo.z, i % 2 ? COR_LED.vermelho : COR_LED.verde, 0.6, 0, lampada]);
+        } else if (tipo === "medidor") {
+          add(C.modulo, caixa(x - 0.022, x + 0.022, TOPO, TOPO + 0.07, z - 0.015, z + 0.015));
+          topo = new THREE.Vector3(x, TOPO + 0.05, z + 0.017);
+          leds.push([topo.x, topo.y, topo.z, COR_LED.azul, 1.5, 0, [1.2, 1.2, 1]]);
+        } else {
+          // Sensor de nível do rio, preso no guarda-corpo da ponte.
+          add(C.sensor, caixa(x - 0.015, x + 0.015, TOPO + 0.02, TOPO + 0.06, z - 0.015, z + 0.015));
+          topo = new THREE.Vector3(x, TOPO + 0.068, z);
+          leds.push([topo.x, topo.y, topo.z, COR_LED.azul, 0.9, 0, lampada]);
+        }
+        if (temFeixe && (!lite || i % 2 === 0)) {
+          const dir = new THREE.Vector3(x - praca.x, 0, z - praca.z);
+          dir.normalize().multiplyScalar(0.3);
+          feixes.push([topo, new THREE.Vector3(praca.x + dir.x, HOLO_Y, praca.z + dir.z)]);
+        }
+      });
+    }
+
     // ---- Peças vivas (fora dos lotes) ------------------------------------------------
     const vivo = new THREE.Group();
     vivo.name = "tema-tecnologia";
     root.add(vivo);
 
-    // LEDs.
+    // LEDs: [x, y, z, cor, pisca, fase?, escala?].
     const ledGeo = track(new THREE.BoxGeometry(0.022, 0.022, 0.012));
     const ledMat = track(new THREE.MeshBasicMaterial({ color: white }));
     const ledMesh = new THREE.InstancedMesh(ledGeo, ledMat, leds.length);
     const m4 = new THREE.Matrix4();
     const apagado = new THREE.Color();
-    leds.forEach(([x, y, z, cor], i) => {
-      ledMesh.setMatrixAt(i, m4.makeTranslation(x, y, z));
+    leds.forEach(([x, y, z, cor, , , esc], i) => {
+      ledMesh.setMatrixAt(i, esc ? m4.makeScale(...esc).setPosition(x, y, z) : m4.makeTranslation(x, y, z));
       ledMesh.setColorAt(i, cor);
     });
     ledMesh.instanceMatrix.needsUpdate = true;
     vivo.add(ledMesh);
-    const fases = leds.map(() => rand() * 10);
+    const fases = leds.map((l) => l[5] ?? rand() * 10);
+
+    // Central: feixes de dados (um mesh), pacotes subindo por eles (um
+    // InstancedMesh) e o holograma (anéis, painéis e facho num mesh só, com
+    // a mesma textura), que gira devagar.
+    const feixeMat = track(new THREE.MeshBasicMaterial({ color: mix(pv("blue-300"), pv("green-500"), 0.3), transparent: true, opacity: 0.45, depthWrite: false }));
+    {
+      const up = new THREE.Vector3(0, 1, 0);
+      const q = new THREE.Quaternion();
+      const geos = feixes.map(([a, b]) => {
+        const d = b.clone().sub(a);
+        const len = d.length();
+        q.setFromUnitVectors(up, d.normalize());
+        return new THREE.CylinderGeometry(0.005, 0.005, len, 4, 1, true)
+          .applyQuaternion(q)
+          .translate((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
+      });
+      const mesh = new THREE.Mesh(track(mergeGeos(geos)), feixeMat);
+      mesh.name = "central-feixes";
+      vivo.add(mesh);
+    }
+    const pacotes = new THREE.InstancedMesh(
+      track(new THREE.BoxGeometry(0.028, 0.028, 0.028)),
+      track(new THREE.MeshBasicMaterial({ color: mix(white, pv("blue-200"), 0.3) })),
+      feixes.length,
+    );
+    pacotes.name = "central-pacotes";
+    pacotes.frustumCulled = false;
+    vivo.add(pacotes);
+    const holo = new THREE.Group();
+    holo.position.set(praca.x, 0, praca.z);
+    {
+      const holoCanvas = makeCanvas(HO.W, HO.H);
+      desenharHolo(holoCanvas, pal, caberFonte);
+      const holoTex = track(canvasTexture(holoCanvas));
+      document.fonts?.ready.then(() => {
+        desenharHolo(holoCanvas, pal, caberFonte);
+        holoTex.needsUpdate = true;
+      });
+      const holoMat = track(new THREE.MeshBasicMaterial({ map: holoTex, transparent: true, depthWrite: false }));
+      const y0 = TOPO + 0.06;
+      const partes = [
+        noRecorte(new THREE.CylinderGeometry(0.4, 0.06, HOLO_Y - y0, lite ? 10 : 18, 1, true).translate(0, (y0 + HOLO_Y) / 2, 0), R_FACHO, HO.W, HO.H),
+        noRecorte(new THREE.TorusGeometry(0.44, 0.008, 4, lite ? 28 : 44).rotateX(Math.PI / 2).translate(0, HOLO_Y, 0), R_SOLIDO, HO.W, HO.H),
+        noRecorte(new THREE.TorusGeometry(0.4, 0.006, 4, lite ? 28 : 44).rotateX(Math.PI / 2).translate(0, HOLO_Y + 0.62, 0), R_SOLIDO, HO.W, HO.H),
+      ];
+      // Painéis voltados para fora, com uma cópia virada para dentro: lidos
+      // do lado de fora e através do holograma (o texto nunca sai espelhado).
+      R_HOLO.forEach((reg, k) => {
+        const a = (k * Math.PI * 2) / 3;
+        partes.push(recorte(0.56, 0.35, reg, HO.W, HO.H).translate(0, HOLO_Y + 0.31, 0.38).rotateY(a));
+        partes.push(recorte(0.56, 0.35, reg, HO.W, HO.H).rotateY(Math.PI).translate(0, HOLO_Y + 0.31, 0.376).rotateY(a));
+      });
+      const mesh = new THREE.Mesh(track(mergeGeos(partes)), holoMat);
+      mesh.name = "central-holograma";
+      mesh.renderOrder = 1;
+      holo.add(mesh);
+    }
+    vivo.add(holo);
+    const vp = new THREE.Vector3();
+    const poseCentral = (t) => {
+      holo.rotation.y = t * 0.22;
+      feixeMat.opacity = reducedMotion ? 0.45 : 0.3 + 0.25 * (0.5 + 0.5 * Math.sin(t * 2.2));
+      feixes.forEach(([a, b], i) => {
+        const f = (t * 0.45 + i * 0.37) % 1;
+        vp.copy(a).lerp(b, f);
+        pacotes.setMatrixAt(i, m4.makeTranslation(vp.x, vp.y, vp.z));
+      });
+      pacotes.instanceMatrix.needsUpdate = true;
+    };
 
     // Braço robótico: giro (torre) e ombro (braço inteiro, num mesh só).
     const giro = new THREE.Group();
@@ -1099,6 +1683,7 @@ export const tecnologia = {
       ponte.position.y = topo + 0.05;
       const parado = prog >= 1;
       cabecote.position.set(imp.x + (parado ? 0.18 : Math.sin(t * 6) * 0.06), topo + 0.012, imp.z - 0.06 + (parado ? -0.04 : Math.cos(t * 4.3) * 0.04));
+      poseCentral(t);
     };
     pose(reducedMotion ? 13 : 0);
 

@@ -1,8 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { Moon, Sun } from "lucide-react";
+import { Bike, Moon, Sun } from "lucide-react";
 import TitleScreen from "./TitleScreen";
+import TelaCarregamento from "./TelaCarregamento";
+import OficinaBike from "./OficinaBike";
+import { assinarBicicleta, lerBicicleta, salvarBicicleta } from "./bicicleta";
+import { arquivoDoJogador, lerJogadorSalvo, salvarJogador } from "./EscolhaPersonagem";
 import FullscreenButton from "./FullscreenButton";
 import { areaOf, CHEFE_POR_AREA, mapaDeLideres } from "./areas";
 import { CHEFES, LINGUAGENS, TREINADORES } from "./batalha/dados";
@@ -35,6 +39,21 @@ import {
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
+// Tela de carregamento inicial: quando aparece o "Continuar mesmo assim".
+const CARGA_PULAR_MS = 15000;
+// Preparo da Vila (tela "Preparando a Vila"): teto da espera, quando aparece
+// o "Jogar agora" (pular a espera) e rótulo de cada fase.
+const PREPARO_MAX_MS = 45000;
+const PREPARO_PULAR_MS = 8000;
+const ROTULO_PREPARO = {
+  cargas: "Carregando personagens e prédios",
+  compilar: "Preparando os gráficos",
+  texturas: "Preparando as texturas",
+  render: "Quase lá…",
+  predios: "Preparando a SEMEC por dentro",
+  pronto: "Pronto!",
+};
+
 // "Líder do Ginásio Front-End" → "líder do Ginásio Front-End" (no meio da frase,
 // sem perder as maiúsculas dos nomes próprios).
 const minusculaInicial = (t) => t.charAt(0).toLowerCase() + t.slice(1);
@@ -64,7 +83,7 @@ const INTRO = [
   },
   {
     title: "Como jogar",
-    text: "Ande com as setas ou WASD (segure Shift para correr), ou clique no mapa. Fique de frente para alguém e aperte Espaço para conversar. Use a roda do mouse (ou + e -) para aproximar e afastar a câmera.",
+    text: "Ande com as setas ou WASD (segure Shift para correr; conserte a bicicleta do bicicletário da praça do Front-End e use B para subir e descer), ou clique no mapa. Fique de frente para alguém e aperte Espaço para conversar. Use a roda do mouse (ou + e -) para aproximar e afastar a câmera.",
   },
 ];
 
@@ -141,6 +160,32 @@ export default function VilaSemec({ members }) {
   // Tela de título ("Começar"): o jogo só abre depois dela; a vila aparece
   // ao fundo em modo vitrine.
   const [started, setStarted] = useState(false);
+  // Personagem do jogador (tela de escolha): o motor nasce com o último
+  // escolhido (lembrado no navegador) e troca o boneco se mudar.
+  const personagemRef = useRef(null);
+  // Montado na bicicleta (o motor avisa; tecla B, botão do HUD ou do toque).
+  // A bicicleta só vale depois da oficina do bicicletário (bicicleta.js).
+  const [naBike, setNaBike] = useState(false);
+  // Preparo da Vila antes de jogar ({ fase, progresso }, avisado pelo motor) e
+  // se o jogador já pediu para começar e está esperando o preparo.
+  const [preparo, setPreparo] = useState({ fase: "cargas", progresso: 0 });
+  const [aguardandoPreparo, setAguardandoPreparo] = useState(false);
+  // Tela de carregamento ao abrir a página: cobre tudo (a tela de título só
+  // aparece com a Vila, os gráficos e a entrada da SEMEC prontos). Depois de
+  // CARGA_PULAR_MS, "Continuar mesmo assim" deixa seguir sem esperar.
+  const [pulouCarga, setPulouCarga] = useState(false);
+  const [podePularCarga, setPodePularCarga] = useState(false);
+  useEffect(() => {
+    const id = setTimeout(() => setPodePularCarga(true), CARGA_PULAR_MS);
+    return () => clearTimeout(id);
+  }, []);
+  const [podePularPreparo, setPodePularPreparo] = useState(false);
+  const comecandoRef = useRef(false);
+  const comecarRef = useRef(null); // começa já (o "Jogar agora")
+  const temBicicleta = useSyncExternalStore(assinarBicicleta, lerBicicleta, () => false);
+  useEffect(() => {
+    engineRef.current?.setBicicletaLiberada(temBicicleta);
+  }, [temBicicleta]);
   // Página do diálogo: { title, text, link?, linkLabel?, actions? }, com
   // actions = [{ label, primary?, onSelect }] (só na última página).
   const [dialog, setDialog] = useState(null);
@@ -188,6 +233,8 @@ export default function VilaSemec({ members }) {
   const [transicao, setTransicao] = useState(null); // { fase, para, modo, rotulo }
   const [quadroAberto, setQuadroAberto] = useState(null);
   const [elevadorAberto, setElevadorAberto] = useState(false);
+  // Já saiu do prédio alguma vez: a volta à Vila também é anunciada.
+  const [voltouDoPredio, setVoltouDoPredio] = useState(false);
   const quadrosMuseu = useMemo(() => montarQuadros(members), [members]);
   // Prédio da SEMFAZ: o andar atual (null na Vila) e quem aparece no painel
   // do close (quadros da Galeria ou as mesas do andar).
@@ -199,9 +246,10 @@ export default function VilaSemec({ members }) {
   }, [andarAtual, quadrosMuseu]);
   // A íris some depois de abrir (0,7 s no motor; 0,2 s com movimento
   // reduzido, quando o nome do lugar não pode ficar parado sobre a cena).
+  // De elevador, o motor avisa o fim (null) quando o jogador sai da cabine.
   useEffect(() => {
-    if (transicao?.fase !== "abrir") return undefined;
-    const ms = movimentoReduzido ? 250 : transicao.modo === "elevador" ? 900 : 800;
+    if (transicao?.fase !== "abrir" || transicao.modo === "elevador") return undefined;
+    const ms = movimentoReduzido ? 250 : 800;
     const id = setTimeout(() => setTransicao(null), ms);
     return () => clearTimeout(id);
   }, [transicao, movimentoReduzido]);
@@ -329,6 +377,7 @@ export default function VilaSemec({ members }) {
                   recomecar();
                   avancarQuest("nova");
                   reiniciarColetas();
+                  salvarBicicleta(false);
                   setDialog({
                     pages: [
                       {
@@ -780,14 +829,55 @@ export default function VilaSemec({ members }) {
 
   const fecharModal = useCallback(() => setModal(null), []);
 
+  // Bicicletário da praça do Front-End: antes da bicicleta, oferece a
+  // oficina (minigame); depois, só lembra como usar.
+  const abrirBicicletario = useCallback(() => {
+    const title = "Bicicletário da Vila";
+    if (lerBicicleta()) {
+      setDialog({
+        pages: [{ title, text: "Aqui ficam as bicicletas da Vila. A sua já está com você: use o botão da bicicleta no HUD ou aperte B." }],
+        page: 0,
+      });
+      return;
+    }
+    setDialog({
+      pages: [
+        {
+          title,
+          text: "Uma bicicleta da SEMEC está encostada aqui: pneu murcho, parafuso do guidão solto e corrente seca. Quem consertar pode ficar com ela!",
+          actions: [
+            {
+              label: "Consertar a bicicleta",
+              primary: true,
+              onSelect: () => {
+                setDialog(null);
+                setModal({ tipo: "oficina" });
+              },
+            },
+            { label: "Agora não", onSelect: dismiss },
+          ],
+        },
+      ],
+      page: 0,
+    });
+  }, [dismiss]);
+  const concluirOficina = useCallback(() => {
+    salvarBicicleta(true);
+    setModal(null);
+  }, []);
+  const alternarBike = useCallback(() => {
+    engineRef.current?.toggleBicicleta();
+  }, []);
+
   const onInteractRef = useRef(null);
   useEffect(() => {
     onInteractRef.current = (ev) => {
       if (ev.type === "npc") openNpc(ev.index);
       else if (ev.type === "treinador") abrirTreinador(ev.id);
+      else if (ev.id === "bicicletario") abrirBicicletario();
       else if (SIGN_TEXT[ev.id]) setDialog({ pages: [SIGN_TEXT[ev.id]], page: 0 });
     };
-  }, [openNpc, abrirTreinador]);
+  }, [openNpc, abrirTreinador, abrirBicicletario]);
 
   // Pisou na ocarina (o motor já mostra ela subindo): avisa e manda devolver.
   const onQuestFindRef = useRef(null);
@@ -851,6 +941,7 @@ export default function VilaSemec({ members }) {
         setTransicao(null);
         setQuadroAberto(null);
         setElevadorAberto(false);
+        setVoltouDoPredio(false);
         engine = createVila(hostRef.current, {
           members,
           leaders: new Set(mapaDeLideres(members).keys()),
@@ -863,6 +954,11 @@ export default function VilaSemec({ members }) {
             if (auto && ehLeve(novo)) lembrarNivelAuto(novo);
           },
           modelUrl: `${basePath}/quem-somos/gava.glb`,
+          playerModel: arquivoDoJogador((personagemRef.current ??= lerJogadorSalvo() ?? "homem")),
+          onBicicleta: setNaBike,
+          bicicletaLiberada: lerBicicleta(),
+          onPreparo: setPreparo,
+          carregando: true,
           onInteract: (ev) => onInteractRef.current?.(ev),
           onInspect: (ev) => onInspectRef.current?.(ev),
           onFacing: setFacing,
@@ -874,7 +970,10 @@ export default function VilaSemec({ members }) {
           onColeta: (ev) => onColetaRef.current?.(ev),
           onColetaPerto: ({ quest, perto }) => setColetaPerto((p) => (p[quest] === perto ? p : { ...p, [quest]: perto })),
           quadrosMuseu,
-          onLocal: ({ local: l }) => setLocal(l),
+          onLocal: ({ local: l }) => {
+            setLocal(l);
+            setVoltouDoPredio(l === "vila");
+          },
           onElevador: () => setElevadorAberto(true),
           // Objeto que ensina: o texto abre na caixa de diálogo (texto pode
           // ser uma lista de páginas).
@@ -1007,16 +1106,55 @@ export default function VilaSemec({ members }) {
     engineRef.current?.skipCutscene();
   }, []);
 
-  const startGame = useCallback(() => {
-    setStarted(true);
-    setDialog({ pages: INTRO, page: 0 });
-    stageRef.current?.focus({ preventScroll: true });
+  // escolhido: { id } da tela de escolha; sem ele (Enter direto na tela de
+  // título), vale o último personagem.
+  // Tela de carregamento inicial (ver pulouCarga): some quando o motor avisa
+  // "pronto", se o 3D não roda neste navegador, ou se a pessoa pulou.
+  const semJogo3d = status === "error" || status === "sem-webgl";
+  const carregandoTudo = !started && !semJogo3d && preparo.fase !== "pronto" && !pulouCarga;
+  useEffect(() => {
+    engineRef.current?.setCarregando(carregandoTudo);
+  }, [carregandoTudo]);
+
+  // O jogo só abre com a Vila preparada (motor: cargas, shaders e texturas
+  // perto do jogador, feito durante a tela de título). Se ainda não acabou,
+  // a tela "Preparando a Vila" mostra o progresso; PREPARO_MAX_MS é o teto
+  // (PC muito lento ou carga presa: abre assim mesmo).
+  const startGame = useCallback((escolhido) => {
+    if (comecandoRef.current) return;
+    const id = escolhido?.id ?? personagemRef.current ?? lerJogadorSalvo() ?? "homem";
+    const engine = engineRef.current;
+    let timerPular = 0;
+    if (id !== personagemRef.current) {
+      personagemRef.current = id;
+      engine?.setJogador(arquivoDoJogador(id));
+    }
+    salvarJogador(id);
+    const comecar = () => {
+      if (!comecandoRef.current && engine) return; // já começou (pulou ou terminou)
+      comecandoRef.current = false;
+      clearTimeout(timerPular);
+      setAguardandoPreparo(false);
+      setPodePularPreparo(false);
+      setStarted(true);
+      setDialog({ pages: INTRO, page: 0 });
+      stageRef.current?.focus({ preventScroll: true });
+    };
+    if (!engine) {
+      comecar();
+      return;
+    }
+    comecandoRef.current = true;
+    comecarRef.current = comecar;
+    setAguardandoPreparo(true);
+    timerPular = setTimeout(() => setPodePularPreparo(true), PREPARO_PULAR_MS);
+    Promise.race([engine.preparar(), new Promise((r) => setTimeout(r, PREPARO_MAX_MS))]).then(comecar);
   }, []);
 
   // Enter na tela de título começa o jogo (como "Press Start"), exceto quando
   // o foco está num campo, link ou botão — esses tratam a própria tecla.
   useEffect(() => {
-    if (started) return undefined;
+    if (started || carregandoTudo) return undefined;
     const onKey = (e) => {
       if (e.key !== "Enter" || e.repeat) return;
       if (e.target.closest?.("input, textarea, select, button, a, [contenteditable='true']")) return;
@@ -1025,7 +1163,7 @@ export default function VilaSemec({ members }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [started, startGame]);
+  }, [started, carregandoTudo, startGame]);
 
   const current = dialog ? dialog.pages[dialog.page] : null;
   const isLastPage = dialog ? dialog.page === dialog.pages.length - 1 : false;
@@ -1139,6 +1277,9 @@ export default function VilaSemec({ members }) {
       if (!e.repeat) engine.interact();
     } else if (e.key === "Shift") {
       engine.setRun(true);
+    } else if (e.code === "KeyB" && temBicicleta) {
+      e.preventDefault();
+      if (!e.repeat) engine.toggleBicicleta();
     }
   };
 
@@ -1213,7 +1354,7 @@ export default function VilaSemec({ members }) {
     const t = TREINADORES.find((x) => x.id === facing.id);
     if (t) hint = `Espaço: falar com ${t.titulo}`;
   } else if (!dialog && !modal && facing?.type === "sign") {
-    hint = "Espaço: ler a placa";
+    hint = facing.id === "bicicletario" ? "Espaço: ver o bicicletário" : "Espaço: ler a placa";
   } else if (!dialog && !modal && facing?.type === "inspect" && questDoNpc(facing.id)) {
     const q = QUESTS_COLETA[questDoNpc(facing.id)];
     hint = `Espaço: falar com ${q.nomeNpc} (quest: ${q.titulo})`;
@@ -1268,20 +1409,51 @@ export default function VilaSemec({ members }) {
       </div>
 
       <p id="vila-instrucoes" className="sr-only">
-        Use as setas ou W A S D para andar, Shift para correr, Espaço ou Enter
+        Use as setas ou W A S D para andar, Shift para correr, B para subir ou descer da bicicleta (depois de consertá-la no bicicletário), Espaço ou Enter
         para conversar, mais e menos (ou a roda do mouse) para aproximar e
         afastar a câmera e Esc para fechar o diálogo. A mesma equipe está
         listada logo abaixo do mapa.
       </p>
 
-      {!started && (
+      {carregandoTudo && (
+        <TelaCarregamento
+          baseUrl={`${basePath}/quem-somos/`}
+          progresso={preparo.progresso}
+          fase={preparo.fase}
+          podePular={podePularCarga}
+          onPular={() => setPulouCarga(true)}
+        />
+      )}
+
+      {!started && !carregandoTudo && (
         <TitleScreen
           onStart={startGame}
+          baseUrl={`${basePath}/quem-somos/`}
           graficos={graficos}
           nivelAtual={nivelAtual}
           semAceleracao={semAceleracao}
           onGraficos={salvarPreferencia}
         />
+      )}
+
+      {!started && aguardandoPreparo && (
+        <div className="vila-preparo">
+          <div className="vila-preparo-caixa">
+            <p className="vila-preparo-titulo">Preparando a Vila…</p>
+            <progress
+              className="vila-preparo-barra"
+              max={100}
+              value={Math.round(preparo.progresso * 100)}
+              aria-label="Progresso do carregamento"
+            />
+            <p className="vila-preparo-fase" role="status">{ROTULO_PREPARO[preparo.fase] ?? "Quase lá…"}</p>
+            {podePularPreparo && (
+              <button type="button" className="vila-preparo-pular" onClick={() => comecarRef.current?.()}>
+                Jogar agora <span className="vila-preparo-pular-nota">(pode travar um pouco no começo)</span>
+              </button>
+            )}
+          </div>
+        </div>
       )}
 
       {started && !cena && !quadroAberto && (
@@ -1421,26 +1593,25 @@ export default function VilaSemec({ members }) {
       </p>
 
       {/* Entrada e saída do prédio: íris que fecha no escuro, com o nome do
-          lugar, e abre do outro lado. De elevador: portas que fecham, display
-          do andar e abrem (durações em vila-engine.js). */}
+          lugar, e abre do outro lado. De elevador, a viagem é toda no 3D
+          (vila-engine.js, ELEVADOR_IDA/_VOLTA): aqui só o escurecer rápido da
+          troca de andar, uma cor sólida, sem desenho. */}
       {transicao && transicao.modo !== "elevador" && (
         <div className="vila-iris" data-fase={transicao.fase} aria-hidden="true">
           <p className="vila-iris-titulo">{transicao.rotulo}</p>
         </div>
       )}
-      {transicao?.modo === "elevador" && (
-        <div className="vila-elevador" data-fase={transicao.fase} aria-hidden="true">
-          <span className="vila-elevador-porta" />
-          <span className="vila-elevador-porta" />
-          <p className="vila-elevador-display">{transicao.rotulo}</p>
-        </div>
-      )}
+      {transicao?.modo === "elevador" && <div className="vila-elevador" data-fase={transicao.fase} aria-hidden="true" />}
       <p className="sr-only" aria-live="polite">
-        {!started || naVila
+        {!started
           ? ""
-          : naGaleria
-            ? "Você está na Galeria da Equipe. Quadros nas paredes: aproxime-se e aperte Espaço para ver. O elevador fica ao sul."
-            : `Você está no ${andarAtual?.rotulo}, ${andarAtual?.nome}. Aproxime-se de uma mesa e aperte Espaço para conhecer quem chefia cada setor. O elevador fica ao norte.`}
+          : naVila
+            ? voltouDoPredio
+              ? "Você voltou para a Vila SEMEC, na frente da SEMFAZ."
+              : ""
+            : naGaleria
+              ? "Você está na Galeria da Equipe. Quadros nas paredes: aproxime-se e aperte Espaço para ver. O elevador fica ao sul."
+              : `Você está no ${andarAtual?.rotulo}, ${andarAtual?.nome}. Aproxime-se de uma mesa e aperte Espaço para conhecer quem chefia cada setor. O elevador fica ao norte.`}
       </p>
       {elevadorAberto && (
         <PainelElevador
@@ -1570,6 +1741,25 @@ export default function VilaSemec({ members }) {
         </button>
       )}
 
+      {/* Bicicleta conquistada na oficina: acima da StackDex, liga e desliga. */}
+      {started && temBicicleta && !cena && !dialog && !modal && !ficha && !quadroAberto && (
+        <button
+          type="button"
+          className="vila-bike-icone"
+          aria-pressed={naBike}
+          aria-keyshortcuts="B"
+          onClick={() => {
+            alternarBike();
+            focusStage();
+          }}
+        >
+          <span className="vila-bike-icone-roda" aria-hidden="true">
+            <Bike size={30} strokeWidth={2.4} />
+          </span>
+          <span className="vila-bike-icone-nome">Bicicleta</span>
+        </button>
+      )}
+
       {started && !modal && !ficha && !cena && (
         <div className="vila-pad" aria-label="Controles de toque" role="group">
           {DPAD.map(({ dir, label, glyph }) => (
@@ -1592,6 +1782,17 @@ export default function VilaSemec({ members }) {
               <span aria-hidden="true">{glyph}</span>
             </button>
           ))}
+          {temBicicleta && (
+            <button
+              type="button"
+              className="vila-pad-btn vila-pad-btn--b"
+              aria-pressed={naBike}
+              aria-label="Bicicleta"
+              onClick={alternarBike}
+            >
+              B
+            </button>
+          )}
           <button
             type="button"
             className="vila-pad-btn vila-pad-btn--a"
@@ -1605,6 +1806,11 @@ export default function VilaSemec({ members }) {
 
       {ficha && <FichaPersonagem id={ficha} onClose={fecharFicha} onChange={setFicha} />}
 
+      {modal?.tipo === "oficina" && (
+        <ModalJornada titulo="Oficina da bicicleta" onFechar={fecharModal}>
+          <OficinaBike onConcluir={concluirOficina} />
+        </ModalJornada>
+      )}
       {modal?.tipo === "escolha" && (
         <ModalJornada titulo="Escolha a sua linguagem inicial" onFechar={fecharModal}>
           <EscolhaInicial onEscolher={escolher} />

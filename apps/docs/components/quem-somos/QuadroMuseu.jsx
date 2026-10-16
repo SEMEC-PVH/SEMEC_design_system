@@ -166,7 +166,7 @@ export default function QuadroMuseu({ quadros, id, tipo = "quadro", fonte = null
         </button>
         <button type="button" className={s.passo} onClick={() => onTrocar(proximo.id)}>
           <span>
-            <span className="sr-only">Próxima: </span>
+            <span className="sr-only">{tipo === "mesa" ? "Próxima" : "Próximo"}: </span>
             {proximo.nome.split(" ")[0]}
           </span>
           <ChevronRight aria-hidden="true" size={18} />

@@ -95,11 +95,16 @@ export const ANDARES = [
     rotulo: "5º andar",
     nome: "Tecnologia e Administração",
     cor: "gray-700",
+    // Sem ilha de gabinete: o centro é da Central de Operações (tema). A
+    // ordem leva cada departamento à sua faixa (escritorio.js, PRIORIDADE):
+    // Inovação no norte-oeste, Sistemas no norte-leste, Administrativo no
+    // oeste e Tecnologia no leste, junto dos racks e da bancada de IoT.
+    semIlha: true,
     zonas: [
-      zona(exec("6.1.6"), ["6.1.6"]),
       zona(exec("6.1.2"), ["6.1.2"]),
       zona(exec("6.1.11"), ["6.1.11"]),
       zona(exec("6.1.7"), ["6.1.7"]),
+      zona(exec("6.1.6"), ["6.1.6"]),
     ],
   },
   { id: "galeria", numero: 6, rotulo: "6º andar", nome: "Galeria da Equipe", cor: "yellow-500", galeria: true, zonas: [] },

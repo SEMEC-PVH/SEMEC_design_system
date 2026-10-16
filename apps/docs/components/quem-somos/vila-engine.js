@@ -23,6 +23,7 @@ import { createDayNight, formatClock } from "./scene/daynight";
 import { createNightLights } from "./scene/nightlights";
 import { createCutscene } from "./scene/cutscene";
 import { createPedro } from "./scene/pedro";
+import { createVinicius } from "./scene/vinicius";
 import { createOcarinaHideout, createQuestMarker } from "./scene/quest";
 import { createColetaveis } from "./scene/coleta";
 import { createHistoria } from "./scene/historia";
@@ -37,7 +38,7 @@ import { areaOf } from "./areas";
 import { ehLeve, arquivoLeve } from "./scene/qualidade";
 import { createMuseu } from "./scene/museu";
 import { createEscritorio } from "./predio/escritorio";
-import { andarPorId } from "./predio/andares";
+import { ANDARES, andarPorId } from "./predio/andares";
 
 const W = 30;
 const H = 24;
@@ -65,10 +66,51 @@ const OPPOSITE = { up: "down", down: "up", left: "right", right: "left" };
 
 const STEP_WALK = 0.26;
 const STEP_RUN = 0.15;
+// Bicicleta (tecla B): passo mais curto e uma volta do pedivela (o clipe
+// `pedalando`) a cada BIKE_TILES_POR_VOLTA tiles. Sinais do giro de rodas e
+// pedivela em X local (nós da bicicleta dentro do GLB do jogador).
+const STEP_BIKE = 0.11;
+// Onde se conquista a bicicleta (um dos bicicletários de PROPS).
+const BICICLETARIO = { x: 18, y: 15 };
+const BIKE_TILES_POR_VOLTA = 3;
+const RODA_SINAL = 1;
+const PEDIVELA_SINAL = 1;
+// Pilotagem (só visual: a grade, a colisão e o "de frente para" não mudam).
+// Giro: o yaw visual persegue o lógico (player.dir) por amortecimento
+// exponencial; 16/s fecha ~95% de 90° em 0,2 s (vale também a pé).
+const GIRO_TAXA = 16;
+// Teto da velocidade angular do giro amortecido (rad/s): sem ele o 1º quadro
+// de uma meia-volta já cobriria metade dela (num PC lento, um estalo). Com
+// 11 rad/s, 90° levam ~0,2 s e 180° ~0,32 s.
+const GIRO_MAX = 11;
+// Inclinação (roll) para dentro da curva: proporcional à velocidade angular do
+// yaw visual × embalo da bicicleta (parado não inclina); ~17° no máximo. Na
+// esquina em arco o yaw gira ~14 rad/s, o que já satura.
+const INCLINA_MAX = 0.3;
+const INCLINA_K = 0.026;
+const INCLINA_TAXA = 10;
+// Guidão (nó `Garfo`, Y local, + = esquerda do ciclista) e o peso das clips
+// `pedalando_esq`/`pedalando_dir`: pela mesma velocidade angular.
+const GUIDAO_MAX = 0.35;
+const GUIDAO_K = 0.035;
+const GUIDAO_TAXA = 12;
+// Embalo: de parado à cadência e ao passo cheios (e de volta) em ~0,3 s; na
+// largada o passo anda a 45% (o 1º tile leva ~0,24 s em vez de 0,11 s).
+const BIKE_EMBALO = 0.3;
+const BIKE_RITMO_MIN = 0.45;
+// Crossfade para `bike_parado` (pé no chão) ao parar, e de volta ao sair.
+const BIKE_PARADO_ENTRA = 6;
+const BIKE_PARADO_SAI = 14;
+// Parado, o pedivela vai estacionar no ângulo da `bike_parado` a pelo menos
+// 35% da cadência cheia (meia volta, o pior caso, em ~0,45 s).
+const BIKE_ESTACIONA = 0.35;
 // Ciclo da clip `andando` = 2 passos ≈ 0,68 m na escala do modelo.
 const WALK_CYCLE_STRIDE = 0.68;
 // Teto de aceleração da clip: acima disso a perna vira borrão (o pé desliza um pouco).
 const WALK_MAX_TIMESCALE = 2.6;
+// Andando sozinho (porta, elevador) por menos de 1 s: um pouco mais rápido,
+// ainda com o pé no chão (clip ≈ 0,58 m/s em 1x).
+const WALK_AUTO_TIMESCALE = 3;
 const TURN_LOCK = 0.09;
 const IDLE_BEFORE_CODING = 2.2;
 // Distância da câmera no modo vitrine (tela de título).
@@ -148,12 +190,13 @@ const FESTA_SPOTS = [
 // flores dentro da roda); o acampamento e os assentos ficam em
 // scene/historia.js.
 const FOGO_TILE = [6, 11];
-// Aprendizes do Laboratório de ML (batalha/dados.js, TREINADORES): chibis de
-// jaleco na frente do laboratório, com batalhas opcionais antes da Mariana.
-const TREINADORES_VILA = [
-  { id: "aprendiz-numpy", x: 16, y: 7, dir: "down" },
-  { id: "aprendiz-seaborn", x: 21, y: 6, dir: "left" },
-];
+// Aprendizes do Laboratório de ML (batalha/dados.js, TREINADORES): eram
+// chibis de jaleco na frente do laboratório, com batalhas opcionais antes da
+// Mariana. Saíram do mapa a pedido (só ficam bonecos de gente do time, em 3D);
+// os dados e as batalhas continuam em dados.js, para voltarem com um boneco
+// próprio: { id: "aprendiz-numpy", x: 16, y: 7, dir: "down" },
+// { id: "aprendiz-seaborn", x: 21, y: 6, dir: "left" }.
+const TREINADORES_VILA = [];
 const AREA_SPOTS = {
   frontend: [
     { x: 16, y: 15, dir: "down" },
@@ -191,8 +234,82 @@ const SEMEC_FRENTE = { x: 6, y: 7 };
 // com as mesmas durações: .vila-iris no globals.css).
 const TRANSICAO = { fechar: 0.7, escuro: 0.3, abrir: 0.7 };
 const TRANSICAO_RAPIDA = { fechar: 0.2, escuro: 0.1, abrir: 0.2 };
-// Elevador: entra, as portas fecham, o painel conta os andares e abre.
-const TRANSICAO_ELEVADOR = { fechar: 0.9, escuro: 1.2, abrir: 0.8 };
+// Elevador, em etapas (segundos), toda no 3D. Ida, no andar de origem: o
+// display pisca chamando, "ding" e as portas abrem, o jogador entra andando
+// na cabine, vira de frente e as portas fecham com a câmera chegando perto;
+// na partida a câmera desliza na vertical no sentido da viagem (sobe ao
+// subir) e a tela escurece (.vila-elevador no globals.css: só uma cor
+// sólida, ELEVADOR_ESCURECER) enquanto o display conta os andares. A cena
+// troca no escuro. Volta, no destino: a câmera chega do sentido oposto e
+// assenta com a tela clareando, o display termina a contagem, "ding", as
+// portas abrem e ele sai andando de frente (tracarSaida); as portas fecham
+// atrás assim que ele passa do vão, e o controle volta quando ele para.
+// Duração 0 em "entrar"/"sair": pela distância, no passo de ELEVADOR_VEL;
+// em "partir"/"chegar": por andares (deslizeDoElevador). As
+// portas levam ELEVADOR_PORTA para abrir: "abrir" é só a espera até o
+// jogador começar a andar. Na chegada, ela dura até o vão passar de ~80%
+// (ele arranca devagar e cruza a porta já toda aberta).
+const ELEVADOR_IDA = [
+  ["chamar", 0.2],
+  ["abrir", 0.24],
+  ["entrar", 0],
+  ["virar", 0.28],
+  ["fechar", 0.34],
+  ["partir", 0],
+];
+const ELEVADOR_VOLTA = [
+  ["chegar", 0],
+  ["ding", 0.1],
+  ["abrir", 0.3],
+  ["sair", 0],
+];
+const ELEVADOR_PORTA = 0.42;
+// Movimento reduzido: sem pisca, sem giro animado, sem deslize nem
+// contagem: um corte curto no escuro.
+const ELEVADOR_IDA_RAPIDA = [
+  ["chamar", 0],
+  ["abrir", 0.12],
+  ["entrar", 0.2],
+  ["virar", 0],
+  ["fechar", 0.12],
+  ["partir", 0.1],
+];
+const ELEVADOR_VOLTA_RAPIDA = [
+  ["chegar", 0.08],
+  ["ding", 0],
+  ["abrir", 0.12],
+  ["sair", 0.2],
+];
+const ELEVADOR_FECHA_ATRAS = 0.55;
+// Passo de quem entra/sai da cabine (m/s): a clip de caminhada acompanha
+// (walkTimeScale, até WALK_AUTO_TIMESCALE), sem o pé deslizar.
+const ELEVADOR_VEL = 1.75;
+// Saída da cabine: arranque e parada (s) com a velocidade subindo e
+// descendo em cosseno (a clip acompanha, sem o pé deslizar); as portas
+// fecham atrás quando ele passa ELEVADOR_VAO_LIVRE (m) à frente da cabine.
+const SAIDA_RAMPA = 0.3;
+const ELEVADOR_VAO_LIVRE = 0.95;
+// Pré-carregamento do andar de destino durante a viagem: espera pelos GLBs
+// (ms, desde o clique), orçamento por quadro para subir texturas (ms) e o
+// máximo (s) que a troca espera no escuro pelo destino pronto.
+const PREPARO_CARGAS_MAX = 2500;
+const PREPARO_TEXTURAS_MS = 6;
+const PREPARO_ESPERA_MAX = 1.6;
+// Escurecer da tela (igual ao .vila-elevador[data-fase="fechar"]) e o
+// instante parado no escuro antes de trocar de cena.
+const ELEVADOR_ESCURECER = 0.24;
+const ELEVADOR_ESCURO = 0.06;
+// Clarear no destino (.vila-elevador[data-fase="abrir"]) cabe em "chegar".
+const ELEVADOR_CLAREAR = 0.3;
+// Deslize vertical da câmera (unidades do mundo) e a duração da partida e
+// da chegada: um pouco mais por andar, até +0,35 s em cada.
+const ELEVADOR_DESLIZE = 1.1;
+const deslizeDoElevador = (andares) => {
+  const extra = Math.min(0.35, 0.07 * Math.max(0, andares - 1));
+  return { partir: 0.12 + ELEVADOR_ESCURECER + ELEVADOR_ESCURO + extra, chegar: ELEVADOR_CLAREAR + 0.06 + extra };
+};
+// Câmera mais perto (fração da distância normal) com o jogador na cabine.
+const ELEVADOR_ZOOM = 0.62;
 // Câmera dentro do prédio: a mesma distância da Vila.
 const MUSEU_ZOOM = 1;
 
@@ -266,7 +383,7 @@ function mulberry32(seed) {
   };
 }
 
-export function readPalette() {
+function readPalette() {
   const cs = getComputedStyle(document.documentElement);
   const pv = (name) => {
     const v = cs.getPropertyValue(`--pv-${name}`).trim();
@@ -566,6 +683,18 @@ export function createVila(host, options) {
     leaders = new Set(),
     reducedMotion = false,
     modelUrl,
+    // GLB do jogador, ao lado de modelUrl ("jogador-homem.glb" |
+    // "jogador-mulher.glb" | "gava.glb"); trocável depois com setJogador().
+    playerModel = "gava.glb",
+    // Subiu (true) ou desceu (false) da bicicleta.
+    onBicicleta = () => {},
+    // Já conquistou a bicicleta (minigame da oficina)? Sem ela, B não monta.
+    bicicletaLiberada = false,
+    // Preparo da Vila antes de jogar ({ fase, progresso 0..1 }): ver
+    // "Preparo da Vila" e api.preparar().
+    onPreparo = () => {},
+    // Nasce com a tela de carregamento por cima (ver setCarregando).
+    carregando = false,
     // Nível gráfico (scene/qualidade.js): "high" | "medium" | "low" | "minimal".
     // Sombras, antialias e resolução seguem o nível; nos dois mais baixos a
     // cena já nasce com modelos e vegetação leves. `autoQuality`: pode descer
@@ -622,6 +751,10 @@ export function createVila(host, options) {
     antialias: !lite,
     powerPreference: "high-performance",
   });
+  // Sem a checagem de erro de cada shader (getShaderInfoLog no 1º uso): ela
+  // obriga o navegador a terminar a compilação na hora, travando o quadro
+  // (no Windows/ANGLE, segundos somados com ~140 programas).
+  renderer.debug.checkShaderErrors = false;
   renderer.domElement.setAttribute("aria-hidden", "true");
   host.appendChild(renderer.domElement);
 
@@ -771,6 +904,7 @@ export function createVila(host, options) {
   // Quem tem boneco 3D (scene/walkers.js), líder ou não: o chibi vira âncora
   // invisível (tile, balão, conversa e cenas) e o 3D fica no lugar dele.
   const anchors = new Map(); // id do boneco 3D → fig do chibi
+  let viniciusFig = null; // chibi da Diretoria que leva o 3D do Vinicius
   // Quem dá quest (o Pedro) não vira chibi: é o NPC 3D de scene/pedro.js.
   const questIndex = members.findIndex((m) => m.quest);
   members.forEach((member, index) => {
@@ -786,7 +920,10 @@ export function createVila(host, options) {
     fig.rotation.y = DIRS[spot.dir].rot;
     const leader = leaders.has(index);
     const boneco = modelUrl && WALKER_IDS.has(member.retrato) ? member.retrato : null;
-    if (boneco) {
+    // O Vinicius (retrato "gava") tem boneco 3D próprio (scene/vinicius.js),
+    // preso dentro do chibi escondido.
+    const ehVinicius = modelUrl && member.retrato === "gava";
+    if (boneco || ehVinicius) {
       fig.traverse((o) => {
         if (o.isMesh) o.visible = false; // continua no raycast do clique
       });
@@ -794,7 +931,7 @@ export function createVila(host, options) {
     }
     const marker = makeMarker({ leader });
     // O 3D é mais baixo que o chibi: balão um pouco mais perto da cabeça.
-    const markerY = boneco ? MARKER_Y - 0.12 : MARKER_Y;
+    const markerY = boneco || ehVinicius ? MARKER_Y - 0.12 : MARKER_Y;
     marker.position.y = markerY;
     // Balão sempre de frente para a câmera, qualquer que seja a direção do NPC.
     marker.rotation.set(MARKER_TILT, -fig.rotation.y, 0);
@@ -804,6 +941,7 @@ export function createVila(host, options) {
     const npc = { index, member, x: spot.x, y: spot.y, dir: spot.dir, fig, marker, markerY, boneco, talked: false, leader, beaten: false, phase: rand() * 6 };
     npcs.push(npc);
     occupied.set(`${spot.x},${spot.y}`, npc);
+    if (ehVinicius) viniciusFig = fig;
   });
   // Aprendizes (depois dos membros: as cenas que reúnem o time usam os
   // primeiros da lista). `index` null: não são da equipe; a conversa sai como
@@ -847,13 +985,22 @@ export function createVila(host, options) {
     path: [],
     pending: null,
     turnLock: 0,
+    tap: null, // direção de um toque curto (api.press), vale um passo
     idle: 0,
     run: false,
   };
   player.root.position.copy(tileToWorld(player.x, player.y));
   player.root.rotation.y = DIRS[player.dir].rot;
+  // root (posição e yaw lógicos, a câmera segue) → giro (diferença do yaw
+  // visual para o lógico) → inclina (roll da bicicleta, em Z = eixo da frente)
+  // → body. O que é só visual fica nos grupos de dentro: a lógica, as
+  // transições e o sentar continuam lendo/escrevendo o root como antes.
+  player.giro = new THREE.Group();
+  player.inclina = new THREE.Group();
+  player.root.add(player.giro);
+  player.giro.add(player.inclina);
   const placeholder = makeChibi({ shirt: pal.white, pants: pal.pants, skin: pal.skin, hair: pal.hair, eye: pal.eye });
-  player.root.add(placeholder);
+  player.inclina.add(placeholder);
   player.body = placeholder;
   scene.add(player.root);
 
@@ -864,7 +1011,7 @@ export function createVila(host, options) {
   );
   blob.rotation.x = -Math.PI / 2;
   blob.position.y = 0.01;
-  player.root.add(blob);
+  player.giro.add(blob);
 
   // Personagem animado: anda de notebook guardado; parado, abre e programa.
   let mixer = null;
@@ -880,6 +1027,19 @@ export function createVila(host, options) {
 
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
+  // Conta toda carga de GLB da Vila (jogador, Pedro, duplas, Vinicius,
+  // ocarina…): o preparo da Vila espera todas antes de compilar.
+  const cargasVila = { total: 0, feitas: 0 };
+  const loadAsyncOriginal = loader.loadAsync.bind(loader);
+  loader.loadAsync = (...args) => {
+    const p = loadAsyncOriginal(...args);
+    cargasVila.total++;
+    const conta = () => {
+      cargasVila.feitas++;
+    };
+    p.then(conta, conta);
+    return p;
+  };
 
   // Pedro: NPC 3D parado na frente da SEMEC com a quest da ocarina
   // (scene/pedro.js); a ocarina fica escondida no mato (scene/quest.js).
@@ -902,6 +1062,15 @@ export function createVila(host, options) {
           isPaused: () => paused || cutscene.active,
         })
       : null;
+  const vinicius = viniciusFig
+    ? createVinicius({
+        fig: viniciusFig,
+        loader,
+        url: modelUrl.replace(/gava\.glb$/, arquivoLeve("gava.glb", lite)),
+        shadowColor: pal.black,
+        reducedMotion,
+      })
+    : null;
   const ocarina = pedro
     ? createOcarinaHideout({
         scene,
@@ -945,13 +1114,37 @@ export function createVila(host, options) {
   });
   const tileOf = (pos) => ({ x: Math.floor(pos.x + W / 2), y: Math.floor(pos.z + H / 2) });
 
-  if (modelUrl) {
+  // Carrega (ou troca) o boneco do jogador. O Gava traz `entrada`/`digitando`
+  // (notebook); os jogadores novos trazem só `parado` e `andando` (sem
+  // programar parado). Uma troca no meio de outra carga vale a mais nova.
+  let jogadorPedido = 0;
+  let jogadorPronto = !modelUrl; // o boneco atual já montou (ou falhou)
+  function carregarJogador(arquivo) {
+    if (!modelUrl) return;
+    const pedido = ++jogadorPedido;
+    jogadorPronto = false;
     loader
-      .loadAsync(modelUrl.replace(/gava\.glb$/, arquivoLeve("gava.glb", lite)))
+      .loadAsync(modelUrl.replace(/gava\.glb$/, arquivoLeve(arquivo, lite)))
       .then((gltf) => {
-        if (disposed) return;
+        if (disposed || pedido !== jogadorPedido) return;
+        if (coding) stopCoding();
+        if (bike.on) onBicicleta(false);
+        bike.on = false;
+        if (sentados.has(player.body)) sentados.delete(player.body);
+        mixer?.stopAllAction();
+        mixer = null;
+        actions = null;
+        laptop = null;
+        laptopLid = null;
+        walking = false;
+        walkCycle = 1;
         const model = gltf.scene;
+        // A bicicleta (jogadores novos) fica fora da medida da altura.
+        const bicicleta = model.getObjectByName("Bicicleta");
+        const paiBike = bicicleta?.parent;
+        bicicleta?.removeFromParent();
         const box = new THREE.Box3().setFromObject(model);
+        paiBike?.add(bicicleta);
         const size = box.getSize(new THREE.Vector3());
         const k = 0.98 / size.y;
         walkStride = WALK_CYCLE_STRIDE * k;
@@ -959,19 +1152,42 @@ export function createVila(host, options) {
         model.position.y = -box.min.y * k;
         const wrap = new THREE.Group();
         wrap.add(shadowed(model));
-        player.root.remove(placeholder);
-        player.root.add(wrap);
+        const antigo = player.body;
+        player.inclina.remove(antigo);
+        if (antigo !== placeholder) descartarJogador(antigo);
+        player.inclina.add(wrap);
         player.body = wrap;
         laptop = model.getObjectByName("Laptop");
         laptopLid = model.getObjectByName("LaptopLid");
+        prepararBike(model, bicicleta);
         if (gltf.animations.length) {
           mixer = new THREE.AnimationMixer(model);
           const clip = (n) => gltf.animations.find((a) => a.name === n);
           const entrada = clip("entrada");
           const digitando = clip("digitando");
           const andando = clip("andando");
-          if (entrada && digitando) {
+          const parado = clip("parado");
+          if (!(entrada && digitando) && parado) {
+            // Jogador novo: `parado` em loop é a pose de descanso.
+            actions = { parado: mixer.clipAction(parado) };
+            actions.pose = actions.parado;
+            if (clip("pedalando")) actions.pedalando = mixer.clipAction(clip("pedalando"));
+            // Opcionais (GLB novo): curva para cada lado e parado com o pé no chão.
+            if (clip("pedalando_esq")) actions.pedalandoEsq = mixer.clipAction(clip("pedalando_esq"));
+            if (clip("pedalando_dir")) actions.pedalandoDir = mixer.clipAction(clip("pedalando_dir"));
+            if (clip("bike_parado")) actions.bikeParado = mixer.clipAction(clip("bike_parado"));
+            // O guidão já vem nas clips de curva? Então o peso delas o esterça;
+            // senão, o código gira o `Garfo` (ver girarBike).
+            bike.garfoNaClip = ["pedalando", "pedalando_esq", "pedalando_dir"].some((n) =>
+              clip(n)?.tracks.some((tr) => tr.name.startsWith("Garfo."))
+            );
+            if (andando) {
+              actions.andando = mixer.clipAction(andando);
+              walkCycle = andando.duration;
+            }
+          } else if (entrada && digitando) {
             actions = { entrada: mixer.clipAction(entrada), digitando: mixer.clipAction(digitando) };
+            actions.pose = actions.entrada;
             if (andando) {
               actions.andando = mixer.clipAction(andando);
               walkCycle = andando.duration;
@@ -993,22 +1209,287 @@ export function createVila(host, options) {
           }
         }
         stopCoding();
+        jogadorPronto = true;
       })
       .catch(() => {
-        // Sem o modelo, o bonequinho provisório continua valendo.
+        // Sem o modelo, o bonequinho provisório (ou o boneco anterior) continua.
+        if (pedido === jogadorPedido) jogadorPronto = true;
       });
   }
+  // Boneco trocado: libera malhas, materiais e texturas do anterior.
+  function descartarJogador(obj) {
+    obj.traverse((o) => {
+      o.geometry?.dispose();
+      for (const m of [].concat(o.material ?? [])) {
+        for (const v of Object.values(m)) if (v?.isTexture) v.dispose();
+        m.dispose();
+      }
+    });
+  }
+  carregarJogador(playerModel);
 
-  // Caminhada: crossfade entre a pose parada (1º quadro da `entrada`) e a
+  // ---- Bicicleta --------------------------------------------------------------
+  // Os GLBs dos jogadores novos trazem o nó `Bicicleta` (rodas, pedivela e
+  // pedais com origem no eixo, girando em X local) e o clipe `pedalando` (uma
+  // volta do pedivela). Rodas giram pela distância andada; o pedivela segue o
+  // tempo do clipe; os pedais contra-giram para ficarem nivelados.
+  // Pilotagem: `vel` é o embalo (0 parado … 1 cadência cheia), `guidao` o
+  // esterço atual (rad), `paradoPeso` o peso da `bike_parado`. `desvio` é o
+  // resto de uma curva planejada que não aconteceu (ver planejarCurva), que
+  // some amortecido em vez de saltar para o centro do tile.
+  const bike = {
+    on: false,
+    node: null,
+    rodas: [],
+    pedivela: null,
+    pedais: [],
+    garfo: null,
+    garfoY0: 0,
+    garfoNaClip: false,
+    raio: 0.1,
+    ultimo: new THREE.Vector3(),
+    vel: 0,
+    guidao: 0,
+    paradoPeso: 0,
+    desvio: new THREE.Vector3(),
+  };
+  function prepararBike(model, bicicleta) {
+    bike.node = bicicleta ?? null;
+    bike.rodas = ["RodaDianteira", "RodaTraseira"].map((n) => model.getObjectByName(n)).filter(Boolean);
+    bike.pedivela = model.getObjectByName("Pedivela") ?? null;
+    bike.pedais = ["PedalEsq", "PedalDir"].map((n) => model.getObjectByName(n)).filter(Boolean);
+    // Só rotation: o meshopt pôs escala nos nós da bicicleta.
+    bike.garfo = model.getObjectByName("Garfo") ?? null;
+    bike.garfoY0 = bike.garfo?.rotation.y ?? 0;
+    bike.garfoNaClip = false;
+    if (!bicicleta) return;
+    bicicleta.visible = false;
+    // Raio da roda já na escala do jogo (o modelo acabou de ser escalado).
+    model.updateMatrixWorld(true);
+    if (bike.rodas[0]) bike.raio = new THREE.Box3().setFromObject(bike.rodas[0]).getSize(new THREE.Vector3()).y / 2 || 0.1;
+  }
+  let bikeLiberada = bicicletaLiberada;
+  const temBike = () => Boolean(bikeLiberada && bike.node && actions?.pedalando);
+  function montar() {
+    if (bike.on || !temBike() || noPredio() || cutscene.active || transicao || foco) return false;
+    if (coding) stopCoding();
+    bike.on = true;
+    bike.node.visible = true;
+    walking = false;
+    actions.andando?.stop();
+    actions.pose.stop();
+    // Todas as clips da bicicleta tocam juntas e o peso de cada uma sai de
+    // pesarBike (sem crossFade: ele brigaria com os pesos manuais). Parado na
+    // largada: a cadência começa em 0 (timeScale 0 congela o pedivela).
+    bike.vel = 0;
+    bike.guidao = 0;
+    bike.paradoPeso = actions.bikeParado ? 1 : 0;
+    bike.desvio.set(0, 0, 0);
+    for (const a of clipsBike()) {
+      a.reset().play();
+      a.timeScale = 0;
+    }
+    if (actions.bikeParado) actions.bikeParado.timeScale = reducedMotion ? 0 : 1;
+    pesarBike();
+    mixer.update(0);
+    bike.ultimo.copy(player.root.position);
+    onBicicleta(true);
+    return true;
+  }
+  function desmontar() {
+    if (!bike.on) return;
+    bike.on = false;
+    bike.node.visible = false;
+    for (const a of clipsBike()) a.stop();
+    walking = false;
+    // Sobra de curva desfeita: volta ao centro do tile (numa transição, quem
+    // move o jogador é ela).
+    if (bike.desvio.lengthSq() && !player.move && !transicao) player.root.position.copy(paraMundo(player.x, player.y));
+    bike.desvio.set(0, 0, 0);
+    bike.guidao = 0;
+    player.inclina.rotation.z = 0;
+    if (bike.garfo && !bike.garfoNaClip) bike.garfo.rotation.y = bike.garfoY0;
+    playPose();
+    mixer.update(0);
+    onBicicleta(false);
+  }
+  const clipsBike = () => [actions.pedalando, actions.pedalandoEsq, actions.pedalandoDir, actions.bikeParado].filter(Boolean);
+
+  // Pesos: pedalando ↔ curva (esq/dir pela fração do esterço) e, por cima,
+  // pedalando ↔ bike_parado. Somam 1 (abaixo disso o mixer misturaria a pose
+  // de repouso do rig). As de curva andam no mesmo tempo da `pedalando`.
+  function pesarBike() {
+    const s = THREE.MathUtils.clamp(bike.guidao / GUIDAO_MAX, -1, 1);
+    const p = actions.bikeParado ? bike.paradoPeso : 0;
+    const esq = actions.pedalandoEsq ? Math.max(s, 0) : 0;
+    const dir = actions.pedalandoDir ? Math.max(-s, 0) : 0;
+    actions.pedalando.setEffectiveWeight((1 - p) * (1 - esq - dir));
+    actions.pedalandoEsq?.setEffectiveWeight((1 - p) * esq);
+    actions.pedalandoDir?.setEffectiveWeight((1 - p) * dir);
+    actions.bikeParado?.setEffectiveWeight(p);
+    const base = actions.pedalando;
+    for (const a of [actions.pedalandoEsq, actions.pedalandoDir]) {
+      if (!a) continue;
+      a.time = base.time;
+      a.timeScale = base.timeScale;
+    }
+  }
+
+  // Antes do mixer, a cada quadro montado: embalo (cadência e passo), guidão
+  // (pela velocidade angular do yaw visual, em giroVisual) e pesos das clips.
+  function pilotarBike(dt, omega) {
+    const continua = held.length || player.tap || player.path.length;
+    // Andando com mais passos pela frente: embala; no último passo (nada
+    // segurado), já vai freando, e parado o pedivela perde o giro devagar.
+    const alvo = player.move && continua ? 1 : 0;
+    if (reducedMotion) bike.vel = player.move ? 1 : 0;
+    else bike.vel += THREE.MathUtils.clamp(alvo - bike.vel, -dt / BIKE_EMBALO, dt / BIKE_EMBALO);
+    // Pé no chão só depois de parar; ao sair, larga rápido.
+    const paradoAlvo = player.move ? 0 : 1;
+    const taxaParado = paradoAlvo ? BIKE_PARADO_ENTRA : BIKE_PARADO_SAI;
+    bike.paradoPeso = reducedMotion
+      ? paradoAlvo
+      : bike.paradoPeso + (paradoAlvo - bike.paradoPeso) * (1 - Math.exp(-dt * taxaParado));
+    const guidaoAlvo = reducedMotion ? 0 : THREE.MathUtils.clamp(omega * GUIDAO_K, -GUIDAO_MAX, GUIDAO_MAX);
+    bike.guidao += (guidaoAlvo - bike.guidao) * (1 - Math.exp(-dt * GUIDAO_TAXA));
+    // Uma volta do pedivela a cada BIKE_TILES_POR_VOLTA tiles na cadência cheia.
+    const p = actions.pedalando;
+    const dur = p.getClip().duration;
+    const cheia = dur / (STEP_BIKE * BIKE_TILES_POR_VOLTA);
+    p.timeScale = cheia * bike.vel;
+    // A `bike_parado` foi feita com o pedivela em 0 (pedal direito na frente,
+    // pé esquerdo no chão): parado, o pedivela vai até a volta inteira mais
+    // perto (para a frente ou, se for mais curto, para trás, como quem ajeita
+    // o pedal) e estaciona em t = 0, senão o pé direito sai do pedal. Voltando
+    // a pedalar, a fase recomeça daí e pedal e pé casam. Sem `bike_parado`,
+    // só congela onde parou.
+    if (actions.bikeParado && !player.move) {
+      const fase = ((p.time % dur) + dur) % dur;
+      const frente = fase > dur / 2;
+      const falta = frente ? dur - fase : fase;
+      const giro = Math.max(cheia * bike.vel, cheia * BIKE_ESTACIONA);
+      if (reducedMotion || falta <= giro * dt + 1e-4) {
+        p.time = 0;
+        p.timeScale = 0;
+      } else p.timeScale = frente ? giro : -giro;
+    }
+    pesarBike();
+  }
+  // Fração do passo cheio que o passo de agora anda (o embalo da largada).
+  const ritmoBike = () => (reducedMotion ? 1 : BIKE_RITMO_MIN + (1 - BIKE_RITMO_MIN) * bike.vel);
+
+  // Depois do mixer, a cada quadro: rodas pela distância, pedivela pelo clipe
+  // (com a cadência a 0 ele congela no ângulo em que parou), guidão.
+  function girarBike() {
+    const dist = player.root.position.distanceTo(bike.ultimo);
+    bike.ultimo.copy(player.root.position);
+    for (const roda of bike.rodas) roda.rotation.x += (RODA_SINAL * dist) / bike.raio;
+    if (bike.garfo && !bike.garfoNaClip) bike.garfo.rotation.y = bike.garfoY0 + bike.guidao;
+    if (!bike.pedivela) return;
+    const p = actions.pedalando;
+    const a = PEDIVELA_SINAL * 2 * Math.PI * (p.time / p.getClip().duration);
+    bike.pedivela.rotation.x = a;
+    for (const pedal of bike.pedais) pedal.rotation.x = -a;
+  }
+
+  // ---- Curva em arco nas esquinas (bicicleta) ---------------------------------
+  // No meio de um passo, se já há outra direção pedida (não a oposta) e o tile
+  // dela está livre, a segunda metade deste passo e a primeira do próximo viram
+  // uma Bézier quadrática: do meio do tile anterior, pela esquina (controle),
+  // ao meio do seguinte. A grade não muda: player.x/y e a colisão continuam
+  // tile a tile; só o root (que a câmera segue, amortecida) corta a quina.
+  // A curva fica combinada (player.tap): o próximo passo sai mesmo se a seta
+  // subir antes do fim; se ainda assim não sair (tile ocupado de repente,
+  // outra seta), o resto vira `desvio` e some amortecido.
+  const vCurva = new THREE.Vector3();
+  function planejarCurva(m) {
+    if (!bike.on || reducedMotion || noPredio()) return null;
+    const want = held[held.length - 1] ?? player.tap;
+    if (!want || want === m.dir || want === OPPOSITE[m.dir]) return null;
+    const nx = player.x + DIRS[want].dx;
+    const ny = player.y + DIRS[want].dy;
+    if ((nx === SEMEC_PORTA.x && ny === SEMEC_PORTA.y) || !podeAndar(nx, ny)) return null;
+    if (!held.length) player.tap = want;
+    const seguinte = paraMundo(nx, ny);
+    return {
+      dir: want,
+      p0: new THREE.Vector3().lerpVectors(m.from, m.to, 0.5),
+      p1: m.to.clone(),
+      p2: new THREE.Vector3().lerpVectors(m.to, seguinte, 0.5),
+    };
+  }
+  // Ponto (em `out`) e yaw da tangente da curva em u ∈ [0, 1].
+  function pontoDaCurva(c, u, out) {
+    const w = 1 - u;
+    out.set(0, 0, 0).addScaledVector(c.p0, w * w).addScaledVector(c.p1, 2 * w * u).addScaledVector(c.p2, u * u);
+    vCurva.subVectors(c.p1, c.p0).multiplyScalar(w);
+    vCurva.addScaledVector(vAux2.subVectors(c.p2, c.p1), u);
+    return Math.atan2(vCurva.x, vCurva.z);
+  }
+  const vAux2 = new THREE.Vector3();
+  // Posição do passo de agora; devolve o yaw da tangente quando está na curva
+  // (o giro visual segue a curva em vez de amortecer) ou null na reta.
+  function posicionarPasso(m) {
+    const k = Math.min(m.t, 1);
+    let yaw = null;
+    if (m.entrada && k <= 0.5) yaw = pontoDaCurva(m.entrada, 0.5 + k, player.root.position);
+    else if (m.saida && k >= 0.5) yaw = pontoDaCurva(m.saida, k - 0.5, player.root.position);
+    else player.root.position.lerpVectors(m.from, m.to, k);
+    player.root.position.add(bike.desvio);
+    return yaw;
+  }
+
+  // ---- Giro visual e inclinação -------------------------------------------------
+  // O yaw lógico (player.dir → root.rotation.y) muda na hora, como sempre;
+  // o visual (player.giro) persegue-o pelo lado mais curto, ou segue a tangente
+  // da curva. Travado (= lógico) com movimento reduzido, em transições, cenas
+  // e sentado, onde quem gira o root é o código daquele trecho.
+  let yawVisual = player.root.rotation.y;
+  const VOLTA = Math.PI * 2;
+  const difAngulo = (a, b) => {
+    const d = (a - b) % VOLTA;
+    return d > Math.PI ? d - VOLTA : d < -Math.PI ? d + VOLTA : d;
+  };
+  function giroVisual(dt, yawCurva) {
+    const logico = player.root.rotation.y;
+    let omega = 0;
+    if (reducedMotion || transicao || cutscene.active || sentados.has(player.body) || dt <= 0) yawVisual = logico;
+    else {
+      const passo = THREE.MathUtils.clamp(
+        difAngulo(logico, yawVisual) * (1 - Math.exp(-dt * GIRO_TAXA)),
+        -GIRO_MAX * dt,
+        GIRO_MAX * dt
+      );
+      const novo = yawCurva ?? yawVisual + passo;
+      omega = difAngulo(novo, yawVisual) / dt;
+      yawVisual = novo;
+    }
+    player.giro.rotation.y = difAngulo(yawVisual, logico);
+    // Roll só montado e com embalo; em Z local (frente = +Z), negativo inclina
+    // para a esquerda do ciclista, que é o lado de um yaw crescente.
+    const rollAlvo =
+      bike.on && !reducedMotion ? THREE.MathUtils.clamp(-omega * INCLINA_K * bike.vel, -INCLINA_MAX, INCLINA_MAX) : 0;
+    player.inclina.rotation.z += (rollAlvo - player.inclina.rotation.z) * (reducedMotion ? 1 : 1 - Math.exp(-dt * INCLINA_TAXA));
+    return omega;
+  }
+
+  // Caminhada: crossfade entre a pose parada (1º quadro da `entrada`, ou a
+  // `parado` dos jogadores novos) e a
   // clip `andando`, acelerada para casar com a velocidade do passo em grade.
+  // Andando sozinho (porta, elevador): a velocidade de verdade (m/s), para a
+  // clip acompanhar o chão; 0 no passo normal da grade.
+  let velAuto = 0;
   function walkTimeScale() {
     const dur = player.run ? STEP_RUN : STEP_WALK;
     const natural = walkStride / walkCycle; // m/s da clip em 1x
+    if (velAuto) return Math.min(velAuto / natural, WALK_AUTO_TIMESCALE);
     return Math.min(1 / dur / natural, WALK_MAX_TIMESCALE);
   }
 
   function startWalk() {
     walking = true;
+    // Montado, a cadência (e o congelar do pedivela) é do embalo (pilotarBike).
+    if (bike.on) return;
     const walk = actions?.andando;
     if (!walk) return;
     walk.timeScale = walkTimeScale();
@@ -1016,20 +1497,27 @@ export function createVila(host, options) {
     walk.enabled = true;
     walk.setEffectiveWeight(1);
     walk.play();
-    walk.crossFadeFrom(actions.entrada, 0.12, false);
+    walk.crossFadeFrom(actions.pose, 0.12, false);
+  }
+
+  // Pose de descanso: a `parado` em loop (parada no 1º quadro com movimento
+  // reduzido) ou o 1º quadro da `entrada` do Gava.
+  function playPose() {
+    actions.pose.reset().play();
+    actions.pose.paused = !actions.parado || reducedMotion;
   }
 
   function stopWalk() {
     walking = false;
+    if (bike.on) return;
     const walk = actions?.andando;
     if (!walk || coding) return;
-    actions.entrada.reset().play();
-    actions.entrada.paused = true;
-    actions.entrada.crossFadeFrom(walk, 0.15, false);
+    playPose();
+    actions.pose.crossFadeFrom(walk, 0.15, false);
   }
 
   function startCoding() {
-    if (!actions || coding) return;
+    if (!actions?.digitando || coding) return;
     coding = true;
     // Vira para a câmera: o notebook fica de frente para quem joga.
     face("down");
@@ -1049,10 +1537,9 @@ export function createVila(host, options) {
       if (laptop) laptop.visible = false;
       return;
     }
-    actions.digitando.stop();
+    actions.digitando?.stop();
     // Pose de caminhada = primeiro quadro da `entrada` (braços baixos).
-    actions.entrada.reset().play();
-    actions.entrada.paused = true;
+    playPose();
     if (laptop) laptop.visible = false;
     mixer.update(0);
   }
@@ -1073,15 +1560,23 @@ export function createVila(host, options) {
 
   // ---- Galeria da Equipe: o jogador anda na grade do lugar em que está -------
   let local = "vila";
-  // Interiores do prédio (térreo, andares e Galeria), criados na primeira
-  // visita e guardados; `interior` é o atual (null na Vila).
+  // Interiores do prédio (térreo, andares e Galeria), criados na visita; só
+  // os dois mais recentes ficam guardados (guardarSoRecentes). `interior` é
+  // o atual (null na Vila).
   const interiores = new Map();
   let interior = null;
   let transicao = null; // { para, t, fase, de, ate }
   let foco = null; // id do quadro com a câmera em close
   let voltaDoFoco = 0; // segundos de câmera suave depois de fechar o close
   let snapCamera = false;
+  // Elevador: dolly da câmera (multiplica a distância) e as portas que fecham
+  // atrás de quem já saiu (o jogador anda livre enquanto isso).
+  let zoomElevador = 1;
+  let zoomElevadorAlvo = 1;
+  let dollyVolta = null; // { de, t, dur }: recuo da câmera na saída da cabine
+  let portaFechando = null; // { interior, t }
   const camLook = new THREE.Vector3();
+  const camPos = new THREE.Vector3();
   const noPredio = () => local !== "vila";
   const paraMundo = (x, y) => (noPredio() ? interior.tileToWorld(x, y) : tileToWorld(x, y));
   const podeAndar = (x, y) => (noPredio() ? interior.passable(x, y) : passable(x, y));
@@ -1108,6 +1603,8 @@ export function createVila(host, options) {
     if (npc) return { type: npc.isWalker ? "pedro" : "npc", npc };
     const sign = SIGNS.find((sg) => sg.x === x && sg.y === y);
     if (sign) return { type: "sign", sign };
+    // Bicicletário da praça do Front-End: a oficina da bicicleta (minigame).
+    if (x === BICICLETARIO.x && y === BICICLETARIO.y) return { type: "sign", sign: { id: "bicicletario" } };
     return null;
   }
 
@@ -1146,6 +1643,8 @@ export function createVila(host, options) {
     reportFacing();
   }
 
+  // Passo que terminou neste quadro, montado: { sobra (s), saida (curva) }.
+  let passoAcabou = null;
   function tryStep(dir) {
     const d = DIRS[dir];
     const nx = player.x + d.dx;
@@ -1161,12 +1660,25 @@ export function createVila(host, options) {
       return false;
     }
     if (!podeAndar(nx, ny)) return false;
+    // Emendando no passo que acabou neste quadro (bicicleta): herda o tempo que
+    // sobrou dele (sem o soluço de um quadro parado no centro do tile) e, se
+    // era a curva combinada, a 1ª metade deste passo segue o arco.
+    const emenda = bike.on ? passoAcabou : null;
+    const dur = bike.on ? STEP_BIKE : player.run ? STEP_RUN : STEP_WALK;
     player.move = {
       from: paraMundo(player.x, player.y),
       to: paraMundo(nx, ny),
-      t: 0,
-      dur: player.run ? STEP_RUN : STEP_WALK,
+      t: emenda ? Math.min(emenda.sobra / dur, 0.5) : 0,
+      dur,
+      dir,
+      entrada: emenda?.saida?.dir === dir ? emenda.saida : null,
+      saida: undefined, // decidida no meio do passo (planejarCurva)
     };
+    // Montado e fora de um arco: o que o root estiver fora do centro do tile
+    // (resto de uma curva combinada que saiu para outro lado) vira desvio,
+    // que some amortecido.
+    if (bike.on && !player.move.entrada) bike.desvio.subVectors(player.root.position, player.move.from);
+    passoAcabou = null;
     player.x = nx;
     player.y = ny;
     if (!noPredio()) veg.rustle(nx, ny);
@@ -1306,6 +1818,8 @@ export function createVila(host, options) {
   // ~60 MB, fora o mapa de sombra 2048² de cada um nos níveis com sombra.
   // Ficam só o atual e o anterior (ida e volta pelo elevador ou à rua sem
   // reconstruir); os outros são descartados e refeitos na próxima visita.
+  // Na viagem de elevador o destino já existe (prepararDestino): ficam 3 até
+  // a troca, que chama guardarSoRecentes e volta a 2.
   const MAX_INTERIORES = 2;
   function guardarSoRecentes(atual) {
     // Map mantém a ordem de inserção: reinserir o atual o põe no fim (LRU).
@@ -1331,6 +1845,216 @@ export function createVila(host, options) {
     i.dispose();
     for (const l of luzes) l.dispose?.();
   }
+
+  // ---- Pré-carregamento do destino do elevador ---------------------------------
+  // Criar o andar e a 1ª renderização dele (shaders, texturas, mapa de sombra,
+  // os GLBs do time na Galeria) travavam a chegada. Agora o destino é criado
+  // no clique e aquecido enquanto o jogador está no elevador, um passo por
+  // quadro (avancarPreparo): espera os GLBs (`pronto()` do museu), compila os
+  // materiais, sobe as texturas aos poucos e, com a tela já escura, roda o
+  // primeiro `update` e faz um render do destino fora da tela (o render
+  // normal do quadro o cobre). Compilar e subir texturas só acontece com a
+  // cena ainda visível quando o navegador compila shaders em paralelo
+  // (KHR_parallel_shader_compile); sem isso, cada shader trava o quadro e
+  // tudo fica para o escuro. A troca de cena espera o destino pronto, até
+  // PREPARO_ESPERA_MAX no escuro.
+  const aquecidos = new WeakSet();
+  const camPreparo = new THREE.PerspectiveCamera();
+  const compilaEmParalelo = renderer.extensions.has("KHR_parallel_shader_compile");
+  let preparo = null; // { id, destino, fase, cargas, pronto, ocupado, inicio, texturas, i }
+  function prepararDestino(id) {
+    if (disposed || preparo?.id === id) return;
+    const destino = obterInterior(id);
+    const p = { id, destino, fase: "cargas", cargas: !destino.pronto, pronto: aquecidos.has(destino), ocupado: false, inicio: performance.now(), texturas: null, i: 0 };
+    preparo = p;
+    destino.pronto?.().then(() => {
+      p.cargas = true;
+    });
+  }
+  // Câmera do primeiro quadro no destino: perto da cabine, como na chegada.
+  function posicionarCamPreparo(d) {
+    camPreparo.copy(camera, false);
+    const alvo = d.cabine ?? d.tileToWorld(d.chegada.x, d.chegada.y);
+    camPreparo.position.copy(alvo).addScaledVector(CAM_OFFSET, (camera.userData.far || 1) * MUSEU_ZOOM * userZoom * ELEVADOR_ZOOM);
+    camPreparo.lookAt(alvo.x, alvo.y + 0.4, alvo.z);
+    camPreparo.updateMatrixWorld();
+  }
+  function texturasDe(cena) {
+    const set = new Set();
+    cena.traverse((o) => {
+      const mats = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];
+      for (const m of mats) for (const v of Object.values(m)) if (v?.isTexture) set.add(v);
+    });
+    return [...set];
+  }
+  // `escuro`: a tela já está toda coberta (o render fora da tela não aparece).
+  function avancarPreparo(escuro) {
+    const p = preparo;
+    if (!p || p.pronto || p.ocupado || disposed) return;
+    if (p.fase === "cargas") {
+      if (!p.cargas && performance.now() - p.inicio < PREPARO_CARGAS_MAX) return;
+      if (!compilaEmParalelo && !escuro) return;
+      p.fase = "compilar";
+      posicionarCamPreparo(p.destino);
+      if (!compilaEmParalelo) {
+        renderer.compile(p.destino.scene, camPreparo);
+        p.fase = "texturas";
+        return;
+      }
+      p.ocupado = true;
+      const fim = () => {
+        p.ocupado = false;
+        p.fase = "texturas";
+      };
+      renderer.compileAsync(p.destino.scene, camPreparo).then(fim, fim);
+    } else if (p.fase === "texturas") {
+      if (!compilaEmParalelo && !escuro) return;
+      p.texturas ??= texturasDe(p.destino.scene);
+      const t0 = performance.now();
+      while (p.i < p.texturas.length && performance.now() - t0 < PREPARO_TEXTURAS_MS) renderer.initTexture(p.texturas[p.i++]);
+      if (p.i >= p.texturas.length) p.fase = "render";
+    } else if (p.fase === "render" && escuro) {
+      // Com o jogador dentro: compila também os materiais dele (e a sombra)
+      // com as luzes do destino.
+      const d = p.destino;
+      const pai = player.root.parent;
+      const pos = vPreparo.copy(player.root.position);
+      d.scene.add(player.root);
+      player.root.position.copy(d.cabine ?? d.tileToWorld(d.chegada.x, d.chegada.y));
+      // O 1º update (mixers do time, ligações das clips) também pesa.
+      d.update?.(t, 0);
+      posicionarCamPreparo(d);
+      renderer.render(d.scene, camPreparo);
+      // Lê 1 pixel: obriga a GPU a terminar a fila (uploads e compilações
+      // pesariam nos primeiros quadros visíveis); no escuro, não aparece.
+      sincronizarGpu();
+      pai?.add(player.root);
+      player.root.position.copy(pos);
+      p.pronto = true;
+      aquecidos.add(d);
+    }
+  }
+  const vPreparo = new THREE.Vector3();
+  const vCamPos = new THREE.Vector3();
+  const qCam = new THREE.Quaternion();
+  const pixelPreparo = new Uint8Array(4);
+  // Lê 1 pixel da tela: espera a GPU terminar tudo o que já foi pedido.
+  function sincronizarGpu() {
+    const gl = renderer.getContext();
+    gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelPreparo);
+  }
+
+  // ---- Preparo da Vila (antes de jogar) -----------------------------------------
+  // A tela de título já mostra a Vila de longe, mas os GLBs chegam aos poucos e
+  // o 1º quadro perto do jogador ainda compila shaders e sobe texturas (o
+  // engasgo do começo). O preparo roda na tela de título, um passo por quadro
+  // (avancarPreparoVila, no tick): espera todas as cargas da Vila e o boneco
+  // do jogador, compila a cena vista de perto do jogador (em paralelo, se o
+  // navegador deixar), sobe as texturas aos poucos e faz um render fora da
+  // tela (o render normal do quadro o cobre) seguido de um sincronizarGpu.
+  // api.preparar() devolve a promessa; trocar o boneco refaz o preparo.
+  let preparoVila = null; // { fase, texturas, i, ocupado, resolver, promessa }
+  function prepararVila() {
+    if (preparoVila) return preparoVila.promessa;
+    let resolver;
+    const promessa = new Promise((r) => (resolver = r));
+    preparoVila = { fase: "cargas", texturas: null, i: 0, ocupado: false, resolver, promessa };
+    return promessa;
+  }
+  function posicionarCamJogador() {
+    camPreparo.copy(camera, false);
+    const alvo = player.root.position;
+    camPreparo.position.copy(alvo).addScaledVector(CAM_OFFSET, (camera.userData.far || 1) * userZoom);
+    camPreparo.lookAt(alvo.x, alvo.y + 0.4, alvo.z);
+    camPreparo.updateMatrixWorld();
+  }
+  let ultimoAviso = "";
+  function avisarPreparo(fase, progresso) {
+    const chave = `${fase}:${Math.round(progresso * 100)}`;
+    if (chave === ultimoAviso) return;
+    ultimoAviso = chave;
+    onPreparo({ fase, progresso });
+  }
+  // Com a tela de carregamento por cima (setCarregando), o preparo também
+  // monta e aquece por dentro a entrada da SEMEC (e a Galeria, fora dos níveis
+  // leves: ela pesa ~60 MB de texturas), pelo mesmo caminho do elevador
+  // (prepararDestino/avancarPreparo com a tela "escura"); a 1ª visita abre na
+  // hora. Sem a tela (boneco trocado depois), só a Vila.
+  const PREDIOS_NA_CARGA = lite ? ["terreo"] : ["terreo", "galeria"];
+  let capa = carregando; // tela de carregamento por cima do jogo
+  const faixa = (de, ate, f) => de + (ate - de) * Math.min(Math.max(f, 0), 1);
+  function avancarPreparoVila() {
+    const p = preparoVila;
+    if (!p || p.fase === "pronto" || p.ocupado || disposed || noPredio()) return;
+    if (p.fase === "cargas") {
+      const { total, feitas } = cargasVila;
+      avisarPreparo("cargas", faixa(0, 0.55, total ? feitas / total : 0));
+      if (feitas < total || !jogadorPronto) return;
+      p.fase = "compilar";
+      avisarPreparo("compilar", 0.6);
+      posicionarCamJogador();
+      if (!compilaEmParalelo) {
+        renderer.compile(scene, camPreparo);
+        p.fase = "texturas";
+        return;
+      }
+      p.ocupado = true;
+      const fim = () => {
+        p.ocupado = false;
+        p.fase = "texturas";
+      };
+      renderer.compileAsync(scene, camPreparo).then(fim, fim);
+    } else if (p.fase === "texturas") {
+      p.texturas ??= texturasDe(scene);
+      // Debaixo da tela de carregamento, fatias maiores (ninguém vê o quadro).
+      const orcamento = capa ? 40 : PREPARO_TEXTURAS_MS;
+      const t0 = performance.now();
+      while (p.i < p.texturas.length && performance.now() - t0 < orcamento) renderer.initTexture(p.texturas[p.i++]);
+      avisarPreparo("texturas", faixa(0.6, 0.7, p.i / Math.max(p.texturas.length, 1)));
+      if (p.i >= p.texturas.length) p.fase = "render";
+    } else if (p.fase === "render") {
+      // Render fora da tela pelo caminho de verdade (sombra, névoa e
+      // pós-processamento: programas que o compileAsync não cobre), de perto
+      // do jogador e da vitrine da tela de título, e espera a GPU; o tick
+      // refaz a luz da câmera de verdade logo depois.
+      vCamPos.copy(camera.position);
+      qCam.copy(camera.quaternion);
+      posicionarCamJogador();
+      camera.position.copy(camPreparo.position);
+      camera.quaternion.copy(camPreparo.quaternion);
+      camera.updateMatrixWorld();
+      lighting.update(player.root.position, (camera.userData.far || 1) * userZoom);
+      lighting.desenhar();
+      camera.position.copy(vCamPos);
+      camera.quaternion.copy(qCam);
+      camera.updateMatrixWorld();
+      lighting.update(camTarget, (camera.userData.far || 1) * zoom);
+      lighting.desenhar();
+      sincronizarGpu();
+      p.predio = 0;
+      p.fase = capa && modelUrl ? "predios" : "pronto";
+      if (p.fase === "pronto") {
+        avisarPreparo("pronto", 1);
+        p.resolver();
+      }
+    } else if (p.fase === "predios") {
+      const id = PREDIOS_NA_CARGA[p.predio];
+      if (!id || !capa) {
+        p.fase = "pronto";
+        avisarPreparo("pronto", 1);
+        p.resolver();
+        return;
+      }
+      const de = 0.72 + (0.27 * p.predio) / PREDIOS_NA_CARGA.length;
+      const ate = 0.72 + (0.27 * (p.predio + 1)) / PREDIOS_NA_CARGA.length;
+      if (preparo?.id !== id) prepararDestino(id);
+      const etapa = { cargas: 0, compilar: 0.35, texturas: 0.6, render: 0.9 }[preparo.fase] ?? 0;
+      avisarPreparo("predios", faixa(de, ate, preparo.pronto ? 1 : etapa));
+      if (preparo.pronto) p.predio++;
+      else avancarPreparo(true);
+    }
+  }
+
 
   // Porta da rua (térreo) ou elevador: o tile de saída do interior atual.
   function usarSaida(tipo) {
@@ -1363,22 +2087,309 @@ export function createVila(host, options) {
     let ate;
     if (!noPredio()) ate = tileToWorld(SEMEC_PORTA.x, SEMEC_PORTA.y).add(new THREE.Vector3(0, 0, 0.2));
     else if (modo === "elevador") {
+      // Até o meio da cabine (escritórios e Galeria); sem cabine, até o tile
+      // atrás da chegada.
       const e = atrasDe(interior.chegada);
-      ate = interior.tileToWorld(e.x, e.y);
+      ate = interior.cabine ? interior.cabine.clone() : interior.tileToWorld(e.x, e.y);
       face(OPPOSITE[interior.chegada.dir]);
+      fecharPortaAtras(true);
+      dollyVolta = null;
     } else {
       const r = atrasDe(interior.entradaRua ?? interior.chegada);
       ate = interior.tileToWorld(r.x, r.y);
       interior.abrirPorta(1);
     }
     transicao = { para, modo, t: 0, fase: "fechar", de: player.root.position.clone(), ate };
+    if (modo === "elevador") {
+      transicao.etapas = reducedMotion ? ELEVADOR_IDA_RAPIDA : ELEVADOR_IDA;
+      transicao.i = -1;
+      transicao.deAndar = andarPorId(local)?.numero ?? 0;
+      transicao.ateAndar = andarPorId(para)?.numero ?? 0;
+      transicao.sentido = transicao.ateAndar >= transicao.deAndar ? 1 : -1;
+      // Partida e chegada dividem a contagem dos andares no display.
+      const viagem = deslizeDoElevador(Math.abs(transicao.ateAndar - transicao.deAndar));
+      transicao.durPartir = reducedMotion ? ELEVADOR_IDA_RAPIDA.at(-1)[1] : viagem.partir;
+      transicao.durChegar = reducedMotion ? ELEVADOR_VOLTA_RAPIDA[0][1] : viagem.chegar;
+      // O andar de destino já nasce agora e aquece durante a ida.
+      prepararDestino(para);
+      proximaEtapa(transicao);
+      // A interface só esconde a dica (a tela escurece na partida).
+      avisarElevador(transicao, "chamar");
+      return;
+    }
     onTransicao({ fase: "fechar", para, modo, rotulo: rotuloDe(para) });
+  }
+
+  // ---- Viagem de elevador, etapa por etapa (ELEVADOR_IDA / _VOLTA) --------------
+  const TAU = Math.PI * 2;
+  // Interface (VilaSemec.jsx): a tela escurece ("fechar") e clareia ("abrir").
+  const avisarElevador = (tr, fase) => onTransicao({ fase, para: tr.para, modo: tr.modo, rotulo: rotuloDe(tr.para) });
+  const anguloDe = (de, ate) => Math.atan2(ate.x - de.x, ate.z - de.z);
+  const rotuloDoNumero = (n) => ANDARES.find((a) => a.numero === n)?.rotulo ?? "";
+  const easeIn = (k) => k * k * k;
+  const easeOut = (k) => 1 - (1 - k) ** 3;
+  // Deslize vertical da câmera na viagem (tickMuseu soma na posição e no alvo).
+  let deslizeElevador = 0;
+  // Display acima da porta: conta os andares de `u` 0 (saindo) a 1 (chegou).
+  function contarAndares(tr, u) {
+    if (reducedMotion) return;
+    const n = Math.abs(tr.ateAndar - tr.deAndar);
+    const idx = Math.min(n, Math.floor(u * n + 0.5));
+    interior.displayElevador?.(rotuloDoNumero(tr.deAndar + tr.sentido * idx), tr.sentido);
+  }
+  // Duração de "entrar"/"sair": a distância no passo de ELEVADOR_VEL.
+  const duracaoDoPasso = (de, ate) => THREE.MathUtils.clamp(de.distanceTo(ate) / ELEVADOR_VEL, 0.25, 0.75);
+  function proximaEtapa(tr) {
+    tr.i += 1;
+    tr.t = 0;
+    velAuto = 0;
+    if (tr.i >= tr.etapas.length) {
+      // Fim da chegada: o controle volta e as portas fecham atrás.
+      transicao = null;
+      deslizeElevador = 0;
+      // (Já fechando se ele saiu do vão antes do fim.)
+      portaFechando ??= { interior, t: 0 };
+      onTransicao(null);
+      reportFacing();
+      return;
+    }
+    const [nome, dur] = tr.etapas[tr.i];
+    tr.etapa = nome;
+    tr.dur = dur;
+    tr.avisou = false;
+    if (nome === "abrir") tr.porta = 0;
+    if (tr.fase !== "abrir") {
+      if (nome === "chamar") interior.sinalElevador?.("chamando");
+      else if (nome === "abrir") interior.sinalElevador?.("ding");
+      else if (nome === "entrar") {
+        tr.de = player.root.position.clone();
+        if (!dur) tr.dur = duracaoDoPasso(tr.de, tr.ate);
+        // Anda olhando para onde vai (na diagonal, se veio do tile ao lado).
+        if (tr.de.distanceToSquared(tr.ate) > 1e-4) player.root.rotation.y = anguloDe(tr.de, tr.ate);
+        if (!reducedMotion) zoomElevadorAlvo = ELEVADOR_ZOOM;
+      } else if (nome === "virar") {
+        // Na cabine: dá meia-volta de frente para a porta (sem cabine, não gira).
+        tr.rot0 = player.root.rotation.y;
+        const alvo = DIRS[interior.chegada.dir].rot;
+        const d = interior.cabine ? ((((alvo - tr.rot0) % TAU) + TAU * 1.5) % TAU) - Math.PI : 0;
+        tr.rot1 = tr.rot0 + d;
+        if (!d) tr.dur = 0;
+      } else if (nome === "partir") tr.dur = tr.durPartir;
+    } else if (nome === "chegar") tr.dur = tr.durChegar;
+    else if (nome === "ding") {
+      interior.displayElevador?.(rotuloDoNumero(tr.ateAndar), 0);
+      interior.sinalElevador?.("ding");
+    } else if (nome === "abrir") {
+      zoomElevadorAlvo = 1;
+      if (!reducedMotion) {
+        // A saída já fica traçada: a câmera recua da cabine para o "seguir"
+        // numa curva só, das portas abrindo até ele parar.
+        tr.saida = tracarSaida();
+        dollyVolta = { de: zoomElevador, t: 0, dur: dur + tr.saida.T };
+      }
+    } else if (nome === "sair") {
+      tr.de = player.root.position.clone();
+      if (tr.saida) tr.dur = tr.saida.T;
+      else if (!dur) tr.dur = duracaoDoPasso(tr.de, tr.ate);
+    }
+  }
+
+  // Saída da cabine: anda reto para a frente (já de frente para a sala),
+  // passa o vão e só então desvia de leve para o tile da chegada (a cabine
+  // fica no meio dos 2 tiles do elevador): uma curva em S (Bézier cúbica)
+  // que começa e termina apontando para a frente, sem giro brusco. Se o
+  // tile depois da chegada estiver livre, ele dá um passo a mais (a curva
+  // fica mais suave e o vão fica livre para as portas fecharem).
+  const vBez = new THREE.Vector3();
+  function tracarSaida() {
+    const tr = transicao;
+    const c = interior.chegada;
+    const d = DIRS[c.dir];
+    const nx = player.x + d.dx;
+    const ny = player.y + d.dy;
+    if (interior.passable(nx, ny) && !interior.saidaEm(nx, ny)) {
+      player.x = nx;
+      player.y = ny;
+      tr.ate = interior.tileToWorld(nx, ny);
+    }
+    const p0 = player.root.position.clone();
+    const p3 = tr.ate.clone();
+    const frente = new THREE.Vector3(d.dx, 0, d.dy);
+    const a = 0.45 * Math.max(0.2, p3.clone().sub(p0).dot(frente));
+    const pts = [p0, p0.clone().addScaledVector(frente, a), p3.clone().addScaledVector(frente, -a), p3];
+    // Tabela do comprimento ao longo da curva (passo uniforme no chão).
+    const N = 24;
+    const tab = [0];
+    const ant = p0.clone();
+    for (let i = 1; i <= N; i++) {
+      bezier(pts, i / N, vBez);
+      tab.push(tab[i - 1] + ant.distanceTo(vBez));
+      ant.copy(vBez);
+    }
+    const L = tab[N];
+    // Passo de verdade: no máximo o que a clip acompanha sem deslizar.
+    const natural = walkStride / walkCycle;
+    let v = Math.min(ELEVADOR_VEL, natural * WALK_AUTO_TIMESCALE);
+    const rampa = SAIDA_RAMPA;
+    if (L < v * rampa) v = L / rampa;
+    return { pts, tab, L, v, rampa, T: L / v + rampa, frente, fechou: false };
+  }
+  function bezier(pts, u, out) {
+    const w = 1 - u;
+    out.set(0, 0, 0);
+    out.addScaledVector(pts[0], w * w * w);
+    out.addScaledVector(pts[1], 3 * w * w * u);
+    out.addScaledVector(pts[2], 3 * w * u * u);
+    return out.addScaledVector(pts[3], u * u * u);
+  }
+  // Distância andada em `t` (velocidade sobe e desce em cosseno nas rampas).
+  function distanciaNaSaida(s, t) {
+    const { v, rampa: r, T, L } = s;
+    const naRampa = (x) => v * (x / 2 - (r / (2 * Math.PI)) * Math.sin((Math.PI * x) / r));
+    if (t <= 0) return 0;
+    if (t >= T) return L;
+    if (t < r) return naRampa(t);
+    if (t > T - r) return L - naRampa(T - t);
+    return v * (r / 2 + (t - r));
+  }
+  // Parâmetro da curva para a distância `dist` (pela tabela).
+  function uDaDistancia(s, dist) {
+    const { tab } = s;
+    const N = tab.length - 1;
+    let i = 1;
+    while (i < N && tab[i] < dist) i++;
+    const f = (dist - tab[i - 1]) / Math.max(1e-6, tab[i] - tab[i - 1]);
+    return THREE.MathUtils.clamp((i - 1 + f) / N, 0, 1);
+  }
+  const vTan = new THREE.Vector3();
+  const vAux = new THREE.Vector3();
+  function andarNaSaida(tr) {
+    const s = tr.saida;
+    const [p0, p1, p2, p3] = s.pts;
+    const u = uDaDistancia(s, distanciaNaSaida(s, tr.t));
+    bezier(s.pts, u, player.root.position);
+    // Olha para onde anda (tangente da curva).
+    const w = 1 - u;
+    vTan.subVectors(p1, p0).multiplyScalar(w * w);
+    vTan.addScaledVector(vAux.subVectors(p2, p1), 2 * w * u);
+    vTan.addScaledVector(vAux.subVectors(p3, p2), u * u);
+    if (vTan.lengthSq() > 1e-8) player.root.rotation.y = Math.atan2(vTan.x, vTan.z);
+    // Velocidade de agora (a clip acompanha; nunca 0, que é o passo da grade).
+    const h = 1 / 120;
+    velAuto = Math.max(0.05, (distanciaNaSaida(s, tr.t + h) - distanciaNaSaida(s, tr.t - h)) / (2 * h));
+    // Passou do vão: as portas já começam a fechar atrás dele.
+    if (!s.fechou && tr.porta == null && vAux.subVectors(player.root.position, p0).dot(s.frente) > ELEVADOR_VAO_LIVRE) {
+      s.fechou = true;
+      portaFechando = { interior, t: 0 };
+    }
+    return tr.t < s.T;
+  }
+
+  // Avança a etapa atual; true enquanto o jogador anda (anima o passo).
+  function atualizarElevador(tr, dt) {
+    tr.t += dt;
+    const k = tr.dur > 0 ? Math.min(tr.t / tr.dur, 1) : 1;
+    let andando = false;
+    // Ida: aquece o destino, um passo por quadro (o render, só no escuro).
+    if (tr.fase !== "abrir") avancarPreparo(tr.etapa === "partir" && tr.avisou && (reducedMotion || tr.t >= tr.dur - ELEVADOR_ESCURO));
+    // Portas abrindo (seguem abrindo enquanto o jogador já anda).
+    if (tr.porta != null) {
+      tr.porta += dt;
+      const kp = reducedMotion ? 1 : Math.min(tr.porta / ELEVADOR_PORTA, 1);
+      interior.abrirElevador?.(kp);
+      if (kp >= 1) tr.porta = null;
+    }
+    if (tr.etapa === "fechar") interior.abrirElevador?.(1 - k);
+    else if (tr.etapa === "sair" && tr.saida) andando = andarNaSaida(tr);
+    else if (tr.etapa === "entrar" || tr.etapa === "sair") {
+      player.root.position.lerpVectors(tr.de, tr.ate, k);
+      andando = k < 1;
+      if (andando) velAuto = tr.de.distanceTo(tr.ate) / tr.dur;
+    } else if (tr.etapa === "virar") {
+      player.root.rotation.y = tr.rot0 + (tr.rot1 - tr.rot0) * k * k * (3 - 2 * k);
+      // Passinhos no lugar enquanto gira.
+      andando = k < 1;
+      if (andando) velAuto = 0.9;
+    } else if (tr.etapa === "partir") {
+      contarAndares(tr, tr.t / (tr.durPartir + tr.durChegar));
+      // Ritmo dos quadros antes da troca (ms): a chegada espera voltar a ele.
+      const agora = performance.now();
+      if (tr.quadroAnt != null) (tr.ritmos ??= []).push(agora - tr.quadroAnt);
+      tr.quadroAnt = agora;
+      // Câmera sobe (ou desce) acelerando; a tela escurece no fim.
+      if (!reducedMotion) deslizeElevador = tr.sentido * ELEVADOR_DESLIZE * easeIn(k);
+      if (!tr.avisou && (reducedMotion || tr.t >= tr.dur - ELEVADOR_ESCURO - ELEVADOR_ESCURECER)) {
+        tr.avisou = true;
+        avisarElevador(tr, "fechar");
+      }
+    } else if (tr.etapa === "chegar") {
+      // A tela só clareia quando a cena nova já roda no ritmo de antes (os
+      // primeiros quadros sobem texturas e shaders): até 1 s no escuro.
+      if (!tr.avisou) {
+        // Termina o quadro anterior na GPU antes de medir: sem isso, os
+        // primeiros quadros "voam" com a fila da GPU cheia e o pagamento
+        // vem depois, já com a tela clara.
+        sincronizarGpu();
+        const agora = performance.now();
+        // Ritmo de antes: a mediana dos quadros da partida (o mínimo enganava:
+        // com a fila da GPU, um quadro sai "de graça" de vez em quando).
+        if (tr.ritmo == null) {
+          const r = (tr.ritmos ?? []).sort((a, b) => a - b);
+          tr.ritmo = r.length ? r[r.length >> 1] : 25;
+        }
+        const liso = agora - tr.quadroAnt < Math.max(40, 1.6 * tr.ritmo);
+        tr.quadroAnt = agora;
+        tr.inicioEspera ??= agora;
+        if (!liso && agora - tr.inicioEspera < 1000) {
+          tr.t = 0;
+          return false;
+        }
+        tr.t = 0;
+        tr.avisou = true;
+        avisarElevador(tr, "abrir");
+        if (reducedMotion) interior.displayElevador?.(rotuloDoNumero(tr.ateAndar), 0);
+      }
+      contarAndares(tr, (tr.durPartir + tr.t) / (tr.durPartir + tr.dur));
+      // Câmera chega do sentido oposto, freando até a posição normal.
+      deslizeElevador = reducedMotion ? 0 : -tr.sentido * ELEVADOR_DESLIZE * (1 - easeOut(k));
+    }
+    if (k < 1) return andando;
+    // De frente para a porta na cabine; saindo, olhando para a sala.
+    if ((tr.etapa === "virar" && interior.cabine) || tr.etapa === "sair") face(interior.chegada.dir);
+    if (tr.etapa === "partir") {
+      // No escuro, a troca espera o destino aquecido (até PREPARO_ESPERA_MAX).
+      if (preparo && !preparo.pronto && tr.t - tr.dur < PREPARO_ESPERA_MAX) return andando;
+      // No escuro: troca de cena; a câmera já começa do lado oposto.
+      trocarDeLugar();
+      deslizeElevador = reducedMotion ? 0 : -tr.sentido * ELEVADOR_DESLIZE;
+      tr.fase = "abrir";
+      tr.etapas = reducedMotion ? ELEVADOR_VOLTA_RAPIDA : ELEVADOR_VOLTA;
+      tr.i = -1;
+    }
+    if (tr.etapa === "chegar") deslizeElevador = 0;
+    proximaEtapa(tr);
+    return andando;
+  }
+
+  // Portas do elevador fechando atrás de quem saiu (de uma vez, se `ja`).
+  function fecharPortaAtras(ja = false) {
+    const pf = portaFechando;
+    if (!pf) return;
+    if (ja) pf.t = ELEVADOR_FECHA_ATRAS;
+    const k = Math.min(pf.t / ELEVADOR_FECHA_ATRAS, 1);
+    pf.interior.abrirElevador?.(1 - k);
+    if (k >= 1) {
+      pf.interior.sinalElevador?.(null);
+      portaFechando = null;
+    }
   }
 
   // No escuro (íris ou portas do elevador fechadas): troca a cena, põe o
   // jogador no batente do outro lado e prepara a caminhada de chegada.
   function trocarDeLugar() {
     const tr = transicao;
+    // Quem "olha para o jogador" (o time na Galeria) para de segui-lo ao sair.
+    interior?.setJogador?.(null);
     if (tr.para === "vila") {
       local = "vila";
       interior = null;
@@ -1389,42 +2400,52 @@ export function createVila(host, options) {
       tr.ate = tileToWorld(player.x, player.y);
       face("down");
     } else {
+      fecharPortaAtras(true);
       interior?.abrirElevador?.(0);
+      interior?.sinalElevador?.(null);
       interior = obterInterior(tr.para);
       local = tr.para;
+      preparo = null;
+      aquecidos.add(interior);
       guardarSoRecentes(tr.para);
       interior.scene.add(player.root);
+      interior.setJogador?.(player.root.position);
       // Da rua, entra pela porta do térreo; de elevador, sai dele.
       const c = tr.modo === "porta" && interior.entradaRua ? interior.entradaRua : interior.chegada;
       const de = atrasDe(c);
       player.x = c.x;
       player.y = c.y;
-      tr.de = interior.tileToWorld(de.x, de.y);
       tr.ate = interior.tileToWorld(c.x, c.y);
-      if (tr.modo === "elevador") interior.abrirElevador?.(1);
-      else interior.abrirPorta(1);
+      if (tr.modo === "elevador") {
+        // Chega dentro da cabine, de frente, com as portas fechadas.
+        tr.de = interior.cabine ? interior.cabine.clone() : interior.tileToWorld(de.x, de.y);
+        interior.abrirElevador?.(0);
+      } else {
+        tr.de = interior.tileToWorld(de.x, de.y);
+        interior.abrirPorta(1);
+      }
       face(c.dir);
     }
     player.root.position.copy(tr.de);
-    camTarget.copy(tr.ate);
+    // De elevador, a câmera começa perto do jogador (ainda na cabine).
+    camTarget.copy(tr.modo === "elevador" ? tr.de : tr.ate);
     snapCamera = true;
     lastFacingKey = "";
     onLocal({ local });
+    // De elevador, a tela clareia no primeiro quadro de "chegar".
+    if (tr.modo === "elevador") return;
     onTransicao({ fase: "abrir", para: tr.para, modo: tr.modo, rotulo: rotuloDe(tr.para) });
   }
 
   // Avança a transição; true enquanto o jogador anda sozinho (anima o passo).
   function atualizarTransicao(dt) {
     const tr = transicao;
-    const T = reducedMotion ? TRANSICAO_RAPIDA : tr.modo === "elevador" ? TRANSICAO_ELEVADOR : TRANSICAO;
+    if (tr.modo === "elevador") return atualizarElevador(tr, dt);
+    const T = reducedMotion ? TRANSICAO_RAPIDA : TRANSICAO;
     tr.t += dt;
+    // O passo acompanha a caminhada até a porta (e da porta para dentro).
+    velAuto = tr.de.distanceTo(tr.ate) / (tr.fase === "fechar" ? T.fechar : T.abrir);
     if (tr.fase === "fechar") {
-      // O elevador abre primeiro; o jogador entra e as portas fecham.
-      if (tr.modo === "elevador" && noPredio()) {
-        const kAbre = Math.min(tr.t / (T.fechar * 0.4), 1);
-        const kFecha = Math.max(0, (tr.t - T.fechar) / (T.escuro * 0.5));
-        interior.abrirElevador?.(Math.max(0, Math.min(kAbre, 1 - kFecha)));
-      }
       const k = Math.min(tr.t / T.fechar, 1);
       player.root.position.lerpVectors(tr.de, tr.ate, k);
       if (tr.t >= T.fechar + T.escuro) {
@@ -1436,13 +2457,11 @@ export function createVila(host, options) {
     }
     const k = Math.min(tr.t / T.abrir, 1);
     player.root.position.lerpVectors(tr.de, tr.ate, k);
-    // A porta (ou o elevador) fecha atrás de quem chega.
-    if (noPredio()) {
-      if (tr.modo === "elevador") interior.abrirElevador?.(1 - k);
-      else interior.abrirPorta(1 - k);
-    }
+    // A porta fecha atrás de quem chega.
+    if (noPredio()) interior.abrirPorta(1 - k);
     if (k >= 1) {
       transicao = null;
+      velAuto = 0;
       reportFacing();
       return false;
     }
@@ -1775,9 +2794,16 @@ export function createVila(host, options) {
       player.path = [];
       player.pending = null;
       if (!held.includes(dir)) held.push(dir);
-      if (!player.move && player.dir !== dir && !paused && !transicao && !foco) {
-        face(dir);
-        player.turnLock = TURN_LOCK;
+      if (!player.move && !paused && !transicao && !foco) {
+        if (player.dir !== dir) {
+          face(dir);
+          player.turnLock = TURN_LOCK;
+        } else {
+          // Já de frente: o toque vale um passo mesmo se a tecla subir antes
+          // do próximo quadro (PC lento: um toque curto se perdia, e o passo
+          // para o elevador/porta não acontecia).
+          player.tap = dir;
+        }
       }
     },
     release(dir) {
@@ -1786,6 +2812,7 @@ export function createVila(host, options) {
     },
     releaseAll() {
       held.length = 0;
+      player.tap = null;
       player.run = false;
     },
     step(dir) {
@@ -1795,12 +2822,25 @@ export function createVila(host, options) {
     setRun(on) {
       player.run = on;
     },
+    // Bicicleta (tecla B / botão): sobe ou desce. Devolve se ficou montado.
+    setBicicletaLiberada(on) {
+      bikeLiberada = on;
+      if (!on) desmontar();
+    },
+    toggleBicicleta() {
+      if (bike.on) desmontar();
+      else montar();
+      return bike.on;
+    },
     interact() {
       if (!paused && !player.move && !cutscene.active && !transicao && !foco) interact();
     },
     setPaused(p) {
       paused = p;
-      if (p) held.length = 0;
+      if (p) {
+        held.length = 0;
+        player.tap = null;
+      }
     },
     // Nível gráfico em uso agora (pode ter descido sozinho).
     get quality() {
@@ -1861,6 +2901,23 @@ export function createVila(host, options) {
     // Modo vitrine (tela de título): câmera afastada sobrevoando a vila.
     setAttract(on) {
       attract = on;
+    },
+    // Troca o boneco do jogador (tela de escolha de personagem).
+    setJogador(arquivo) {
+      carregarJogador(arquivo);
+      // Boneco novo: refaz o preparo (o que já subiu sai rápido do cache).
+      preparoVila = null;
+      prepararVila();
+    },
+    // Promessa do preparo da Vila (cargas + shaders + texturas perto do
+    // jogador); resolve na hora se já estiver pronto.
+    preparar() {
+      return prepararVila();
+    },
+    // Tela de carregamento por cima do jogo: enquanto ligada, a Vila não é
+    // desenhada (o preparo anda mais rápido) e o preparo inclui os prédios.
+    setCarregando(on) {
+      capa = on;
     },
     // Galeria da Equipe: onde o jogador está, troca do quadro em close (setas
     // do painel), fim do close e saída pela interface.
@@ -2027,11 +3084,20 @@ export function createVila(host, options) {
 
     // Movimento em grade.
     if (player.turnLock > 0) player.turnLock -= dt;
+    let yawCurva = null;
+    // Resto de curva desfeita (bicicleta): some em ~0,15 s.
+    if (bike.desvio.lengthSq()) {
+      bike.desvio.multiplyScalar(Math.exp(-dt * 20));
+      if (bike.desvio.lengthSq() < 1e-7) bike.desvio.set(0, 0, 0);
+      if (!player.move && !transicao) player.root.position.copy(paraMundo(player.x, player.y)).add(bike.desvio);
+    }
     if (player.move) {
       const m = player.move;
-      m.t += dt / m.dur;
+      // Montado, o passo segue o embalo (mais lento na largada).
+      m.t += (dt * (bike.on ? ritmoBike() : 1)) / m.dur;
+      if (m.saida === undefined && m.t >= 0.5) m.saida = planejarCurva(m);
       const k = Math.min(m.t, 1);
-      player.root.position.lerpVectors(m.from, m.to, k);
+      yawCurva = posicionarPasso(m);
       // Sem a clip `andando` (bonequinho provisório), balanço procedural.
       if (player.body && !reducedMotion && !actions?.andando) {
         player.body.position.y = Math.abs(Math.sin(k * Math.PI)) * 0.06;
@@ -2039,6 +3105,7 @@ export function createVila(host, options) {
       }
       if (m.t >= 1) {
         player.move = null;
+        if (bike.on) passoAcabou = { sobra: (m.t - 1) * m.dur, saida: m.saida };
         if (!noPredio() && !tryFindOcarina(player.x, player.y)) tryColeta(player.x, player.y);
         if (player.body) {
           player.body.position.y = 0;
@@ -2047,9 +3114,13 @@ export function createVila(host, options) {
         reportFacing();
       }
     }
+    const passoAntes = player.move;
     if (!player.move && !paused && !cutscene.active && !transicao && !foco) {
-      const want = held[held.length - 1];
-      if (want && player.turnLock <= 0) tryStep(want);
+      const want = held[held.length - 1] ?? player.tap;
+      if (want && player.turnLock <= 0) {
+        player.tap = null;
+        tryStep(want);
+      }
       else if (!want && player.path.length) {
         const dir = player.path.shift();
         if (!tryStep(dir)) player.path = [];
@@ -2065,6 +3136,11 @@ export function createVila(host, options) {
         }
       }
     }
+    // Passo emendado neste quadro: já anda o tempo herdado (e o arco).
+    if (player.move && player.move !== passoAntes) yawCurva = posicionarPasso(player.move);
+    // Não emendou: se vinha numa curva combinada, o resto dela vira desvio.
+    if (passoAcabou?.saida) bike.desvio.subVectors(player.root.position, paraMundo(player.x, player.y));
+    passoAcabou = null;
     if (!player.move && !held.length && !player.path.length) {
       player.idle += dt;
       // Sentar para programar vira o jogador para a câmera (para baixo): não
@@ -2084,17 +3160,28 @@ export function createVila(host, options) {
     }
     // Entrando ou saindo da galeria, o jogador anda sozinho até a porta.
     const andandoSozinho = transicao ? atualizarTransicao(dt) : false;
+    if (portaFechando) {
+      portaFechando.t += dt;
+      fecharPortaAtras();
+    }
+    // Prédio, elevador, porta ou cena: desce da bicicleta.
+    if (bike.on && (noPredio() || cutscene.active || transicao)) desmontar();
     const emPasso = Boolean(player.move) || andandoSozinho;
     if (emPasso && !walking) startWalk();
     else if (!emPasso && walking) stopWalk();
-    if (walking && actions?.andando) actions.andando.timeScale = walkTimeScale();
+    // Yaw visual, roll e (montado) embalo, guidão e pesos das clips.
+    const omega = giroVisual(dt, bike.on ? yawCurva : null);
+    if (bike.on) pilotarBike(dt, omega);
+    else if (walking && actions?.andando) actions.andando.timeScale = walkTimeScale();
     if (mixer) mixer.update(dt);
+    if (bike.on) girarBike();
     // Na galeria, a Vila fica parada: só o relógio anda.
     if (noPredio()) {
       tickMuseu(dt);
       return;
     }
     pedro?.update(dt);
+    vinicius?.update(dt);
     questMarker.update(t, dt);
     ocarina?.update(t, dt);
     // Perto do Pedro: o painel da quest aparece no canto da tela.
@@ -2202,6 +3289,8 @@ export function createVila(host, options) {
     camera.lookAt(camTarget.x, camTarget.y + 0.4, camTarget.z);
     // Sol, frustum de sombra e névoa acompanham a câmera; render (com ou sem
     // pós-processamento) fica no módulo de iluminação.
+    avancarPreparoVila();
+    if (capa) return;
     lighting.update(camTarget, camFar);
     lighting.render(ts);
   }
@@ -2229,30 +3318,45 @@ export function createVila(host, options) {
     else {
       camTarget.lerp(player.root.position, reducedMotion ? 1 : 1 - Math.exp(-dt * 6));
       vLook.set(camTarget.x, camTarget.y + 0.4, camTarget.z);
-      vPos.copy(camTarget).addScaledVector(CAM_OFFSET, (camera.userData.far || 1) * MUSEU_ZOOM * userZoom);
+      // Dolly do elevador: chega perto com o jogador na cabine e volta. Na
+      // saída, recua numa curva suave (começa e termina parada) até o "seguir".
+      if (dollyVolta && !reducedMotion) {
+        dollyVolta.t += dt;
+        const k = Math.min(dollyVolta.t / dollyVolta.dur, 1);
+        zoomElevador = dollyVolta.de + (zoomElevadorAlvo - dollyVolta.de) * k * k * (3 - 2 * k);
+        if (k >= 1) dollyVolta = null;
+      } else zoomElevador = reducedMotion ? 1 : zoomElevador + (zoomElevadorAlvo - zoomElevador) * (1 - Math.exp(-dt * 2.4));
+      vPos.copy(camTarget).addScaledVector(CAM_OFFSET, (camera.userData.far || 1) * MUSEU_ZOOM * userZoom * zoomElevador);
     }
     if (voltaDoFoco > 0) voltaDoFoco -= dt;
     const suave = Boolean(pose) || voltaDoFoco > 0;
     const r = snapCamera || reducedMotion ? 1 : 1 - Math.exp(-dt * (suave ? 3 : 30));
     snapCamera = false;
-    camera.position.lerp(vPos, r);
+    camPos.lerp(vPos, r);
     camLook.lerp(vLook, r);
-    camera.lookAt(camLook);
+    // Viagem de elevador: a câmera desliza na vertical (posição e alvo juntos).
+    camera.position.copy(camPos);
+    camera.position.y += deslizeElevador;
+    vLook.copy(camLook);
+    vLook.y += deslizeElevador;
+    camera.lookAt(vLook);
     renderer.render(interior.scene, camera);
   }
 
   renderer.setAnimationLoop(tick);
-  window.__vilaDbg = { get local() { return local; }, get interior() { return interior; }, player, occupied, passable, pedro, walkers, map, epocas, get paused() { return paused; }, get cut() { return cutscene.active; }, renderer, camera, interiores }; // TEMP-HOOK
+  window.__vilaDbg = { get local() { return local; }, get interior() { return interior; }, player, occupied, passable, pedro, walkers, map, epocas, get paused() { return paused; }, get cut() { return cutscene.active; }, bike, liberarBike() { bikeLiberada = true; } }; // TEMP-HOOK
   reportFacing();
+  prepararVila();
   onReady();
 
   function dispose() {
     disposed = true;
-    // Todos os interiores visitados (não só o atual): o museu descarta os
-    // próprios recursos; os escritórios saem da cena e o `track` abaixo libera.
+    // Os interiores guardados (o atual e o anterior, guardarSoRecentes): cada
+    // um descarta os próprios recursos (o escritório tem `track` próprio).
     for (const i of interiores.values()) descartarInterior(i);
     interiores.clear();
     pedro?.dispose();
+    vinicius?.dispose();
     ocarina?.dispose();
     for (const w of walkers) w.dispose();
     renderer.setAnimationLoop(null);

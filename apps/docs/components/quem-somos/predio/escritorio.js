@@ -116,8 +116,9 @@ export function planejar(andar) {
   const bloq = new Set();
   const lista = andar.zonas ?? [];
 
+  // `andar.semIlha`: o centro fica para o tema e todas as zonas vão às faixas.
   let resto = lista;
-  if (lista[0]?.pessoas.length === 1) {
+  if (!andar.semIlha && lista[0]?.pessoas.length === 1) {
     const z = lista[0];
     const p = tileToWorld(CX, ILHA_Y);
     estacoes.push({
@@ -1400,6 +1401,12 @@ export function createEscritorio({ andar, pal, track: trackExterno, lite = false
     falar() {},
     abrirPorta,
     abrirElevador: (k) => elevador.abrir(k),
+    // Viagem de elevador (vila-engine.js): onde o jogador para dentro da
+    // cabine e os sinais do display/lanterna ("chamando", "ding", null).
+    cabine: new THREE.Vector3(0, 0, ZN - elevador.dentro),
+    sinalElevador: (estado) => elevador.sinal(estado),
+    // Display acima da porta na viagem: o andar que passa e a seta do sentido.
+    displayElevador: (texto, sentido) => elevador.viagem(texto, sentido),
     update(t, dt) {
       for (const { e } of estacoes.values()) e.update(t, dt);
       fusao.atualizar();
