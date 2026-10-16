@@ -135,4 +135,19 @@ test.describe("layout de consumidor", () => {
     expect(m.textoRight, JSON.stringify(m)).toBeLessThanOrEqual(m.viewport);
     await expect(page.getByRole("table", { name: "Protocolos abertos em 2026" })).toBeVisible();
   });
+
+  test("CardTitle e AlertTitle longos têm entrelinha maior que a fonte (NEXT42-07)", async ({ page }) => {
+    await mountLayout(page, "titulos-longos");
+    const m = await page.evaluate(() =>
+      ["t-card", "t-alert"].map((id) => {
+        const el = document.getElementById(id);
+        const s = getComputedStyle(el);
+        return { id, fontSize: parseFloat(s.fontSize), lineHeight: parseFloat(s.lineHeight), height: el.getBoundingClientRect().height };
+      })
+    );
+    for (const t of m) {
+      expect(t.height / t.lineHeight, `${t.id} quebra linha: ${JSON.stringify(t)}`).toBeGreaterThanOrEqual(2);
+      expect(t.lineHeight / t.fontSize, `${t.id}: ${JSON.stringify(t)}`).toBeGreaterThanOrEqual(1.2);
+    }
+  });
 });
