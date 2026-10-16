@@ -12,9 +12,17 @@ O repositório do **Design System da SEMEC** (Secretaria Municipal de Economia d
 
 ## Fase atual
 
-O kit é **publicado no npm público** desde 17/09/2026 ([ADR-022](adr/0022-publicacao-npm-publico.md)), sob o nome `@semec/ds`; a versão publicada em 15/10/2026 é a **3.2.0** (ondas 2 e 3 da auditoria de 14/10/2026, aditiva); a 4.0.0, que remove o que a 3.1.0 e a 3.2.0 anunciaram como depreciado, está em preparação ([guia de migração](migracao-4.0.md)). A versão vigente está sempre em `packages/react/package.json` e no [CHANGELOG](../packages/react/CHANGELOG.md). O consumo é via `npm install @semec/ds` (subpath exports: `/react`, `/react/validacao`, `/skills`, `/lite/skills`, tokens CSS e preset Tailwind).
+O kit é **publicado no npm público** desde 17/09/2026 ([ADR-022](adr/0022-publicacao-npm-publico.md)), sob o nome `@semec/ds`. A 4.0.0 removeu o que a 3.1.0 e a 3.2.0 tinham anunciado como depreciado ([guia de migração](migracao-4.0.md)), e a 4.0.1 era a última publicada na bateria de testes de 16/10/2026. O consumo é via `npm install @semec/ds` (subpath exports: `/react`, `/react/validacao`, `/skills`, `/lite/skills`, tokens CSS e preset Tailwind).
 
-Não há Storybook nem regressão visual. O kit tem testes com Vitest + Testing Library + axe (`npm test`, em `packages/react/test/`), e a CI ([ci.yml](../.github/workflows/ci.yml)) roda `lint`, `typecheck`, `test` (com zod 3 e 4), `build` (com conferência de deriva dos artefatos de agentes), `changeset` e o `gate` de qualidade (`npm run gate`: tokens, exports, smoke de acessibilidade com axe e estados abertos em Chromium). O site é export estático e a publicação é via GitHub Pages ([workflow](../.github/workflows/deploy-pages.yml)).
+A versão não é escrita à mão neste documento. O bloco abaixo é gerado do `package.json` e dos changesets pendentes em `.changeset/` pelo `build-artifacts.mjs`, que roda no `npm run build:ds`. O histórico fica no [CHANGELOG](../packages/react/CHANGELOG.md), e a versão publicada de fato é a do npm (`npm view @semec/ds version`).
+
+<!-- ds:release:start -->
+Versão no repositório (`packages/react/package.json`): **4.0.1**. Há 4 changesets pendentes (minor): a próxima versão prevista é a **4.1.0**, e até ela sair o npm tem só a 4.0.1. Os artefatos para IA (llms.txt, manifest.json, .md por componente e skills) marcam esse conteúdo como "não publicado".
+<!-- ds:release:end -->
+
+O site de documentação é publicado a cada push no `main`, antes do release no npm. Enquanto houver changesets pendentes, o `llms.txt`, o `manifest.json` (campo `unreleased`), os `.md` por componente e as skills avisam que esse conteúdo ainda não está no npm (TST-15).
+
+Não há Storybook. O kit tem testes com Vitest + Testing Library + axe (`npm test`, em `packages/react/test/`) e regressão visual com Playwright (`toHaveScreenshot`, em `tests/visual/`, `npm run test:visual`), com baselines Linux geradas num contêiner Docker com a imagem oficial do Playwright. A CI ([ci.yml](../.github/workflows/ci.yml)) roda `lint`, `typecheck`, `test` (com zod 3 e 4), `build` (com conferência de deriva dos artefatos de agentes), `changeset` e o `gate` de qualidade (`npm run gate`: marcadores de conflito, tokens, exports, smoke de acessibilidade com axe e estados abertos em Chromium). O site é export estático e a publicação é via GitHub Pages ([workflow](../.github/workflows/deploy-pages.yml)).
 
 ## O que este repositório não é
 
