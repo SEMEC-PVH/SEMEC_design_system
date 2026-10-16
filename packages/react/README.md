@@ -386,6 +386,7 @@ Com `axe-core` direto (ou `jest-axe`/`vitest-axe`), o equivalente é passar `{ r
 
 ## Limitações conhecidas
 
+- **Windows: caminho longo no `next build`.** Com o projeto numa pasta funda, o Turbopack pode falhar com `exceeds max length of filesystem` em `.next/server/chunks/ssr` (limite de 260 caracteres do Windows). Não é do kit: mova o projeto para um caminho curto (ex.: `C:\dev\app`), habilite caminhos longos no Windows (`LongPathsEnabled`) ou use `next build --webpack`.
 - **3.0 e 3.1: bundle único e sem fronteira RSC.** Importar uma peça carregava o kit inteiro e importar `@semec/ds/react` num Server Component quebrava. Corrigido na 3.2 (saída por módulo, `"use client"` por componente e subpaths `@semec/ds/react/*`; ver o passo 5 de [Comece aqui](#comece-aqui) e [Subpath exports](#subpath-exports)).
 
 ## Migração para a 4.0 e depreciações
