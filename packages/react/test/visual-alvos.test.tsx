@@ -168,3 +168,75 @@ describe("TST-05: ScrollArea alcançável pelo teclado", () => {
     expect(vp()).toHaveAttribute("tabindex", "0");
   });
 });
+
+describe("TST-08: NavigationMenuLink estilizado por padrão", () => {
+  it("link do painel com alvo de 44px, respiro lateral e anel de foco", async () => {
+    render(
+      <NavigationMenu>
+        <NavigationMenuList>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <NavigationMenuLink href="/iptu">IPTU</NavigationMenuLink>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <NavigationMenuLink href="/contato" className={navigationMenuTriggerStyle()}>
+              Contato
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    );
+    await userEvent.setup().click(screen.getByRole("button", { name: "Serviços" }));
+    const iptu = classes(screen.getByRole("link", { name: "IPTU" }));
+    expect(iptu).toEqual(
+      expect.arrayContaining(["min-h-11", "px-4", "focus-visible:ring-2", "focus-visible:ring-ring"])
+    );
+
+    // Quem já usa navigationMenuTriggerStyle() mantém o visual do gatilho.
+    const contato = classes(screen.getByRole("link", { name: "Contato" }));
+    expect(contato).toEqual(expect.arrayContaining(["inline-flex", "h-11", "w-max", "bg-background"]));
+    expect(contato).not.toContain("flex");
+  });
+});
+
+describe("TST-09: itens do DropdownMenu com 44px", () => {
+  it("Item, CheckboxItem, RadioItem e SubTrigger têm min-h-11", async () => {
+    render(
+      <DropdownMenu>
+        <DropdownMenuTrigger>Ações</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem>Editar</DropdownMenuItem>
+          <DropdownMenuCheckboxItem checked>Mostrar arquivados</DropdownMenuCheckboxItem>
+          <DropdownMenuRadioGroup value="a">
+            <DropdownMenuRadioItem value="a">Ordem alfabética</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>Mover para</DropdownMenuSubTrigger>
+          </DropdownMenuSub>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+    await userEvent.setup().click(screen.getByRole("button", { name: "Ações" }));
+    const menu = screen.getByRole("menu");
+    for (const item of [
+      within(menu).getByRole("menuitem", { name: "Editar" }),
+      within(menu).getByRole("menuitemcheckbox", { name: "Mostrar arquivados" }),
+      within(menu).getByRole("menuitemradio", { name: "Ordem alfabética" }),
+      within(menu).getByRole("menuitem", { name: "Mover para" }),
+    ]) {
+      expect(item).toHaveClass("min-h-11");
+    }
+  });
+});
+
+describe("TST-22: polegar do Slider com alvo ≥ 44×44", () => {
+  it("o ::after parte da caixa de padding de 16px e cresce 14px por lado", () => {
+    render(<Slider defaultValue={[5]} max={10} aria-label="Raio" />);
+    const thumb = classes(screen.getByRole("slider", { name: "Raio" }));
+    // h-5 (20px) − borda de 2px × 2 = 16px de caixa de padding.
+    expect(thumb).toEqual(expect.arrayContaining(["h-5", "w-5", "border-2", "after:-inset-3.5"]));
+    expect(16 + 2 * 3.5 * 4).toBeGreaterThanOrEqual(44);
+  });
+});
