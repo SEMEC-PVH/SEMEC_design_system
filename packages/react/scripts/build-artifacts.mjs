@@ -238,7 +238,7 @@ function skillComponentList() {
   for (const { cat, items } of componentsByCategory()) {
     out.push(`### ${cat.label} (${items.length})`, "");
     for (const c of items) {
-      out.push(`- \`${dsExportName(c)}\` (\`${c.code}\`) — ${c.desc}`);
+      out.push(`- \`${dsExportName(c)}\` (\`${c.code}\`, \`components/${c.slug}.md\`) — ${c.desc}`);
     }
     out.push("");
   }

@@ -45,7 +45,7 @@ export default defineConfig({
 });
 ```
 
-O CSS global é o `src/index.css` (importado em `src/main.tsx`). **Troque o conteúdo inteiro** pelas linhas do kit (abaixo) e apague o `import "./App.css"` do `App.tsx`: os estilos do template ficam fora de camada e vencem os do kit.
+O CSS global é o `src/index.css` (importado em `src/main.tsx`). **Troque o conteúdo inteiro** pelas linhas do kit (abaixo) e apague o `import "./App.css"` do `App.tsx`: os estilos do template ficam fora de camada e vencem os do kit. No `index.html`, troque `<html lang="en">` por `<html lang="pt-BR">` (o template do Vite gera em inglês, e o leitor de tela lê o português com a pronúncia errada).
 
 **Next.js** (`create-next-app` com Tailwind): o Tailwind v4 já vem configurado. O `create-next-app` 16.4 gera o plugin `@tailwindcss/turbopack`, sem `postcss.config.mjs`; ele funciona igual ao `@tailwindcss/postcss` dos templates anteriores, e as linhas do kit são as mesmas nos dois. Sem Tailwind no projeto: `npm install -D tailwindcss @tailwindcss/postcss` e um `postcss.config.mjs` com `export default { plugins: { "@tailwindcss/postcss": {} } };`.
 

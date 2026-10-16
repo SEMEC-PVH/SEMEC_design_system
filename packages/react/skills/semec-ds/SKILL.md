@@ -36,7 +36,7 @@ npm install react-hook-form @hookform/resolvers zod
 
 **Tailwind v4 no bundler:**
 
-- **Vite:** `npm install -D tailwindcss @tailwindcss/vite`, `plugins: [react(), tailwindcss()]` no `vite.config.ts` (`import tailwindcss from "@tailwindcss/vite"`). O CSS global é o `src/index.css`: troque o conteúdo do template pelas linhas abaixo e apague o `import "./App.css"`.
+- **Vite:** `npm install -D tailwindcss @tailwindcss/vite`, `plugins: [react(), tailwindcss()]` no `vite.config.ts` (`import tailwindcss from "@tailwindcss/vite"`). O CSS global é o `src/index.css`: troque o conteúdo do template pelas linhas abaixo e apague o `import "./App.css"`. No `index.html`, troque `<html lang="en">` por `<html lang="pt-BR">`.
 - **Next.js (`create-next-app`):** o Tailwind já vem (`@tailwindcss/postcss`, ou `@tailwindcss/turbopack` sem `postcss.config` no `create-next-app` 16.4; os dois funcionam igual). Em `app/globals.css`, **apague** o que o template gerou (`:root`, `@theme inline` com `--font-sans: var(--font-geist-sans)`, `@media (prefers-color-scheme: dark)`, `body { font-family: Arial… }`): fora de camada, eles vencem o `@layer base` do `tokens.css` e o app fica com Arial e as cores do template. Em `app/layout.tsx`, apague o `next/font/google` Geist e as classes `geist*.variable` do `<body>`, e use `<html lang="pt-BR">`.
 
 No CSS global do app (não via `import` em JS):
@@ -199,7 +199,7 @@ Com React Hook Form, o campo R$ está no exemplo canônico (seção "Padrão de 
 
 ## Componentes ({{ds:component-count}})
 
-Lista gerada do manifest (export principal, `code` e descrição). Detalhes, variantes e exemplo de uso de cada um: `components/<slug>.md` ou `manifest.json`.
+Lista gerada do manifest (export principal, `code`, arquivo `.md` e descrição). Detalhes, variantes e exemplo de uso de cada um: o `components/<slug>.md` indicado em cada linha (o slug é em português, ex.: `DataTable` → `components/tabela-de-dados.md`) ou `manifest.json`.
 
 <!-- ds:component-list -->
 
@@ -369,7 +369,7 @@ export function PainelDeProtocolos() {
 ## Workflow IA
 
 1. Leia `llms.txt` → escolha o componente pelo `code` (lista em "Componentes", acima)
-2. Leia `components/<slug>.md` → parta do exemplo de `usage` e **importe** o componente; nunca o reimplemente
+2. Leia `components/<slug>.md` (o arquivo citado na lista de componentes, não o `code`) → parta do exemplo de `usage` e **importe** o componente; nunca o reimplemente
 3. Monte a tela pelo esqueleto de "Padrões de tela"
 4. Aplique tokens L1 pelos utilitários da tabela "Do token ao utilitário" — nunca hex solto
 5. Valide variantes em `manifest.json` e confira teclado e contraste (seção abaixo)
