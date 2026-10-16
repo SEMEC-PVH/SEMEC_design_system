@@ -1,0 +1,316 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it } from "vitest";
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+  Heading,
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+  ScrollArea,
+  Slider,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  Toggle,
+} from "../src/index";
+
+/**
+ * Onda 1 da bateria de 16/10/2026 (TST-03, 05, 08, 09, 16, 21, 22, 26, 29).
+ * O jsdom não faz layout: os casos travam a classe que resolve o defeito e,
+ * no Toggle, calculam o contraste a partir dos valores do `tokens.css`.
+ */
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const tokensCss = fs.readFileSync(path.resolve(here, "../tokens.css"), "utf8");
+const classes = (el: Element | null) => (el?.getAttribute("class") ?? "").split(/\s+/);
+
+/** Resolve `--nome` seguindo `var(--outro)` até um hex (primeira definição = tema claro). */
+function tokenHex(name: string): string {
+  const m = new RegExp(`${name.replace(/[-]/g, "\\-")}\\s*:\\s*([^;]+);`).exec(tokensCss);
+  if (!m) throw new Error(`token ${name} não encontrado`);
+  const value = m[1].trim();
+  const ref = /^var\((--[\w-]+)\)$/.exec(value);
+  if (ref) return tokenHex(ref[1]);
+  if (!/^#[0-9a-f]{6}$/i.test(value)) throw new Error(`${name} = ${value} não é hex`);
+  return value;
+}
+
+function luminance(hex: string) {
+  const [r, g, b] = [1, 3, 5].map((i) => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function contrast(a: string, b: string) {
+  const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p);
+  return (x + 0.05) / (y + 0.05);
+}
+
+/** Cor do utilitário `prefixo<cor>` com o modificador dado (ex.: `data-[state=on]:bg-`). */
+function utilColor(list: string[], prefix: string) {
+  const cls = list.find((c) => c.startsWith(prefix) && !c.slice(prefix.length).includes(":"));
+  if (!cls) return undefined;
+  return tokenHex(`--color-${cls.slice(prefix.length)}`);
+}
+
+describe("TST-03: Toggle ligado distinguível do solto", () => {
+  const superficies = { background: tokenHex("--bg"), surface: tokenHex("--surface") };
+
+  it.each(["default", "outline"] as const)(
+    "variante %s: contorno primary ≥ 3:1 contra a superfície e texto ≥ 4,5:1 no fundo ligado",
+    (variant) => {
+      render(
+        <Toggle aria-label="Filtrar pendentes" variant={variant} defaultPressed>
+          Pendentes
+        </Toggle>
+      );
+      const botao = screen.getByRole("button", { name: "Filtrar pendentes" });
+      expect(botao).toHaveAttribute("data-state", "on");
+      const list = classes(botao);
+
+      const fundo = utilColor(list, "data-[state=on]:bg-");
+      const borda = utilColor(list, "data-[state=on]:border-");
+      const texto = utilColor(list, "data-[state=on]:text-");
+      expect(fundo, "fundo do estado ligado").toBeDefined();
+      expect(borda, "borda do estado ligado").toBeDefined();
+      expect(texto, "texto do estado ligado").toBeDefined();
+
+      for (const [nome, sup] of Object.entries(superficies)) {
+        expect(contrast(borda!, sup), `borda × ${nome}`).toBeGreaterThanOrEqual(3);
+      }
+      expect(contrast(borda!, fundo!), "borda × fundo ligado").toBeGreaterThanOrEqual(3);
+      expect(contrast(texto!, fundo!), "texto × fundo ligado").toBeGreaterThanOrEqual(4.5);
+    }
+  );
+
+  it("outline: a borda solta (input) é próxima do primary, então o ligado ganha inset-ring primary", () => {
+    render(<Toggle aria-label="Negrito" variant="outline" defaultPressed />);
+    const list = classes(screen.getByRole("button", { name: "Negrito" }));
+    expect(contrast(tokenHex("--color-input"), tokenHex("--color-primary"))).toBeLessThan(3);
+    expect(list).toEqual(
+      expect.arrayContaining(["data-[state=on]:inset-ring", "data-[state=on]:inset-ring-primary"])
+    );
+  });
+
+  it("hover solto perceptível: borda border-strong (≥ 3:1) na variante default", () => {
+    render(<Toggle aria-label="Negrito" />);
+    const list = classes(screen.getByRole("button", { name: "Negrito" }));
+    const hover = utilColor(list, "hover:border-");
+    expect(hover).toBeDefined();
+    expect(contrast(hover!, tokenHex("--bg"))).toBeGreaterThanOrEqual(3);
+    expect(list).not.toContain("hover:bg-muted");
+  });
+});
+
+describe("TST-05: ScrollArea alcançável pelo teclado", () => {
+  it("com conteúdo focável a viewport não vira parada extra de Tab", () => {
+    render(
+      <ScrollArea className="h-24">
+        <a href="#a">Primeiro link</a>
+      </ScrollArea>
+    );
+    const viewport = screen.getByText("Primeiro link").closest("[data-radix-scroll-area-viewport]");
+    expect(viewport).not.toHaveAttribute("tabindex");
+  });
+
+  it("texto puro: Tab chega à viewport, que tem anel de foco visível", async () => {
+    render(
+      <ScrollArea className="h-24" viewportProps={{ "aria-label": "Termos de uso" }}>
+        <p>Texto longo</p>
+      </ScrollArea>
+    );
+    await userEvent.setup().tab();
+    const viewport = screen.getByText("Texto longo").closest("[data-radix-scroll-area-viewport]");
+    expect(viewport).toHaveFocus();
+    expect(viewport).toHaveAttribute("aria-label", "Termos de uso");
+    expect(classes(viewport)).toEqual(
+      expect.arrayContaining(["focus-visible:ring-2", "focus-visible:ring-inset", "focus-visible:ring-ring"])
+    );
+  });
+
+  it("focusable={false} desliga e focusable força mesmo com link dentro", () => {
+    const { rerender } = render(
+      <ScrollArea focusable={false}>
+        <p>Só texto</p>
+      </ScrollArea>
+    );
+    const vp = () => screen.getByText(/texto|link/i).closest("[data-radix-scroll-area-viewport]");
+    expect(vp()).not.toHaveAttribute("tabindex");
+    rerender(
+      <ScrollArea focusable>
+        <a href="#b">Um link</a>
+      </ScrollArea>
+    );
+    expect(vp()).toHaveAttribute("tabindex", "0");
+  });
+});
+
+describe("TST-08: NavigationMenuLink estilizado por padrão", () => {
+  it("link do painel com alvo de 44px, respiro lateral e anel de foco", async () => {
+    render(
+      <NavigationMenu>
+        <NavigationMenuList>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <NavigationMenuLink href="/iptu">IPTU</NavigationMenuLink>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <NavigationMenuLink href="/contato" className={navigationMenuTriggerStyle()}>
+              Contato
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    );
+    await userEvent.setup().click(screen.getByRole("button", { name: "Serviços" }));
+    const iptu = classes(screen.getByRole("link", { name: "IPTU" }));
+    expect(iptu).toEqual(
+      expect.arrayContaining(["min-h-11", "px-4", "focus-visible:ring-2", "focus-visible:ring-ring"])
+    );
+
+    // Quem já usa navigationMenuTriggerStyle() mantém o visual do gatilho.
+    const contato = classes(screen.getByRole("link", { name: "Contato" }));
+    expect(contato).toEqual(expect.arrayContaining(["inline-flex", "h-11", "w-max", "bg-background"]));
+    expect(contato).not.toContain("flex");
+  });
+});
+
+describe("TST-09: itens do DropdownMenu com 44px", () => {
+  it("Item, CheckboxItem, RadioItem e SubTrigger têm min-h-11", async () => {
+    render(
+      <DropdownMenu>
+        <DropdownMenuTrigger>Ações</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem>Editar</DropdownMenuItem>
+          <DropdownMenuCheckboxItem checked>Mostrar arquivados</DropdownMenuCheckboxItem>
+          <DropdownMenuRadioGroup value="a">
+            <DropdownMenuRadioItem value="a">Ordem alfabética</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>Mover para</DropdownMenuSubTrigger>
+          </DropdownMenuSub>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+    await userEvent.setup().click(screen.getByRole("button", { name: "Ações" }));
+    const menu = screen.getByRole("menu");
+    for (const item of [
+      within(menu).getByRole("menuitem", { name: "Editar" }),
+      within(menu).getByRole("menuitemcheckbox", { name: "Mostrar arquivados" }),
+      within(menu).getByRole("menuitemradio", { name: "Ordem alfabética" }),
+      within(menu).getByRole("menuitem", { name: "Mover para" }),
+    ]) {
+      expect(item).toHaveClass("min-h-11");
+    }
+  });
+});
+
+describe("TST-16: escala do Heading igual à do tokens.css", () => {
+  it("h1 = text-3xl (32px), h2 = text-2xl (24px), h3 = text-xl (20px)", () => {
+    render(
+      <>
+        <Heading level={1}>Página</Heading>
+        <Heading level={2}>Seção</Heading>
+        <Heading level={3}>Subtítulo</Heading>
+      </>
+    );
+    expect(screen.getByRole("heading", { level: 1 })).toHaveClass("text-3xl");
+    expect(screen.getByRole("heading", { level: 2 })).toHaveClass("text-2xl");
+    expect(screen.getByRole("heading", { level: 3 })).toHaveClass("text-xl");
+    expect(tokenValue("--pv-text-3xl")).toBe("2rem");
+  });
+});
+
+function tokenValue(name: string) {
+  return new RegExp(`${name}\\s*:\\s*([^;]+);`).exec(tokensCss)?.[1].split("/*")[0].trim();
+}
+
+describe("TST-21: Button com rótulo longo quebra em vez de rolar", () => {
+  it.each(["sm", "md", "lg"] as const)("size %s: sem whitespace-nowrap e com altura mínima", (size) => {
+    render(<Button size={size}>Emitir a segunda via do carnê do IPTU de todos os imóveis do contribuinte</Button>);
+    const list = classes(screen.getByRole("button"));
+    expect(list).not.toContain("whitespace-nowrap");
+    expect(list.some((c) => /^min-h-(9|11|12)$/.test(c))).toBe(true);
+    expect(list.some((c) => /^h-\d+$/.test(c))).toBe(false);
+    expect(list).toContain("text-balance");
+  });
+
+  it("o botão de ícone mantém 44×44 fixo", () => {
+    render(<Button size="icon" aria-label="Fechar" />);
+    expect(screen.getByRole("button", { name: "Fechar" })).toHaveClass("h-11", "w-11");
+  });
+});
+
+describe("TST-22: polegar do Slider com alvo ≥ 44×44", () => {
+  it("o ::after parte da caixa de padding de 16px e cresce 14px por lado", () => {
+    render(<Slider defaultValue={[5]} max={10} aria-label="Raio" />);
+    const thumb = classes(screen.getByRole("slider", { name: "Raio" }));
+    // h-5 (20px) − borda de 2px × 2 = 16px de caixa de padding.
+    expect(thumb).toEqual(expect.arrayContaining(["h-5", "w-5", "border-2", "after:-inset-3.5"]));
+    expect(16 + 2 * 3.5 * 4).toBeGreaterThanOrEqual(44);
+  });
+});
+
+describe("TST-26: Avatar com a foto quebrada", () => {
+  it("foto decorativa (alt vazio) não acrescenta nome ao fallback", () => {
+    const { container } = render(
+      <Avatar>
+        <AvatarImage src="/x.jpg" alt="" />
+        <AvatarFallback delayMs={0}>JS</AvatarFallback>
+      </Avatar>
+    );
+    expect(container.querySelector(".sr-only")).toBeNull();
+  });
+
+  it("aria-label do fallback tem prioridade sobre o alt da foto", () => {
+    const { container } = render(
+      <Avatar>
+        <AvatarImage src="/x.jpg" alt="João Silva" />
+        <AvatarFallback aria-label="Foto de João Silva">JS</AvatarFallback>
+      </Avatar>
+    );
+    expect(container.querySelector(".sr-only")).toBeNull();
+  });
+});
+
+describe("TST-29: TabsList não rola a página em 320px", () => {
+  it("a lista fica na largura do pai e rola dentro de si", () => {
+    render(
+      <Tabs defaultValue="a">
+        <TabsList>
+          <TabsTrigger value="a">Dados pessoais</TabsTrigger>
+          <TabsTrigger value="b">Documentos</TabsTrigger>
+        </TabsList>
+      </Tabs>
+    );
+    const list = classes(screen.getByRole("tablist"));
+    expect(list).toEqual(expect.arrayContaining(["max-w-full", "overflow-x-auto", "justify-center-safe"]));
+    expect(list).not.toContain("justify-center");
+  });
+});

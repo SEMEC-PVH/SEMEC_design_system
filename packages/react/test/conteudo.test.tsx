@@ -384,7 +384,7 @@ describe("Avatar", () => {
   // TST-F2-07: com a foto quebrada, o nome da pessoa (alt da AvatarImage) some
   // e o leitor de tela lê só "JS". O manifest promete "fallback automático
   // (iniciais)" e o exemplo não dá ao fallback um nome equivalente ao alt.
-  it.fails("TST-F2-07: com a foto quebrada, o avatar continua anunciando \"João Silva\"", async () => {
+  it("TST-F2-07: com a foto quebrada, o avatar continua anunciando \"João Silva\"", async () => {
     stubImagem(false);
     const { container } = render(
       <Avatar>
@@ -411,15 +411,15 @@ describe("Avatar", () => {
 describe("Heading", () => {
   it("level define o elemento (padrão h2) e size só o visual", () => {
     const { rerender } = render(<Heading>Dados do estudante</Heading>);
-    expect(screen.getByRole("heading", { level: 2 })).toHaveClass("text-xl");
+    expect(screen.getByRole("heading", { level: 2 })).toHaveClass("text-2xl");
     rerender(
       <Heading level={3} size={2}>
         Documentos
       </Heading>
     );
     const h = screen.getByRole("heading", { level: 3, name: "Documentos" });
-    expect(h).toHaveClass("text-xl");
-    expect(h).not.toHaveClass("text-lg");
+    expect(h).toHaveClass("text-2xl");
+    expect(h).not.toHaveClass("text-xl");
   });
 
   it("os seis níveis viram h1–h6 e o ref chega ao elemento", () => {
@@ -548,7 +548,7 @@ describe("ScrollArea", () => {
   // de 100px e 2096px de conteúdo, o axe acusa `scrollable-region-focusable`
   // (serious, WCAG 2.1.1). O jsdom não calcula rolagem, então o teste verifica a
   // causa: a viewport sem tabindex quando não há nada focável dentro.
-  it.fails("TST-F2-09: a viewport de texto puro entra no Tab (tabindex=0)", () => {
+  it("TST-F2-09: a viewport de texto puro entra no Tab (tabindex=0)", () => {
     render(
       <ScrollArea className="h-48">
         <p>Conteúdo longo aqui</p>
