@@ -1,5 +1,37 @@
 # @semec/ds
 
+## 4.1.0
+
+### Minor Changes
+
+- 5f09e20: Padronização de formulários com React Hook Form, Zod e tratamento de erros em 3 níveis (SEM-817):
+  
+  - `FormField` ganha prop opcional `errorRole` ("alert" | undefined) para anúncio imediato por leitores de tela quando há validação assíncrona ou inline.
+  - Padrões de arquitetura documentados e integrados às skills do DS (`semec-ds` e `semec-ds-lite`) com:
+    - 3 níveis de feedback de erro: Inline (`FormField`), Resumo no topo (`ErrorSummary`) e Servidor/API (`Alert variant="destructive"`).
+    - Padrão oficial de validação com `react-hook-form` e `@hookform/resolvers/zod`.
+    - Legenda e texto de ajuda abaixo de botões de envio e exportação ("Campos com * são obrigatórios", "O download do arquivo inicia automaticamente").
+    - Foco programático no primeiro campo inválido ou no `ErrorSummary` ao submeter com erro.
+
+### Patch Changes
+
+- 422ae70: Correções da onda 0 da bateria de testes de 16/10/2026 (#54):
+  
+  - **ErrorSummary (TST-01, #48, bloqueante):** com `focusKey`, o resumo só recebe foco quando o `focusKey` muda (inclusive na montagem, se o valor ainda não foi focado naquele `<form>`). O resumo que some e volta durante a digitação (0 → N erros, ao apagar e redigitar um campo) não rouba mais o foco: o último `focusKey` focado fica guardado no `<form>` e sobrevive à renderização condicional da receita. Sem `focusKey`, o resumo foca ao passar de 0 para N erros, como antes. Mudar só a lista de erros nunca move o foco. Antes, a validação ao vivo (react-hook-form, Formik) mudava a contagem de erros a cada tecla depois do 1º envio e o foco saltava para o resumo, perdendo as teclas seguintes (o celular "69999998888" era gravado como "(69) 9999-9888"). Viola o WCAG 3.2.2.
+  - **HeaderBrand (TST-12, TST-10):** o nome acessível do link separa os nomes ("SEMEC Matrícula — ir para o início", antes "SEMECMatrícula— ir…"). O link da marca ganha `min-h-11` (44 px de alvo). Mudança visual: a marca passa a ter no mínimo 44 px de altura; o espaçamento em volta do "|" é o mesmo.
+  - **FileUpload (TST-13):** tamanhos com vírgula decimal PT-BR e no máximo 1 casa ("5 MB", "1,5 MB"), na lista e na mensagem de limite.
+  - **Progress (TST-14):** a barra preenche `value / max` (com `value={3}` e `max={4}`, 75%, o mesmo que o leitor de tela anuncia).
+  - **maskCurrency (TST-20):** sem dígitos significativos devolve `""` em vez de "R$ 0,00", então o campo volta a ficar vazio e falha em `z.string().min(1)`.
+  - **toast() (TST-24):** o `onOpenChange` passado a `toast()` é chamado junto com o handler interno, em vez de ser descartado.
+- 422ae70: Remove os marcadores de conflito de merge do exemplo canônico da SKILL `semec-ds` (TST-02, #49). O lado HEAD (código que não compilava: `errors.length` sobre objeto e `handleSubmit` sem callback) saiu; ficou o lado SEM-817. A SKILL publicada no tarball (`@semec/ds/skills/semec-ds`), no site e em `.claude/` / `.opencode/` volta a ter só código válido.
+  
+  - `build-artifacts.mjs` (roda no `build` do pacote) agora falha se encontrar marcadores (`<<<<<<<`, `=======`, `>>>>>>>` no início da linha) nas fontes dos artefatos (SKILLs, `manifest.js`, README, tokens, fontes dos componentes) ou nos artefatos gerados. As fontes são checadas antes de qualquer escrita.
+  - O gate (`npm run gate`) ganha a checagem `[marcadores]`, que varre todos os arquivos de texto versionados do repositório.
+- 422ae70: Corrige a receita oficial de formulário (React Hook Form + Zod + `FormField` + `ErrorSummary`) na SKILL `semec-ds`, no `manifest` (`form-field.usage`) e no README (TST-17 e TST-20, #54):
+  
+  - **TST-17:** o exemplo usa `shouldFocusError: false` no `useForm` (sem isso o RHF foca o 1º campo inválido e o `ErrorSummary` nunca recebe o foco), soma a `tentativa` do `focusKey` só no envio inválido (`handleSubmit(onSubmit, onInvalid)`) e monta os itens do resumo por uma lista fixa de ids na ordem da tela (`ORDEM_CAMPOS`), não por `Object.entries(errors)`. A descrição do `ErrorSummary` passa a dizer quando ele puxa o foco (0 → N erros e troca de `focusKey`; não durante a digitação).
+  - **TST-20:** as instruções de instalação (SKILL, README, `manifest.json` em `install.peers` e no novo campo aditivo `install.form`) incluem `npm install react-hook-form @hookform/resolvers zod`, opcionais e só para a receita. A assinatura de `maskCurrency(value: string): string` está documentada (centavos, `""` sem dígitos desde a 4.1.0, espaço não separável depois de `R$`), com um exemplo de campo R$ avulso e outro dentro da receita.
+
 ## 4.0.1
 
 ### Patch Changes

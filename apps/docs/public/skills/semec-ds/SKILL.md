@@ -6,7 +6,7 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 # SEMEC Design System — skill completa
 
-> Gerado para `@semec/ds@4.0.1` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
+> Gerado para `@semec/ds@4.1.0` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
 
 Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
