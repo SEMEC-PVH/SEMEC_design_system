@@ -135,6 +135,7 @@ A partir da 3.2 o `dist` sai **um arquivo por módulo**, e cada componente inter
 - props de função (`onClick`, `onValueChange`, `onOpenChange`…) continuam exigindo um arquivo `"use client"` seu, como em qualquer componente de cliente;
 - os providers do passo 4 já são de cliente e podem ir direto no `layout`;
 - não use `export *` para reexportar o kit num arquivo `"use client"` (o Next não aceita); reexporte por nome ou importe direto.
+- **peso no cliente:** desde a 4.2.1 o barrel `@semec/ds/react` reexporta por nome, e no Turbopack (padrão do Next 16) importar pela raiz num Server Component leva ao cliente só os componentes interativos usados, como o subpath. No 4.2.0 e anteriores, a raiz num Server Component levava o kit inteiro (~77 kB gzip a mais): importe por subpath (`@semec/ds/react/navigation-menu`). Com `next build --webpack`, ligue `experimental.optimizePackageImports: ["@semec/ds/react"]` no `next.config` ou use o subpath.
 
 Na 3.0 e na 3.1 o `dist` era um bundle único sem `"use client"` e importar o kit num Server Component quebrava; se estiver preso a essas versões, use o kit só em arquivos `"use client"`.
 
@@ -241,7 +242,7 @@ import { cn } from "@semec/ds/react";
 | `@semec/ds/skills/semec-ds` | Skill full do agente |
 | `@semec/ds/lite/skills/semec-ds-lite` | Skill lite (tokens + a11y + responsive) |
 
-**Poda (tree-shaking).** Desde a 3.2 cada componente é um módulo ESM próprio em `dist/react/components/` e o pacote declara `"sideEffects": ["**/*.css"]`, então o bundler do app descarta o que não é importado: `import { Button } from "@semec/ds/react"` custa cerca de 35 kB minificado com as dependências (quase tudo `tailwind-merge`); o código do kit fica em ~3 kB, em vez do kit inteiro (~340 kB na 3.1). Importar pela raiz ou pelo subpath dá o mesmo resultado num bundler com poda; o subpath ajuda ferramentas sem poda (ex.: `next dev` sem `optimizePackageImports`) e testes. A CI mede isso (`npm run test:dist`).
+**Poda (tree-shaking).** Desde a 3.2 cada componente é um módulo ESM próprio em `dist/react/components/` e o pacote declara `"sideEffects": ["**/*.css"]`, então o bundler do app descarta o que não é importado: `import { Button } from "@semec/ds/react"` custa cerca de 35 kB minificado com as dependências (quase tudo `tailwind-merge`); o código do kit fica em ~3 kB, em vez do kit inteiro (~340 kB na 3.1). Importar pela raiz ou pelo subpath dá o mesmo resultado num bundler com poda (esbuild, Vite, Turbopack); o subpath ajuda ferramentas sem poda e testes. Exceção: Server Component do Next com webpack (`next build --webpack`), em que a raiz leva ao cliente todos os componentes interativos; ali use o subpath ou `experimental.optimizePackageImports: ["@semec/ds/react"]` (ver o passo 5). A CI mede a poda e confere que o barrel reexporta por nome (`npm run test:dist`).
 
 **O CSS não sofre poda.** A poda vale para o JS. O `@source "…/node_modules/@semec/ds/dist/react"` faz o Tailwind varrer o `dist` inteiro, então o CSS gera as classes de todos os componentes, use o app um ou todos: cerca de 68 kB de CSS do kit (~12 kB com gzip), um custo fixo medido num app novo com a 4.0.0. O JS, sim, cai para o que é importado (os ~35 kB do `Button` acima).
 

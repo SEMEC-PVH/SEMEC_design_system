@@ -74,8 +74,8 @@
     "**/*.css"
   ],
   "scripts": {
-    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsup && npm run build:types && node scripts/build-artifacts.mjs",
-    "build:react": "tsup",
+    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsup && node scripts/explicit-barrel.mjs && npm run build:types && node scripts/build-artifacts.mjs",
+    "build:react": "tsup && node scripts/explicit-barrel.mjs",
     "build:types": "tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/fix-dts-extensions.mjs && node scripts/build-skills-types.mjs",
     "build:skills": "node scripts/build-artifacts.mjs",
     "dev": "tsup --watch",
@@ -85,7 +85,7 @@
     "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs"
+    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-barrel.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs"
   },
   "peerDependencies": {
     "lucide-react": ">=0.468.0 <2",
