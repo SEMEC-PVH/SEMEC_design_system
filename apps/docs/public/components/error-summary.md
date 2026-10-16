@@ -9,7 +9,7 @@ variants: "props: title · errors [{ id, message }] · autoFocus · focusKey"
 
 # ErrorSummary — `error-summary`
 
-> Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco, título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`).
+> Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco. Título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`).
 
 **Arquivo:** `src/components/error-summary.tsx` | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/error-summary/
 
@@ -53,7 +53,7 @@ import { ErrorSummary } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `ErrorSummary` (ErrorSummary) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco, título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`). API e variantes: props: title · errors [{ id, message }] · autoFocus · focusKey. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `ErrorSummary` (ErrorSummary) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco. Título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`). API e variantes: props: title · errors [{ id, message }] · autoFocus · focusKey. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte

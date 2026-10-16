@@ -541,7 +541,7 @@ export function FormularioExemplo() {
     label: "ErrorSummary",
     file: "src/components/error-summary.tsx",
     category: "formularios",
-    desc: "Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role=\"alert\"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco, título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className=\"mb-6\"`).",
+    desc: "Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role=\"alert\"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco. Título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className=\"mb-6\"`).",
     variants: [{ prop: "props", values: "title · errors [{ id, message }] · autoFocus · focusKey" }],
     usage: `import { ErrorSummary } from "@semec/ds/react";
 
