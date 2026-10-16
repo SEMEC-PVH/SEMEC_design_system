@@ -146,10 +146,55 @@ describe("Pagination", () => {
     expect(await severeViolations()).toEqual([]);
   });
 
-  // TST-F2-03: `siblingCount` vira `Math.max(siblingCount, 1)` (pagination.tsx),
-  // então 0 é ignorado em silêncio. O manifest só diz "janela por siblingCount".
-  it.fails("TST-F2-03: siblingCount=0 mostra só a página atual entre as elipses", () => {
+  // TST-F2-03 (TST-25, corrigido): `siblingCount` virava `Math.max(siblingCount, 1)`,
+  // então 0 era ignorado em silêncio. Agora 0 é aceito e negativos viram 0.
+  it("TST-F2-03: siblingCount=0 mostra só a página atual entre as elipses", () => {
     render(<Pagination page={10} pageCount={20} siblingCount={0} onPageChange={() => {}} />);
     expect(sequencia(screen.getByRole("navigation"))).toEqual(["1", "…", "10", "…", "20"]);
+  });
+
+  it("TST-25: siblingCount=0 nas pontas e negativo tratado como 0", () => {
+    const { rerender } = render(<Pagination page={1} pageCount={20} siblingCount={0} onPageChange={() => {}} />);
+    expect(sequencia(screen.getByRole("navigation"))).toEqual(["1", "…", "20"]);
+    rerender(<Pagination page={10} pageCount={20} siblingCount={-3} onPageChange={() => {}} />);
+    expect(sequencia(screen.getByRole("navigation"))).toEqual(["1", "…", "10", "…", "20"]);
+  });
+
+  it("TST-07: setas, números e elipses não encolhem (shrink-0)", () => {
+    render(<Pagination page={12} pageCount={40} onPageChange={() => {}} />);
+    const nav = screen.getByRole("navigation");
+    for (const el of Array.from(nav.children)) expect(el).toHaveClass("shrink-0");
+  });
+
+  it("TST-07: abaixo de sm só ficam as setas e a atual ± 1; bordas e elipses somem", () => {
+    render(<Pagination page={12} pageCount={40} siblingCount={2} onPageChange={() => {}} />);
+    const nav = screen.getByRole("navigation");
+    const visiveisNoMobile = Array.from(nav.children)
+      .slice(1, -1)
+      .filter((el) => !el.classList.contains("max-sm:hidden"))
+      .map((el) => el.textContent);
+    expect(visiveisNoMobile).toEqual(["11", "12", "13"]);
+    // As setas nunca somem.
+    expect(screen.getByRole("button", { name: "Página anterior" })).not.toHaveClass("max-sm:hidden");
+    expect(screen.getByRole("button", { name: "Próxima página" })).not.toHaveClass("max-sm:hidden");
+    // No desktop a janela de siblingCount=2 continua inteira.
+    expect(sequencia(nav)).toEqual(["1", "…", "10", "11", "12", "13", "14", "…", "40"]);
+  });
+
+  it("TST-07: com até 7 páginas, o mobile também esconde as distantes da atual", () => {
+    render(<Pagination page={2} pageCount={5} onPageChange={() => {}} />);
+    const ocultas = Array.from(screen.getByRole("navigation").children)
+      .filter((el) => el.classList.contains("max-sm:hidden"))
+      .map((el) => el.textContent);
+    expect(ocultas).toEqual(["4", "5"]);
+  });
+
+  it("TST-07: siblingCount=0 também vale no mobile (só a atual)", () => {
+    render(<Pagination page={12} pageCount={40} siblingCount={0} onPageChange={() => {}} />);
+    const visiveisNoMobile = Array.from(screen.getByRole("navigation").children)
+      .slice(1, -1)
+      .filter((el) => !el.classList.contains("max-sm:hidden"))
+      .map((el) => el.textContent);
+    expect(visiveisNoMobile).toEqual(["12"]);
   });
 });
