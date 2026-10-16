@@ -72,4 +72,19 @@ test.describe("layout de consumidor", () => {
     expect(area.width, JSON.stringify(area)).toBeGreaterThanOrEqual(44);
     expect(area.height, JSON.stringify(area)).toBeGreaterThanOrEqual(44);
   });
+
+  test("links do painel do NavigationMenu cabem numa linha (V42-VITE-03)", async ({ page }) => {
+    await mountLayout(page, "navigation-menu-painel");
+    await page.getByRole("button", { name: "Serviços" }).click();
+    const alvara = page.getByRole("link", { name: "Alvará de funcionamento" });
+    await expect(alvara).toBeVisible();
+    await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {}))));
+    for (const nome of ["IPTU", "Alvará de funcionamento", "Certidão negativa"]) {
+      const box = await page.getByRole("link", { name: nome }).boundingBox();
+      // min-h-11 = 44 px; duas linhas de texto passam de 50.
+      expect(box.height, `${nome}: ${JSON.stringify(box)}`).toBeLessThanOrEqual(46);
+    }
+    const scroll = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(scroll, "o painel não cria rolagem horizontal").toBeLessThanOrEqual(0);
+  });
 });
