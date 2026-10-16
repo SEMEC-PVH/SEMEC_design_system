@@ -5,7 +5,7 @@ import BasePreview from "@/components/demos/base-previews";
 import CodeBlock from "@/components/docs/CodeBlock";
 import AnimateOnScroll from "@/components/ui/AnimateOnScroll";
 import { dsCategories, dsPrompt } from "semec-ds/skills";
-import { dsPackageRootResolve } from "semec-ds/react/server";
+import { dsPackageRoot } from "@/lib/ds-package-root";
 
 export function ProtoStyle() {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -17,7 +17,7 @@ export function ProtoStyle() {
 }
 
 export default function ComponentDoc({ c, extra }) {
-  const source = readFileSync(join(dsPackageRootResolve(), c.file), "utf8");
+  const source = readFileSync(join(dsPackageRoot(), c.file), "utf8");
   const cat = dsCategories.find((k) => k.key === c.category);
 
   return (

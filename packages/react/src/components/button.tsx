@@ -6,7 +6,7 @@ import { cn } from "../lib/utils";
 import { ButtonLoadingIndicator } from "./button-loading";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -26,9 +26,13 @@ const buttonVariants = cva(
       size: {
         // AUD-10: o visual compacto (36px) é mantido, mas a área clicável é
         // estendida a 44×44px por um pseudo-elemento centralizado.
-        sm: "h-9 px-4 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2",
-        md: "h-11 px-5 text-sm",
-        lg: "h-12 px-6 text-base",
+        // TST-21: altura mínima (`min-h-*`) em vez de fixa e sem
+        // `whitespace-nowrap`: o rótulo longo quebra em linhas (balanceadas por
+        // `text-balance`) em vez de gerar rolagem horizontal. O `py-*` só conta
+        // quando há quebra; numa linha a altura segue 36/44/48px, como antes.
+        sm: "min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2",
+        md: "min-h-11 px-5 py-2 text-sm",
+        lg: "min-h-12 px-6 py-2 text-base",
         icon: "h-11 w-11",
       },
     },

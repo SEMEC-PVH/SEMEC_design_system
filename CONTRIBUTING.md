@@ -348,7 +348,7 @@ A 2.0.0 e a 3.0.0 removeram coisas sem esse aviso (AUD-43; errata da 2.0.0 no [C
 
 ### Depreciações anunciadas
 
-Anúncio na **3.1.0** (onda 2 da auditoria de 14/10/2026). Os itens da 4.0 foram **removidos na 4.0.0**; guia com antes/depois, tabela primitivo → semântico e codemod (`npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 <pasta>`): [docs/migracao-4.0.md](docs/migracao-4.0.md). Os itens anunciados na 4.0 saem na **5.0.0**.
+Anúncio na **3.1.0** (onda 2 da auditoria de 14/10/2026). Os itens da 4.0 foram **removidos na 4.0.0**; guia com antes/depois, tabela primitivo → semântico e codemod (`npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 <pasta>`): [docs/migracao-4.0.md](docs/migracao-4.0.md). Os itens anunciados na 4.0 e na 4.1 saem na **5.0.0**.
 
 | O que muda | Status e o que fazer | Achado |
 |---|---|---|
@@ -359,6 +359,8 @@ Anúncio na **3.1.0** (onda 2 da auditoria de 14/10/2026). Os itens da 4.0 foram
 | **Button `loading`.** O `Button` ganha `loading` (mudança aditiva): `aria-busy="true"` e `aria-disabled="true"`, focalizável, só durante o carregamento. ~~O desabilitado pode passar de `disabled` nativo para `aria-disabled`.~~ **Cancelado em 15/10/2026:** o desabilitado continua `disabled` nativo. | Para estado de carregamento, use `loading` em vez de `disabled`. Teste o `Button` pelo papel e pelo nome acessível; `:disabled` continua valendo para o desabilitado. | AUD-63 |
 | **`Combobox`: `ariaLabel` e `emptyMessage`.** `@deprecated` desde a 3.1.0, sem data de saída na época. | **Anunciado na 4.0, sai na 5.0.** Use rótulo visível (`<Label htmlFor>`/`FormField`), `aria-labelledby` ou o atributo `aria-label` (que continua aceito) no lugar de `ariaLabel`, e `emptyText` no lugar de `emptyMessage`. | AUD-03 |
 | **`AlertDialog`: `modal`; `AlertDialogContent`: `onPointerDownOutside` e `onInteractOutside`.** `@deprecated` e ignorados desde a 3.1.0 (o AlertDialog é sempre modal e não fecha por clique fora). | **Anunciado na 4.0, sai na 5.0.** Só os tipos saem; o comportamento já é o atual. Tire essas props do código. | AUD-34 |
+| **`digits`** (exportado por `@semec/ds/react` e `@semec/ds/react/validacao`). Helper interno que vazou para os entries públicos. | **Anunciado na 4.1, sai na 5.0.** `@deprecated` no JSDoc e `console.warn` único em desenvolvimento. Use `valor.replace(/\D/g, "")` no seu código. | TST-34b |
+| **Subpath `@semec/ds/react/server`** (`dsPackageRootResolve`). Uso interno do monorepo; fora do repositório só lança erro. | **Anunciado na 4.1, sai na 5.0.** `@deprecated` no JSDoc e `console.warn` único em desenvolvimento. Não há substituto no pacote: resolva o caminho no seu próprio código (o site usa `apps/docs/lib/ds-package-root.js`). | TST-34b |
 
 Se você mantém um desses pontos no código, o `@deprecated` (JSDoc) e o aviso em desenvolvimento entram no PR que fizer a mudança aditiva correspondente; esta tabela é o registro oficial do aviso até lá.
 

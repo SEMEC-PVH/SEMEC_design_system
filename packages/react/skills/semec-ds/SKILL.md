@@ -8,6 +8,8 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 > Gerado para `@semec/ds@{{ds:version}}` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
 
+<!-- ds:release-status -->
+
 Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
 **Regra número 1: use os componentes do kit, não os reimplemente.** Importe de `@semec/ds/react`. Não copie o código-fonte de um componente para o app, não recrie um componente existente com `div` + classes e não troque o estilo dele por outro. Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
@@ -183,7 +185,7 @@ import { cpfSchema, cnpjSchema, cpfCnpjSchema, emailSchema, cepSchema } from "@s
 As máscaras têm a mesma assinatura, `(value: string) => string` (tipo `MaskFn`): recebem o texto digitado (com ou sem máscara) e devolvem o texto formatado. Aplique no `onValueChange` do `Input`: `onValueChange={(v) => setValor(maskCurrency(v))}`.
 
 - `maskCPF` → `000.000.000-00` · `maskCNPJ` → `00.000.000/0000-00` · `maskCEP` → `00000-000` (só os dígitos contam; o excesso é cortado).
-- `maskCurrency(value: string): string` → moeda BRL: guarda até 12 dígitos e lê os 2 últimos como centavos (`"123456"` → `"R$ 1.234,56"`). Entrada sem dígitos (`""`, `"abc"`) devolve `""` (desde a 4.1.0; até a 4.0.1 devolvia `"R$ 0,00"`), então o campo volta a vazio e `z.string().min(1)` barra o envio. A saída vem do `Intl` (`toLocaleString("pt-BR", { style: "currency", currency: "BRL" })`), com espaço não separável (U+00A0) depois de `R$`: compare com o mesmo `Intl` ou só com os dígitos, nunca com um literal digitado com espaço comum. O valor é texto: converta para número no envio (`Number(valor.replace(/\D/g, "")) / 100`).
+- `maskCurrency(value: string): string` → moeda BRL: guarda até 12 dígitos e lê os 2 últimos como centavos (`"123456"` → `"R$ 1.234,56"`). Entrada sem dígitos significativos (`""`, `"abc"`, só zeros como `"R$ 0,0"` ao apagar com Backspace) devolve `""` (desde a 4.1.0; até a 4.0.1 devolvia `"R$ 0,00"`), então o campo volta a vazio e `z.string().min(1)` barra o envio. A saída vem do `Intl` (`toLocaleString("pt-BR", { style: "currency", currency: "BRL" })`), com espaço não separável (U+00A0) depois de `R$`: compare com o mesmo `Intl` ou só com os dígitos, nunca com um literal digitado com espaço comum. O valor é texto: converta para número no envio (`Number(valor.replace(/\D/g, "")) / 100`).
 
 ```tsx
 const [valor, setValor] = useState("");
@@ -212,6 +214,12 @@ Coisas que o componente faz sozinho e que mudam como você monta a tela. Leve em
 - **`HeaderBrand` sem `logo`** mostra um placeholder decorativo (`aria-hidden`) e avisa no console em desenvolvimento. Passe sempre `logo` com o asset real (`<img alt="Prefeitura de Porto Velho">`). O nome quebra linha no mobile (use `truncate` para cortar).
 - **`NavigationMenu`** é `<nav aria-label="Menu principal">` por padrão; passe outro `aria-label` se houver mais de um menu na página.
 - **`FormField`** liga dica e erro ao controle sozinho (contexto com `useId`): o controle filho recebe `id`, `aria-describedby`, `aria-invalid` e `aria-required`. Não monte `aria-describedby` à mão; o que você passar explicitamente vence.
+- **`Toggle` ligado** (`pressed`) tem fundo `tint`, contorno de 2px em `primary` e texto `foreground`: o contorno tem 5,00:1 sobre `--bg` e 5,42:1 sobre branco, então ligado e solto se distinguem sem depender só do cinza. O estado vai para o leitor de tela por `aria-pressed`. Não troque o visual do ligado por `className` com `bg-accent` (1,01:1 contra o fundo).
+- **`Button` com rótulo longo** quebra em linhas balanceadas em vez de criar rolagem horizontal: os tamanhos usam altura **mínima** (`min-h-9`/`min-h-11`/`min-h-12`). Para reduzir a altura por `className`, sobrescreva o `min-h-*` junto com o `h-*`. Mesmo assim, prefira rótulos curtos (verbo + objeto).
+- **`ScrollArea`** vira parada de Tab sozinha quando não há nada focável dentro (`focusable="auto"`, o padrão): quem usa teclado consegue rolar texto puro. Dê nome à região com `viewportProps={{ "aria-label": "Termos de uso" }}`. `focusable` aceita `true` (sempre focável) e `false` (nunca; só se o conteúdo garantir outro caminho de teclado).
+- **`Avatar` com foto quebrada:** o `AvatarFallback` anuncia o `alt` da `AvatarImage` (as iniciais ficam só visuais). Um `aria-label` no `AvatarFallback` continua aceito e tem prioridade. `alt=""` (foto decorativa) não anuncia nada.
+- **`NavigationMenuLink`** já vem com alvo de 44px (`min-h-11`), `px-4`, hover/foco em `tint` e anel de foco por dentro (`navigationMenuLinkStyle`, exportado). `active` marca a página atual (`aria-current="page"`). Para o visual de gatilho, use `className={navigationMenuTriggerStyle()}`.
+- **`Pagination`:** `siblingCount` aceita `0` (padrão `1`; negativo conta como `0`). Abaixo de `sm` ficam só as setas e a página atual ± 1: primeira, última e elipses somem, para as setas não encolherem.
 
 
 ## Padrões de tela
@@ -264,7 +272,65 @@ export function PaginaDeServico() {
 
 
 - **Landmarks:** um `banner`, um `main`, um `contentinfo`; cada `<nav>` com `aria-label` distinto ("Menu principal", "Menu lateral", "Trilha de navegação", "Paginação"). O `tabIndex={-1}` no `<main>` deixa o link de pular mover o foco de fato.
-- **Com `Sidebar`:** o `SidebarInset` faz o papel do `<main>` (dê a ele `id="conteudo"` e `tabIndex={-1}`); o `SkipLink` e o `Header` ficam antes do `SidebarProvider` ou no topo do `SidebarInset`.
+- **Com `Sidebar`:** use a composição de "Esqueleto com Sidebar", logo abaixo. É a única testada.
+
+### Esqueleto com Sidebar (painéis administrativos)
+
+Uma composição só (TST-04): **`SkipLink` antes do `SidebarProvider`** e **`Header` dentro do `SidebarInset`**, com o `SidebarInset` como `div` e o `<main id="conteudo">` dentro dele, depois do `Header`.
+
+```tsx
+import {
+  SkipLink, Header, HeaderBrand, HeaderNav, HeaderNavLink, Heading,
+  SidebarProvider, Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel,
+  SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton,
+  SidebarInset, SidebarTrigger,
+} from "@semec/ds/react";
+
+export function PainelDeProtocolos() {
+  return (
+    <>
+      {/* 1ª parada de Tab, fora do SidebarProvider */}
+      <SkipLink />
+      <SidebarProvider>
+        <Sidebar>
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel>Gestão</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive>
+                      <a href="/protocolos">Protocolos</a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
+        {/* "div": o <main> é o de baixo, depois do Header (banner fora do main) */}
+        <SidebarInset as="div">
+          <Header>
+            <SidebarTrigger />
+            <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+            <HeaderNav aria-label="Menu principal">
+              <HeaderNavLink href="/ajuda">Ajuda</HeaderNavLink>
+            </HeaderNav>
+          </Header>
+          <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-[75rem] px-4 py-8">
+            <Heading level={1}>Protocolos</Heading>
+            {/* conteúdo */}
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
+    </>
+  );
+}
+```
+
+- **Por que assim:** no desktop a `Sidebar` é `fixed` desde o topo da janela (`inset-y-0`). Um `Header` antes do `SidebarProvider` ocupa a largura toda e fica com o começo **embaixo** da barra: a marca do `HeaderBrand` recebe o foco sem aparecer (WCAG 2.4.7), e o axe não acusa. Dentro do `SidebarInset`, o `Header` começa depois da barra.
+- **Resultado (Chromium, 1280 e 390 px):** o `SkipLink` é a 1ª parada de Tab e leva o foco ao `<main id="conteudo">`; o `Header` e a marca ficam visíveis e focáveis; há um `banner` e um `main`; axe sem violação serious ou critical. No desktop a ordem segue com os itens da `Sidebar` e depois o `Header`; no mobile a barra vira gaveta e o `SidebarTrigger` do `Header` é a 2ª parada.
+- **Não faça:** `Header` antes do `SidebarProvider` (fica sob a barra) nem `SkipLink` dentro do `SidebarInset` (deixa de ser a 1ª parada, porque a `Sidebar` vem antes no DOM). O `SidebarTrigger` só funciona dentro do `SidebarProvider`.
 
 ### Container e largura de leitura
 
@@ -288,10 +354,12 @@ export function PaginaDeServico() {
 - Use `Table` (ou `DataTable` para ordenar e paginar) com `TableCaption` ou `caption` descrevendo o conteúdo; cabeçalhos em `TableHead`.
 - A `Table` já rola na horizontal (wrapper `overflow-auto`), mas esse wrapper não recebe foco: se a tabela não tiver nenhum elemento focável, quem usa só teclado não consegue rolar. Em telas estreitas, prefira **menos colunas** (as secundárias vão para uma tela de detalhe) ou uma **lista de `Card`** abaixo de `md:`, mantendo a `Table` a partir de `md:`.
 - Quando a linha tem várias ações, use uma coluna "Ações" com `Button`, não a linha inteira clicável.
+- **`DataTable` com `onRowClick`:** passe também `rowLabel` (ex.: `rowLabel={(p) => \`Abrir protocolo ${p.numero}\`}`). A linha clicável é focável, mas sem `rowLabel` não tem nome e o leitor de tela não diz o que o Enter faz. Cliques e teclas em controles da célula (botão, link, campo, menu aberto por ela) **não** ativam a linha.
+- **Ordenação do `DataTable`:** o `columnheader` e o botão de ordenar se chamam só pelo nome da coluna; a instrução "Ordenar por …" (`labels.sortBy`) é a **descrição** do botão (`aria-describedby`), e a ordem atual vem em `aria-sort`. Num cabeçalho ordenável feito à mão, faça igual: não ponha "Ordenar por X" no `aria-label` do botão (vira o nome do cabeçalho e se repete em cada célula).
 
 ### Sidebar (painéis administrativos)
 
-- `SidebarProvider` > `Sidebar` + `SidebarInset`. Abaixo de 768px (48rem, `matchMedia`; o complemento exato do `md:`) a barra vira gaveta: um diálogo modal com foco preso, Esc para fechar e botão "Fechar menu". O `SidebarTrigger` tem 44px e `aria-expanded`.
+- `SidebarProvider` > `Sidebar` + `SidebarInset`, com `SkipLink` antes do provider e `Header` dentro do `SidebarInset` (ver "Esqueleto com Sidebar"). Abaixo de 768px (48rem, `matchMedia`; o complemento exato do `md:`) a barra vira gaveta: um diálogo modal com foco preso, Esc para fechar e botão "Fechar menu". O `SidebarTrigger` tem 44px e `aria-expanded`.
 - O `SidebarInset` já traz `min-w-0`: conteúdo largo (tabelas, gráficos) rola dentro dele em vez de empurrar a largura da página.
 
 
@@ -351,7 +419,8 @@ Nunca `outline: none` sem alternativa visível com 3:1.
 ### Áreas clicáveis
 
 - **Régua do DS: 44×44px** nos controles interativos (`min-h-11 min-w-11`, `h-11`, `size-11`). É **decisão do projeto**, mais exigente que o AA: o WCAG 2.1 AA não tem critério de tamanho de alvo; o critério de 44px (2.5.5 Target Size) é **AAA**. (No WCAG 2.2, o 2.5.8, AA, pede 24×24px.)
-- Os padrões do kit já seguem a régua: Pagination, Tabs, Toggle, NavigationMenuTrigger e o X dos overlays têm 44px; o `Button size="sm"` mantém 36px visuais com área de toque de 44px
+- Os padrões do kit já seguem a régua: Pagination, Tabs, Toggle, NavigationMenuTrigger, `NavigationMenuLink`, os itens do `DropdownMenu` (inclusive Checkbox e Radio), o botão de ordenação do `DataTable`, o polegar do `Slider` e o X dos overlays têm 44px; o `Button size="sm"` mantém 36px visuais com área de toque de 44px
+- Abaixo de `sm`, o `Link` e os links do `Breadcrumb` ganham área de toque de no mínimo 44×44px sem mudar o visual (no `Link`, um `::after`, sem alterar a altura da linha; no `Breadcrumb`, `min-h-11` mais um `::after` de largura)
 - Espaçamento entre alvos: 8px (regra do DS)
 - O pacote não define `--control-height-*`; use os utilitários acima
 
@@ -361,7 +430,7 @@ O `tokens.css` já reduz animações e transições globalmente com `@media (pre
 
 ### Não uso exclusivo de cores
 
-Complementar cor com ícone, texto ou padrão (erro com mensagem, status com rótulo). O `Link` é sublinhado por padrão; `underline={false}` só em navegação (menus, cabeçalho), nunca em texto corrido. A aba ativa do `Tabs` tem barra de 3px, além da cor.
+Complementar cor com ícone, texto ou padrão (erro com mensagem, status com rótulo). O `Link` é sublinhado por padrão; `underline={false}` só em navegação (menus, cabeçalho), nunca em texto corrido. A aba ativa do `Tabs` tem barra de 3px, além da cor. O `Toggle` ligado tem contorno `primary` de 2px, além do fundo `tint`.
 
 ## Padrão de formulários e feedback (Validação + Toast)
 
@@ -656,6 +725,8 @@ Depreciado, sai na 5.0 (não gere código novo com isto):
 
 - `Combobox`: `ariaLabel` (use rótulo visível ou o atributo `aria-label`) e `emptyMessage` (use `emptyText`).
 - `AlertDialog` `modal` e `AlertDialogContent` `onPointerDownOutside` / `onInteractOutside`: já são ignorados.
+- `digits` (de `@semec/ds/react` e `@semec/ds/react/validacao`): use `valor.replace(/\D/g, "")` no seu código. Anunciado na 4.1; avisa no console em desenvolvimento.
+- Subpath `@semec/ds/react/server` (`dsPackageRootResolve`): uso interno do monorepo, sem substituto no pacote. Anunciado na 4.1; avisa no console em desenvolvimento.
 
 
 <!-- ds:maintainer:start -->
