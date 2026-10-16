@@ -23,6 +23,7 @@
     "proto:css": "npm run proto:css --workspace @semec/docs",
     "clean": "npm run clean --workspace @semec/ds",
     "gate": "npm run build:ds && node scripts/gate/gate.mjs",
+    "cobertura:promessas": "node scripts/gate/cobertura-promessas.mjs",
     "changeset": "changeset",
     "changeset:check": "changeset status --since=origin/main",
     "check:artifacts": "npm run generate:llms && git diff --exit-code --stat -I generatedAt -I \"^> Gerado \" -- apps/docs/public packages/react/README.md",
