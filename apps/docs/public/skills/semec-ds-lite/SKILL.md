@@ -8,6 +8,8 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 > Gerado para `@semec/ds@4.0.1` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
 
+> **Não publicado: este conteúdo vem do repositório e inclui 8 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.0.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.1.0. Confira a versão instalada com `npm ls @semec/ds`.**
+
 Tokens, acessibilidade, responsive e padrões visuais para interfaces da Prefeitura de Porto Velho. **Sem componentes React.**
 
 Para UI com o kit React (`@semec/ds`), use a skill `semec-ds`.
@@ -31,6 +33,8 @@ O Tailwind v4 precisa estar ligado ao bundler (Vite: `npm install -D tailwindcss
 **Sem `@source`.** A variante lite não usa os componentes React, então o Tailwind só precisa varrer o código do próprio app (detecção automática; para limitar: `@import "tailwindcss" source("../src");`, caminho relativo ao CSS). O `@source` para `dist/react` só é necessário com a skill `semec-ds`, que usa os componentes.
 
 O `npm install` traz junto as dependências do kit React (o pacote é um só) e, no npm 7+, também os peers dele (`react`, `react-dom`, `lucide-react`); a variante lite não os importa, então nada disso entra no seu bundle. No pnpm e no Yarn, o aviso de peer ausente desses pacotes pode ser ignorado na lite.
+
+**Preset JS (opcional):** `@config "@semec/ds/lite/pv-preset";` no CSS global, depois dos imports. O `tokens.css` já gera os utilitários pelo `@theme inline`; o preset (o mesmo `pv-preset` da variante React) só serve a quem ainda configura o Tailwind por JS. Sem Tailwind, ignore.
 
 **Fonte:** `@semec/ds/lite/fonts.css` (o mesmo arquivo de `@semec/ds/react/fonts.css`) traz a Poppins 400/500/600/700 (SIL OFL) e vai **antes** do `tokens.css`. Sem ela, o texto cai em `system-ui`. Não existem pesos 800/900.
 
@@ -240,7 +244,7 @@ Complementar com ícone, texto ou padrão. Link em texto corrido é sublinhado.
   - Três padrões de erro:
     1. *Inline no campo:* mensagem em texto abaixo do campo (`text-xs text-destructive`, `--feedback-danger: #b91c1c`, 5,98:1), campo com `aria-invalid="true"` e `aria-describedby="[id]-hint [id]-error"`. Sem `role="alert"` em listas para não interromper leitores de tela.
     2. *Resumo no topo:* contêiner com `role="alert"`, `tabindex="-1"`, foco automático ao submeter e links para cada campo com erro (`<a href="#id">`).
-    3. *Erro de servidor:* caixa de aviso (`role="alert"`, fundo `--pv-red-50`, texto `--pv-red-700`) com instruções claras de recuperação.
+    3. *Erro de servidor:* caixa de aviso (`role="alert"`, fundo `--feedback-danger-surface`, texto e borda `--feedback-danger`; com Tailwind, `bg-destructive-surface text-destructive border-destructive`) com instruções claras de recuperação. Nunca os primitivos `--pv-red-*` direto.
   - *Legenda Auxiliar de Ação / Download:* botões que geram efeitos secundários (ex.: download de PDF gerado) devem conter legenda explicativa complementar abaixo (`text-xs text-text-muted`).
 - **Navegação:** página atual com `aria-current="page"`; sidebar vira gaveta no mobile.
 - **Feedback:** avisos com ícone + título + texto; erro no contexto do campo. Sucesso pós-envio via notificação ou mensagem confirmando protocolo.

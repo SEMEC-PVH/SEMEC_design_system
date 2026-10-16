@@ -11,7 +11,7 @@ variants: "contrato: value · defaultValue · onValueChange(number[]) · name ·
 
 > Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares.
 
-**Arquivo:** `src/components/slider.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/slider`
+**Arquivo:** `src/components/slider.tsx` | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/slider/
 
 ## Variantes
 
@@ -31,6 +31,10 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 8 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.0.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.1.0. Confira a versão instalada com `npm ls @semec/ds`.
 
 ## Uso
 
@@ -133,7 +137,9 @@ const Slider = React.forwardRef<
             aria-labelledby={getAriaLabel ? undefined : ariaLabelledBy}
             aria-describedby={field["aria-describedby"] ?? ariaDescribedBy}
             aria-invalid={field["aria-invalid"] ?? ariaInvalid}
-            className="relative block h-5 w-5 rounded-full after:absolute after:-inset-3 after:content-[''] after:rounded-full border-2 border-primary bg-background shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 aria-[invalid=true]:border-destructive"
+            // TST-22: o ::after parte da caixa de padding (16px, dentro da borda
+            // de 2px). `-inset-3` dava 40×40; `-inset-3.5` dá 16 + 2×14 = 44×44.
+            className="relative block h-5 w-5 rounded-full after:absolute after:-inset-3.5 after:content-[''] after:rounded-full border-2 border-primary bg-background shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 aria-[invalid=true]:border-destructive"
           />
         ))}
       </SliderPrimitive.Root>

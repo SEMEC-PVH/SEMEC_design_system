@@ -4,18 +4,19 @@ code: "pagination"
 slug: "paginacao"
 file: "src/components/pagination.tsx"
 category: "navegacao"
-variants: "props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label 'Página N' nos números · aria-label nos botões prev/next · aria-hidden nos elipses"
+variants: "props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · siblingCount: páginas de cada lado da atual · padrão 1 · aceita 0 (só a atual entre as elipses) · negativo conta como 0 · abaixo de sm, no máximo 1 · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label 'Página N' nos números · aria-label nos botões prev/next · aria-hidden nos elipses"
 ---
 
 # Paginação — `pagination`
 
-> Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px. Textos em PT-BR, sobrescrevíveis por `labels`.
+> Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px que não encolhem. Abaixo de `sm` ficam só as setas e a página atual ± 1 (primeira, última e elipses ocultas). Textos em PT-BR, sobrescrevíveis por `labels`.
 
-**Arquivo:** `src/components/pagination.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/paginacao`
+**Arquivo:** `src/components/pagination.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/paginacao/
 
 ## Variantes
 
 - **props**: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }>
+- **siblingCount**: páginas de cada lado da atual · padrão 1 · aceita 0 (só a atual entre as elipses) · negativo conta como 0 · abaixo de sm, no máximo 1
 - **a11y**: role=navigation · aria-label=Paginação · aria-current=page · aria-label "Página N" nos números · aria-label nos botões prev/next · aria-hidden nos elipses
 
 ## Instalação (@semec/ds)
@@ -32,6 +33,10 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 8 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.0.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.1.0. Confira a versão instalada com `npm ls @semec/ds`.
 
 ## Uso
 
@@ -51,7 +56,7 @@ import { Pagination } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `Pagination` (Paginação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px. Textos em PT-BR, sobrescrevíveis por `labels`. API e variantes: props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label "Página N" nos números · aria-label nos botões prev/next · aria-hidden nos elipses. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Pagination` (Paginação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px que não encolhem. Abaixo de `sm` ficam só as setas e a página atual ± 1 (primeira, última e elipses ocultas). Textos em PT-BR, sobrescrevíveis por `labels`. API e variantes: props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · siblingCount: páginas de cada lado da atual · padrão 1 · aceita 0 (só a atual entre as elipses) · negativo conta como 0 · abaixo de sm, no máximo 1 · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label "Página N" nos números · aria-label nos botões prev/next · aria-hidden nos elipses. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -87,6 +92,13 @@ export interface PaginationProps extends React.HTMLAttributes<HTMLElement> {
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
+  /**
+   * Quantas páginas aparecem de cada lado da atual. Padrão: 1. Aceita 0 (só a
+   * atual entre as elipses, TST-25); valores negativos ou fracionários são
+   * arredondados para baixo, com mínimo 0. Abaixo de `sm` a
+   * janela fica limitada à atual ± 1 e as páginas de borda (primeira, última
+   * e elipses) somem, para as setas não encolherem (TST-07).
+   */
   siblingCount?: number;
   /** Sobrescreve os textos anunciados. */
   labels?: Partial<PaginationLabels>;
@@ -95,9 +107,18 @@ export interface PaginationProps extends React.HTMLAttributes<HTMLElement> {
 const range = (start: number, end: number) =>
   Array.from({ length: end - start + 1 }, (_, i) => start + i);
 
+/** Distância máxima da página atual que continua visível abaixo de `sm`. */
+const MOBILE_SIBLINGS = 1;
+
+// `shrink-0`: sem ele, numa linha apertada (390/320 px) o flex encolhe as
+// setas para 18–23 px de largura (TST-07).
+const arrowClass =
+  "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+
 const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
   ({ className, page, pageCount, onPageChange, siblingCount = 1, labels, ...props }, ref) => {
     const text = { ...DEFAULT_LABELS, ...labels };
+    const mobileSiblings = Math.min(Math.max(Math.floor(siblingCount), 0), MOBILE_SIBLINGS);
     const go = (p: number) => {
       if (p >= 1 && p <= pageCount && p !== page) onPageChange(p);
     };
@@ -105,7 +126,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
     const pages = React.useMemo(() => {
       const total = pageCount;
       const current = page;
-      const sib = Math.max(siblingCount, 1);
+      const sib = Math.max(Math.floor(siblingCount), 0);
       const first = 1;
       const last = total;
 
@@ -140,7 +161,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
           onClick={() => go(page - 1)}
           disabled={page <= 1}
           aria-label={text.previous}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          className={arrowClass}
         >
           <ChevronLeft className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -149,7 +170,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
             <span
               key={`gap-${i}`}
               aria-hidden="true"
-              className="flex h-11 w-11 items-center justify-center text-sm text-muted-foreground"
+              className="flex h-11 w-11 shrink-0 items-center justify-center text-sm text-muted-foreground max-sm:hidden"
             >
               …
             </span>
@@ -161,8 +182,9 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
               aria-current={p === page ? "page" : undefined}
               aria-label={text.page(p)}
               className={cn(
-                "inline-flex h-11 min-w-11 items-center justify-center rounded-md border border-input px-2 text-sm text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                p === page && "border-transparent bg-primary text-primary-foreground hover:bg-primary"
+                "inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-md border border-input px-2 text-sm text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                p === page && "border-transparent bg-primary text-primary-foreground hover:bg-primary",
+                Math.abs(p - page) > mobileSiblings && "max-sm:hidden"
               )}
             >
               {p}
@@ -174,7 +196,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
           onClick={() => go(page + 1)}
           disabled={page >= pageCount}
           aria-label={text.next}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          className={arrowClass}
         >
           <ChevronRight className="h-4 w-4" aria-hidden="true" />
         </button>

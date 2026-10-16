@@ -11,7 +11,7 @@ variants: "composição: Tabs · TabsList · TabsTrigger · TabsContent · a11y:
 
 > Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix. A aba ativa tem barra inferior de 3px em `primary` (≥4,97:1) e peso semibold, além do fundo: não depende só de cor. Alvo de 44px.
 
-**Arquivo:** `src/components/tabs.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/abas`
+**Arquivo:** `src/components/tabs.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/abas/
 
 ## Variantes
 
@@ -32,6 +32,10 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 8 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.0.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.1.0. Confira a versão instalada com `npm ls @semec/ds`.
 
 ## Uso
 
@@ -73,7 +77,12 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex min-h-11 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground",
+      // TST-29: sem quebra nem rolagem própria, a lista vazava 5px em 320px e
+      // rolava a página. Agora não passa da largura do pai (`max-w-full`) e
+      // rola na horizontal dentro de si (`overflow-x-auto`). `justify-center-safe`
+      // centraliza só quando cabe: com overflow, a primeira aba não fica cortada
+      // à esquerda. O `p-1` acomoda o anel de foco (2px + offset 2px).
+      "inline-flex min-h-11 max-w-full items-center justify-center-safe overflow-x-auto rounded-lg bg-muted p-1 text-muted-foreground",
       className
     )}
     {...props}

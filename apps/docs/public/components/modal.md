@@ -11,7 +11,7 @@ variants: "composição: Dialog · DialogTrigger · DialogContent · DialogHeade
 
 > Diálogo modal acessível com overlay, header, título, descrição e footer.
 
-**Arquivo:** `src/components/dialog.tsx` | **Categoria:** Feedback e estados | **Rota:** `/componentes/modal`
+**Arquivo:** `src/components/dialog.tsx` | **Categoria:** Feedback e estados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/modal/
 
 ## Variantes
 
@@ -33,9 +33,14 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @source "../node_modules/@semec/ds/dist/react";
 ```
 
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 8 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.0.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.1.0. Confira a versão instalada com `npm ls @semec/ds`.
+
 ## Uso
 
 ```tsx
+import * as React from "react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "@semec/ds/react";
 
 // Para confirmação destrutiva use AlertDialog (role="alertdialog").
@@ -52,11 +57,24 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 
 // Controlado SEM DialogTrigger: o Radix não sabe para onde devolver o foco.
 // Guarde o elemento de origem e devolva o foco em onCloseAutoFocus.
-const origemRef = React.useRef(null);
-<Button ref={origemRef} onClick={() => setAberto(true)}>Editar</Button>
-<Dialog open={aberto} onOpenChange={setAberto}>
-  <DialogContent onCloseAutoFocus={(e) => { e.preventDefault(); origemRef.current?.focus(); }}>…</DialogContent>
-</Dialog>
+function EdicaoControlada() {
+  const [aberto, setAberto] = React.useState(false);
+  // Tipe o ref (TS strict): sem o tipo, origemRef.current vira never.
+  const origemRef = React.useRef<HTMLButtonElement>(null);
+  return (
+    <>
+      <Button ref={origemRef} onClick={() => setAberto(true)}>Editar</Button>
+      <Dialog open={aberto} onOpenChange={setAberto}>
+        <DialogContent onCloseAutoFocus={(e) => { e.preventDefault(); origemRef.current?.focus(); }}>
+          <DialogHeader>
+            <DialogTitle>Editar contato</DialogTitle>
+            <DialogDescription>Atualize o telefone do responsável.</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
 ```
 
 ## Prompt para IA
