@@ -5,6 +5,7 @@
 // ←/→ trocam, Enter confirma (o escolhido comemora com a clip `escolhido`,
 // se houver), Esc volta ao menu (a TitleScreen cuida do Esc).
 import { useEffect, useRef, useState } from "react";
+import { tocar } from "./som/sfx";
 import styles from "./TitleScreen.module.css";
 
 export const JOGADORES = [
@@ -79,6 +80,7 @@ export default function EscolhaPersonagem({ baseUrl, leve = false, onConfirm, on
 
   const escolher = (i, foco = true) => {
     if (confirmando) return;
+    if (i !== sel) tocar("ui-mover");
     setSel(i);
     if (foco) opcoesRef.current[i]?.focus({ preventScroll: true });
   };
@@ -86,6 +88,7 @@ export default function EscolhaPersonagem({ baseUrl, leve = false, onConfirm, on
   const confirmar = async () => {
     if (confirmando) return;
     setConfirmando(true);
+    tocar("escolhido");
     await (vitrineRef.current?.confirmar(sel) ?? Promise.resolve());
     onConfirm?.(JOGADORES[sel]);
   };

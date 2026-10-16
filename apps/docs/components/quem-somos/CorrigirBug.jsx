@@ -56,6 +56,7 @@ import {
   Label,
   Link,
 } from "semec-ds/react";
+import { tocar } from "./som/sfx";
 import s from "./CorrigirBug.module.css";
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -314,7 +315,9 @@ export default function CorrigirBug({ item, onCorrigido }) {
     if (selecao === item.certa) {
       setAviso((a) => ({ texto: "", n: a.n + 1 }));
       setCorrigido(true);
+      tocar("bug-corrigido");
     } else {
+      tocar("ui-erro");
       setAviso((a) => ({ texto: `Ainda não… ${DICAS[item.bug]}`, n: a.n + 1 }));
     }
   };

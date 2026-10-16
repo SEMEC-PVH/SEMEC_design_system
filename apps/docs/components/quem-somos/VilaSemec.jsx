@@ -9,6 +9,10 @@ import CorrigirBug from "./CorrigirBug";
 import { assinarBicicleta, lerBicicleta, salvarBicicleta } from "./bicicleta";
 import { arquivoDoJogador, lerJogadorSalvo, salvarJogador } from "./EscolhaPersonagem";
 import FullscreenButton from "./FullscreenButton";
+import SomButton from "./SomButton";
+import { assinarSom, desbloquear, lerSom } from "./som/som";
+import { tocar } from "./som/sfx";
+import { tocarMusica } from "./som/musica";
 import { areaOf, CHEFE_POR_AREA, mapaDeLideres } from "./areas";
 import { CHEFES, LINGUAGENS, TREINADORES } from "./batalha/dados";
 import { nomeTipo } from "./batalha/motor";
@@ -167,6 +171,21 @@ export default function VilaSemec({ members }) {
   // Montado na bicicleta (o motor avisa; tecla B, botão do HUD ou do toque).
   // A bicicleta só vale depois da oficina do bicicletário (bicicleta.js).
   const [naBike, setNaBike] = useState(false);
+  // Som (som/): preferência "tudo" | "efeitos" | "desligado". O áudio só
+  // destrava no 1º clique/tecla (regra dos navegadores); aí a trilha entra.
+  const somPref = useSyncExternalStore(assinarSom, lerSom, () => "tudo");
+  const faixaRef = useRef(null);
+  useEffect(() => {
+    const destravar = () => {
+      if (desbloquear()) tocarMusica(faixaRef.current);
+    };
+    window.addEventListener("pointerdown", destravar, { capture: true });
+    window.addEventListener("keydown", destravar, { capture: true });
+    return () => {
+      window.removeEventListener("pointerdown", destravar, { capture: true });
+      window.removeEventListener("keydown", destravar, { capture: true });
+    };
+  }, []);
   // Preparo da Vila antes de jogar ({ fase, progresso }, avisado pelo motor) e
   // se o jogador já pediu para começar e está esperando o preparo.
   const [preparo, setPreparo] = useState({ fase: "cargas", progresso: 0 });
@@ -575,6 +594,7 @@ export default function VilaSemec({ members }) {
       aplicarColeta(id, { tipo: "concluir" });
       setColetaFeita(id);
       setDialog(null);
+      tocar("stack");
       if (!engine) return;
       // Quest dada dentro do prédio (o Rafa, na Galeria): as cenas só rodam na
       // Vila, então a entrega é na conversa e o painel mostra a Stack.
@@ -662,6 +682,7 @@ export default function VilaSemec({ members }) {
         primary: true,
         onSelect: () => {
           aplicarColeta(id, { tipo: "aceitar" });
+          tocar("quest-aceita");
           setDialog({ pages: [fala(resposta)], page: 0 });
         },
       });
@@ -792,7 +813,8 @@ export default function VilaSemec({ members }) {
         setModal({ tipo: "bug", quest: id, item, resto });
         return;
       }
-      const errou = () =>
+      const errou = () => {
+        tocar("ui-erro");
         setDialog({
           pages: [
             {
@@ -806,6 +828,7 @@ export default function VilaSemec({ members }) {
           ],
           page: 0,
         });
+      };
       function perguntar() {
         setDialog({
           pages: [
@@ -817,6 +840,7 @@ export default function VilaSemec({ members }) {
                 onSelect: () => {
                   if (i !== item.certa) return errou();
                   coletar();
+                  tocar("coleta");
                   setDialog({ pages: [{ title: "Resposta certa!", text: `${item.explicacao} ${resto}` }], page: 0 });
                 },
               })),
@@ -930,6 +954,7 @@ export default function VilaSemec({ members }) {
   }, [modal, aplicarColeta]);
 
   const concluirOficina = useCallback(() => {
+    tocar("stack");
     salvarBicicleta(true);
     setModal(null);
   }, []);
@@ -952,6 +977,7 @@ export default function VilaSemec({ members }) {
   useEffect(() => {
     onQuestFindRef.current = () => {
       avancarQuest("achou");
+      tocar("coleta");
       setDialog({
         pages: [
           {
@@ -1026,7 +1052,11 @@ export default function VilaSemec({ members }) {
           },
           modelUrl: `${basePath}/quem-somos/gava.glb`,
           playerModel: arquivoDoJogador((personagemRef.current ??= lerJogadorSalvo() ?? "homem")),
-          onBicicleta: setNaBike,
+          onBicicleta: (on) => {
+            setNaBike(on);
+            tocar(on ? "campainha" : "bike-desce");
+          },
+          onSom: (nome, opts) => tocar(nome, opts),
           bicicletaLiberada: lerBicicleta(),
           onPreparo: setPreparo,
           carregando: true,
@@ -1262,6 +1292,14 @@ export default function VilaSemec({ members }) {
         ? current.falante
         : null;
 
+  // Blip de fala a cada letra nova (voz por personagem; placas e avisos têm
+  // a voz "placa"). sfx.js limita a frequência.
+  const vozDaFala = falante?.retrato ?? "placa";
+  useEffect(() => {
+    if (digitacao.pronto) return;
+    if (/[\p{L}\p{N}]/u.test(digitacao.visivel.slice(-1))) tocar("fala", { quem: vozDaFala });
+  }, [digitacao.visivel, digitacao.pronto, vozDaFala]);
+
   const focusChoices = useCallback(() => {
     actionsRef.current?.querySelector("button")?.focus({ preventScroll: true });
   }, []);
@@ -1291,6 +1329,7 @@ export default function VilaSemec({ members }) {
   }, [dialog, modal, ficha, cena, pularCena, focusStage]);
 
   const advance = useCallback(() => {
+    tocar("ui-mover");
     // Fala ainda aparecendo: o primeiro toque completa o texto.
     if (!digitacao.pronto) {
       digitacao.completar();
@@ -1391,6 +1430,7 @@ export default function VilaSemec({ members }) {
   const selectChoice = (action) => (e) => {
     // Clique de teclado vindo da mesma tecla que abriu a conversa: ignora.
     if (e.detail === 0 && performance.now() - actionsShownAt.current < GUARDA_ESCOLHA_MS) return;
+    tocar("ui-ok");
     // Ações montadas no render (sem onSelect): "Ver ficha" e o "Fechar" dela.
     if (action.ficha) setFicha(action.ficha);
     else if (action.fechar) dismiss();
@@ -1440,6 +1480,12 @@ export default function VilaSemec({ members }) {
   // da entrega.
   const questConcluida = questEtapa === "concluida";
   const naVila = local === "vila";
+  // Trilha: título → Vila / prédio → batalha; nada durante o carregamento.
+  const faixa = carregandoTudo ? null : !started ? "titulo" : modal?.tipo === "batalha" ? "batalha" : naVila ? "vila" : "predio";
+  useEffect(() => {
+    faixaRef.current = faixa;
+    tocarMusica(somPref === "tudo" ? faixa : null);
+  }, [faixa, somPref]);
   const mostrarQuest = started && !cena && naVila && (questFeita || (!questConcluida && (questPerto || questEtapa !== "nova")));
   // Stacks no HUD (insígnias de insignias.js): ginásios, ocarina e as das
   // quests do Zé e da Emily; cinza enquanto não conquistadas.
@@ -1570,6 +1616,7 @@ export default function VilaSemec({ members }) {
               <a className="vila-panel vila-skip" href="#equipe">
                 Ver equipe em lista
               </a>
+              <SomButton />
               <FullscreenButton />
             </div>
             {mostrarQuest && (

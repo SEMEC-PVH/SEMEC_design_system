@@ -695,6 +695,9 @@ export function createVila(host, options) {
     onPreparo = () => {},
     // Nasce com a tela de carregamento por cima (ver setCarregando).
     carregando = false,
+    // Som (som/sfx.js): onSom(nome, opts) a cada passo (pelo chão), catraca
+    // da bicicleta, porta e elevador. A UI decide se toca.
+    onSom = () => {},
     // Nível gráfico (scene/qualidade.js): "high" | "medium" | "low" | "minimal".
     // Sombras, antialias e resolução seguem o nível; nos dois mais baixos a
     // cena já nasce com modelos e vegetação leves. `autoQuality`: pode descer
@@ -1693,7 +1696,14 @@ export function createVila(host, options) {
     if (!noPredio()) veg.rustle(nx, ny);
     if (coding) stopCoding();
     player.idle = 0;
+    onSom(somDoPasso(nx, ny));
     return true;
+  }
+  // Som do passo pelo chão: grama/mato, calçada, madeira (Galeria), carpete.
+  function somDoPasso(x, y) {
+    if (bike.on) return "pneu";
+    if (noPredio()) return interior?.galeria || local === "galeria" ? "passo-madeira" : "passo-carpete";
+    return map[y]?.[x] === PATH ? "passo-pedra" : "passo-grama";
   }
 
   function paintMarker(npc, color) {
@@ -2139,8 +2149,10 @@ export function createVila(host, options) {
   };
 
   // `para`: id do andar ou "vila". `modo`: "porta" (rua) ou "elevador".
+  let catracaT = 0;
   function entrarOuSair(para, modo = "porta") {
     if (transicao || cutscene.active || para === local) return;
+    if (modo === "porta") onSom("porta");
     held.length = 0;
     player.path = [];
     player.pending = null;
@@ -2225,7 +2237,11 @@ export function createVila(host, options) {
     if (nome === "abrir") tr.porta = 0;
     if (tr.fase !== "abrir") {
       if (nome === "chamar") interior.sinalElevador?.("chamando");
-      else if (nome === "abrir") interior.sinalElevador?.("ding");
+      else if (nome === "abrir") {
+        interior.sinalElevador?.("ding");
+        onSom("elevador-ding");
+        onSom("elevador-porta");
+      } else if (nome === "fechar") onSom("elevador-porta");
       else if (nome === "entrar") {
         tr.de = player.root.position.clone();
         if (!dur) tr.dur = duracaoDoPasso(tr.de, tr.ate);
@@ -2244,8 +2260,10 @@ export function createVila(host, options) {
     else if (nome === "ding") {
       interior.displayElevador?.(rotuloDoNumero(tr.ateAndar), 0);
       interior.sinalElevador?.("ding");
+      onSom("elevador-ding");
     } else if (nome === "abrir") {
       zoomElevadorAlvo = 1;
+      onSom("elevador-porta");
       if (!reducedMotion) {
         // A saída já fica traçada: a câmera recua da cabine para o "seguir"
         // numa curva só, das portas abrindo até ele parar.
@@ -3250,7 +3268,18 @@ export function createVila(host, options) {
     if (bike.on) pilotarBike(dt, omega);
     else if (walking && actions?.andando) actions.andando.timeScale = walkTimeScale();
     if (mixer) mixer.update(dt);
-    if (bike.on) girarBike();
+    if (bike.on) {
+      girarBike();
+      // Roda livre: freando ou embalado sem pedalar, a catraca "tica" mais
+      // rápido quanto maior o embalo.
+      if (bike.vel > 0.08 && !held.length) {
+        catracaT -= dt;
+        if (catracaT <= 0) {
+          onSom("catraca");
+          catracaT = 0.035 + (1 - bike.vel) * 0.09;
+        }
+      }
+    }
     // Na galeria, a Vila fica parada: só o relógio anda.
     if (noPredio()) {
       tickMuseu(dt);

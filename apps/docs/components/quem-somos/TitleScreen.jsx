@@ -8,10 +8,12 @@
 //      escolhe (em Gráficos, troca o nível; ←/→ também), Esc volta;
 //   3. "Novo jogo" abre a escolha de personagem (EscolhaPersonagem).
 // O VilaSemec controla `started`; aqui só chamamos onStart(jogador).
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import EscolhaPersonagem from "./EscolhaPersonagem";
 import FullscreenButton from "./FullscreenButton";
 import { OPCOES, ROTULO, ehLeve } from "./scene/qualidade";
+import { assinarSom, lerSom, proximaOpcaoSom, ROTULO_SOM, salvarSom } from "./som/som";
+import { tocar } from "./som/sfx";
 import styles from "./TitleScreen.module.css";
 
 const YEAR = 2026;
@@ -31,7 +33,16 @@ export default function TitleScreen({
   const menuRef = useRef(null);
   const pressRef = useRef(null);
 
-  const openMenu = useCallback(() => setStage("menu"), []);
+  const openMenu = useCallback(() => {
+    tocar("ui-ok");
+    setStage("menu");
+  }, []);
+  const somPref = useSyncExternalStore(assinarSom, lerSom, () => "tudo");
+  // Troca de tela do menu com o som de confirmação (ou de voltar).
+  const irPara = (nova, voltar = false) => {
+    tocar(voltar ? "ui-voltar" : "ui-ok");
+    setStage(nova);
+  };
 
   // Teclado na captura da janela (o VilaSemec também escuta Enter e
   // começaria o jogo direto):
@@ -52,6 +63,7 @@ export default function TitleScreen({
       } else if (e.key === "Escape") {
         e.preventDefault();
         e.stopImmediatePropagation();
+        tocar("ui-voltar");
         setStage(stage === "menu" ? "press" : "menu");
       } else if ((e.key === "Enter" || e.key === " ") && !inBox && !t.closest?.("a, button")) {
         e.preventDefault();
@@ -87,10 +99,16 @@ export default function TitleScreen({
     const i = items.indexOf(document.activeElement);
     if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && e.target.dataset.graficos) {
       e.preventDefault();
+      tocar("ui-mover");
       trocarGraficos(e.key === "ArrowRight" ? 1 : -1);
+    } else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && e.target.dataset.som) {
+      e.preventDefault();
+      salvarSom(proximaOpcaoSom(somPref));
+      tocar("ui-mover");
     } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
       const next = (i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+      tocar("ui-mover");
       items[next]?.focus({ preventScroll: true });
     }
   };
@@ -129,19 +147,19 @@ export default function TitleScreen({
                 baseUrl={baseUrl}
                 leve={ehLeve(nivelAtual)}
                 onConfirm={onStart}
-                onVoltar={() => setStage("menu")}
+                onVoltar={() => irPara("menu", true)}
               />
             </div>
           ) : stage === "menu" ? (
             <nav aria-label="Menu do jogo">
               <ul ref={menuRef} className={styles.menu}>
                 <li>
-                  <button type="button" className={styles.item} onClick={() => setStage("personagem")}>
+                  <button type="button" className={styles.item} onClick={() => irPara("personagem")}>
                     Novo jogo
                   </button>
                 </li>
                 <li>
-                  <button type="button" className={styles.item} onClick={() => setStage("help")}>
+                  <button type="button" className={styles.item} onClick={() => irPara("help")}>
                     Como jogar
                   </button>
                 </li>
@@ -151,9 +169,25 @@ export default function TitleScreen({
                     className={styles.item}
                     data-graficos="true"
                     aria-describedby="vila-graficos-dica"
-                    onClick={() => trocarGraficos(1)}
+                    onClick={() => {
+                      tocar("ui-mover");
+                      trocarGraficos(1);
+                    }}
                   >
                     Gráficos: <span className={styles.valor}>{rotuloGraficos}</span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className={styles.item}
+                    data-som="true"
+                    onClick={() => {
+                      salvarSom(proximaOpcaoSom(somPref));
+                      tocar("ui-mover");
+                    }}
+                  >
+                    Som: <span className={styles.valor}>{ROTULO_SOM[somPref]}</span>
                   </button>
                 </li>
                 <li>
@@ -198,7 +232,7 @@ export default function TitleScreen({
                 <dt>Clique</dt>
                 <dd>Andar até o ponto</dd>
               </dl>
-              <button type="button" className={styles.item} onClick={() => setStage("menu")}>
+              <button type="button" className={styles.item} onClick={() => irPara("menu", true)}>
                 Voltar
               </button>
             </div>

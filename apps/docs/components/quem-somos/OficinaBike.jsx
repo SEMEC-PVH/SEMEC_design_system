@@ -10,6 +10,7 @@
 // caixas do cursor e da faixa na tela. Cada etapa tem faixa mais estreita e
 // cursor mais rápido; com movimento reduzido, tudo mais lento e mais largo.
 import { useRef, useState } from "react";
+import { tocar } from "./som/sfx";
 import s from "./OficinaBike.module.css";
 
 const ETAPAS = [
@@ -34,6 +35,9 @@ export default function OficinaBike({ onConcluir }) {
     if (!c || !f) return;
     const meio = c.left + c.width / 2;
     if (meio >= f.left && meio <= f.right) {
+      // Pneu: o "psss" da bomba; nas outras etapas, só o acerto.
+      if (etapa === 0) tocar("bomba");
+      tocar("acerto");
       setAcertou(true);
       setAviso(etapa === ETAPAS.length - 1 ? "Perfeito!" : "Acertou! Próxima etapa…");
       setTimeout(() => {
@@ -42,6 +46,7 @@ export default function OficinaBike({ onConcluir }) {
         setEtapa((e) => e + 1);
       }, 900);
     } else {
+      tocar("ui-erro");
       setErros((n) => n + 1);
       setAviso(meio < f.left ? "Cedo demais! Tente de novo." : "Passou do ponto! Tente de novo.");
     }

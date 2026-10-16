@@ -5,6 +5,7 @@ import { GOLPES, ITENS, LINGUAGENS, MOTIVO_VANTAGEM, VANTAGEM, multiplicadorTipo
 import { criarLutador, iniciarBatalha, jogarTurno, nomeTipo, xpParaProximo } from "./motor";
 import { Cenario, Sprite } from "./Sprite";
 import Evolucao from "./Evolucao";
+import { tocar } from "../som/sfx";
 import s from "./batalha.module.css";
 
 // Quanto tempo cada evento fica na tela antes do próximo (ms).
@@ -246,12 +247,15 @@ export default function Batalha({ jogador, chefe, onFim }) {
         }
         if (ev.texto) setMensagem(ev.texto);
         if (ev.tipo === "dano") {
+          // Golpe: mais forte quanto maior a fração de vida tirada.
+          tocar(ev.valor / Math.max(ev.maxHp, 1) > 0.3 ? "golpe-forte" : ev.valor ? "golpe" : "golpe-fraco");
           setAnim({ lado: ev.lado, tipo: "hit" });
           setAviso(`${ev.lado === "jogador" ? "Você" : "O adversário"} perdeu ${ev.valor} de vida: ${ev.hp} de ${ev.maxHp}.`);
           setVis((v) => (ev.lado === "jogador" ? { ...v, jHp: ev.hp } : { ...v, oHp: ev.hp }));
         } else if (ev.tipo === "cura") {
           setVis((v) => ({ ...v, jHp: ev.hp }));
         } else if (ev.tipo === "desmaio") {
+          tocar(ev.lado === "jogador" ? "derrota" : "vitoria");
           setAnim({ lado: ev.lado, tipo: "desmaio" });
         } else if (ev.tipo === "entra") {
           setAnim(null);
