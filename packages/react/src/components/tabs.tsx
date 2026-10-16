@@ -14,7 +14,12 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex min-h-11 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground",
+      // TST-29: sem quebra nem rolagem própria, a lista vazava 5px em 320px e
+      // rolava a página. Agora não passa da largura do pai (`max-w-full`) e
+      // rola na horizontal dentro de si (`overflow-x-auto`). `justify-center-safe`
+      // centraliza só quando cabe: com overflow, a primeira aba não fica cortada
+      // à esquerda. O `p-1` acomoda o anel de foco (2px + offset 2px).
+      "inline-flex min-h-11 max-w-full items-center justify-center-safe overflow-x-auto rounded-lg bg-muted p-1 text-muted-foreground",
       className
     )}
     {...props}

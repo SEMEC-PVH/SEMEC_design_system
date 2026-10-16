@@ -251,6 +251,22 @@ function tokenValue(name: string) {
   return new RegExp(`${name}\\s*:\\s*([^;]+);`).exec(tokensCss)?.[1].split("/*")[0].trim();
 }
 
+describe("TST-21: Button com rótulo longo quebra em vez de rolar", () => {
+  it.each(["sm", "md", "lg"] as const)("size %s: sem whitespace-nowrap e com altura mínima", (size) => {
+    render(<Button size={size}>Emitir a segunda via do carnê do IPTU de todos os imóveis do contribuinte</Button>);
+    const list = classes(screen.getByRole("button"));
+    expect(list).not.toContain("whitespace-nowrap");
+    expect(list.some((c) => /^min-h-(9|11|12)$/.test(c))).toBe(true);
+    expect(list.some((c) => /^h-\d+$/.test(c))).toBe(false);
+    expect(list).toContain("text-balance");
+  });
+
+  it("o botão de ícone mantém 44×44 fixo", () => {
+    render(<Button size="icon" aria-label="Fechar" />);
+    expect(screen.getByRole("button", { name: "Fechar" })).toHaveClass("h-11", "w-11");
+  });
+});
+
 describe("TST-22: polegar do Slider com alvo ≥ 44×44", () => {
   it("o ::after parte da caixa de padding de 16px e cresce 14px por lado", () => {
     render(<Slider defaultValue={[5]} max={10} aria-label="Raio" />);
@@ -258,5 +274,21 @@ describe("TST-22: polegar do Slider com alvo ≥ 44×44", () => {
     // h-5 (20px) − borda de 2px × 2 = 16px de caixa de padding.
     expect(thumb).toEqual(expect.arrayContaining(["h-5", "w-5", "border-2", "after:-inset-3.5"]));
     expect(16 + 2 * 3.5 * 4).toBeGreaterThanOrEqual(44);
+  });
+});
+
+describe("TST-29: TabsList não rola a página em 320px", () => {
+  it("a lista fica na largura do pai e rola dentro de si", () => {
+    render(
+      <Tabs defaultValue="a">
+        <TabsList>
+          <TabsTrigger value="a">Dados pessoais</TabsTrigger>
+          <TabsTrigger value="b">Documentos</TabsTrigger>
+        </TabsList>
+      </Tabs>
+    );
+    const list = classes(screen.getByRole("tablist"));
+    expect(list).toEqual(expect.arrayContaining(["max-w-full", "overflow-x-auto", "justify-center-safe"]));
+    expect(list).not.toContain("justify-center");
   });
 });
