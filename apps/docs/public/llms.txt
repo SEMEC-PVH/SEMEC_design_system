@@ -4,6 +4,8 @@
 
 Site: https://semec-pvh.github.io/SEMEC_design_system/
 
+> **Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (patch) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.2.1. Confira a versão instalada com `npm ls @semec/ds`.**
+
 ## Instalar
 
 ```bash
@@ -49,7 +51,7 @@ No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca 
   Uso: `import { Select } from "@semec/ds/react";`
 - [Combobox (`combobox`) — Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.](https://semec-pvh.github.io/SEMEC_design_system/componentes/combobox/) — `src/components/combobox.tsx` — md: https://semec-pvh.github.io/SEMEC_design_system/components/combobox.md
   Uso: `import { Combobox } from "@semec/ds/react";`
-- [Seletor de data (`date-picker`) — Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).](https://semec-pvh.github.io/SEMEC_design_system/componentes/seletor-de-data/) — `src/components/date-picker.tsx` — md: https://semec-pvh.github.io/SEMEC_design_system/components/seletor-de-data.md
+- [Seletor de data (`date-picker`) — Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). O formato mostrado (dd/mm/aaaa ou mm/dd/aaaa) vem do idioma do navegador, não do `lang` da página: nos PCs da prefeitura, deixe o navegador em português. Num navegador sem `type="date"` o campo vira texto e `onValueChange` recebe o que foi digitado, então valide o ISO no schema (ex.: `z.string().regex(/^\d{4}-\d{2}-\d{2}$/)`). Em teste automatizado, preencha com `fill("2026-10-16")`, não digitando a data.](https://semec-pvh.github.io/SEMEC_design_system/componentes/seletor-de-data/) — `src/components/date-picker.tsx` — md: https://semec-pvh.github.io/SEMEC_design_system/components/seletor-de-data.md
   Uso: `import { DatePicker } from "@semec/ds/react";`
 - [Envio de arquivos (`file-upload`) — Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio.](https://semec-pvh.github.io/SEMEC_design_system/componentes/envio-de-arquivos/) — `src/components/file-upload.tsx` — md: https://semec-pvh.github.io/SEMEC_design_system/components/envio-de-arquivos.md
   Uso: `import { FileUpload } from "@semec/ds/react";`
@@ -168,4 +170,4 @@ Padrões de tela (navegação, formulários, dados e relatórios, feedback, aces
 3. Copie o snippet da seção "Uso" de `https://semec-pvh.github.io/SEMEC_design_system/components/<slug>.md` ou do `manifest.json`
 4. Aplique tokens L1 (`--action-primary` etc.), nunca hex solto
 
-> Gerado 2026-10-16T16:45:23.000Z a partir de packages/react/manifest.js. Versão 4.2.0.
+> Gerado 2026-10-16T18:16:03.000Z a partir de packages/react/manifest.js. Versão 4.2.0.

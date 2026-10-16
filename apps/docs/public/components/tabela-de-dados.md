@@ -35,6 +35,8 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 
 No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
+> Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (patch) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.2.1. Confira a versão instalada com `npm ls @semec/ds`.
+
 ## Uso
 
 ```tsx
@@ -176,7 +178,10 @@ interface DataTableProps<T> extends React.HTMLAttributes<HTMLDivElement> {
   labels?: Partial<DataTableLabels>;
 }
 
-function DataTableInner<T extends Record<string, unknown>>(
+// NEXT42-03: `T extends object` (e não `Record<string, unknown>`) para aceitar
+// linhas tipadas com `interface`, que não têm assinatura de índice. Alargar a
+// restrição não quebra quem já passava `type`.
+function DataTableInner<T extends object>(
   {
     columns,
     data,
@@ -245,13 +250,15 @@ function DataTableInner<T extends Record<string, unknown>>(
 
   return (
     <div ref={_ref} className={cn("w-full", className)} {...props}>
+      {/* V42-VITE-05: a <caption> ficava dentro da área rolável, com a
+          largura da tabela, e saía cortada no mobile. O texto visível agora
+          fica fora do overflow (abaixo da tabela, como antes) e continua
+          nomeando a tabela, por aria-labelledby. */}
       <div className="relative w-full overflow-auto rounded-md border border-border">
-        <table className="w-full caption-bottom text-sm">
-          {caption && (
-            <caption className="mt-4 text-sm text-muted-foreground">
-              {caption}
-            </caption>
-          )}
+        <table
+          className="w-full text-sm"
+          aria-labelledby={caption ? `${idBase}-caption` : undefined}
+        >
           <thead className="border-b border-border bg-muted/50">
             <tr>
               {columns.map((col, colIndex) => (
@@ -341,7 +348,7 @@ function DataTableInner<T extends Record<string, unknown>>(
                     >
                       {col.render
                         ? col.render(row, index)
-                        : String(row[col.key] ?? "")}
+                        : String((row as Record<string, unknown>)[col.key] ?? "")}
                     </td>
                   ))}
                 </tr>
@@ -350,6 +357,11 @@ function DataTableInner<T extends Record<string, unknown>>(
           </tbody>
         </table>
       </div>
+      {caption && (
+        <p id={`${idBase}-caption`} className="mt-4 text-center text-sm text-muted-foreground">
+          {caption}
+        </p>
+      )}
 
       {page !== undefined && pageCount !== undefined && pageCount > 1 && (
         // Abaixo de `sm` o rodapé vira coluna e os botões podem quebrar de
@@ -385,7 +397,7 @@ function DataTableInner<T extends Record<string, unknown>>(
 }
 
 const DataTable = React.forwardRef(DataTableInner) as <
-  T extends Record<string, unknown>
+  T extends object
 >(
   props: DataTableProps<T> & { ref?: React.Ref<HTMLDivElement> }
 ) => React.ReactElement;
