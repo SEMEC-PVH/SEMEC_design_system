@@ -5,6 +5,7 @@ import { Bike, Moon, Sun } from "lucide-react";
 import TitleScreen from "./TitleScreen";
 import TelaCarregamento from "./TelaCarregamento";
 import OficinaBike from "./OficinaBike";
+import CorrigirBug from "./CorrigirBug";
 import { assinarBicicleta, lerBicicleta, salvarBicicleta } from "./bicicleta";
 import { arquivoDoJogador, lerJogadorSalvo, salvarJogador } from "./EscolhaPersonagem";
 import FullscreenButton from "./FullscreenButton";
@@ -575,6 +576,23 @@ export default function VilaSemec({ members }) {
       setColetaFeita(id);
       setDialog(null);
       if (!engine) return;
+      // Quest dada dentro do prédio (o Rafa, na Galeria): as cenas só rodam na
+      // Vila, então a entrega é na conversa e o painel mostra a Stack.
+      const q = QUESTS_COLETA[id];
+      if (q.local) {
+        setDialog({
+          pages: [
+            {
+              title: q.nomeNpc,
+              falante: { name: q.nomeNpc, retrato: q.npc },
+              ficha: q.npc,
+              text: `Você corrigiu todos os bugs! Acessibilidade não é enfeite: é o que deixa o serviço da prefeitura chegar a todo mundo. Leve a ${q.recompensa.nome}: ela fica na sua StackDex.`,
+            },
+          ],
+          page: 0,
+        });
+        return;
+      }
       const cenaAtual = ++cenaId.current;
       setCena(true);
       engine.playCutscene(cenaColeta({ quest: QUESTS_COLETA[id] })).then(() => {
@@ -679,6 +697,39 @@ export default function VilaSemec({ members }) {
             ]),
           ];
         }
+      } else if (id === "bugs") {
+        // Rafa, na Galeria: apresenta o Design System e dá a caça aos bugs.
+        if (est.etapa === "nova") {
+          pages = [
+            fala(
+              "Oi! Eu sou o Rafa, cuido dos componentes do SEMEC Design System. Sabe aquela exposição aqui da Galeria? Botões, cores, alertas, formulários... tudo pronto e acessível para qualquer sistema da prefeitura usar."
+            ),
+            fala(
+              "O problema é que ainda tem tela feita sem o kit por aí, e com bug de acessibilidade: texto que ninguém lê, botão que some no teclado, foto sem descrição... Achei seis! Você me ajuda a corrigir usando o Design System?",
+              [
+                aceitar(
+                  "Valeu! Os bugs brilham em vermelho. Tem quatro lá fora na Vila (perto das placas do Rio Madeira, do Front-End, do Back-End e da entrada), um na recepção do térreo e um no andar da Tecnologia. Chegue perto e aperte Espaço."
+                ),
+                agoraNao,
+              ]
+            ),
+          ];
+        } else if (est.etapa === "coletando") {
+          const faltam = q.itens.filter((i) => !est.itens.includes(i.id)).map((i) => i.onde.toLowerCase());
+          pages = [
+            fala(
+              `Já foram ${est.itens.length} de ${q.itens.length}! Ainda faltam: ${faltam.join("; ")}. Os bugs brilham em vermelho: chegue perto e aperte Espaço.`
+            ),
+          ];
+        } else if (est.etapa === "pronta") {
+          pages = [fala("Você achou e corrigiu todos os seis! Deixa eu ver...", [entregar("Mostrar as correções")])];
+        } else {
+          pages = [
+            fala(
+              "Graças a você, as telas da Vila estão acessíveis! Quando for fazer um sistema novo, comece pelo kit: os componentes já vêm com contraste, foco e rótulos certos."
+            ),
+          ];
+        }
       } else {
         // Emily: mini game "Campanha da SEMEC".
         const jogar = (label) => ({
@@ -734,6 +785,13 @@ export default function VilaSemec({ members }) {
         aplicarColeta(id, { tipo: "coletar", item: itemId });
         engineRef.current?.coletar(id, itemId);
       };
+      // Bug de acessibilidade (quest do Rafa): a correção é um modal com o
+      // "antes" e o "depois" (CorrigirBug.jsx).
+      if (q.tipoItem === "bug") {
+        setDialog(null);
+        setModal({ tipo: "bug", quest: id, item, resto });
+        return;
+      }
       const errou = () =>
         setDialog({
           pages: [
@@ -861,6 +919,16 @@ export default function VilaSemec({ members }) {
       page: 0,
     });
   }, [dismiss]);
+  // Bug corrigido no modal: coleta e avisa quantos faltam.
+  const bugCorrigido = useCallback(() => {
+    if (modal?.tipo !== "bug") return;
+    const { quest: id, item, resto } = modal;
+    aplicarColeta(id, { tipo: "coletar", item: item.id });
+    engineRef.current?.coletar(id, item.id);
+    setModal(null);
+    setDialog({ pages: [{ title: "Bug corrigido!", text: `${item.onde}: agora está acessível. ${resto}` }], page: 0 });
+  }, [modal, aplicarColeta]);
+
   const concluirOficina = useCallback(() => {
     salvarBicicleta(true);
     setModal(null);
@@ -902,9 +970,12 @@ export default function VilaSemec({ members }) {
   useEffect(() => {
     onInspectRef.current = (ev) => {
       if (!started || cena || modal) return;
-      // Na galeria, todo mundo só mostra a ficha (sem quests nem batalhas).
+      // Na galeria, todo mundo só mostra a ficha (sem batalhas)...
       if (ev?.museu) {
-        if (ehFicha(ev.id)) setFicha(ev.id);
+        // ...menos quem dá quest ali (o Rafa: caça aos bugs).
+        const questGaleria = questDoNpc(ev.id, "galeria");
+        if (questGaleria) abrirQuestColeta(questGaleria);
+        else if (ehFicha(ev.id)) setFicha(ev.id);
         return;
       }
       // Zé Carlos e Emily dão quest: conversam em vez de abrir a ficha (a
@@ -1341,7 +1412,8 @@ export default function VilaSemec({ members }) {
     if (q) hint = `Espaço: ver o quadro de ${q.nome}`;
     else if (p) hint = `Espaço: conhecer ${p.nome} (${p.setor})`;
   } else if (!dialog && !modal && facing?.type === "museu-pessoa" && ehFicha(facing.id)) {
-    hint = `Espaço: falar com ${FICHAS[facing.id].nome}`;
+    const qg = questDoNpc(facing.id, "galeria");
+    hint = `Espaço: falar com ${FICHAS[facing.id].nome}${qg ? ` (quest: ${QUESTS_COLETA[qg].titulo})` : ""}`;
   } else if (!dialog && !modal && facing?.type === "npc" && members[facing.index]) {
     const chefeId = lideres.get(facing.index);
     const papel = chefeId
@@ -1383,7 +1455,8 @@ export default function VilaSemec({ members }) {
   const mostrarColeta = (id) =>
     started &&
     !cena &&
-    naVila &&
+    // A caça aos bugs também tem itens nos andares: o painel vale no prédio.
+    (naVila || Boolean(QUESTS_COLETA[id].local)) &&
     (coletaFeita === id || (coletas[id].etapa !== "concluida" && (coletaPerto[id] || coletas[id].etapa !== "nova")));
 
   return (
@@ -1806,6 +1879,11 @@ export default function VilaSemec({ members }) {
 
       {ficha && <FichaPersonagem id={ficha} onClose={fecharFicha} onChange={setFicha} />}
 
+      {modal?.tipo === "bug" && (
+        <ModalJornada titulo={`Bug: ${modal.item.onde}`} onFechar={fecharModal}>
+          <CorrigirBug key={modal.item.id} item={modal.item} onCorrigido={bugCorrigido} />
+        </ModalJornada>
+      )}
       {modal?.tipo === "oficina" && (
         <ModalJornada titulo="Oficina da bicicleta" onFechar={fecharModal}>
           <OficinaBike onConcluir={concluirOficina} />

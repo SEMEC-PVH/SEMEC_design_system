@@ -790,6 +790,21 @@ export function createPersonagens({ scene, loader, baseUrl, lite = false, reduce
     return id ? { id } : null;
   }
 
+  // Raiz do dono `id` (Group parado no tile dele; não pula nem gira com a
+  // fala, que vão no `corpo` filho): o motor pendura ali o cristal de quest.
+  // Existe desde a criação, antes do GLB chegar. null se não está aqui.
+  const raizDe = (id) => pessoas.get(id)?.dono.root ?? null;
+
+  // Tile { x, y } do dono `id` (para "perto de quem dá a quest") ou null.
+  function tileDe(id) {
+    for (const [k, v] of porTile) {
+      if (v !== id) continue;
+      const [x, y] = k.split(",").map(Number);
+      return { x, y };
+    }
+    return null;
+  }
+
   // Jogador falou: os dois se viram para ele e se exibem; depois de
   // FALA_SEGUNDOS voltam à pose (atualizar).
   function falar(id, yaw) {
@@ -841,5 +856,5 @@ export function createPersonagens({ scene, loader, baseUrl, lite = false, reduce
   // Para a prévia e a depuração (o motor usa o retorno).
   grupo.userData.setJogador = setJogador;
 
-  return { update, at, falar, setJogador, hitProxies, dispose };
+  return { update, at, raizDe, tileDe, falar, setJogador, hitProxies, dispose };
 }

@@ -1,10 +1,18 @@
-// Testes das quests de coleta do Zé Carlos e da Emily (funções puras de
-// quests-coleta.js). Rodar: npm run test:batalha (em apps/docs).
+// Testes das quests de coleta do Zé Carlos, da Emily e do Rafa (funções puras
+// de quests-coleta.js). Rodar: npm run test:batalha (em apps/docs).
 
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
-import { IDS_COLETA, QUESTS_COLETA, objetivoColeta, questDoNpc, transicao } from "../../quests-coleta.js";
+import { IDS_COLETA, QUESTS_COLETA, localDoItem, objetivoColeta, questDoNpc, transicao } from "../../quests-coleta.js";
+
+// ids dos andares lidos do código-fonte de predio/andares.js: o módulo importa
+// semfaz.json sem atributo de importação, que o Node puro não carrega.
+const FONTE_ANDARES = readFileSync(new URL("../../predio/andares.js", import.meta.url), "utf8");
+const ANDARES_IDS = [...FONTE_ANDARES.matchAll(/\bid: "([a-z-]+)",\s*numero:/g)].map((m) => m[1]);
+const LOCAIS = new Set(["vila", ...ANDARES_IDS]);
+const TIPOS_BUG = ["contraste", "foco", "alt", "link", "cor", "label"];
 
 const NOVA = { etapa: "nova", itens: [] };
 
@@ -60,17 +68,62 @@ describe("dados das quests", () => {
     assert.equal(questDoNpc("pedro"), null);
   });
 
-  it("itens em tiles diferentes e ids únicos", () => {
+  it("quest com local só é dada naquele lugar", () => {
+    // O Rafa da Vila é o líder do ginásio; a quest é do Rafa da Galeria.
+    assert.equal(questDoNpc("rafa"), null);
+    assert.equal(questDoNpc("rafa", "galeria"), "bugs");
+    assert.equal(questDoNpc("rafa", "terreo"), null);
+    assert.equal(questDoNpc("ze-carlos", "galeria"), null);
+  });
+
+  it("itens em tiles diferentes (por local) e ids únicos", () => {
     const tiles = new Set();
+    const todosIds = new Set();
     for (const id of IDS_COLETA) {
       const ids = QUESTS_COLETA[id].itens.map((i) => i.id);
       assert.equal(new Set(ids).size, ids.length);
       for (const i of QUESTS_COLETA[id].itens) {
-        const k = `${i.x},${i.y}`;
+        assert.ok(!todosIds.has(i.id), `id repetido entre quests: ${i.id}`);
+        todosIds.add(i.id);
+        const k = `${localDoItem(i)}:${i.x},${i.y}`;
         assert.ok(!tiles.has(k), `tile repetido ${k}`);
         tiles.add(k);
       }
     }
+  });
+
+  it("todo item fica num local que existe (vila ou andar do prédio)", () => {
+    assert.ok(ANDARES_IDS.includes("galeria"), "andares.js mudou de formato?");
+    for (const id of IDS_COLETA) {
+      const q = QUESTS_COLETA[id];
+      if (q.local) assert.ok(LOCAIS.has(q.local), `${id}: local ${q.local}`);
+      for (const i of q.itens) assert.ok(LOCAIS.has(localDoItem(i)), `${id}/${i.id}: local ${localDoItem(i)}`);
+    }
+  });
+
+  it("quest do Rafa: 6 bugs completos, um de cada tipo", () => {
+    const q = QUESTS_COLETA.bugs;
+    assert.equal(q.npc, "rafa");
+    assert.equal(q.local, "galeria");
+    assert.equal(q.recompensa.id, "acessibilidade");
+    assert.equal(q.itens.length, 6);
+    assert.deepEqual(q.itens.map((i) => i.bug).sort(), [...TIPOS_BUG].sort());
+    for (const b of q.itens) {
+      assert.ok(TIPOS_BUG.includes(b.bug), `${b.id}: bug ${b.bug}`);
+      for (const campo of ["onde", "problema", "pergunta", "wcag", "explicacao"]) {
+        assert.ok(typeof b[campo] === "string" && b[campo].length > 0, `${b.id}: falta ${campo}`);
+      }
+      assert.match(b.wcag, /^\d\.\d\.\d+ /, `${b.id}: wcag sem número do critério`);
+      assert.equal(b.opcoes.length, 3, `${b.id}: 3 opções`);
+      assert.equal(new Set(b.opcoes).size, 3, `${b.id}: opções repetidas`);
+      assert.ok(Number.isInteger(b.certa) && b.certa >= 0 && b.certa < b.opcoes.length, `${b.id}: certa`);
+      assert.ok(Number.isInteger(b.x) && Number.isInteger(b.y), `${b.id}: tile`);
+    }
+  });
+
+  it("objetivo da quest do Rafa conta os bugs", () => {
+    const q = QUESTS_COLETA.bugs;
+    assert.match(objetivoColeta(q, { etapa: "coletando", itens: ["b1", "b2"] }), /2 de 6/);
   });
 
   it("toda pergunta do Zé tem resposta certa válida e explicação", () => {

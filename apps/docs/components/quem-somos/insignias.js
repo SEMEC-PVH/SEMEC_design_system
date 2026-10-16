@@ -11,7 +11,7 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 // ?v=: troca quando as imagens mudam (o navegador guardava a versão antiga).
 const VERSAO = 2;
 
-export const INSIGNIAS = ["front", "back", "dados", "ia", "full", "ocarina", "sabedoria", "comunicacao"];
+export const INSIGNIAS = ["front", "back", "dados", "ia", "full", "ocarina", "sabedoria", "comunicacao", "acessibilidade"];
 
 export const urlInsignia = (id) =>
   INSIGNIAS.includes(id) ? `${basePath}/quem-somos/insignias/${id}.webp?v=${VERSAO}` : null;
@@ -90,5 +90,14 @@ export const FICHAS_INSIGNIAS = {
     forma: "Losango roxo com microfone",
     comoGanhar: "Monte as 3 campanhas da Emily na praça do Front-End com pelo menos 6 estrelas.",
     oQueE: "Falar simples, para quem importa, no canal certo e de um jeito que todo mundo consiga ler — inclusive quem usa leitor de tela.",
+  },
+  acessibilidade: {
+    numero: 9,
+    nome: "Stack da Acessibilidade",
+    grupo: "especial",
+    cor: "blue-700",
+    forma: "Octógono azul com tecla de teclado, olho e anel de foco",
+    comoGanhar: "Corrija os 6 bugs de acessibilidade da quest do Rafa, na Galeria da Equipe.",
+    oQueE: "Tela que todo mundo usa: contraste, foco visível, texto alternativo, links claros e rótulos nos campos. No Design System, o WCAG 2.1 AA é regra, não enfeite.",
   },
 };

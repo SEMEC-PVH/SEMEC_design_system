@@ -40,6 +40,7 @@
 /* Cores por insígnia (data-cor = token de FICHAS_INSIGNIAS[id].cor). */
 .fundo [data-cor="blue-400"] { --cor: var(--pv-blue-400); }
 .fundo [data-cor="blue-500"] { --cor: var(--pv-blue-500); }
+.fundo [data-cor="blue-700"] { --cor: var(--pv-blue-700); }
 .fundo [data-cor="blue-800"] { --cor: var(--pv-blue-800); }
 .fundo [data-cor="green-500"] { --cor: var(--pv-green-500); }
 .fundo [data-cor="yellow-500"] { --cor: var(--pv-yellow-500); }

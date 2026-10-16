@@ -106,9 +106,10 @@ export function createVitrineJogador(canvas, { arquivos, reducedMotion = false, 
   ro.observe(canvas);
   resize();
 
-  const relogio = new THREE.Clock();
-  function quadro() {
+  const relogio = new THREE.Timer(); // (THREE.Clock está obsoleto)
+  function quadro(ts) {
     if (disposed) return;
+    relogio.update(ts);
     const dt = Math.min(relogio.getDelta(), 0.1);
     const suave = reducedMotion ? 1 : 1 - Math.exp(-dt * 10);
     lugares.forEach((l, i) => {

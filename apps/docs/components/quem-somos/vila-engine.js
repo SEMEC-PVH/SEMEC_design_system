@@ -29,7 +29,7 @@ import { createColetaveis } from "./scene/coleta";
 import { createHistoria } from "./scene/historia";
 import { createSentado } from "./scene/sentar";
 import { urlInsignia } from "./insignias";
-import { QUESTS_COLETA } from "./quests-coleta";
+import { QUESTS_COLETA, localDoItem } from "./quests-coleta";
 import { createEpocas } from "./scene/epocas";
 import { createWalkers, WALKER_IDS } from "./scene/walkers";
 import { buildVegetation } from "./scene/vegetation";
@@ -716,7 +716,9 @@ export function createVila(host, options) {
     onQuestNear = () => {},
     onQuestFind = () => {},
     // Quests de coleta (quests-coleta.js): pisou num item ({ quest, item }) e
-    // chegou perto de quem dá a quest ({ quest, perto }).
+    // chegou perto de quem dá a quest ({ quest, perto }). Vale também dentro
+    // do prédio: itens com `local` de um andar e quest com `local` (o Rafa da
+    // Galeria), cujo "perto" só acontece naquele interior.
     onColeta = () => {},
     onColetaPerto = () => {},
     // Efeito visual de uma cena, feito na interface: { efeito: "sepia", on }
@@ -1101,11 +1103,18 @@ export function createVila(host, options) {
       })
     : [];
   // Quests de coleta: itens no mapa (scene/coleta.js) e o cristal de quest
-  // sobre quem dá cada uma (Zé Carlos, Emily).
+  // sobre quem dá cada uma (Zé Carlos, Emily; o Rafa da Galeria). Aqui só os
+  // itens da Vila (localDoItem); os dos andares nascem com o interior
+  // (ligarColetaInterior). Quest com `local` (a do Rafa, dada na Galeria):
+  // o cristal NÃO vai no walker da Vila (o Rafa de lá é o líder do ginásio);
+  // fica guardado e é pendurado na pessoa do interior quando ele é criado.
+  // Tipo do item: `tipoItem` da quest ("bug"), senão o de antes.
+  const tipoDoItem = (q) => q.tipoItem ?? (q.id === "paginas" ? "pagina" : "nota");
+  const estadosColeta = new Map(); // questId → { etapa, itens } (setColeta)
   const coletaveis = createColetaveis({ scene, pal, track, tileToWorld, reducedMotion });
   const questsColeta = Object.values(QUESTS_COLETA).map((q) => {
-    coletaveis.add(q.id, q.itens, q.id === "paginas" ? "pagina" : "nota");
-    const walker = walkers.find((w) => w.id === q.npc) ?? null;
+    coletaveis.add(q.id, q.itens.filter((i) => localDoItem(i) === "vila"), tipoDoItem(q));
+    const walker = q.local ? null : (walkers.find((w) => w.id === q.npc) ?? null);
     const marker = createQuestMarker({ pal, track, reducedMotion });
     marker.object.userData.baseY = 1.42;
     marker.object.position.y = 1.42;
@@ -1706,7 +1715,7 @@ export function createVila(host, options) {
   // Item de quest de coleta: pisou no tile (ou de frente, com Espaço). Quem
   // decide se coleta é a interface (a página do Zé pede a resposta certa).
   function tryColeta(x, y) {
-    const hit = coletaveis.itemAt(x, y);
+    const hit = coletaAqui()?.itemAt(x, y) ?? null;
     if (hit) onColeta(hit);
     return Boolean(hit);
   }
@@ -1723,7 +1732,11 @@ export function createVila(host, options) {
       onInspect({ id: t.id, museu: true });
       return;
     }
-    if (noPredio()) return;
+    // No prédio, Espaço de frente para um item de quest (bug de um andar).
+    if (noPredio()) {
+      if (!t) tryColeta(f.x, f.y);
+      return;
+    }
     if (!t) {
       if (!tryFindOcarina(f.x, f.y)) tryColeta(f.x, f.y);
       return;
@@ -1810,8 +1823,59 @@ export function createVila(host, options) {
         })
       : createEscritorio({ andar, pal, lite, reducedMotion });
     interiores.set(id, novo);
+    ligarColetaInterior(novo, id);
     return novo;
   }
+
+  // Quests de coleta dentro de um interior (andar `id`): uma instância de
+  // createColetaveis na cena dele (com o tileToWorld dele) com os itens
+  // daquele andar, e o cristal das quests dadas ali (`q.local`) sobre a
+  // pessoa (raizPessoa, só a Galeria tem). Como o interior pode ser
+  // descartado e recriado (LRU, guardarSoRecentes), o estado vem do último
+  // setColeta (estadosColeta) e é reaplicado aqui.
+  const coletaDoInterior = new Map(); // interior → { coleta, recursos, marcadores: [qc] }
+  function ligarColetaInterior(int, id) {
+    const recursos = [];
+    const trackInt = (x) => {
+      recursos.push(x);
+      return x;
+    };
+    let coleta = null;
+    const marcadores = [];
+    for (const qc of questsColeta) {
+      const q = qc.quest;
+      const itens = q.itens.filter((i) => localDoItem(i) === id);
+      if (itens.length) {
+        coleta ??= createColetaveis({ scene: int.scene, pal, track: trackInt, tileToWorld: int.tileToWorld, reducedMotion });
+        coleta.add(q.id, itens, tipoDoItem(q));
+        const e = estadosColeta.get(q.id);
+        if (e) coleta.set(q.id, { visivel: e.etapa === "coletando", coletados: e.itens });
+      }
+      const raiz = q.local === id ? int.raizPessoa?.(q.npc) : null;
+      if (raiz) {
+        raiz.add(qc.marker.object);
+        marcadores.push(qc);
+      }
+    }
+    if (coleta || marcadores.length) coletaDoInterior.set(int, { coleta, recursos, marcadores });
+  }
+  // Antes do dispose do interior: tira o cristal (é do motor e volta na
+  // próxima Galeria) e descarta os recursos dos itens do andar.
+  function desligarColetaInterior(int) {
+    const c = coletaDoInterior.get(int);
+    if (!c) return;
+    coletaDoInterior.delete(int);
+    for (const qc of c.marcadores) {
+      qc.marker.object.removeFromParent();
+      if (qc.perto) {
+        qc.perto = false;
+        onColetaPerto({ quest: qc.quest.id, perto: false });
+      }
+    }
+    for (const r of c.recursos) r.dispose?.();
+  }
+  // Coletáveis de onde o jogador está: os da Vila ou os do interior atual.
+  const coletaAqui = () => (noPredio() ? (coletaDoInterior.get(interior)?.coleta ?? null) : coletaveis);
 
   // Em PC fraco (vídeo integrado, 8 GB), guardar os 7 interiores pesa: cada
   // escritório tem ~20-28 MB de texturas (fotos, placas, carpete) e a Galeria
@@ -1842,6 +1906,7 @@ export function createVila(host, options) {
     i.scene.traverse((o) => {
       if (o.isLight) luzes.push(o);
     });
+    desligarColetaInterior(i);
     i.dispose();
     for (const l of luzes) l.dispose?.();
   }
@@ -2864,11 +2929,22 @@ export function createVila(host, options) {
       if (!qc) return;
       const visual = { nova: "nova", coletando: "procurando", pronta: "achou", concluida: "concluida" };
       qc.marker.setEtapa(visual[estado.etapa] ?? "nova");
-      coletaveis.set(questId, { visivel: estado.etapa === "coletando", coletados: estado.itens });
+      estadosColeta.set(questId, { etapa: estado.etapa, itens: [...estado.itens] });
+      const vis = { visivel: estado.etapa === "coletando", coletados: estado.itens };
+      coletaveis.set(questId, vis);
+      // Os andares guardados também (os descartados reaplicam ao recriar).
+      for (const c of coletaDoInterior.values()) c.coleta?.set(questId, vis);
     },
-    // Item aceito pela interface: sobe girando sobre o jogador e some.
+    // Item aceito pela interface: sobe girando sobre o jogador e some. O
+    // item pode ser da Vila ou do andar onde o jogador está.
     coletar(questId, itemId) {
-      coletaveis.pop(questId, itemId, player.root.position);
+      if (coletaAqui()?.pop(questId, itemId, player.root.position)) return;
+      // Fora do lugar do item (a UI aceitou depois de sair?): só esconde.
+      const e = estadosColeta.get(questId);
+      if (e && !e.itens.includes(itemId)) e.itens.push(itemId);
+      const vis = { visivel: e?.etapa === "coletando", coletados: e?.itens ?? [itemId] };
+      coletaveis.set(questId, vis);
+      for (const c of coletaDoInterior.values()) c.coleta?.set(questId, vis);
     },
     // Líderes já vencidos (Set/array de índices em members): estrela → "✓".
     setLeadersDone(indices) {
@@ -3106,7 +3182,7 @@ export function createVila(host, options) {
       if (m.t >= 1) {
         player.move = null;
         if (bike.on) passoAcabou = { sobra: (m.t - 1) * m.dur, saida: m.saida };
-        if (!noPredio() && !tryFindOcarina(player.x, player.y)) tryColeta(player.x, player.y);
+        if (noPredio() || !tryFindOcarina(player.x, player.y)) tryColeta(player.x, player.y);
         if (player.body) {
           player.body.position.y = 0;
           player.body.rotation.z = 0;
@@ -3197,9 +3273,10 @@ export function createVila(host, options) {
     historia.update(t, dt);
     // Depois de todos os mixers (jogador, Pedro, duplas): pose sentada.
     for (const s of sentados.values()) s.update(dt);
+    soltarPertoFora();
     for (const qc of questsColeta) {
-      qc.marker.update(t, dt);
       if (!qc.walker) continue;
+      qc.marker.update(t, dt);
       const p = tileOf(qc.walker.owner.root.position);
       const perto = Math.max(Math.abs(player.x - p.x), Math.abs(player.y - p.y)) <= QUEST_NEAR;
       if (perto !== qc.perto) {
@@ -3297,6 +3374,32 @@ export function createVila(host, options) {
 
   const vPos = new THREE.Vector3();
   const vLook = new THREE.Vector3();
+  // Itens e cristal de quest do interior atual; "perto" de quem dá a quest
+  // aqui dentro (o Rafa da Galeria), como os walkers fazem na Vila.
+  // Quem dá a quest num interior (`q.local`): fora de lá, não está "perto".
+  function soltarPertoFora() {
+    for (const qc of questsColeta) {
+      if (!qc.perto || !qc.quest.local || qc.quest.local === local) continue;
+      qc.perto = false;
+      onColetaPerto({ quest: qc.quest.id, perto: false });
+    }
+  }
+  function atualizarColetaInterior(dt) {
+    soltarPertoFora();
+    const c = coletaDoInterior.get(interior);
+    if (!c) return;
+    c.coleta?.update(t, dt);
+    for (const qc of c.marcadores) {
+      qc.marker.update(t, dt);
+      const p = interior.tilePessoa?.(qc.quest.npc);
+      const perto = Boolean(p) && Math.max(Math.abs(player.x - p.x), Math.abs(player.y - p.y)) <= QUEST_NEAR;
+      if (perto !== qc.perto) {
+        qc.perto = perto;
+        onColetaPerto({ quest: qc.quest.id, perto });
+      }
+    }
+  }
+
   function tickMuseu(dt) {
     if (coding && laptopPose) {
       for (const p of laptopPose) {
@@ -3311,6 +3414,7 @@ export function createVila(host, options) {
       onClock({ time: clock, night: dayNight.state.night > 0.5 });
     }
     interior.update(t, dt);
+    atualizarColetaInterior(dt);
     // Câmera: segue o jogador como na Vila (mais perto) ou voa até o quadro
     // em foco; ao fechar o close, volta devagar.
     const pose = foco ? interior.pose(foco) : null;

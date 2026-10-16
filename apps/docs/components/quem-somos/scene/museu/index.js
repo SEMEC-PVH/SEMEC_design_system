@@ -100,6 +100,10 @@ export function createMuseu({ loader, baseUrl, pal, lite, reducedMotion, quadros
       return s ? { x: s.ver[0], y: s.ver[1], dir: s.dir } : null;
     },
     pessoaEm: (x, y) => personagens.at(x, y),
+    // Raiz 3D (Group fixo no tile) e tile da pessoa `id`, ou null: o motor
+    // pendura o cristal de quest sobre quem dá a quest aqui (o Rafa).
+    raizPessoa: (id) => personagens.raizDe(id),
+    tilePessoa: (id) => personagens.tileDe(id),
     ids: quadros.map((q) => q.id),
     // A placa de latão fica sob a moldura: entra no close (abaixo).
     pose: (id) => {
