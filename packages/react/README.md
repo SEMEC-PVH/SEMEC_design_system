@@ -67,6 +67,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
+**Logo no Next:** os exemplos usam `logo={<img src="/marca.svg" alt="…" />}`, que é válido, mas o `eslint-config-next` avisa `@next/next/no-img-element`. O `logo` aceita qualquer nó: use `<Image src="/marca.svg" alt="Prefeitura de Porto Velho" width={120} height={36} />` do `next/image`, ou ignore o aviso para SVG estático. É só aviso de lint; o build passa.
+
 **As linhas do kit**, no arquivo CSS global (`src/index.css` no Vite, `app/globals.css` no Next), não via `import` em JS:
 
 ```css
