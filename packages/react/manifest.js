@@ -1545,8 +1545,11 @@ import { LayoutDashboard } from "lucide-react";
     <Sidebar>{/* … */}</Sidebar>
     <SidebarInset as="div">
       <Header>
-        <SidebarTrigger />
-        <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+        {/* Gatilho e marca num grupo à esquerda (o Header é justify-between) */}
+        <div className="flex min-w-0 items-center gap-2">
+          <SidebarTrigger />
+          <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+        </div>
       </Header>
       <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-[75rem] px-4 py-8">
         <Heading level={1}>Protocolos</Heading>

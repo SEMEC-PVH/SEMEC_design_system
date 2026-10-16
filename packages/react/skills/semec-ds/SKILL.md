@@ -311,8 +311,11 @@ export function PainelDeProtocolos() {
         {/* "div": o <main> é o de baixo, depois do Header (banner fora do main) */}
         <SidebarInset as="div">
           <Header>
-            <SidebarTrigger />
-            <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+            {/* Gatilho e marca num grupo: o Header é justify-between, e com 3 filhos soltos a marca ia para o meio */}
+            <div className="flex min-w-0 items-center gap-2">
+              <SidebarTrigger />
+              <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+            </div>
             <HeaderNav aria-label="Menu principal">
               <HeaderNavLink href="/ajuda">Ajuda</HeaderNavLink>
             </HeaderNav>
