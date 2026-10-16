@@ -1,0 +1,15 @@
+---
+"@semec/ds": minor
+---
+
+Documentação e artefatos para IA da onda 1 da bateria de testes de 16/10/2026 (#51, #55):
+
+- **TST-04 (#51):** a SKILL `semec-ds` tem uma composição só de `Sidebar` + `Header` ("Esqueleto com Sidebar"): `SkipLink` antes do `SidebarProvider` e `Header` dentro do `SidebarInset` (`as="div"`), antes do `<main id="conteudo">`. A alternativa "Header antes do SidebarProvider" saiu: no desktop a `Sidebar` é `fixed` desde o topo e cobria a marca focada (WCAG 2.4.7). Provado em Chromium (1280 e 390 px): o `SkipLink` é a 1ª parada de Tab e leva ao `<main>`, o `Header` e a marca ficam visíveis e focáveis, axe sem serious/critical. O manifest (`header`, `sidebar`) traz a mesma composição.
+- **TST-15:** enquanto houver changesets pendentes do `@semec/ds`, o `llms.txt`, o `llms-full.txt`, os `.md` por componente e as duas skills avisam que o conteúdo ainda não está no npm, e o `manifest.json` ganha o campo aditivo `unreleased` (`{ pendingChangesets, bump, nextVersion, note }` ou `null`). Sem changesets (como no tarball publicado), nada muda.
+- **TST-18:** os links do `llms.txt` e os campos `url`/`md` do `manifest.json` do site passam a ser URLs completas a partir do `homepage` do pacote (com o `basePath` `/SEMEC_design_system` e a barra final). Antes, `/componentes/<slug>` dava 404.
+- **TST-19:** `install` do `manifest.json`: o novo `install.css` tem as 4 linhas do CSS global (`tailwindcss`, `fonts.css`, `tokens.css`, `@source`); `install.tokens` deixa de ser um `import` em JS e vira a linha `@import` do CSS; `install.preset` passa a ser o `@config "@semec/ds/react/pv-preset"` (antes era o `@source`, agora em `install.source`); entram `install.fonts`, `install.cssNote` e `fonts.css` em `tokens.files`. O manifest lite ganha `install.preset` com `@semec/ds/lite/pv-preset`.
+- **TST-30:** os exemplos controlados de `Dialog` e `Sheet` compilam em TS strict (`React.useRef<HTMLButtonElement>(null)` e `import * as React`).
+- **TST-31:** a descrição do `Button` deriva o número de variantes da lista ("Sete variantes", antes "Seis").
+- **TST-33:** a SKILL lite usa `--feedback-danger-surface`/`--feedback-danger` no erro de servidor (não os primitivos `--pv-red-*`), documenta o preset `@semec/ds/lite/pv-preset` e não fixa mais a versão à mão.
+- **API da onda 1 documentada no manifest e na SKILL:** `Toggle` ligado (fundo `tint` + contorno `primary` de 2px, 5,00:1 e 5,42:1), `Heading` 32/24/20px, `Button` com rótulo longo em várias linhas (`min-h-*`), `ScrollArea` com `focusable` e `viewportProps`, `Avatar` que anuncia o `alt` com a foto quebrada, `NavigationMenuLink` estilizado e `navigationMenuLinkStyle`, `DataTable` com `rowLabel` e `labels.sortBy` como descrição (`aria-describedby`), `Pagination` com `siblingCount={0}` e versão mobile, alvos de 44px de `Link` e `Breadcrumb` no mobile.
+- O README do pacote perdeu um trecho duplicado (a seção "Comece aqui" até "Componentes" aparecia duas vezes, efeito de um `$\`` na substituição da nota do `maskCurrency`).

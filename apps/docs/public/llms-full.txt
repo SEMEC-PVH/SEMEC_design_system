@@ -1,6 +1,8 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-16T13:01:58.000Z — packages/react/manifest.js + packages/react/* — versão 4.0.1
+> Gerado 2026-10-16T13:41:42.000Z — packages/react/manifest.js + packages/react/* — versão 4.0.1
+
+> **Não publicado: este conteúdo vem do repositório e inclui 4 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.0.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.1.0. Confira a versão instalada com `npm ls @semec/ds`.**
 
 ## Instalação
 
@@ -9,6 +11,15 @@ npm install @semec/ds lucide-react
 ```
 
 lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+
+```css
+@import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
+@import "@semec/ds/react/tokens.css";
+@source "../node_modules/@semec/ds/dist/react";
+```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
 ## packages/react/src/index.ts — barrel
 
@@ -992,7 +1003,7 @@ export default {
 
 ### Botões (`button`) — `src/components/button.tsx` — slug: botoes
 
-Desc: Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.
+Desc: Ação principal. Sete variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. A altura é mínima (`min-h-*`), não fixa: rótulo longo quebra em linhas balanceadas em vez de criar rolagem horizontal; para reduzir a altura com `className`, sobrescreva o `min-h-*` junto com o `h-*`. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.
 
 Variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento) · com asChild, o spinner entra no link e o onClick do filho não dispara · o clique ainda sobe aos ancestrais (só envio e navegação são cancelados)
 
@@ -1022,7 +1033,7 @@ import { Plus } from "lucide-react";
 
 Prompt:
 ```text
-Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento) · com asChild, o spinner entra no link e o onClick do filho não dispara · o clique ainda sobe aos ancestrais (só envio e navegação são cancelados). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Sete variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. A altura é mínima (`min-h-*`), não fixa: rótulo longo quebra em linhas balanceadas em vez de criar rolagem horizontal; para reduzir a altura com `className`, sobrescreva o `min-h-*` junto com o `h-*`. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento) · com asChild, o spinner entra no link e o onClick do filho não dispara · o clique ainda sobe aos ancestrais (só envio e navegação são cancelados). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -1235,7 +1246,7 @@ export { IconButton };
 
 Desc: Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas.
 
-Variantes: variant: primary · onSurface · muted · underline: true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido)
+Variantes: variant: primary · onSurface · muted · underline: true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido) · alvo de toque: abaixo de sm, área mínima de 44×44px por um ::after centralizado, sem mudar a altura da linha (ex.: link tel/mailto sozinho num parágrafo); no desktop o ::after não existe
 
 Uso:
 ```tsx
@@ -1251,7 +1262,7 @@ import { Link } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Link` (Link) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas. API e variantes: variant: primary · onSurface · muted · underline: true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Link` (Link) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas. API e variantes: variant: primary · onSurface · muted · underline: true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido) · alvo de toque: abaixo de sm, área mínima de 44×44px por um ::after centralizado, sem mudar a altura da linha (ex.: link tel/mailto sozinho num parágrafo); no desktop o ::after não existe. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -4096,9 +4107,9 @@ export {
 
 ### Título (`heading`) — `src/components/heading.tsx` — slug: titulo
 
-Desc: Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual.
+Desc: Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual. Escala: 1 = `text-3xl` (32px, título da página), 2 = `text-2xl` (24px), 3 = `text-xl` (20px), 4 = `text-base`, 5 = `text-sm`, 6 = `text-xs` em caixa alta.
 
-Variantes: level: 1 · 2 (padrão) · 3 · 4 · 5 · 6 · size: 1–6 (padrão: igual ao level)
+Variantes: level: 1 · 2 (padrão) · 3 · 4 · 5 · 6 · size: 1–6 (padrão: igual ao level) · 1 = 32px · 2 = 24px · 3 = 20px · 4 = 16px · 5 = 14px · 6 = 12px
 
 Uso:
 ```tsx
@@ -4113,7 +4124,7 @@ import { Heading } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Heading` (Título) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual. API e variantes: level: 1 · 2 (padrão) · 3 · 4 · 5 · 6 · size: 1–6 (padrão: igual ao level). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Heading` (Título) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual. Escala: 1 = `text-3xl` (32px, título da página), 2 = `text-2xl` (24px), 3 = `text-xl` (20px), 4 = `text-base`, 5 = `text-sm`, 6 = `text-xs` em caixa alta. API e variantes: level: 1 · 2 (padrão) · 3 · 4 · 5 · 6 · size: 1–6 (padrão: igual ao level) · 1 = 32px · 2 = 24px · 3 = 20px · 4 = 16px · 5 = 14px · 6 = 12px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -4708,7 +4719,7 @@ export { ErrorState };
 
 Desc: Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
 
-Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores
+Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores · abaixo de sm, links com alvo mínimo de 44×44px (min-h-11 + ::after de largura)
 
 Uso:
 ```tsx
@@ -4723,7 +4734,7 @@ import { Breadcrumb } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Breadcrumb` (Trilha de navegação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela. API e variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Breadcrumb` (Trilha de navegação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela. API e variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores · abaixo de sm, links com alvo mínimo de 44×44px (min-h-11 + ::after de largura). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -4789,7 +4800,7 @@ export { Breadcrumb };
 
 Desc: Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.
 
-Variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ("" = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional)
+Variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ("" = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional) · com Sidebar: Header dentro do SidebarInset (as="div"), antes do <main id="conteudo">; SkipLink antes do SidebarProvider. Antes do provider o Header fica sob a Sidebar fixa e a marca recebe foco sem aparecer
 
 Uso:
 ```tsx
@@ -4816,7 +4827,7 @@ import { Button } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Header` (Cabeçalho) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav. API e variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ("" = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Header` (Cabeçalho) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav. API e variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ("" = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional) · com Sidebar: Header dentro do SidebarInset (as="div"), antes do <main id="conteudo">; SkipLink antes do SidebarProvider. Antes do provider o Header fica sob a Sidebar fixa e a marca recebe foco sem aparecer. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -5574,9 +5585,9 @@ export { Tabs, TabsList, TabsTrigger, TabsContent };
 
 ### Paginação (`pagination`) — `src/components/pagination.tsx` — slug: paginacao
 
-Desc: Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px. Textos em PT-BR, sobrescrevíveis por `labels`.
+Desc: Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px que não encolhem. Abaixo de `sm` ficam só as setas e a página atual ± 1 (primeira, última e elipses ocultas). Textos em PT-BR, sobrescrevíveis por `labels`.
 
-Variantes: props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label "Página N" nos números · aria-label nos botões prev/next · aria-hidden nos elipses
+Variantes: props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · siblingCount: páginas de cada lado da atual · padrão 1 · aceita 0 (só a atual entre as elipses) · negativo conta como 0 · abaixo de sm, no máximo 1 · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label "Página N" nos números · aria-label nos botões prev/next · aria-hidden nos elipses
 
 Uso:
 ```tsx
@@ -5594,7 +5605,7 @@ import { Pagination } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Pagination` (Paginação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px. Textos em PT-BR, sobrescrevíveis por `labels`. API e variantes: props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label "Página N" nos números · aria-label nos botões prev/next · aria-hidden nos elipses. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Pagination` (Paginação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px que não encolhem. Abaixo de `sm` ficam só as setas e a página atual ± 1 (primeira, última e elipses ocultas). Textos em PT-BR, sobrescrevíveis por `labels`. API e variantes: props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · siblingCount: páginas de cada lado da atual · padrão 1 · aceita 0 (só a atual entre as elipses) · negativo conta como 0 · abaixo de sm, no máximo 1 · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label "Página N" nos números · aria-label nos botões prev/next · aria-hidden nos elipses. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -5864,6 +5875,7 @@ Variantes: composição: Dialog · DialogTrigger · DialogContent · DialogHeade
 
 Uso:
 ```tsx
+import * as React from "react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "@semec/ds/react";
 
 // Para confirmação destrutiva use AlertDialog (role="alertdialog").
@@ -5880,11 +5892,24 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 
 // Controlado SEM DialogTrigger: o Radix não sabe para onde devolver o foco.
 // Guarde o elemento de origem e devolva o foco em onCloseAutoFocus.
-const origemRef = React.useRef(null);
-<Button ref={origemRef} onClick={() => setAberto(true)}>Editar</Button>
-<Dialog open={aberto} onOpenChange={setAberto}>
-  <DialogContent onCloseAutoFocus={(e) => { e.preventDefault(); origemRef.current?.focus(); }}>…</DialogContent>
-</Dialog>
+function EdicaoControlada() {
+  const [aberto, setAberto] = React.useState(false);
+  // Tipe o ref (TS strict): sem o tipo, origemRef.current vira never.
+  const origemRef = React.useRef<HTMLButtonElement>(null);
+  return (
+    <>
+      <Button ref={origemRef} onClick={() => setAberto(true)}>Editar</Button>
+      <Dialog open={aberto} onOpenChange={setAberto}>
+        <DialogContent onCloseAutoFocus={(e) => { e.preventDefault(); origemRef.current?.focus(); }}>
+          <DialogHeader>
+            <DialogTitle>Editar contato</DialogTitle>
+            <DialogDescription>Atualize o telefone do responsável.</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
 ```
 
 Prompt:
@@ -7032,23 +7057,29 @@ export { Separator };
 
 ### Avatar (`avatar`) — `src/components/avatar.tsx` — slug: avatar
 
-Desc: Foto de perfil com fallback automático (iniciais).
+Desc: Foto de perfil com fallback automático (iniciais). Com a foto quebrada, o `AvatarFallback` anuncia o `alt` da `AvatarImage` (as iniciais ficam só visuais); um `aria-label` no `AvatarFallback` continua aceito e tem prioridade.
 
-Variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className
+Variantes: composição: Avatar · AvatarImage · AvatarFallback · a11y: alt da AvatarImage = nome da pessoa (vale também para o fallback) · alt vazio para foto decorativa (o fallback não anuncia) · aria-label no AvatarFallback vence o alt · tamanhos: h-10 w-10 (padrão) — sobrescreva com className
 
 Uso:
 ```tsx
 import { Avatar, AvatarImage, AvatarFallback } from "@semec/ds/react";
 
+// Se a foto falhar, o leitor de tela continua ouvindo "João Silva" (não "JS")
 <Avatar>
   <AvatarImage src="/foto.jpg" alt="João Silva" />
   <AvatarFallback>JS</AvatarFallback>
+</Avatar>
+
+// Sem foto: dê o nome no próprio fallback
+<Avatar>
+  <AvatarFallback aria-label="Maria Souza">MS</AvatarFallback>
 </Avatar>
 ```
 
 Prompt:
 ```text
-Use o componente `Avatar` (Avatar) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Foto de perfil com fallback automático (iniciais). API e variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Avatar` (Avatar) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Foto de perfil com fallback automático (iniciais). Com a foto quebrada, o `AvatarFallback` anuncia o `alt` da `AvatarImage` (as iniciais ficam só visuais); um `aria-label` no `AvatarFallback` continua aceito e tem prioridade. API e variantes: composição: Avatar · AvatarImage · AvatarFallback · a11y: alt da AvatarImage = nome da pessoa (vale também para o fallback) · alt vazio para foto decorativa (o fallback não anuncia) · aria-label no AvatarFallback vence o alt · tamanhos: h-10 w-10 (padrão) — sobrescreva com className. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -7110,9 +7141,9 @@ export { Avatar, AvatarImage, AvatarFallback };
 
 ### Toggle (`toggle`) — `src/components/toggle.tsx` — slug: toggle
 
-Desc: Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos.
+Desc: Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. Ligado = fundo `tint` + contorno de 2px em `primary` (5,00:1 sobre `--bg`, 5,42:1 sobre branco) e texto `foreground`; o estado vai ao leitor de tela por `aria-pressed`.
 
-Variantes: variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)
+Variantes: variant: default (solto sem borda) · outline (solto com borda input) · estado ligado: data-state=on · aria-pressed=true · fundo tint · contorno primary de 2px (borda + inset-ring) · hover escurece para primary-hover · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)
 
 Uso:
 ```tsx
@@ -7126,7 +7157,7 @@ import { Bold } from "lucide-react";
 
 Prompt:
 ```text
-Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. API e variantes: variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. Ligado = fundo `tint` + contorno de 2px em `primary` (5,00:1 sobre `--bg`, 5,42:1 sobre branco) e texto `foreground`; o estado vai ao leitor de tela por `aria-pressed`. API e variantes: variant: default (solto sem borda) · outline (solto com borda input) · estado ligado: data-state=on · aria-pressed=true · fundo tint · contorno primary de 2px (borda + inset-ring) · hover escurece para primary-hover · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -8227,22 +8258,23 @@ export { Calendar };
 
 ### Área de scroll (`scroll-area`) — `src/components/scroll-area.tsx` — slug: scroll-area
 
-Desc: Scroll customizado e consistente entre navegadores.
+Desc: Scroll customizado e consistente entre navegadores. A região rolável é alcançável pelo teclado: sem nada focável dentro (ex.: texto puro), a viewport vira parada de Tab com anel de foco (`focusable="auto"`, o padrão). Dê nome à região com `viewportProps={{ "aria-label": "…" }}`.
 
-Variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal
+Variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal · focusable: "auto" (padrão: focável só sem conteúdo focável dentro) · true (sempre) · false (nunca; só se o conteúdo garantir outro caminho de teclado) · viewportProps: props da viewport (ex.: aria-label da região focável, className)
 
 Uso:
 ```tsx
 import { ScrollArea } from "@semec/ds/react";
 
-<ScrollArea className="h-48">
+// Texto puro: a viewport recebe tabIndex=0; o aria-label nomeia a região
+<ScrollArea className="h-48" viewportProps={{ "aria-label": "Termos de uso" }}>
   <div className="p-4">Conteúdo longo aqui…</div>
 </ScrollArea>
 ```
 
 Prompt:
 ```text
-Use o componente `ScrollArea` (Área de scroll) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Scroll customizado e consistente entre navegadores. API e variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `ScrollArea` (Área de scroll) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Scroll customizado e consistente entre navegadores. A região rolável é alcançável pelo teclado: sem nada focável dentro (ex.: texto puro), a viewport vira parada de Tab com anel de foco (`focusable="auto"`, o padrão). Dê nome à região com `viewportProps={{ "aria-label": "…" }}`. API e variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal · focusable: "auto" (padrão: focável só sem conteúdo focável dentro) · true (sempre) · false (nunca; só se o conteúdo garantir outro caminho de teclado) · viewportProps: props da viewport (ex.: aria-label da região focável, className). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -8722,6 +8754,7 @@ Variantes: side: left · right · top · bottom · composição: Sheet · Trigge
 
 Uso:
 ```tsx
+import * as React from "react";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "@semec/ds/react";
 
 <Sheet>
@@ -8742,7 +8775,7 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescri
 // não sabe para onde devolver o foco. Guarde a origem e devolva em onCloseAutoFocus.
 function FiltrosControlados() {
   const [aberto, setAberto] = React.useState(false);
-  const origemRef = React.useRef(null);
+  const origemRef = React.useRef<HTMLButtonElement>(null);
   return (
     <>
       <Button ref={origemRef} onClick={() => setAberto(true)}>Filtros</Button>
@@ -8911,9 +8944,9 @@ export {
 
 ### Tabela de dados (`data-table`) — `src/components/data-table.tsx` — slug: tabela-de-dados
 
-Desc: Tabela com ordenação, paginação e estados vazios.
+Desc: Tabela com ordenação, paginação e estados vazios. Com `onRowClick`, passe `rowLabel` para dar nome à linha clicável.
 
-Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · labels (sortBy · pageOf · previous · next) · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px
+Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · rowLabel?: (row, index) => string (aria-label da linha; use com onRowClick) · emptyMessage · caption · labels (sortBy: descrição "Ordenar por …" do botão de ordenação, via aria-describedby, não o nome dele · pageOf · previous · next) · a11y: columnheader e botão de ordenação nomeados só pela coluna; "Ordenar por …" como descrição (aria-describedby) · aria-sort no cabeçalho ordenado · botão de ordenação com alvo de 44px · linha focável e ativável por Enter/Espaço quando há onRowClick · rowLabel nomeia a linha clicável · cliques e teclas em controles da célula (e em portais abertos por ela) não ativam a linha · rodapé empilha abaixo de sm · paginação com alvos de 44px
 
 Uso:
 ```tsx
@@ -8941,11 +8974,23 @@ import { DataTable, Button } from "@semec/ds/react";
   pageCount={totalPaginas}
   onPageChange={setPagina}
 />
+
+// Linha inteira clicável (uma ação só): rowLabel diz ao leitor de tela o que o Enter faz
+<DataTable
+  caption="Protocolos abertos"
+  columns={[
+    { key: "numero", header: "Número", sortable: true },
+    { key: "status", header: "Status" },
+  ]}
+  data={protocolos}
+  onRowClick={(protocolo) => abrirProtocolo(protocolo)}
+  rowLabel={(protocolo) => "Abrir protocolo " + protocolo.numero}
+/>
 ```
 
 Prompt:
 ```text
-Use o componente `DataTable` (Tabela de dados) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Tabela com ordenação, paginação e estados vazios. API e variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · labels (sortBy · pageOf · previous · next) · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `DataTable` (Tabela de dados) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Tabela com ordenação, paginação e estados vazios. Com `onRowClick`, passe `rowLabel` para dar nome à linha clicável. API e variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · rowLabel?: (row, index) => string (aria-label da linha; use com onRowClick) · emptyMessage · caption · labels (sortBy: descrição "Ordenar por …" do botão de ordenação, via aria-describedby, não o nome dele · pageOf · previous · next) · a11y: columnheader e botão de ordenação nomeados só pela coluna; "Ordenar por …" como descrição (aria-describedby) · aria-sort no cabeçalho ordenado · botão de ordenação com alvo de 44px · linha focável e ativável por Enter/Espaço quando há onRowClick · rowLabel nomeia a linha clicável · cliques e teclas em controles da célula (e em portais abertos por ela) não ativam a linha · rodapé empilha abaixo de sm · paginação com alvos de 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -9382,9 +9427,9 @@ export {
 
 ### Menu de navegação (`navigation-menu`) — `src/components/navigation-menu.tsx` — slug: menu-de-navegacao
 
-Desc: Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px.
+Desc: Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. O `NavigationMenuLink` já vem estilizado: alvo de 44px (`min-h-11`), `px-4`, hover/foco em `tint` e anel de foco por dentro; `active` marca a página atual com `aria-current="page"`.
 
-Variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · a11y: aria-label padrão "Menu principal" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix)
+Variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · estilos exportados: navigationMenuTriggerStyle() (visual de gatilho, ex.: link solto na lista) · navigationMenuLinkStyle() (estilo padrão do NavigationMenuLink, para links próprios) · a11y: aria-label padrão "Menu principal" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix)
 
 Uso:
 ```tsx
@@ -9394,7 +9439,8 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuT
   <NavigationMenuList>
     <NavigationMenuItem>
       <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>
-      <NavigationMenuContent>
+      <NavigationMenuContent className="p-2">
+        {/* NavigationMenuLink já tem 44px de altura, px-4 e foco visível */}
         <NavigationMenuLink href="/iptu">IPTU</NavigationMenuLink>
         <NavigationMenuLink href="/alvara">Alvará</NavigationMenuLink>
       </NavigationMenuContent>
@@ -9405,7 +9451,7 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuT
 
 Prompt:
 ```text
-Use o componente `NavigationMenu` (Menu de navegação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. API e variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · a11y: aria-label padrão "Menu principal" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `NavigationMenu` (Menu de navegação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. O `NavigationMenuLink` já vem estilizado: alvo de 44px (`min-h-11`), `px-4`, hover/foco em `tint` e anel de foco por dentro; `active` marca a página atual com `aria-current="page"`. API e variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · estilos exportados: navigationMenuTriggerStyle() (visual de gatilho, ex.: link solto na lista) · navigationMenuLinkStyle() (estilo padrão do NavigationMenuLink, para links próprios) · a11y: aria-label padrão "Menu principal" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -9556,7 +9602,7 @@ Variantes: side: left · right · variant: sidebar · floating · inset · colla
 
 Uso:
 ```tsx
-import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@semec/ds/react";
+import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SkipLink, Header, HeaderBrand, Heading } from "@semec/ds/react";
 import { LayoutDashboard } from "lucide-react";
 
 <SidebarProvider>
@@ -9586,6 +9632,25 @@ import { LayoutDashboard } from "lucide-react";
     <div className="p-4">Conteúdo</div>
   </SidebarInset>
 </SidebarProvider>
+
+// Painel com Header (composição única, TST-04): SkipLink antes do SidebarProvider,
+// Header dentro do SidebarInset (as="div") e o <main> depois do Header.
+// Header antes do provider fica sob a Sidebar fixa (marca focada sem aparecer).
+<>
+  <SkipLink />
+  <SidebarProvider>
+    <Sidebar>{/* … */}</Sidebar>
+    <SidebarInset as="div">
+      <Header>
+        <SidebarTrigger />
+        <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+      </Header>
+      <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-[75rem] px-4 py-8">
+        <Heading level={1}>Protocolos</Heading>
+      </main>
+    </SidebarInset>
+  </SidebarProvider>
+</>
 
 // Item ativo com link (aria-current="page" vem de isActive) e tooltip no modo recolhido
 <Sidebar collapsible="icon" labels={{ navigation: "Menu do servidor" }}>
@@ -10736,270 +10801,7 @@ Metadados de componente (o que versões anteriores deste README chamavam de `get
 
 Mais: `SemecProvider`, `cn`, masks (`maskCPF`, `maskCNPJ`, `maskCEP`, `maskCurrency`) e validadores puros (`validateCPF`, `validateCNPJ`, `validateEmail`).
 
-As masks têm a assinatura `(value: string) => string` (tipo `MaskFn`): recebem o texto digitado e devolvem o formatado, para usar no `onValueChange` do `Input`. `maskCurrency` lê os dígitos como centavos (`"123456"` → `"R$ 1.234,56"`, com espaço não separável depois de `R# @semec/ds
-
-Design System SEMEC — componentes React + tokens CSS + artefatos para agentes de IA.
-
-React 19 + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Tokens `pv-*` (tema claro).
-
-## Comece aqui
-
-São 5 passos. Pular qualquer um deles faz os componentes saírem sem estilo, sem fonte ou sem funcionar.
-
-### 1. Instalar
-
-```bash
-npm install @semec/ds lucide-react
-# pnpm add @semec/ds lucide-react
-# yarn add @semec/ds lucide-react
-```
-
-`lucide-react` é **peer dependency** (`>=0.468.0 <2`), não dependência: os componentes importam os ícones dele, e sem ele o build do app quebra. Instale-o junto, sempre, com qualquer gerenciador:
-
-- **npm 7+** instala peers ausentes sozinho (exceto com `--legacy-peer-deps`); listar `lucide-react` no comando só o deixa explícito no `package.json`;
-- **pnpm** só instala peers com `auto-install-peers=true` (padrão desde o pnpm 8, mas muitos projetos e monorepos usam `false`);
-- **Yarn** (clássico e Berry) **não** instala peers: só avisa.
-
-Os peers obrigatórios são `react` e `react-dom` ^19 (o app já tem), `tailwindcss` ^4 (entra no passo 2, com o plugin do seu bundler) e `lucide-react`. Peer opcional: `zod` `^3.23.0 || ^4.0.0`, só se usar `@semec/ds/react/validacao`. Os pacotes Radix UI, `class-variance-authority`, `clsx`, `tailwind-merge` e `get-nonce` são **dependências** do `@semec/ds` e vêm automaticamente: não instale a lista de `@radix-ui/*` à mão.
-
-### 2. CSS global (Tailwind v4)
-
-Primeiro, o Tailwind v4 precisa estar ligado ao bundler do app. Depois, as linhas do kit vão no CSS global.
-
-**Vite** (`npm create vite@latest`, template React):
-
-```bash
-npm install -D tailwindcss @tailwindcss/vite
-```
-
-```ts
-// vite.config.ts
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
-
-export default defineConfig({
-  plugins: [react(), tailwindcss()],
-});
-```
-
-O CSS global é o `src/index.css` (importado em `src/main.tsx`). **Troque o conteúdo inteiro** pelas linhas do kit (abaixo) e apague o `import "./App.css"` do `App.tsx`: os estilos do template ficam fora de camada e vencem os do kit.
-
-**Next.js** (`create-next-app` com Tailwind): o Tailwind v4 já vem configurado. O `create-next-app` 16.4 gera o plugin `@tailwindcss/turbopack`, sem `postcss.config.mjs`; ele funciona igual ao `@tailwindcss/postcss` dos templates anteriores, e as linhas do kit são as mesmas nos dois. Sem Tailwind no projeto: `npm install -D tailwindcss @tailwindcss/postcss` e um `postcss.config.mjs` com `export default { plugins: { "@tailwindcss/postcss": {} } };`.
-
-O template do Next traz estilos que **vencem** os do kit. Só acrescentar as linhas do kit ao `globals.css` deixa o app com Arial, as cores do template e fundo escuro quando o sistema está em modo escuro: o `body { font-family: Arial… }`, o `:root`, o `@theme inline { --font-sans: var(--font-geist-sans) … }` e o `@media (prefers-color-scheme: dark)` do template ficam fora de camada e ganham do `@layer base` do `tokens.css`. Então:
-
-1. em `app/globals.css`, **apague tudo** o que o template gerou (`:root`, `@theme inline`, `@media (prefers-color-scheme: dark)`, `body`) e deixe só as linhas do kit;
-2. em `app/layout.tsx`, apague o `next/font/google` (`Geist`, `Geist_Mono`) e as classes `geistSans.variable` / `geistMono.variable` do `<body>`; a fonte vem do passo 3. Aproveite para trocar `lang="en"` por `lang="pt-BR"`:
-
-```tsx
-// app/layout.tsx
-import "./globals.css";
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="pt-BR">
-      <body>{children}</body>
-    </html>
-  );
-}
-```
-
-**As linhas do kit**, no arquivo CSS global (`src/index.css` no Vite, `app/globals.css` no Next), não via `import` em JS:
-
-```css
-@import "tailwindcss";
-@import "@semec/ds/react/tokens.css";
-@source "../node_modules/@semec/ds/dist/react";
-```
-
-- O `@source` é **obrigatório**: sem ele o Tailwind não gera as classes usadas dentro do pacote (`bg-card`, `shadow-elevation-*`, `animate-in`…) e os componentes saem sem estilo.
-- O caminho do `@source` é **relativo ao arquivo CSS**, não à raiz do projeto. Ajuste a quantidade de `../` até chegar em `node_modules`:
-
-| Onde está o CSS | `@source` |
-|---|---|
-| `src/index.css` (Vite) | `"../node_modules/@semec/ds/dist/react"` |
-| `app/globals.css` (Next) | `"../node_modules/@semec/ds/dist/react"` |
-| `src/app/globals.css` (Next com `src/`) | `"../../node_modules/@semec/ds/dist/react"` |
-| monorepo com `node_modules` na raiz | suba até a pasta que contém o `node_modules` com `@semec/ds` |
-
-- Se o Tailwind estiver varrendo pastas demais (build lento, recarga cruzada em monorepo), limite a detecção automática ao código do app com `source()`, também relativo ao CSS: `@import "tailwindcss" source("../src");`. O `@source` do pacote continua necessário.
-
-Alternativa com preset JS (opcional): acrescente `@config "@semec/ds/react/pv-preset";` depois das linhas acima.
-
-### 3. Fonte Poppins
-
-O pacote traz a Poppins auto-hospedada (pesos 400, 500, 600 e 700, `font-display: swap`, subconjunto latino que cobre o PT-BR; licença SIL OFL 1.1 em `dist/react/fonts/OFL.txt`). Não existem 800/900 no sistema. Importe `fonts.css` **antes** do `tokens.css`, no mesmo CSS global:
-
-```css
-@import "tailwindcss";
-@import "@semec/ds/react/fonts.css";
-@import "@semec/ds/react/tokens.css";
-@source "../node_modules/@semec/ds/dist/react";
-```
-
-O `@font-face` usa a família `"Poppins"`, que é o nome que `--font-family-sans` já espera; não é preciso ajustar token. As URLs são relativas (`./fonts/Poppins-*.woff2`): `@tailwindcss/postcss` (Next.js) e `@tailwindcss/vite` reescrevem o caminho e o bundler copia os arquivos para o build. Com o `@tailwindcss/cli`, que não reescreve URL de CSS importado, importe `fonts.css` pelo JS (`import "@semec/ds/react/fonts.css";`) ou copie `dist/react/fonts/` para junto do CSS gerado.
-
-Sem carregar a fonte, o texto cai no `system-ui` (Segoe UI no Windows) e o layout varia entre máquinas. Quem já usa `next/font/local` pode continuar: aponte o token para a variável gerada (`:root { --font-family-sans: var(--font-poppins), system-ui, -apple-system, sans-serif; }`, depois do `tokens.css`) e não importe `fonts.css`. Evite Google Fonts em sistemas da Prefeitura (rede externa).
-
-### 4. Providers no root (quando necessários)
-
-| Se usar… | Coloque uma vez no root |
-|---|---|
-| `useToast()` / `toast()` | `<Toaster />` |
-| `Tooltip` | `<TooltipProvider>` em volta do app (o Radix exige o provider) |
-| CSP estrita com nonce | `<SemecProvider nonce={nonce}>` (ver [Segurança](#segurança-csp)) |
-
-O `SemecProvider` **não** inclui `Toaster` nem `TooltipProvider`; monte-os à parte.
-
-```tsx
-import { Toaster, TooltipProvider } from "@semec/ds/react";
-
-export function Providers({ children }: { children: React.ReactNode }) {
-  return (
-    <TooltipProvider>
-      {children}
-      <Toaster />
-    </TooltipProvider>
-  );
-}
-```
-
-### 5. Next.js App Router: Server Components e `"use client"`
-
-A partir da 3.2 o `dist` sai **um arquivo por módulo**, e cada componente interativo (estado, efeitos, contexto, Radix ou handlers) começa com `"use client"`. Por isso:
-
-- **pode importar `@semec/ds/react` num Server Component.** Os componentes de apresentação (`Heading`, `Card`, `Badge`, `Button`, `Link`, `Table`, `Alert`, `Skeleton`, `Spinner`, `Separator`, `Breadcrumb`, `EmptyState`, `Footer`, `Timeline`, `IconButton`) renderizam no servidor; os interativos viram fronteira de cliente sozinhos;
-- props de função (`onClick`, `onValueChange`, `onOpenChange`…) continuam exigindo um arquivo `"use client"` seu, como em qualquer componente de cliente;
-- os providers do passo 4 já são de cliente e podem ir direto no `layout`;
-- não use `export *` para reexportar o kit num arquivo `"use client"` (o Next não aceita); reexporte por nome ou importe direto.
-
-Na 3.0 e na 3.1 o `dist` era um bundle único sem `"use client"` e importar o kit num Server Component quebrava; se estiver preso a essas versões, use o kit só em arquivos `"use client"`.
-
-Em Vite/SPA nada disso se aplica.
-
-## Uso rápido
-
-```tsx
-"use client"; // no Next App Router, só se este arquivo passar handlers ou usar hooks
-
-import { Button, Input, Card, CardHeader, CardTitle, CardContent, Label } from "@semec/ds/react";
-
-export function Exemplo() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Formulário</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Label htmlFor="nome">Nome</Label>
-        <Input id="nome" />
-        <Button variant="primary">Salvar</Button>
-      </CardContent>
-    </Card>
-  );
-}
-```
-
-### Toast
-
-```tsx
-import { Button, Toaster, useToast } from "@semec/ds/react";
-
-// Adicionar Toaster no root do app (uma vez)
-function App() {
-  return (
-    <>
-      <MinhaPagina />
-      <Toaster />
-    </>
-  );
-}
-
-// Usar em qualquer componente
-function MeuComponente() {
-  const { toast } = useToast();
-
-  return (
-    <Button onClick={() => toast({ title: "Salvo!", description: "Dados gravados." })}>
-      Salvar
-    </Button>
-  );
-}
-```
-
-Não monte `ToastProvider` + `ToastViewport` à mão: eles são as peças cruas do Radix e não leem o estado de `useToast()` — nada aparece. Use `<Toaster />`.
-
-### Sheet (modal lateral)
-
-```tsx
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@semec/ds/react";
-
-function Exemplo() {
-  return (
-    <Sheet>
-      <SheetTrigger>Abrir</SheetTrigger>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Título</SheetTitle>
-        </SheetHeader>
-        <p>Conteúdo do sheet.</p>
-      </SheetContent>
-    </Sheet>
-  );
-}
-```
-
-### `cn()`
-
-```tsx
-import { cn } from "@semec/ds/react";
-
-<div className={cn("p-4 bg-surface", ativo && "ring-2 ring-ring")} />
-```
-
-`cn` = `clsx` + `tailwind-merge`, o mesmo helper usado dentro dos componentes (exportado a partir da 3.1.0).
-
-## Subpath exports
-
-| Import | O que é |
-|---|---|
-| `@semec/ds/react` | Todos os componentes, `cn()`, masks e validadores puros |
-| `@semec/ds/react/<componente>` | Um componente só, pelo nome do arquivo em `src/components` (ex.: `@semec/ds/react/button`, `@semec/ds/react/dialog`, `@semec/ds/react/form-field`). Desde a 3.2 |
-| `@semec/ds/react/validacao` | Schemas Zod (exige o peer `zod`) |
-| `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) + utilitários de animação |
-| `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS config) |
-| `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 (arquivo TS original) |
-| `@semec/ds/react/server` | **Uso interno do monorepo.** Só tem `dsPackageRootResolve()`, que procura `packages/react` a partir do `cwd` e lança erro fora do repositório. Não use em apps consumidores |
-| `@semec/ds/skills` | Metadados dos componentes para agentes IA (`dsComponents`, `dsBySlug`, `dsCategories`…) |
-| `@semec/ds/skills/llms.txt` | Índice para IA |
-| `@semec/ds/skills/llms-full.txt` | Dump completo |
-| `@semec/ds/skills/manifest.json` | JSON para consumo por máquinas |
-| `@semec/ds/skills/components/*.md` | Chunk RAG por componente |
-| `@semec/ds/skills/semec-ds` | Skill full do agente |
-| `@semec/ds/lite/skills/semec-ds-lite` | Skill lite (tokens + a11y + responsive) |
-
-**Poda (tree-shaking).** Desde a 3.2 cada componente é um módulo ESM próprio em `dist/react/components/` e o pacote declara `"sideEffects": ["**/*.css"]`, então o bundler do app descarta o que não é importado: `import { Button } from "@semec/ds/react"` custa cerca de 35 kB minificado com as dependências (quase tudo `tailwind-merge`); o código do kit fica em ~3 kB, em vez do kit inteiro (~340 kB na 3.1). Importar pela raiz ou pelo subpath dá o mesmo resultado num bundler com poda; o subpath ajuda ferramentas sem poda (ex.: `next dev` sem `optimizePackageImports`) e testes. A CI mede isso (`npm run test:dist`).
-
-**O CSS não sofre poda.** A poda vale para o JS. O `@source "…/node_modules/@semec/ds/dist/react"` faz o Tailwind varrer o `dist` inteiro, então o CSS gera as classes de todos os componentes, use o app um ou todos: cerca de 68 kB de CSS do kit (~12 kB com gzip), um custo fixo medido num app novo com a 4.0.0. O JS, sim, cai para o que é importado (os ~35 kB do `Button` acima).
-
-Metadados de componente (o que versões anteriores deste README chamavam de `getComponentMetadata()`, função que nunca existiu) vêm de `@semec/ds/skills`: `dsBySlug["botoes"]`, `dsComponents`.
-
-## Componentes
-
-<!-- ds:component-list:start -->
-**55 componentes** no manifest (`manifest.js`), pelo export principal de cada um. Lista e contagem geradas por `scripts/build-artifacts.mjs`; não edite à mão.
-
-| Categoria | Componentes |
-|---|---|
-| **Ações e links** (3) | Button, IconButton, Link |
-| **Formulários** (18) | Input, PasswordInput, InputMask, Textarea, Select, Combobox, DatePicker, FileUpload, Checkbox, RadioGroup, Switch, Label, FormField, ErrorSummary, Toggle, Slider, InputOTP, Calendar |
-| **Conteúdo e dados** (9) | Card, Heading, Badge, Table, Accordion, Separator, Avatar, DataTable, Timeline |
-| **Navegação** (12) | Breadcrumb, Header, Stepper, SkipLink, Footer, Tabs, Pagination, SidebarToggleButton, ScrollArea, DropdownMenu, NavigationMenu, Sidebar |
-| **Feedback e estados** (13) | Skeleton, EmptyState, ErrorState, Dialog, Toaster, Tooltip, Alert, AlertDialog, Popover, Spinner, Progress, Drawer, Sheet |
-<!-- ds:component-list:end -->
-
-) e, desde a 4.0.2, devolve `""` quando não há dígitos (antes, `"R$ 0,00"`).
+As masks têm a assinatura `(value: string) => string` (tipo `MaskFn`): recebem o texto digitado e devolvem o formatado, para usar no `onValueChange` do `Input`. `maskCurrency` lê os dígitos como centavos (`"123456"` → `"R$ 1.234,56"`, com espaço não separável depois de `R$`) e, desde a 4.0.2, devolve `""` quando não há dígitos significativos (vazio, sem dígitos ou só zeros; antes, `"R$ 0,00"`).
 
 ## Tokens
 

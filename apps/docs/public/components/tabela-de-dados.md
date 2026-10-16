@@ -4,19 +4,19 @@ code: "data-table"
 slug: "tabela-de-dados"
 file: "src/components/data-table.tsx"
 category: "conteudo-dados"
-variants: "props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · labels (sortBy · pageOf · previous · next) · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px"
+variants: "props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · rowLabel?: (row, index) => string (aria-label da linha; use com onRowClick) · emptyMessage · caption · labels (sortBy: descrição 'Ordenar por …' do botão de ordenação, via aria-describedby, não o nome dele · pageOf · previous · next) · a11y: columnheader e botão de ordenação nomeados só pela coluna; 'Ordenar por …' como descrição (aria-describedby) · aria-sort no cabeçalho ordenado · botão de ordenação com alvo de 44px · linha focável e ativável por Enter/Espaço quando há onRowClick · rowLabel nomeia a linha clicável · cliques e teclas em controles da célula (e em portais abertos por ela) não ativam a linha · rodapé empilha abaixo de sm · paginação com alvos de 44px"
 ---
 
 # Tabela de dados — `data-table`
 
-> Tabela com ordenação, paginação e estados vazios.
+> Tabela com ordenação, paginação e estados vazios. Com `onRowClick`, passe `rowLabel` para dar nome à linha clicável.
 
-**Arquivo:** `src/components/data-table.tsx` | **Categoria:** Conteúdo e dados | **Rota:** `/componentes/tabela-de-dados`
+**Arquivo:** `src/components/data-table.tsx` | **Categoria:** Conteúdo e dados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/tabela-de-dados/
 
 ## Variantes
 
-- **props**: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · labels (sortBy · pageOf · previous · next)
-- **a11y**: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px
+- **props**: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · rowLabel?: (row, index) => string (aria-label da linha; use com onRowClick) · emptyMessage · caption · labels (sortBy: descrição "Ordenar por …" do botão de ordenação, via aria-describedby, não o nome dele · pageOf · previous · next)
+- **a11y**: columnheader e botão de ordenação nomeados só pela coluna; "Ordenar por …" como descrição (aria-describedby) · aria-sort no cabeçalho ordenado · botão de ordenação com alvo de 44px · linha focável e ativável por Enter/Espaço quando há onRowClick · rowLabel nomeia a linha clicável · cliques e teclas em controles da célula (e em portais abertos por ela) não ativam a linha · rodapé empilha abaixo de sm · paginação com alvos de 44px
 
 ## Instalação (@semec/ds)
 
@@ -32,6 +32,10 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 4 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.0.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.1.0. Confira a versão instalada com `npm ls @semec/ds`.
 
 ## Uso
 
@@ -60,12 +64,24 @@ import { DataTable, Button } from "@semec/ds/react";
   pageCount={totalPaginas}
   onPageChange={setPagina}
 />
+
+// Linha inteira clicável (uma ação só): rowLabel diz ao leitor de tela o que o Enter faz
+<DataTable
+  caption="Protocolos abertos"
+  columns={[
+    { key: "numero", header: "Número", sortable: true },
+    { key: "status", header: "Status" },
+  ]}
+  data={protocolos}
+  onRowClick={(protocolo) => abrirProtocolo(protocolo)}
+  rowLabel={(protocolo) => "Abrir protocolo " + protocolo.numero}
+/>
 ```
 
 ## Prompt para IA
 
 ```text
-Use o componente `DataTable` (Tabela de dados) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Tabela com ordenação, paginação e estados vazios. API e variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · labels (sortBy · pageOf · previous · next) · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `DataTable` (Tabela de dados) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Tabela com ordenação, paginação e estados vazios. Com `onRowClick`, passe `rowLabel` para dar nome à linha clicável. API e variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · rowLabel?: (row, index) => string (aria-label da linha; use com onRowClick) · emptyMessage · caption · labels (sortBy: descrição "Ordenar por …" do botão de ordenação, via aria-describedby, não o nome dele · pageOf · previous · next) · a11y: columnheader e botão de ordenação nomeados só pela coluna; "Ordenar por …" como descrição (aria-describedby) · aria-sort no cabeçalho ordenado · botão de ordenação com alvo de 44px · linha focável e ativável por Enter/Espaço quando há onRowClick · rowLabel nomeia a linha clicável · cliques e teclas em controles da célula (e em portais abertos por ela) não ativam a linha · rodapé empilha abaixo de sm · paginação com alvos de 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte

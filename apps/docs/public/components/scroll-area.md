@@ -4,19 +4,21 @@ code: "scroll-area"
 slug: "scroll-area"
 file: "src/components/scroll-area.tsx"
 category: "navegacao"
-variants: "composição: ScrollArea · ScrollBar · orientation: vertical · horizontal"
+variants: "composição: ScrollArea · ScrollBar · orientation: vertical · horizontal · focusable: 'auto' (padrão: focável só sem conteúdo focável dentro) · true (sempre) · false (nunca; só se o conteúdo garantir outro caminho de teclado) · viewportProps: props da viewport (ex.: aria-label da região focável, className)"
 ---
 
 # Área de scroll — `scroll-area`
 
-> Scroll customizado e consistente entre navegadores.
+> Scroll customizado e consistente entre navegadores. A região rolável é alcançável pelo teclado: sem nada focável dentro (ex.: texto puro), a viewport vira parada de Tab com anel de foco (`focusable="auto"`, o padrão). Dê nome à região com `viewportProps={{ "aria-label": "…" }}`.
 
-**Arquivo:** `src/components/scroll-area.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/scroll-area`
+**Arquivo:** `src/components/scroll-area.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/scroll-area/
 
 ## Variantes
 
 - **composição**: ScrollArea · ScrollBar
 - **orientation**: vertical · horizontal
+- **focusable**: "auto" (padrão: focável só sem conteúdo focável dentro) · true (sempre) · false (nunca; só se o conteúdo garantir outro caminho de teclado)
+- **viewportProps**: props da viewport (ex.: aria-label da região focável, className)
 
 ## Instalação (@semec/ds)
 
@@ -33,12 +35,17 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @source "../node_modules/@semec/ds/dist/react";
 ```
 
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 4 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.0.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.1.0. Confira a versão instalada com `npm ls @semec/ds`.
+
 ## Uso
 
 ```tsx
 import { ScrollArea } from "@semec/ds/react";
 
-<ScrollArea className="h-48">
+// Texto puro: a viewport recebe tabIndex=0; o aria-label nomeia a região
+<ScrollArea className="h-48" viewportProps={{ "aria-label": "Termos de uso" }}>
   <div className="p-4">Conteúdo longo aqui…</div>
 </ScrollArea>
 ```
@@ -46,7 +53,7 @@ import { ScrollArea } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `ScrollArea` (Área de scroll) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Scroll customizado e consistente entre navegadores. API e variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `ScrollArea` (Área de scroll) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Scroll customizado e consistente entre navegadores. A região rolável é alcançável pelo teclado: sem nada focável dentro (ex.: texto puro), a viewport vira parada de Tab com anel de foco (`focusable="auto"`, o padrão). Dê nome à região com `viewportProps={{ "aria-label": "…" }}`. API e variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal · focusable: "auto" (padrão: focável só sem conteúdo focável dentro) · true (sempre) · false (nunca; só se o conteúdo garantir outro caminho de teclado) · viewportProps: props da viewport (ex.: aria-label da região focável, className). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte

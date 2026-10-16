@@ -4,18 +4,19 @@ code: "toggle"
 slug: "toggle"
 file: "src/components/toggle.tsx"
 category: "formularios"
-variants: "variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)"
+variants: "variant: default (solto sem borda) · outline (solto com borda input) · estado ligado: data-state=on · aria-pressed=true · fundo tint · contorno primary de 2px (borda + inset-ring) · hover escurece para primary-hover · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)"
 ---
 
 # Toggle — `toggle`
 
-> Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos.
+> Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. Ligado = fundo `tint` + contorno de 2px em `primary` (5,00:1 sobre `--bg`, 5,42:1 sobre branco) e texto `foreground`; o estado vai ao leitor de tela por `aria-pressed`.
 
-**Arquivo:** `src/components/toggle.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/toggle`
+**Arquivo:** `src/components/toggle.tsx` | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/toggle/
 
 ## Variantes
 
-- **variant**: default · outline
+- **variant**: default (solto sem borda) · outline (solto com borda input)
+- **estado ligado**: data-state=on · aria-pressed=true · fundo tint · contorno primary de 2px (borda + inset-ring) · hover escurece para primary-hover
 - **size**: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)
 
 ## Instalação (@semec/ds)
@@ -33,6 +34,10 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @source "../node_modules/@semec/ds/dist/react";
 ```
 
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 4 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.0.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.1.0. Confira a versão instalada com `npm ls @semec/ds`.
+
 ## Uso
 
 ```tsx
@@ -47,7 +52,7 @@ import { Bold } from "lucide-react";
 ## Prompt para IA
 
 ```text
-Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. API e variantes: variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. Ligado = fundo `tint` + contorno de 2px em `primary` (5,00:1 sobre `--bg`, 5,42:1 sobre branco) e texto `foreground`; o estado vai ao leitor de tela por `aria-pressed`. API e variantes: variant: default (solto sem borda) · outline (solto com borda input) · estado ligado: data-state=on · aria-pressed=true · fundo tint · contorno primary de 2px (borda + inset-ring) · hover escurece para primary-hover · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte

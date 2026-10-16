@@ -11,7 +11,7 @@ variants: "side: left · right · top · bottom · composição: Sheet · Trigge
 
 > Painel lateral modal com overlay. Variantes left/right/top/bottom.
 
-**Arquivo:** `src/components/sheet.tsx` | **Categoria:** Feedback e estados | **Rota:** `/componentes/sheet`
+**Arquivo:** `src/components/sheet.tsx` | **Categoria:** Feedback e estados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/sheet/
 
 ## Variantes
 
@@ -35,9 +35,14 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @source "../node_modules/@semec/ds/dist/react";
 ```
 
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 4 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.0.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.1.0. Confira a versão instalada com `npm ls @semec/ds`.
+
 ## Uso
 
 ```tsx
+import * as React from "react";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "@semec/ds/react";
 
 <Sheet>
@@ -58,7 +63,7 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescri
 // não sabe para onde devolver o foco. Guarde a origem e devolva em onCloseAutoFocus.
 function FiltrosControlados() {
   const [aberto, setAberto] = React.useState(false);
-  const origemRef = React.useRef(null);
+  const origemRef = React.useRef<HTMLButtonElement>(null);
   return (
     <>
       <Button ref={origemRef} onClick={() => setAberto(true)}>Filtros</Button>

@@ -4,18 +4,19 @@ code: "navigation-menu"
 slug: "menu-de-navegacao"
 file: "src/components/navigation-menu.tsx"
 category: "navegacao"
-variants: "composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · a11y: aria-label padrão 'Menu principal' · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix)"
+variants: "composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · estilos exportados: navigationMenuTriggerStyle() (visual de gatilho, ex.: link solto na lista) · navigationMenuLinkStyle() (estilo padrão do NavigationMenuLink, para links próprios) · a11y: aria-label padrão 'Menu principal' · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix)"
 ---
 
 # Menu de navegação — `navigation-menu`
 
-> Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px.
+> Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. O `NavigationMenuLink` já vem estilizado: alvo de 44px (`min-h-11`), `px-4`, hover/foco em `tint` e anel de foco por dentro; `active` marca a página atual com `aria-current="page"`.
 
-**Arquivo:** `src/components/navigation-menu.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/menu-de-navegacao`
+**Arquivo:** `src/components/navigation-menu.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/menu-de-navegacao/
 
 ## Variantes
 
 - **composição**: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator
+- **estilos exportados**: navigationMenuTriggerStyle() (visual de gatilho, ex.: link solto na lista) · navigationMenuLinkStyle() (estilo padrão do NavigationMenuLink, para links próprios)
 - **a11y**: aria-label padrão "Menu principal" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix)
 
 ## Instalação (@semec/ds)
@@ -33,6 +34,10 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @source "../node_modules/@semec/ds/dist/react";
 ```
 
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 4 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.0.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.1.0. Confira a versão instalada com `npm ls @semec/ds`.
+
 ## Uso
 
 ```tsx
@@ -42,7 +47,8 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuT
   <NavigationMenuList>
     <NavigationMenuItem>
       <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>
-      <NavigationMenuContent>
+      <NavigationMenuContent className="p-2">
+        {/* NavigationMenuLink já tem 44px de altura, px-4 e foco visível */}
         <NavigationMenuLink href="/iptu">IPTU</NavigationMenuLink>
         <NavigationMenuLink href="/alvara">Alvará</NavigationMenuLink>
       </NavigationMenuContent>
@@ -54,7 +60,7 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuT
 ## Prompt para IA
 
 ```text
-Use o componente `NavigationMenu` (Menu de navegação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. API e variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · a11y: aria-label padrão "Menu principal" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `NavigationMenu` (Menu de navegação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. O `NavigationMenuLink` já vem estilizado: alvo de 44px (`min-h-11`), `px-4`, hover/foco em `tint` e anel de foco por dentro; `active` marca a página atual com `aria-current="page"`. API e variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · estilos exportados: navigationMenuTriggerStyle() (visual de gatilho, ex.: link solto na lista) · navigationMenuLinkStyle() (estilo padrão do NavigationMenuLink, para links próprios) · a11y: aria-label padrão "Menu principal" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
