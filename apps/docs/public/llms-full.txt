@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-15T16:09:13.000Z — packages/react/manifest.js + packages/react/* — versão 4.0.1
+> Gerado 2026-10-16T14:53:55.000Z — packages/react/manifest.js + packages/react/* — versão 4.0.1
 
 ## Instalação
 
@@ -8,7 +8,7 @@
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ## packages/react/src/index.ts — barrel
 
@@ -2786,7 +2786,7 @@ export interface FileUploadLabels {
   dropzoneAction: string;
   /** Erro de tipo não aceito. Padrão: "Tipo de arquivo não permitido.". */
   invalidType: string;
-  /** Erro de tamanho; recebe o limite já formatado (ex.: "5.0 MB"). */
+  /** Erro de tamanho; recebe o limite já formatado em PT-BR (ex.: "5 MB", "1,5 MB"). */
   tooLarge: (maxSize: string) => string;
 }
 
@@ -2847,10 +2847,14 @@ export interface FileUploadProps
   labels?: Partial<FileUploadLabels>;
 }
 
+// Vírgula decimal PT-BR e no máximo 1 casa (ADR-016; TST-13): "5 MB", "1,5 MB".
+const decimalPtBR = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
+
+/** Tamanho legível em PT-BR: `512 B`, `1,5 KB`, `5 MB`. */
 const formatBytes = (bytes: number) => {
   if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1024 * 1024) return `${decimalPtBR.format(bytes / 1024)} KB`;
+  return `${decimalPtBR.format(bytes / (1024 * 1024))} MB`;
 };
 
 // Mesma regra do atributo `accept`: extensões (".pdf"), MIME exato ou curinga ("image/*").
@@ -3394,39 +3398,56 @@ Variantes: props: label · htmlFor · required · hint · error (mensagem; impli
 
 Uso:
 ```tsx
-import { FormField, Input, ErrorSummary, Alert, AlertTitle, AlertDescription, Button, useToast } from "@semec/ds/react";
+import { FormField, Input, ErrorSummary, Button, useToast, maskCurrency } from "@semec/ds/react";
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useState } from "react";
 
+// npm install react-hook-form @hookform/resolvers zod (opcionais, só para esta receita)
 const formSchema = z.object({
   nome: z.string().min(3, "Nome deve ter ao menos 3 caracteres"),
   email: emailSchema,
   cpf: cpfSchema,
+  valor: z.string().min(1, "Informe o valor"),
 });
+
+type FormValues = z.infer<typeof formSchema>;
+
+// Ordem dos campos na tela: o ErrorSummary segue esta lista (não a ordem do objeto errors)
+const ORDEM_CAMPOS = ["nome", "email", "cpf", "valor"] as const satisfies readonly (keyof FormValues)[];
 
 export function FormularioExemplo() {
   const { toast } = useToast();
-  const { register, control, handleSubmit, formState: { errors } } = useForm({
+  const [tentativa, setTentativa] = useState(0);
+  const { register, control, handleSubmit, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    defaultValues: { nome: "", email: "", cpf: "", valor: "" },
+    // Sem isto o RHF foca o 1º campo inválido e o ErrorSummary nunca recebe o foco
+    shouldFocusError: false,
   });
 
-  // Padrão 2: Resumo consolidado no topo
-  const errorSummaryItems = Object.entries(errors).map(([id, err]) => ({
-    id,
-    message: String(err?.message || "Campo inválido"),
-  }));
+  // Padrão 2: Resumo consolidado no topo, na ordem da tela
+  const errorSummaryItems = ORDEM_CAMPOS.flatMap((id) => {
+    const message = errors[id]?.message;
+    return message ? [{ id, message }] : [];
+  });
 
-  const onSubmit = async (data) => {
+  const onSubmit = (data: FormValues) => {
+    void data;
     // Padrão de sucesso via Toast:
     toast({ variant: "success", title: "Sucesso!", description: "Dados gravados com sucesso." });
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="max-w-xl space-y-4">
+    <form
+      onSubmit={handleSubmit(onSubmit, () => setTentativa((t) => t + 1))}
+      noValidate
+      className="max-w-xl space-y-4"
+    >
       {errorSummaryItems.length > 0 && (
-        <ErrorSummary title="Corrija os erros destacados" errors={errorSummaryItems} />
+        <ErrorSummary title="Corrija os erros destacados" errors={errorSummaryItems} focusKey={tentativa} />
       )}
 
       {/* Padrão 1: Erro inline ligado via aria-describedby e aria-invalid */}
@@ -3444,7 +3465,26 @@ export function FormularioExemplo() {
         control={control}
         render={({ field }) => (
           <FormField label="CPF" htmlFor="cpf" required error={errors.cpf?.message}>
-            <Input id="cpf" {...field} />
+            <Input id="cpf" inputMode="numeric" {...field} />
+          </FormField>
+        )}
+      />
+
+      {/* Campo R$: maskCurrency("") devolve "", então min(1) barra o vazio */}
+      <Controller
+        name="valor"
+        control={control}
+        render={({ field }) => (
+          <FormField label="Valor da taxa" htmlFor="valor" required error={errors.valor?.message}>
+            <Input
+              id="valor"
+              inputMode="numeric"
+              name={field.name}
+              ref={field.ref}
+              onBlur={field.onBlur}
+              value={field.value}
+              onValueChange={(v) => field.onChange(maskCurrency(v))}
+            />
           </FormField>
         )}
       />
@@ -3747,7 +3787,7 @@ export { FormField };
 
 ### ErrorSummary (`error-summary`) — `src/components/error-summary.tsx` — slug: error-summary
 
-Desc: Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático, título ligado por id gerado. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`).
+Desc: Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco. Título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`).
 
 Variantes: props: title · errors [{ id, message }] · autoFocus · focusKey
 
@@ -3766,7 +3806,7 @@ import { ErrorSummary } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `ErrorSummary` (ErrorSummary) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático, título ligado por id gerado. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`). API e variantes: props: title · errors [{ id, message }] · autoFocus · focusKey. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `ErrorSummary` (ErrorSummary) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco. Título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`). API e variantes: props: title · errors [{ id, message }] · autoFocus · focusKey. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -3786,9 +3826,30 @@ export interface ErrorSummaryItem {
 export interface ErrorSummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   errors?: ErrorSummaryItem[];
+  /**
+   * Foca o resumo automaticamente. Com `focusKey`, o foco vem **só** quando o
+   * `focusKey` muda (inclusive na montagem, se for um valor ainda não focado
+   * naquele formulário). Sem `focusKey`, foca quando o resumo aparece (de 0
+   * para N erros). Mudanças só na lista de erros (validação ao vivo) nunca
+   * movem o foco. Padrão: `true`.
+   */
   autoFocus?: boolean;
+  /**
+   * Valor que muda a cada envio inválido (ex.: `tentativa`, somada no callback
+   * de envio inválido do `handleSubmit`). É o único gatilho de foco quando
+   * informado: o resumo que some e volta durante a digitação (0 → N erros) não
+   * rouba o foco do campo (WCAG 3.2.2; TST-01). O último valor focado fica
+   * guardado no `<form>` (ou no elemento pai) e sobrevive à desmontagem, então
+   * a renderização condicional (`erros.length > 0 && <ErrorSummary … />`)
+   * também funciona.
+   */
   focusKey?: unknown;
 }
+
+// Último `focusKey` visto por âncora (o `<form>` ou o pai do resumo). Fica fora
+// do componente porque a receita monta o resumo só quando há erros: sem isso,
+// cada remontagem (0 → N erros na validação ao vivo) pareceria um envio novo.
+const focusKeyPorAncora = new WeakMap<Element, unknown>();
 
 // Primeiro elemento focável dentro do alvo (input hidden não conta).
 const FOCUSABLE =
@@ -3812,11 +3873,40 @@ const ErrorSummary = React.forwardRef<HTMLDivElement, ErrorSummaryProps>(
       [ref]
     );
 
+    // Gatilhos de foco (WCAG 3.2.2; TST-01, #48). Mudar só a contagem — a
+    // validação ao vivo do RHF ou do Formik revalida a cada tecla — nunca tira
+    // o foco do campo em que a pessoa digita.
+    // - Com `focusKey`: foca só quando ele difere do último valor visto naquela
+    //   âncora. O resumo que some e volta com o mesmo `focusKey` não foca.
+    // - Sem `focusKey`: foca na transição de 0 para N erros (comportamento
+    //   legado; com validação ao vivo, passe `focusKey`).
+    const prevCount = React.useRef(0);
+    const ultimaChave = React.useRef<{ valor: unknown } | null>(null);
+    const count = errors.length;
+    const temFocusKey = focusKey !== undefined;
     React.useEffect(() => {
-      if (autoFocus && errors.length > 0) {
-        internalRef.current?.focus();
+      const el = internalRef.current;
+      let deveFocar = false;
+      if (temFocusKey) {
+        // A chave só é consumida com erros na tela: no Formik o `submitCount`
+        // muda antes de os erros chegarem, e o foco espera por eles.
+        if (count > 0) {
+          const ancora = el?.closest("form") ?? el?.parentElement ?? null;
+          const vista =
+            ancora && focusKeyPorAncora.has(ancora)
+              ? { valor: focusKeyPorAncora.get(ancora) }
+              : ultimaChave.current;
+          deveFocar = vista === null || !Object.is(vista.valor, focusKey);
+          ultimaChave.current = { valor: focusKey };
+          if (ancora) focusKeyPorAncora.set(ancora, focusKey);
+        }
+      } else {
+        deveFocar = prevCount.current === 0 && count > 0;
       }
-    }, [autoFocus, errors.length, focusKey]);
+      prevCount.current = count;
+
+      if (autoFocus && deveFocar) el?.focus();
+    }, [autoFocus, count, focusKey, temFocusKey]);
 
     if (errors.length === 0) return null;
 
@@ -4876,7 +4966,9 @@ const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
             Logo
           </span>
         )}
-        <span aria-hidden="true" className="h-7 w-px shrink-0 bg-border" />
+        {/* Espaços em texto: num contêiner flex não aparecem na tela, mas
+            separam as palavras no nome acessível do link (TST-12). */}{" "}
+        <span aria-hidden="true" className="h-7 w-px shrink-0 bg-border" />{" "}
         {children ?? (
           <span
             className={cn(
@@ -4884,13 +4976,11 @@ const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
               truncate ? "truncate" : "break-words"
             )}
           >
-            {orgName}
-            <span
-              aria-hidden="true"
-              className="mx-1 font-normal text-muted-foreground"
-            >
+            {/* O "|" é só visual; os espaços separam os nomes (TST-12). */}
+            {orgName}{" "}
+            <span aria-hidden="true" className="font-normal text-muted-foreground">
               |
-            </span>
+            </span>{" "}
             <span className="font-semibold text-foreground">{serviceName}</span>
           </span>
         )}
@@ -4898,14 +4988,14 @@ const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
     );
 
     const rootClass = cn(
-      "flex min-w-0 items-center gap-3 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+      "flex min-h-11 min-w-0 items-center gap-3 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       className
     );
 
     if (href) {
       return (
         <a ref={ref as React.Ref<HTMLAnchorElement>} href={href} className={rootClass} {...props}>
-          {content}
+          {content}{" "}
           <span className="sr-only">— {homeLabel}</span>
         </a>
       );
@@ -6220,11 +6310,20 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">;
 
-function toast({ ...props }: Toast) {
+function toast({ onOpenChange: onOpenChangeProp, ...props }: Toast) {
   const id = genId();
-  const update = (props: ToasterToast) =>
-    dispatch({ type: "UPDATE_TOAST", toast: { ...props, id } });
+  // O `onOpenChange` de quem chama é composto com o interno (que tira o aviso
+  // da fila ao fechar), em vez de ser descartado (TST-24).
+  let userOnOpenChange = onOpenChangeProp;
   const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
+  const onOpenChange = (open: boolean) => {
+    if (!open) dismiss();
+    userOnOpenChange?.(open);
+  };
+  const update = ({ onOpenChange: next, ...rest }: ToasterToast) => {
+    if (next) userOnOpenChange = next;
+    dispatch({ type: "UPDATE_TOAST", toast: { ...rest, id } });
+  };
 
   dispatch({
     type: "ADD_TOAST",
@@ -6232,9 +6331,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss();
-      },
+      onOpenChange,
     },
   });
 
@@ -7285,27 +7382,36 @@ export interface ProgressProps
  * (3,77:1 sobre `surface`, 3,49:1 sobre `bg`) para ser percebida como
  * componente gráfico (WCAG 1.4.11); o indicador `primary` tem 5,42:1 sobre a
  * trilha `surface`. Dê nome com `aria-label` ou `aria-labelledby`.
+ * O preenchimento é `value / max` (padrão `max = 100`): com `value={3}` e
+ * `max={4}`, a barra mostra 75%, o mesmo que o leitor de tela anuncia.
  */
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   ProgressProps
->(({ className, value, ...props }, ref) => (
-  <ProgressPrimitive.Root
-    ref={ref}
-    className={cn(
-      "relative h-3 w-full overflow-hidden rounded-full border border-border-strong bg-surface",
-      className
-    )}
-    value={value}
-    aria-valuenow={value ?? undefined}
-    {...props}
-  >
-    <ProgressPrimitive.Indicator
-      className="h-full w-full flex-1 rounded-full bg-primary transition-all duration-base ease-standard"
-      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
-    />
-  </ProgressPrimitive.Root>
-));
+>(({ className, value, max, ...props }, ref) => {
+  // O indicador segue a mesma proporção que o leitor de tela anuncia
+  // (`value / max`), não `value` como se o máximo fosse sempre 100 (TST-14).
+  const limite = typeof max === "number" && max > 0 ? max : 100;
+  const percentual = Math.min(100, Math.max(0, ((value ?? 0) / limite) * 100));
+  return (
+    <ProgressPrimitive.Root
+      ref={ref}
+      className={cn(
+        "relative h-3 w-full overflow-hidden rounded-full border border-border-strong bg-surface",
+        className
+      )}
+      value={value}
+      max={max}
+      aria-valuenow={value ?? undefined}
+      {...props}
+    >
+      <ProgressPrimitive.Indicator
+        className="h-full w-full flex-1 rounded-full bg-primary transition-all duration-base ease-standard"
+        style={{ transform: `translateX(-${100 - percentual}%)` }}
+      />
+    </ProgressPrimitive.Root>
+  );
+});
 Progress.displayName = ProgressPrimitive.Root.displayName;
 
 export { Progress };
@@ -10700,6 +10806,8 @@ Metadados de componente (o que versões anteriores deste README chamavam de `get
 
 Mais: `SemecProvider`, `cn`, masks (`maskCPF`, `maskCNPJ`, `maskCEP`, `maskCurrency`) e validadores puros (`validateCPF`, `validateCNPJ`, `validateEmail`).
 
+As masks têm a assinatura `(value: string) => string` (tipo `MaskFn`): recebem o texto digitado e devolvem o formatado, para usar no `onValueChange` do `Input`. `maskCurrency` lê os dígitos como centavos (`"123456"` → `"R$ 1.234,56"`, com espaço não separável depois de `R$`) e, desde a 4.1.0, devolve `""` quando não há dígitos significativos (vazio, sem dígitos ou só zeros; antes, `"R$ 0,00"`).
+
 ## Tokens
 
 O que existe no pacote está em `tokens.css` (camadas L0 `--pv-*` e L1 semânticas). O `@theme inline` expõe os tokens como utilitários (o preset JS gera os mesmos nomes):
@@ -10726,6 +10834,12 @@ Os tokens do pacote (`tokens.css`) são tema **claro**. Não há `shadcn.css` no
 ## Validação (Zod)
 
 Schemas Zod ficam no entry **`@semec/ds/react/validacao`** — o entry principal não importa `zod`. O `zod` é peer opcional, `^3.23.0 || ^4.0.0` (o kit é testado com o 3 e o 4): instale-o (`npm install zod`) só se usar esse entry.
+
+A receita de formulário da skill `semec-ds` (React Hook Form + Zod + `FormField` + `ErrorSummary`) usa também `react-hook-form` e `@hookform/resolvers`, que não vêm com o kit (opcionais, só para a receita):
+
+```bash
+npm install react-hook-form @hookform/resolvers zod
+```
 
 ```ts
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";

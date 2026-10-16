@@ -411,39 +411,56 @@ import { Download, Search, Trash2 } from "lucide-react";
       { prop: "hooks", values: "useFormField · useFormFieldControl (para campos próprios)" },
       { prop: "padrões", values: "1. Inline (FormField error) · 2. Resumo topo (ErrorSummary) · 3. Servidor (Alert destructive) · Legenda de ação no botão" },
     ],
-    usage: `import { FormField, Input, ErrorSummary, Alert, AlertTitle, AlertDescription, Button, useToast } from "@semec/ds/react";
+    usage: `import { FormField, Input, ErrorSummary, Button, useToast, maskCurrency } from "@semec/ds/react";
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useState } from "react";
 
+// npm install react-hook-form @hookform/resolvers zod (opcionais, só para esta receita)
 const formSchema = z.object({
   nome: z.string().min(3, "Nome deve ter ao menos 3 caracteres"),
   email: emailSchema,
   cpf: cpfSchema,
+  valor: z.string().min(1, "Informe o valor"),
 });
+
+type FormValues = z.infer<typeof formSchema>;
+
+// Ordem dos campos na tela: o ErrorSummary segue esta lista (não a ordem do objeto errors)
+const ORDEM_CAMPOS = ["nome", "email", "cpf", "valor"] as const satisfies readonly (keyof FormValues)[];
 
 export function FormularioExemplo() {
   const { toast } = useToast();
-  const { register, control, handleSubmit, formState: { errors } } = useForm({
+  const [tentativa, setTentativa] = useState(0);
+  const { register, control, handleSubmit, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    defaultValues: { nome: "", email: "", cpf: "", valor: "" },
+    // Sem isto o RHF foca o 1º campo inválido e o ErrorSummary nunca recebe o foco
+    shouldFocusError: false,
   });
 
-  // Padrão 2: Resumo consolidado no topo
-  const errorSummaryItems = Object.entries(errors).map(([id, err]) => ({
-    id,
-    message: String(err?.message || "Campo inválido"),
-  }));
+  // Padrão 2: Resumo consolidado no topo, na ordem da tela
+  const errorSummaryItems = ORDEM_CAMPOS.flatMap((id) => {
+    const message = errors[id]?.message;
+    return message ? [{ id, message }] : [];
+  });
 
-  const onSubmit = async (data) => {
+  const onSubmit = (data: FormValues) => {
+    void data;
     // Padrão de sucesso via Toast:
     toast({ variant: "success", title: "Sucesso!", description: "Dados gravados com sucesso." });
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="max-w-xl space-y-4">
+    <form
+      onSubmit={handleSubmit(onSubmit, () => setTentativa((t) => t + 1))}
+      noValidate
+      className="max-w-xl space-y-4"
+    >
       {errorSummaryItems.length > 0 && (
-        <ErrorSummary title="Corrija os erros destacados" errors={errorSummaryItems} />
+        <ErrorSummary title="Corrija os erros destacados" errors={errorSummaryItems} focusKey={tentativa} />
       )}
 
       {/* Padrão 1: Erro inline ligado via aria-describedby e aria-invalid */}
@@ -461,7 +478,26 @@ export function FormularioExemplo() {
         control={control}
         render={({ field }) => (
           <FormField label="CPF" htmlFor="cpf" required error={errors.cpf?.message}>
-            <Input id="cpf" {...field} />
+            <Input id="cpf" inputMode="numeric" {...field} />
+          </FormField>
+        )}
+      />
+
+      {/* Campo R$: maskCurrency("") devolve "", então min(1) barra o vazio */}
+      <Controller
+        name="valor"
+        control={control}
+        render={({ field }) => (
+          <FormField label="Valor da taxa" htmlFor="valor" required error={errors.valor?.message}>
+            <Input
+              id="valor"
+              inputMode="numeric"
+              name={field.name}
+              ref={field.ref}
+              onBlur={field.onBlur}
+              value={field.value}
+              onValueChange={(v) => field.onChange(maskCurrency(v))}
+            />
           </FormField>
         )}
       />
@@ -483,7 +519,7 @@ export function FormularioExemplo() {
     label: "ErrorSummary",
     file: "src/components/error-summary.tsx",
     category: "formularios",
-    desc: "Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role=\"alert\"`, foco automático, título ligado por id gerado. Sem margem externa: espace pelo layout (ex.: `className=\"mb-6\"`).",
+    desc: "Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role=\"alert\"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco. Título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className=\"mb-6\"`).",
     variants: [{ prop: "props", values: "title · errors [{ id, message }] · autoFocus · focusKey" }],
     usage: `import { ErrorSummary } from "@semec/ds/react";
 

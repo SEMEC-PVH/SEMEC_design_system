@@ -25,7 +25,7 @@ variants: "props: label · htmlFor · required · hint · error (mensagem; impli
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ```css
 @import "tailwindcss";
@@ -37,39 +37,56 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 ## Uso
 
 ```tsx
-import { FormField, Input, ErrorSummary, Alert, AlertTitle, AlertDescription, Button, useToast } from "@semec/ds/react";
+import { FormField, Input, ErrorSummary, Button, useToast, maskCurrency } from "@semec/ds/react";
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useState } from "react";
 
+// npm install react-hook-form @hookform/resolvers zod (opcionais, só para esta receita)
 const formSchema = z.object({
   nome: z.string().min(3, "Nome deve ter ao menos 3 caracteres"),
   email: emailSchema,
   cpf: cpfSchema,
+  valor: z.string().min(1, "Informe o valor"),
 });
+
+type FormValues = z.infer<typeof formSchema>;
+
+// Ordem dos campos na tela: o ErrorSummary segue esta lista (não a ordem do objeto errors)
+const ORDEM_CAMPOS = ["nome", "email", "cpf", "valor"] as const satisfies readonly (keyof FormValues)[];
 
 export function FormularioExemplo() {
   const { toast } = useToast();
-  const { register, control, handleSubmit, formState: { errors } } = useForm({
+  const [tentativa, setTentativa] = useState(0);
+  const { register, control, handleSubmit, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    defaultValues: { nome: "", email: "", cpf: "", valor: "" },
+    // Sem isto o RHF foca o 1º campo inválido e o ErrorSummary nunca recebe o foco
+    shouldFocusError: false,
   });
 
-  // Padrão 2: Resumo consolidado no topo
-  const errorSummaryItems = Object.entries(errors).map(([id, err]) => ({
-    id,
-    message: String(err?.message || "Campo inválido"),
-  }));
+  // Padrão 2: Resumo consolidado no topo, na ordem da tela
+  const errorSummaryItems = ORDEM_CAMPOS.flatMap((id) => {
+    const message = errors[id]?.message;
+    return message ? [{ id, message }] : [];
+  });
 
-  const onSubmit = async (data) => {
+  const onSubmit = (data: FormValues) => {
+    void data;
     // Padrão de sucesso via Toast:
     toast({ variant: "success", title: "Sucesso!", description: "Dados gravados com sucesso." });
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="max-w-xl space-y-4">
+    <form
+      onSubmit={handleSubmit(onSubmit, () => setTentativa((t) => t + 1))}
+      noValidate
+      className="max-w-xl space-y-4"
+    >
       {errorSummaryItems.length > 0 && (
-        <ErrorSummary title="Corrija os erros destacados" errors={errorSummaryItems} />
+        <ErrorSummary title="Corrija os erros destacados" errors={errorSummaryItems} focusKey={tentativa} />
       )}
 
       {/* Padrão 1: Erro inline ligado via aria-describedby e aria-invalid */}
@@ -87,7 +104,26 @@ export function FormularioExemplo() {
         control={control}
         render={({ field }) => (
           <FormField label="CPF" htmlFor="cpf" required error={errors.cpf?.message}>
-            <Input id="cpf" {...field} />
+            <Input id="cpf" inputMode="numeric" {...field} />
+          </FormField>
+        )}
+      />
+
+      {/* Campo R$: maskCurrency("") devolve "", então min(1) barra o vazio */}
+      <Controller
+        name="valor"
+        control={control}
+        render={({ field }) => (
+          <FormField label="Valor da taxa" htmlFor="valor" required error={errors.valor?.message}>
+            <Input
+              id="valor"
+              inputMode="numeric"
+              name={field.name}
+              ref={field.ref}
+              onBlur={field.onBlur}
+              value={field.value}
+              onValueChange={(v) => field.onChange(maskCurrency(v))}
+            />
           </FormField>
         )}
       />

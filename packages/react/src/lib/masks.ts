@@ -26,9 +26,17 @@ export const maskCEP: MaskFn = (v) => {
   return v;
 };
 
-/** R$ 0.000,00 */
+/**
+ * Moeda em reais para campo de digitação: os dígitos viram centavos.
+ * `maskCurrency("123456")` → `"R$ 1.234,56"`; até 12 dígitos.
+ *
+ * Sem dígitos significativos devolve `""` — `maskCurrency("")`,
+ * `maskCurrency("abc")` e `maskCurrency("R$ 0,0")` (apagando com Backspace) —
+ * para o campo poder voltar a ficar vazio e falhar em `z.string().min(1)`
+ * (TST-20). Use `placeholder="R$ 0,00"` para indicar o formato.
+ */
 export const maskCurrency: MaskFn = (v) => {
-  v = v.replace(/\D/g, "").slice(0, 12);
-  const n = Number(v) / 100;
-  return isNaN(n) ? "" : n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  v = v.replace(/\D/g, "").replace(/^0+/, "").slice(0, 12);
+  if (!v) return "";
+  return (Number(v) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 };

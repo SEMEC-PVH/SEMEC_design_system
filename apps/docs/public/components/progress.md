@@ -23,7 +23,7 @@ _Sem variantes_
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ```css
 @import "tailwindcss";
@@ -66,27 +66,36 @@ export interface ProgressProps
  * (3,77:1 sobre `surface`, 3,49:1 sobre `bg`) para ser percebida como
  * componente gráfico (WCAG 1.4.11); o indicador `primary` tem 5,42:1 sobre a
  * trilha `surface`. Dê nome com `aria-label` ou `aria-labelledby`.
+ * O preenchimento é `value / max` (padrão `max = 100`): com `value={3}` e
+ * `max={4}`, a barra mostra 75%, o mesmo que o leitor de tela anuncia.
  */
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   ProgressProps
->(({ className, value, ...props }, ref) => (
-  <ProgressPrimitive.Root
-    ref={ref}
-    className={cn(
-      "relative h-3 w-full overflow-hidden rounded-full border border-border-strong bg-surface",
-      className
-    )}
-    value={value}
-    aria-valuenow={value ?? undefined}
-    {...props}
-  >
-    <ProgressPrimitive.Indicator
-      className="h-full w-full flex-1 rounded-full bg-primary transition-all duration-base ease-standard"
-      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
-    />
-  </ProgressPrimitive.Root>
-));
+>(({ className, value, max, ...props }, ref) => {
+  // O indicador segue a mesma proporção que o leitor de tela anuncia
+  // (`value / max`), não `value` como se o máximo fosse sempre 100 (TST-14).
+  const limite = typeof max === "number" && max > 0 ? max : 100;
+  const percentual = Math.min(100, Math.max(0, ((value ?? 0) / limite) * 100));
+  return (
+    <ProgressPrimitive.Root
+      ref={ref}
+      className={cn(
+        "relative h-3 w-full overflow-hidden rounded-full border border-border-strong bg-surface",
+        className
+      )}
+      value={value}
+      max={max}
+      aria-valuenow={value ?? undefined}
+      {...props}
+    >
+      <ProgressPrimitive.Indicator
+        className="h-full w-full flex-1 rounded-full bg-primary transition-all duration-base ease-standard"
+        style={{ transform: `translateX(-${100 - percentual}%)` }}
+      />
+    </ProgressPrimitive.Root>
+  );
+});
 Progress.displayName = ProgressPrimitive.Root.displayName;
 
 export { Progress };
