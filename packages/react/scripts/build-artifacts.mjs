@@ -167,8 +167,12 @@ const componentCount = dsComponents.length;
 
 /** Instalação do kit React: `lucide-react` é peer e só o npm 7+ o instala sozinho. */
 const INSTALL_CMD = "npm install @semec/ds lucide-react";
+/** Pacotes opcionais da receita de formulário (TST-20): não são peers do kit. */
+const FORM_RECIPE_CMD = "npm install react-hook-form @hookform/resolvers zod";
 const PEERS_NOTE =
-  "lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.";
+  "lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: " +
+  FORM_RECIPE_CMD +
+  ".";
 const homepage = (pkgJson.homepage || "https://semec-pvh.github.io/SEMEC_design_system/").replace(/\/?$/, "/");
 
 function componentsByCategory() {
@@ -297,6 +301,7 @@ function buildManifest({ site = false } = {}) {
     install: {
       packages: INSTALL_CMD,
       peers: PEERS_NOTE,
+      form: FORM_RECIPE_CMD,
       tokens: 'import "@semec/ds/react/tokens.css";',
       preset: '@source "../node_modules/@semec/ds/dist/react";',
       utils: 'import { cn } from "@semec/ds/react";',
