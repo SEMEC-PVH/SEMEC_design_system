@@ -4,19 +4,20 @@ code: "link"
 slug: "link"
 file: "src/components/link.tsx"
 category: "acoes"
-variants: "variant: primary · onSurface · muted · underline: true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido)"
+variants: "variant: primary · onSurface · muted · underline: true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido) · alvo de toque: abaixo de sm, área mínima de 44×44px por um ::after centralizado, sem mudar a altura da linha (ex.: link tel/mailto sozinho num parágrafo); no desktop o ::after não existe"
 ---
 
 # Link — `link`
 
 > Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas.
 
-**Arquivo:** `src/components/link.tsx` | **Categoria:** Ações e links | **Rota:** `/componentes/link`
+**Arquivo:** `src/components/link.tsx` | **Categoria:** Ações e links | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/link/
 
 ## Variantes
 
 - **variant**: primary · onSurface · muted
 - **underline**: true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido)
+- **alvo de toque**: abaixo de sm, área mínima de 44×44px por um ::after centralizado, sem mudar a altura da linha (ex.: link tel/mailto sozinho num parágrafo); no desktop o ::after não existe
 
 ## Instalação (@semec/ds)
 
@@ -32,6 +33,10 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 8 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.0.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.1.0. Confira a versão instalada com `npm ls @semec/ds`.
 
 ## Uso
 
@@ -49,7 +54,7 @@ import { Link } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `Link` (Link) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas. API e variantes: variant: primary · onSurface · muted · underline: true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Link` (Link) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas. API e variantes: variant: primary · onSurface · muted · underline: true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido) · alvo de toque: abaixo de sm, área mínima de 44×44px por um ::after centralizado, sem mudar a altura da linha (ex.: link tel/mailto sozinho num parágrafo); no desktop o ::after não existe. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -61,7 +66,11 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../lib/utils";
 
 const linkVariants = cva(
-  "inline-flex items-center gap-1 text-sm font-medium underline-offset-4 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+  // TST-10: abaixo de `sm`, um ::after centralizado de no mínimo 44×44 amplia a
+  // área de toque (mesmo recurso do Button sm) sem mudar a altura da linha do
+  // texto: um link tel/mailto sozinho num parágrafo media 21 px. No desktop o
+  // ::after não existe, para não roubar cliques do texto das linhas vizinhas.
+  "relative inline-flex items-center gap-1 text-sm font-medium underline-offset-4 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background max-sm:after:absolute max-sm:after:left-1/2 max-sm:after:top-1/2 max-sm:after:h-full max-sm:after:min-h-11 max-sm:after:w-full max-sm:after:min-w-11 max-sm:after:-translate-x-1/2 max-sm:after:-translate-y-1/2",
   {
     variants: {
       variant: {

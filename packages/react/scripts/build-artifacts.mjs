@@ -11,7 +11,8 @@
  * bloco `<!-- ds:component-list:start/end -->`, preenchidos a partir de dsComponents.
  *
  * Targets:
- *   dist          → packages/react/dist/skills/* + dist/lite/*  (npm)
+ *   dist          → packages/react/dist/skills/* + dist/lite/*  (npm); sincroniza a lista
+ *                   de componentes do README do pacote e a versão de docs/objetivo.md
  *   docs-public   → apps/docs/public/{llms.txt,llms-full.txt,manifest.json,components/*,skills/*}
  *   agent-dirs    → .claude/skills/semec-ds/SKILL.md + .opencode/skills/semec-ds/SKILL.md
  *   all (default)
@@ -26,6 +27,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { assertNoConflictMarkers, listFilesRecursive } from "./conflict-markers.mjs";
+import { pendingRelease, unreleasedNote } from "./release-status.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgRoot = path.resolve(__dirname, "..");
@@ -87,6 +89,16 @@ const { dsComponents, dsCategories, dsPrompt, dsExportName } = await import(mani
 const pkgJson = JSON.parse(readPkgRootBase("package.json") || '{"version":"0.0.0"}');
 const version = pkgJson.version || "0.0.0";
 const generatedAt = resolveGeneratedAt();
+
+// TST-15 (#55): changesets pendentes = conteúdo que o npm ainda não tem. O site é
+// publicado a cada push no main; sem esta marca, "Versão 4.0.1" descrevia código
+// que não era o do npm 4.0.1.
+const pending = pendingRelease({
+  changesetDir: path.join(repoRoot, ".changeset"),
+  pkgName: pkgJson.name || "@semec/ds",
+  version,
+});
+const unreleased = unreleasedNote(pending, version, pkgJson.name || "@semec/ds");
 
 /**
  * Carimbo determinístico: dois builds do mesmo commit geram arquivos idênticos.
@@ -173,7 +185,37 @@ const PEERS_NOTE =
   "lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: " +
   FORM_RECIPE_CMD +
   ".";
+
+/**
+ * As 4 linhas do CSS global do app (TST-19): `fonts.css` antes do `tokens.css`,
+ * e o `@source` relativo ao arquivo CSS. Vão no CSS, nunca num `import` em JS:
+ * o `tokens.css` tem `@theme inline` e `@utility`, que só o Tailwind processa.
+ */
+const GLOBAL_CSS_LINES = [
+  '@import "tailwindcss";',
+  '@import "@semec/ds/react/fonts.css";',
+  '@import "@semec/ds/react/tokens.css";',
+  '@source "../node_modules/@semec/ds/dist/react";',
+];
+const GLOBAL_CSS = GLOBAL_CSS_LINES.join("\n");
+const GLOBAL_CSS_NOTE =
+  "No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).";
+/** Preset JS opcional do Tailwind (no CSS global, depois dos imports). */
+const PRESET_LINE = '@config "@semec/ds/react/pv-preset";';
+const LITE_PRESET_LINE = '@config "@semec/ds/lite/pv-preset";';
+
 const homepage = (pkgJson.homepage || "https://semec-pvh.github.io/SEMEC_design_system/").replace(/\/?$/, "/");
+
+/**
+ * URLs do site (TST-18, #55). Em produção o site tem `basePath`
+ * (`/SEMEC_design_system`) e `trailingSlash`: links à raiz (`/componentes/x`)
+ * davam 404. Os artefatos do site usam a URL completa a partir do `homepage` do
+ * package.json, que já inclui o basePath e continua válida fora do site (agente
+ * que lê o llms.txt solto, sem URL base).
+ */
+const siteUrl = (rel = "") => `${homepage}${rel.replace(/^\//, "")}`;
+const componentPageUrl = (c) => siteUrl(`componentes/${c.slug}/`);
+const componentMdUrl = (c) => siteUrl(`components/${c.slug}.md`);
 
 function componentsByCategory() {
   const known = new Set(dsCategories.map((cat) => cat.key));
@@ -226,6 +268,8 @@ const INTEGRATOR_NOTE = /[ \t]*<!-- INTEGRADOR:[\s\S]*?-->[ \t]*\n?/g;
  * - `{{ds:component-count}}` e `<!-- ds:component-list -->` → gerados do manifest;
  * - `{{ds:homepage}}` → URL do site de documentação;
  * - `{{ds:version}}` → versão do package.json (nunca escrita à mão na SKILL);
+ * - `<!-- ds:release-status -->` → aviso de "não publicado" quando há changesets
+ *   pendentes (TST-15); some quando não há;
  * - blocos `<!-- ds:maintainer:start -->…<!-- ds:maintainer:end -->` (caminhos do
  *   monorepo, scripts de manutenção) só ficam na cópia do repositório
  *   (`.claude/`, `.opencode/`); saem da SKILL publicada no npm e no site (AUD-67);
@@ -237,7 +281,8 @@ function renderSkill(src, { maintainer = false } = {}) {
     .replaceAll("{{ds:component-count}}", String(componentCount))
     .replaceAll("{{ds:homepage}}", homepage)
     .replaceAll("{{ds:version}}", version)
-    .replace("<!-- ds:component-list -->", skillComponentList());
+    .replace("<!-- ds:component-list -->", skillComponentList())
+    .replace("<!-- ds:release-status -->", unreleased ? `> **${unreleased}**` : "");
   out = maintainer
     ? out.replace(/<!-- ds:maintainer:(start|end) -->\n?/g, "")
     : out.replace(MAINTAINER_BLOCK, "");
@@ -276,6 +321,38 @@ function syncPackageReadme() {
   }
 }
 
+/**
+ * TST-35 (#55): a versão em `docs/objetivo.md` (documento canônico) é gerada do
+ * package.json e dos changesets pendentes, entre
+ * `<!-- ds:release:start -->` e `<!-- ds:release:end -->`. Antes era escrita à
+ * mão e ficou duas versões atrás ("publicada 3.2.0" com o npm em 4.0.1).
+ */
+function releaseStatusBlock() {
+  const name = pkgJson.name || "@semec/ds";
+  const base = `Versão no repositório (\`packages/react/package.json\`): **${version}**.`;
+  if (!pending) {
+    return `${base} Sem changesets pendentes: o \`main\` corresponde ao \`${name}@${version}\` publicado no npm.`;
+  }
+  const plural = pending.count === 1 ? "changeset pendente" : "changesets pendentes";
+  return `${base} Há ${pending.count} ${plural} (${pending.bump}): a próxima versão prevista é a **${pending.nextVersion}**, e até ela sair o npm tem só a ${version}. Os artefatos para IA (llms.txt, manifest.json, .md por componente e skills) marcam esse conteúdo como "não publicado".`;
+}
+
+function syncObjetivo() {
+  const file = path.join(repoRoot, "docs", "objetivo.md");
+  if (!fs.existsSync(file)) return;
+  const current = fs.readFileSync(file, "utf8");
+  const re = /(<!-- ds:release:start -->\n)[\s\S]*?(\n<!-- ds:release:end -->)/;
+  if (!re.test(current)) {
+    console.warn("  docs/objetivo.md sem marcadores ds:release; versão não sincronizada");
+    return;
+  }
+  const next = current.replace(re, `$1${releaseStatusBlock()}$2`);
+  if (next !== current) {
+    fs.writeFileSync(file, next, "utf8");
+    console.log("  synced docs/objetivo.md (versão e changesets pendentes)");
+  }
+}
+
 function buildManifest({ site = false } = {}) {
   return {
     name: "SEMEC Design System",
@@ -295,18 +372,36 @@ function buildManifest({ site = false } = {}) {
       usage: c.usage,
       prompt: dsPrompt(c),
       ...(site
-        ? { url: `/componentes/${c.slug}`, md: `/components/${c.slug}.md` }
+        ? { url: componentPageUrl(c), md: componentMdUrl(c) }
         : {}),
     })),
+    // TST-15: `null` quando o repositório não tem changesets pendentes.
+    unreleased: pending
+      ? {
+          pendingChangesets: pending.count,
+          bump: pending.bump,
+          nextVersion: pending.nextVersion,
+          note: unreleased,
+        }
+      : null,
+    // TST-19: `css` são as 4 linhas do CSS global; `fonts`, `tokens` e `source`
+    // são linhas desse mesmo CSS (antes, `tokens` era um import em JS e `preset`
+    // era o `@source`). `preset` é o preset JS opcional (`@config`).
     install: {
       packages: INSTALL_CMD,
       peers: PEERS_NOTE,
       form: FORM_RECIPE_CMD,
-      tokens: 'import "@semec/ds/react/tokens.css";',
-      preset: '@source "../node_modules/@semec/ds/dist/react";',
+      css: GLOBAL_CSS,
+      cssNote: GLOBAL_CSS_NOTE,
+      fonts: GLOBAL_CSS_LINES[1],
+      tokens: GLOBAL_CSS_LINES[2],
+      source: GLOBAL_CSS_LINES[3],
+      preset: PRESET_LINE,
+      presetNote:
+        "Opcional, no CSS global depois dos imports. O tokens.css já gera os utilitários; o preset só serve a quem ainda configura o Tailwind por JS.",
       utils: 'import { cn } from "@semec/ds/react";',
     },
-    tokens: { files: ["tokens.css", "pv-preset.ts"] },
+    tokens: { files: ["tokens.css", "fonts.css", "pv-preset.ts"] },
   };
 }
 
@@ -317,7 +412,7 @@ function componentMd(c, { site = false } = {}) {
     : "—";
   const catLabel = dsCategories.find((x) => x.key === c.category)?.label ?? c.category;
   const routeLine = site
-    ? `**Arquivo:** \`${c.file}\` | **Categoria:** ${catLabel} | **Rota:** \`/componentes/${c.slug}\``
+    ? `**Arquivo:** \`${c.file}\` | **Categoria:** ${catLabel} | **Página:** ${componentPageUrl(c)}`
     : `**Arquivo:** \`${c.file}\` | **Categoria:** ${catLabel}`;
 
   return `---
@@ -348,12 +443,11 @@ ${INSTALL_CMD}
 ${PEERS_NOTE}
 
 \`\`\`css
-@import "tailwindcss";
-@import "@semec/ds/react/fonts.css";
-@import "@semec/ds/react/tokens.css";
-@source "../node_modules/@semec/ds/dist/react";
+${GLOBAL_CSS}
 \`\`\`
 
+${GLOBAL_CSS_NOTE}
+${unreleased ? `\n> ${unreleased}\n` : ""}
 ## Uso
 
 \`\`\`tsx
@@ -384,8 +478,8 @@ Gerado a partir de \`packages/react/manifest.js\` — não edite manualmente. Co
 function llmsIndex({ site = false, lite = false } = {}) {
   const skillPaths = site
     ? [
-        "- `/skills/semec-ds/SKILL.md` — skill full (React + tokens + a11y + responsive)",
-        "- `/skills/semec-ds-lite/SKILL.md` — skill lite (tokens + a11y + responsive, sem React)",
+        `- [skills/semec-ds/SKILL.md](${siteUrl("skills/semec-ds/SKILL.md")}) — skill full (React + tokens + a11y + responsive)`,
+        `- [skills/semec-ds-lite/SKILL.md](${siteUrl("skills/semec-ds-lite/SKILL.md")}) — skill lite (tokens + a11y + responsive, sem React)`,
         "- No repositório: `.claude/skills/semec-ds/SKILL.md` e `.opencode/skills/semec-ds/SKILL.md`",
       ]
     : lite
@@ -401,8 +495,8 @@ function llmsIndex({ site = false, lite = false } = {}) {
   const artifactPaths = lite
     ? site
       ? [
-          "- `/manifest.json` — JSON com categorias e tokens",
-          "- `/skills/semec-ds-lite/SKILL.md` — skill lite",
+          `- [manifest.json](${siteUrl("manifest.json")}) — JSON com categorias e tokens`,
+          `- [skills/semec-ds-lite/SKILL.md](${siteUrl("skills/semec-ds-lite/SKILL.md")}) — skill lite`,
         ]
       : [
           "- `llms.txt` — este índice",
@@ -411,9 +505,9 @@ function llmsIndex({ site = false, lite = false } = {}) {
         ]
     : site
       ? [
-          "- `/manifest.json` — JSON com todos componentes + prompts",
-          "- `/llms-full.txt` — dump concatenado (tokens + todos componentes + prompts)",
-          "- `/components/<slug>.md` — 1 md por componente (chunk RAG)",
+          `- [manifest.json](${siteUrl("manifest.json")}) — JSON com todos componentes + prompts`,
+          `- [llms-full.txt](${siteUrl("llms-full.txt")}) — dump concatenado (tokens + todos componentes + prompts)`,
+          `- \`${siteUrl("components/<slug>.md")}\` — 1 md por componente (chunk RAG)`,
         ]
       : [
           "- `llms.txt` — este índice",
@@ -444,6 +538,8 @@ function llmsIndex({ site = false, lite = false } = {}) {
       "```",
       "",
       "Sem `@source` para `dist/react`: a variante lite não usa os componentes React, então o Tailwind só precisa varrer o código do próprio app.",
+      "",
+      `Preset JS opcional (TST-33), no CSS global depois dos imports: \`${LITE_PRESET_LINE}\`. O \`tokens.css\` já gera os utilitários; o preset só serve a quem ainda configura o Tailwind por JS.`,
       "",
       "Sem Tailwind: as variáveis `--*` e a camada base funcionam em CSS puro. Os subpaths `@semec/ds/lite/*.css` só resolvem num bundler (`import` no JS ou `@import` processado por Vite/Next); num `<link>`, use os arquivos reais:",
       "",
@@ -488,6 +584,8 @@ function llmsIndex({ site = false, lite = false } = {}) {
     "",
     "> Kit `@semec/ds` (React + Tailwind v4 + Radix + CVA). Conteúdo PT-BR, código EN (ADR-016).",
     "",
+    ...(site ? [`Site: ${homepage}`, ""] : []),
+    ...(unreleased ? [`> **${unreleased}**`, ""] : []),
     "## Instalar",
     "",
     "```bash",
@@ -497,11 +595,10 @@ function llmsIndex({ site = false, lite = false } = {}) {
     PEERS_NOTE,
     "",
     "```css",
-    '@import "tailwindcss";',
-    '@import "@semec/ds/react/fonts.css";',
-    '@import "@semec/ds/react/tokens.css";',
-    '@source "../node_modules/@semec/ds/dist/react";',
+    ...GLOBAL_CSS_LINES,
     "```",
+    "",
+    GLOBAL_CSS_NOTE,
     "",
     "## Categorias",
     "",
@@ -517,7 +614,7 @@ function llmsIndex({ site = false, lite = false } = {}) {
     const importName = dsExportName(c);
     if (site) {
       lines.push(
-        `- [${c.label} (\`${c.code}\`) — ${c.desc}](/componentes/${c.slug}) — \`${c.file}\` — md: \`/components/${c.slug}.md\``
+        `- [${c.label} (\`${c.code}\`) — ${c.desc}](${componentPageUrl(c)}) — \`${c.file}\` — md: ${componentMdUrl(c)}`
       );
     } else {
       lines.push(
@@ -532,7 +629,7 @@ function llmsIndex({ site = false, lite = false } = {}) {
     "## Padrões",
     "",
     site
-      ? "Padrões em `/padroes/*` (navegação, formulários, dados-relatórios, feedback, acessibilidade). Exemplos interativos em `/components/demos/examples/*` e `/components/demos/patterns/*`."
+      ? `Padrões de tela (navegação, formulários, dados e relatórios, feedback, acessibilidade) em ${siteUrl("padroes/")}; exemplos interativos na página de cada componente.`
       : `Padrões de tela (esqueleto de página, landmarks, formulários, tabelas, feedback) em ${homepage}padroes/ e resumidos na skill \`semec-ds/SKILL.md\` (seção "Padrões de tela").`,
     "",
     "## Tokens",
@@ -552,7 +649,7 @@ function llmsIndex({ site = false, lite = false } = {}) {
     "1. Leia este índice (`llms.txt`)",
     "2. Escolha componente por slug/code",
     site
-      ? "3. Copie snippet de `/components/<slug>.md#uso` ou `/manifest.json`"
+      ? `3. Copie o snippet da seção "Uso" de \`${siteUrl("components/<slug>.md")}\` ou do \`manifest.json\``
       : "3. Copie snippet de `components/<slug>.md` ou `manifest.json`",
     "4. Aplique tokens L1 (`--action-primary` etc.), nunca hex solto",
     "",
@@ -565,7 +662,9 @@ function llmsIndex({ site = false, lite = false } = {}) {
 function llmsFullDump() {
   let full = `# SEMEC Design System — Dump completo para IA\n\n`;
   full += `> Gerado ${generatedAt} — packages/react/manifest.js + packages/react/* — versão ${version}\n\n`;
+  if (unreleased) full += `> **${unreleased}**\n\n`;
   full += `## Instalação\n\n\`\`\`bash\n${INSTALL_CMD}\n\`\`\`\n\n${PEERS_NOTE}\n\n`;
+  full += `\`\`\`css\n${GLOBAL_CSS}\n\`\`\`\n\n${GLOBAL_CSS_NOTE}\n\n`;
   full += `## packages/react/src/index.ts — barrel\n\n\`\`\`ts\n${baseIndex}\n\`\`\`\n\n`;
   full += `## packages/react/tokens.css\n\n\`\`\`css\n${tokensCss}\n\`\`\`\n\n`;
   full += `## packages/react/pv-preset.ts\n\n\`\`\`ts\n${pvPreset}\n\`\`\`\n\n`;
@@ -604,6 +703,7 @@ function writeLlmsFullForTarget(outDir, { lite = false } = {}) {
 function buildDist() {
   console.log("→ dist (npm)");
   syncPackageReadme();
+  syncObjetivo();
 
   // CSS + preset em dist/react
   const cssFiles = ["tokens.css"];
@@ -672,9 +772,20 @@ function buildDist() {
         description:
           "Tokens, acessibilidade, responsive e padrões visuais. Sem componentes React.",
         categories: dsCategories,
+        unreleased: pending
+          ? {
+              pendingChangesets: pending.count,
+              bump: pending.bump,
+              nextVersion: pending.nextVersion,
+              note: unreleased,
+            }
+          : null,
         install: {
           css: '@import "tailwindcss"; @import "@semec/ds/lite/fonts.css"; @import "@semec/ds/lite/tokens.css";',
           note: "Sem @source para dist/react: a variante lite não usa componentes React.",
+          preset: LITE_PRESET_LINE,
+          presetNote:
+            "Opcional, no CSS global depois dos imports. O tokens.css já gera os utilitários; o preset só serve a quem ainda configura o Tailwind por JS.",
           withoutTailwind:
             "Os subpaths @semec/ds/lite/*.css só resolvem num bundler. Num <link>, use node_modules/@semec/ds/dist/react/fonts.css e node_modules/@semec/ds/dist/react/tokens.css (ou copie esses arquivos e a pasta fonts/ para a pasta estática).",
         },
@@ -774,7 +885,10 @@ if (targets.has("agent-dirs")) buildAgentDirs();
     outputs.push(
       ...listFilesRecursive(path.join(distDir, "skills")),
       ...listFilesRecursive(path.join(distDir, "lite")),
-      path.join(pkgRoot, "README.md")
+      path.join(pkgRoot, "README.md"),
+      ...(fs.existsSync(path.join(repoRoot, "docs", "objetivo.md"))
+        ? [path.join(repoRoot, "docs", "objetivo.md")]
+        : [])
     );
   }
   if (targets.has("docs-public")) {
