@@ -424,7 +424,8 @@ Nunca `outline: none` sem alternativa visível com 3:1.
 
 - **Régua do DS: 44×44px** nos controles interativos (`min-h-11 min-w-11`, `h-11`, `size-11`). É **decisão do projeto**, mais exigente que o AA: o WCAG 2.1 AA não tem critério de tamanho de alvo; o critério de 44px (2.5.5 Target Size) é **AAA**. (No WCAG 2.2, o 2.5.8, AA, pede 24×24px.)
 - Os padrões do kit já seguem a régua: Pagination, Tabs, Toggle, NavigationMenuTrigger, `NavigationMenuLink`, os itens do `DropdownMenu` (inclusive Checkbox e Radio), o botão de ordenação do `DataTable`, o polegar do `Slider` e o X dos overlays têm 44px; o `Button size="sm"` mantém 36px visuais com área de toque de 44px
-- Abaixo de `sm`, o `Link` e os links do `Breadcrumb` ganham área de toque de no mínimo 44×44px sem mudar o visual (no `Link`, um `::after`, sem alterar a altura da linha; no `Breadcrumb`, `min-h-11` mais um `::after` de largura)
+- `Checkbox` e `RadioGroupItem` têm 20×20px de propósito e **não** ampliam o alvo: o alvo é o conjunto caixa + `<Label>`. Ponha o rótulo ao lado (`<Label htmlFor>`), e o clique nele marca o controle. Para chegar a 44px de altura na linha, use `<div className="flex min-h-11 items-center gap-2"><Checkbox id="aceite" /><Label htmlFor="aceite">Li e aceito</Label></div>` (decisão da auditoria de 14/10/2026)
+- Abaixo de `sm`, o `Link`, os links do `Breadcrumb` e o `FooterLink` ganham área de toque de no mínimo 44×44px sem mudar o visual (no `Link`, um `::after`, sem alterar a altura da linha; no `Breadcrumb`, `min-h-11` mais um `::after` de largura)
 - Espaçamento entre alvos: 8px (regra do DS)
 - O pacote não define `--control-height-*`; use os utilitários acima
 
