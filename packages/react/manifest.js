@@ -304,7 +304,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Seletor de data",
     file: "src/components/date-picker.tsx",
     category: "formularios",
-    desc: 'Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).',
+    desc: 'Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). O formato mostrado (dd/mm/aaaa ou mm/dd/aaaa) vem do idioma do navegador, não do `lang` da página: nos PCs da prefeitura, deixe o navegador em português. Num navegador sem `type="date"` o campo vira texto e `onValueChange` recebe o que foi digitado, então valide o ISO no schema (ex.: `z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/)`). Em teste automatizado, preencha com `fill("2026-10-16")`, não digitando a data.',
     variants: [
       { prop: "props", values: "nativo HTML (min · max · disabled · name · required · onChange(evento)) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar" },
       { prop: "mudou na 4.0", values: "onChange é o evento nativo do <input> (até a 3.x recebia a string); para o valor, use onValueChange" },
