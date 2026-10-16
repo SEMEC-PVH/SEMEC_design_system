@@ -125,3 +125,46 @@ describe("TST-03: Toggle ligado distinguível do solto", () => {
     expect(list).not.toContain("hover:bg-muted");
   });
 });
+
+describe("TST-05: ScrollArea alcançável pelo teclado", () => {
+  it("com conteúdo focável a viewport não vira parada extra de Tab", () => {
+    render(
+      <ScrollArea className="h-24">
+        <a href="#a">Primeiro link</a>
+      </ScrollArea>
+    );
+    const viewport = screen.getByText("Primeiro link").closest("[data-radix-scroll-area-viewport]");
+    expect(viewport).not.toHaveAttribute("tabindex");
+  });
+
+  it("texto puro: Tab chega à viewport, que tem anel de foco visível", async () => {
+    render(
+      <ScrollArea className="h-24" viewportProps={{ "aria-label": "Termos de uso" }}>
+        <p>Texto longo</p>
+      </ScrollArea>
+    );
+    await userEvent.setup().tab();
+    const viewport = screen.getByText("Texto longo").closest("[data-radix-scroll-area-viewport]");
+    expect(viewport).toHaveFocus();
+    expect(viewport).toHaveAttribute("aria-label", "Termos de uso");
+    expect(classes(viewport)).toEqual(
+      expect.arrayContaining(["focus-visible:ring-2", "focus-visible:ring-inset", "focus-visible:ring-ring"])
+    );
+  });
+
+  it("focusable={false} desliga e focusable força mesmo com link dentro", () => {
+    const { rerender } = render(
+      <ScrollArea focusable={false}>
+        <p>Só texto</p>
+      </ScrollArea>
+    );
+    const vp = () => screen.getByText(/texto|link/i).closest("[data-radix-scroll-area-viewport]");
+    expect(vp()).not.toHaveAttribute("tabindex");
+    rerender(
+      <ScrollArea focusable>
+        <a href="#b">Um link</a>
+      </ScrollArea>
+    );
+    expect(vp()).toHaveAttribute("tabindex", "0");
+  });
+});

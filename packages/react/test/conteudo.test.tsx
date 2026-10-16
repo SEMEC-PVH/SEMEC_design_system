@@ -539,7 +539,7 @@ describe("ScrollArea", () => {
   // de 100px e 2096px de conteúdo, o axe acusa `scrollable-region-focusable`
   // (serious, WCAG 2.1.1). O jsdom não calcula rolagem, então o teste verifica a
   // causa: a viewport sem tabindex quando não há nada focável dentro.
-  it.fails("TST-F2-09: a viewport de texto puro entra no Tab (tabindex=0)", () => {
+  it("TST-F2-09: a viewport de texto puro entra no Tab (tabindex=0)", () => {
     render(
       <ScrollArea className="h-48">
         <p>Conteúdo longo aqui</p>
