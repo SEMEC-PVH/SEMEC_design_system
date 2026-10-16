@@ -158,7 +158,9 @@ const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
             Logo
           </span>
         )}
-        <span aria-hidden="true" className="h-7 w-px shrink-0 bg-border" />
+        {/* Espaços em texto: num contêiner flex não aparecem na tela, mas
+            separam as palavras no nome acessível do link (TST-12). */}{" "}
+        <span aria-hidden="true" className="h-7 w-px shrink-0 bg-border" />{" "}
         {children ?? (
           <span
             className={cn(
@@ -166,13 +168,11 @@ const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
               truncate ? "truncate" : "break-words"
             )}
           >
-            {orgName}
-            <span
-              aria-hidden="true"
-              className="mx-1 font-normal text-muted-foreground"
-            >
+            {/* O "|" é só visual; os espaços separam os nomes (TST-12). */}
+            {orgName}{" "}
+            <span aria-hidden="true" className="font-normal text-muted-foreground">
               |
-            </span>
+            </span>{" "}
             <span className="font-semibold text-foreground">{serviceName}</span>
           </span>
         )}
@@ -180,14 +180,14 @@ const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
     );
 
     const rootClass = cn(
-      "flex min-w-0 items-center gap-3 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+      "flex min-h-11 min-w-0 items-center gap-3 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       className
     );
 
     if (href) {
       return (
         <a ref={ref as React.Ref<HTMLAnchorElement>} href={href} className={rootClass} {...props}>
-          {content}
+          {content}{" "}
           <span className="sr-only">— {homeLabel}</span>
         </a>
       );

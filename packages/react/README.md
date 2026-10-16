@@ -263,7 +263,7 @@ Metadados de componente (o que versões anteriores deste README chamavam de `get
 
 Mais: `SemecProvider`, `cn`, masks (`maskCPF`, `maskCNPJ`, `maskCEP`, `maskCurrency`) e validadores puros (`validateCPF`, `validateCNPJ`, `validateEmail`).
 
-As masks têm a assinatura `(value: string) => string` (tipo `MaskFn`): recebem o texto digitado e devolvem o formatado, para usar no `onValueChange` do `Input`. `maskCurrency` lê os dígitos como centavos (`"123456"` → `"R$ 1.234,56"`, com espaço não separável depois de `R$`) e, desde a 4.0.2, devolve `""` quando não há dígitos significativos (vazio, sem dígitos ou só zeros; antes, `"R$ 0,00"`).
+As masks têm a assinatura `(value: string) => string` (tipo `MaskFn`): recebem o texto digitado e devolvem o formatado, para usar no `onValueChange` do `Input`. `maskCurrency` lê os dígitos como centavos (`"123456"` → `"R$ 1.234,56"`, com espaço não separável depois de `R$`) e, desde a 4.1.0, devolve `""` quando não há dígitos significativos (vazio, sem dígitos ou só zeros; antes, `"R$ 0,00"`).
 
 ## Tokens
 
