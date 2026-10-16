@@ -28,9 +28,14 @@ const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
                   {item.label}
                 </span>
               ) : (
+                // Alvo de 44 px no mobile (TST-10): a altura vem do layout
+                // (`max-sm:min-h-11`, a trilha fica mais alta só abaixo de
+                // `sm`); a largura mínima vem de um ::after centralizado, que
+                // não empurra os vizinhos. No desktop, o link segue do tamanho
+                // do texto.
                 <a
                   href={item.href}
-                  className="transition-colors duration-fast ease-standard hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="relative inline-flex items-center transition-colors duration-fast ease-standard hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background max-sm:min-h-11 max-sm:after:absolute max-sm:after:inset-y-0 max-sm:after:left-1/2 max-sm:after:w-full max-sm:after:min-w-11 max-sm:after:-translate-x-1/2"
                 >
                   {item.label}
                 </a>

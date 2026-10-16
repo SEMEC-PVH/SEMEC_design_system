@@ -17,8 +17,18 @@ const distToSrc = {
   replacement: path.join(here, "src/index.ts"),
 };
 
+/**
+ * As demos do site importam o kit por `semec-ds/react`, que aponta para o
+ * `dist/` (inexistente no job `test` da CI, que não roda `build:ds`). Nos
+ * testes que renderizam essas demos, o alias aponta para `src/index.ts`.
+ */
+const demoAlias = {
+  find: /^semec-ds\/react$/,
+  replacement: path.join(here, "src/index.ts"),
+};
+
 export default defineConfig({
-  resolve: { alias: [distToSrc] },
+  resolve: { alias: [distToSrc, demoAlias] },
   test: {
     projects: [
       {
@@ -35,7 +45,7 @@ export default defineConfig({
         // Mesmos testes de validação com zod 3 (peer aceita ^3.23.0 || ^4.0.0).
         // `zod3` é um alias npm (`npm:zod@^3.25`) nas devDependencies.
         extends: true,
-        resolve: { alias: [distToSrc, { find: /^zod$/, replacement: "zod3" }] },
+        resolve: { alias: [distToSrc, demoAlias, { find: /^zod$/, replacement: "zod3" }] },
         test: {
           name: "zod3",
           environment: "node",

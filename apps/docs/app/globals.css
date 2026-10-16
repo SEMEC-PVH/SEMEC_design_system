@@ -1088,6 +1088,35 @@ h3 {
   margin-bottom: 1.25rem;
 }
 
+/* ---- Aviso "Não publicado" (ReleaseBanner, TST-15) ----
+   Contraste: claro, texto 14,62:1 e borda 5,49:1 sobre o fundo amarelo-50;
+   escuro, texto 12,85:1 e borda 11,06:1 sobre o fundo de aviso escuro. */
+.release-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  background: var(--color-feedback-warning-surface);
+  border: 1px solid var(--color-feedback-warning);
+  border-left-width: 4px;
+  border-radius: 0.75rem;
+  padding: 0.875rem 1.125rem;
+  margin: 0 0 1.25rem;
+}
+.release-banner__icon {
+  flex-shrink: 0;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-top: 0.125rem;
+  color: var(--color-feedback-warning);
+}
+.release-banner__text {
+  font-size: var(--font-size-sm);
+  color: var(--fg);
+  line-height: 1.55;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 /* ---- Note callout (componente <Note> e classe .note legada) ---- */
 .note-callout {
   display: flex;

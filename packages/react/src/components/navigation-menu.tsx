@@ -82,7 +82,29 @@ const NavigationMenuContent = React.forwardRef<
 ));
 NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName;
 
-const NavigationMenuLink = NavigationMenuPrimitive.Link;
+// TST-08: o Link vinha cru (`NavigationMenuPrimitive.Link`) e media 23px de
+// altura no painel. Agora tem alvo de 44px (`min-h-11`), respiro lateral
+// (`px-4`), hover/foco em `tint` e anel de foco por dentro (o viewport tem
+// overflow-hidden e cortaria um anel com offset). `active` (Radix) marca a
+// página atual com `aria-current="page"` e ganha peso semibold.
+// Quem passa `className={navigationMenuTriggerStyle()}` continua com o visual
+// do gatilho: o tailwind-merge resolve display, padding e fundo a favor da
+// classe recebida.
+const navigationMenuLinkStyle = cva(
+  "flex min-h-11 select-none items-center rounded-md px-4 py-2 text-sm font-medium leading-snug text-foreground no-underline outline-none transition-colors duration-fast ease-standard hover:bg-tint hover:text-foreground focus:bg-tint focus:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[active]:font-semibold"
+);
+
+const NavigationMenuLink = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Link>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Link>
+>(({ className, ...props }, ref) => (
+  <NavigationMenuPrimitive.Link
+    ref={ref}
+    className={cn(navigationMenuLinkStyle(), className)}
+    {...props}
+  />
+));
+NavigationMenuLink.displayName = NavigationMenuPrimitive.Link.displayName;
 
 const NavigationMenuViewport = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Viewport>,
@@ -122,6 +144,7 @@ NavigationMenuIndicator.displayName =
 
 export {
   navigationMenuTriggerStyle,
+  navigationMenuLinkStyle,
   NavigationMenu,
   NavigationMenuList,
   NavigationMenuItem,

@@ -4,19 +4,19 @@ code: "heading"
 slug: "titulo"
 file: "src/components/heading.tsx"
 category: "conteudo-dados"
-variants: "level: 1 · 2 (padrão) · 3 · 4 · 5 · 6 · size: 1–6 (padrão: igual ao level)"
+variants: "level: 1 · 2 (padrão) · 3 · 4 · 5 · 6 · size: 1–6 (padrão: igual ao level) · 1 = 32px · 2 = 24px · 3 = 20px · 4 = 16px · 5 = 14px · 6 = 12px"
 ---
 
 # Título — `heading`
 
-> Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual.
+> Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual. Escala: 1 = `text-3xl` (32px, título da página), 2 = `text-2xl` (24px), 3 = `text-xl` (20px), 4 = `text-base`, 5 = `text-sm`, 6 = `text-xs` em caixa alta.
 
-**Arquivo:** `src/components/heading.tsx` | **Categoria:** Conteúdo e dados | **Rota:** `/componentes/titulo`
+**Arquivo:** `src/components/heading.tsx` | **Categoria:** Conteúdo e dados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/titulo/
 
 ## Variantes
 
 - **level**: 1 · 2 (padrão) · 3 · 4 · 5 · 6
-- **size**: 1–6 (padrão: igual ao level)
+- **size**: 1–6 (padrão: igual ao level) · 1 = 32px · 2 = 24px · 3 = 20px · 4 = 16px · 5 = 14px · 6 = 12px
 
 ## Instalação (@semec/ds)
 
@@ -33,6 +33,10 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @source "../node_modules/@semec/ds/dist/react";
 ```
 
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 4 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.1.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.2.0. Confira a versão instalada com `npm ls @semec/ds`.
+
 ## Uso
 
 ```tsx
@@ -48,7 +52,7 @@ import { Heading } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `Heading` (Título) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual. API e variantes: level: 1 · 2 (padrão) · 3 · 4 · 5 · 6 · size: 1–6 (padrão: igual ao level). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Heading` (Título) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual. Escala: 1 = `text-3xl` (32px, título da página), 2 = `text-2xl` (24px), 3 = `text-xl` (20px), 4 = `text-base`, 5 = `text-sm`, 6 = `text-xs` em caixa alta. API e variantes: level: 1 · 2 (padrão) · 3 · 4 · 5 · 6 · size: 1–6 (padrão: igual ao level) · 1 = 32px · 2 = 24px · 3 = 20px · 4 = 16px · 5 = 14px · 6 = 12px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -72,9 +76,13 @@ export type HeadingTag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div" | "p";
 const headingVariants = cva("text-foreground", {
   variants: {
     size: {
-      1: "text-2xl font-bold leading-tight tracking-tight",
-      2: "text-xl font-bold leading-snug",
-      3: "text-lg font-semibold leading-snug",
+      // TST-16: alinhado à escala do tokens.css e à SKILL (3xl = título de
+      // página/h1 32px · 2xl = seção/h2 24px · xl = subtítulo/h3 20px). Até a
+      // 4.0.1 o h1 saía com 24px, o h2 com 20px e o h3 com 18px. A entrelinha
+      // vem do par `--text-*--line-height` da escala.
+      1: "text-3xl font-bold tracking-tight",
+      2: "text-2xl font-bold",
+      3: "text-xl font-semibold",
       4: "text-base font-semibold leading-normal",
       5: "text-sm font-semibold leading-normal",
       6: "text-xs font-semibold uppercase leading-normal tracking-wide",

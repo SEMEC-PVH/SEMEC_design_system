@@ -1,6 +1,8 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-16T15:39:02.000Z — packages/react/manifest.js + packages/react/* — versão 4.1.0
+> Gerado 2026-10-16T15:39:18.000Z — packages/react/manifest.js + packages/react/* — versão 4.1.0
+
+> **Não publicado: este conteúdo vem do repositório e inclui 4 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.1.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.2.0. Confira a versão instalada com `npm ls @semec/ds`.**
 
 ## Instalação
 
@@ -9,6 +11,15 @@ npm install @semec/ds lucide-react
 ```
 
 lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+
+```css
+@import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
+@import "@semec/ds/react/tokens.css";
+@source "../node_modules/@semec/ds/dist/react";
+```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
 ## packages/react/src/index.ts — barrel
 
@@ -992,7 +1003,7 @@ export default {
 
 ### Botões (`button`) — `src/components/button.tsx` — slug: botoes
 
-Desc: Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.
+Desc: Ação principal. Sete variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. A altura é mínima (`min-h-*`), não fixa: rótulo longo quebra em linhas balanceadas em vez de criar rolagem horizontal; para reduzir a altura com `className`, sobrescreva o `min-h-*` junto com o `h-*`. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.
 
 Variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento) · com asChild, o spinner entra no link e o onClick do filho não dispara · o clique ainda sobe aos ancestrais (só envio e navegação são cancelados)
 
@@ -1022,7 +1033,7 @@ import { Plus } from "lucide-react";
 
 Prompt:
 ```text
-Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento) · com asChild, o spinner entra no link e o onClick do filho não dispara · o clique ainda sobe aos ancestrais (só envio e navegação são cancelados). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Sete variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. A altura é mínima (`min-h-*`), não fixa: rótulo longo quebra em linhas balanceadas em vez de criar rolagem horizontal; para reduzir a altura com `className`, sobrescreva o `min-h-*` junto com o `h-*`. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento) · com asChild, o spinner entra no link e o onClick do filho não dispara · o clique ainda sobe aos ancestrais (só envio e navegação são cancelados). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -1035,7 +1046,7 @@ import { cn } from "../lib/utils";
 import { ButtonLoadingIndicator } from "./button-loading";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -1055,9 +1066,13 @@ const buttonVariants = cva(
       size: {
         // AUD-10: o visual compacto (36px) é mantido, mas a área clicável é
         // estendida a 44×44px por um pseudo-elemento centralizado.
-        sm: "h-9 px-4 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2",
-        md: "h-11 px-5 text-sm",
-        lg: "h-12 px-6 text-base",
+        // TST-21: altura mínima (`min-h-*`) em vez de fixa e sem
+        // `whitespace-nowrap`: o rótulo longo quebra em linhas (balanceadas por
+        // `text-balance`) em vez de gerar rolagem horizontal. O `py-*` só conta
+        // quando há quebra; numa linha a altura segue 36/44/48px, como antes.
+        sm: "min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2",
+        md: "min-h-11 px-5 py-2 text-sm",
+        lg: "min-h-12 px-6 py-2 text-base",
         icon: "h-11 w-11",
       },
     },
@@ -1235,7 +1250,7 @@ export { IconButton };
 
 Desc: Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas.
 
-Variantes: variant: primary · onSurface · muted · underline: true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido)
+Variantes: variant: primary · onSurface · muted · underline: true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido) · alvo de toque: abaixo de sm, área mínima de 44×44px por um ::after centralizado, sem mudar a altura da linha (ex.: link tel/mailto sozinho num parágrafo); no desktop o ::after não existe
 
 Uso:
 ```tsx
@@ -1251,7 +1266,7 @@ import { Link } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Link` (Link) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas. API e variantes: variant: primary · onSurface · muted · underline: true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Link` (Link) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas. API e variantes: variant: primary · onSurface · muted · underline: true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido) · alvo de toque: abaixo de sm, área mínima de 44×44px por um ::after centralizado, sem mudar a altura da linha (ex.: link tel/mailto sozinho num parágrafo); no desktop o ::after não existe. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -1262,7 +1277,11 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../lib/utils";
 
 const linkVariants = cva(
-  "inline-flex items-center gap-1 text-sm font-medium underline-offset-4 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+  // TST-10: abaixo de `sm`, um ::after centralizado de no mínimo 44×44 amplia a
+  // área de toque (mesmo recurso do Button sm) sem mudar a altura da linha do
+  // texto: um link tel/mailto sozinho num parágrafo media 21 px. No desktop o
+  // ::after não existe, para não roubar cliques do texto das linhas vizinhas.
+  "relative inline-flex items-center gap-1 text-sm font-medium underline-offset-4 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background max-sm:after:absolute max-sm:after:left-1/2 max-sm:after:top-1/2 max-sm:after:h-full max-sm:after:min-h-11 max-sm:after:w-full max-sm:after:min-w-11 max-sm:after:-translate-x-1/2 max-sm:after:-translate-y-1/2",
   {
     variants: {
       variant: {
@@ -4150,9 +4169,9 @@ export {
 
 ### Título (`heading`) — `src/components/heading.tsx` — slug: titulo
 
-Desc: Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual.
+Desc: Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual. Escala: 1 = `text-3xl` (32px, título da página), 2 = `text-2xl` (24px), 3 = `text-xl` (20px), 4 = `text-base`, 5 = `text-sm`, 6 = `text-xs` em caixa alta.
 
-Variantes: level: 1 · 2 (padrão) · 3 · 4 · 5 · 6 · size: 1–6 (padrão: igual ao level)
+Variantes: level: 1 · 2 (padrão) · 3 · 4 · 5 · 6 · size: 1–6 (padrão: igual ao level) · 1 = 32px · 2 = 24px · 3 = 20px · 4 = 16px · 5 = 14px · 6 = 12px
 
 Uso:
 ```tsx
@@ -4167,7 +4186,7 @@ import { Heading } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Heading` (Título) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual. API e variantes: level: 1 · 2 (padrão) · 3 · 4 · 5 · 6 · size: 1–6 (padrão: igual ao level). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Heading` (Título) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual. Escala: 1 = `text-3xl` (32px, título da página), 2 = `text-2xl` (24px), 3 = `text-xl` (20px), 4 = `text-base`, 5 = `text-sm`, 6 = `text-xs` em caixa alta. API e variantes: level: 1 · 2 (padrão) · 3 · 4 · 5 · 6 · size: 1–6 (padrão: igual ao level) · 1 = 32px · 2 = 24px · 3 = 20px · 4 = 16px · 5 = 14px · 6 = 12px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -4190,9 +4209,13 @@ export type HeadingTag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div" | "p";
 const headingVariants = cva("text-foreground", {
   variants: {
     size: {
-      1: "text-2xl font-bold leading-tight tracking-tight",
-      2: "text-xl font-bold leading-snug",
-      3: "text-lg font-semibold leading-snug",
+      // TST-16: alinhado à escala do tokens.css e à SKILL (3xl = título de
+      // página/h1 32px · 2xl = seção/h2 24px · xl = subtítulo/h3 20px). Até a
+      // 4.0.1 o h1 saía com 24px, o h2 com 20px e o h3 com 18px. A entrelinha
+      // vem do par `--text-*--line-height` da escala.
+      1: "text-3xl font-bold tracking-tight",
+      2: "text-2xl font-bold",
+      3: "text-xl font-semibold",
       4: "text-base font-semibold leading-normal",
       5: "text-sm font-semibold leading-normal",
       6: "text-xs font-semibold uppercase leading-normal tracking-wide",
@@ -4762,7 +4785,7 @@ export { ErrorState };
 
 Desc: Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
 
-Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores
+Variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores · abaixo de sm, links com alvo mínimo de 44×44px (min-h-11 + ::after de largura)
 
 Uso:
 ```tsx
@@ -4777,7 +4800,7 @@ import { Breadcrumb } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Breadcrumb` (Trilha de navegação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela. API e variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Breadcrumb` (Trilha de navegação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela. API e variantes: props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores · abaixo de sm, links com alvo mínimo de 44×44px (min-h-11 + ::after de largura). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -4812,9 +4835,14 @@ const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
                   {item.label}
                 </span>
               ) : (
+                // Alvo de 44 px no mobile (TST-10): a altura vem do layout
+                // (`max-sm:min-h-11`, a trilha fica mais alta só abaixo de
+                // `sm`); a largura mínima vem de um ::after centralizado, que
+                // não empurra os vizinhos. No desktop, o link segue do tamanho
+                // do texto.
                 <a
                   href={item.href}
-                  className="transition-colors duration-fast ease-standard hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="relative inline-flex items-center transition-colors duration-fast ease-standard hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background max-sm:min-h-11 max-sm:after:absolute max-sm:after:inset-y-0 max-sm:after:left-1/2 max-sm:after:w-full max-sm:after:min-w-11 max-sm:after:-translate-x-1/2"
                 >
                   {item.label}
                 </a>
@@ -4843,7 +4871,7 @@ export { Breadcrumb };
 
 Desc: Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.
 
-Variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ("" = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional)
+Variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ("" = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional) · com Sidebar: Header dentro do SidebarInset (as="div"), antes do <main id="conteudo">; SkipLink antes do SidebarProvider. Antes do provider o Header fica sob a Sidebar fixa e a marca recebe foco sem aparecer
 
 Uso:
 ```tsx
@@ -4870,7 +4898,7 @@ import { Button } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Header` (Cabeçalho) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav. API e variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ("" = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Header` (Cabeçalho) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav. API e variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ("" = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional) · com Sidebar: Header dentro do SidebarInset (as="div"), antes do <main id="conteudo">; SkipLink antes do SidebarProvider. Antes do provider o Header fica sob a Sidebar fixa e a marca recebe foco sem aparecer. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -5579,7 +5607,12 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex min-h-11 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground",
+      // TST-29: sem quebra nem rolagem própria, a lista vazava 5px em 320px e
+      // rolava a página. Agora não passa da largura do pai (`max-w-full`) e
+      // rola na horizontal dentro de si (`overflow-x-auto`). `justify-center-safe`
+      // centraliza só quando cabe: com overflow, a primeira aba não fica cortada
+      // à esquerda. O `p-1` acomoda o anel de foco (2px + offset 2px).
+      "inline-flex min-h-11 max-w-full items-center justify-center-safe overflow-x-auto rounded-lg bg-muted p-1 text-muted-foreground",
       className
     )}
     {...props}
@@ -5628,9 +5661,9 @@ export { Tabs, TabsList, TabsTrigger, TabsContent };
 
 ### Paginação (`pagination`) — `src/components/pagination.tsx` — slug: paginacao
 
-Desc: Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px. Textos em PT-BR, sobrescrevíveis por `labels`.
+Desc: Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px que não encolhem. Abaixo de `sm` ficam só as setas e a página atual ± 1 (primeira, última e elipses ocultas). Textos em PT-BR, sobrescrevíveis por `labels`.
 
-Variantes: props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label "Página N" nos números · aria-label nos botões prev/next · aria-hidden nos elipses
+Variantes: props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · siblingCount: páginas de cada lado da atual · padrão 1 · aceita 0 (só a atual entre as elipses) · negativo conta como 0 · abaixo de sm, no máximo 1 · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label "Página N" nos números · aria-label nos botões prev/next · aria-hidden nos elipses
 
 Uso:
 ```tsx
@@ -5648,7 +5681,7 @@ import { Pagination } from "@semec/ds/react";
 
 Prompt:
 ```text
-Use o componente `Pagination` (Paginação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px. Textos em PT-BR, sobrescrevíveis por `labels`. API e variantes: props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label "Página N" nos números · aria-label nos botões prev/next · aria-hidden nos elipses. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Pagination` (Paginação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px que não encolhem. Abaixo de `sm` ficam só as setas e a página atual ± 1 (primeira, última e elipses ocultas). Textos em PT-BR, sobrescrevíveis por `labels`. API e variantes: props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · siblingCount: páginas de cada lado da atual · padrão 1 · aceita 0 (só a atual entre as elipses) · negativo conta como 0 · abaixo de sm, no máximo 1 · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label "Página N" nos números · aria-label nos botões prev/next · aria-hidden nos elipses. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -5683,6 +5716,13 @@ export interface PaginationProps extends React.HTMLAttributes<HTMLElement> {
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
+  /**
+   * Quantas páginas aparecem de cada lado da atual. Padrão: 1. Aceita 0 (só a
+   * atual entre as elipses, TST-25); valores negativos ou fracionários são
+   * arredondados para baixo, com mínimo 0. Abaixo de `sm` a
+   * janela fica limitada à atual ± 1 e as páginas de borda (primeira, última
+   * e elipses) somem, para as setas não encolherem (TST-07).
+   */
   siblingCount?: number;
   /** Sobrescreve os textos anunciados. */
   labels?: Partial<PaginationLabels>;
@@ -5691,9 +5731,18 @@ export interface PaginationProps extends React.HTMLAttributes<HTMLElement> {
 const range = (start: number, end: number) =>
   Array.from({ length: end - start + 1 }, (_, i) => start + i);
 
+/** Distância máxima da página atual que continua visível abaixo de `sm`. */
+const MOBILE_SIBLINGS = 1;
+
+// `shrink-0`: sem ele, numa linha apertada (390/320 px) o flex encolhe as
+// setas para 18–23 px de largura (TST-07).
+const arrowClass =
+  "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+
 const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
   ({ className, page, pageCount, onPageChange, siblingCount = 1, labels, ...props }, ref) => {
     const text = { ...DEFAULT_LABELS, ...labels };
+    const mobileSiblings = Math.min(Math.max(Math.floor(siblingCount), 0), MOBILE_SIBLINGS);
     const go = (p: number) => {
       if (p >= 1 && p <= pageCount && p !== page) onPageChange(p);
     };
@@ -5701,7 +5750,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
     const pages = React.useMemo(() => {
       const total = pageCount;
       const current = page;
-      const sib = Math.max(siblingCount, 1);
+      const sib = Math.max(Math.floor(siblingCount), 0);
       const first = 1;
       const last = total;
 
@@ -5736,7 +5785,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
           onClick={() => go(page - 1)}
           disabled={page <= 1}
           aria-label={text.previous}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          className={arrowClass}
         >
           <ChevronLeft className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -5745,7 +5794,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
             <span
               key={`gap-${i}`}
               aria-hidden="true"
-              className="flex h-11 w-11 items-center justify-center text-sm text-muted-foreground"
+              className="flex h-11 w-11 shrink-0 items-center justify-center text-sm text-muted-foreground max-sm:hidden"
             >
               …
             </span>
@@ -5757,8 +5806,9 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
               aria-current={p === page ? "page" : undefined}
               aria-label={text.page(p)}
               className={cn(
-                "inline-flex h-11 min-w-11 items-center justify-center rounded-md border border-input px-2 text-sm text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                p === page && "border-transparent bg-primary text-primary-foreground hover:bg-primary"
+                "inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-md border border-input px-2 text-sm text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                p === page && "border-transparent bg-primary text-primary-foreground hover:bg-primary",
+                Math.abs(p - page) > mobileSiblings && "max-sm:hidden"
               )}
             >
               {p}
@@ -5770,7 +5820,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
           onClick={() => go(page + 1)}
           disabled={page >= pageCount}
           aria-label={text.next}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          className={arrowClass}
         >
           <ChevronRight className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -5918,6 +5968,7 @@ Variantes: composição: Dialog · DialogTrigger · DialogContent · DialogHeade
 
 Uso:
 ```tsx
+import * as React from "react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "@semec/ds/react";
 
 // Para confirmação destrutiva use AlertDialog (role="alertdialog").
@@ -5934,11 +5985,24 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 
 // Controlado SEM DialogTrigger: o Radix não sabe para onde devolver o foco.
 // Guarde o elemento de origem e devolva o foco em onCloseAutoFocus.
-const origemRef = React.useRef(null);
-<Button ref={origemRef} onClick={() => setAberto(true)}>Editar</Button>
-<Dialog open={aberto} onOpenChange={setAberto}>
-  <DialogContent onCloseAutoFocus={(e) => { e.preventDefault(); origemRef.current?.focus(); }}>…</DialogContent>
-</Dialog>
+function EdicaoControlada() {
+  const [aberto, setAberto] = React.useState(false);
+  // Tipe o ref (TS strict): sem o tipo, origemRef.current vira never.
+  const origemRef = React.useRef<HTMLButtonElement>(null);
+  return (
+    <>
+      <Button ref={origemRef} onClick={() => setAberto(true)}>Editar</Button>
+      <Dialog open={aberto} onOpenChange={setAberto}>
+        <DialogContent onCloseAutoFocus={(e) => { e.preventDefault(); origemRef.current?.focus(); }}>
+          <DialogHeader>
+            <DialogTitle>Editar contato</DialogTitle>
+            <DialogDescription>Atualize o telefone do responsável.</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
 ```
 
 Prompt:
@@ -7093,23 +7157,29 @@ export { Separator };
 
 ### Avatar (`avatar`) — `src/components/avatar.tsx` — slug: avatar
 
-Desc: Foto de perfil com fallback automático (iniciais).
+Desc: Foto de perfil com fallback automático (iniciais). Com a foto quebrada, o `AvatarFallback` anuncia o `alt` da `AvatarImage` (as iniciais ficam só visuais); um `aria-label` no `AvatarFallback` continua aceito e tem prioridade.
 
-Variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className
+Variantes: composição: Avatar · AvatarImage · AvatarFallback · a11y: alt da AvatarImage = nome da pessoa (vale também para o fallback) · alt vazio para foto decorativa (o fallback não anuncia) · aria-label no AvatarFallback vence o alt · tamanhos: h-10 w-10 (padrão) — sobrescreva com className
 
 Uso:
 ```tsx
 import { Avatar, AvatarImage, AvatarFallback } from "@semec/ds/react";
 
+// Se a foto falhar, o leitor de tela continua ouvindo "João Silva" (não "JS")
 <Avatar>
   <AvatarImage src="/foto.jpg" alt="João Silva" />
   <AvatarFallback>JS</AvatarFallback>
+</Avatar>
+
+// Sem foto: dê o nome no próprio fallback
+<Avatar>
+  <AvatarFallback aria-label="Maria Souza">MS</AvatarFallback>
 </Avatar>
 ```
 
 Prompt:
 ```text
-Use o componente `Avatar` (Avatar) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Foto de perfil com fallback automático (iniciais). API e variantes: composição: Avatar · AvatarImage · AvatarFallback · tamanhos: h-10 w-10 (padrão) — sobrescreva com className. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Avatar` (Avatar) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Foto de perfil com fallback automático (iniciais). Com a foto quebrada, o `AvatarFallback` anuncia o `alt` da `AvatarImage` (as iniciais ficam só visuais); um `aria-label` no `AvatarFallback` continua aceito e tem prioridade. API e variantes: composição: Avatar · AvatarImage · AvatarFallback · a11y: alt da AvatarImage = nome da pessoa (vale também para o fallback) · alt vazio para foto decorativa (o fallback não anuncia) · aria-label no AvatarFallback vence o alt · tamanhos: h-10 w-10 (padrão) — sobrescreva com className. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -7121,46 +7191,87 @@ import * as AvatarPrimitive from "@radix-ui/react-avatar";
 
 import { cn } from "../lib/utils";
 
+/**
+ * TST-26: guarda o `alt` da AvatarImage para o AvatarFallback. Com a foto
+ * quebrada, o Radix desmonta a imagem e o leitor de tela lia só as iniciais
+ * ("JS"), perdendo o nome da pessoa.
+ */
+const AvatarAltContext = React.createContext<{
+  alt: string | undefined;
+  setAlt: (alt: string | undefined) => void;
+} | null>(null);
+
 const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Root
-    ref={ref}
-    className={cn(
-      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
-      className
-    )}
-    {...props}
-  />
-));
+>(({ className, ...props }, ref) => {
+  const [alt, setAlt] = React.useState<string | undefined>(undefined);
+  const value = React.useMemo(() => ({ alt, setAlt }), [alt]);
+  return (
+    <AvatarAltContext.Provider value={value}>
+      <AvatarPrimitive.Root
+        ref={ref}
+        className={cn(
+          "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
+          className
+        )}
+        {...props}
+      />
+    </AvatarAltContext.Provider>
+  );
+});
 Avatar.displayName = AvatarPrimitive.Root.displayName;
 
 const AvatarImage = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Image
-    ref={ref}
-    className={cn("aspect-square h-full w-full", className)}
-    {...props}
-  />
-));
+>(({ className, alt, ...props }, ref) => {
+  const setAlt = React.useContext(AvatarAltContext)?.setAlt;
+  React.useEffect(() => {
+    if (!setAlt) return;
+    setAlt(alt);
+    return () => setAlt(undefined);
+  }, [alt, setAlt]);
+  return (
+    <AvatarPrimitive.Image
+      ref={ref}
+      alt={alt}
+      className={cn("aspect-square h-full w-full", className)}
+      {...props}
+    />
+  );
+});
 AvatarImage.displayName = AvatarPrimitive.Image.displayName;
 
 const AvatarFallback = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Fallback>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Fallback
-    ref={ref}
-    className={cn(
-      "flex h-full w-full items-center justify-center rounded-full bg-muted text-sm font-medium text-muted-foreground",
-      className
-    )}
-    {...props}
-  />
-));
+>(({ className, children, ...props }, ref) => {
+  const alt = React.useContext(AvatarAltContext)?.alt;
+  // Quando a foto tem `alt` e quem usa não deu nome ao fallback, o fallback
+  // anuncia o mesmo nome da foto (texto `sr-only`) e esconde as iniciais do
+  // leitor de tela. `alt=""` (foto decorativa) não muda nada.
+  const named = Boolean(alt && !props["aria-label"] && !props["aria-labelledby"]);
+  return (
+    <AvatarPrimitive.Fallback
+      ref={ref}
+      className={cn(
+        "flex h-full w-full items-center justify-center rounded-full bg-muted text-sm font-medium text-muted-foreground",
+        className
+      )}
+      {...props}
+    >
+      {named ? (
+        <>
+          <span aria-hidden="true">{children}</span>
+          <span className="sr-only">{alt}</span>
+        </>
+      ) : (
+        children
+      )}
+    </AvatarPrimitive.Fallback>
+  );
+});
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
 export { Avatar, AvatarImage, AvatarFallback };
@@ -7171,9 +7282,9 @@ export { Avatar, AvatarImage, AvatarFallback };
 
 ### Toggle (`toggle`) — `src/components/toggle.tsx` — slug: toggle
 
-Desc: Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos.
+Desc: Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. Ligado = fundo `tint` + contorno de 2px em `primary` (5,00:1 sobre `--bg`, 5,42:1 sobre branco) e texto `foreground`; o estado vai ao leitor de tela por `aria-pressed`.
 
-Variantes: variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)
+Variantes: variant: default (solto sem borda) · outline (solto com borda input) · estado ligado: data-state=on · aria-pressed=true · fundo tint · contorno primary de 2px (borda + inset-ring) · hover escurece para primary-hover · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)
 
 Uso:
 ```tsx
@@ -7187,7 +7298,7 @@ import { Bold } from "lucide-react";
 
 Prompt:
 ```text
-Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. API e variantes: variant: default · outline · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Toggle` (Toggle) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. Ligado = fundo `tint` + contorno de 2px em `primary` (5,00:1 sobre `--bg`, 5,42:1 sobre branco) e texto `foreground`; o estado vai ao leitor de tela por `aria-pressed`. API e variantes: variant: default (solto sem borda) · outline (solto com borda input) · estado ligado: data-state=on · aria-pressed=true · fundo tint · contorno primary de 2px (borda + inset-ring) · hover escurece para primary-hover · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -7201,13 +7312,23 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../lib/utils";
 
 const toggleVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors duration-fast ease-standard hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground",
+  // TST-03: o estado ligado não pode depender de um cinza quase igual ao fundo
+  // (antes `bg-accent`, 1,01:1). Ligado = fundo `tint` + contorno de 2px em
+  // `primary` (borda + inset-ring de 1px), texto `foreground`:
+  //   primary × background (pv-gray-50) 5,00:1 · × surface (branco) 5,42:1
+  //   · × tint 4,89:1 · foreground × tint 14,24:1 (mínimo 3:1 / 4,5:1).
+  // Contra o estado solto: na variante `default` o solto não tem contorno, e a
+  // borda primary fica sobre a superfície (5,00:1 / 5,42:1). Na `outline` a
+  // borda solta é `input` (pv-gray-400, 1,44:1 contra primary), por isso o
+  // inset-ring: o pixel interno passa de superfície a primary (5,00:1 / 5,42:1).
+  // Hover solto: borda `border-strong` (3,49:1 / 3,77:1) na `default` e
+  // `foreground` na `outline`; hover ligado escurece para `primary-hover`.
+  "inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[state=on]:border-primary data-[state=on]:bg-tint data-[state=on]:text-foreground data-[state=on]:inset-ring data-[state=on]:inset-ring-primary data-[state=on]:hover:border-primary-hover data-[state=on]:hover:inset-ring-primary-hover",
   {
     variants: {
       variant: {
-        default: "bg-transparent",
-        outline:
-          "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
+        default: "border-transparent bg-transparent hover:border-border-strong",
+        outline: "border-input bg-transparent hover:border-foreground",
       },
       size: {
         // AUD-10: `md` (padrão) e `lg` têm 44px. `sm` mantém o visual de 36px,
@@ -7524,7 +7645,9 @@ const Slider = React.forwardRef<
             aria-labelledby={getAriaLabel ? undefined : ariaLabelledBy}
             aria-describedby={field["aria-describedby"] ?? ariaDescribedBy}
             aria-invalid={field["aria-invalid"] ?? ariaInvalid}
-            className="relative block h-5 w-5 rounded-full after:absolute after:-inset-3 after:content-[''] after:rounded-full border-2 border-primary bg-background shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 aria-[invalid=true]:border-destructive"
+            // TST-22: o ::after parte da caixa de padding (16px, dentro da borda
+            // de 2px). `-inset-3` dava 40×40; `-inset-3.5` dá 16 + 2×14 = 44×44.
+            className="relative block h-5 w-5 rounded-full after:absolute after:-inset-3.5 after:content-[''] after:rounded-full border-2 border-primary bg-background shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 aria-[invalid=true]:border-destructive"
           />
         ))}
       </SliderPrimitive.Root>
@@ -8297,22 +8420,23 @@ export { Calendar };
 
 ### Área de scroll (`scroll-area`) — `src/components/scroll-area.tsx` — slug: scroll-area
 
-Desc: Scroll customizado e consistente entre navegadores.
+Desc: Scroll customizado e consistente entre navegadores. A região rolável é alcançável pelo teclado: sem nada focável dentro (ex.: texto puro), a viewport vira parada de Tab com anel de foco (`focusable="auto"`, o padrão). Dê nome à região com `viewportProps={{ "aria-label": "…" }}`.
 
-Variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal
+Variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal · focusable: "auto" (padrão: focável só sem conteúdo focável dentro) · true (sempre) · false (nunca; só se o conteúdo garantir outro caminho de teclado) · viewportProps: props da viewport (ex.: aria-label da região focável, className)
 
 Uso:
 ```tsx
 import { ScrollArea } from "@semec/ds/react";
 
-<ScrollArea className="h-48">
+// Texto puro: a viewport recebe tabIndex=0; o aria-label nomeia a região
+<ScrollArea className="h-48" viewportProps={{ "aria-label": "Termos de uso" }}>
   <div className="p-4">Conteúdo longo aqui…</div>
 </ScrollArea>
 ```
 
 Prompt:
 ```text
-Use o componente `ScrollArea` (Área de scroll) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Scroll customizado e consistente entre navegadores. API e variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `ScrollArea` (Área de scroll) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Scroll customizado e consistente entre navegadores. A região rolável é alcançável pelo teclado: sem nada focável dentro (ex.: texto puro), a viewport vira parada de Tab com anel de foco (`focusable="auto"`, o padrão). Dê nome à região com `viewportProps={{ "aria-label": "…" }}`. API e variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal · focusable: "auto" (padrão: focável só sem conteúdo focável dentro) · true (sempre) · false (nunca; só se o conteúdo garantir outro caminho de teclado) · viewportProps: props da viewport (ex.: aria-label da região focável, className). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -8324,22 +8448,79 @@ import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
 import { cn } from "../lib/utils";
 
+// Seletor de elementos que já entram no Tab. Se a viewport contém algum, quem
+// usa teclado rola a área focando esses elementos e a viewport não precisa
+// virar mais uma parada de Tab.
+const FOCUSABLE_SELECTOR =
+  'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), iframe, summary, audio[controls], video[controls], [contenteditable]:not([contenteditable="false"]), [tabindex]:not([tabindex="-1"])';
+
+export interface ScrollAreaProps
+  extends React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> {
+  /**
+   * TST-05 (WCAG 2.1.1): a região rolável precisa ser alcançável pelo teclado.
+   * - `"auto"` (padrão): a viewport recebe `tabIndex={0}` e anel de foco só
+   *   quando não há nada focável dentro dela (ex.: texto puro).
+   * - `true`: a viewport é sempre focável.
+   * - `false`: nunca (use só se o conteúdo garantir outro caminho de teclado).
+   */
+  focusable?: boolean | "auto";
+  /** Props repassadas à viewport (ex.: `aria-label` da região rolável focável). */
+  viewportProps?: React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Viewport>;
+}
+
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
-  <ScrollAreaPrimitive.Root
-    ref={ref}
-    className={cn("relative overflow-hidden", className)}
-    {...props}
-  >
-    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
-      {children}
-    </ScrollAreaPrimitive.Viewport>
-    <ScrollBar />
-    <ScrollAreaPrimitive.Corner />
-  </ScrollAreaPrimitive.Root>
-));
+  ScrollAreaProps
+>(({ className, children, focusable = "auto", viewportProps, ...props }, ref) => {
+  const viewportRef = React.useRef<HTMLDivElement>(null);
+  // Começa focável (inclusive no HTML do servidor): sem JS, a área de texto
+  // continua alcançável. O efeito retira a parada quando há conteúdo focável.
+  const [hasFocusable, setHasFocusable] = React.useState(false);
+
+  React.useEffect(() => {
+    if (focusable !== "auto") return;
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const check = () => setHasFocusable(viewport.querySelector(FOCUSABLE_SELECTOR) !== null);
+    check();
+    if (typeof MutationObserver === "undefined") return;
+    const observer = new MutationObserver(check);
+    observer.observe(viewport, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["href", "disabled", "tabindex", "contenteditable", "controls", "type"],
+    });
+    return () => observer.disconnect();
+  }, [focusable]);
+
+  const isFocusable = focusable === "auto" ? !hasFocusable : focusable;
+  const { className: viewportClassName, ...restViewportProps } = viewportProps ?? {};
+
+  return (
+    <ScrollAreaPrimitive.Root
+      ref={ref}
+      className={cn("relative overflow-hidden", className)}
+      {...props}
+    >
+      <ScrollAreaPrimitive.Viewport
+        ref={viewportRef}
+        tabIndex={isFocusable ? 0 : undefined}
+        {...restViewportProps}
+        className={cn(
+          // Anel por dentro (`ring-inset`): a raiz tem overflow-hidden e
+          // cortaria um anel com offset.
+          "h-full w-full rounded-[inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+          viewportClassName
+        )}
+      >
+        {children}
+      </ScrollAreaPrimitive.Viewport>
+      <ScrollBar />
+      <ScrollAreaPrimitive.Corner />
+    </ScrollAreaPrimitive.Root>
+  );
+});
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
 
 const ScrollBar = React.forwardRef<
@@ -8452,7 +8633,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-tint focus:ring-2 focus:ring-inset focus:ring-ring data-[state=open]:bg-accent",
+      "flex min-h-11 cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-tint focus:ring-2 focus:ring-inset focus:ring-ring data-[state=open]:bg-accent",
       inset && "pl-8",
       className
     )}
@@ -8499,6 +8680,8 @@ const DropdownMenuContent = React.forwardRef<
 ));
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
+// TST-09: itens (inclusive Checkbox, Radio e SubTrigger) com alvo de 44px
+// (`min-h-11`), como o `SelectItem`. Antes `py-1.5` dava 33px.
 const DropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
   DropdownMenuItemProps
@@ -8506,7 +8689,7 @@ const DropdownMenuItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex min-h-11 cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       inset && "pl-8",
       className
     )}
@@ -8522,7 +8705,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex min-h-11 cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     checked={checked}
@@ -8546,7 +8729,7 @@ const DropdownMenuRadioItem = React.forwardRef<
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex min-h-11 cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     {...props}
@@ -8792,6 +8975,7 @@ Variantes: side: left · right · top · bottom · composição: Sheet · Trigge
 
 Uso:
 ```tsx
+import * as React from "react";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "@semec/ds/react";
 
 <Sheet>
@@ -8812,7 +8996,7 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescri
 // não sabe para onde devolver o foco. Guarde a origem e devolva em onCloseAutoFocus.
 function FiltrosControlados() {
   const [aberto, setAberto] = React.useState(false);
-  const origemRef = React.useRef(null);
+  const origemRef = React.useRef<HTMLButtonElement>(null);
   return (
     <>
       <Button ref={origemRef} onClick={() => setAberto(true)}>Filtros</Button>
@@ -8981,9 +9165,9 @@ export {
 
 ### Tabela de dados (`data-table`) — `src/components/data-table.tsx` — slug: tabela-de-dados
 
-Desc: Tabela com ordenação, paginação e estados vazios.
+Desc: Tabela com ordenação, paginação e estados vazios. Com `onRowClick`, passe `rowLabel` para dar nome à linha clicável.
 
-Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · labels (sortBy · pageOf · previous · next) · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px
+Variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · rowLabel?: (row, index) => string (aria-label da linha; use com onRowClick) · emptyMessage · caption · labels (sortBy: descrição "Ordenar por …" do botão de ordenação, via aria-describedby, não o nome dele · pageOf · previous · next) · a11y: columnheader e botão de ordenação nomeados só pela coluna; "Ordenar por …" como descrição (aria-describedby) · aria-sort no cabeçalho ordenado · botão de ordenação com alvo de 44px · linha focável e ativável por Enter/Espaço quando há onRowClick · rowLabel nomeia a linha clicável · cliques e teclas em controles da célula (e em portais abertos por ela) não ativam a linha · rodapé empilha abaixo de sm · paginação com alvos de 44px
 
 Uso:
 ```tsx
@@ -9011,11 +9195,23 @@ import { DataTable, Button } from "@semec/ds/react";
   pageCount={totalPaginas}
   onPageChange={setPagina}
 />
+
+// Linha inteira clicável (uma ação só): rowLabel diz ao leitor de tela o que o Enter faz
+<DataTable
+  caption="Protocolos abertos"
+  columns={[
+    { key: "numero", header: "Número", sortable: true },
+    { key: "status", header: "Status" },
+  ]}
+  data={protocolos}
+  onRowClick={(protocolo) => abrirProtocolo(protocolo)}
+  rowLabel={(protocolo) => "Abrir protocolo " + protocolo.numero}
+/>
 ```
 
 Prompt:
 ```text
-Use o componente `DataTable` (Tabela de dados) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Tabela com ordenação, paginação e estados vazios. API e variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · labels (sortBy · pageOf · previous · next) · a11y: ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `DataTable` (Tabela de dados) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Tabela com ordenação, paginação e estados vazios. Com `onRowClick`, passe `rowLabel` para dar nome à linha clicável. API e variantes: props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · rowLabel?: (row, index) => string (aria-label da linha; use com onRowClick) · emptyMessage · caption · labels (sortBy: descrição "Ordenar por …" do botão de ordenação, via aria-describedby, não o nome dele · pageOf · previous · next) · a11y: columnheader e botão de ordenação nomeados só pela coluna; "Ordenar por …" como descrição (aria-describedby) · aria-sort no cabeçalho ordenado · botão de ordenação com alvo de 44px · linha focável e ativável por Enter/Espaço quando há onRowClick · rowLabel nomeia a linha clicável · cliques e teclas em controles da célula (e em portais abertos por ela) não ativam a linha · rodapé empilha abaixo de sm · paginação com alvos de 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -9029,8 +9225,35 @@ import { cn } from "../lib/utils";
 
 type SortDirection = "asc" | "desc" | null;
 
+/** Controles que tratam o próprio clique e não devem ativar a linha (TST-11). */
+const INTERACTIVE_SELECTOR = [
+  "a[href]",
+  "button",
+  "input",
+  "select",
+  "textarea",
+  "label",
+  "summary",
+  "[contenteditable]:not([contenteditable=false])",
+  "[role=button]",
+  "[role=link]",
+  "[role=checkbox]",
+  "[role=radio]",
+  "[role=switch]",
+  "[role=menuitem]",
+  "[role=option]",
+  "[role=combobox]",
+  "[role=tab]",
+  "[tabindex]:not([tabindex='-1'])",
+].join(",");
+
 export interface DataTableLabels {
-  /** Rótulo do botão de ordenação. Padrão: `Ordenar por ${header}`. */
+  /**
+   * Instrução do botão de ordenação, exposta como **descrição**
+   * (`aria-describedby`). Padrão: `Ordenar por ${header}`. O nome do botão e do
+   * cabeçalho é só o texto da coluna (TST-27): antes este texto virava o nome
+   * do `columnheader` e era repetido a cada célula pelo leitor de tela.
+   */
   sortBy: (header: string) => string;
   /** Texto da paginação. Padrão: `Página ${page} de ${pageCount}`. */
   pageOf: (page: number, pageCount: number) => string;
@@ -9072,6 +9295,13 @@ interface DataTableProps<T> extends React.HTMLAttributes<HTMLDivElement> {
    * coluna de ações com botões (`render`) — ver manifest/usage.
    */
   onRowClick?: (row: T, index: number) => void;
+  /**
+   * Nome acessível da linha (`aria-label` na `<tr>`), por exemplo
+   * `(row) => "Abrir protocolo " + row.numero`. Recomendado junto com
+   * `onRowClick`: a linha focável não tem nome próprio e o leitor de tela não
+   * diz o que o Enter faz (TST-28).
+   */
+  rowLabel?: (row: T, index: number) => string;
   caption?: string;
   /** Textos embutidos (PT-BR por padrão), sobrescrevíveis um a um. */
   labels?: Partial<DataTableLabels>;
@@ -9090,6 +9320,7 @@ function DataTableInner<T extends Record<string, unknown>>(
     emptyMessage = "Nenhum registro encontrado.",
     rowKey,
     onRowClick,
+    rowLabel,
     caption,
     labels: labelsProp,
     className,
@@ -9098,6 +9329,7 @@ function DataTableInner<T extends Record<string, unknown>>(
   _ref: React.Ref<HTMLDivElement>
 ) {
   const labels = { ...defaultDataTableLabels, ...labelsProp };
+  const idBase = React.useId();
 
   const handleSort = (key: string) => {
     onSort?.(key);
@@ -9124,6 +9356,24 @@ function DataTableInner<T extends Record<string, unknown>>(
     }
   };
 
+  // O clique (do mouse, ou o sintético que o Enter/Espaço gera num botão) sobe
+  // até a <tr>. Ignora o que vem de um controle dentro da célula e o que vem
+  // de um portal (menu/diálogo aberto por uma célula), que sobe pela árvore do
+  // React sem estar dentro da linha no DOM (TST-11).
+  const handleRowClick = (
+    event: React.MouseEvent<HTMLTableRowElement>,
+    row: T,
+    index: number
+  ) => {
+    if (!onRowClick) return;
+    const rowEl = event.currentTarget;
+    const target = event.target as Element | null;
+    if (!target || !rowEl.contains(target)) return;
+    const interactive = target.closest(INTERACTIVE_SELECTOR);
+    if (interactive && interactive !== rowEl && rowEl.contains(interactive)) return;
+    onRowClick(row, index);
+  };
+
   return (
     <div ref={_ref} className={cn("w-full", className)} {...props}>
       <div className="relative w-full overflow-auto rounded-md border border-border">
@@ -9135,7 +9385,7 @@ function DataTableInner<T extends Record<string, unknown>>(
           )}
           <thead className="border-b border-border bg-muted/50">
             <tr>
-              {columns.map((col) => (
+              {columns.map((col, colIndex) => (
                 <th
                   key={col.key}
                   scope="col"
@@ -9155,15 +9405,24 @@ function DataTableInner<T extends Record<string, unknown>>(
                   )}
                 >
                   {col.sortable ? (
-                    <button
-                      type="button"
-                      onClick={() => handleSort(col.key)}
-                      aria-label={labels.sortBy(col.header)}
-                      className="inline-flex items-center gap-2 rounded-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    >
-                      {col.header}
-                      {getSortIcon(col.key)}
-                    </button>
+                    <>
+                      {/* min-h-11/min-w-11: alvo de 44 px (TST-10) sem
+                          crescer o cabeçalho, que já tem h-11. */}
+                      <button
+                        type="button"
+                        onClick={() => handleSort(col.key)}
+                        aria-describedby={`${idBase}-sort-${colIndex}`}
+                        className="inline-flex min-h-11 min-w-11 items-center gap-2 rounded-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      >
+                        {col.header}
+                        {getSortIcon(col.key)}
+                      </button>
+                      {/* `hidden`: fora do nome do columnheader (calculado
+                          pelo conteúdo), mas referenciável como descrição. */}
+                      <span id={`${idBase}-sort-${colIndex}`} hidden>
+                        {labels.sortBy(col.header)}
+                      </span>
+                    </>
                   ) : (
                     <div className="flex items-center gap-2">{col.header}</div>
                   )}
@@ -9191,7 +9450,12 @@ function DataTableInner<T extends Record<string, unknown>>(
                       "cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
                   )}
                   tabIndex={onRowClick ? 0 : undefined}
-                  onClick={onRowClick ? () => onRowClick(row, index) : undefined}
+                  aria-label={rowLabel ? rowLabel(row, index) : undefined}
+                  onClick={
+                    onRowClick
+                      ? (event) => handleRowClick(event, row, index)
+                      : undefined
+                  }
                   onKeyDown={
                     onRowClick
                       ? (event) => handleRowKeyDown(event, row, index)
@@ -9219,16 +9483,18 @@ function DataTableInner<T extends Record<string, unknown>>(
       </div>
 
       {page !== undefined && pageCount !== undefined && pageCount > 1 && (
-        <div className="flex items-center justify-between px-2 py-4">
+        // Abaixo de `sm` o rodapé vira coluna e os botões podem quebrar de
+        // linha, em vez de o texto quebrar dentro do botão (TST-23).
+        <div className="flex flex-col gap-2 px-2 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-sm text-muted-foreground">
             {labels.pageOf(page, pageCount)}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => onPageChange?.(page - 1)}
               disabled={page <= 1}
-              className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               {labels.previous}
@@ -9237,7 +9503,7 @@ function DataTableInner<T extends Record<string, unknown>>(
               type="button"
               onClick={() => onPageChange?.(page + 1)}
               disabled={page >= pageCount}
-              className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               {labels.next}
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
@@ -9452,9 +9718,9 @@ export {
 
 ### Menu de navegação (`navigation-menu`) — `src/components/navigation-menu.tsx` — slug: menu-de-navegacao
 
-Desc: Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px.
+Desc: Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. O `NavigationMenuLink` já vem estilizado: alvo de 44px (`min-h-11`), `px-4`, hover/foco em `tint` e anel de foco por dentro; `active` marca a página atual com `aria-current="page"`.
 
-Variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · a11y: aria-label padrão "Menu principal" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix)
+Variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · estilos exportados: navigationMenuTriggerStyle() (visual de gatilho, ex.: link solto na lista) · navigationMenuLinkStyle() (estilo padrão do NavigationMenuLink, para links próprios) · a11y: aria-label padrão "Menu principal" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix)
 
 Uso:
 ```tsx
@@ -9464,7 +9730,8 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuT
   <NavigationMenuList>
     <NavigationMenuItem>
       <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>
-      <NavigationMenuContent>
+      <NavigationMenuContent className="p-2">
+        {/* NavigationMenuLink já tem 44px de altura, px-4 e foco visível */}
         <NavigationMenuLink href="/iptu">IPTU</NavigationMenuLink>
         <NavigationMenuLink href="/alvara">Alvará</NavigationMenuLink>
       </NavigationMenuContent>
@@ -9475,7 +9742,7 @@ import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuT
 
 Prompt:
 ```text
-Use o componente `NavigationMenu` (Menu de navegação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. API e variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · a11y: aria-label padrão "Menu principal" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `NavigationMenu` (Menu de navegação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. O `NavigationMenuLink` já vem estilizado: alvo de 44px (`min-h-11`), `px-4`, hover/foco em `tint` e anel de foco por dentro; `active` marca a página atual com `aria-current="page"`. API e variantes: composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · estilos exportados: navigationMenuTriggerStyle() (visual de gatilho, ex.: link solto na lista) · navigationMenuLinkStyle() (estilo padrão do NavigationMenuLink, para links próprios) · a11y: aria-label padrão "Menu principal" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -9564,7 +9831,29 @@ const NavigationMenuContent = React.forwardRef<
 ));
 NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName;
 
-const NavigationMenuLink = NavigationMenuPrimitive.Link;
+// TST-08: o Link vinha cru (`NavigationMenuPrimitive.Link`) e media 23px de
+// altura no painel. Agora tem alvo de 44px (`min-h-11`), respiro lateral
+// (`px-4`), hover/foco em `tint` e anel de foco por dentro (o viewport tem
+// overflow-hidden e cortaria um anel com offset). `active` (Radix) marca a
+// página atual com `aria-current="page"` e ganha peso semibold.
+// Quem passa `className={navigationMenuTriggerStyle()}` continua com o visual
+// do gatilho: o tailwind-merge resolve display, padding e fundo a favor da
+// classe recebida.
+const navigationMenuLinkStyle = cva(
+  "flex min-h-11 select-none items-center rounded-md px-4 py-2 text-sm font-medium leading-snug text-foreground no-underline outline-none transition-colors duration-fast ease-standard hover:bg-tint hover:text-foreground focus:bg-tint focus:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[active]:font-semibold"
+);
+
+const NavigationMenuLink = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Link>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Link>
+>(({ className, ...props }, ref) => (
+  <NavigationMenuPrimitive.Link
+    ref={ref}
+    className={cn(navigationMenuLinkStyle(), className)}
+    {...props}
+  />
+));
+NavigationMenuLink.displayName = NavigationMenuPrimitive.Link.displayName;
 
 const NavigationMenuViewport = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Viewport>,
@@ -9604,6 +9893,7 @@ NavigationMenuIndicator.displayName =
 
 export {
   navigationMenuTriggerStyle,
+  navigationMenuLinkStyle,
   NavigationMenu,
   NavigationMenuList,
   NavigationMenuItem,
@@ -9626,7 +9916,7 @@ Variantes: side: left · right · variant: sidebar · floating · inset · colla
 
 Uso:
 ```tsx
-import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@semec/ds/react";
+import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SkipLink, Header, HeaderBrand, Heading } from "@semec/ds/react";
 import { LayoutDashboard } from "lucide-react";
 
 <SidebarProvider>
@@ -9656,6 +9946,25 @@ import { LayoutDashboard } from "lucide-react";
     <div className="p-4">Conteúdo</div>
   </SidebarInset>
 </SidebarProvider>
+
+// Painel com Header (composição única, TST-04): SkipLink antes do SidebarProvider,
+// Header dentro do SidebarInset (as="div") e o <main> depois do Header.
+// Header antes do provider fica sob a Sidebar fixa (marca focada sem aparecer).
+<>
+  <SkipLink />
+  <SidebarProvider>
+    <Sidebar>{/* … */}</Sidebar>
+    <SidebarInset as="div">
+      <Header>
+        <SidebarTrigger />
+        <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+      </Header>
+      <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-[75rem] px-4 py-8">
+        <Heading level={1}>Protocolos</Heading>
+      </main>
+    </SidebarInset>
+  </SidebarProvider>
+</>
 
 // Item ativo com link (aria-current="page" vem de isActive) e tooltip no modo recolhido
 <Sidebar collapsible="icon" labels={{ navigation: "Menu do servidor" }}>
@@ -10769,13 +11078,13 @@ import { cn } from "@semec/ds/react";
 
 | Import | O que é |
 |---|---|
-| `@semec/ds/react` | Todos os componentes, `cn()`, masks e validadores puros |
+| `@semec/ds/react` | Todos os componentes, `cn()`, masks e validadores puros (`digits` está depreciado e sai na 5.0) |
 | `@semec/ds/react/<componente>` | Um componente só, pelo nome do arquivo em `src/components` (ex.: `@semec/ds/react/button`, `@semec/ds/react/dialog`, `@semec/ds/react/form-field`). Desde a 3.2 |
 | `@semec/ds/react/validacao` | Schemas Zod (exige o peer `zod`) |
 | `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) + utilitários de animação |
 | `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS config) |
 | `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 (arquivo TS original) |
-| `@semec/ds/react/server` | **Uso interno do monorepo.** Só tem `dsPackageRootResolve()`, que procura `packages/react` a partir do `cwd` e lança erro fora do repositório. Não use em apps consumidores |
+| `@semec/ds/react/server` | **Depreciado na 4.1, sai na 5.0** (TST-34b). Uso interno do monorepo: só tem `dsPackageRootResolve()`, que procura `packages/react` a partir do `cwd` e lança erro fora do repositório. Em desenvolvimento, avisa no console. Não use em apps consumidores |
 | `@semec/ds/skills` | Metadados dos componentes para agentes IA (`dsComponents`, `dsBySlug`, `dsCategories`…) |
 | `@semec/ds/skills/llms.txt` | Índice para IA |
 | `@semec/ds/skills/llms-full.txt` | Dump completo |
@@ -10945,7 +11254,7 @@ Removido na 4.0 (anunciado desde a 3.1.0, política de duas minors, ADR-013):
 - Utilitários de primitivo `bg-pv-*` / `text-pv-*` / `border-pv-*` e as variáveis `--color-pv-*` (do `@theme` e do `pv-preset`): use os semânticos. As variáveis `--pv-*` continuam. Semânticos novos: `text-text-brand`, `bg-success-emphasis`, `text-success-emphasis-foreground`.
 - Import por caminho de arquivo em `dist/`: o `exports` bloqueia (`ERR_PACKAGE_PATH_NOT_EXPORTED`); use `@semec/ds/react` ou `@semec/ds/react/<componente>`.
 
-Depreciado, sai na 5.0: `ariaLabel` e `emptyMessage` do `Combobox`; `modal` do `AlertDialog` e `onPointerDownOutside`/`onInteractOutside` do `AlertDialogContent` (já ignorados). Lista oficial: [CONTRIBUTING.md § Depreciações anunciadas](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/CONTRIBUTING.md#depreciações-anunciadas).
+Depreciado, sai na 5.0: `ariaLabel` e `emptyMessage` do `Combobox`; `modal` do `AlertDialog` e `onPointerDownOutside`/`onInteractOutside` do `AlertDialogContent` (já ignorados); `digits` de `@semec/ds/react` e `@semec/ds/react/validacao` (use `valor.replace(/\D/g, "")`); o subpath `@semec/ds/react/server` (`dsPackageRootResolve`, uso interno do monorepo). Os dois últimos foram anunciados na 4.1 e avisam no console em desenvolvimento. Lista oficial: [CONTRIBUTING.md § Depreciações anunciadas](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/CONTRIBUTING.md#depreciações-anunciadas).
 
 O que a 2.0.0 removeu sem aviso está na errata do [CHANGELOG](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/CHANGELOG.md).
 

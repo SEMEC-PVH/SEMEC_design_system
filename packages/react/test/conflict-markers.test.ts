@@ -75,6 +75,7 @@ function arvoreTemporaria() {
   for (const rel of [
     "scripts/build-artifacts.mjs",
     "scripts/conflict-markers.mjs",
+    "scripts/release-status.mjs",
     "manifest.js",
     "package.json",
     "README.md",
