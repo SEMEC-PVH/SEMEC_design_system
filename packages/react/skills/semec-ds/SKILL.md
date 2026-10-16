@@ -26,6 +26,12 @@ npm install @semec/ds lucide-react   # pnpm add / yarn add: mesmos pacotes
 
 Instale `lucide-react` **sempre** junto: é peer (os componentes importam os ícones), e sem ele o build quebra. O npm 7+ instala peer ausente sozinho; o pnpm só com `auto-install-peers=true`; o Yarn (clássico e Berry) nunca. Os pacotes `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge` e `get-nonce` são dependências do `@semec/ds` e vêm automaticamente. **Não** instale lista de Radix à mão.
 
+Formulários com a receita oficial (React Hook Form + Zod, seção "Padrão de formulários"): instale também os pacotes da receita, que são **opcionais** e não vêm com o kit:
+
+```bash
+npm install react-hook-form @hookform/resolvers zod
+```
+
 **Tailwind v4 no bundler:**
 
 - **Vite:** `npm install -D tailwindcss @tailwindcss/vite`, `plugins: [react(), tailwindcss()]` no `vite.config.ts` (`import tailwindcss from "@tailwindcss/vite"`). O CSS global é o `src/index.css`: troque o conteúdo do template pelas linhas abaixo e apague o `import "./App.css"`.
@@ -173,6 +179,21 @@ import { maskCPF, maskCNPJ, maskCEP, maskCurrency } from "@semec/ds/react";
 import { validateCPF, validateCNPJ, validateEmail } from "@semec/ds/react";
 import { cpfSchema, cnpjSchema, cpfCnpjSchema, emailSchema, cepSchema } from "@semec/ds/react/validacao";
 ```
+
+As máscaras têm a mesma assinatura, `(value: string) => string` (tipo `MaskFn`): recebem o texto digitado (com ou sem máscara) e devolvem o texto formatado. Aplique no `onValueChange` do `Input`: `onValueChange={(v) => setValor(maskCurrency(v))}`.
+
+- `maskCPF` → `000.000.000-00` · `maskCNPJ` → `00.000.000/0000-00` · `maskCEP` → `00000-000` (só os dígitos contam; o excesso é cortado).
+- `maskCurrency(value: string): string` → moeda BRL: guarda até 12 dígitos e lê os 2 últimos como centavos (`"123456"` → `"R$ 1.234,56"`). Entrada sem dígitos (`""`, `"abc"`) devolve `""` (desde a 4.0.2; até a 4.0.1 devolvia `"R$ 0,00"`), então o campo volta a vazio e `z.string().min(1)` barra o envio. A saída vem do `Intl` (`toLocaleString("pt-BR", { style: "currency", currency: "BRL" })`), com espaço não separável (U+00A0) depois de `R$`: compare com o mesmo `Intl` ou só com os dígitos, nunca com um literal digitado com espaço comum. O valor é texto: converta para número no envio (`Number(valor.replace(/\D/g, "")) / 100`).
+
+```tsx
+const [valor, setValor] = useState("");
+
+<FormField label="Valor da taxa" htmlFor="valor" required hint="Somente números; os centavos entram sozinhos">
+  <Input id="valor" inputMode="numeric" value={valor} onValueChange={(v) => setValor(maskCurrency(v))} />
+</FormField>
+```
+
+Com React Hook Form, o campo R$ está no exemplo canônico (seção "Padrão de formulários").
 
 ## Componentes ({{ds:component-count}})
 
@@ -356,8 +377,10 @@ Nos formulários do SEMEC DS, o ciclo de validação e feedback segue três padr
 
 2. **Padrão 2: Resumo Consolidado no Topo (`ErrorSummary`)**:
    - Obrigatório quando houver múltiplos campos ou formulários longos.
-   - Posicionado no início do `<form>`, com `role="alert"` e foco programático automático (`autoFocus` e `focusKey={tentativa}`).
-   - Cada erro é um link (`<a href="#<id>">`) com scroll suave e transferência de foco direta ao primeiro campo inválido.
+   - Posicionado no início do `<form>`, com `role="alert"` e foco programático (`autoFocus`, padrão `true`). O resumo puxa o foco quando passa de 0 para N erros e a cada mudança de `focusKey` (passe `focusKey={tentativa}`, somado a cada envio inválido); enquanto a pessoa digita e os erros mudam, ele **não** rouba o foco.
+   - Com React Hook Form, use `shouldFocusError: false` no `useForm`: senão o RHF foca o 1º campo inválido e o resumo nunca recebe o foco.
+   - Os itens seguem a ordem dos campos na tela (lista fixa de ids), não a ordem de `Object.entries(errors)`.
+   - Cada erro é um link (`<a href="#<id>">`) com scroll suave e transferência de foco direta ao campo correspondente.
 
 3. **Padrão 3: Erro de Submissão do Servidor (`Alert variant="destructive"`)**:
    - Falhas globais de comunicação (timeout, 500, indisponibilidade) não pertencem a um campo isolado.
@@ -372,8 +395,31 @@ Quando o botão de submissão do formulário disparar uma ação de efeito secun
 
 ### Exemplo Canônico: React Hook Form + Zod + SEMEC DS
 
+A receita usa três pacotes que **não** vêm com o kit. Instale-os junto (são opcionais: só para esta receita de formulário):
+
+```bash
+npm install react-hook-form @hookform/resolvers zod
+```
+
+Três regras da receita (TST-17):
+
+- **`shouldFocusError: false`** no `useForm`. Sem isso, o RHF foca o 1º campo inválido no envio e o `ErrorSummary` nunca recebe o foco.
+- **`focusKey={tentativa}`**, com `tentativa` somada no callback de envio inválido (`handleSubmit(onSubmit, onInvalid)`). O `ErrorSummary` só puxa o foco quando o `focusKey` muda ou quando passa de 0 para N erros; enquanto a pessoa corrige os campos, a lista se atualiza sem roubar o foco.
+- **Ordem fixa dos itens**: monte a lista a partir de um array com os ids na ordem da tela (`ORDEM_CAMPOS`), nunca de `Object.entries(errors)`, que segue a ordem em que o resolver devolveu os erros.
+
 ```tsx
-import { FormField, Input, ErrorSummary, Alert, AlertTitle, AlertDescription, Button, useToast } from "@semec/ds/react";
+import {
+  FormField,
+  Input,
+  ErrorSummary,
+  Alert,
+  AlertTitle,
+  AlertDescription,
+  Button,
+  useToast,
+  maskCPF,
+  maskCurrency,
+} from "@semec/ds/react";
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -384,9 +430,13 @@ const requerimentoSchema = z.object({
   nome: z.string().min(3, "Informe o nome completo (ao menos 3 caracteres)."),
   email: emailSchema,
   cpf: cpfSchema,
+  valor: z.string().min(1, "Informe o valor da taxa."),
 });
 
 type RequerimentoForm = z.infer<typeof requerimentoSchema>;
+
+// Ids dos campos na ordem em que aparecem na tela (ordem do ErrorSummary).
+const ORDEM_CAMPOS = ["nome", "email", "cpf", "valor"] as const satisfies readonly (keyof RequerimentoForm)[];
 
 export function FormularioRequerimento() {
   const { toast } = useToast();
@@ -400,19 +450,23 @@ export function FormularioRequerimento() {
     formState: { errors },
   } = useForm<RequerimentoForm>({
     resolver: zodResolver(requerimentoSchema),
+    defaultValues: { nome: "", email: "", cpf: "", valor: "" },
+    // O foco do envio inválido vai para o ErrorSummary, não para o 1º campo.
+    shouldFocusError: false,
   });
 
-  // Padrão 2: Resumo de erros para o topo
-  const errorSummaryItems = Object.entries(errors).map(([id, err]) => ({
-    id,
-    message: String(err?.message || "Campo inválido"),
-  }));
+  // Padrão 2: Resumo de erros para o topo, na ordem da tela
+  const errorSummaryItems = ORDEM_CAMPOS.flatMap((id) => {
+    const message = errors[id]?.message;
+    return message ? [{ id, message }] : [];
+  });
 
   const onSubmit = async (dados: RequerimentoForm) => {
     try {
       setErroServidor(null);
       // Simulação de envio da API:
       // await api.post("/requerimentos", dados);
+      void dados;
 
       // Sucesso na submissão pós-envio via Toast:
       toast({
@@ -426,22 +480,12 @@ export function FormularioRequerimento() {
     }
   };
 
-  return (
-<<<<<<< HEAD
-    <form onSubmit={handleSubmit} noValidate className="max-w-3xl space-y-4">
-      {errors.length > 0 && <ErrorSummary errors={errors} />}
+  // Cada envio inválido muda o focusKey: o ErrorSummary volta a receber o foco.
+  const onInvalid = () => setTentativa((t) => t + 1);
 
-      <FormField label="CPF" htmlFor="cpf" required error={erroCpf}>
-        <Input
-          id="cpf"
-          value={cpf}
-          onValueChange={setCpf}
-=======
+  return (
     <form
-      onSubmit={(e) => {
-        setTentativa((t) => t + 1);
-        handleSubmit(onSubmit)(e);
-      }}
+      onSubmit={handleSubmit(onSubmit, onInvalid)}
       noValidate
       className="max-w-3xl space-y-4"
     >
@@ -451,7 +495,6 @@ export function FormularioRequerimento() {
           title="Há pendências a corrigir antes de prosseguir"
           errors={errorSummaryItems}
           focusKey={tentativa}
->>>>>>> rafaelruggieriti-sem-817-featds-padrao-de-formulario-form-field-mensagem-de-erro-e
         />
       )}
 
@@ -496,7 +539,40 @@ export function FormularioRequerimento() {
             hint="000.000.000-00"
             error={errors.cpf?.message}
           >
-            <Input id="cpf" inputMode="numeric" {...field} />
+            <Input
+              id="cpf"
+              inputMode="numeric"
+              name={field.name}
+              ref={field.ref}
+              onBlur={field.onBlur}
+              value={field.value}
+              onValueChange={(v) => field.onChange(maskCPF(v))}
+            />
+          </FormField>
+        )}
+      />
+
+      {/* Campo R$: maskCurrency devolve "" quando não há dígitos, então min(1) barra o vazio */}
+      <Controller
+        name="valor"
+        control={control}
+        render={({ field }) => (
+          <FormField
+            label="Valor da taxa"
+            htmlFor="valor"
+            required
+            hint="Somente números; os centavos entram sozinhos"
+            error={errors.valor?.message}
+          >
+            <Input
+              id="valor"
+              inputMode="numeric"
+              name={field.name}
+              ref={field.ref}
+              onBlur={field.onBlur}
+              value={field.value}
+              onValueChange={(v) => field.onChange(maskCurrency(v))}
+            />
           </FormField>
         )}
       />

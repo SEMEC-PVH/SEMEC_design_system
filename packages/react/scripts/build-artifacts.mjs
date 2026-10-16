@@ -25,6 +25,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { assertNoConflictMarkers, listFilesRecursive } from "./conflict-markers.mjs";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgRoot = path.resolve(__dirname, "..");
 const repoRoot = path.resolve(__dirname, "../../..");
@@ -121,6 +123,32 @@ if (!fs.existsSync(liteSkillSrc)) {
   process.exit(1);
 }
 
+// --- marcadores de conflito (TST-02, #49) ---
+// Um merge mal resolvido na SKILL chegou ao site e ao tarball sem que nada falhasse.
+// As fontes são checadas antes de qualquer escrita (o artefato anterior fica intacto)
+// e as saídas, depois de geradas.
+function failOnConflictMarkers(files, context) {
+  try {
+    assertNoConflictMarkers(files, { root: repoRoot, context });
+  } catch (err) {
+    console.error(`build-artifacts: ${err.message}`);
+    process.exit(1);
+  }
+}
+
+failOnConflictMarkers(
+  [
+    ...listFilesRecursive(skillsSrcDir),
+    manifestSrc,
+    path.join(pkgRoot, "README.md"),
+    path.join(pkgRoot, "tokens.css"),
+    path.join(pkgRoot, "pv-preset.ts"),
+    path.join(pkgRoot, "src", "index.ts"),
+    ...dsComponents.map((c) => path.join(pkgRoot, c.file)),
+  ],
+  "fontes dos artefatos de IA"
+);
+
 const tokensCss = readBase("packages/react/tokens.css") ?? readPkgRootBase("tokens.css");
 const pvPreset = readBase("packages/react/pv-preset.ts") ?? readPkgRootBase("pv-preset.ts");
 const baseReadme = readBase("packages/react/README.md") ?? readPkgRootBase("README.md");
@@ -139,8 +167,12 @@ const componentCount = dsComponents.length;
 
 /** Instalação do kit React: `lucide-react` é peer e só o npm 7+ o instala sozinho. */
 const INSTALL_CMD = "npm install @semec/ds lucide-react";
+/** Pacotes opcionais da receita de formulário (TST-20): não são peers do kit. */
+const FORM_RECIPE_CMD = "npm install react-hook-form @hookform/resolvers zod";
 const PEERS_NOTE =
-  "lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.";
+  "lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: " +
+  FORM_RECIPE_CMD +
+  ".";
 const homepage = (pkgJson.homepage || "https://semec-pvh.github.io/SEMEC_design_system/").replace(/\/?$/, "/");
 
 function componentsByCategory() {
@@ -269,6 +301,7 @@ function buildManifest({ site = false } = {}) {
     install: {
       packages: INSTALL_CMD,
       peers: PEERS_NOTE,
+      form: FORM_RECIPE_CMD,
       tokens: 'import "@semec/ds/react/tokens.css";',
       preset: '@source "../node_modules/@semec/ds/dist/react";',
       utils: 'import { cn } from "@semec/ds/react";',
@@ -734,5 +767,33 @@ function buildAgentDirs() {
 if (targets.has("dist")) buildDist();
 if (targets.has("docs-public")) buildDocsPublic();
 if (targets.has("agent-dirs")) buildAgentDirs();
+
+{
+  const outputs = [];
+  if (targets.has("dist")) {
+    outputs.push(
+      ...listFilesRecursive(path.join(distDir, "skills")),
+      ...listFilesRecursive(path.join(distDir, "lite")),
+      path.join(pkgRoot, "README.md")
+    );
+  }
+  if (targets.has("docs-public")) {
+    const publicDir = path.join(repoRoot, "apps", "docs", "public");
+    outputs.push(
+      path.join(publicDir, "llms.txt"),
+      path.join(publicDir, "llms-full.txt"),
+      path.join(publicDir, "manifest.json"),
+      ...listFilesRecursive(path.join(publicDir, "components")),
+      ...listFilesRecursive(path.join(publicDir, "skills"))
+    );
+  }
+  if (targets.has("agent-dirs")) {
+    outputs.push(
+      ...listFilesRecursive(path.join(repoRoot, ".claude", "skills", "semec-ds")),
+      ...listFilesRecursive(path.join(repoRoot, ".opencode", "skills", "semec-ds"))
+    );
+  }
+  failOnConflictMarkers(outputs, "artefatos gerados");
+}
 
 console.log(`\nbuild-artifacts: done (version ${version}, target ${targetArg}).`);
