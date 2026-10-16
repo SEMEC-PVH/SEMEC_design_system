@@ -64,6 +64,14 @@ describe("DataTable", () => {
     for (const th of cabecalhos) expect(th).toHaveAttribute("scope", "col");
   });
 
+  it("a legenda visível fica fora da área rolável e continua nomeando a tabela (V42-VITE-05)", () => {
+    render(<DataTable caption="Protocolos do contribuinte" columns={colunas} data={registros} />);
+    const legenda = screen.getByText("Protocolos do contribuinte");
+    // Dentro do overflow-auto ela tinha a largura da tabela e saía cortada no mobile.
+    expect(legenda.closest(".overflow-auto")).toBeNull();
+    expect(screen.getByRole("table")).toHaveAccessibleName("Protocolos do contribuinte");
+  });
+
   it("aria-sort: none nas ordenáveis sem ordem, ausente nas não ordenáveis", () => {
     render(<DataTable columns={colunas} data={registros} />);
     const [nome, status, valor] = screen.getAllByRole("columnheader");

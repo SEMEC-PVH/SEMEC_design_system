@@ -109,4 +109,30 @@ test.describe("layout de consumidor", () => {
       expect(valor, `${campo}: ${JSON.stringify(tamanhos)}`).toBe(esperado);
     }
   });
+
+  test("caption do DataTable fica inteira na tela com a tabela rolando (V42-VITE-05)", async ({ page }, testInfo) => {
+    test.skip(!isMobile(testInfo), "a tabela só transborda no mobile");
+    await mountLayout(page, "data-table-larga");
+    const m = await page.evaluate(() => {
+      const scroller = document.querySelector("table").parentElement;
+      const cap = [...document.querySelectorAll("caption, p, div, span")].find(
+        (el) => el.textContent === "Protocolos abertos em 2026" && el.children.length === 0
+      );
+      const r = cap.getBoundingClientRect();
+      const range = document.createRange();
+      range.selectNodeContents(cap);
+      const t = range.getBoundingClientRect();
+      return {
+        transborda: scroller.scrollWidth > scroller.clientWidth,
+        textoLeft: t.left,
+        textoRight: t.right,
+        viewport: document.documentElement.clientWidth,
+        capWidth: r.width,
+      };
+    });
+    expect(m.transborda, "a fixture precisa transbordar").toBe(true);
+    expect(m.textoLeft, JSON.stringify(m)).toBeGreaterThanOrEqual(0);
+    expect(m.textoRight, JSON.stringify(m)).toBeLessThanOrEqual(m.viewport);
+    await expect(page.getByRole("table", { name: "Protocolos abertos em 2026" })).toBeVisible();
+  });
 });

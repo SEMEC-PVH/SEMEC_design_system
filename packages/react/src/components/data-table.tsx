@@ -158,13 +158,15 @@ function DataTableInner<T extends Record<string, unknown>>(
 
   return (
     <div ref={_ref} className={cn("w-full", className)} {...props}>
+      {/* V42-VITE-05: a <caption> ficava dentro da área rolável, com a
+          largura da tabela, e saía cortada no mobile. O texto visível agora
+          fica fora do overflow (abaixo da tabela, como antes) e continua
+          nomeando a tabela, por aria-labelledby. */}
       <div className="relative w-full overflow-auto rounded-md border border-border">
-        <table className="w-full caption-bottom text-sm">
-          {caption && (
-            <caption className="mt-4 text-sm text-muted-foreground">
-              {caption}
-            </caption>
-          )}
+        <table
+          className="w-full text-sm"
+          aria-labelledby={caption ? `${idBase}-caption` : undefined}
+        >
           <thead className="border-b border-border bg-muted/50">
             <tr>
               {columns.map((col, colIndex) => (
@@ -263,6 +265,11 @@ function DataTableInner<T extends Record<string, unknown>>(
           </tbody>
         </table>
       </div>
+      {caption && (
+        <p id={`${idBase}-caption`} className="mt-4 text-center text-sm text-muted-foreground">
+          {caption}
+        </p>
+      )}
 
       {page !== undefined && pageCount !== undefined && pageCount > 1 && (
         // Abaixo de `sm` o rodapé vira coluna e os botões podem quebrar de
