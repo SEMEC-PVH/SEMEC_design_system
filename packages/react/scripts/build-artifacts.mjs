@@ -25,6 +25,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { assertNoConflictMarkers, listFilesRecursive } from "./conflict-markers.mjs";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgRoot = path.resolve(__dirname, "..");
 const repoRoot = path.resolve(__dirname, "../../..");
@@ -120,6 +122,32 @@ if (!fs.existsSync(liteSkillSrc)) {
   console.error(`Missing skill: ${liteSkillSrc}`);
   process.exit(1);
 }
+
+// --- marcadores de conflito (TST-02, #49) ---
+// Um merge mal resolvido na SKILL chegou ao site e ao tarball sem que nada falhasse.
+// As fontes são checadas antes de qualquer escrita (o artefato anterior fica intacto)
+// e as saídas, depois de geradas.
+function failOnConflictMarkers(files, context) {
+  try {
+    assertNoConflictMarkers(files, { root: repoRoot, context });
+  } catch (err) {
+    console.error(`build-artifacts: ${err.message}`);
+    process.exit(1);
+  }
+}
+
+failOnConflictMarkers(
+  [
+    ...listFilesRecursive(skillsSrcDir),
+    manifestSrc,
+    path.join(pkgRoot, "README.md"),
+    path.join(pkgRoot, "tokens.css"),
+    path.join(pkgRoot, "pv-preset.ts"),
+    path.join(pkgRoot, "src", "index.ts"),
+    ...dsComponents.map((c) => path.join(pkgRoot, c.file)),
+  ],
+  "fontes dos artefatos de IA"
+);
 
 const tokensCss = readBase("packages/react/tokens.css") ?? readPkgRootBase("tokens.css");
 const pvPreset = readBase("packages/react/pv-preset.ts") ?? readPkgRootBase("pv-preset.ts");
@@ -734,5 +762,33 @@ function buildAgentDirs() {
 if (targets.has("dist")) buildDist();
 if (targets.has("docs-public")) buildDocsPublic();
 if (targets.has("agent-dirs")) buildAgentDirs();
+
+{
+  const outputs = [];
+  if (targets.has("dist")) {
+    outputs.push(
+      ...listFilesRecursive(path.join(distDir, "skills")),
+      ...listFilesRecursive(path.join(distDir, "lite")),
+      path.join(pkgRoot, "README.md")
+    );
+  }
+  if (targets.has("docs-public")) {
+    const publicDir = path.join(repoRoot, "apps", "docs", "public");
+    outputs.push(
+      path.join(publicDir, "llms.txt"),
+      path.join(publicDir, "llms-full.txt"),
+      path.join(publicDir, "manifest.json"),
+      ...listFilesRecursive(path.join(publicDir, "components")),
+      ...listFilesRecursive(path.join(publicDir, "skills"))
+    );
+  }
+  if (targets.has("agent-dirs")) {
+    outputs.push(
+      ...listFilesRecursive(path.join(repoRoot, ".claude", "skills", "semec-ds")),
+      ...listFilesRecursive(path.join(repoRoot, ".opencode", "skills", "semec-ds"))
+    );
+  }
+  failOnConflictMarkers(outputs, "artefatos gerados");
+}
 
 console.log(`\nbuild-artifacts: done (version ${version}, target ${targetArg}).`);
