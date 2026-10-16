@@ -19,6 +19,7 @@
     "lint": "npm run lint --workspace @semec/docs && npm run lint --workspace @semec/ds",
     "typecheck": "npm run typecheck --workspace @semec/ds",
     "test": "npm run test --workspace @semec/ds",
+    "test:dist": "npm run test:dist --workspace @semec/ds",
     "generate:llms": "npm run build:skills --workspace @semec/ds",
     "proto:css": "npm run proto:css --workspace @semec/docs",
     "clean": "npm run clean --workspace @semec/ds",
