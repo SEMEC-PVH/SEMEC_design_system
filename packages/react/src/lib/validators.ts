@@ -2,7 +2,13 @@
 /*  Helpers puros (sem Zod) — exportados pelo entry principal          */
 /* ------------------------------------------------------------------ */
 
-/** Remove tudo que não é dígito. */
+/**
+ * Remove tudo que não é dígito.
+ *
+ * @deprecated Helper interno que vazou para o entry principal e para
+ * `@semec/ds/react/validacao`. Anunciado na 4.1 (TST-34b, ADR-013); **sai na
+ * 5.0**. Use `valor.replace(/\D/g, "")` no seu código.
+ */
 function digits(v: string): string {
   return v.replace(/\D/g, "");
 }

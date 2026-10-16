@@ -16,7 +16,7 @@
     "build": "npm run build --workspace @semec/docs",
     "build:ds": "npm run build --workspace @semec/ds",
     "start": "npm run start --workspace @semec/docs",
-    "lint": "npm run lint --workspace @semec/docs",
+    "lint": "npm run lint --workspace @semec/docs && npm run lint --workspace @semec/ds",
     "typecheck": "npm run typecheck --workspace @semec/ds",
     "test": "npm run test --workspace @semec/ds",
     "generate:llms": "npm run build:skills --workspace @semec/ds",
@@ -27,10 +27,15 @@
     "changeset:check": "changeset status --since=origin/main",
     "check:artifacts": "npm run generate:llms && git diff --exit-code --stat -I generatedAt -I \"^> Gerado \" -- apps/docs/public packages/react/README.md",
     "version-packages": "changeset version && npm install --package-lock-only --ignore-scripts",
-    "release": "npm run build:ds && changeset publish"
+    "release": "npm run build:ds && changeset publish",
+    "pretest:visual": "npm run build:ds",
+    "test:visual": "node tests/visual/docker.mjs",
+    "pretest:visual:update": "npm run build:ds",
+    "test:visual:update": "node tests/visual/docker.mjs --update-snapshots"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
+    "@playwright/test": "1.56.1",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",
