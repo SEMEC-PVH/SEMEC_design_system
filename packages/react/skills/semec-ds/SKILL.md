@@ -446,7 +446,7 @@ Nos formulários do SEMEC DS, o ciclo de validação e feedback segue três padr
 
 2. **Padrão 2: Resumo Consolidado no Topo (`ErrorSummary`)**:
    - Obrigatório quando houver múltiplos campos ou formulários longos.
-   - Posicionado no início do `<form>`, com `role="alert"` e foco programático (`autoFocus`, padrão `true`). O resumo puxa o foco quando passa de 0 para N erros e a cada mudança de `focusKey` (passe `focusKey={tentativa}`, somado a cada envio inválido); enquanto a pessoa digita e os erros mudam, ele **não** rouba o foco.
+   - Posicionado no início do `<form>`, com `role="alert"` e foco programático (`autoFocus`, padrão `true`). Com `focusKey` (passe `focusKey={tentativa}`, somado a cada envio inválido), o resumo puxa o foco **só** quando o `focusKey` muda. Enquanto a pessoa digita, a lista muda, o resumo some e volta (0 → N erros), e ele **não** rouba o foco. Sem `focusKey`, o resumo foca ao passar de 0 para N erros; por isso, com validação ao vivo, passe sempre o `focusKey`.
    - Com React Hook Form, use `shouldFocusError: false` no `useForm`: senão o RHF foca o 1º campo inválido e o resumo nunca recebe o foco.
    - Os itens seguem a ordem dos campos na tela (lista fixa de ids), não a ordem de `Object.entries(errors)`.
    - Cada erro é um link (`<a href="#<id>">`) com scroll suave e transferência de foco direta ao campo correspondente.
@@ -473,7 +473,7 @@ npm install react-hook-form @hookform/resolvers zod
 Três regras da receita (TST-17):
 
 - **`shouldFocusError: false`** no `useForm`. Sem isso, o RHF foca o 1º campo inválido no envio e o `ErrorSummary` nunca recebe o foco.
-- **`focusKey={tentativa}`**, com `tentativa` somada no callback de envio inválido (`handleSubmit(onSubmit, onInvalid)`). O `ErrorSummary` só puxa o foco quando o `focusKey` muda ou quando passa de 0 para N erros; enquanto a pessoa corrige os campos, a lista se atualiza sem roubar o foco.
+- **`focusKey={tentativa}`**, com `tentativa` somada no callback de envio inválido (`handleSubmit(onSubmit, onInvalid)`). O `ErrorSummary` só puxa o foco quando o `focusKey` muda. Enquanto a pessoa corrige os campos, a lista se atualiza sem roubar o foco, mesmo quando o resumo some e volta porque ela apagou um campo e redigitou. O último `focusKey` focado fica guardado no `<form>`, então a renderização condicional abaixo funciona.
 - **Ordem fixa dos itens**: monte a lista a partir de um array com os ids na ordem da tela (`ORDEM_CAMPOS`), nunca de `Object.entries(errors)`, que segue a ordem em que o resolver devolveu os erros.
 
 ```tsx

@@ -218,7 +218,7 @@ Lista gerada do manifest (export principal, `code` e descrição). Detalhes, var
 - `Switch` (`switch`) — Interruptor on/off para ativação imediata. API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.
 - `Label` (`label`) — Rótulo acessível vinculado ao campo.
 - `FormField` (`form-field`) — Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio.
-- `ErrorSummary` (`error-summary`) — Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático ao passar de 0 para N erros e a cada mudança de `focusKey` (sem roubar o foco enquanto a pessoa digita), título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`).
+- `ErrorSummary` (`error-summary`) — Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco, título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`).
 - `Toggle` (`toggle`) — Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. Ligado = fundo `tint` + contorno de 2px em `primary` (5,00:1 sobre `--bg`, 5,42:1 sobre branco) e texto `foreground`; o estado vai ao leitor de tela por `aria-pressed`.
 - `Slider` (`slider`) — Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares.
 - `InputOTP` (`input-otp`) — Campo de código OTP com foco automático entre dígitos.
@@ -507,7 +507,7 @@ Nos formulários do SEMEC DS, o ciclo de validação e feedback segue três padr
 
 2. **Padrão 2: Resumo Consolidado no Topo (`ErrorSummary`)**:
    - Obrigatório quando houver múltiplos campos ou formulários longos.
-   - Posicionado no início do `<form>`, com `role="alert"` e foco programático (`autoFocus`, padrão `true`). O resumo puxa o foco quando passa de 0 para N erros e a cada mudança de `focusKey` (passe `focusKey={tentativa}`, somado a cada envio inválido); enquanto a pessoa digita e os erros mudam, ele **não** rouba o foco.
+   - Posicionado no início do `<form>`, com `role="alert"` e foco programático (`autoFocus`, padrão `true`). Com `focusKey` (passe `focusKey={tentativa}`, somado a cada envio inválido), o resumo puxa o foco **só** quando o `focusKey` muda. Enquanto a pessoa digita, a lista muda, o resumo some e volta (0 → N erros), e ele **não** rouba o foco. Sem `focusKey`, o resumo foca ao passar de 0 para N erros; por isso, com validação ao vivo, passe sempre o `focusKey`.
    - Com React Hook Form, use `shouldFocusError: false` no `useForm`: senão o RHF foca o 1º campo inválido e o resumo nunca recebe o foco.
    - Os itens seguem a ordem dos campos na tela (lista fixa de ids), não a ordem de `Object.entries(errors)`.
    - Cada erro é um link (`<a href="#<id>">`) com scroll suave e transferência de foco direta ao campo correspondente.
@@ -534,7 +534,7 @@ npm install react-hook-form @hookform/resolvers zod
 Três regras da receita (TST-17):
 
 - **`shouldFocusError: false`** no `useForm`. Sem isso, o RHF foca o 1º campo inválido no envio e o `ErrorSummary` nunca recebe o foco.
-- **`focusKey={tentativa}`**, com `tentativa` somada no callback de envio inválido (`handleSubmit(onSubmit, onInvalid)`). O `ErrorSummary` só puxa o foco quando o `focusKey` muda ou quando passa de 0 para N erros; enquanto a pessoa corrige os campos, a lista se atualiza sem roubar o foco.
+- **`focusKey={tentativa}`**, com `tentativa` somada no callback de envio inválido (`handleSubmit(onSubmit, onInvalid)`). O `ErrorSummary` só puxa o foco quando o `focusKey` muda. Enquanto a pessoa corrige os campos, a lista se atualiza sem roubar o foco, mesmo quando o resumo some e volta porque ela apagou um campo e redigitou. O último `focusKey` focado fica guardado no `<form>`, então a renderização condicional abaixo funciona.
 - **Ordem fixa dos itens**: monte a lista a partir de um array com os ids na ordem da tela (`ORDEM_CAMPOS`), nunca de `Object.entries(errors)`, que segue a ordem em que o resolver devolveu os erros.
 
 ```tsx

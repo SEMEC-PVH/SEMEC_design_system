@@ -308,7 +308,7 @@ describe("ErrorSummary", () => {
       expect(onGravar).toHaveBeenLastCalledWith("69999998888");
     });
 
-    it("só a contagem mudar não refoca; 0 → N erros e focusKey novo refocam", () => {
+    it("com focusKey, só a troca de focusKey refoca (a contagem e o 0 → N não)", () => {
       const um = [erros[0]!];
       const { rerender } = render(
         <>
@@ -333,7 +333,8 @@ describe("ErrorSummary", () => {
         </>
       );
       expect(campo).toHaveFocus();
-      // Some (0 erros) e volta: é um resumo novo na tela, então foca.
+      // Some (0 erros) e volta com o mesmo focusKey: é a validação ao vivo
+      // durante a digitação, não um envio novo. Não foca (TST-01, rodada 2).
       rerender(
         <>
           <input aria-label="Campo" />
@@ -346,12 +347,121 @@ describe("ErrorSummary", () => {
           <ErrorSummary errors={um} focusKey={1} />
         </>
       );
-      expect(screen.getByRole("alert")).toHaveFocus();
-      campo.focus();
+      expect(campo).toHaveFocus();
       rerender(
         <>
           <input aria-label="Campo" />
           <ErrorSummary errors={um} focusKey={2} />
+        </>
+      );
+      expect(screen.getByRole("alert")).toHaveFocus();
+    });
+
+    // Formulário com validação ao vivo depois do 1º envio, como o RHF com
+    // `reValidateMode: "onChange"`. `modo` escolhe a receita da SKILL
+    // (renderização condicional) ou o resumo sempre montado.
+    function FormularioEmail({ modo }: { modo: "receita" | "sempre" }) {
+      const [nome, setNome] = React.useState("");
+      const [email, setEmail] = React.useState("");
+      const [tentativa, setTentativa] = React.useState(0);
+      const lista =
+        tentativa > 0
+          ? [
+              ...(nome.length < 3 ? [{ id: "nome", message: "Informe o nome." }] : []),
+              ...(email.includes("@") ? [] : [{ id: "email", message: "Informe o e-mail." }]),
+            ]
+          : [];
+      return (
+        <form
+          noValidate
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (nome.length < 3 || !email.includes("@")) setTentativa((t) => t + 1);
+          }}
+        >
+          {modo === "receita" ? (
+            lista.length > 0 && <ErrorSummary errors={lista} focusKey={tentativa} />
+          ) : (
+            <ErrorSummary errors={lista} focusKey={tentativa} />
+          )}
+          <label htmlFor="nome">Nome</label>
+          <input id="nome" value={nome} onChange={(e) => setNome(e.target.value)} />
+          <label htmlFor="email">E-mail</label>
+          <input id="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <button type="submit">Enviar</button>
+        </form>
+      );
+    }
+
+    it.each(["receita", "sempre"] as const)(
+      "%s: corrigir tudo, apagar um campo e redigitar não rouba o foco nem as teclas",
+      async (modo) => {
+        const user = userEvent.setup();
+        render(<FormularioEmail modo={modo} />);
+        await user.click(screen.getByRole("button", { name: "Enviar" }));
+        expect(screen.getByRole("alert")).toHaveFocus();
+
+        const nome = screen.getByRole("textbox", { name: "Nome" });
+        const email = screen.getByRole("textbox", { name: "E-mail" });
+        await user.click(nome);
+        await user.keyboard("Maria Souza");
+        await user.click(email);
+        await user.keyboard("maria@semec.gov.br");
+        // Tudo corrigido: o resumo some.
+        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+
+        // Apaga o e-mail (0 → 1 erro) e redigita.
+        await user.keyboard("{Control>}a{/Control}{Backspace}");
+        expect(screen.getByRole("alert")).toBeInTheDocument();
+        expect(email).toHaveFocus();
+        await user.keyboard("jose@semec.gov.br");
+        expect(email).toHaveFocus();
+        expect(email).toHaveValue("jose@semec.gov.br");
+
+        // Um envio inválido novo volta a focar o resumo.
+        await user.clear(nome);
+        await user.click(screen.getByRole("button", { name: "Enviar" }));
+        expect(screen.getByRole("alert")).toHaveFocus();
+      }
+    );
+
+    it("o 1º envio foca o resumo também na renderização condicional (montagem com focusKey novo)", () => {
+      const { rerender } = render(<form />);
+      rerender(
+        <form>
+          <ErrorSummary errors={erros} focusKey={1} />
+        </form>
+      );
+      expect(screen.getByRole("alert")).toHaveFocus();
+    });
+
+    it("focusKey que muda antes de os erros chegarem (Formik) foca quando eles chegam", () => {
+      const { rerender } = render(<ErrorSummary errors={[]} focusKey={0} />);
+      rerender(<ErrorSummary errors={[]} focusKey={1} />);
+      rerender(<ErrorSummary errors={erros} focusKey={1} />);
+      expect(screen.getByRole("alert")).toHaveFocus();
+    });
+
+    it("sem focusKey mantém o legado: foca na transição de 0 para N erros", () => {
+      const { rerender } = render(
+        <>
+          <input aria-label="Campo" />
+          <ErrorSummary errors={erros} />
+        </>
+      );
+      expect(screen.getByRole("alert")).toHaveFocus();
+      const campo = screen.getByRole("textbox", { name: "Campo" });
+      campo.focus();
+      rerender(
+        <>
+          <input aria-label="Campo" />
+          <ErrorSummary errors={[]} />
+        </>
+      );
+      rerender(
+        <>
+          <input aria-label="Campo" />
+          <ErrorSummary errors={erros} />
         </>
       );
       expect(screen.getByRole("alert")).toHaveFocus();
