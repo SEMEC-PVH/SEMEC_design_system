@@ -87,4 +87,26 @@ test.describe("layout de consumidor", () => {
     const scroll = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(scroll, "o painel não cria rolagem horizontal").toBeLessThanOrEqual(0);
   });
+
+  test("campos de digitação têm 16 px no mobile e 14 px no desktop (NAV-01, zoom do iOS)", async ({ page }, testInfo) => {
+    await mountLayout(page, "campos-digitacao");
+    await page.getByRole("button", { name: /^Município/ }).click();
+    await expect(page.locator("input[aria-autocomplete=list]")).toBeVisible();
+    const tamanhos = await page.evaluate(() => {
+      const px = (el) => parseFloat(getComputedStyle(el).fontSize);
+      const busca = document.querySelector("input[aria-autocomplete=list]");
+      return {
+        input: px(document.getElementById("c-input")),
+        textarea: px(document.getElementById("c-textarea")),
+        mask: px(document.getElementById("c-mask")),
+        senha: px(document.getElementById("c-senha")),
+        data: px(document.getElementById("c-data")),
+        busca: busca ? px(busca) : null,
+      };
+    });
+    const esperado = isMobile(testInfo) ? 16 : 14;
+    for (const [campo, valor] of Object.entries(tamanhos)) {
+      expect(valor, `${campo}: ${JSON.stringify(tamanhos)}`).toBe(esperado);
+    }
+  });
 });

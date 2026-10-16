@@ -335,7 +335,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
                 aria-required={required || ctx?.required ? true : undefined}
                 aria-labelledby={labelIds}
                 aria-label={labelIds ? undefined : hiddenLabel ?? text.search}
-                className="flex h-11 w-full rounded-md border border-input bg-surface px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="flex h-11 w-full rounded-md border border-input bg-surface px-3 py-1 text-base sm:text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               />
             </div>
             {filtered.length > 0 ? (
