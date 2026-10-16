@@ -231,6 +231,26 @@ describe("TST-09: itens do DropdownMenu com 44px", () => {
   });
 });
 
+describe("TST-16: escala do Heading igual à do tokens.css", () => {
+  it("h1 = text-3xl (32px), h2 = text-2xl (24px), h3 = text-xl (20px)", () => {
+    render(
+      <>
+        <Heading level={1}>Página</Heading>
+        <Heading level={2}>Seção</Heading>
+        <Heading level={3}>Subtítulo</Heading>
+      </>
+    );
+    expect(screen.getByRole("heading", { level: 1 })).toHaveClass("text-3xl");
+    expect(screen.getByRole("heading", { level: 2 })).toHaveClass("text-2xl");
+    expect(screen.getByRole("heading", { level: 3 })).toHaveClass("text-xl");
+    expect(tokenValue("--pv-text-3xl")).toBe("2rem");
+  });
+});
+
+function tokenValue(name: string) {
+  return new RegExp(`${name}\\s*:\\s*([^;]+);`).exec(tokensCss)?.[1].split("/*")[0].trim();
+}
+
 describe("TST-22: polegar do Slider com alvo ≥ 44×44", () => {
   it("o ::after parte da caixa de padding de 16px e cresce 14px por lado", () => {
     render(<Slider defaultValue={[5]} max={10} aria-label="Raio" />);

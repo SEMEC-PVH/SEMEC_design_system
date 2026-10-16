@@ -402,15 +402,15 @@ describe("Avatar", () => {
 describe("Heading", () => {
   it("level define o elemento (padrão h2) e size só o visual", () => {
     const { rerender } = render(<Heading>Dados do estudante</Heading>);
-    expect(screen.getByRole("heading", { level: 2 })).toHaveClass("text-xl");
+    expect(screen.getByRole("heading", { level: 2 })).toHaveClass("text-2xl");
     rerender(
       <Heading level={3} size={2}>
         Documentos
       </Heading>
     );
     const h = screen.getByRole("heading", { level: 3, name: "Documentos" });
-    expect(h).toHaveClass("text-xl");
-    expect(h).not.toHaveClass("text-lg");
+    expect(h).toHaveClass("text-2xl");
+    expect(h).not.toHaveClass("text-xl");
   });
 
   it("os seis níveis viram h1–h6 e o ref chega ao elemento", () => {
