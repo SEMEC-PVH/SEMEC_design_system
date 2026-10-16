@@ -3,7 +3,9 @@ name: Release
 # Fluxo Changesets (ver CONTRIBUTING.md, "Publicação e versionamento", e ADR-022):
 # 1. PRs com mudança publicada trazem um arquivo em .changeset/ (a CI exige).
 # 2. Um mantenedor versiona num PR: roda `npm run version-packages` localmente numa
-#    branch `changeset-release/<versão>` e abre o PR com o bump, o CHANGELOG e o lockfile.
+#    branch `changeset-release/<versão>` e abre o PR com o bump, o CHANGELOG, o lockfile e os artefatos de IA
+#    regenerados (o script roda changeset version, npm install --package-lock-only e
+#    generate:llms na mesma passada).
 #    Este workflow NÃO cria branch, commit nem PR: a organização bloqueia PR aberto por
 #    workflow, e o push do PR de versão com PAT deu 403 (AUD-12, run 38615303248).
 # 3. Depois que a CI fica verde num push ao main, este workflow só decide e publica:

@@ -279,14 +279,14 @@ O `RELEASE_TOKEN` (PAT cadastrado em 29/09/2026 para abrir os PRs de versão) **
    git switch main && git pull --ff-only
    npm ci
    git switch -c changeset-release/3.1.0     # o nome da versão que sairá
-   npm run version-packages                  # changeset version + package-lock
-   git add -A .changeset packages/react/package.json packages/react/CHANGELOG.md package-lock.json
+   npm run version-packages                  # changeset version + package-lock + artefatos de IA
+   git add -A .changeset packages/react/package.json packages/react/CHANGELOG.md package-lock.json apps/docs/public docs/objetivo.md packages/react/README.md
    git commit -m "chore(release): versiona @semec/ds 3.1.0"
    git push -u origin changeset-release/3.1.0
    gh pr create --base main --title "chore(release): versiona @semec/ds 3.1.0" --body "Consome os changesets pendentes."
    ```
 
-   O `version-packages` consome os arquivos de `.changeset/`, faz o bump em `packages/react/package.json`, escreve o `packages/react/CHANGELOG.md` e atualiza o `package-lock.json`. Confira o diff: a versão tem de ser a que o `changeset status` previa e o CHANGELOG tem de listar todos os changesets.
+   O `version-packages` consome os arquivos de `.changeset/`, faz o bump em `packages/react/package.json`, escreve o `packages/react/CHANGELOG.md`, atualiza o `package-lock.json` e regenera os artefatos de IA (`npm run generate:llms`: `apps/docs/public`, o bloco de versão de `docs/objetivo.md` e as skills) na mesma passada. Sem isso o PR de versão saía com os artefatos ainda dizendo a versão anterior e "não publicado", e a CI (deriva dos artefatos) ou o PR seguinte tinham de corrigir, gerando conflito. Confira o diff: a versão tem de ser a que o `changeset status` previa e o CHANGELOG tem de listar todos os changesets.
 
 3. **Revisão e merge do PR de versão.** Um mantenedor confere a versão e o CHANGELOG e mergeia, como qualquer PR, com a CI verde (com revisão de outra pessoa quando houver revisor). Ninguém roda `version-packages` direto no `main`.
 
