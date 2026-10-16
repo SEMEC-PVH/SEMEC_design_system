@@ -375,7 +375,7 @@ describe("Avatar", () => {
   // TST-F2-07: com a foto quebrada, o nome da pessoa (alt da AvatarImage) some
   // e o leitor de tela lê só "JS". O manifest promete "fallback automático
   // (iniciais)" e o exemplo não dá ao fallback um nome equivalente ao alt.
-  it.fails("TST-F2-07: com a foto quebrada, o avatar continua anunciando \"João Silva\"", async () => {
+  it("TST-F2-07: com a foto quebrada, o avatar continua anunciando \"João Silva\"", async () => {
     stubImagem(false);
     const { container } = render(
       <Avatar>

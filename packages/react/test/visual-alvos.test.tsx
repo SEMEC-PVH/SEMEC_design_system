@@ -277,6 +277,28 @@ describe("TST-22: polegar do Slider com alvo ≥ 44×44", () => {
   });
 });
 
+describe("TST-26: Avatar com a foto quebrada", () => {
+  it("foto decorativa (alt vazio) não acrescenta nome ao fallback", () => {
+    const { container } = render(
+      <Avatar>
+        <AvatarImage src="/x.jpg" alt="" />
+        <AvatarFallback delayMs={0}>JS</AvatarFallback>
+      </Avatar>
+    );
+    expect(container.querySelector(".sr-only")).toBeNull();
+  });
+
+  it("aria-label do fallback tem prioridade sobre o alt da foto", () => {
+    const { container } = render(
+      <Avatar>
+        <AvatarImage src="/x.jpg" alt="João Silva" />
+        <AvatarFallback aria-label="Foto de João Silva">JS</AvatarFallback>
+      </Avatar>
+    );
+    expect(container.querySelector(".sr-only")).toBeNull();
+  });
+});
+
 describe("TST-29: TabsList não rola a página em 320px", () => {
   it("a lista fica na largura do pai e rola dentro de si", () => {
     render(
