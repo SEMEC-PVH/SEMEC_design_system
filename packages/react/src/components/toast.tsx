@@ -208,11 +208,20 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">;
 
-function toast({ ...props }: Toast) {
+function toast({ onOpenChange: onOpenChangeProp, ...props }: Toast) {
   const id = genId();
-  const update = (props: ToasterToast) =>
-    dispatch({ type: "UPDATE_TOAST", toast: { ...props, id } });
+  // O `onOpenChange` de quem chama é composto com o interno (que tira o aviso
+  // da fila ao fechar), em vez de ser descartado (TST-24).
+  let userOnOpenChange = onOpenChangeProp;
   const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
+  const onOpenChange = (open: boolean) => {
+    if (!open) dismiss();
+    userOnOpenChange?.(open);
+  };
+  const update = ({ onOpenChange: next, ...rest }: ToasterToast) => {
+    if (next) userOnOpenChange = next;
+    dispatch({ type: "UPDATE_TOAST", toast: { ...rest, id } });
+  };
 
   dispatch({
     type: "ADD_TOAST",
@@ -220,9 +229,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss();
-      },
+      onOpenChange,
     },
   });
 
