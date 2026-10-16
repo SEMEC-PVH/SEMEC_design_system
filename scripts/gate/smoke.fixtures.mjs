@@ -349,12 +349,15 @@ export function getComponentElement(code) {
         )
       );
 
+    // Conteúdo maior que a área (TST-B3, TST-36): sem overflow a ScrollArea
+    // nem rola, e o caso do TST-05 (só texto, sem nada focável) não aparece.
     case "scroll-area":
       return React.createElement(
         ds.ScrollArea,
         { style: { height: "100px" } },
-        React.createElement("div", null, "Linha 1"),
-        React.createElement("div", null, "Linha 2")
+        ...Array.from({ length: 30 }, (_, i) =>
+          React.createElement("p", { key: i }, `Linha ${i + 1} do histórico de movimentações do protocolo`)
+        )
       );
 
     case "select":
@@ -386,10 +389,13 @@ export function getComponentElement(code) {
         )
       );
 
+    // Com SidebarTrigger (TST-B3): no mobile a Sidebar vira uma folha fechada
+    // e, sem o gatilho, a tela ficava em branco e não havia como abri-la.
     case "sidebar":
       return React.createElement(
         ds.SidebarProvider,
         null,
+        React.createElement(ds.SidebarTrigger, { "aria-label": "Alternar barra lateral" }),
         React.createElement(
           ds.Sidebar,
           null,
@@ -505,15 +511,22 @@ export function getComponentElement(code) {
         )
       );
 
+    // ToastViewport no mesmo provider (TST-B3): sem ele o Toast aberto não
+    // tem onde se desenhar. O Toaster continua no caso, com o próprio provider.
     case "toast":
       return React.createElement(
-        ds.ToastProvider,
+        React.Fragment,
         null,
         React.createElement(
-          ds.Toast,
-          { open: true },
-          React.createElement(ds.ToastTitle, null, "Notificação"),
-          React.createElement(ds.ToastDescription, null, "Arquivo salvo com sucesso")
+          ds.ToastProvider,
+          null,
+          React.createElement(
+            ds.Toast,
+            { open: true, duration: 1e9 },
+            React.createElement(ds.ToastTitle, null, "Notificação"),
+            React.createElement(ds.ToastDescription, null, "Arquivo salvo com sucesso")
+          ),
+          React.createElement(ds.ToastViewport, { label: "Avisos ({hotkey})" })
         ),
         React.createElement(ds.Toaster, null)
       );
