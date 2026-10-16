@@ -41,16 +41,7 @@ execFileSync(
   { stdio: ["ignore", "ignore", "inherit"], cwd: root }
 );
 
-// check-smoke-a11y.mjs importa jsdom (só usado no Node); no navegador vira stub.
-const stubJsdom = {
-  name: "stub-jsdom",
-  setup(b) {
-    b.onResolve({ filter: /^jsdom$/ }, () => ({ path: "jsdom", namespace: "stub" }));
-    b.onLoad({ filter: /.*/, namespace: "stub" }, () => ({ contents: "export class JSDOM {}", loader: "js" }));
-  },
-};
-
-await build({
+const result = await build({
   entryPoints: [path.join(here, "harness/entry.mjs")],
   outfile: path.join(out, "harness.js"),
   bundle: true,
@@ -59,7 +50,14 @@ await build({
   logLevel: "warning",
   // development como no gate: o act() do Testing Library só existe no build de dev do React.
   define: { "process.env.NODE_ENV": '"development"' },
-  plugins: [stubJsdom],
+  metafile: true,
 });
+
+// TST-B6: a bancada não pode voltar a arrastar o axe/jsdom do smoke do gate.
+const pesados = Object.keys(result.metafile.inputs).filter((f) => /node_modules[\\/](axe-core|jsdom)[\\/]/.test(f));
+if (pesados.length) {
+  console.error(`a bancada visual importou dependências do gate que não usa:\n  ${pesados.slice(0, 5).join("\n  ")}`);
+  process.exit(1);
+}
 
 console.log(`bancada visual pronta em ${path.relative(root, out)}`);

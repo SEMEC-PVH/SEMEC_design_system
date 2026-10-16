@@ -1,7 +1,7 @@
 /**
  * Entrada da bancada visual (empacotada com esbuild e servida em .harness/).
  * Reaproveita as fixtures do gate:
- *   - getComponentElement (check-smoke-a11y.mjs): estado padrão de cada componente do manifest;
+ *   - getComponentElement (smoke.fixtures.mjs): estado padrão de cada componente do manifest;
  *   - openStateCases (open-states.fixtures.mjs): camadas abertas pelo caminho do usuário;
  * e acrescenta só os estados que o gate não cobre (visual.fixtures.mjs).
  *
@@ -11,7 +11,9 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import * as ds from "../../../packages/react/dist/react/index.js";
-import { getComponentElement } from "../../../scripts/gate/check-smoke-a11y.mjs";
+// smoke.fixtures.mjs e não check-smoke-a11y.mjs: este último puxa axe-core, jsdom e
+// react-dom/server, que não servem à bancada (TST-B6).
+import { getComponentElement } from "../../../scripts/gate/smoke.fixtures.mjs";
 import { openStateCases } from "../../../scripts/gate/open-states.fixtures.mjs";
 import { extraStates } from "../visual.fixtures.mjs";
 
