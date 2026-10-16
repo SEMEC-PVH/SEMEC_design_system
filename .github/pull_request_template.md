@@ -12,6 +12,8 @@ Closes #
 - [ ] `npm run typecheck` passando
 - [ ] `npm run build` passando
 - [ ] `npm run lint` passando
+- [ ] `npm test` passando
+- [ ] `npm run test:visual` passando se o PR muda aparência (o check `test:visual` é obrigatório)
 - [ ] Artefatos de agentes regenerados e commitados (`apps/docs/public`) quando `packages/react/manifest.js` mudou — a CI cobra
 - [ ] Navegação por teclado verificada ponta a ponta (Tab, Shift+Tab, Enter, Espaço, Esc, setas) e foco visível
 - [ ] Contraste calculado para qualquer cor nova (4.5:1 texto, 3:1 texto grande e UI)
@@ -24,5 +26,5 @@ Closes #
 
 ## Revisão
 
-Quando houver revisor, de preferência um code owner que **não** seja o autor (`.github/CODEOWNERS`). A aprovação não é obrigatória; a CI verde é.
-Quem revisa (ou o próprio autor, sem revisor) confirma teclado, foco e contraste — não só o código.
+Obrigatória: 1 aprovação de um code owner que **não** seja o autor (`.github/CODEOWNERS`), além da CI verde com `test:visual` (TST-06).
+Quem revisa confirma teclado, foco e contraste — não só o código.

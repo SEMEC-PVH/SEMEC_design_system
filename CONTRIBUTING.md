@@ -48,7 +48,7 @@ Duas regras que o próprio site publica e que valem para quem edita o site:
 
 ## 4. Revisão
 
-Sempre que houver outra pessoa disponível, o pull request é revisado por **alguém diferente de quem implementou**. A revisão cobre código e acessibilidade. Desde 15/10/2026, a aprovação de outra pessoa **não é obrigatória na proteção do `main`**: a equipe ativa é pequena, e exigir aprovação travaria todo merge. O que é obrigatório é a CI verde (ver "Proteção do main"). Sem revisor, o próprio autor percorre o checklist abaixo antes do merge.
+Todo pull request precisa de **1 aprovação de outra pessoa**, um **code owner** (`.github/CODEOWNERS`) diferente de quem implementou (TST-06, 16/10/2026). A revisão cobre código e acessibilidade. O GitHub não aceita autoaprovação: o PR de um code owner é aprovado pelo outro. Isso substitui a decisão de 15/10/2026, que dispensava a aprovação porque havia um só revisor ativo; a bateria de testes de 16/10 (TST-06) tornou a revisão obrigatória, com dois code owners (`@VgavaBR123` e `@Rug-gieri`, autor do SEM-817). Além da aprovação, a CI precisa estar verde, **inclusive o check `test:visual`** (ver "Proteção do main").
 
 O axe roda nos testes do kit (`npm test`, em `packages/react/test/`) e no `gate` da CI, mas cobre só o que os testes montam; páginas do site, composições novas e contraste de cor nova continuam com verificação **manual** — e ela precisa ser feita de fato, porque o [ADR-014](docs/adr/0014-wcag-21-aa-criterio-bloqueante.md) trata WCAG 2.1 AA como critério bloqueante e a auditoria encontrou seis falhas de contraste em componentes já publicados como oficiais:
 
@@ -57,11 +57,11 @@ O axe roda nos testes do kit (`npm test`, em `packages/react/test/`) e no `gate`
 - **calcular o contraste** de qualquer par de cores novo (4.5:1 para texto normal, 3:1 para texto grande e para elemento de interface);
 - conferir que imagem tem texto alternativo e que a hierarquia de títulos não pula nível.
 
-Quando há revisão, quem revisa é preferencialmente um **code owner** (`.github/CODEOWNERS`) diferente do autor. O GitHub só libera o merge com a CI verde (ver "Proteção do main").
+Quem aprova é um **code owner** diferente do autor. O GitHub só libera o merge com essa aprovação e a CI verde, `test:visual` incluído (ver "Proteção do main"). Commits novos depois da aprovação a descartam: o PR precisa ser aprovado de novo.
 
 ## 5. Merge
 
-Com a CI verde (e revisado, quando houver revisor), o pull request entra por merge no `main`. Nada entra no `main` por push direto: a proteção bloqueia, inclusive para admins. O que acontece depois com o pacote está em "Publicação e versionamento", abaixo: o merge de um PR com changeset **não publica sozinho**: os changesets se acumulam no `main` até um mantenedor abrir o PR de versão, e a publicação acontece quando esse PR é mergeado.
+Com a CI verde (todos os checks obrigatórios, `test:visual` incluído) e aprovado por um code owner que não seja o autor, o pull request entra por merge no `main`. Nada entra no `main` por push direto: a proteção bloqueia, inclusive para admins. O que acontece depois com o pacote está em "Publicação e versionamento", abaixo: o merge de um PR com changeset **não publica sozinho**: os changesets se acumulam no `main` até um mantenedor abrir o PR de versão, e a publicação acontece quando esse PR é mergeado.
 
 ## O que um pull request precisa ter hoje
 
@@ -78,10 +78,11 @@ O template de PR (`.github/pull_request_template.md`) repete esta lista.
 - [ ] Página conferida com teclado, foco visível ponta a ponta
 - [ ] Contraste calculado para qualquer cor nova
 - [ ] Nenhum hex, `rgba()` ou `style` inline novo fora das variáveis existentes
-- [ ] Revisão de outra pessoa, quando houver revisor disponível (não obrigatória desde 15/10/2026)
+- [ ] `npm run test:visual` passando quando o PR muda aparência (componente, token ou CSS) — o check `test:visual` é obrigatório na CI
+- [ ] Aprovação de 1 code owner que não seja o autor — **obrigatória** desde 16/10/2026 (TST-06)
 - [ ] Mensagens de commit na convenção abaixo
 
-**Scripts que existem hoje** (na raiz, delegando para `apps/docs` e `packages/react`): `dev`, `build`, `build:ds`, `start`, `lint`, `typecheck`, `test`, `generate:llms`, `check:artifacts`, `proto:css`, `gate`, `changeset`, `changeset:check`, `version-packages`, `release`.
+**Scripts que existem hoje** (na raiz, delegando para `apps/docs` e `packages/react`): `dev`, `build`, `build:ds`, `start`, `lint`, `typecheck`, `test`, `generate:llms`, `check:artifacts`, `proto:css`, `gate`, `cobertura:promessas`, `changeset`, `changeset:check`, `version-packages`, `release`, `test:visual`, `test:visual:update`.
 
 ## O que a CI verifica
 
@@ -94,7 +95,8 @@ O template de PR (`.github/pull_request_template.md`) repete esta lista.
 | `typecheck` | `npm run typecheck` | `tsc --noEmit` do kit falha |
 | `build` | `npm run build:ds`, build do site (`next build`, export estático) e conferência de `apps/docs/public` | o pacote ou o site não compilam, ou os artefatos de agentes estão desatualizados |
 | `test` | `npm test` (Vitest + Testing Library + axe, com zod 3 e 4) | um teste do `@semec/ds` falha, inclusive violação do axe |
-| `gate` | `npm run gate` | o gate de qualidade e regressão reprova |
+| `gate` | `npm run gate` | o gate de qualidade e regressão reprova, inclusive a cobertura por promessa do manifest abaixo do piso (`npm run cobertura:promessas`) |
+| `test:visual` | `npm run test:visual` (regressão visual com Playwright no contêiner `mcr.microsoft.com/playwright:v1.56.1-noble`) | um print diverge da baseline em `tests/visual/__screenshots__` |
 
 Para rodar o mesmo localmente, na ordem: `npm run build:ds`, `npm run typecheck`, `npm test`, `npm run build`, `npm run lint`, `npm run changeset:check`, `npm run check:artifacts`.
 
@@ -113,17 +115,17 @@ Se a mudança em arquivo publicado realmente não precisa de versão nova (ex.: 
 
 ## Proteção do main
 
-**Aplicada em 15/10/2026** (#32). A regra é configuração do repositório no GitHub, não arquivo.
+Aplicada em 15/10/2026 (#32) e **revista em 16/10/2026 (TST-06)**: passa a exigir 1 aprovação de code owner e o check `test:visual`. A regra é configuração do repositório no GitHub, não arquivo: até um admin rodar o comando abaixo, a proteção ativa continua a de 15/10 (0 aprovações, sem `test:visual`). Confira com o comando de "Conferir depois".
 
 **O que a proteção exige:**
 
 - PR obrigatório para entrar no `main`, sem push direto, inclusive para admins (`enforce_admins`);
-- **nenhuma aprovação obrigatória** (`required_approving_review_count: 0`). Decisão do mantenedor em 15/10/2026: sem um segundo revisor ativo, exigir aprovação impediria o próprio mantenedor de mergear. Aprovação já dada é descartada se chegarem commits novos;
-- checks obrigatórios e branch atualizada: `changeset`, `lint`, `typecheck`, `test`, `build`, `gate`;
+- **1 aprovação de outra pessoa** (`required_approving_review_count: 1`), que precisa ser de um **code owner** (`require_code_owner_reviews: true`). Aprovação já dada é descartada se chegarem commits novos (`dismiss_stale_reviews`);
+- checks obrigatórios e branch atualizada: `changeset`, `lint`, `typecheck`, `test`, `build`, `gate`, `test:visual`;
 - conversas resolvidas antes do merge;
 - sem force push e sem apagar o `main`.
 
-**Code owners.** `.github/CODEOWNERS` lista `@Rug-gieri` e `@VgavaBR123`. Hoje o arquivo só indica quem é chamado para revisar; ele não bloqueia o merge, porque `require_code_owner_reviews` está desligado. Para voltar a exigir revisão quando a equipe tiver dois revisores ativos, troque `required_approving_review_count` para `1` e `require_code_owner_reviews` para `true` no comando abaixo.
+**Code owners.** `.github/CODEOWNERS` lista `@VgavaBR123` e `@Rug-gieri` para o repositório inteiro e, explicitamente, para `packages/react/`, `packages/react/skills/`, `.changeset/`, `.github/`, `scripts/gate/` e `tests/visual/`. Com `require_code_owner_reviews` ligado, o PR de um precisa da aprovação do outro. Se um dos dois sair, inclua outra pessoa no arquivo **antes**: com um code owner só, nenhum PR dele consegue ser aprovado.
 
 **Pela API** (admin autenticado no `gh`):
 
@@ -138,13 +140,14 @@ gh api -X PUT repos/SEMEC-PVH/SEMEC_design_system/branches/main/protection   -H 
       { "context": "typecheck" },
       { "context": "test" },
       { "context": "build" },
-      { "context": "gate" }
+      { "context": "gate" },
+      { "context": "test:visual" }
     ]
   },
   "enforce_admins": true,
   "required_pull_request_reviews": {
-    "required_approving_review_count": 0,
-    "require_code_owner_reviews": false,
+    "required_approving_review_count": 1,
+    "require_code_owner_reviews": true,
     "dismiss_stale_reviews": true
   },
   "required_conversation_resolution": true,
@@ -158,7 +161,7 @@ JSON
 Conferir depois:
 
 ```bash
-gh api repos/SEMEC-PVH/SEMEC_design_system/branches/main/protection   --jq '{checks: [.required_status_checks.checks[].context], reviews: .required_pull_request_reviews.required_approving_review_count, admins: .enforce_admins.enabled, force: .allow_force_pushes.enabled}'
+gh api repos/SEMEC-PVH/SEMEC_design_system/branches/main/protection   --jq '{checks: [.required_status_checks.checks[].context], reviews: .required_pull_request_reviews.required_approving_review_count, codeOwners: .required_pull_request_reviews.require_code_owner_reviews, admins: .enforce_admins.enabled, force: .allow_force_pushes.enabled}'
 ```
 
 O job `changeset` só roda em PR; em push no `main` e no PR de versão (branch `changeset-release/*`) ele aparece como *skipped*, o que conta como aprovado para a proteção.
@@ -288,7 +291,7 @@ O `RELEASE_TOKEN` (PAT cadastrado em 29/09/2026 para abrir os PRs de versão) **
 
    O `version-packages` consome os arquivos de `.changeset/`, faz o bump em `packages/react/package.json`, escreve o `packages/react/CHANGELOG.md`, atualiza o `package-lock.json` e regenera os artefatos de IA (`npm run generate:llms`: `apps/docs/public`, o bloco de versão de `docs/objetivo.md` e as skills) na mesma passada. Sem isso o PR de versão saía com os artefatos ainda dizendo a versão anterior e "não publicado", e a CI (deriva dos artefatos) ou o PR seguinte tinham de corrigir, gerando conflito. Confira o diff: a versão tem de ser a que o `changeset status` previa e o CHANGELOG tem de listar todos os changesets.
 
-3. **Revisão e merge do PR de versão.** Um mantenedor confere a versão e o CHANGELOG e mergeia, como qualquer PR, com a CI verde (com revisão de outra pessoa quando houver revisor). Ninguém roda `version-packages` direto no `main`.
+3. **Revisão e merge do PR de versão.** Um mantenedor confere a versão e o CHANGELOG e mergeia, como qualquer PR, com a CI verde e a aprovação de um code owner que não seja quem rodou o `version-packages`. Ninguém roda `version-packages` direto no `main`.
 
 4. **Publicação.** Com a CI verde no commit do merge, o Release não encontra changesets pendentes, vê que a versão ainda não está no npm e publica (modo `publish`, tabela acima).
 
