@@ -1,10 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import * as React from "react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
-// A demo do site importa o kit pelo alias do Next (`semec-ds/react`); aqui ele
-// aponta para o código-fonte do kit.
-vi.mock("semec-ds/react", async () => await import("../src/index"));
+// A demo do site importa o kit pelo alias do Next (`semec-ds/react`); o
+// vitest.config.ts aponta esse alias para o código-fonte do kit.
 
 // @ts-expect-error demo em JSX sem tipos, fora do pacote
 import { TableAdvanced } from "../../../apps/docs/components/demos/examples/table-advanced.jsx";

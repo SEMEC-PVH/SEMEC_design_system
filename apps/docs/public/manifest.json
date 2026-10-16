@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
-  "version": "4.0.1",
-  "generatedAt": "2026-10-16T15:00:37.000Z",
+  "version": "4.1.0",
+  "generatedAt": "2026-10-16T15:39:18.000Z",
   "componentCount": 55,
   "categories": [
     {
@@ -1417,10 +1417,10 @@
     }
   ],
   "unreleased": {
-    "pendingChangesets": 8,
+    "pendingChangesets": 4,
     "bump": "minor",
-    "nextVersion": "4.1.0",
-    "note": "Não publicado: este conteúdo vem do repositório e inclui 8 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.0.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.1.0. Confira a versão instalada com `npm ls @semec/ds`."
+    "nextVersion": "4.2.0",
+    "note": "Não publicado: este conteúdo vem do repositório e inclui 4 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.1.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.2.0. Confira a versão instalada com `npm ls @semec/ds`."
   },
   "install": {
     "packages": "npm install @semec/ds lucide-react",

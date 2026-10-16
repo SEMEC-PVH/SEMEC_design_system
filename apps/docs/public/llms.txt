@@ -4,7 +4,7 @@
 
 Site: https://semec-pvh.github.io/SEMEC_design_system/
 
-> **Não publicado: este conteúdo vem do repositório e inclui 8 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.0.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.1.0. Confira a versão instalada com `npm ls @semec/ds`.**
+> **Não publicado: este conteúdo vem do repositório e inclui 4 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.1.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.2.0. Confira a versão instalada com `npm ls @semec/ds`.**
 
 ## Instalar
 
@@ -170,4 +170,4 @@ Padrões de tela (navegação, formulários, dados e relatórios, feedback, aces
 3. Copie o snippet da seção "Uso" de `https://semec-pvh.github.io/SEMEC_design_system/components/<slug>.md` ou do `manifest.json`
 4. Aplique tokens L1 (`--action-primary` etc.), nunca hex solto
 
-> Gerado 2026-10-16T15:00:37.000Z a partir de packages/react/manifest.js. Versão 4.0.1.
+> Gerado 2026-10-16T15:39:18.000Z a partir de packages/react/manifest.js. Versão 4.1.0.
