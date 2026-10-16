@@ -1,6 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { gateBrowserLabel, launchGateBrowser } from "./browser.mjs";
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 
 /**
@@ -25,7 +27,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
  * para os navegadores instalados; na CI, `npx playwright install --with-deps chromium`.
  */
 export async function checkOpenStates() {
-  console.log("▶ [6/6] Varredura a11y (axe-core) nas camadas abertas (Chromium headless)...");
+  console.log(`▶ [6/6] Varredura a11y (axe-core) nas camadas abertas (${gateBrowserLabel()})...`);
 
   const { build } = await import("esbuild");
   const bundle = await build({
@@ -39,16 +41,7 @@ export async function checkOpenStates() {
   });
   const script = bundle.outputFiles[0].text;
 
-  const { chromium } = await import("playwright");
-  let browser;
-  try {
-    browser = await chromium.launch();
-  } catch (err) {
-    throw new Error(
-      `Não foi possível abrir o Chromium do Playwright (${err.message.split("\n")[0]}). ` +
-        "Rode 'npx playwright install --with-deps chromium' (CI) ou defina PLAYWRIGHT_BROWSERS_PATH."
-    );
-  }
+  const browser = await launchGateBrowser();
 
   let results;
   try {
