@@ -64,4 +64,12 @@ test.describe("layout de consumidor", () => {
     }
     expect(errors).toEqual([]);
   });
+
+  test("FooterLink curto tem alvo de 44×44 no mobile (NEXT42-05)", async ({ page }, testInfo) => {
+    test.skip(!isMobile(testInfo), "a área ampliada vale só abaixo de sm");
+    await mountLayout(page, "footer-link-curto");
+    const area = await hitArea(page, "a[href='#iptu']");
+    expect(area.width, JSON.stringify(area)).toBeGreaterThanOrEqual(44);
+    expect(area.height, JSON.stringify(area)).toBeGreaterThanOrEqual(44);
+  });
 });
