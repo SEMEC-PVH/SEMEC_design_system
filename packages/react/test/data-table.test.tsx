@@ -1,6 +1,7 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { describe, expect, it, vi } from "vitest";
 
 import { Button, DataTable, type SortDirection } from "../src/index";
@@ -24,6 +25,16 @@ const colunas = [
   { key: "status", header: "Status" },
   { key: "valor", header: "Valor", sortable: true },
 ];
+
+/**
+ * Botão de ordenação da coluna, achado pelo papel: o cabeçalho (columnheader)
+ * se chama só pelo nome da coluna e o botão é o único controle dentro dele
+ * (TST-B4: não consultar pelo texto "Ordenar por …", que é descrição).
+ */
+function botaoDaColuna(nome: string) {
+  const th = screen.getByRole("columnheader", { name: nome });
+  return { th, botao: within(th).getByRole("button", { name: nome }) };
+}
 
 /** Consumidor típico: alterna asc → desc → asc na mesma coluna. */
 function Ordenavel() {
@@ -61,11 +72,11 @@ describe("DataTable", () => {
     expect(valor).toHaveAttribute("aria-sort", "none");
   });
 
-  it("o botão \"Ordenar por …\" alterna ascending/descending pelo clique e pelo teclado", async () => {
+  it("o botão de ordenação alterna ascending/descending pelo clique e pelo teclado", async () => {
     const user = userEvent.setup();
     render(<Ordenavel />);
-    const botao = screen.getByRole("button", { name: "Ordenar por Nome" });
-    const th = botao.closest("th")!;
+    const { th, botao } = botaoDaColuna("Nome");
+    expect(th).toHaveAttribute("aria-sort", "none");
 
     await user.click(botao);
     expect(th).toHaveAttribute("aria-sort", "ascending");
@@ -78,16 +89,13 @@ describe("DataTable", () => {
     expect(th).toHaveAttribute("aria-sort", "ascending");
 
     // A outra coluna ordenável volta a "none".
-    expect(screen.getByRole("button", { name: "Ordenar por Valor" }).closest("th")).toHaveAttribute(
-      "aria-sort",
-      "none"
-    );
+    expect(botaoDaColuna("Valor").th).toHaveAttribute("aria-sort", "none");
   });
 
   it("onSort recebe a key da coluna", async () => {
     const onSort = vi.fn();
     render(<DataTable columns={colunas} data={registros} onSort={onSort} />);
-    await userEvent.setup().click(screen.getByRole("button", { name: "Ordenar por Valor" }));
+    await userEvent.setup().click(botaoDaColuna("Valor").botao);
     expect(onSort).toHaveBeenCalledWith("valor");
   });
 
@@ -156,7 +164,7 @@ describe("DataTable", () => {
         }}
       />
     );
-    expect(screen.getByRole("button", { name: "Classificar por Nome" })).toBeInTheDocument();
+    expect(botaoDaColuna("Nome").botao).toHaveAccessibleDescription("Classificar por Nome");
     expect(screen.getByText("2/4")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Voltar" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Avançar" })).toBeInTheDocument();
@@ -197,11 +205,11 @@ describe("DataTable", () => {
     expect(onRowClick).toHaveBeenCalledTimes(1);
   });
 
-  // TST-F2-04: o keydown da linha ignora teclas vindas de botões nas células
-  // (data-table.tsx, handleRowKeyDown), mas o `onClick` da <tr> não: o clique
-  // (do mouse ou o sintético do Enter/Espaço) num botão da célula sobe até a
-  // linha e dispara onRowClick junto com a ação do botão.
-  it.fails("TST-F2-04: Enter num botão da célula não ativa a linha", async () => {
+  // TST-F2-04 (TST-11, corrigido): o keydown da linha já ignorava teclas vindas
+  // de botões nas células, mas o `onClick` da <tr> não: o clique (do mouse ou o
+  // sintético do Enter/Espaço) num botão da célula subia até a linha e
+  // disparava onRowClick junto com a ação do botão.
+  it("TST-F2-04: Enter num botão da célula não ativa a linha", async () => {
     const onRowClick = vi.fn();
     const onVer = vi.fn();
     const user = userEvent.setup();
@@ -218,7 +226,7 @@ describe("DataTable", () => {
     expect(onRowClick).not.toHaveBeenCalled();
   });
 
-  it.fails("TST-F2-04: clicar num botão da célula não ativa a linha", async () => {
+  it("TST-F2-04: clicar num botão da célula não ativa a linha", async () => {
     const onRowClick = vi.fn();
     const onVer = vi.fn();
     render(
@@ -231,6 +239,92 @@ describe("DataTable", () => {
     await userEvent.setup().click(screen.getByRole("button", { name: "Ver" }));
     expect(onVer).toHaveBeenCalledTimes(1);
     expect(onRowClick).not.toHaveBeenCalled();
+  });
+
+  it("TST-11: link, input e o filho de um botão na célula também não ativam a linha", async () => {
+    const onRowClick = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <DataTable
+        columns={[
+          { key: "nome", header: "Nome" },
+          {
+            key: "acoes",
+            header: "Ações",
+            render: () => (
+              <>
+                <a href="#detalhe">Detalhe</a>
+                <input aria-label="Observação" />
+                <button type="button">
+                  <span>Arquivar</span>
+                </button>
+              </>
+            ),
+          },
+        ]}
+        data={[registros[0]!]}
+        onRowClick={onRowClick}
+      />
+    );
+    await user.click(screen.getByRole("link", { name: "Detalhe" }));
+    await user.click(screen.getByRole("textbox", { name: "Observação" }));
+    await user.click(screen.getByText("Arquivar"));
+    expect(onRowClick).not.toHaveBeenCalled();
+    // O texto comum da célula continua ativando a linha.
+    await user.click(screen.getByText("Ana"));
+    expect(onRowClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("TST-11: clique num portal aberto pela célula (menu/diálogo) não ativa a linha", () => {
+    const onRowClick = vi.fn();
+    render(
+      <DataTable
+        columns={[
+          {
+            key: "acoes",
+            header: "Ações",
+            render: () => createPortal(<div>Item do menu</div>, document.body),
+          },
+        ]}
+        data={[registros[0]!]}
+        onRowClick={onRowClick}
+      />
+    );
+    // O evento sobe pela árvore do React até a <tr>, mas o alvo não está na linha.
+    fireEvent.click(screen.getByText("Item do menu"));
+    expect(onRowClick).not.toHaveBeenCalled();
+  });
+
+  it("TST-28: rowLabel dá nome à linha clicável; sem rowLabel, nada de aria-label", () => {
+    const { rerender } = render(
+      <DataTable
+        columns={[{ key: "nome", header: "Nome" }]}
+        data={registros}
+        onRowClick={() => {}}
+        rowLabel={(row) => `Abrir protocolo de ${row.nome}`}
+      />
+    );
+    expect(screen.getByRole("row", { name: "Abrir protocolo de Ana" })).toHaveAttribute("tabindex", "0");
+    expect(screen.getByRole("row", { name: "Abrir protocolo de Bruno" })).toBeInTheDocument();
+    rerender(<DataTable columns={[{ key: "nome", header: "Nome" }]} data={registros} onRowClick={() => {}} />);
+    for (const linha of screen.getAllByRole("row").slice(1)) expect(linha).not.toHaveAttribute("aria-label");
+  });
+
+  it("TST-10: botão de ordenação com alvo de 44px (min-h-11/min-w-11) dentro do cabeçalho h-11", () => {
+    render(<DataTable columns={colunas} data={registros} />);
+    const { th, botao } = botaoDaColuna("Nome");
+    expect(th).toHaveClass("h-11");
+    expect(botao).toHaveClass("min-h-11", "min-w-11");
+  });
+
+  it("TST-23: o rodapé da paginação empilha abaixo de sm e os botões não quebram o texto", () => {
+    render(<DataTable columns={colunas} data={registros} page={1} pageCount={2} onPageChange={() => {}} />);
+    const proximo = screen.getByRole("button", { name: "Próximo" });
+    const grupo = proximo.parentElement!;
+    const rodape = grupo.parentElement!;
+    expect(rodape).toHaveClass("flex-col", "sm:flex-row", "sm:justify-between");
+    expect(grupo).toHaveClass("flex-wrap");
+    expect(proximo).toHaveClass("whitespace-nowrap", "shrink-0");
   });
 
   it("rowKey é usado como key (sem aviso de key duplicada)", () => {
@@ -272,16 +366,29 @@ describe("DataTable", () => {
     expect(await severeViolations()).toEqual([]);
   });
 
-  // TST-F2-02: o aria-label do botão ("Ordenar por Nome") vira o nome do
-  // cabeçalho inteiro. No Chromium (árvore de acessibilidade via CDP) o
-  // columnheader se chama "Ordenar por Nome", e o leitor de tela repete isso
+  // TST-F2-02 (TST-27, corrigido): o aria-label do botão ("Ordenar por Nome")
+  // virava o nome do cabeçalho inteiro. No Chromium (árvore de acessibilidade via CDP) o
+  // columnheader se chamava "Ordenar por Nome", e o leitor de tela repetia isso
   // como cabeçalho de cada célula da coluna. O jsdom (dom-accessibility-api)
   // calcula "Nome", então o teste verifica a causa: o aria-label do botão
   // diferente do texto da coluna. O padrão APG (Sortable Table) mantém só o nome
   // da coluna no botão e comunica a ordem por aria-sort.
-  it.fails("TST-F2-02: o botão de ordenação não troca o nome da coluna por \"Ordenar por …\"", () => {
+  it("TST-F2-02: o botão de ordenação não troca o nome da coluna por \"Ordenar por …\"", () => {
     render(<DataTable columns={colunas} data={registros} />);
     const botao = screen.getByRole("button", { name: /Nome/ });
     expect(botao.getAttribute("aria-label") ?? "Nome").toBe("Nome");
+  });
+
+  it("TST-27: \"Ordenar por …\" vira a descrição do botão, fora do nome do cabeçalho", () => {
+    render(<DataTable columns={colunas} data={registros} />);
+    const { th, botao } = botaoDaColuna("Nome");
+    expect(botao).toHaveAccessibleName("Nome");
+    expect(botao).toHaveAccessibleDescription("Ordenar por Nome");
+    expect(th).toHaveAccessibleName("Nome");
+    expect(botaoDaColuna("Valor").botao).toHaveAccessibleDescription("Ordenar por Valor");
+    // Uma descrição por coluna, com id único, invisível na tela.
+    const ids = screen.getAllByRole("button").map((b) => b.getAttribute("aria-describedby"));
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(screen.getByText("Ordenar por Nome")).not.toBeVisible();
   });
 });
