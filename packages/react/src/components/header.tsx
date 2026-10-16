@@ -138,7 +138,7 @@ const HeaderNav = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement
     <nav
       ref={ref}
       aria-label="Principal"
-      className={cn("flex items-center gap-2", className)}
+      className={cn("flex flex-wrap items-center gap-2", className)}
       {...props}
     >
       {children}

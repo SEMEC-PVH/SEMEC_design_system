@@ -1,0 +1,67 @@
+/**
+ * Conferências de LAYOUT em telas de consumidor (validação da 4.2.0 como
+ * consumidor). Sem print: cada teste mede o que o achado descreveu, com o CSS
+ * do kit aplicado (Tailwind v4 contra o dist, como na regressão visual).
+ *
+ * Roda nos mesmos projetos da regressão visual (desktop-1366 e mobile-390);
+ * o que é de 320 px redimensiona a página dentro do teste.
+ */
+import { test, expect } from "@playwright/test";
+
+const isMobile = (testInfo) => testInfo.project.name.startsWith("mobile");
+
+async function mountLayout(page, code) {
+  const errors = [];
+  page.on("pageerror", (err) => errors.push(err.message));
+  await page.goto("/index.html");
+  await page.waitForFunction(() => window.__visualReady === true);
+  const result = await page.evaluate((c) => window.__visual.mount(c, "layout"), code);
+  expect(result.error ?? null, `montagem de ${code}`).toBeNull();
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  });
+  return errors;
+}
+
+/**
+ * Área de toque efetiva por hit-test: a partir do centro do elemento, quanto
+ * dá para andar em cada eixo e ainda acertar o próprio elemento (inclui o
+ * `::after` que amplia o alvo). Devolve largura e altura em px.
+ */
+function hitArea(page, selector) {
+  return page.evaluate((sel) => {
+    const el = document.querySelector(sel);
+    const r = el.getBoundingClientRect();
+    const cx = r.x + r.width / 2;
+    const cy = r.y + r.height / 2;
+    const hits = (x, y) => {
+      const t = document.elementFromPoint(x, y);
+      return !!t && (t === el || el.contains(t));
+    };
+    const reach = (dx, dy) => {
+      let d = 0;
+      while (d < 60 && hits(cx + dx * (d + 1), cy + dy * (d + 1))) d++;
+      return d;
+    };
+    return { width: reach(-1, 0) + reach(1, 0) + 1, height: reach(0, -1) + reach(0, 1) + 1 };
+  }, selector);
+}
+
+test.describe("layout de consumidor", () => {
+  test("HeaderNav com 4 links não cria rolagem horizontal a 320 px (NEXT42-02, WCAG 1.4.10)", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 700 });
+    const errors = await mountLayout(page, "header-4-links");
+    const medida = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+      navRight: document.querySelector("nav[aria-label='Principal']").getBoundingClientRect().right,
+    }));
+    expect(medida.scrollWidth, JSON.stringify(medida)).toBeLessThanOrEqual(medida.clientWidth);
+    expect(medida.navRight).toBeLessThanOrEqual(medida.clientWidth);
+    for (const nome of ["Início", "Protocolos", "Requerimento", "Painel"]) {
+      await expect(page.getByRole("link", { name: nome, exact: true })).toBeInViewport({ ratio: 1 });
+    }
+    expect(errors).toEqual([]);
+  });
+});
