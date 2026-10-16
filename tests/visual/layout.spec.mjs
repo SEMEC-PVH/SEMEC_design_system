@@ -146,7 +146,10 @@ test.describe("layout de consumidor", () => {
       })
     );
     for (const t of m) {
-      expect(t.height / t.lineHeight, `${t.id} quebra linha: ${JSON.stringify(t)}`).toBeGreaterThanOrEqual(2);
+      // O WebKit arredonda a entrelinha computada (17,5 px vira 17 px na caixa),
+      // então a razão altura/entrelinha fica em 1,94 com duas linhas reais.
+      // Arredondar dá o número de linhas sem depender do motor.
+      expect(Math.round(t.height / t.lineHeight), `${t.id} quebra linha: ${JSON.stringify(t)}`).toBeGreaterThanOrEqual(2);
       expect(t.lineHeight / t.fontSize, `${t.id}: ${JSON.stringify(t)}`).toBeGreaterThanOrEqual(1.2);
     }
   });
