@@ -21,11 +21,10 @@ const here = path.dirname(fileURLToPath(import.meta.url));
  */
 const CASOS = ["scroll-area"];
 
-const FALHAS_CONHECIDAS = {
-  // TST-05 (#56/#55): a viewport da ScrollArea só com texto não recebe foco.
-  // Remover esta entrada quando a correção do TST-05 entrar.
-  "scroll-area": { rules: ["scrollable-region-focusable"], achado: "TST-05" },
-};
+// Vazio: a falha do TST-05 (ScrollArea só com texto sem foco) foi corrigida em
+// fix/b1-comp-a, e o caso "scroll-area" agora protege contra regressão.
+/** @type {Record<string, { rules: string[]; achado: string }>} */
+const FALHAS_CONHECIDAS = {};
 
 // O CSS do kit vem do Tailwind do consumidor; aqui só o necessário para haver overflow.
 const CSS_MINIMO = "[data-radix-scroll-area-viewport]{height:100%;width:100%}";
