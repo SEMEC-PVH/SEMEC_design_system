@@ -24,6 +24,7 @@
     "clean": "npm run clean --workspace @semec/ds",
     "gate": "npm run build:ds && node scripts/gate/gate.mjs",
     "cobertura:promessas": "node scripts/gate/cobertura-promessas.mjs",
+    "gate:browsers": "npm run build:ds && node scripts/gate/browsers.mjs",
     "changeset": "changeset",
     "changeset:check": "changeset status --since=origin/main",
     "check:artifacts": "npm run generate:llms && git diff --exit-code --stat -I generatedAt -I \"^> Gerado \" -- apps/docs/public packages/react/README.md",
@@ -32,7 +33,9 @@
     "pretest:visual": "npm run build:ds",
     "test:visual": "node tests/visual/docker.mjs",
     "pretest:visual:update": "npm run build:ds",
-    "test:visual:update": "node tests/visual/docker.mjs --update-snapshots"
+    "test:visual:update": "node tests/visual/docker.mjs --update-snapshots",
+    "pretest:visual:browsers": "npm run build:ds",
+    "test:visual:browsers": "node tests/visual/docker.mjs --browsers=webkit,firefox --ignore-snapshots"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
