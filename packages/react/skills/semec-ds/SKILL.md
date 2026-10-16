@@ -725,6 +725,8 @@ Depreciado, sai na 5.0 (não gere código novo com isto):
 
 - `Combobox`: `ariaLabel` (use rótulo visível ou o atributo `aria-label`) e `emptyMessage` (use `emptyText`).
 - `AlertDialog` `modal` e `AlertDialogContent` `onPointerDownOutside` / `onInteractOutside`: já são ignorados.
+- `digits` (de `@semec/ds/react` e `@semec/ds/react/validacao`): use `valor.replace(/\D/g, "")` no seu código. Anunciado na 4.1; avisa no console em desenvolvimento.
+- Subpath `@semec/ds/react/server` (`dsPackageRootResolve`): uso interno do monorepo, sem substituto no pacote. Anunciado na 4.1; avisa no console em desenvolvimento.
 
 
 <!-- ds:maintainer:start -->

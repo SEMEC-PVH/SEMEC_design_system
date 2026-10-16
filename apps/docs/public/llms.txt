@@ -170,4 +170,4 @@ Padrões de tela (navegação, formulários, dados e relatórios, feedback, aces
 3. Copie o snippet da seção "Uso" de `https://semec-pvh.github.io/SEMEC_design_system/components/<slug>.md` ou do `manifest.json`
 4. Aplique tokens L1 (`--action-primary` etc.), nunca hex solto
 
-> Gerado 2026-10-16T14:54:31.000Z a partir de packages/react/manifest.js. Versão 4.0.1.
+> Gerado 2026-10-16T15:00:37.000Z a partir de packages/react/manifest.js. Versão 4.0.1.

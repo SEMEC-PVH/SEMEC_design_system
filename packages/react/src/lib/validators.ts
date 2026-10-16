@@ -1,21 +1,33 @@
+import { warnDeprecated } from "./deprecation";
+
 /* ------------------------------------------------------------------ */
 /*  Helpers puros (sem Zod) — exportados pelo entry principal          */
 /* ------------------------------------------------------------------ */
+
+/** Remove tudo que não é dígito (uso interno). */
+function soDigitos(v: string): string {
+  return v.replace(/\D/g, "");
+}
 
 /**
  * Remove tudo que não é dígito.
  *
  * @deprecated Helper interno que vazou para o entry principal e para
  * `@semec/ds/react/validacao`. Anunciado na 4.1 (TST-34b, ADR-013); **sai na
- * 5.0**. Use `valor.replace(/\D/g, "")` no seu código.
+ * 5.0**. Use `valor.replace(/\D/g, "")` no seu código. Em desenvolvimento, a
+ * 1ª chamada emite um `console.warn`.
  */
 function digits(v: string): string {
-  return v.replace(/\D/g, "");
+  warnDeprecated(
+    "digits",
+    'digits() está depreciado e sai na 5.0 (TST-34b, ADR-013). Use valor.replace(/\\D/g, "") no seu código.'
+  );
+  return soDigitos(v);
 }
 
 /** Valida CPF por cálculo dos dígitos verificadores. */
 export function validateCPF(v: string): boolean {
-  const d = digits(v);
+  const d = soDigitos(v);
   if (d.length !== 11) return false;
   if (/^(\d)\1{10}$/.test(d)) return false;
 
@@ -35,7 +47,7 @@ export function validateCPF(v: string): boolean {
 
 /** Valida CNPJ por cálculo dos dígitos verificadores. */
 export function validateCNPJ(v: string): boolean {
-  const d = digits(v);
+  const d = soDigitos(v);
   if (d.length !== 14) return false;
   if (/^(\d)\1{13}$/.test(d)) return false;
 
