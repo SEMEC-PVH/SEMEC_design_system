@@ -38,6 +38,7 @@ import { areaOf } from "./areas";
 import { ehLeve, arquivoLeve } from "./scene/qualidade";
 import { createMuseu } from "./scene/museu";
 import { createEscritorio } from "./predio/escritorio";
+import { createPista } from "./scene/pista";
 import { ANDARES, andarPorId } from "./predio/andares";
 
 const W = 30;
@@ -312,6 +313,26 @@ const deslizeDoElevador = (andares) => {
 const ELEVADOR_ZOOM = 0.62;
 // Câmera dentro do prédio: a mesma distância da Vila.
 const MUSEU_ZOOM = 1;
+// Corrida na pista (scene/pista): contagem de 3 bipes, 1 s cada, e o verde.
+const CORRIDA_BIPE = 1;
+const CORRIDA_CONTAGEM = 3;
+// Câmera na pista: mais afastada (o `zoom` da pista, ou PISTA_ZOOM) e
+// adiantada na direção do movimento (a bicicleta anda ~9 tiles/s: sem isso
+// a curva chega antes de aparecer). PISTA_FRENTE_S: quantos segundos de velocidade ela adianta,
+// até PISTA_FRENTE_MAX tiles; PISTA_FRENTE_TAXA amortece a direção (1/s),
+// devagar o bastante para não sacudir nas esquinas em arco.
+const PISTA_ZOOM = 1.3;
+const PISTA_FRENTE_S = 0.28;
+const PISTA_FRENTE_MAX = 2.2;
+const PISTA_FRENTE_TAXA = 2.5;
+// Volta da pista para a Vila: ao lado do bicicletário, de frente para ele
+// (o 1º tile andável na ordem; a calçada ao sul vem primeiro).
+const VOLTA_DA_PISTA = [
+  { dx: 0, dy: 1, dir: "up" },
+  { dx: -1, dy: 0, dir: "right" },
+  { dx: 1, dy: 0, dir: "left" },
+  { dx: 0, dy: -1, dir: "down" },
+];
 
 function buildMap() {
   const g = Array.from({ length: H }, () => Array(W).fill(GRASS));
@@ -738,6 +759,14 @@ export function createVila(host, options) {
     onElevador = () => {},
     // Objeto que ensina num andar ({ id, titulo, texto }): Espaço de frente.
     onInfo = () => {},
+    // Corrida de bicicleta na pista (scene/pista): { tipo: "entrou" | "saiu" |
+    // "contagem" (n 3..1) | "largada" (inicio) | "checkpoint" (i, total, volta,
+    // tempo) | "volta" (volta, voltas, tempo) | "chegada" (tempo) }. "entrou"
+    // e "contagem" levam também voltas e total (checkpoints por volta, com a
+    // chegada); checkpoint.i é o índice dentro da volta e checkpoint.volta a
+    // volta atual (1-based); volta.volta é a que acabou de fechar; `tempo` em
+    // milissegundos de jogo. Ver "Corrida na pista" e api.corrida.
+    onCorrida = () => {},
   } = options;
 
   const map = buildMap();
@@ -1282,8 +1311,11 @@ export function createVila(host, options) {
   }
   let bikeLiberada = bicicletaLiberada;
   const temBike = () => Boolean(bikeLiberada && bike.node && actions?.pedalando);
-  function montar() {
-    if (bike.on || !temBike() || noPredio() || cutscene.active || transicao || foco) return false;
+  // `forcar`: a entrada na pista monta no escuro da íris (com a transição
+  // ainda ativa); na pista vale montar, nos prédios não.
+  function montar(forcar = false) {
+    if (bike.on || !temBike()) return false;
+    if (!forcar && ((noPredio() && !naPista()) || cutscene.active || transicao || foco)) return false;
     if (coding) stopCoding();
     bike.on = true;
     bike.node.visible = true;
@@ -1415,12 +1447,14 @@ export function createVila(host, options) {
   // outra seta), o resto vira `desvio` e some amortecido.
   const vCurva = new THREE.Vector3();
   function planejarCurva(m) {
-    if (!bike.on || reducedMotion || noPredio()) return null;
+    // Na pista as esquinas também viram arco (nos prédios, não).
+    if (!bike.on || reducedMotion || (noPredio() && !naPista())) return null;
     const want = held[held.length - 1] ?? player.tap;
     if (!want || want === m.dir || want === OPPOSITE[m.dir]) return null;
     const nx = player.x + DIRS[want].dx;
     const ny = player.y + DIRS[want].dy;
-    if ((nx === SEMEC_PORTA.x && ny === SEMEC_PORTA.y) || !podeAndar(nx, ny)) return null;
+    if (!noPredio() && nx === SEMEC_PORTA.x && ny === SEMEC_PORTA.y) return null;
+    if ((noPredio() && interior.saidaEm(nx, ny)) || !podeAndar(nx, ny)) return null;
     if (!held.length) player.tap = want;
     const seguinte = paraMundo(nx, ny);
     return {
@@ -1589,7 +1623,11 @@ export function createVila(host, options) {
   let portaFechando = null; // { interior, t }
   const camLook = new THREE.Vector3();
   const camPos = new THREE.Vector3();
+  // "Prédio" = qualquer interior (andares, Galeria e a pista de corrida): a
+  // grade, o mundo e o render passam a ser os dele. A pista tem regras
+  // próprias (naPista): bicicleta liberada, sem desmontar sozinho.
   const noPredio = () => local !== "vila";
+  const naPista = () => local === "pista";
   const paraMundo = (x, y) => (noPredio() ? interior.tileToWorld(x, y) : tileToWorld(x, y));
   const podeAndar = (x, y) => (noPredio() ? interior.passable(x, y) : passable(x, y));
   const dentro = (x, y) => (noPredio() ? interior.inBounds(x, y) : inBounds(x, y));
@@ -1601,11 +1639,11 @@ export function createVila(host, options) {
 
   function targetAt(x, y) {
     if (noPredio()) {
-      const pessoa = interior.pessoaEm(x, y);
+      const pessoa = interior.pessoaEm?.(x, y);
       if (pessoa) return { type: "pessoa", id: pessoa.id };
       const saida = interior.saidaEm(x, y);
       if (saida) return { type: "saida", saida };
-      const quadro = interior.quadroNaParede(x, y);
+      const quadro = interior.quadroNaParede?.(x, y);
       if (quadro) return { type: "quadro", id: quadro };
       const info = interior.infoEm?.(x, y);
       return info ? { type: "info", info } : null;
@@ -1636,7 +1674,7 @@ export function createVila(host, options) {
     else if (t?.type === "saida") key = `saida:${t.saida}`;
     if (key === lastFacingKey) return;
     lastFacingKey = key;
-    if (noPredio()) interior.setPerto(t?.type === "quadro" ? t.id : null);
+    if (noPredio()) interior.setPerto?.(t?.type === "quadro" ? t.id : null);
     if (t?.type === "pessoa") return onFacing({ type: "museu-pessoa", id: t.id });
     if (t?.type === "quadro") return onFacing({ type: "quadro", id: t.id });
     if (t?.type === "info") return onFacing({ type: "info", id: t.info.id, titulo: t.info.titulo });
@@ -1671,6 +1709,11 @@ export function createVila(host, options) {
       usarSaida(interior.saidaEm(nx, ny));
       return false;
     }
+    // Pista: o portão do box (corrida.saidaVila) leva de volta à Vila.
+    if (naPista() && naSaidaDaPista(nx, ny)) {
+      sairDaPista();
+      return false;
+    }
     if (!podeAndar(nx, ny)) return false;
     // Emendando no passo que acabou neste quadro (bicicleta): herda o tempo que
     // sobrou dele (sem o soluço de um quadro parado no centro do tile) e, se
@@ -1702,6 +1745,7 @@ export function createVila(host, options) {
   // Som do passo pelo chão: grama/mato, calçada, madeira (Galeria), carpete.
   function somDoPasso(x, y) {
     if (bike.on) return "pneu";
+    if (interior?.piso === "asfalto") return "passo-pedra";
     if (noPredio()) return interior?.galeria || local === "galeria" ? "passo-madeira" : "passo-carpete";
     return map[y]?.[x] === PATH ? "passo-pedra" : "passo-grama";
   }
@@ -1821,6 +1865,12 @@ export function createVila(host, options) {
   // do motor, e o cache da mobília, que é por `track`, vai junto).
   function obterInterior(id) {
     if (interiores.has(id)) return interiores.get(id);
+    // A pista de corrida entra no mesmo LRU dos andares (guardarSoRecentes).
+    if (id === "pista") {
+      const pista = createPista({ pal, lite, reducedMotion });
+      interiores.set(id, pista);
+      return pista;
+    }
     const andar = andarPorId(id);
     const novo = andar.galeria
       ? createMuseu({
@@ -2133,7 +2183,8 @@ export function createVila(host, options) {
 
   // Porta da rua (térreo) ou elevador: o tile de saída do interior atual.
   function usarSaida(tipo) {
-    if (tipo === "rua") entrarOuSair("vila");
+    if (naPista()) sairDaPista();
+    else if (tipo === "rua") entrarOuSair("vila");
     else if (tipo === "elevador") {
       held.length = 0;
       player.path = [];
@@ -2144,6 +2195,7 @@ export function createVila(host, options) {
   // Tile do elevador (ou da porta) atrás de um ponto de chegada.
   const atrasDe = (c) => ({ x: c.x - DIRS[c.dir].dx, y: c.y - DIRS[c.dir].dy });
   const rotuloDe = (para) => {
+    if (para === "pista") return "Pista de corrida";
     const andar = para === "vila" ? null : andarPorId(para);
     return andar ? `${andar.rotulo} · ${andar.nome}` : "Vila SEMEC";
   };
@@ -2524,6 +2576,7 @@ export function createVila(host, options) {
   function atualizarTransicao(dt) {
     const tr = transicao;
     if (tr.modo === "elevador") return atualizarElevador(tr, dt);
+    if (tr.modo === "pista") return atualizarTransicaoPista(tr, dt);
     const T = reducedMotion ? TRANSICAO_RAPIDA : TRANSICAO;
     tr.t += dt;
     // O passo acompanha a caminhada até a porta (e da porta para dentro).
@@ -2549,6 +2602,262 @@ export function createVila(host, options) {
       return false;
     }
     return true;
+  }
+
+  // ---- Corrida na pista (scene/pista) ---------------------------------------------
+  // A pista é um interior como os andares (mesma grade, mesmo LRU, mesmo
+  // preparo), mas se entra a partir da Vila, já montado: api.entrarPista()
+  // fecha a íris parado (modo "pista": ninguém anda até porta nenhuma),
+  // troca de cena no escuro e abre com o jogador na largada. Lá dentro a
+  // bicicleta não desce (nem pelo B, nem sozinha) e as esquinas viram arco
+  // como na Vila. O portão do box (corrida.saidaVila) ou api.sairDaPista()
+  // levam de volta para o lado do bicicletário.
+  //
+  // Máquina da corrida (no motor, para o tempo ser justo):
+  //   "espera"    jogador travado até a íris abrir;
+  //   "contagem"  3 bipes, 1 s cada (onCorrida "contagem" n = 3, 2, 1; o
+  //               semáforo da pista no vermelho), jogador travado;
+  //   "correndo"  verde ("largada"); conta o tempo e os checkpoints na ordem
+  //               (o último é a linha de chegada; fora de ordem não conta);
+  //   "fim"       cruzou a chegada na última volta: festa, jogador freia e
+  //               fica parado até correrDeNovo() ou sairDaPista().
+  // Tempo: soma do dt do próprio tick (já limitado a 0,05 s por quadro), só
+  // em "correndo" e sem pausa. É o mesmo relógio que move a bicicleta (o
+  // passo anda dt/STEP_BIKE): num PC lento, em que o quadro passa de 50 ms,
+  // o jogo inteiro anda mais devagar e o cronômetro também, então a mesma
+  // pilotagem dá o mesmo tempo em qualquer máquina, e um engasgo (GC, aba em
+  // segundo plano) não vira segundos perdidos. Com performance.now() o PC
+  // fraco daria tempos piores. Pausa (modal, menu) congela contagem e tempo.
+  // Por dentro, c.tempo em segundos; nos eventos e em api.corrida, em ms.
+  let corrida = null; // { fase, t, bipes, tempo, volta, voltas, proximo, total, tile, tiles }
+  // Eventos e sons da corrida passam por aqui; `espiaCorrida` (TEMP-HOOK,
+  // window.__vilaDbg.espiarCorrida) deixa o teste headless ver os dois.
+  let espiaCorrida = null;
+  const avisarCorrida = (ev) => {
+    onCorrida(ev);
+    espiaCorrida?.(ev);
+  };
+  const somCorrida = (nome, opts) => {
+    onSom(nome, opts);
+    espiaCorrida?.({ som: nome, ...opts });
+  };
+  const corridaTrava = () => Boolean(corrida && naPista() && corrida.fase !== "correndo");
+  const naSaidaDaPista = (x, y) => (interior?.corrida?.saidaVila ?? []).some(([sx, sy]) => sx === x && sy === y);
+
+  // Íris para a pista (entrar ou recomeçar: para = "pista") ou para a Vila.
+  function iniciarTransicaoPista(para) {
+    if (transicao || cutscene.active) return false;
+    held.length = 0;
+    player.path = [];
+    player.pending = null;
+    player.tap = null;
+    player.idle = 0;
+    if (coding) stopCoding();
+    hover.visible = false;
+    const aqui = player.root.position.clone();
+    transicao = { para, modo: "pista", t: 0, fase: "fechar", de: aqui, ate: aqui.clone() };
+    onTransicao({ fase: "fechar", para, modo: "pista", rotulo: rotuloDe(para) });
+    return true;
+  }
+  function sairDaPista() {
+    if (!naPista() || !iniciarTransicaoPista("vila")) return false;
+    corrida = null;
+    return true;
+  }
+
+  // Parado no lugar: a íris fecha (a pista aquece; o render fora da tela, só
+  // no escuro), troca no escuro (esperando a pista pronta, até
+  // PREPARO_ESPERA_MAX) e abre. Nunca "anda sozinho" (devolve false).
+  function atualizarTransicaoPista(tr, dt) {
+    const T = reducedMotion ? TRANSICAO_RAPIDA : TRANSICAO;
+    tr.t += dt;
+    if (tr.fase === "fechar") {
+      const aquecendo = tr.para === "pista" && !naPista() && preparo?.id === "pista";
+      if (aquecendo) avancarPreparo(tr.t >= T.fechar);
+      if (tr.t < T.fechar + T.escuro) return false;
+      if (aquecendo && !preparo.pronto && tr.t - T.fechar - T.escuro < PREPARO_ESPERA_MAX) return false;
+      trocarDePista(tr);
+      tr.fase = "abrir";
+      tr.t = 0;
+      return false;
+    }
+    if (tr.t >= T.abrir) {
+      transicao = null;
+      reportFacing();
+    }
+    return false;
+  }
+
+  // No escuro: Vila → pista (na largada, montado), pista → largada de novo,
+  // ou pista → Vila (ao lado do bicicletário, de frente para ele).
+  function trocarDePista(tr) {
+    const de = local;
+    // Passo pela metade, curva combinada, setas: tudo zerado (é um teleporte).
+    player.move = null;
+    player.path = [];
+    player.pending = null;
+    player.tap = null;
+    held.length = 0;
+    passoAcabou = null;
+    bike.desvio.set(0, 0, 0);
+    bike.vel = 0;
+    if (tr.para === "vila") {
+      interior?.setJogador?.(null);
+      local = "vila";
+      interior = null;
+      corrida = null;
+      scene.add(player.root);
+      const b = BICICLETARIO;
+      const lado = VOLTA_DA_PISTA.find((l) => passable(b.x + l.dx, b.y + l.dy)) ?? VOLTA_DA_PISTA[0];
+      player.x = b.x + lado.dx;
+      player.y = b.y + lado.dy;
+      face(lado.dir);
+    } else {
+      if (!naPista()) {
+        interior?.setJogador?.(null);
+        interior = obterInterior("pista");
+        local = "pista";
+        if (preparo?.id === "pista") preparo = null;
+        aquecidos.add(interior);
+        guardarSoRecentes("pista");
+        interior.scene.add(player.root);
+        interior.setJogador?.(player.root.position);
+      }
+      const L = interior.corrida.largada;
+      player.x = L.x;
+      player.y = L.y;
+      face(L.dir);
+      montar(true);
+    }
+    const pos = paraMundo(player.x, player.y);
+    player.root.position.copy(pos);
+    tr.de = pos.clone();
+    tr.ate = pos.clone();
+    // Sem giro amortecido nem inclinação herdados do outro lado.
+    yawVisual = player.root.rotation.y;
+    player.giro.rotation.y = 0;
+    player.inclina.rotation.z = 0;
+    bike.guidao = 0;
+    bike.ultimo.copy(pos);
+    camTarget.copy(pos);
+    pistaFrente.set(0, 0, 0);
+    pistaUltimo.copy(pos);
+    snapCamera = true;
+    lastFacingKey = "";
+    if (local !== de) onLocal({ local });
+    if (tr.para === "vila") avisarCorrida({ tipo: "saiu" });
+    else {
+      prepararCorrida();
+      if (de !== "pista") avisarCorrida({ tipo: "entrou", voltas: corrida.voltas, total: corrida.total });
+    }
+    onTransicao({ fase: "abrir", para: tr.para, modo: "pista", rotulo: rotuloDe(tr.para) });
+  }
+
+  // Corrida nova (na largada, ainda no escuro): espera a íris abrir.
+  function prepararCorrida() {
+    const c = interior.corrida;
+    corrida = {
+      fase: "espera",
+      t: 0,
+      bipes: 0,
+      tempo: 0,
+      volta: 1,
+      voltas: c.voltas ?? 1,
+      proximo: 0,
+      total: c.checkpoints.length,
+      tile: "",
+      tiles: c.checkpoints.map((cp) => new Set(cp.tiles.map(([x, y]) => `${x},${y}`))),
+    };
+    interior.setProximo?.(0);
+    // Semáforo apagado; cada bipe acende mais uma lâmpada (largada(n)).
+    interior.largada?.(null);
+  }
+
+  // A cada quadro, depois do movimento (o tile novo vale já no quadro em que
+  // o passo começa: player.x/y mudam no início do passo).
+  function atualizarCorrida(dt) {
+    const c = corrida;
+    if (!c || !naPista() || paused) return;
+    if (c.fase === "espera") {
+      if (transicao) return;
+      c.fase = "contagem";
+      c.t = 0;
+    }
+    if (c.fase === "contagem") {
+      c.t += dt;
+      const k = Math.floor(c.t / CORRIDA_BIPE);
+      while (c.bipes < CORRIDA_CONTAGEM && c.bipes <= k) {
+        const n = CORRIDA_CONTAGEM - c.bipes++;
+        interior.largada?.(n);
+        somCorrida("contagem", { n });
+        avisarCorrida({ tipo: "contagem", n, voltas: c.voltas, total: c.total });
+      }
+      if (k < CORRIDA_CONTAGEM) return;
+      c.fase = "correndo";
+      c.tempo = 0;
+      c.tile = `${player.x},${player.y}`;
+      interior.largada?.("verde");
+      somCorrida("largada");
+      avisarCorrida({ tipo: "largada", inicio: performance.now() });
+      return;
+    }
+    if (c.fase !== "correndo") return;
+    c.tempo += dt;
+    const tile = `${player.x},${player.y}`;
+    if (tile === c.tile) return;
+    c.tile = tile;
+    const i = c.proximo;
+    if (!c.tiles[i]?.has(tile)) return;
+    interior.passou?.(i);
+    avisarCorrida({ tipo: "checkpoint", i, total: c.total, volta: c.volta, tempo: c.tempo * 1000 });
+    if (i < c.total - 1) {
+      c.proximo = i + 1;
+      interior.setProximo?.(c.proximo);
+      somCorrida("checkpoint", { i });
+      return;
+    }
+    // Linha de chegada: fecha a volta (`volta` = a que acabou de fechar).
+    avisarCorrida({ tipo: "volta", volta: c.volta, voltas: c.voltas, tempo: c.tempo * 1000 });
+    if (c.volta < c.voltas) {
+      c.volta += 1;
+      c.proximo = 0;
+      interior.setProximo?.(0);
+      somCorrida("volta");
+      return;
+    }
+    // Última volta: festa, freia (o passo de agora termina e o embalo cai)
+    // e fica parado (corridaTrava).
+    c.fase = "fim";
+    c.proximo = -1;
+    interior.setProximo?.(-1);
+    held.length = 0;
+    player.tap = null;
+    player.path = [];
+    player.pending = null;
+    interior.festa?.();
+    somCorrida("chegada");
+    somCorrida("torcida");
+    avisarCorrida({ tipo: "chegada", tempo: c.tempo * 1000 });
+  }
+
+  // Câmera na pista: o alvo vai à frente, na direção (amortecida) em que o
+  // jogador anda. Movimento reduzido: só segue.
+  const pistaFrente = new THREE.Vector3();
+  const pistaUltimo = new THREE.Vector3();
+  const vPistaVel = new THREE.Vector3();
+  function adiantarCameraPista(dt, out) {
+    const pos = player.root.position;
+    if (reducedMotion || snapCamera || dt <= 0) {
+      pistaFrente.set(0, 0, 0);
+      pistaUltimo.copy(pos);
+      return out;
+    }
+    vPistaVel.subVectors(pos, pistaUltimo).divideScalar(dt);
+    pistaUltimo.copy(pos);
+    // Teleporte (mais de 20 m/s): não é movimento.
+    if (vPistaVel.lengthSq() > 400) vPistaVel.set(0, 0, 0);
+    pistaFrente.lerp(vPistaVel.multiplyScalar(PISTA_FRENTE_S), 1 - Math.exp(-dt * PISTA_FRENTE_TAXA));
+    return out.add(vPistaVel.copy(pistaFrente).clampLength(0, PISTA_FRENTE_MAX));
   }
 
   function abrirQuadro(id) {
@@ -2877,7 +3186,8 @@ export function createVila(host, options) {
       player.path = [];
       player.pending = null;
       if (!held.includes(dir)) held.push(dir);
-      if (!player.move && !paused && !transicao && !foco) {
+      // Na contagem a seta fica segurada (sai no verde), mas não vira.
+      if (!player.move && !paused && !transicao && !foco && !corridaTrava()) {
         if (player.dir !== dir) {
           face(dir);
           player.turnLock = TURN_LOCK;
@@ -2911,6 +3221,8 @@ export function createVila(host, options) {
       if (!on) desmontar();
     },
     toggleBicicleta() {
+      // Na pista não se desce (o B não faz nada).
+      if (naPista()) return bike.on;
       if (bike.on) desmontar();
       else montar();
       return bike.on;
@@ -3034,7 +3346,40 @@ export function createVila(host, options) {
     },
     // Painel do elevador: vai para o andar escolhido.
     irParaAndar(id) {
-      if (noPredio() && !foco && andarPorId(id)) entrarOuSair(id, "elevador");
+      if (noPredio() && !naPista() && !foco && andarPorId(id)) entrarOuSair(id, "elevador");
+    },
+    // ---- Corrida na pista (ver "Corrida na pista") ----
+    // Convite do bicicletário na tela: cria a pista e começa a aquecê-la
+    // (shaders e texturas com a Vila visível; o resto no escuro da íris).
+    prepararPista() {
+      if (disposed || local !== "vila" || transicao) return;
+      // Debaixo da tela de carregamento o `preparo` é dos prédios.
+      if (preparoVila && preparoVila.fase !== "pronto") return;
+      prepararDestino("pista");
+    },
+    // Da Vila para a largada da pista, já montado. Só com a bicicleta
+    // conquistada (e o boneco carregado). Devolve se a ida começou.
+    entrarPista() {
+      if (disposed || local !== "vila" || transicao || cutscene.active || foco || !temBike()) return false;
+      if (!(preparoVila && preparoVila.fase !== "pronto")) prepararDestino("pista");
+      return iniciarTransicaoPista("pista");
+    },
+    // Volta para a largada (íris) e recomeça a contagem.
+    correrDeNovo() {
+      if (!naPista() || !iniciarTransicaoPista("pista")) return false;
+      corrida = null;
+      return true;
+    },
+    // Da pista para a Vila, ao lado do bicicletário (também pelo portão).
+    sairDaPista() {
+      return sairDaPista();
+    },
+    // Estado da corrida para o HUD (cronômetro ao vivo): null fora da pista.
+    // tempo em milissegundos de jogo (o mesmo relógio dos eventos).
+    get corrida() {
+      if (!corrida || !naPista()) return null;
+      const c = corrida;
+      return { fase: c.fase, tempo: c.tempo * 1000, volta: c.volta, voltas: c.voltas, proximo: c.proximo, total: c.total };
     },
     dispose,
   };
@@ -3055,8 +3400,8 @@ export function createVila(host, options) {
     pointer.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
     raycaster.setFromCamera(pointer, camera);
     if (noPredio()) {
-      const quadro = raycaster.intersectObjects(interior.hitQuadros, false)[0];
-      const pessoa = raycaster.intersectObjects(interior.hitPessoas, true)[0];
+      const quadro = raycaster.intersectObjects(interior.hitQuadros ?? [], false)[0];
+      const pessoa = raycaster.intersectObjects(interior.hitPessoas ?? [], true)[0];
       if (pessoa && (!quadro || pessoa.distance <= quadro.distance)) return { inspect: pessoa.object.userData.inspectId, museu: true };
       if (quadro) return { quadro: quadro.object.userData.quadroId };
       const p = raycaster.ray.intersectPlane(groundPlane, v);
@@ -3107,7 +3452,7 @@ export function createVila(host, options) {
   }
 
   function onClick(ev) {
-    if (paused || cutscene.active || transicao || foco) return;
+    if (paused || cutscene.active || transicao || foco || corridaTrava()) return;
     const t = pick(ev);
     if (!t) return;
     // Personagem 3D ou mascote: abre a ficha sem andar até ele.
@@ -3209,7 +3554,8 @@ export function createVila(host, options) {
       }
     }
     const passoAntes = player.move;
-    if (!player.move && !paused && !cutscene.active && !transicao && !foco) {
+    // (Na pista, travado na espera, na contagem e depois da chegada.)
+    if (!player.move && !paused && !cutscene.active && !transicao && !foco && !corridaTrava()) {
       const want = held[held.length - 1] ?? player.tap;
       if (want && player.turnLock <= 0) {
         player.tap = null;
@@ -3235,14 +3581,17 @@ export function createVila(host, options) {
     // Não emendou: se vinha numa curva combinada, o resto dela vira desvio.
     if (passoAcabou?.saida) bike.desvio.subVectors(player.root.position, paraMundo(player.x, player.y));
     passoAcabou = null;
+    atualizarCorrida(dt);
     if (!player.move && !held.length && !player.path.length) {
       player.idle += dt;
       // Sentar para programar vira o jogador para a câmera (para baixo): não
       // senta de frente para alguém/uma mesa/uma saída nem quando embaixo há
       // um alvo, senão a dica "Espaço: …" (e o alvo do Espaço) mudaria sem o
       // jogador ter feito nada.
+      // (Montado nunca: na largada da pista ele ficaria de notebook na bike.)
       if (
         !coding &&
+        !bike.on &&
         !cutscene.active &&
         !transicao &&
         !foco &&
@@ -3258,8 +3607,9 @@ export function createVila(host, options) {
       portaFechando.t += dt;
       fecharPortaAtras();
     }
-    // Prédio, elevador, porta ou cena: desce da bicicleta.
-    if (bike.on && (noPredio() || cutscene.active || transicao)) desmontar();
+    // Prédio, elevador, porta ou cena: desce da bicicleta (na pista e na íris
+    // de ida e volta dela, não).
+    if (bike.on && ((noPredio() && !naPista()) || cutscene.active || (transicao && transicao.modo !== "pista"))) desmontar();
     const emPasso = Boolean(player.move) || andandoSozinho;
     if (emPasso && !walking) startWalk();
     else if (!emPasso && walking) stopWalk();
@@ -3396,6 +3746,9 @@ export function createVila(host, options) {
     // Sol, frustum de sombra e névoa acompanham a câmera; render (com ou sem
     // pós-processamento) fica no módulo de iluminação.
     avancarPreparoVila();
+    // Convite da pista aberto (api.prepararPista): compila e sobe texturas
+    // com a Vila na tela; o render fora da tela fica para o escuro da íris.
+    if (preparo?.id === "pista" && !transicao) avancarPreparo(false);
     if (capa) return;
     lighting.update(camTarget, camFar);
     lighting.render(ts);
@@ -3403,6 +3756,7 @@ export function createVila(host, options) {
 
   const vPos = new THREE.Vector3();
   const vLook = new THREE.Vector3();
+  const vAlvoCam = new THREE.Vector3();
   // Itens e cristal de quest do interior atual; "perto" de quem dá a quest
   // aqui dentro (o Rafa da Galeria), como os walkers fazem na Vila.
   // Quem dá a quest num interior (`q.local`): fora de lá, não está "perto".
@@ -3449,7 +3803,10 @@ export function createVila(host, options) {
     const pose = foco ? interior.pose(foco) : null;
     if (pose) cameraDoQuadro(pose, vPos, vLook);
     else {
-      camTarget.lerp(player.root.position, reducedMotion ? 1 : 1 - Math.exp(-dt * 6));
+      // Na pista: mais afastada e adiantada na direção do movimento.
+      vAlvoCam.copy(player.root.position);
+      if (naPista()) adiantarCameraPista(dt, vAlvoCam);
+      camTarget.lerp(vAlvoCam, reducedMotion ? 1 : 1 - Math.exp(-dt * 6));
       vLook.set(camTarget.x, camTarget.y + 0.4, camTarget.z);
       // Dolly do elevador: chega perto com o jogador na cabine e volta. Na
       // saída, recua numa curva suave (começa e termina parada) até o "seguir".
@@ -3459,7 +3816,8 @@ export function createVila(host, options) {
         zoomElevador = dollyVolta.de + (zoomElevadorAlvo - dollyVolta.de) * k * k * (3 - 2 * k);
         if (k >= 1) dollyVolta = null;
       } else zoomElevador = reducedMotion ? 1 : zoomElevador + (zoomElevadorAlvo - zoomElevador) * (1 - Math.exp(-dt * 2.4));
-      vPos.copy(camTarget).addScaledVector(CAM_OFFSET, (camera.userData.far || 1) * MUSEU_ZOOM * userZoom * zoomElevador);
+      const zoomLocal = naPista() ? (interior.zoom ?? PISTA_ZOOM) : MUSEU_ZOOM;
+      vPos.copy(camTarget).addScaledVector(CAM_OFFSET, (camera.userData.far || 1) * zoomLocal * userZoom * zoomElevador);
     }
     if (voltaDoFoco > 0) voltaDoFoco -= dt;
     const suave = Boolean(pose) || voltaDoFoco > 0;
@@ -3477,7 +3835,7 @@ export function createVila(host, options) {
   }
 
   renderer.setAnimationLoop(tick);
-  window.__vilaDbg = { get local() { return local; }, get interior() { return interior; }, player, occupied, passable, pedro, walkers, map, epocas, get paused() { return paused; }, get cut() { return cutscene.active; }, bike, liberarBike() { bikeLiberada = true; } }; // TEMP-HOOK
+  window.__vilaDbg = { get local() { return local; }, get interior() { return interior; }, player, occupied, passable, pedro, walkers, map, epocas, get paused() { return paused; }, get cut() { return cutscene.active; }, bike, liberarBike() { bikeLiberada = true; }, entrarPista: () => api.entrarPista(), api, get corrida() { return corrida; }, espiarCorrida(fn) { espiaCorrida = fn; } }; // TEMP-HOOK
   reportFacing();
   prepararVila();
   onReady();

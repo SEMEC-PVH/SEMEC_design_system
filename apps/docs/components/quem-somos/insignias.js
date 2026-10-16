@@ -4,14 +4,17 @@
 // ganha uma Stack (scene/cutscene.js, passo emblem).
 //
 // ids: Stacks dos ginásios (batalha/dados.js, CHEFES[].stack.id) e as
-// especiais das quests (quest.js e quests-coleta.js, recompensa.id).
+// especiais das quests (quest.js e quests-coleta.js, recompensa.id) e a
+// "pedal", da corrida da Pista (corrida.js, medalha de ouro).
+
+import { METAS } from "./corrida";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 // ?v=: troca quando as imagens mudam (o navegador guardava a versão antiga).
 const VERSAO = 2;
 
-export const INSIGNIAS = ["front", "back", "dados", "ia", "full", "ocarina", "sabedoria", "comunicacao", "acessibilidade"];
+export const INSIGNIAS = ["front", "back", "dados", "ia", "full", "ocarina", "sabedoria", "comunicacao", "acessibilidade", "pedal"];
 
 export const urlInsignia = (id) =>
   INSIGNIAS.includes(id) ? `${basePath}/quem-somos/insignias/${id}.webp?v=${VERSAO}` : null;
@@ -99,5 +102,14 @@ export const FICHAS_INSIGNIAS = {
     forma: "Octógono azul com tecla de teclado, olho e anel de foco",
     comoGanhar: "Corrija os 6 bugs de acessibilidade da quest do Rafa, na Galeria da Equipe.",
     oQueE: "Tela que todo mundo usa: contraste, foco visível, texto alternativo, links claros e rótulos nos campos. No Design System, o WCAG 2.1 AA é regra, não enfeite.",
+  },
+  pedal: {
+    numero: 10,
+    nome: "Stack do Pedal",
+    grupo: "especial",
+    cor: "green-700",
+    forma: "Medalhão verde com roda de bicicleta e bandeira quadriculada",
+    comoGanhar: `Faça o circuito da Pista em menos de ${Math.round(METAS.ouro / 1000)} s (medalha de ouro).`,
+    oQueE: "Constância vence pressa: duas voltas sem pular checkpoint, ritmo do começo ao fim. Como entregar sistema — cada etapa na ordem, sem atalho.",
   },
 };

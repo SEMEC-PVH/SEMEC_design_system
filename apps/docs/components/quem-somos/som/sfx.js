@@ -54,6 +54,9 @@ function tom(c, saida, t, { f, ate, dur = 0.12, vol = 0.3, forma = "sine", ataqu
 function sopro(c, saida, t, { dur = 0.06, vol = 0.25, tipo = "bandpass", f = 1800, ate, q = 1, ataque = 0.002 }) {
   const s = c.createBufferSource();
   s.buffer = ruido();
+  // O buffer tem 1 s e começa num ponto sorteado: em laço, sopros longos
+  // (torcida, whoosh) não acabam no meio.
+  s.loop = true;
   s.playbackRate.value = r(0.9, 1.1);
   const fl = c.createBiquadFilter();
   fl.type = tipo;
@@ -193,6 +196,64 @@ const SONS = {
   },
   // Oficina da bicicleta: bomba de ar "psss" e aperto de chave.
   bomba: (c, s, t) => sopro(c, s, t, { dur: 0.32, vol: 0.12, tipo: "highpass", f: 2200, ate: 4800, q: 0.7, ataque: 0.03 }),
+
+  // ---- Corrida da Pista -----------------------------------------------------------
+  // Contagem 3-2-1: bipe médio de semáforo de largada (sempre a mesma altura,
+  // como no kart: quem sobe é o "JÁ!").
+  contagem: (c, s, t) => {
+    tom(c, s, t, { f: hz("A4"), dur: 0.2, vol: 0.16, forma: 0.25, filtro: 3200, ataque: 0.003 });
+    tom(c, s, t, { f: hz("A5"), dur: 0.12, vol: 0.04, forma: "sine" });
+  },
+  // Largada: bipe agudo longo (uma oitava acima) + whoosh de arrancada.
+  largada: (c, s, t) => {
+    tom(c, s, t, { f: hz("A5"), dur: 0.6, vol: 0.16, forma: 0.25, filtro: 4200, ataque: 0.003, eco: 0.2 });
+    tom(c, s, t, { f: hz("A6"), dur: 0.35, vol: 0.04, forma: "sine" });
+    sopro(c, s, t + 0.05, { dur: 0.55, vol: 0.14, f: 450, ate: 3200, q: 0.9, ataque: 0.18 });
+  },
+  // Checkpoint: "plim" que sobe e brilha; cada checkpoint um degrau acima na
+  // escala maior (opts.i = índice, 0 o primeiro).
+  checkpoint: (c, s, t, { i = 0 } = {}) => {
+    const ESCALA = [0, 2, 4, 7, 9, 12, 14, 16];
+    const base = semitom(hz("C6"), ESCALA[Math.max(0, i) % ESCALA.length] + 12 * Math.floor(Math.max(0, i) / ESCALA.length));
+    tom(c, s, t, { f: base / 2, ate: base, dur: 0.08, vol: 0.1, forma: "triangle" });
+    tom(c, s, t + 0.05, { f: base, dur: 0.22, vol: 0.12, forma: 0.25, filtro: 6000, eco: 0.3 });
+    sino(c, s, t + 0.06, base * 2, { dur: 0.5, vol: 0.05, eco: 0.45 });
+  },
+  // Volta completa: mini fanfarra (tercinas e acorde curto).
+  volta: (c, s, t) => {
+    arpejo(c, s, t, ["G5", "G5", "G5"], 0.075, { dur: 0.07, vol: 0.11, forma: 0.25, filtro: 4500 });
+    for (const n of ["C5", "E5", "G5", "C6"]) tom(c, s, t + 0.24, { f: hz(n), dur: 0.5, vol: 0.06, forma: 0.25, filtro: 4000, eco: 0.3 });
+    tom(c, s, t + 0.24, { f: hz("C3"), dur: 0.3, vol: 0.12, forma: "triangle" });
+  },
+  // Chegada: fanfarra de pódio + sino de bandeirada.
+  chegada: (c, s, t) => {
+    arpejo(c, s, t, ["G4", "C5", "E5", "G5"], 0.09, { dur: 0.14, vol: 0.11, forma: 0.25, filtro: 4500 });
+    tom(c, s, t + 0.38, { f: hz("E5"), dur: 0.14, vol: 0.11, forma: 0.25, filtro: 4500 });
+    tom(c, s, t + 0.5, { f: hz("G5"), dur: 0.14, vol: 0.11, forma: 0.25, filtro: 4500 });
+    for (const n of ["C5", "E5", "G5", "C6", "E6"]) tom(c, s, t + 0.64, { f: hz(n), dur: 1.3, vol: 0.055, forma: 0.25, filtro: 3800, eco: 0.4 });
+    tom(c, s, t + 0.64, { f: hz("C3"), dur: 0.9, vol: 0.14, forma: "triangle" });
+    sino(c, s, t + 0.66, hz("C7"), { dur: 1.6, vol: 0.1 });
+    sino(c, s, t + 0.9, hz("G6"), { dur: 1.3, vol: 0.06 });
+  },
+  // Novo recorde: arpejo festivo de duas oitavas, com eco e faísca no topo.
+  recorde: (c, s, t) => {
+    arpejo(c, s, t, ["C5", "E5", "G5", "C6", "E6", "G6", "C7"], 0.06, { dur: 0.3, vol: 0.08, forma: "triangle", eco: 0.5 });
+    arpejo(c, s, t + 0.03, ["G4", "C5", "E5", "G5", "C6", "E6", "G6"], 0.06, { dur: 0.2, vol: 0.04, forma: 0.25, filtro: 5000 });
+    sino(c, s, t + 0.44, hz("E7"), { dur: 1.1, vol: 0.07 });
+    for (let k = 0; k < 5; k++) tom(c, s, t + 0.5 + k * r(0.05, 0.09), { f: r(3200, 5200), dur: 0.06, vol: 0.03, forma: "sine", eco: 0.4 });
+  },
+  // Torcida: chiado de público que cresce e cai (~1,5 s) com palmas soltas
+  // por cima, mais densas no meio.
+  torcida: (c, s, t) => {
+    sopro(c, s, t, { dur: 1.5, vol: 0.09, f: 1100, q: 0.5, ataque: 0.55 });
+    sopro(c, s, t + 0.1, { dur: 1.35, vol: 0.05, tipo: "lowpass", f: 600, q: 0.4, ataque: 0.5 });
+    for (let k = 0; k < 46; k++) {
+      // Distribuição em sino: mais palmas perto de 0,6 s.
+      const d = ((Math.random() + Math.random() + Math.random()) / 3) * 1.4;
+      const forca = 1 - Math.abs(d - 0.6) / 0.9;
+      sopro(c, s, t + d, { dur: r(0.015, 0.035), vol: 0.05 * Math.max(0.25, forca), f: r(1400, 2800), q: r(1.2, 2.5), ataque: 0.001 });
+    }
+  },
 
   // ---- Batalha ------------------------------------------------------------------
   golpe: (c, s, t) => {

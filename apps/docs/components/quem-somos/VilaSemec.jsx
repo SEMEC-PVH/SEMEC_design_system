@@ -6,6 +6,9 @@ import TitleScreen from "./TitleScreen";
 import TelaCarregamento from "./TelaCarregamento";
 import OficinaBike from "./OficinaBike";
 import CorrigirBug from "./CorrigirBug";
+import CorridaHud from "./CorridaHud";
+import ResultadoCorrida from "./ResultadoCorrida";
+import { assinarCorrida, formatarTempo, lerCorrida, lerCorridaServidor, reiniciarCorrida, salvarResultado } from "./corrida";
 import { assinarBicicleta, lerBicicleta, salvarBicicleta } from "./bicicleta";
 import { arquivoDoJogador, lerJogadorSalvo, salvarJogador } from "./EscolhaPersonagem";
 import FullscreenButton from "./FullscreenButton";
@@ -171,6 +174,11 @@ export default function VilaSemec({ members }) {
   // Montado na bicicleta (o motor avisa; tecla B, botão do HUD ou do toque).
   // A bicicleta só vale depois da oficina do bicicletário (bicicleta.js).
   const [naBike, setNaBike] = useState(false);
+  // Corrida na Pista (corrida.js, CorridaHud, ResultadoCorrida): o motor manda
+  // os eventos (onCorrida); aqui fica o que o HUD mostra.
+  const [corrida, setCorrida] = useState(null); // { fase, n, inicio, tempo, volta, voltas, checkpoint, total }
+  const placarCorrida = useSyncExternalStore(assinarCorrida, lerCorrida, lerCorridaServidor);
+  const onCorridaRef = useRef(null);
   // Som (som/): preferência "tudo" | "efeitos" | "desligado". O áudio só
   // destrava no 1º clique/tecla (regra dos navegadores); aí a trilha entra.
   const somPref = useSyncExternalStore(assinarSom, lerSom, () => "tudo");
@@ -398,6 +406,7 @@ export default function VilaSemec({ members }) {
                   avancarQuest("nova");
                   reiniciarColetas();
                   salvarBicicleta(false);
+                  reiniciarCorrida();
                   setDialog({
                     pages: [
                       {
@@ -916,8 +925,27 @@ export default function VilaSemec({ members }) {
   const abrirBicicletario = useCallback(() => {
     const title = "Bicicletário da Vila";
     if (lerBicicleta()) {
+      // Com a bicicleta: convite para a corrida na Pista (já aquece o mapa).
+      engineRef.current?.prepararPista?.();
+      const rec = lerCorrida().recorde;
       setDialog({
-        pages: [{ title, text: "Aqui ficam as bicicletas da Vila. A sua já está com você: use o botão da bicicleta no HUD ou aperte B." }],
+        pages: [
+          {
+            title,
+            text: `Pronto para correr? A Pista tem 2 voltas: passe pelos arcos em ordem e cruze a chegada no menor tempo. Ouro dá a Stack do Pedal!${rec ? ` Seu recorde: ${formatarTempo(rec)}.` : ""}`,
+            actions: [
+              {
+                label: "Correr no circuito",
+                primary: true,
+                onSelect: () => {
+                  setDialog(null);
+                  engineRef.current?.entrarPista?.();
+                },
+              },
+              { label: "Agora não", onSelect: dismiss },
+            ],
+          },
+        ],
         page: 0,
       });
       return;
@@ -952,6 +980,45 @@ export default function VilaSemec({ members }) {
     setModal(null);
     setDialog({ pages: [{ title: "Bug corrigido!", text: `${item.onde}: agora está acessível. ${resto}` }], page: 0 });
   }, [modal, aplicarColeta]);
+
+  // Eventos da corrida (vila-engine.js, onCorrida).
+  useEffect(() => {
+    onCorridaRef.current = (ev) => {
+      if (ev.tipo === "entrou") {
+        setCorrida({ fase: "contagem", n: 3, volta: 1, voltas: ev.voltas ?? 2, checkpoint: 0, total: ev.total ?? 0 });
+      } else if (ev.tipo === "contagem") {
+        setCorrida((c) => ({ ...(c ?? {}), fase: "contagem", n: ev.n, volta: 1, checkpoint: 0, voltas: ev.voltas ?? c?.voltas ?? 2, total: ev.total ?? c?.total ?? 0 }));
+      } else if (ev.tipo === "largada") {
+        setCorrida((c) => ({ ...c, fase: "correndo", inicio: ev.inicio }));
+      } else if (ev.tipo === "checkpoint") {
+        setCorrida((c) => ({ ...c, checkpoint: ev.i + 1, total: ev.total ?? c.total, volta: ev.volta ?? c.volta }));
+      } else if (ev.tipo === "volta") {
+        // Fechou uma volta: zera as bolinhas (na última, ficam todas cheias).
+        setCorrida((c) => {
+          const voltas = ev.voltas ?? c.voltas;
+          return ev.volta >= voltas ? { ...c, voltas, checkpoint: c.total } : { ...c, voltas, volta: ev.volta + 1, checkpoint: 0 };
+        });
+      } else if (ev.tipo === "chegada") {
+        setCorrida((c) => ({ ...c, fase: "fim", tempo: ev.tempo }));
+        const res = salvarResultado(Math.round(ev.tempo));
+        setTimeout(() => {
+          if (res.novoRecorde) tocar("recorde");
+          if (res.ganhouStack) tocar("stack");
+          setModal({ tipo: "corrida", ...res });
+        }, 1600);
+      } else if (ev.tipo === "saiu") {
+        setCorrida(null);
+      }
+    };
+  }, []);
+  const correrDeNovo = useCallback(() => {
+    setModal(null);
+    engineRef.current?.correrDeNovo?.();
+  }, []);
+  const sairDaPista = useCallback(() => {
+    setModal(null);
+    engineRef.current?.sairDaPista?.();
+  }, []);
 
   const concluirOficina = useCallback(() => {
     tocar("stack");
@@ -1057,6 +1124,7 @@ export default function VilaSemec({ members }) {
             tocar(on ? "campainha" : "bike-desce");
           },
           onSom: (nome, opts) => tocar(nome, opts),
+          onCorrida: (ev) => onCorridaRef.current?.(ev),
           bicicletaLiberada: lerBicicleta(),
           onPreparo: setPreparo,
           carregando: true,
@@ -1481,7 +1549,7 @@ export default function VilaSemec({ members }) {
   const questConcluida = questEtapa === "concluida";
   const naVila = local === "vila";
   // Trilha: título → Vila / prédio → batalha; nada durante o carregamento.
-  const faixa = carregandoTudo ? null : !started ? "titulo" : modal?.tipo === "batalha" ? "batalha" : naVila ? "vila" : "predio";
+  const faixa = carregandoTudo ? null : !started ? "titulo" : modal?.tipo === "batalha" ? "batalha" : local === "pista" ? "corrida" : naVila ? "vila" : "predio";
   useEffect(() => {
     faixaRef.current = faixa;
     tocarMusica(somPref === "tudo" ? faixa : null);
@@ -1496,6 +1564,7 @@ export default function VilaSemec({ members }) {
       const r = QUESTS_COLETA[id].recompensa;
       return { id: r.id, nome: r.nome, ok: coletas[id].etapa === "concluida" };
     }),
+    { id: "pedal", nome: "Stack do Pedal", ok: placarCorrida.medalhas.ouro > 0 },
   ];
   // Quests de coleta: mesma regra, por quest.
   const mostrarColeta = (id) =>
@@ -1577,8 +1646,8 @@ export default function VilaSemec({ members }) {
 
       {started && !cena && !quadroAberto && (
         <div className="vila-hud vila-hud--top">
-          <div className="vila-panel vila-title">
-            <h1 id="vila-titulo">{naVila ? "Quem Somos" : naGaleria ? "Galeria da Equipe" : andarAtual?.nome}</h1>
+          <div className="vila-panel vila-title" data-oculto={local === "pista" || undefined}>
+            <h1 id="vila-titulo">{naVila ? "Quem Somos" : local === "pista" ? "Pista de Corrida" : naGaleria ? "Galeria da Equipe" : andarAtual?.nome}</h1>
             <p className="vila-counter">
               {naVila ? (
                 <>
@@ -1729,7 +1798,9 @@ export default function VilaSemec({ members }) {
             ? voltouDoPredio
               ? "Você voltou para a Vila SEMEC, na frente da SEMFAZ."
               : ""
-            : naGaleria
+            : local === "pista"
+              ? "Você está na Pista de Corrida. Passe pelos arcos em ordem e cruze a chegada duas vezes. O portão do box leva de volta à Vila."
+              : naGaleria
               ? "Você está na Galeria da Equipe. Quadros nas paredes: aproxime-se e aperte Espaço para ver. O elevador fica ao sul."
               : `Você está no ${andarAtual?.rotulo}, ${andarAtual?.nome}. Aproxime-se de uma mesa e aperte Espaço para conhecer quem chefia cada setor. O elevador fica ao norte.`}
       </p>
@@ -1926,6 +1997,33 @@ export default function VilaSemec({ members }) {
 
       {ficha && <FichaPersonagem id={ficha} onClose={fecharFicha} onChange={setFicha} />}
 
+      {corrida && local === "pista" && !cena && (
+        <CorridaHud
+          fase={corrida.fase}
+          n={corrida.n}
+          inicio={corrida.inicio}
+          tempo={corrida.tempo}
+          volta={corrida.volta}
+          voltas={corrida.voltas}
+          checkpoint={corrida.checkpoint}
+          totalCheckpoints={corrida.total}
+          recorde={placarCorrida.recorde}
+          reducedMotion={movimentoReduzido}
+        />
+      )}
+      {modal?.tipo === "corrida" && (
+        <ModalJornada titulo="Resultado da corrida" onFechar={correrDeNovo}>
+          <ResultadoCorrida
+            tempo={modal.tempo}
+            recorde={modal.recorde}
+            novoRecorde={modal.novoRecorde}
+            medalha={modal.medalha}
+            ganhouStack={modal.ganhouStack}
+            onDeNovo={correrDeNovo}
+            onSair={sairDaPista}
+          />
+        </ModalJornada>
+      )}
       {modal?.tipo === "bug" && (
         <ModalJornada titulo={`Bug: ${modal.item.onde}`} onFechar={fecharModal}>
           <CorrigirBug key={modal.item.id} item={modal.item} onCorrigido={bugCorrigido} />

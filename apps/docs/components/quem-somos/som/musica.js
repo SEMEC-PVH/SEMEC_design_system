@@ -4,7 +4,7 @@
 //   baixo    triângulo, tônica e oitava em colcheias;
 //   arpejo   pulso 12,5% bem baixinho, acorde em semicolcheias;
 //   bateria  bumbo (seno que despenca), caixa (ruído) e chimbal (tic agudo).
-// Faixas: "titulo", "vila", "predio" e "batalha"; trocar faz crossfade de
+// Faixas: "titulo", "vila", "predio", "batalha" e "corrida"; trocar faz crossfade de
 // ~1,2 s e a nova entra no começo de um compasso.
 //
 // Notação de cada compasso: `acorde` (notas do acorde, a 1ª é a tônica do
@@ -70,6 +70,30 @@ const FAIXAS = {
       C(["F2", "A3", "C4", "F4"], "C6 . B5 A5 G5 . F5 ."),
       C(["G2", "B3", "D4", "G4"], "D6 . C6 B5 A5 . G5 ."),
       C(["E2", "G#3", "B3", "E4"], "B5 . . . E6 . . ."),
+    ],
+  },
+  // Corrida da Pista: Ré maior, 160 bpm, bateria cheia; melodia que "corre"
+  // em colcheias e sobe no refrão (A + B, 16 compassos).
+  corrida: {
+    bpm: 160,
+    bateria: "cheia",
+    compassos: [
+      C(["D3", "F#4", "A4", "D5"], "D5 . A4 F#4 A4 D5 E5 F#5"),
+      C(["A2", "C#4", "E4", "A4"], "E5 . C#5 A4 C#5 E5 . -"),
+      C(["B2", "D4", "F#4", "B4"], "F#5 . D5 B4 D5 F#5 G5 F#5"),
+      C(["G2", "B3", "D4", "G4"], "E5 . D5 . B4 . A4 ."),
+      C(["D3", "F#4", "A4", "D5"], "D5 . A4 F#4 A4 D5 E5 F#5"),
+      C(["A2", "C#4", "E4", "A4"], "G5 . F#5 E5 C#5 . A4 ."),
+      C(["G2", "B3", "D4", "G4"], "B4 . D5 . G5 . F#5 E5"),
+      C(["A2", "C#4", "E4", "A4"], "E5 . . . A5 . - -"),
+      C(["G2", "B3", "D4", "G4"], "D5 B4 D5 G5 . F#5 G5 ."),
+      C(["A2", "C#4", "E4", "A4"], "E5 C#5 E5 A5 . G5 F#5 ."),
+      C(["F#2", "A3", "C#4", "F#4"], "F#5 . E5 C#5 A4 . C#5 ."),
+      C(["B2", "D4", "F#4", "B4"], "D5 . F#5 . B5 . A5 ."),
+      C(["G2", "B3", "D4", "G4"], "G5 . F#5 . E5 . D5 ."),
+      C(["E2", "G3", "B3", "E4"], "E5 . G5 . B5 . G5 ."),
+      C(["A2", "C#4", "E4", "A4"], "A5 . G5 F#5 E5 . C#5 ."),
+      C(["D3", "F#4", "A4", "D5"], "D5 . . . A4 . D5 ."),
     ],
   },
 };

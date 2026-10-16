@@ -2369,6 +2369,12 @@ footer {
   }
 }
 
+/* Na Pista, o painel de título some (o HUD da corrida ocupa o topo), mas
+   guarda o lugar: os botões da direita não escorregam para o meio. */
+.vila-title[data-oculto] {
+  visibility: hidden;
+}
+
 /* Bicicleta (conquistada na oficina do bicicletário): acima da StackDex.
    Paleta fixa como a da StackDex: gray-950 sobre yellow-400 ≈ 13:1; montado
    (aria-pressed), white sobre blue-700 ≈ 7:1. */

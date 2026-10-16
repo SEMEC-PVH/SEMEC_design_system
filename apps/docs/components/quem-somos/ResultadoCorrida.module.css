@@ -1,0 +1,233 @@
+/* Resultado da corrida da Pista. Cartão de paleta fixa (claro nos dois
+   temas, como a OficinaBike), só tokens --pv-*. Contraste:
+   gray-950 sobre white ≈ 19:1; gray-700 sobre white ≈ 10:1;
+   blue-950 sobre white ≈ 16:1 (tempo); green-800 sobre green-50 ≈ 6,4:1;
+   gray-950 sobre yellow-400 ≈ 13:1 (selo da Stack);
+   white sobre blue-700 ≈ 7:1 (botão principal);
+   foco gray-950 sobre white ≈ 19:1. As medalhas são decorativas (o nome vai
+   em texto); mesmo assim os contornos escuros passam de 3:1 sobre white. */
+
+.resultado {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-width: min(26rem, 100%);
+  padding: 1rem;
+  border: 3px solid var(--pv-gray-950);
+  border-radius: var(--radius-md);
+  color: var(--pv-gray-950);
+  background: var(--pv-white);
+  box-sizing: border-box;
+}
+.resultado p {
+  margin: 0;
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.medalhaNome {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pv-gray-700);
+}
+.tempo {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--pv-blue-950);
+}
+
+/* Medalha: cores por data-medalha (tokens). */
+.medalha {
+  --fita-a: var(--pv-blue-700);
+  --fita-b: var(--pv-red-600);
+  --disco: var(--pv-gray-200);
+  --aro: var(--pv-gray-300);
+  --borda: var(--pv-gray-600);
+  --estrela: var(--pv-white);
+  flex: none;
+  width: 4.5rem;
+  height: 5.625rem;
+}
+.medalha[data-tamanho="pequena"] {
+  width: 1.5rem;
+  height: 1.875rem;
+}
+.medalha[data-medalha="ouro"] {
+  --disco: var(--pv-yellow-500);
+  --aro: var(--pv-yellow-400);
+  --borda: var(--pv-yellow-800);
+  --estrela: var(--pv-white);
+}
+.medalha[data-medalha="prata"] {
+  --disco: var(--pv-gray-300);
+  --aro: var(--pv-gray-100);
+  --borda: var(--pv-gray-600);
+  --estrela: var(--pv-white);
+}
+.medalha[data-medalha="bronze"] {
+  --disco: var(--pv-yellow-800);
+  --aro: var(--pv-yellow-600);
+  --borda: var(--pv-gray-900);
+  --estrela: var(--pv-yellow-400);
+}
+.medalha[data-medalha="nenhuma"] {
+  --fita-a: var(--pv-gray-400);
+  --fita-b: var(--pv-gray-300);
+  --disco: var(--pv-gray-100);
+  --aro: var(--pv-gray-100);
+  --borda: var(--pv-gray-400);
+  --estrela: var(--pv-gray-300);
+}
+.fitaA,
+.fitaB,
+.disco,
+.aro,
+.estrela {
+  stroke: var(--borda);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+.fitaA {
+  fill: var(--fita-a);
+}
+.fitaB {
+  fill: var(--fita-b);
+}
+.disco {
+  fill: var(--disco);
+}
+.aro {
+  fill: var(--aro);
+  stroke-width: 1.5;
+}
+.estrela {
+  fill: var(--estrela);
+  stroke-width: 2;
+}
+
+/* Conquistas: novo recorde e Stack do Pedal. */
+.conquistas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.conquistas li {
+  padding: 0.3rem 0.75rem;
+  border: 2px solid var(--pv-gray-950);
+  border-radius: 999px;
+  font-weight: 700;
+}
+.novoRecorde {
+  color: var(--pv-green-800);
+  background: var(--pv-green-50);
+}
+.stack {
+  background: var(--pv-yellow-400);
+}
+
+.linha {
+  font-size: var(--font-size-sm);
+}
+.linha:empty {
+  display: none;
+}
+
+.metas {
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--pv-gray-200);
+  border-radius: var(--radius-md);
+  background: var(--pv-gray-50);
+}
+.metasTitulo {
+  margin-bottom: 0.35rem;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pv-gray-700);
+}
+.metas ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+.metas li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.1rem 0.4rem 0.1rem 0.15rem;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+}
+.metas li[data-ganhou] {
+  border-color: var(--pv-gray-950);
+  background: var(--pv-white);
+  font-weight: 700;
+}
+
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 0.2rem;
+}
+.principal,
+.secundario {
+  min-width: 10rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.2rem;
+  border: 3px solid var(--pv-gray-950);
+  border-bottom-width: 6px;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.principal {
+  font-size: var(--font-size-lg);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pv-white);
+  background: var(--pv-blue-700);
+}
+.principal:hover {
+  background: var(--pv-blue-800);
+}
+.secundario {
+  color: var(--pv-gray-950);
+  background: var(--pv-white);
+}
+.secundario:hover {
+  background: var(--pv-gray-100);
+}
+.principal:focus-visible,
+.secundario:focus-visible {
+  outline: 3px solid var(--pv-gray-950);
+  outline-offset: 3px;
+}
+
+@media (max-width: 30rem) {
+  .tempo {
+    font-size: var(--font-size-xl);
+  }
+  .principal,
+  .secundario {
+    flex: 1 1 100%;
+  }
+}
