@@ -5,6 +5,7 @@ import { checkMinimalBuild } from "./check-build.mjs";
 import { checkSmokeAndA11y } from "./check-smoke-a11y.mjs";
 import { checkOpenStates } from "./check-open-states.mjs";
 import { checkFormSubmit } from "./check-form-submit.mjs";
+import { checkLayoutA11y } from "./check-layout-a11y.mjs";
 
 console.log("=================================================");
 console.log("🛡️  SEMEC DS — Portão de Regressão e Qualidade (gate)");
@@ -29,6 +30,9 @@ try {
   console.log("");
 
   await checkFormSubmit();
+  console.log("");
+
+  await checkLayoutA11y();
   console.log("");
 
   const durationSec = ((Date.now() - startTime) / 1000).toFixed(2);
