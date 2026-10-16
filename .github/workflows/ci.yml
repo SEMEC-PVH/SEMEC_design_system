@@ -132,6 +132,10 @@ jobs:
         # Chama o workspace direto: o "build" da raiz repetiria o build:ds no prebuild.
         run: npm run build --workspace @semec/docs
 
+      - name: Aviso "Não publicado" nas páginas do site (TST-15)
+        # Com changesets pendentes, toda página exportada mostra o aviso; sem eles, nenhuma.
+        run: npm run check:release-banner --workspace @semec/docs
+
       - name: Verificar deriva dos artefatos de agentes
         run: |
           # build:ds e o prebuild do site regeneram llms.txt, llms-full.txt,
