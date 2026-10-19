@@ -1,0 +1,62 @@
+{
+  "name": "@semec/ds-css",
+  "version": "0.0.0",
+  "private": false,
+  "description": "Design System SEMEC em CSS puro: classes .semec-* geradas dos componentes React, para HTML, PHP e qualquer stack sem React.",
+  "type": "module",
+  "exports": {
+    "./components.css": {
+      "default": "./dist/components.css"
+    },
+    "./index.css": {
+      "default": "./dist/index.css"
+    },
+    "./dist/semec-ds.css": {
+      "default": "./dist/semec-ds.css"
+    },
+    "./classes.json": {
+      "default": "./dist/classes.json"
+    },
+    "./package.json": "./package.json"
+  },
+  "style": "./dist/semec-ds.css",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/build.mjs && node --test --test-concurrency=1 test/*.test.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@semec/ds-tokens": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SEMEC-PVH/SEMEC_design_system.git",
+    "directory": "packages/css"
+  },
+  "homepage": "https://semec-pvh.github.io/SEMEC_design_system/",
+  "bugs": {
+    "url": "https://github.com/SEMEC-PVH/SEMEC_design_system/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "design-system",
+    "css",
+    "semec",
+    "portovelho",
+    "acessibilidade"
+  ]
+}

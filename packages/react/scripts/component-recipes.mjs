@@ -50,6 +50,12 @@ export function readComponentClasses(pkgRoot, file) {
       if (!call || !ts.isCallExpression(call) || call.expression.getText(source) !== "cva") throw new Error(`CVA ausente: ${name}`);
       return evaluate(call.arguments[1], {}).variants;
     },
+    /** Função `cva` real do componente (usada pelo @semec/ds-css para resolver variantes). */
+    variantFunction(name) {
+      const call = declarations.get(name);
+      if (!call || !ts.isCallExpression(call) || call.expression.getText(source) !== "cva") throw new Error(`CVA ausente: ${name}`);
+      return evaluate(call, {});
+    },
     classes(component, index = 0, props = {}) {
       const attributes = [];
       const declaration = declarations.get(component);
