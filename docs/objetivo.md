@@ -17,7 +17,7 @@ O kit é **publicado no npm público** desde 17/09/2026 ([ADR-022](adr/0022-publ
 A versão não é escrita à mão neste documento. O bloco abaixo é gerado do `package.json` e dos changesets pendentes em `.changeset/` pelo `build-artifacts.mjs`, que roda no `npm run build:ds`. O histórico fica no [CHANGELOG](../packages/react/CHANGELOG.md), e a versão publicada de fato é a do npm (`npm view @semec/ds version`).
 
 <!-- ds:release:start -->
-Versão no repositório (`packages/react/package.json`): **4.2.0**. Há 3 changesets pendentes (minor): a próxima versão prevista é a **4.3.0**, e até ela sair o npm tem só a 4.2.0. Os artefatos para IA (llms.txt, manifest.json, .md por componente e skills) marcam esse conteúdo como "não publicado".
+Versão no repositório (`packages/react/package.json`): **4.3.0**. Há 1 changeset pendente (minor): a próxima versão prevista é a **4.4.0**, e até ela sair o npm tem só a 4.3.0. Os artefatos para IA (llms.txt, manifest.json, .md por componente e skills) marcam esse conteúdo como "não publicado".
 <!-- ds:release:end -->
 
 O site de documentação é publicado a cada push no `main`, antes do release no npm. Enquanto houver changesets pendentes, o `llms.txt`, o `manifest.json` (campo `unreleased`), os `.md` por componente e as skills avisam que esse conteúdo ainda não está no npm (TST-15).
