@@ -287,6 +287,29 @@ Primitivos `--pv-*` não geram utilitário desde a 4.0 (não há `bg-pv-*`).
 
 Link solto no texto (`<a>` sem `class`) é sublinhado pelo `tokens.css`; com classe, o sublinhado é do componente/utilitário (`underline`). Tokens de layout que aparecem no site de documentação (`--container-max`, `--measure`, `--control-height-*`, `data-density`) **não fazem parte do pacote**; use os utilitários do Tailwind indicados na skill `semec-ds` (seção "Responsive / Mobile").
 
+### Tokens como dados (sem React)
+
+O build gera `dist/tokens/tokens.json`, `tokens.js` e `tokens.d.ts` a partir do `:root` de `tokens.css`, que continua sendo a fonte de verdade. Os exports públicos são:
+
+```js
+import dtcg from "@semec/ds/tokens.json" with { type: "json" };
+import { tokens } from "@semec/ds/tokens";
+import { dsTokens } from "@semec/ds/lite/skills";
+
+const primary = tokens["action-primary"]; // valor CSS resolvido, sem var()
+const reference = dtcg.L1["action-primary"].$value; // {L0.pv-blue-600}
+const samePrimary = dsTokens.values["--action-primary"];
+const semanticNames = dsTokens.semantic; // todos os L1, incluindo pv-text/radius/leading/duration
+```
+
+O JSON segue [DTCG 2025.10](https://www.designtokens.org/tr/2025.10/format/), com grupos `L0`/`L1` e referências por caminho completo (`{L0.pv-blue-600}`). Cores usam sRGB; dimensões e durações têm valor e unidade; fontes, pesos, entrelinhas, curvas e sombras têm tipos próprios. Cada token preserva o CSS original em `$extensions["br.gov.portovelho.semec"].css` e o valor CSS resolvido em `.resolved`. O auxiliar `pv-gray-900-rgb` é uma cor sRGB no DTCG e mantém os canais no valor CSS; `elevation-0` é uma sombra transparente de dimensão zero (CSS `none`).
+
+- **Figma / Tokens Studio:** use `dist/tokens/tokens.json` como entrada de uma ferramenta ou integração compatível com DTCG 2025.10, mantendo os grupos e as referências. Versões que usam o formato legado precisam de conversão antes da importação.
+- **Mobile:** transforme as cores sRGB, dimensões (`px`/`rem`) e demais valores tipados para os recursos da plataforma. A conversão para Android/iOS e a escolha da base de `rem` ficam com o consumidor; o pacote ainda não gera XML ou Swift.
+- **Back-end, PDF e e-mail:** importe `tokens` em Node ou leia o JSON com a linguagem do serviço. Os valores em `tokens` e `dsTokens.values` são strings CSS resolvidas; não precisam de DOM, React ou Tailwind em execução.
+
+O catálogo lite mantém as listas `colors`, `semantic`, `typography`, `spacing`, `radii` e `elevation`, agora geradas e completas, e acrescenta `motion` e `values`. `colors` enumera nomes concretos em vez de padrões com `*`.
+
 ## Tema
 
 Os tokens do pacote (`tokens.css`) são tema **claro**. Não há `shadcn.css` no pacote (removido na 2.0.0).

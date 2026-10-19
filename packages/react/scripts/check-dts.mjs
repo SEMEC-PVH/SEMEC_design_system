@@ -133,6 +133,10 @@ const prompt: string = firstComponent ? dsPrompt(firstComponent) : "";
 const categoryKeys: string[] = [...dsCategories, ...liteCategories].map((c) => c.key);
 const portalHrefs: string[] = [...dsPortal.items, ...litePortal.items].map((i) => i.href);
 const semanticTokens: string[] = dsTokens.semantic;
+const primaryToken: string = dsTokens.values["--action-primary"];
+// @ts-expect-error nomes inexistentes não fazem parte dos tokens publicados
+const invalidToken = dsTokens.values["--token-inexistente"];
+void [primaryToken, invalidToken];
 // @ts-expect-error o código do componente é string, não número
 const wrongCode: number = bySlug?.code;
 

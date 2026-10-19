@@ -74,6 +74,8 @@ function arvoreTemporaria() {
   const pkg = path.join(root, "packages", "react");
   for (const rel of [
     "scripts/build-artifacts.mjs",
+    "scripts/build-tokens.mjs",
+    "scripts/token-data.mjs",
     "scripts/conflict-markers.mjs",
     "scripts/release-status.mjs",
     "manifest.js",
