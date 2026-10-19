@@ -107,7 +107,13 @@ O pacote traz a Poppins auto-hospedada (pesos 400, 500, 600 e 700, `font-display
 @import "@semec/ds/react/source.css";
 ```
 
-O `@font-face` usa a família `"Poppins"`, que é o nome que `--font-family-sans` já espera; não é preciso ajustar token. As URLs são relativas (`./fonts/Poppins-*.woff2`): `@tailwindcss/postcss` (Next.js) e `@tailwindcss/vite` reescrevem o caminho e o bundler copia os arquivos para o build. Com o `@tailwindcss/cli`, que não reescreve URL de CSS importado, importe `fonts.css` pelo JS (`import "@semec/ds/react/fonts.css";`) ou copie `dist/react/fonts/` para junto do CSS gerado.
+O `@font-face` usa a família `"Poppins"`, que é o nome que `--font-family-sans` já espera; não é preciso ajustar token. As URLs são relativas (`./fonts/Poppins-*.woff2`): `@tailwindcss/postcss` (Next.js) e `@tailwindcss/vite` reescrevem o caminho e o bundler copia os arquivos para o build. Com o `@tailwindcss/cli`, copie as fontes para junto do CSS gerado (por exemplo, `public/app.css`):
+
+```bash
+npx semec-ds copiar-fontes public
+```
+
+O comando cria o destino e copia `fonts.css` + `fonts/` (quatro pesos e licença OFL), substituindo arquivos de mesmo nome e preservando os demais. Funciona também para PHP, Flask e HTML estático: carregue `<link rel="stylesheet" href="/fonts.css">` ou coloque `fonts/` ao lado do CSS que incorporou os `@font-face`. Destinos com espaços devem ser passados entre aspas.
 
 Sem carregar a fonte, o texto cai no `system-ui` (Segoe UI no Windows) e o layout varia entre máquinas. Quem já usa `next/font/local` pode continuar: aponte o token para a variável gerada (`:root { --font-family-sans: var(--font-poppins), system-ui, -apple-system, sans-serif; }`, depois do `tokens.css`) e não importe `fonts.css`. Evite Google Fonts em sistemas da Prefeitura (rede externa).
 
