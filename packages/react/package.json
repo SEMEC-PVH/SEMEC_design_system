@@ -179,11 +179,10 @@
     "typescript-eslint": "^8.67.0",
     "vitest": "^5.0.4",
     "zod": "^4.6.2",
-    "zod3": "npm:zod@^3.25.76",
-    "postcss": "^8.5.23"
+    "zod3": "npm:zod@^3.25.76"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12"
   },
   "publishConfig": {
     "access": "public"
