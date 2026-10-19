@@ -8,6 +8,8 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 > Gerado para `@semec/ds@4.3.0` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
 
+> **Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (minor) que ainda não estão no npm. O @semec/ds@4.3.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.4.0. Confira a versão instalada com `npm ls @semec/ds`.**
+
 Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
 App em Vue, Angular, Svelte ou HTML sem React: use a skill lite (`@semec/ds/lite/skills/semec-ds-lite`), que traz só tokens, acessibilidade e padrões visuais.
@@ -16,7 +18,7 @@ App em Vue, Angular, Svelte ou HTML sem React: use a skill lite (`@semec/ds/lite
 
 ## Instalação
 
-Peer deps obrigatórios: `react ^19.0.0`, `react-dom ^19.0.0`, `tailwindcss ^4.0.0` e `lucide-react >=0.468.0 <2`. Peer **opcional**: `zod ^3.23.0 || ^4.0.0` (só se usar schemas em `@semec/ds/react/validacao`).
+Peer deps obrigatórios: `react ^18.3.0 || ^19.0.0`, `react-dom ^18.3.0 || ^19.0.0`, `tailwindcss ^4.0.0` e `lucide-react >=0.468.0 <2`. Peer **opcional**: `zod ^3.23.0 || ^4.0.0` (só se usar schemas em `@semec/ds/react/validacao`).
 
 ```bash
 npm install @semec/ds lucide-react   # pnpm add / yarn add: mesmos pacotes
@@ -144,7 +146,7 @@ O `@theme inline` do `tokens.css` gera utilitários para cor, espaçamento (`p-s
 | Sucesso em destaque (fundo cheio, texto 5,85:1) | `--feedback-success-emphasis` / `--text-on-success-emphasis` | `bg-success-emphasis text-success-emphasis-foreground` (nunca o verde cheio como texto: 2,13:1) |
 | Superfície colorida leve | `--tint` | `bg-tint` |
 
-**Armadilha (AUD-30):** **nunca** use `text-muted` nem `text-secondary` para texto: eles **compilam para a cor de fundo** `--surface-alt` (1,09:1, texto invisível), porque `--color-muted` e `--color-secondary` são cores de superfície no estilo shadcn. Use `text-text-muted`, `text-text-secondary` e `text-text-strong`.
+**Armadilha (AUD-30):** **não** use `text-muted` nem `text-secondary` para texto. Desde a 4.4.0 essas classes **não geram CSS** (o texto herda a cor do pai, sem aviso); até a 4.3 compilavam para a cor de fundo `--surface-alt` (1,09:1, texto invisível), porque `--color-muted` e `--color-secondary` são cores de superfície no estilo shadcn. Use `text-text-muted`, `text-text-secondary` e `text-text-strong`; `bg-muted` e `bg-secondary` continuam como fundos.
 
 **Espaçamento:** `--space-N` → `p-space-N`, `gap-space-N`, `mt-space-N` etc. (degraus 0, 1, 2, 3, 4, 6, 8, 12, 16). A escala do Tailwind continua valendo e tem os mesmos valores (`p-4` = `p-space-4` = 16px); use esses degraus no layout do app. Exceções do kit que devem ser preservadas: botão médio `px-5` (20px), botão pequeno `py-1.5` (6px) e `FormField` `gap-1.5` (6px).
 
@@ -809,6 +811,10 @@ Depreciado, sai na 5.0 (não gere código novo com isto):
 ## Arquivos para IA
 
 Publicados com o pacote: `@semec/ds/skills/llms.txt` (índice), `@semec/ds/skills/llms-full.txt` (dump completo), `@semec/ds/skills/manifest.json` (JSON), `@semec/ds/skills/components/<slug>.md` (um por componente) e esta skill (`@semec/ds/skills/semec-ds`). Site de documentação: https://semec-pvh.github.io/SEMEC_design_system/.
+
+## Anatomia sem React
+
+Para HTML, PHP, Vue ou outros ambientes sem React, consulte [Anatomia dos componentes (sem React)](https://semec-pvh.github.io/SEMEC_design_system/skills/semec-ds-lite/SKILL.md#anatomia-dos-componentes-sem-react) na skill lite. O campo `classes` do manifest full/lite contém as mesmas classes extraídas do TSX/CVA, HTML acessível e CSS puro com tokens. No pacote, a seção fica em `dist/lite/semec-ds-lite/SKILL.md`.
 
 ## Licença e crédito
 

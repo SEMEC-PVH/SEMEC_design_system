@@ -255,6 +255,8 @@ const defaultSidebarLabels: SidebarLabels = {
 };
 
 export interface SidebarProps extends React.ComponentProps<"div"> {
+  /** Impede interação e foco no painel, também no React 18. */
+  inert?: boolean;
   side?: "left" | "right";
   variant?: "sidebar" | "floating" | "inset";
   collapsible?: "offcanvas" | "icon" | "none";
@@ -303,6 +305,25 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
     const landmarkLabel =
       Landmark === "div" ? undefined : ariaLabelProp ?? l.navigation;
     const restoreFocusRef = React.useRef<HTMLElement | null>(null);
+    const inertPanelRef = React.useRef<HTMLDivElement | null>(null);
+    const hiddenOffcanvas = !isMobile && state === "collapsed" && collapsible === "offcanvas";
+    // React 18 descarta `inert` booleano no JSX. O ref aplica a propriedade
+    // antes do foco e reaplica quando o estado muda ou o painel é remontado.
+    const panelRef = React.useCallback((node: HTMLDivElement | null) => {
+      inertPanelRef.current = node;
+      if (node) node.inert = Boolean(inertProp ?? hiddenOffcanvas);
+      if (isMobile) mobilePanelRef.current = node;
+      if (isMobile || collapsible === "none") {
+        if (typeof ref === "function") ref(node);
+        else if (ref) ref.current = node;
+      }
+    }, [inertProp, hiddenOffcanvas, isMobile, collapsible, mobilePanelRef, ref]);
+    // O Radix pode manter o ref composto estável quando a prop muda.
+    React.useEffect(() => {
+      if (inertPanelRef.current) {
+        inertPanelRef.current.inert = Boolean(inertProp ?? hiddenOffcanvas);
+      }
+    }, [inertProp, hiddenOffcanvas]);
 
     const id = idProp ?? (panelId || undefined);
 
@@ -316,11 +337,10 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
     if (collapsible === "none") {
       return (
         <Landmark
-          ref={ref as React.Ref<HTMLDivElement>}
+          ref={panelRef}
           id={id}
           aria-label={landmarkLabel}
           data-sidebar="sidebar"
-          inert={inertProp}
           className={cn(
             "flex h-full w-[var(--sidebar-width)] min-w-0 flex-col bg-sidebar text-sidebar-foreground",
             className
@@ -344,17 +364,12 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
               className="fixed inset-0 z-40 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
             />
             <DialogPrimitive.Content
-              ref={(node) => {
-                mobilePanelRef.current = node;
-                if (typeof ref === "function") ref(node);
-                else if (ref) ref.current = node;
-              }}
+              ref={panelRef}
               id={id}
               aria-describedby={undefined}
               data-sidebar="sidebar"
               data-mobile="true"
               data-side={side}
-              inert={inertProp}
               onOpenAutoFocus={(event) => {
                 const active = document.activeElement;
                 restoreFocusRef.current =
@@ -422,7 +437,6 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
 
     // Recolhida em `offcanvas`, a barra fica fora da tela: sai da ordem de
     // Tab e da árvore de acessibilidade até ser reaberta.
-    const hiddenOffcanvas = state === "collapsed" && collapsible === "offcanvas";
 
     return (
       <div
@@ -446,7 +460,7 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
         <Landmark
           id={id}
           aria-label={landmarkLabel}
-          inert={inertProp ?? (hiddenOffcanvas || undefined)}
+          ref={panelRef}
           className={cn(
             "duration-base ease-standard fixed inset-y-0 z-10 hidden h-svh w-[var(--sidebar-width)] transition-[left,right,width] ease-linear md:flex",
             side === "left"

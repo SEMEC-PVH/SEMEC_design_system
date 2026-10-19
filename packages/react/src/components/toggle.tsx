@@ -5,8 +5,12 @@ import * as TogglePrimitive from "@radix-ui/react-toggle";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 
-const toggleVariants = cva(
+const toggleVariants: VariantFunction<{
+  variant: "default" | "outline";
+  size: "sm" | "md" | "lg";
+}> = cva(
   // TST-03: o estado ligado não pode depender de um cinza quase igual ao fundo
   // (antes `bg-accent`, 1,01:1). Ligado = fundo `tint` + contorno de 2px em
   // `primary` (borda + inset-ring de 1px), texto `foreground`:

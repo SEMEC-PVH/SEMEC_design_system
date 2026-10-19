@@ -10,37 +10,47 @@
   "exports": {
     "./react": {
       "types": "./dist/react/index.d.ts",
-      "import": "./dist/react/index.js"
+      "import": "./dist/react/index.js",
+      "default": "./dist/react/index.js"
     },
     "./react/validacao": {
       "types": "./dist/react/validacao.d.ts",
-      "import": "./dist/react/validacao.js"
+      "import": "./dist/react/validacao.js",
+      "default": "./dist/react/validacao.js"
     },
     "./react/tokens.css": "./dist/react/tokens.css",
+    "./react/styles.css": "./dist/react/styles.css",
     "./react/fonts.css": "./dist/react/fonts.css",
     "./react/fonts/*": "./dist/react/fonts/*",
     "./react/pv-preset": {
       "types": "./dist/react/pv-preset.d.ts",
-      "import": "./dist/react/pv-preset.js"
+      "import": "./dist/react/pv-preset.js",
+      "default": "./dist/react/pv-preset.js"
     },
     "./react/pv-preset.ts": "./pv-preset.ts",
     "./react/server": {
       "types": "./dist/react/server.d.ts",
-      "import": "./dist/react/server.js"
+      "import": "./dist/react/server.js",
+      "default": "./dist/react/server.js"
     },
     "./react/button-loading": null,
     "./react/*": {
       "types": "./dist/react/components/*.d.ts",
-      "import": "./dist/react/components/*.js"
+      "import": "./dist/react/components/*.js",
+      "default": "./dist/react/components/*.js"
     },
     "./skills": {
       "types": "./dist/skills/index.d.ts",
-      "import": "./dist/skills/index.js"
+      "import": "./dist/skills/index.js",
+      "default": "./dist/skills/index.js"
     },
     "./skills/llms.txt": "./dist/skills/llms.txt",
     "./skills/llms-full.txt": "./dist/skills/llms-full.txt",
     "./skills/manifest.json": "./dist/skills/manifest.json",
-    "./skills/manifest.js": "./dist/skills/manifest.js",
+    "./skills/manifest.js": {
+      "import": "./dist/skills/manifest.js",
+      "default": "./dist/skills/manifest.js"
+    },
     "./skills/components/*": "./dist/skills/components/*",
     "./skills/semec-ds": "./dist/skills/semec-ds/SKILL.md",
     "./skills/ds-semec-skill": "./dist/skills/semec-ds/SKILL.md",
@@ -48,18 +58,32 @@
     "./lite/fonts.css": "./dist/react/fonts.css",
     "./lite/pv-preset": {
       "types": "./dist/react/pv-preset.d.ts",
-      "import": "./dist/react/pv-preset.js"
+      "import": "./dist/react/pv-preset.js",
+      "default": "./dist/react/pv-preset.js"
     },
     "./lite/pv-preset.ts": "./pv-preset.ts",
     "./lite/skills": {
       "types": "./dist/lite/skills.d.ts",
-      "import": "./dist/lite/skills.js"
+      "import": "./dist/lite/skills.js",
+      "default": "./dist/lite/skills.js"
     },
     "./lite/skills/llms.txt": "./dist/lite/llms.txt",
     "./lite/skills/manifest.json": "./dist/lite/manifest.json",
     "./lite/skills/semec-ds-lite": "./dist/lite/semec-ds-lite/SKILL.md",
     "./lite/skills/ds-semec-skill": "./dist/lite/semec-ds-lite/SKILL.md",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./react/variables.css": "./dist/react/variables.css",
+    "./react/base.css": "./dist/react/base.css",
+    "./react/source.css": "./dist/react/source.css",
+    "./lite/variables.css": "./dist/react/variables.css",
+    "./lite/base.css": "./dist/react/base.css",
+    "./lite/source.css": "./dist/react/source.css",
+    "./tokens.json": "./dist/tokens/tokens.json",
+    "./tokens": {
+      "types": "./dist/tokens/tokens.d.ts",
+      "import": "./dist/tokens/tokens.js",
+      "default": "./dist/tokens/tokens.js"
+    }
   },
   "files": [
     "dist",
@@ -74,28 +98,32 @@
     "**/*.css"
   ],
   "scripts": {
-    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsup && node scripts/explicit-barrel.mjs && npm run build:types && node scripts/build-artifacts.mjs",
-    "build:react": "tsup && node scripts/explicit-barrel.mjs",
-    "build:types": "tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/fix-dts-extensions.mjs && node scripts/build-skills-types.mjs",
+    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && node scripts/build-tokens.mjs && tsup && node scripts/explicit-barrel.mjs && npm run build:css && npm run build:types && node scripts/build-artifacts.mjs",
+    "build:react": "node scripts/build-tokens.mjs && tsup && node scripts/explicit-barrel.mjs && npm run build:css",
+    "build:css": "tailwindcss -i scripts/styles.css -o dist/react/styles.css --minify",
+    "build:types": "node scripts/build-tokens.mjs && tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/fix-dts-extensions.mjs && node scripts/build-skills-types.mjs",
     "build:skills": "node scripts/build-artifacts.mjs",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit && tsc -p tsconfig.skills.json --noEmit",
+    "typecheck": "node scripts/build-tokens.mjs && tsc --noEmit && tsc -p tsconfig.skills.json --noEmit",
     "lint": "eslint src --max-warnings 0",
     "prepublishOnly": "npm run build",
     "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:csp": "node scripts/check-integracao-csp.mjs --browser",
-    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-barrel.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs && node scripts/check-integracao-csp.mjs && node scripts/check-artifact-examples.mjs"
+    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-barrel.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs && node scripts/check-css.mjs && node scripts/check-fonts.mjs && node scripts/check-styles.mjs && node scripts/check-preset.mjs && node scripts/check-tokens.mjs && node scripts/check-token-utilities.mjs && node scripts/check-component-recipes.mjs && node scripts/check-integracao-csp.mjs && node scripts/check-artifact-examples.mjs"
   },
   "peerDependencies": {
     "lucide-react": ">=0.468.0 <2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^18.3.0 || ^19.0.0",
+    "react-dom": "^18.3.0 || ^19.0.0",
     "tailwindcss": "^4.0.0",
     "zod": "^3.23.0 || ^4.0.0"
   },
   "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    },
     "zod": {
       "optional": true
     }
@@ -128,6 +156,8 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "@tailwindcss/node": "^4.3.3",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.3",
@@ -140,9 +170,10 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "jsdom": "^30.1.2",
     "lucide-react": "^1.38.0",
+    "postcss": "^8.5.23",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "tailwindcss": "^4.0.0",
+    "tailwindcss": "^4.3.3",
     "tsup": "^8.5.1",
     "typescript": "5.9.3",
     "typescript-eslint": "^8.67.0",
@@ -151,7 +182,7 @@
     "zod3": "npm:zod@^3.25.76"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12"
   },
   "publishConfig": {
     "access": "public"
@@ -174,5 +205,124 @@
     "shadcn",
     "semec",
     "portovelho"
-  ]
+  ],
+  "typesVersions": {
+    "*": {
+      "react": [
+        "./dist/react/index.d.ts"
+      ],
+      "react/validacao": [
+        "./dist/react/validacao.d.ts"
+      ],
+      "react/tokens.css": [
+        "./dist/react/tokens.css"
+      ],
+      "react/styles.css": [
+        "./dist/react/styles.css"
+      ],
+      "react/fonts.css": [
+        "./dist/react/fonts.css"
+      ],
+      "react/fonts/*": [
+        "./dist/react/fonts/*"
+      ],
+      "react/pv-preset": [
+        "./dist/react/pv-preset.d.ts"
+      ],
+      "react/pv-preset.ts": [
+        "./pv-preset.ts"
+      ],
+      "react/server": [
+        "./dist/react/server.d.ts"
+      ],
+      "react/variables.css": [
+        "./dist/react/variables.css"
+      ],
+      "react/base.css": [
+        "./dist/react/base.css"
+      ],
+      "react/source.css": [
+        "./dist/react/source.css"
+      ],
+      "react/button-loading": [
+        "./__not_exported__"
+      ],
+      "react/*": [
+        "./dist/react/components/*.d.ts"
+      ],
+      "skills": [
+        "./dist/skills/index.d.ts"
+      ],
+      "skills/llms.txt": [
+        "./dist/skills/llms.txt"
+      ],
+      "skills/llms-full.txt": [
+        "./dist/skills/llms-full.txt"
+      ],
+      "skills/manifest.json": [
+        "./dist/skills/manifest.json"
+      ],
+      "skills/manifest.js": [
+        "./dist/skills/manifest.js"
+      ],
+      "skills/components/*": [
+        "./dist/skills/components/*"
+      ],
+      "skills/semec-ds": [
+        "./dist/skills/semec-ds/SKILL.md"
+      ],
+      "skills/ds-semec-skill": [
+        "./dist/skills/semec-ds/SKILL.md"
+      ],
+      "lite/tokens.css": [
+        "./dist/react/tokens.css"
+      ],
+      "lite/fonts.css": [
+        "./dist/react/fonts.css"
+      ],
+      "lite/variables.css": [
+        "./dist/react/variables.css"
+      ],
+      "lite/base.css": [
+        "./dist/react/base.css"
+      ],
+      "lite/source.css": [
+        "./dist/react/source.css"
+      ],
+      "lite/pv-preset": [
+        "./dist/react/pv-preset.d.ts"
+      ],
+      "lite/pv-preset.ts": [
+        "./pv-preset.ts"
+      ],
+      "lite/skills": [
+        "./dist/lite/skills.d.ts"
+      ],
+      "lite/skills/llms.txt": [
+        "./dist/lite/llms.txt"
+      ],
+      "lite/skills/manifest.json": [
+        "./dist/lite/manifest.json"
+      ],
+      "lite/skills/semec-ds-lite": [
+        "./dist/lite/semec-ds-lite/SKILL.md"
+      ],
+      "lite/skills/ds-semec-skill": [
+        "./dist/lite/semec-ds-lite/SKILL.md"
+      ],
+      "tokens.json": [
+        "./dist/tokens/tokens.json"
+      ],
+      "tokens": [
+        "./dist/tokens/tokens.d.ts"
+      ],
+      "package.json": [
+        "./package.json"
+      ],
+      "*": [
+        "./__not_exported__"
+      ]
+    }
+  },
+  "preferUnplugged": true
 }

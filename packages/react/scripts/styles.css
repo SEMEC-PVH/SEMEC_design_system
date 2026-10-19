@@ -1,0 +1,4 @@
+/* CSS pronto: somente classes dos componentes publicados, sem varrer o app. */
+@import "tailwindcss" source(none);
+@import "../tokens.css";
+@source "../dist/react/components/*.js";
