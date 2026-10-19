@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore
 import { Bike, Moon, Sun } from "lucide-react";
 import TitleScreen from "./TitleScreen";
 import TelaCarregamento from "./TelaCarregamento";
+import TelaCarregamentoPista from "./TelaCarregamentoPista";
 import OficinaBike from "./OficinaBike";
 import CorrigirBug from "./CorrigirBug";
 import CorridaHud from "./CorridaHud";
@@ -259,6 +260,9 @@ export default function VilaSemec({ members }) {
   // íris de entrada/saída e o quadro em close ({ id, estreito }).
   const [local, setLocal] = useState("vila");
   const [transicao, setTransicao] = useState(null); // { fase, para, modo, rotulo }
+  // Tela de carregamento da corrida ({ progresso, etapa } ou null): o motor
+  // só a chama quando a íris fecha com a pista ainda fria.
+  const [cargaPista, setCargaPista] = useState(null);
   const [quadroAberto, setQuadroAberto] = useState(null);
   const [elevadorAberto, setElevadorAberto] = useState(false);
   // Já saiu do prédio alguma vez: a volta à Vila também é anunciada.
@@ -1103,6 +1107,7 @@ export default function VilaSemec({ members }) {
         // interface não pode ficar presa num andar, íris ou painel do motor antigo.
         setLocal("vila");
         setTransicao(null);
+        setCargaPista(null);
         setQuadroAberto(null);
         setElevadorAberto(false);
         setVoltouDoPredio(false);
@@ -1151,6 +1156,7 @@ export default function VilaSemec({ members }) {
             setDialog({ pages: textos.map((text) => ({ title: info.titulo, text })), page: 0 });
           },
           onTransicao: (ev) => setTransicao(ev),
+          onCarregamentoPista: ({ ativo, progresso, etapa }) => setCargaPista(ativo ? { progresso, etapa } : null),
           onQuadro: ({ id }) => {
             const h = hostRef.current;
             setQuadroAberto({ id, estreito: Boolean(h && h.clientWidth < h.clientHeight) });
@@ -1791,6 +1797,9 @@ export default function VilaSemec({ members }) {
         </div>
       )}
       {transicao?.modo === "elevador" && <div className="vila-elevador" data-fase={transicao.fase} aria-hidden="true" />}
+      {/* Ida à Pista ainda fria: carregamento da corrida por cima da íris
+          fechada (vila-engine.js, onCarregamentoPista). */}
+      {cargaPista && <TelaCarregamentoPista progresso={cargaPista.progresso} etapa={cargaPista.etapa} />}
       <p className="sr-only" aria-live="polite">
         {!started
           ? ""

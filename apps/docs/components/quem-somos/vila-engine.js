@@ -324,6 +324,12 @@ const ELEVADOR_VAO_LIVRE = 0.95;
 const PREPARO_CARGAS_MAX = 2500;
 const PREPARO_TEXTURAS_MS = 6;
 const PREPARO_ESPERA_MAX = 1.6;
+// Ida à pista ainda fria: com a tela de carregamento da corrida por cima, a
+// troca espera o preparo inteiro (GLBs da torcida incluídos), com este teto
+// de segurança (s, relógio de verdade) para nunca travar; e fatias maiores
+// para subir texturas (ms por quadro: ninguém vê o quadro).
+const PREPARO_PISTA_MAX = 25;
+const PREPARO_PISTA_TEXTURAS_MS = 40;
 // Escurecer da tela (igual ao .vila-elevador[data-fase="fechar"]) e o
 // instante parado no escuro antes de trocar de cena.
 const ELEVADOR_ESCURECER = 0.24;
@@ -795,6 +801,11 @@ export function createVila(host, options) {
     // volta atual (1-based); volta.volta é a que acabou de fechar; `tempo` em
     // milissegundos de jogo. Ver "Corrida na pista" e api.corrida.
     onCorrida = () => {},
+    // Tela de carregamento da corrida ({ ativo, progresso 0..1, etapa }):
+    // só quando a íris fecha com a pista ainda fria (ver "Corrida na pista").
+    // etapa: "circuito" | "torcida" | "zebras" | "graficos" | "largada";
+    // chega só quando muda (etapa ou ponto percentual) e termina com ativo false.
+    onCarregamentoPista = () => {},
   } = options;
 
   const map = buildMap();
@@ -2232,7 +2243,7 @@ export function createVila(host, options) {
     if (interiores.has(id)) return interiores.get(id);
     // A pista de corrida entra no mesmo LRU dos andares (guardarSoRecentes).
     if (id === "pista") {
-      const pista = createPista({ pal, lite, reducedMotion });
+      const pista = createPista({ pal, lite, reducedMotion, loader, baseUrl: modelUrl ? modelUrl.replace(/gava\.glb$/, "") : "" });
       interiores.set(id, pista);
       return pista;
     }
@@ -2356,6 +2367,10 @@ export function createVila(host, options) {
     if (disposed || preparo?.id === id) return;
     const destino = obterInterior(id);
     const p = { id, destino, fase: "cargas", cargas: !destino.pronto, pronto: aquecidos.has(destino), ocupado: false, inicio: performance.now(), texturas: null, i: 0 };
+    // A pista espera os GLBs da torcida também no aquecimento de fundo (convite
+    // do bicicletário): com o teto curto, compilava sem eles e a torcida
+    // chegava depois da largada, sem passar pela tela de carregamento.
+    if (id === "pista") p.cargasMax = PREPARO_PISTA_MAX * 1000;
     preparo = p;
     destino.pronto?.().then(() => {
       p.cargas = true;
@@ -2382,7 +2397,8 @@ export function createVila(host, options) {
     const p = preparo;
     if (!p || p.pronto || p.ocupado || disposed) return;
     if (p.fase === "cargas") {
-      if (!p.cargas && performance.now() - p.inicio < PREPARO_CARGAS_MAX) return;
+      // (cargasMax e fatia: a tela de carregamento da pista espera mais.)
+      if (!p.cargas && performance.now() - p.inicio < (p.cargasMax ?? PREPARO_CARGAS_MAX)) return;
       if (!compilaEmParalelo && !escuro) return;
       p.fase = "compilar";
       posicionarCamPreparo(p.destino);
@@ -2401,7 +2417,7 @@ export function createVila(host, options) {
       if (!compilaEmParalelo && !escuro) return;
       p.texturas ??= texturasDe(p.destino.scene);
       const t0 = performance.now();
-      while (p.i < p.texturas.length && performance.now() - t0 < PREPARO_TEXTURAS_MS) renderer.initTexture(p.texturas[p.i++]);
+      while (p.i < p.texturas.length && performance.now() - t0 < (p.fatia ?? PREPARO_TEXTURAS_MS)) renderer.initTexture(p.texturas[p.i++]);
       if (p.i >= p.texturas.length) p.fase = "render";
     } else if (p.fase === "render" && escuro) {
       // Com o jogador dentro: compila também os materiais dele (e a sombra)
@@ -3022,7 +3038,9 @@ export function createVila(host, options) {
     if (coding) stopCoding();
     hover.visible = false;
     const aqui = player.root.position.clone();
-    transicao = { para, modo: "pista", t: 0, fase: "fechar", de: aqui, ate: aqui.clone() };
+    // `inicio` (relógio real da fase): a íris do CSS fecha em T.fechar de
+    // verdade, mesmo quando o tr.t (dt limitado a 0,05 s) anda devagar.
+    transicao = { para, modo: "pista", t: 0, fase: "fechar", de: aqui, ate: aqui.clone(), inicio: performance.now() };
     onTransicao({ fase: "fechar", para, modo: "pista", rotulo: rotuloDe(para) });
     return true;
   }
@@ -3033,26 +3051,79 @@ export function createVila(host, options) {
   }
 
   // Parado no lugar: a íris fecha (a pista aquece; o render fora da tela, só
-  // no escuro), troca no escuro (esperando a pista pronta, até
-  // PREPARO_ESPERA_MAX) e abre. Nunca "anda sozinho" (devolve false).
+  // no escuro), troca no escuro e abre. Nunca "anda sozinho" (devolve false).
+  // Se a íris fecha com a pista ainda fria (1ª ida, ou descartada pelo LRU),
+  // a tela de carregamento da corrida cobre a espera (onCarregamentoPista,
+  // tr.carga): a troca espera o preparo inteiro, GLBs da torcida incluídos,
+  // até PREPARO_PISTA_MAX. Já aquecida (2ª ida, correrDeNovo), não aparece.
   function atualizarTransicaoPista(tr, dt) {
     const T = reducedMotion ? TRANSICAO_RAPIDA : TRANSICAO;
     tr.t += dt;
+    // Tempo da fase pelo maior entre o de jogo e o relógio real (o da íris do
+    // CSS): a poucos quadros por segundo, só o tr.t (dt limitado) deixava a
+    // tela preta vários segundos antes da tela de carregamento e a segurava
+    // em 100% outros tantos depois.
+    const decorrido = Math.max(tr.t, (performance.now() - tr.inicio) / 1000);
     if (tr.fase === "fechar") {
       const aquecendo = tr.para === "pista" && !naPista() && preparo?.id === "pista";
-      if (aquecendo) avancarPreparo(tr.t >= T.fechar);
-      if (tr.t < T.fechar + T.escuro) return false;
-      if (aquecendo && !preparo.pronto && tr.t - T.fechar - T.escuro < PREPARO_ESPERA_MAX) return false;
+      const escuro = decorrido >= T.fechar;
+      // Só falta o render no escuro (um passo): sem tela, senão ela piscaria.
+      if (aquecendo && escuro && !preparo.pronto && !tr.carga && preparo.fase !== "render") {
+        // `quadros`: a tela é desenhada antes do próximo passo pesado (sem
+        // compilação em paralelo, o renderer.compile trava o quadro inteiro).
+        tr.carga = { inicio: performance.now(), progresso: 0, quadros: 2 };
+        preparo.cargasMax = performance.now() - preparo.inicio + PREPARO_PISTA_MAX * 1000;
+        preparo.fatia = PREPARO_PISTA_TEXTURAS_MS;
+      }
+      if (tr.carga?.quadros > 0) tr.carga.quadros--;
+      else if (aquecendo) avancarPreparo(escuro);
+      if (tr.carga && aquecendo) {
+        // A barra nunca volta (as cargas registradas durante a espera
+        // baixariam a fração).
+        tr.carga.progresso = Math.max(tr.carga.progresso, progressoPreparoPista(preparo));
+        avisarCarregamentoPista(true, tr.carga.progresso, etapaPreparoPista(preparo, tr.carga.progresso));
+      }
+      if (decorrido < T.fechar + T.escuro) return false;
+      if (aquecendo && !preparo.pronto) {
+        const esperou = tr.carga ? (performance.now() - tr.carga.inicio) / 1000 : decorrido - T.fechar - T.escuro;
+        if (esperou < (tr.carga ? PREPARO_PISTA_MAX : PREPARO_ESPERA_MAX)) return false;
+      }
+      if (tr.carga) avisarCarregamentoPista(false, 1, "largada");
       trocarDePista(tr);
       tr.fase = "abrir";
       tr.t = 0;
+      tr.inicio = performance.now();
       return false;
     }
-    if (tr.t >= T.abrir) {
+    if (decorrido >= T.abrir) {
       transicao = null;
       reportFacing();
     }
     return false;
+  }
+
+  // Progresso da tela de carregamento da corrida: as cargas dos módulos da
+  // pista (pista.progresso(): GLBs da torcida) valem até 60%, a compilação
+  // dos shaders ~65%, as texturas sobem de 70% a 95% e o render no escuro
+  // fecha. Etapas com nome de corrida (a UI dá o texto).
+  function progressoPreparoPista(p) {
+    if (p.pronto) return 1;
+    if (p.fase === "cargas") return faixa(0, 0.6, p.cargas ? 1 : (p.destino.progresso?.() ?? 0));
+    if (p.fase === "compilar") return 0.65;
+    if (p.fase === "texturas") return faixa(0.7, 0.95, p.texturas ? p.i / Math.max(p.texturas.length, 1) : 0);
+    return 0.97;
+  }
+  function etapaPreparoPista(p, progresso) {
+    if (p.pronto || p.fase === "render") return "largada";
+    if (p.fase === "cargas") return progresso < 0.2 ? "circuito" : "torcida";
+    return p.fase === "compilar" ? "zebras" : "graficos";
+  }
+  let ultimaCarga = "";
+  function avisarCarregamentoPista(ativo, progresso, etapa) {
+    const chave = ativo ? `${etapa}:${Math.round(progresso * 100)}` : "";
+    if (chave === ultimaCarga) return;
+    ultimaCarga = chave;
+    onCarregamentoPista({ ativo, progresso, etapa });
   }
 
   // No escuro: Vila → pista (na largada, montado), pista → largada de novo,
@@ -4224,7 +4295,7 @@ export function createVila(host, options) {
   }
 
   renderer.setAnimationLoop(tick);
-  window.__vilaDbg = { get local() { return local; }, get interior() { return interior; }, player, occupied, passable, pedro, walkers, map, epocas, get paused() { return paused; }, get cut() { return cutscene.active; }, bike, liberarBike() { bikeLiberada = true; }, entrarPista: () => api.entrarPista(), api, get corrida() { return corrida; }, espiarCorrida(fn) { espiaCorrida = fn; } }; // TEMP-HOOK
+  window.__vilaDbg = { get local() { return local; }, get interior() { return interior; }, player, occupied, passable, pedro, walkers, map, epocas, get paused() { return paused; }, get cut() { return cutscene.active; }, bike, liberarBike() { bikeLiberada = true; }, entrarPista: () => api.entrarPista(), api, get corrida() { return corrida; }, get preparo() { return preparo; }, espiarCorrida(fn) { espiaCorrida = fn; }, camera, renderer }; // TEMP-HOOK
   reportFacing();
   prepararVila();
   onReady();
