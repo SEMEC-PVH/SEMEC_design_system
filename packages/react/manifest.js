@@ -75,7 +75,7 @@ export const dsComponents = [
       { prop: "loading", values: "false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento) · com asChild, o spinner entra no link e o onClick do filho não dispara · o clique ainda sobe aos ancestrais (só envio e navegação são cancelados)" },
     ],
     usage: `import { Button } from "@semec/ds/react";
-import Link from "next/link";
+// No Next.js, substitua <a> por <Link> e habilite: import Link from "next/link";
 import { Plus } from "lucide-react";
 
 <Button variant="primary">Emitir boleto</Button>
@@ -87,7 +87,7 @@ import { Plus } from "lucide-react";
 <Button><Plus /> Adicionar serviço</Button>
 
 <Button asChild>
-  <Link href="/iptu">Ver meu IPTU</Link>
+  <a href="/iptu">Ver meu IPTU</a>
 </Button>
 
 // Envio em andamento: o foco fica no botão e o clique é ignorado
@@ -246,13 +246,13 @@ import { Download, Search, Trash2 } from "lucide-react";
       { prop: "composição", values: "Select · SelectTrigger · SelectValue · SelectContent · SelectItem" },
       { prop: "contrato", values: "Select: value · defaultValue · onValueChange · name · required · disabled — SelectTrigger: id · invalid" },
     ],
-    usage: `import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@semec/ds/react";
+    usage: `import { FormField, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@semec/ds/react";
 
-<Select defaultValue="pbh">
+<Select defaultValue="porto-velho">
   <SelectTrigger aria-label="Município"><SelectValue placeholder="Município" /></SelectTrigger>
   <SelectContent>
-    <SelectItem value="pbh">Porto Velho</SelectItem>
-    <SelectItem value="riob">Rio Branco</SelectItem>
+    <SelectItem value="porto-velho">Porto Velho</SelectItem>
+    <SelectItem value="rio-branco">Rio Branco</SelectItem>
   </SelectContent>
 </Select>
 
@@ -261,7 +261,7 @@ import { Download, Search, Trash2 } from "lucide-react";
   <Select name="municipio" value={municipio} onValueChange={setMunicipio}>
     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
     <SelectContent>
-      <SelectItem value="pbh">Porto Velho</SelectItem>
+      <SelectItem value="porto-velho">Porto Velho</SelectItem>
     </SelectContent>
   </Select>
 </FormField>`,
@@ -359,13 +359,13 @@ import { Download, Search, Trash2 } from "lucide-react";
     ],
     usage: `import { Checkbox, Label } from "@semec/ds/react";
 
-<div className="flex items-center gap-2">
+<div className="flex min-h-11 items-center gap-2">
   <Checkbox id="termos" />
   <Label htmlFor="termos">Aceito os termos</Label>
 </div>
 
 // Controlado, com envio em <form> e erro (checked/onCheckedChange = value/onValueChange)
-<div className="flex items-center gap-2">
+<div className="flex min-h-11 items-center gap-2">
   <Checkbox id="aceite" name="aceite" checked={aceito} onCheckedChange={(v) => setAceito(v === true)} invalid={!aceito && enviado} />
   <Label htmlFor="aceite">Li e aceito o regulamento</Label>
 </div>`,
@@ -384,7 +384,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     usage: `import { RadioGroup, RadioGroupItem, Label } from "@semec/ds/react";
 
 <RadioGroup name="tipoPessoa" defaultValue="pessoa-fisica" onValueChange={setTipoPessoa}>
-  <div className="flex items-center gap-2">
+  <div className="flex min-h-11 items-center gap-2">
     <RadioGroupItem value="pessoa-fisica" id="pf" />
     <Label htmlFor="pf">Pessoa física</Label>
   </div>
@@ -440,7 +440,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 
-// npm install react-hook-form @hookform/resolvers zod (opcionais, só para esta receita)
+// npm install react-hook-form @hookform/resolvers@^5 zod@^4 (opcionais, só para esta receita)
 const formSchema = z.object({
   nome: z.string().min(3, "Nome deve ter ao menos 3 caracteres"),
   email: emailSchema,
@@ -612,22 +612,24 @@ export function FormularioExemplo() {
     label: "Tabela",
     file: "src/components/table.tsx",
     category: "conteudo-dados",
-    desc: "Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.",
+    desc: "Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver https://semec-pvh.github.io/SEMEC_design_system/padroes/dados-relatorios/tabelas/. Se houver rolagem horizontal, use uma região nomeada e focável, como no exemplo, e teste Tab e setas em tela estreita.",
     variants: [
       { prop: "composição", values: "Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption" },
       { prop: "a11y", values: "scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome" },
     ],
     usage: `import { Table, TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/ds/react";
 
-// Básico
-<Table>
-  <TableCaption>Serviços solicitados</TableCaption>
-  <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
-  <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>
-</Table>
+// A região recebe o foco e a rolagem; o wrapper interno da Table fica overflow-visible.
+<div role="region" aria-label="Serviços solicitados" tabIndex={0} className="overflow-x-auto [&>div]:overflow-visible">
+  <Table className="min-w-[40rem]">
+    <TableCaption>Serviços solicitados</TableCaption>
+    <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
+    <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>
+  </Table>
+</div>
 
 // Avançado: ordenação + filtro + paginação + seleção
-// Ver padroes/dados-relatorios/tabelas → demo com TableAdvanced`,
+// Ver https://semec-pvh.github.io/SEMEC_design_system/padroes/dados-relatorios/tabelas/ → demo com TableAdvanced`,
   },
   {
     code: "skeleton",
@@ -732,7 +734,8 @@ import { Button } from "@semec/ds/react";
   <HeaderBrand
     orgName="SEMEC"
     serviceName="Nome do serviço"
-    logo={<img src="/logo-prefeitura.svg" alt="Prefeitura de Porto Velho" className="h-9 w-auto" />}
+    // A logo não vem no pacote: peça o SVG oficial à SEMEC e salve em public/marca.svg.
+    logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" className="h-9 w-auto" />}
   />
   <div className="flex items-center gap-2">
     <HeaderNav>
@@ -939,7 +942,7 @@ function EdicaoControlada() {
     category: "feedback",
     desc: "Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.",
     variants: [
-      { prop: "variant", values: "default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive" },
+      { prop: "variant", values: "default · success (fundo bg-success-emphasis, texto text-success-emphasis-foreground, 5,85:1; título 16px (text-base font-bold), descrição 14px (text-sm), Poppins) · warning · destructive" },
       { prop: "uso", values: "<Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos" },
       { prop: "Toaster", values: "label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis)" },
       { prop: "alvos", values: "X e ToastAction com 44px" },
@@ -1548,7 +1551,7 @@ import { LayoutDashboard } from "lucide-react";
         {/* Gatilho e marca num grupo à esquerda (o Header é justify-between) */}
         <div className="flex min-w-0 items-center gap-2">
           <SidebarTrigger />
-          <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+          <HeaderBrand orgName="SEMEC" href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
         </div>
       </Header>
       <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-[75rem] px-4 py-8">

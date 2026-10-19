@@ -86,7 +86,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:csp": "node scripts/check-integracao-csp.mjs --browser",
-    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-barrel.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs && node scripts/check-integracao-csp.mjs"
+    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-barrel.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs && node scripts/check-integracao-csp.mjs && node scripts/check-artifact-examples.mjs"
   },
   "peerDependencies": {
     "lucide-react": ">=0.468.0 <2",

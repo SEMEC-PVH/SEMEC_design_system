@@ -36,9 +36,13 @@ O `npm install` traz junto as dependências do kit React (o pacote é um só) e,
 
 **Preset JS (opcional):** `@config "@semec/ds/lite/pv-preset";` no CSS global, depois dos imports. O `tokens.css` já gera os utilitários pelo `@theme inline`; o preset (o mesmo `pv-preset` da variante React) só serve a quem ainda configura o Tailwind por JS. Sem Tailwind, ignore.
 
+**Com `@tailwindcss/cli`:** a CLI não copia os arquivos de fonte. Depois de gerar o CSS final, copie `node_modules/@semec/ds/dist/react/fonts/` para `fonts/` ao lado desse CSS (por exemplo, `public/css/fonts/` para `public/css/app.css`). Preserve as URLs relativas `./fonts/…` e confira no navegador que os `.woff2` respondem 200.
+
 **Fonte:** `@semec/ds/lite/fonts.css` (o mesmo arquivo de `@semec/ds/react/fonts.css`) traz a Poppins 400/500/600/700 (SIL OFL) e vai **antes** do `tokens.css`. Sem ela, o texto cai em `system-ui`. Não existem pesos 800/900.
 
 ### Sem Tailwind
+
+**CSS legado e foco:** uma regra `:focus { outline: 0 }` fora de `@layer` vence o foco do kit, que está em `@layer base`, mesmo carregada antes dele. Remova essa regra ou substitua-a por um foco visível equivalente. Não basta passar no axe: percorra a tela com Tab e Shift+Tab e confira o anel em cada controle.
 
 As variáveis do `:root` (`--bg`, `--action-primary`…) e a camada base (foco visível, links, reduced motion) funcionam em CSS puro com `var()`; os blocos `@theme` e `@utility` são ignorados pelo navegador, e os utilitários da tabela abaixo só existem com o Tailwind v4 processando o `tokens.css`.
 
@@ -95,7 +99,7 @@ Camada do dia a dia. Diz o papel, não a cor. Use estes, nunca os L0.
 | `--surface-alt` | Superfície alternativa |
 | `--surface-sunken` | Superfície rebaixada (skeleton, trilhas) |
 | `--border` | Bordas leves |
-| `--border-strong` | Bordas proeminentes |
+| `--border-strong` | Borda de campo (`border-input`), contraste mínimo de 3:1 sobre `--surface` |
 | `--focus-ring` | Anel de foco (a11y) |
 | `--focus-ring-inverse` | Anel de foco sobre a marca |
 | `--text-muted` | Texto de apoio |
@@ -142,11 +146,13 @@ Camada do dia a dia. Diz o papel, não a cor. Use estes, nunca os L0.
 | `--font-semibold` | `600` |
 | `--font-bold` | `700` |
 
-Cada degrau tem altura de linha própria (`--leading-*`), já embutida no utilitário `text-*`. Papéis: `display` 40px = página inicial/hero, `3xl` 32px = h1, `2xl` = h2, `xl` = subtítulo, `lg` = destaque, `base` = corpo, `sm` = apoio, `xs` = rótulo. Não existem pesos 800/900.
+Cada degrau tem altura de linha própria (`--leading-*`), já embutida no utilitário `text-*`. Papéis: `display` 40px = página inicial/hero, `3xl` 32px = h1, `2xl` = h2, `xl` = subtítulo, `lg` = destaque, `base` = corpo, `sm` = apoio, `xs` = etiqueta, dica e mensagem de erro. Rótulo de campo usa `text-sm font-medium` (14px/500), ou `font-size: var(--text-sm); line-height: var(--leading-sm); font-weight: var(--font-medium)` em CSS puro. Não existem pesos 800/900.
 
 **Espaçamento:** `--space-0` 0 · `--space-1` 4px · `--space-2` 8px · `--space-3` 12px · `--space-4` 16px · `--space-6` 24px · `--space-8` 32px · `--space-12` 48px · `--space-16` 64px
 
-**Bordas:** `--radius-sm` 2px · `--radius-md` 8px · `--radius-lg` 12px · `--radius-full` 9999px (escolha pelo papel: controle `md`, cartão `lg`, pílula `full`; escala fixa, não use `rounded-xl` ou acima)
+Use os degraus de espaçamento no layout do app. Preserve as exceções do kit: botão médio `px-5` (20px), botão pequeno `py-1.5` (6px) e `FormField` `gap-1.5` (6px).
+
+**Bordas:** `--radius-sm` 2px · `--radius-md` 8px · `--radius-lg` 12px · `--radius-full` 9999px (escolha pelo papel: controle de entrada (campo, select) `rounded-md` / `--radius-md`, botão `rounded-full` / `--radius-full` (pílula), cartão e diálogo `rounded-lg` / `--radius-lg`; escala fixa, não use `rounded-xl` ou acima)
 
 **Elevação:** `--elevation-0/1/2/3`
 
@@ -164,6 +170,7 @@ Cada degrau tem altura de linha própria (`--leading-*`), já embutida no utilit
 | `bg-surface-alt` | `--surface-alt` |
 | `bg-surface-sunken` | `--surface-sunken` |
 | `border-border` / `border-border-strong` | `--border` / `--border-strong` |
+| `border-input` | `--border-strong` — borda de campo |
 | `text-text-muted` (ou `text-muted-foreground`) | `--text-muted` |
 | `text-text-secondary` | `--text-secondary` |
 | `text-text-on-brand` (ou `text-primary-foreground`) | `--text-on-brand` |
@@ -233,16 +240,16 @@ O `tokens.css` já reduz animações e transições globalmente com `@media (pre
 
 Complementar com ícone, texto ou padrão. Link em texto corrido é sublinhado.
 
-## Padrões de tela (sem React)
+## Padrões de tela (Tailwind, sem React)
 
 - **Esqueleto:** link "Pular para o conteúdo" como primeiro foco (`<a href="#conteudo">`, visível ao receber foco) → `<header>` → `<nav aria-label="Menu principal">` → um único `<main id="conteudo" tabindex="-1">` → `<footer>` institucional. Cada `<nav>` com `aria-label` distinto.
 - **Container:** `mx-auto w-full max-w-[75rem] px-4` (1200px) em todas as telas; texto corrido `max-w-prose`; formulário `max-w-3xl`.
 - **Títulos:** um `h1` por página com o nome da tarefa (`text-3xl font-bold`, 32px), `h2` em `text-2xl`, `h3` em `text-xl`, sem pular nível; `text-display` só no hero da página inicial.
-- **Marca e ação:** marca = `bg-brand-hero text-text-on-brand`; ação principal = `bg-primary` (um botão principal por grupo). Não use a cor de marca em botão nem a de ação como faixa institucional.
+- **Marca e ação:** cabeçalho do portal em `bg-surface border-b border-border`, marca em `text-brand-hero font-bold` e link atual em `text-brand-hero font-semibold`. Reserve `bg-brand-hero text-text-on-brand` para hero e faixas de destaque dentro da página. Ação principal = `bg-primary` (um botão principal por grupo). Não use a cor de marca em botão nem a de ação como faixa institucional. A logo oficial não vem no pacote: peça o SVG à SEMEC e salve como `public/marca.svg`.
 - **Formulários e Validação:**
   - Label associado ao campo (`<label for="id">`; placeholder não é rótulo).
   - Três padrões de erro:
-    1. *Inline no campo:* mensagem em texto abaixo do campo (`text-xs text-destructive`, `--feedback-danger: #b91c1c`, 5,98:1), campo com `aria-invalid="true"` e `aria-describedby="[id]-hint [id]-error"`. Sem `role="alert"` em listas para não interromper leitores de tela.
+    1. *Inline no campo:* mensagem em texto abaixo do campo (`text-xs text-destructive`, token `--feedback-danger`, 5,98:1). Com erro, a dica sai da tela e o campo recebe `aria-invalid="true"` e `aria-describedby="[id]-error"`; sem erro, use `aria-describedby="[id]-hint"` apenas se houver dica. Sem `role="alert"` em listas para não interromper leitores de tela.
     2. *Resumo no topo:* contêiner com `role="alert"`, `tabindex="-1"`, foco automático ao submeter e links para cada campo com erro (`<a href="#id">`).
     3. *Erro de servidor:* caixa de aviso (`role="alert"`, fundo `--feedback-danger-surface`, texto e borda `--feedback-danger`; com Tailwind, `bg-destructive-surface text-destructive border-destructive`) com instruções claras de recuperação. Nunca os primitivos `--pv-red-*` direto.
   - *Legenda Auxiliar de Ação / Download:* botões que geram efeitos secundários (ex.: download de PDF gerado) devem conter legenda explicativa complementar abaixo (`text-xs text-text-muted`).
@@ -252,6 +259,22 @@ Complementar com ícone, texto ou padrão. Link em texto corrido é sublinhado.
 - **Estados vazios:** título, descrição e ação.
 
 Para os mesmos padrões com componentes prontos (`SkipLink`, `Header`, `Heading`, `Footer`, `Table`…), veja a skill `semec-ds`.
+
+### Equivalentes sem Tailwind
+
+Em CSS puro, aplique as declarações abaixo em classes do app, no arquivo CSS. Mantenha o HTML e os atributos acessíveis descritos acima; eles funcionam sem Tailwind. As dimensões de layout (75rem, 65ch, 48rem) não têm token no pacote.
+
+| Padrão | CSS puro e semântica |
+|--------|---------------------|
+| Esqueleto | Página com `background: var(--bg); color: var(--fg); font-family: var(--font-family-sans)`. Preserve link de pular, header, nav, main e footer; deixe o link de pular visível, inclusive ao focar. |
+| Container | `box-sizing: border-box; margin-inline: auto; width: 100%; max-width: 75rem; padding-inline: var(--space-4)`. Texto corrido: `max-width: 65ch`; formulário: `max-width: 48rem`. |
+| Títulos | h1: `font-size: var(--text-3xl); line-height: var(--leading-3xl); font-weight: var(--font-bold); color: var(--fg)`. h2: `--text-2xl` / `--leading-2xl`; h3: `--text-xl` / `--leading-xl`; hero: `--text-display` / `--leading-display`. |
+| Marca e ação | Header: `background: var(--surface); border-bottom: 1px solid var(--border)`; marca: `color: var(--brand-hero); font-weight: var(--font-bold)`. Hero/faixa: `background: var(--brand-hero); color: var(--text-on-brand)` e `data-surface="brand"`. Ação: `background: var(--action-primary); color: var(--text-on-brand)`; hover: `background: var(--action-primary-hover)`. |
+| Formulários e validação | Rótulo: `font-size: var(--text-sm); line-height: var(--leading-sm); font-weight: var(--font-medium)`. Borda de campo: `border: 1px solid var(--border-strong)`. Dica/legenda de ação: `font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--text-muted)`. Erro inline: mesma tipografia, `color: var(--feedback-danger)`; esconda a dica e referencie só o erro. Resumo: foco programático, links para os campos e `color: var(--feedback-danger)`. Erro de servidor: `background: var(--feedback-danger-surface); color: var(--feedback-danger); border: 1px solid var(--feedback-danger)`. |
+| Navegação | Link atual: `color: var(--brand-hero); font-weight: var(--font-semibold)`, com `aria-current="page"`. Preserve `aria-label` distinto em cada nav e o comportamento de gaveta no mobile; CSS sozinho não controla foco nem `inert`. |
+| Feedback | Ícone, título e texto, com `color: var(--feedback-success)` e `background: var(--feedback-success-surface)` para sucesso; use os tokens de perigo para erro. Anuncie a confirmação com `role="status"`; cor sozinha não comunica o resultado. |
+| Tabelas | Região nomeada e focável: `overflow-x: auto; color: var(--fg); background: var(--surface)`; células: `padding: var(--space-4); border-bottom: 1px solid var(--border)`. Preserve caption e th com scope; teste a rolagem por setas. |
+| Estados vazios | Título em `color: var(--fg)`, descrição em `color: var(--text-muted)`, ação em `background: var(--action-primary); color: var(--text-on-brand)`. Mantenha a hierarquia de títulos e o nome acessível da ação. |
 
 ## Responsive / Mobile
 
@@ -268,6 +291,13 @@ Para os mesmos padrões com componentes prontos (`SkipLink`, `Header`, `Heading`
 - Reflow: a tela funciona em 320px de largura sem rolagem horizontal da página (1.4.10)
 - Container e largura de leitura: ver "Padrões de tela"
 - O pacote **não** tem `--container-max`, `--container-docs`, `--measure`, `--control-height-*` nem modo `data-density="compact"`: esses nomes existem só no CSS do site de documentação. `var()` com eles resolve para vazio, sem erro
+
+## Checklist de verificação
+
+- Percorra todos os controles com Tab e Shift+Tab; o anel deve permanecer visível, inclusive após aplicar o CSS legado. Axe sozinho não detecta foco apagado.
+- Em 320px e 390px, confirme reflow e use as setas para rolar a região focável da tabela.
+- Clique nos rótulos de Checkbox/Radio e confira a seleção; teste Space e setas pelo teclado.
+- Confira as fontes na aba de rede e os estados de dica/erro com leitor de tela.
 
 ## Regras
 
