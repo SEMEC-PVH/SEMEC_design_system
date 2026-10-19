@@ -270,14 +270,14 @@ As masks têm a assinatura `(value: string) => string` (tipo `MaskFn`): recebem 
 
 ## Tokens
 
-O que existe no pacote está em `tokens.css` (camadas L0 `--pv-*` e L1 semânticas). O `@theme inline` expõe os tokens como utilitários (o preset JS gera os mesmos nomes):
+O que existe no pacote está em `tokens.css` (camadas L0 `--pv-*` e L1 semânticas). No Tailwind v4, o `@theme inline` expõe os tokens como utilitários:
 
 | Token | Utilitário | Observação |
 |---|---|---|
 | `--space-0` … `--space-16` | `p-space-4`, `gap-space-2`, `mt-space-12`… | Dialeto do sistema. `p-4` dá o mesmo valor, mas só os nove degraus (0, 1, 2, 3, 4, 6, 8, 12, 16) fazem parte da escala |
 | `--text-xs` … `--text-2xl`, `--text-3xl` (32px), `--text-display` (40px) | `text-xs` … `text-3xl`, `text-display` | Tamanho **e** entrelinha do degrau (`--leading-*`); `leading-*` sobrescreve |
 | `--font-regular` … `--font-bold` | `font-regular`, `font-medium`, `font-semibold`, `font-bold` | 400–700 |
-| `--text-muted`, `--text-secondary`, `--text-strong` | `text-text-muted`, `text-text-secondary`, `text-text-strong` | **Não** use `text-muted`/`text-secondary`: são a cor de fundo `--surface-alt` (1,09:1). `bg-muted`/`bg-secondary` seguem valendo |
+| `--text-muted`, `--text-secondary`, `--text-strong` | `text-text-muted`, `text-text-secondary`, `text-text-strong` | `text-muted`/`text-secondary` não são gerados pelo CSS v4, para evitar texto com cor de fundo (1,09:1). `bg-muted`/`bg-secondary` seguem valendo, inclusive com opacidade |
 | `--surface-sunken` | `bg-surface-sunken` | Skeleton, trilha de Progress/Slider (1,47:1 sobre `--surface`) |
 | `--focus-ring-inverse` | `ring-ring-inverse` | Automático dentro de `data-surface="brand"` ou `bg-brand-hero` (9,38:1); `data-surface="default"` volta ao anel padrão |
 | `--text-brand` | `text-text-brand` | Título institucional escuro (12,43:1). Novo na 4.0 |
@@ -309,6 +309,8 @@ O JSON segue [DTCG 2025.10](https://www.designtokens.org/tr/2025.10/format/), co
 - **Back-end, PDF e e-mail:** importe `tokens` em Node ou leia o JSON com a linguagem do serviço. Os valores em `tokens` e `dsTokens.values` são strings CSS resolvidas; não precisam de DOM, React ou Tailwind em execução.
 
 O catálogo lite mantém as listas `colors`, `semantic`, `typography`, `spacing`, `radii` e `elevation`, agora geradas e completas, e acrescenta `motion` e `values`. `colors` enumera nomes concretos em vez de padrões com `*`.
+
+No CSS v4, `rounded-xs`, `rounded-xl`, `rounded-2xl` e os demais raios nomeados fora da escala deixam de ser gerados. Use `rounded-sm` (2px), `rounded-md` (8px), `rounded-lg` (12px) ou `rounded-full`. `text-fg` e `bg-bg` são apelidos de `text-foreground` e `bg-background`. Não foi adicionado `--color-action-primary`: esse nome já pertence ao tema próprio do site de documentação; para a ação do kit, use `bg-primary`.
 
 ## Tema
 
