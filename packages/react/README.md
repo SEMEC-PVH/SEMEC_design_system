@@ -143,6 +143,57 @@ Na 3.0 e na 3.1 o `dist` era um bundle único sem `"use client"` e importar o ki
 
 Em Vite/SPA nada disso se aplica.
 
+## CommonJS / Node
+
+O pacote publica **somente ESM**. No Node 22.12+ e 24, `require()` pode carregar
+esse ESM síncrono pela condição `default` dos subpaths, compartilhando os mesmos
+módulos de `import` (sem uma segunda cópia de contextos ou estado):
+
+```js
+const { Button } = require("@semec/ds/react/button");
+const { createElement } = require("react");
+const { renderToString } = require("react-dom/server");
+console.log(renderToString(createElement(Button, null, "Salvar")));
+```
+
+Isso não oferece um build CJS para runtimes antigos. No TypeScript, prefira
+`moduleResolution: "bundler"` no bundler ou `module`/`moduleResolution: "nodenext"`
+no Node (TS 5.9). `node16` em projeto CommonJS ainda pode emitir TS1479; nesse caso
+use `nodenext` ou converta o projeto para ESM com `"type": "module"`.
+
+## Testes com Jest
+
+O Jest 29 usa seu próprio carregador: precisa transformar o ESM do kit mesmo
+quando o Node aceita `require(esm)`. Configuração mínima com Babel e jsdom:
+
+```bash
+npm install -D jest@29 babel-jest@29 jest-environment-jsdom@29 @babel/core@7 @babel/preset-env@7 @babel/preset-react@7
+```
+
+```js
+// jest.config.cjs
+module.exports = {
+  testEnvironment: "jsdom",
+  transform: { "^.+\\.[jt]sx?$": "babel-jest" },
+  transformIgnorePatterns: ["/node_modules/(?!@semec/ds/)"],
+};
+```
+
+```js
+// babel.config.cjs
+module.exports = {
+  presets: [
+    ["@babel/preset-env", { targets: { node: "current" } }],
+    ["@babel/preset-react", { runtime: "automatic" }],
+  ],
+};
+```
+
+Esta receita cobre JavaScript/JSX com npm e `node_modules` convencional. Não
+adicione a condição global `import` em `customExportConditions`: ela também muda
+a resolução das dependências do Jest. Os subpaths do kit resolvem sem
+`moduleNameMapper`; configure mocks de CSS separadamente se o teste importar CSS.
+
 ## Uso rápido
 
 ```tsx
