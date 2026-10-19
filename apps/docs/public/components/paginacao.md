@@ -2,7 +2,7 @@
 title: "Paginação"
 code: "pagination"
 slug: "paginacao"
-file: "src/components/pagination.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/pagination.tsx"
 category: "navegacao"
 variants: "props: page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }> · siblingCount: páginas de cada lado da atual · padrão 1 · aceita 0 (só a atual entre as elipses) · negativo conta como 0 · abaixo de sm, no máximo 1 · a11y: role=navigation · aria-label=Paginação · aria-current=page · aria-label 'Página N' nos números · aria-label nos botões prev/next · aria-hidden nos elipses"
 ---
@@ -11,7 +11,7 @@ variants: "props: page · pageCount · onPageChange · siblingCount · labels?: 
 
 > Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px que não encolhem. Abaixo de `sm` ficam só as setas e a página atual ± 1 (primeira, última e elipses ocultas). Textos em PT-BR, sobrescrevíveis por `labels`.
 
-**Arquivo:** `src/components/pagination.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/paginacao/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/pagination.tsx) | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/paginacao/
 
 ## Variantes
 
@@ -25,7 +25,7 @@ variants: "props: page · pageCount · onPageChange · siblingCount · labels?: 
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";

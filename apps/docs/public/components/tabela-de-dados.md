@@ -2,7 +2,7 @@
 title: "Tabela de dados"
 code: "data-table"
 slug: "tabela-de-dados"
-file: "src/components/data-table.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/data-table.tsx"
 category: "conteudo-dados"
 variants: "props: columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · rowLabel?: (row, index) => string (aria-label da linha; use com onRowClick) · emptyMessage · caption · labels (sortBy: descrição 'Ordenar por …' do botão de ordenação, via aria-describedby, não o nome dele · pageOf · previous · next) · a11y: columnheader e botão de ordenação nomeados só pela coluna; 'Ordenar por …' como descrição (aria-describedby) · aria-sort no cabeçalho ordenado · botão de ordenação com alvo de 44px · linha focável e ativável por Enter/Espaço quando há onRowClick · rowLabel nomeia a linha clicável · cliques e teclas em controles da célula (e em portais abertos por ela) não ativam a linha · rodapé empilha abaixo de sm · paginação com alvos de 44px"
 ---
@@ -11,7 +11,7 @@ variants: "props: columns · data · sortKey · sortDir · onSort · page · pag
 
 > Tabela com ordenação, paginação e estados vazios. Com `onRowClick`, passe `rowLabel` para dar nome à linha clicável.
 
-**Arquivo:** `src/components/data-table.tsx` | **Categoria:** Conteúdo e dados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/tabela-de-dados/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/data-table.tsx) | **Categoria:** Conteúdo e dados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/tabela-de-dados/
 
 ## Variantes
 
@@ -24,7 +24,7 @@ variants: "props: columns · data · sortKey · sortDir · onSort · page · pag
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";

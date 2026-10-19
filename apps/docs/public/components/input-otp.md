@@ -2,7 +2,7 @@
 title: "Input OTP"
 code: "input-otp"
 slug: "input-otp"
-file: "src/components/input-otp.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/input-otp.tsx"
 category: "formularios"
 variants: "composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSeparator · props: value · defaultValue · onValueChange · name (input oculto) · form · id · invalid · required · maxLength · disabled · labels (group · slot(index, total)) · removidas na 4.0: onChange(value) → use onValueChange"
 ---
@@ -11,7 +11,7 @@ variants: "composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSe
 
 > Campo de código OTP com foco automático entre dígitos.
 
-**Arquivo:** `src/components/input-otp.tsx` | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/input-otp/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/input-otp.tsx) | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/input-otp/
 
 ## Variantes
 
@@ -25,7 +25,7 @@ variants: "composição: InputOTP · InputOTPGroup · InputOTPSlot · InputOTPSe
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";

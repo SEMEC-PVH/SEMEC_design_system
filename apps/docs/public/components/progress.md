@@ -2,7 +2,7 @@
 title: "Progresso"
 code: "progress"
 slug: "progress"
-file: "src/components/progress.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/progress.tsx"
 category: "feedback"
 variants: "—"
 ---
@@ -11,7 +11,7 @@ variants: "—"
 
 > Barra de progresso determinada. Trilha com contorno border-strong (3,77:1 sobre surface) e indicador primary.
 
-**Arquivo:** `src/components/progress.tsx` | **Categoria:** Feedback e estados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/progress/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/progress.tsx) | **Categoria:** Feedback e estados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/progress/
 
 ## Variantes
 
@@ -23,7 +23,7 @@ _Sem variantes_
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -93,10 +93,12 @@ const Progress = React.forwardRef<
       aria-valuenow={value ?? undefined}
       {...props}
     >
-      <ProgressPrimitive.Indicator
-        className="h-full w-full flex-1 rounded-full bg-primary transition-all duration-base ease-standard"
-        style={{ transform: `translateX(-${100 - percentual}%)` }}
-      />
+      <ProgressPrimitive.Indicator asChild>
+        {/* Atributos SVG funcionam no SSR com style-src-attr 'none'. */}
+        <svg className="block h-full w-full" aria-hidden="true" focusable="false">
+          <rect width={`${percentual}%`} height="100%" className="fill-primary" />
+        </svg>
+      </ProgressPrimitive.Indicator>
     </ProgressPrimitive.Root>
   );
 });

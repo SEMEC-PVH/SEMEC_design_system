@@ -2,7 +2,7 @@
 title: "Menu de seleção"
 code: "select"
 slug: "menu-de-selecao"
-file: "src/components/select.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/select.tsx"
 category: "formularios"
 variants: "composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem · contrato: Select: value · defaultValue · onValueChange · name · required · disabled — SelectTrigger: id · invalid"
 ---
@@ -11,7 +11,7 @@ variants: "composição: Select · SelectTrigger · SelectValue · SelectContent
 
 > Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`).
 
-**Arquivo:** `src/components/select.tsx` | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/menu-de-selecao/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/select.tsx) | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/menu-de-selecao/
 
 ## Variantes
 
@@ -24,7 +24,7 @@ variants: "composição: Select · SelectTrigger · SelectValue · SelectContent
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -40,13 +40,13 @@ No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca 
 ## Uso
 
 ```tsx
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@semec/ds/react";
+import { FormField, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@semec/ds/react";
 
-<Select defaultValue="pbh">
+<Select defaultValue="porto-velho">
   <SelectTrigger aria-label="Município"><SelectValue placeholder="Município" /></SelectTrigger>
   <SelectContent>
-    <SelectItem value="pbh">Porto Velho</SelectItem>
-    <SelectItem value="riob">Rio Branco</SelectItem>
+    <SelectItem value="porto-velho">Porto Velho</SelectItem>
+    <SelectItem value="rio-branco">Rio Branco</SelectItem>
   </SelectContent>
 </Select>
 
@@ -55,7 +55,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
   <Select name="municipio" value={municipio} onValueChange={setMunicipio}>
     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
     <SelectContent>
-      <SelectItem value="pbh">Porto Velho</SelectItem>
+      <SelectItem value="porto-velho">Porto Velho</SelectItem>
     </SelectContent>
   </Select>
 </FormField>
@@ -77,6 +77,7 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import { useNonce } from "../lib/nonce-context";
 import { useFormFieldControl } from "./form-field";
 
 const Select = SelectPrimitive.Root;
@@ -147,34 +148,41 @@ SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayNam
 
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
->(({ className, children, position = "popper", ...props }, ref) => (
-  <SelectPrimitive.Portal>
-    <SelectPrimitive.Content
-      ref={ref}
-      className={cn(
-        "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 data-[state=open]:animate-in data-[state=closed]:animate-out",
-        position === "popper" &&
-          "w-[var(--radix-select-trigger-width)] max-w-[var(--radix-select-trigger-width)] data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
-        className
-      )}
-      position={position}
-      {...props}
-    >
-      <SelectScrollUpButton />
-      <SelectPrimitive.Viewport
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> & {
+    /** Nonce do estilo do Viewport; prevalece sobre o SemecProvider. */
+    nonce?: string;
+  }
+>(({ className, children, position = "popper", nonce, ...props }, ref) => {
+  const viewportNonce = useNonce(nonce);
+  return (
+    <SelectPrimitive.Portal>
+      <SelectPrimitive.Content
+        ref={ref}
         className={cn(
-          "p-1.5",
+          "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 data-[state=open]:animate-in data-[state=closed]:animate-out",
           position === "popper" &&
-            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+            "w-[var(--radix-select-trigger-width)] max-w-[var(--radix-select-trigger-width)] data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
+          className
         )}
+        position={position}
+        {...props}
       >
-        {children}
-      </SelectPrimitive.Viewport>
-      <SelectScrollDownButton />
-    </SelectPrimitive.Content>
-  </SelectPrimitive.Portal>
-));
+        <SelectScrollUpButton />
+        <SelectPrimitive.Viewport
+          nonce={viewportNonce}
+          className={cn(
+            "p-1.5",
+            position === "popper" &&
+              "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+          )}
+        >
+          {children}
+        </SelectPrimitive.Viewport>
+        <SelectScrollDownButton />
+      </SelectPrimitive.Content>
+    </SelectPrimitive.Portal>
+  );
+});
 SelectContent.displayName = SelectPrimitive.Content.displayName;
 
 const SelectLabel = React.forwardRef<
@@ -235,6 +243,7 @@ export {
   SelectScrollUpButton,
   SelectScrollDownButton,
 };
+
 ```
 
 ## Tokens relacionados

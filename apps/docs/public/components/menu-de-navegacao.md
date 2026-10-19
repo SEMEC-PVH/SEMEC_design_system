@@ -2,7 +2,7 @@
 title: "Menu de navegação"
 code: "navigation-menu"
 slug: "menu-de-navegacao"
-file: "src/components/navigation-menu.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/navigation-menu.tsx"
 category: "navegacao"
 variants: "composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · estilos exportados: navigationMenuTriggerStyle() (visual de gatilho, ex.: link solto na lista) · navigationMenuLinkStyle() (estilo padrão do NavigationMenuLink, para links próprios) · a11y: aria-label padrão 'Menu principal' · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix)"
 ---
@@ -11,7 +11,7 @@ variants: "composição: NavigationMenu · List · Item · Trigger · Content ·
 
 > Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. O `NavigationMenuLink` já vem estilizado: alvo de 44px (`min-h-11`), `px-4`, hover/foco em `tint` e anel de foco por dentro; `active` marca a página atual com `aria-current="page"`.
 
-**Arquivo:** `src/components/navigation-menu.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/menu-de-navegacao/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/navigation-menu.tsx) | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/menu-de-navegacao/
 
 ## Variantes
 
@@ -25,7 +25,7 @@ variants: "composição: NavigationMenu · List · Item · Trigger · Content ·
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";

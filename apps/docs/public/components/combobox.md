@@ -2,7 +2,7 @@
 title: "Combobox"
 code: "combobox"
 slug: "combobox"
-file: "src/components/combobox.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/combobox.tsx"
 category: "formularios"
 variants: "props: options · value · defaultValue · onValueChange · placeholder · searchPlaceholder · emptyText · name · id · invalid · required · disabled · labels · portalContainer · removidas na 4.0: onChange(value) → use onValueChange (guia docs/migracao-4.0.md; codemod codemod-4) · deprecadas: ariaLabel (use rótulo visível ou aria-labelledby) · emptyMessage (use emptyText); anunciadas na 4.0, saem na 5.0"
 ---
@@ -11,7 +11,7 @@ variants: "props: options · value · defaultValue · onValueChange · placehold
 
 > Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.
 
-**Arquivo:** `src/components/combobox.tsx` | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/combobox/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/combobox.tsx) | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/combobox/
 
 ## Variantes
 
@@ -25,7 +25,7 @@ variants: "props: options · value · defaultValue · onValueChange · placehold
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";

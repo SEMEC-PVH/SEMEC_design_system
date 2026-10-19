@@ -2,7 +2,7 @@
 title: "Botão de opção"
 code: "radio-group"
 slug: "botao-de-opcao"
-file: "src/components/radio-group.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/radio-group.tsx"
 category: "formularios"
 variants: "composição: RadioGroup · RadioGroupItem + Label · contrato: value · defaultValue · onValueChange · name · id · invalid · disabled · required"
 ---
@@ -11,7 +11,7 @@ variants: "composição: RadioGroup · RadioGroupItem + Label · contrato: value
 
 > Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`.
 
-**Arquivo:** `src/components/radio-group.tsx` | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/botao-de-opcao/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/radio-group.tsx) | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/botao-de-opcao/
 
 ## Variantes
 
@@ -24,7 +24,7 @@ variants: "composição: RadioGroup · RadioGroupItem + Label · contrato: value
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -43,7 +43,7 @@ No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca 
 import { RadioGroup, RadioGroupItem, Label } from "@semec/ds/react";
 
 <RadioGroup name="tipoPessoa" defaultValue="pessoa-fisica" onValueChange={setTipoPessoa}>
-  <div className="flex items-center gap-2">
+  <div className="flex min-h-11 items-center gap-2">
     <RadioGroupItem value="pessoa-fisica" id="pf" />
     <Label htmlFor="pf">Pessoa física</Label>
   </div>

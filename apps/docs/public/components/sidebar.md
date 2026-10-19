@@ -2,7 +2,7 @@
 title: "Barra lateral"
 code: "sidebar"
 slug: "sidebar"
-file: "src/components/sidebar.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/sidebar.tsx"
 category: "navegacao"
 variants: "side: left · right · variant: sidebar · floating · inset · collapsible: offcanvas · icon · none · as (Sidebar): nav (padrão) · aside · div · labels (Sidebar): navigation ('Menu lateral') · mobileTitle ('Menu de navegação') · close ('Fechar menu') · as (SidebarInset): main (padrão) · div · section · label (SidebarTrigger): padrão 'Alternar barra lateral' · SidebarMenuButton: isActive (aria-current=page) · tooltip (string ou props do TooltipContent) · asChild · a11y: landmark nav/aside com aria-label · gaveta mobile com focus trap, Esc e retorno de foco · aria-expanded/aria-controls no gatilho · aria-current=page no item ativo · alvos de 44px · barra offcanvas recolhida fica inert · composição: SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail"
 ---
@@ -11,7 +11,7 @@ variants: "side: left · right · variant: sidebar · floating · inset · colla
 
 > Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile. Abaixo de 768px (48rem, via `matchMedia`) a Sidebar vira gaveta modal (Radix Dialog): foco preso, Esc fecha, conteúdo de trás inerte, foco volta a quem abriu e botão visível "Fechar menu" (44×44). No desktop renderiza um landmark `<nav aria-label="Menu lateral">`. `SidebarMenuButton isActive` gera `aria-current="page"`; `tooltip` aparece só no modo recolhido (`collapsible="icon"`). `SidebarTrigger` (44×44) expõe `aria-expanded` e `aria-controls`.
 
-**Arquivo:** `src/components/sidebar.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/sidebar/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/sidebar.tsx) | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/sidebar/
 
 ## Variantes
 
@@ -32,7 +32,7 @@ variants: "side: left · right · variant: sidebar · floating · inset · colla
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -91,7 +91,7 @@ import { LayoutDashboard } from "lucide-react";
         {/* Gatilho e marca num grupo à esquerda (o Header é justify-between) */}
         <div className="flex min-w-0 items-center gap-2">
           <SidebarTrigger />
-          <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+          <HeaderBrand orgName="SEMEC" href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
         </div>
       </Header>
       <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-[75rem] px-4 py-8">

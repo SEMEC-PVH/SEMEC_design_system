@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-16T18:16:03.000Z — packages/react/manifest.js + packages/react/* — versão 4.2.0
+> Gerado 2026-10-19T13:53:36.000Z — packages/react/manifest.js + packages/react/* — versão 4.2.0
 
 > **Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (patch) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.2.1. Confira a versão instalada com `npm ls @semec/ds`.**
 
@@ -10,7 +10,7 @@
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -760,11 +760,50 @@ export * from "./components/input-mask";
     --focus-ring: var(--focus-ring-inverse);
   }
 
+  /* INT-A-01: o anel inverso precisa da superfície de marca mesmo sem Tailwind. */
+  .bg-brand-hero {
+    background-color: var(--brand-hero);
+    color: var(--text-on-brand);
+  }
+
   /* O próprio elemento bg-brand-hero focado desenha o anel por fora, sobre
      o fundo da página: mantém o anel padrão (9,38:1 sobre --surface). */
   .bg-brand-hero:focus-visible,
   [data-surface="default"] {
     --focus-ring: var(--pv-blue-hero);
+  }
+
+  /* INT-B2-02: o CSP pode bloquear os atributos style do HTML do Radix. */
+  button[role="checkbox"] + input[type="checkbox"][aria-hidden="true"],
+  button[role="switch"] + input[type="checkbox"][aria-hidden="true"],
+  button[role="radio"] + input[type="radio"][aria-hidden="true"] {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    margin: 0;
+  }
+
+  /* O input de apoio do Slider não tem aria-hidden nem type no Radix. */
+  [data-semec-slider] > input {
+    display: none;
+  }
+
+  [data-semec-slider][data-orientation="horizontal"] {
+    --radix-slider-thumb-transform: translateX(-50%);
+  }
+
+  [data-semec-slider][data-orientation="vertical"] {
+    --radix-slider-thumb-transform: translateY(50%);
+  }
+
+  [data-semec-slider] > span:has(> [role="slider"]) {
+    position: absolute;
+    transform: var(--radix-slider-thumb-transform);
+  }
+
+  /* O Radix só conhece o índice/valor do polegar após montar a coleção. */
+  [data-semec-slider] [role="slider"]:not([aria-valuenow]) {
+    visibility: hidden;
   }
 }
 
@@ -1001,7 +1040,7 @@ export default {
 
 ## Componentes — todos (55)
 
-### Botões (`button`) — `src/components/button.tsx` — slug: botoes
+### Botões (`button`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/button.tsx) — slug: botoes
 
 Desc: Ação principal. Sete variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. A altura é mínima (`min-h-*`), não fixa: rótulo longo quebra em linhas balanceadas em vez de criar rolagem horizontal; para reduzir a altura com `className`, sobrescreva o `min-h-*` junto com o `h-*`. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.
 
@@ -1010,7 +1049,7 @@ Variantes: variant: primary · secondary · outline · ghost · destructive · s
 Uso:
 ```tsx
 import { Button } from "@semec/ds/react";
-import Link from "next/link";
+// No Next.js, substitua <a> por <Link> e habilite: import Link from "next/link";
 import { Plus } from "lucide-react";
 
 <Button variant="primary">Emitir boleto</Button>
@@ -1022,7 +1061,7 @@ import { Plus } from "lucide-react";
 <Button><Plus /> Adicionar serviço</Button>
 
 <Button asChild>
-  <Link href="/iptu">Ver meu IPTU</Link>
+  <a href="/iptu">Ver meu IPTU</a>
 </Button>
 
 // Envio em andamento: o foco fica no botão e o clique é ignorado
@@ -1160,7 +1199,7 @@ export { Button, buttonVariants };
 
 ---
 
-### Botão de ícone (`icon-button`) — `src/components/icon-button.tsx` — slug: botao-de-icone
+### Botão de ícone (`icon-button`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/icon-button.tsx) — slug: botao-de-icone
 
 Desc: Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome.
 
@@ -1246,7 +1285,7 @@ export { IconButton };
 
 ---
 
-### Link (`link`) — `src/components/link.tsx` — slug: link
+### Link (`link`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/link.tsx) — slug: link
 
 Desc: Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas.
 
@@ -1327,7 +1366,7 @@ export { Link, linkVariants };
 
 ---
 
-### Caixa de texto (`input`) — `src/components/input.tsx` — slug: caixa-de-texto
+### Caixa de texto (`input`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/input.tsx) — slug: caixa-de-texto
 
 Desc: Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string.
 
@@ -1416,7 +1455,7 @@ export { Input };
 
 ---
 
-### Campo de senha (`password-input`) — `src/components/password-input.tsx` — slug: campo-de-senha
+### Campo de senha (`password-input`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/password-input.tsx) — slug: campo-de-senha
 
 Desc: Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Desliga corretor e maiúscula automática (`spellCheck={false}`, `autoCapitalize="none"`, `autoCorrect="off"`, sobrescrevíveis), que alterariam a senha visível. Repassa todas as props do `Input`, inclusive `autoComplete`.
 
@@ -1549,7 +1588,7 @@ export { PasswordInput };
 
 ---
 
-### Campo com máscara (`input-mask`) — `src/components/input-mask.tsx` — slug: campo-com-mascara
+### Campo com máscara (`input-mask`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/input-mask.tsx) — slug: campo-com-mascara
 
 Desc: Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
 
@@ -1901,7 +1940,7 @@ export { InputMask };
 
 ---
 
-### Área de texto (`textarea`) — `src/components/textarea.tsx` — slug: area-de-texto
+### Área de texto (`textarea`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/textarea.tsx) — slug: area-de-texto
 
 Desc: Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`).
 
@@ -1974,7 +2013,7 @@ export { Textarea };
 
 ---
 
-### Menu de seleção (`select`) — `src/components/select.tsx` — slug: menu-de-selecao
+### Menu de seleção (`select`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/select.tsx) — slug: menu-de-selecao
 
 Desc: Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`).
 
@@ -1982,13 +2021,13 @@ Variantes: composição: Select · SelectTrigger · SelectValue · SelectContent
 
 Uso:
 ```tsx
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@semec/ds/react";
+import { FormField, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@semec/ds/react";
 
-<Select defaultValue="pbh">
+<Select defaultValue="porto-velho">
   <SelectTrigger aria-label="Município"><SelectValue placeholder="Município" /></SelectTrigger>
   <SelectContent>
-    <SelectItem value="pbh">Porto Velho</SelectItem>
-    <SelectItem value="riob">Rio Branco</SelectItem>
+    <SelectItem value="porto-velho">Porto Velho</SelectItem>
+    <SelectItem value="rio-branco">Rio Branco</SelectItem>
   </SelectContent>
 </Select>
 
@@ -1997,7 +2036,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
   <Select name="municipio" value={municipio} onValueChange={setMunicipio}>
     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
     <SelectContent>
-      <SelectItem value="pbh">Porto Velho</SelectItem>
+      <SelectItem value="porto-velho">Porto Velho</SelectItem>
     </SelectContent>
   </Select>
 </FormField>
@@ -2017,6 +2056,7 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import { useNonce } from "../lib/nonce-context";
 import { useFormFieldControl } from "./form-field";
 
 const Select = SelectPrimitive.Root;
@@ -2087,34 +2127,41 @@ SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayNam
 
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
->(({ className, children, position = "popper", ...props }, ref) => (
-  <SelectPrimitive.Portal>
-    <SelectPrimitive.Content
-      ref={ref}
-      className={cn(
-        "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 data-[state=open]:animate-in data-[state=closed]:animate-out",
-        position === "popper" &&
-          "w-[var(--radix-select-trigger-width)] max-w-[var(--radix-select-trigger-width)] data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
-        className
-      )}
-      position={position}
-      {...props}
-    >
-      <SelectScrollUpButton />
-      <SelectPrimitive.Viewport
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> & {
+    /** Nonce do estilo do Viewport; prevalece sobre o SemecProvider. */
+    nonce?: string;
+  }
+>(({ className, children, position = "popper", nonce, ...props }, ref) => {
+  const viewportNonce = useNonce(nonce);
+  return (
+    <SelectPrimitive.Portal>
+      <SelectPrimitive.Content
+        ref={ref}
         className={cn(
-          "p-1.5",
+          "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 data-[state=open]:animate-in data-[state=closed]:animate-out",
           position === "popper" &&
-            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+            "w-[var(--radix-select-trigger-width)] max-w-[var(--radix-select-trigger-width)] data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
+          className
         )}
+        position={position}
+        {...props}
       >
-        {children}
-      </SelectPrimitive.Viewport>
-      <SelectScrollDownButton />
-    </SelectPrimitive.Content>
-  </SelectPrimitive.Portal>
-));
+        <SelectScrollUpButton />
+        <SelectPrimitive.Viewport
+          nonce={viewportNonce}
+          className={cn(
+            "p-1.5",
+            position === "popper" &&
+              "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+          )}
+        >
+          {children}
+        </SelectPrimitive.Viewport>
+        <SelectScrollDownButton />
+      </SelectPrimitive.Content>
+    </SelectPrimitive.Portal>
+  );
+});
 SelectContent.displayName = SelectPrimitive.Content.displayName;
 
 const SelectLabel = React.forwardRef<
@@ -2175,11 +2222,12 @@ export {
   SelectScrollUpButton,
   SelectScrollDownButton,
 };
+
 ```
 
 ---
 
-### Combobox (`combobox`) — `src/components/combobox.tsx` — slug: combobox
+### Combobox (`combobox`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/combobox.tsx) — slug: combobox
 
 Desc: Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.
 
@@ -2617,7 +2665,7 @@ export { Combobox };
 
 ---
 
-### Seletor de data (`date-picker`) — `src/components/date-picker.tsx` — slug: seletor-de-data
+### Seletor de data (`date-picker`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/date-picker.tsx) — slug: seletor-de-data
 
 Desc: Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). O formato mostrado (dd/mm/aaaa ou mm/dd/aaaa) vem do idioma do navegador, não do `lang` da página: nos PCs da prefeitura, deixe o navegador em português. Num navegador sem `type="date"` o campo vira texto e `onValueChange` recebe o que foi digitado, então valide o ISO no schema (ex.: `z.string().regex(/^\d{4}-\d{2}-\d{2}$/)`). Em teste automatizado, preencha com `fill("2026-10-16")`, não digitando a data.
 
@@ -2758,7 +2806,7 @@ export { DatePicker };
 
 ---
 
-### Envio de arquivos (`file-upload`) — `src/components/file-upload.tsx` — slug: envio-de-arquivos
+### Envio de arquivos (`file-upload`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/file-upload.tsx) — slug: envio-de-arquivos
 
 Desc: Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio.
 
@@ -3144,7 +3192,7 @@ export { FileUpload };
 
 ---
 
-### Caixa de marcação (`checkbox`) — `src/components/checkbox.tsx` — slug: caixa-de-marcacao
+### Caixa de marcação (`checkbox`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/checkbox.tsx) — slug: caixa-de-marcacao
 
 Desc: Caixa de marcação com estado indeterminado. Mantém a API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.
 
@@ -3154,13 +3202,13 @@ Uso:
 ```tsx
 import { Checkbox, Label } from "@semec/ds/react";
 
-<div className="flex items-center gap-2">
+<div className="flex min-h-11 items-center gap-2">
   <Checkbox id="termos" />
   <Label htmlFor="termos">Aceito os termos</Label>
 </div>
 
 // Controlado, com envio em <form> e erro (checked/onCheckedChange = value/onValueChange)
-<div className="flex items-center gap-2">
+<div className="flex min-h-11 items-center gap-2">
   <Checkbox id="aceite" name="aceite" checked={aceito} onCheckedChange={(v) => setAceito(v === true)} invalid={!aceito && enviado} />
   <Label htmlFor="aceite">Li e aceito o regulamento</Label>
 </div>
@@ -3216,7 +3264,7 @@ export { Checkbox };
 
 ---
 
-### Botão de opção (`radio-group`) — `src/components/radio-group.tsx` — slug: botao-de-opcao
+### Botão de opção (`radio-group`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/radio-group.tsx) — slug: botao-de-opcao
 
 Desc: Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`.
 
@@ -3227,7 +3275,7 @@ Uso:
 import { RadioGroup, RadioGroupItem, Label } from "@semec/ds/react";
 
 <RadioGroup name="tipoPessoa" defaultValue="pessoa-fisica" onValueChange={setTipoPessoa}>
-  <div className="flex items-center gap-2">
+  <div className="flex min-h-11 items-center gap-2">
     <RadioGroupItem value="pessoa-fisica" id="pf" />
     <Label htmlFor="pf">Pessoa física</Label>
   </div>
@@ -3302,7 +3350,7 @@ export { RadioGroup, RadioGroupItem };
 
 ---
 
-### Interruptor (`switch`) — `src/components/switch.tsx` — slug: interruptor
+### Interruptor (`switch`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/switch.tsx) — slug: interruptor
 
 Desc: Interruptor on/off para ativação imediata. API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.
 
@@ -3367,7 +3415,7 @@ export { Switch };
 
 ---
 
-### Rótulo (`label`) — `src/components/label.tsx` — slug: rotulo
+### Rótulo (`label`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/label.tsx) — slug: rotulo
 
 Desc: Rótulo acessível vinculado ao campo.
 
@@ -3413,7 +3461,7 @@ export { Label };
 
 ---
 
-### Campo de formulário (`form-field`) — `src/components/form-field.tsx` — slug: campo-de-formulario
+### Campo de formulário (`form-field`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/form-field.tsx) — slug: campo-de-formulario
 
 Desc: Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio.
 
@@ -3428,7 +3476,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 
-// npm install react-hook-form @hookform/resolvers zod (opcionais, só para esta receita)
+// npm install react-hook-form @hookform/resolvers@^5 zod@^4 (opcionais, só para esta receita)
 const formSchema = z.object({
   nome: z.string().min(3, "Nome deve ter ao menos 3 caracteres"),
   email: emailSchema,
@@ -3808,7 +3856,7 @@ export { FormField };
 
 ---
 
-### ErrorSummary (`error-summary`) — `src/components/error-summary.tsx` — slug: error-summary
+### ErrorSummary (`error-summary`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/error-summary.tsx) — slug: error-summary
 
 Desc: Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco. Título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`).
 
@@ -4003,7 +4051,7 @@ export { ErrorSummary };
 
 ---
 
-### Cartão (`card`) — `src/components/card.tsx` — slug: cartao
+### Cartão (`card`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/card.tsx) — slug: cartao
 
 Desc: Superfície de conteúdo com header, corpo e footer. Sombra pelo token `shadow-elevation-1`.
 
@@ -4171,7 +4219,7 @@ export {
 
 ---
 
-### Título (`heading`) — `src/components/heading.tsx` — slug: titulo
+### Título (`heading`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/heading.tsx) — slug: titulo
 
 Desc: Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual. Escala: 1 = `text-3xl` (32px, título da página), 2 = `text-2xl` (24px), 3 = `text-xl` (20px), 4 = `text-base`, 5 = `text-sm`, 6 = `text-xs` em caixa alta.
 
@@ -4264,7 +4312,7 @@ export { Heading, headingVariants };
 
 ---
 
-### Etiqueta (`badge`) — `src/components/badge.tsx` — slug: etiqueta
+### Etiqueta (`badge`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/badge.tsx) — slug: etiqueta
 
 Desc: Etiqueta curta de status ou contagem.
 
@@ -4326,9 +4374,9 @@ export { Badge, badgeVariants };
 
 ---
 
-### Tabela (`table`) — `src/components/table.tsx` — slug: tabela
+### Tabela (`table`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/table.tsx) — slug: tabela
 
-Desc: Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
+Desc: Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver https://semec-pvh.github.io/SEMEC_design_system/padroes/dados-relatorios/tabelas/. Se houver rolagem horizontal, use uma região nomeada e focável, como no exemplo, e teste Tab e setas em tela estreita.
 
 Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome
 
@@ -4336,20 +4384,22 @@ Uso:
 ```tsx
 import { Table, TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/ds/react";
 
-// Básico
-<Table>
-  <TableCaption>Serviços solicitados</TableCaption>
-  <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
-  <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>
-</Table>
+// A região recebe o foco e a rolagem; o wrapper interno da Table fica overflow-visible.
+<div role="region" aria-label="Serviços solicitados" tabIndex={0} className="overflow-x-auto [&>div]:overflow-visible">
+  <Table className="min-w-[40rem]">
+    <TableCaption>Serviços solicitados</TableCaption>
+    <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
+    <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>
+  </Table>
+</div>
 
 // Avançado: ordenação + filtro + paginação + seleção
-// Ver padroes/dados-relatorios/tabelas → demo com TableAdvanced
+// Ver https://semec-pvh.github.io/SEMEC_design_system/padroes/dados-relatorios/tabelas/ → demo com TableAdvanced
 ```
 
 Prompt:
 ```text
-Use o componente `Table` (Tabela) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas. API e variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Table` (Tabela) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver https://semec-pvh.github.io/SEMEC_design_system/padroes/dados-relatorios/tabelas/. Se houver rolagem horizontal, use uma região nomeada e focável, como no exemplo, e teste Tab e setas em tela estreita. API e variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -4481,7 +4531,7 @@ export {
 
 ---
 
-### Esqueleto (`skeleton`) — `src/components/skeleton.tsx` — slug: esqueleto
+### Esqueleto (`skeleton`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/skeleton.tsx) — slug: esqueleto
 
 Desc: Placeholder pulsante de carregamento, decorativo (aria-hidden). Fundo `surface-sunken`. Anuncie o carregamento no contêiner com aria-busy e um texto ou Spinner.
 
@@ -4534,7 +4584,7 @@ export { Skeleton };
 
 ---
 
-### Estado vazio (`empty-state`) — `src/components/empty-state.tsx` — slug: estado-vazio
+### Estado vazio (`empty-state`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/empty-state.tsx) — slug: estado-vazio
 
 Desc: Estado vazio com ícone, título, descrição e ação opcional.
 
@@ -4613,7 +4663,7 @@ export { EmptyState };
 
 ---
 
-### Estado de erro (`error-state`) — `src/components/error-state.tsx` — slug: estado-de-erro
+### Estado de erro (`error-state`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/error-state.tsx) — slug: estado-de-erro
 
 Desc: Estado de erro com anúncio acessível (role=alert), mensagem explicativa e ação de recuperação (onRetry ou ação personalizada).
 
@@ -4785,7 +4835,7 @@ export { ErrorState };
 
 ---
 
-### Trilha de navegação (`breadcrumb`) — `src/components/breadcrumb.tsx` — slug: trilha-de-navegacao
+### Trilha de navegação (`breadcrumb`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/breadcrumb.tsx) — slug: trilha-de-navegacao
 
 Desc: Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
 
@@ -4871,7 +4921,7 @@ export { Breadcrumb };
 
 ---
 
-### Cabeçalho (`header`) — `src/components/header.tsx` — slug: cabecalho
+### Cabeçalho (`header`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/header.tsx) — slug: cabecalho
 
 Desc: Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.
 
@@ -4886,7 +4936,8 @@ import { Button } from "@semec/ds/react";
   <HeaderBrand
     orgName="SEMEC"
     serviceName="Nome do serviço"
-    logo={<img src="/logo-prefeitura.svg" alt="Prefeitura de Porto Velho" className="h-9 w-auto" />}
+    // A logo não vem no pacote: peça o SVG oficial à SEMEC e salve em public/marca.svg.
+    logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" className="h-9 w-auto" />}
   />
   <div className="flex items-center gap-2">
     <HeaderNav>
@@ -4935,6 +4986,7 @@ export interface HeaderBrandProps extends React.HTMLAttributes<HTMLElement> {
    * renderizar a marca sem link (ex.: já na página inicial).
    */
   href?: string | null;
+  /** Nome do órgão. @default "SEMEC" */
   orgName?: string;
   serviceName?: string;
   /**
@@ -5046,7 +5098,7 @@ const HeaderNav = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement
   ({ className, children, ...props }, ref) => (
     <nav
       ref={ref}
-      aria-label="Principal"
+      aria-label="Menu principal"
       className={cn("flex flex-wrap items-center gap-2", className)}
       {...props}
     >
@@ -5083,7 +5135,7 @@ export { Header, HeaderBrand, HeaderNav, HeaderNavLink };
 
 ---
 
-### Etapas (`stepper`) — `src/components/stepper.tsx` — slug: etapas
+### Etapas (`stepper`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/stepper.tsx) — slug: etapas
 
 Desc: Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.
 
@@ -5331,7 +5383,7 @@ export { Stepper };
 
 ---
 
-### Link para o conteúdo (`skip-link`) — `src/components/skip-link.tsx` — slug: link-para-o-conteudo
+### Link para o conteúdo (`skip-link`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/skip-link.tsx) — slug: link-para-o-conteudo
 
 Desc: Link "Pular para o conteúdo principal" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo).
 
@@ -5412,7 +5464,7 @@ export { SkipLink };
 
 ---
 
-### Rodapé (`footer`) — `src/components/footer.tsx` — slug: rodape
+### Rodapé (`footer`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/footer.tsx) — slug: rodape
 
 Desc: Rodapé institucional (<footer>, landmark contentinfo) com seções de links e faixa final. Use um por página, fora do <main>.
 
@@ -5571,7 +5623,7 @@ export {
 
 ---
 
-### Abas (`tabs`) — `src/components/tabs.tsx` — slug: abas
+### Abas (`tabs`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/tabs.tsx) — slug: abas
 
 Desc: Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix. A aba ativa tem barra inferior de 3px em `primary` (≥4,97:1) e peso semibold, além do fundo: não depende só de cor. Alvo de 44px.
 
@@ -5666,7 +5718,7 @@ export { Tabs, TabsList, TabsTrigger, TabsContent };
 
 ---
 
-### Paginação (`pagination`) — `src/components/pagination.tsx` — slug: paginacao
+### Paginação (`pagination`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/pagination.tsx) — slug: paginacao
 
 Desc: Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px que não encolhem. Abaixo de `sm` ficam só as setas e a página atual ± 1 (primeira, última e elipses ocultas). Textos em PT-BR, sobrescrevíveis por `labels`.
 
@@ -5842,7 +5894,7 @@ export { Pagination };
 
 ---
 
-### Gatilho da barra lateral (`sidebar-trigger`) — `src/components/sidebar-trigger.tsx` — slug: gatilho-da-barra-lateral
+### Gatilho da barra lateral (`sidebar-trigger`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/sidebar-trigger.tsx) — slug: gatilho-da-barra-lateral
 
 Desc: `SidebarToggleButton`: botão controlado (`open` + `onToggle`) para colapsar/expandir uma sidebar cujo estado vive no seu layout (ex.: Header). Alterna entre ícones PanelLeftOpen e PanelLeftClose. Dentro de `SidebarProvider`, use `SidebarTrigger` (ver Barra lateral), que não recebe `open`/`onToggle`.
 
@@ -5967,7 +6019,7 @@ export { SidebarToggleButton };
 
 ---
 
-### Modal (`dialog`) — `src/components/dialog.tsx` — slug: modal
+### Modal (`dialog`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/dialog.tsx) — slug: modal
 
 Desc: Diálogo modal acessível com overlay, header, título, descrição e footer.
 
@@ -6142,11 +6194,11 @@ export {
 
 ---
 
-### Notificação (`toast`) — `src/components/toast.tsx` — slug: notificacao
+### Notificação (`toast`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/toast.tsx) — slug: notificacao
 
 Desc: Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.
 
-Variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos · Toaster: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis) · alvos: X e ToastAction com 44px
+Variantes: variant: default · success (fundo bg-success-emphasis, texto text-success-emphasis-foreground, 5,85:1; título 16px (text-base font-bold), descrição 14px (text-sm), Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos · Toaster: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis) · alvos: X e ToastAction com 44px
 
 Uso:
 ```tsx
@@ -6166,7 +6218,7 @@ function Acao() {
 
 Prompt:
 ```text
-Use o componente `Toaster` (Notificação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`. API e variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos · Toaster: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis) · alvos: X e ToastAction com 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Toaster` (Notificação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`. API e variantes: variant: default · success (fundo bg-success-emphasis, texto text-success-emphasis-foreground, 5,85:1; título 16px (text-base font-bold), descrição 14px (text-sm), Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos · Toaster: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis) · alvos: X e ToastAction com 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -6202,7 +6254,7 @@ const ToastViewport = React.forwardRef<
     ref={ref}
     label={label}
     className={cn(
-      "fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col gap-2 p-4 sm:top-4 sm:right-4 md:max-w-[420px]",
+      "pointer-events-none fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col gap-2 p-4 sm:top-4 sm:right-4 md:max-w-[420px]",
       className
     )}
     {...props}
@@ -6473,11 +6525,12 @@ export {
   Toaster,
   useToast,
 };
+
 ```
 
 ---
 
-### Dica (`tooltip`) — `src/components/tooltip.tsx` — slug: dica
+### Dica (`tooltip`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/tooltip.tsx) — slug: dica
 
 Desc: Dica curta ao passar o ponteiro ou focar o elemento.
 
@@ -6539,7 +6592,7 @@ export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };
 
 ---
 
-### Aviso (`alert`) — `src/components/alert.tsx` — slug: aviso
+### Aviso (`alert`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/alert.tsx) — slug: aviso
 
 Desc: Mensagem de feedback em linha, com ícone automático por variante. Só destructive interrompe o leitor de tela (role=alert); as demais usam role=status.
 
@@ -6707,7 +6760,7 @@ export { Alert, AlertTitle, AlertDescription };
 
 ---
 
-### Acordeão (`accordion`) — `src/components/accordion.tsx` — slug: acordeao
+### Acordeão (`accordion`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/accordion.tsx) — slug: acordeao
 
 Desc: Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`).
 
@@ -6794,7 +6847,7 @@ export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };
 
 ---
 
-### Diálogo de alerta (`alert-dialog`) — `src/components/alert-dialog.tsx` — slug: dialogo-de-alerta
+### Diálogo de alerta (`alert-dialog`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/alert-dialog.tsx) — slug: dialogo-de-alerta
 
 Desc: Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role="alertdialog", sempre modal, não fecha por clique fora e abre com o foco no Cancelar.
 
@@ -7043,7 +7096,7 @@ export {
 
 ---
 
-### Popover (`popover`) — `src/components/popover.tsx` — slug: popover
+### Popover (`popover`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/popover.tsx) — slug: popover
 
 Desc: Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.
 
@@ -7109,7 +7162,7 @@ export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor };
 
 ---
 
-### Separador (`separator`) — `src/components/separator.tsx` — slug: separador
+### Separador (`separator`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/separator.tsx) — slug: separador
 
 Desc: Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.
 
@@ -7162,7 +7215,7 @@ export { Separator };
 
 ---
 
-### Avatar (`avatar`) — `src/components/avatar.tsx` — slug: avatar
+### Avatar (`avatar`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/avatar.tsx) — slug: avatar
 
 Desc: Foto de perfil com fallback automático (iniciais). Com a foto quebrada, o `AvatarFallback` anuncia o `alt` da `AvatarImage` (as iniciais ficam só visuais); um `aria-label` no `AvatarFallback` continua aceito e tem prioridade.
 
@@ -7287,7 +7340,7 @@ export { Avatar, AvatarImage, AvatarFallback };
 
 ---
 
-### Toggle (`toggle`) — `src/components/toggle.tsx` — slug: toggle
+### Toggle (`toggle`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/toggle.tsx) — slug: toggle
 
 Desc: Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. Ligado = fundo `tint` + contorno de 2px em `primary` (5,00:1 sobre `--bg`, 5,42:1 sobre branco) e texto `foreground`; o estado vai ao leitor de tela por `aria-pressed`.
 
@@ -7374,7 +7427,7 @@ export { Toggle, toggleVariants };
 
 ---
 
-### Spinner (`spinner`) — `src/components/spinner.tsx` — slug: spinner
+### Spinner (`spinner`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/spinner.tsx) — slug: spinner
 
 Desc: Indicador de carregamento inline (role=status). Com `decorative`, é só visual (sem role, aria-label nem texto sr-only), para quando outro elemento já anuncia o carregamento; é o que o `Button` com `loading` usa.
 
@@ -7475,7 +7528,7 @@ export { Spinner };
 
 ---
 
-### Progresso (`progress`) — `src/components/progress.tsx` — slug: progress
+### Progresso (`progress`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/progress.tsx) — slug: progress
 
 Desc: Barra de progresso determinada. Trilha com contorno border-strong (3,77:1 sobre surface) e indicador primary.
 
@@ -7533,10 +7586,12 @@ const Progress = React.forwardRef<
       aria-valuenow={value ?? undefined}
       {...props}
     >
-      <ProgressPrimitive.Indicator
-        className="h-full w-full flex-1 rounded-full bg-primary transition-all duration-base ease-standard"
-        style={{ transform: `translateX(-${100 - percentual}%)` }}
-      />
+      <ProgressPrimitive.Indicator asChild>
+        {/* Atributos SVG funcionam no SSR com style-src-attr 'none'. */}
+        <svg className="block h-full w-full" aria-hidden="true" focusable="false">
+          <rect width={`${percentual}%`} height="100%" className="fill-primary" />
+        </svg>
+      </ProgressPrimitive.Indicator>
     </ProgressPrimitive.Root>
   );
 });
@@ -7548,7 +7603,7 @@ export { Progress };
 
 ---
 
-### Slider (`slider`) — `src/components/slider.tsx` — slug: slider
+### Slider (`slider`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/slider.tsx) — slug: slider
 
 Desc: Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares.
 
@@ -7623,6 +7678,16 @@ const Slider = React.forwardRef<
       { labelable: false }
     );
     const ariaLabelledBy = field["aria-labelledby"] ?? ariaLabelledByProp;
+    // O preenchimento SVG não depende dos atributos style bloqueados no SSR.
+    // O Radix continua responsável pelo estado, teclado e inputs do formulário.
+    const [uncontrolledValue, setUncontrolledValue] = React.useState(props.defaultValue ?? [0]);
+    const values = props.value ?? uncontrolledValue;
+    const min = props.min ?? 0;
+    const max = props.max ?? 100;
+    const percentages = values.map((value) => max > min ? Math.min(100, Math.max(0, (value - min) / (max - min) * 100)) : 0);
+    const start = percentages.length > 1 ? Math.min(...percentages) : 0;
+    const end = percentages.length ? Math.max(...percentages) : 0;
+    const vertical = props.orientation === "vertical";
     // Um polegar por valor (range com 2 valores = 2 polegares).
     const count = Math.max((props.value ?? props.defaultValue ?? [0]).length, 1);
 
@@ -7640,10 +7705,33 @@ const Slider = React.forwardRef<
           className
         )}
         {...props}
+        onValueChange={(value) => {
+          setUncontrolledValue(value);
+          props.onValueChange?.(value);
+        }}
+        data-semec-slider=""
         id={field.id ?? props.id}
       >
         <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
-          <SliderPrimitive.Range className="absolute h-full bg-primary" />
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            data-inverted={props.inverted || undefined}
+            className={cn(
+              "absolute inset-0 h-full w-full",
+              vertical
+                ? "data-[inverted=true]:-scale-y-100"
+                : "data-[inverted=true]:-scale-x-100 rtl:-scale-x-100 rtl:data-[inverted=true]:scale-x-100"
+            )}
+          >
+            <rect
+              x={vertical ? 0 : `${start}%`}
+              y={vertical ? `${100 - end}%` : 0}
+              width={vertical ? "100%" : `${end - start}%`}
+              height={vertical ? `${end - start}%` : "100%"}
+              className="fill-primary"
+            />
+          </svg>
         </SliderPrimitive.Track>
         {Array.from({ length: count }, (_, index) => (
           <SliderPrimitive.Thumb
@@ -7669,7 +7757,7 @@ export { Slider };
 
 ---
 
-### Input OTP (`input-otp`) — `src/components/input-otp.tsx` — slug: input-otp
+### Input OTP (`input-otp`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/input-otp.tsx) — slug: input-otp
 
 Desc: Campo de código OTP com foco automático entre dígitos.
 
@@ -8079,7 +8167,7 @@ export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator };
 
 ---
 
-### Calendário (`calendar`) — `src/components/calendar.tsx` — slug: calendario
+### Calendário (`calendar`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/calendar.tsx) — slug: calendario
 
 Desc: Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px.
 
@@ -8425,7 +8513,7 @@ export { Calendar };
 
 ---
 
-### Área de scroll (`scroll-area`) — `src/components/scroll-area.tsx` — slug: scroll-area
+### Área de scroll (`scroll-area`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/scroll-area.tsx) — slug: scroll-area
 
 Desc: Scroll customizado e consistente entre navegadores. A região rolável é alcançável pelo teclado: sem nada focável dentro (ex.: texto puro), a viewport vira parada de Tab com anel de foco (`focusable="auto"`, o padrão). Dê nome à região com `viewportProps={{ "aria-label": "…" }}`.
 
@@ -8454,6 +8542,7 @@ import * as React from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
 import { cn } from "../lib/utils";
+import { useNonce } from "../lib/nonce-context";
 
 // Seletor de elementos que já entram no Tab. Se a viewport contém algum, quem
 // usa teclado rola a área focando esses elementos e a viewport não precisa
@@ -8463,6 +8552,8 @@ const FOCUSABLE_SELECTOR =
 
 export interface ScrollAreaProps
   extends React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> {
+  /** Nonce do estilo do Viewport; viewportProps.nonce prevalece sobre este e o SemecProvider. */
+  nonce?: string;
   /**
    * TST-05 (WCAG 2.1.1): a região rolável precisa ser alcançável pelo teclado.
    * - `"auto"` (padrão): a viewport recebe `tabIndex={0}` e anel de foco só
@@ -8478,7 +8569,8 @@ export interface ScrollAreaProps
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   ScrollAreaProps
->(({ className, children, focusable = "auto", viewportProps, ...props }, ref) => {
+>(({ className, children, focusable = "auto", viewportProps, nonce, ...props }, ref) => {
+  const viewportNonce = useNonce(viewportProps?.nonce ?? nonce);
   const viewportRef = React.useRef<HTMLDivElement>(null);
   // Começa focável (inclusive no HTML do servidor): sem JS, a área de texto
   // continua alcançável. O efeito retira a parada quando há conteúdo focável.
@@ -8514,6 +8606,7 @@ const ScrollArea = React.forwardRef<
         ref={viewportRef}
         tabIndex={isFocusable ? 0 : undefined}
         {...restViewportProps}
+        nonce={viewportNonce}
         className={cn(
           // Anel por dentro (`ring-inset`): a raiz tem overflow-hidden e
           // cortaria um anel com offset.
@@ -8558,7 +8651,7 @@ export { ScrollArea, ScrollBar };
 
 ---
 
-### Menu suspenso (`dropdown-menu`) — `src/components/dropdown-menu.tsx` — slug: menu-suspenso
+### Menu suspenso (`dropdown-menu`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/dropdown-menu.tsx) — slug: menu-suspenso
 
 Desc: Menu flutuante com itens, checkbox, radio, sub-menus e separadores.
 
@@ -8816,7 +8909,7 @@ export {
 
 ---
 
-### Drawer (`drawer`) — `src/components/drawer.tsx` — slug: drawer
+### Drawer (`drawer`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/drawer.tsx) — slug: drawer
 
 Desc: Painel deslizante de qualquer lado da tela.
 
@@ -8974,7 +9067,7 @@ export {
 
 ---
 
-### Sheet (`sheet`) — `src/components/sheet.tsx` — slug: sheet
+### Sheet (`sheet`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/sheet.tsx) — slug: sheet
 
 Desc: Painel lateral modal com overlay. Variantes left/right/top/bottom.
 
@@ -9170,7 +9263,7 @@ export {
 
 ---
 
-### Tabela de dados (`data-table`) — `src/components/data-table.tsx` — slug: tabela-de-dados
+### Tabela de dados (`data-table`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/data-table.tsx) — slug: tabela-de-dados
 
 Desc: Tabela com ordenação, paginação e estados vazios. Com `onRowClick`, passe `rowLabel` para dar nome à linha clicável.
 
@@ -9545,7 +9638,7 @@ export type { Column, DataTableProps, SortDirection };
 
 ---
 
-### Linha do tempo (`timeline`) — `src/components/timeline.tsx` — slug: timeline
+### Linha do tempo (`timeline`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/timeline.tsx) — slug: timeline
 
 Desc: Sequência temporal em lista ordenada (ol/li), com pontos, conectores visíveis e conteúdo. O status vai em texto (srLabel), não só na cor.
 
@@ -9733,7 +9826,7 @@ export {
 
 ---
 
-### Menu de navegação (`navigation-menu`) — `src/components/navigation-menu.tsx` — slug: menu-de-navegacao
+### Menu de navegação (`navigation-menu`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/navigation-menu.tsx) — slug: menu-de-navegacao
 
 Desc: Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. O `NavigationMenuLink` já vem estilizado: alvo de 44px (`min-h-11`), `px-4`, hover/foco em `tint` e anel de foco por dentro; `active` marca a página atual com `aria-current="page"`.
 
@@ -9928,7 +10021,7 @@ export {
 
 ---
 
-### Barra lateral (`sidebar`) — `src/components/sidebar.tsx` — slug: sidebar
+### Barra lateral (`sidebar`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/sidebar.tsx) — slug: sidebar
 
 Desc: Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile. Abaixo de 768px (48rem, via `matchMedia`) a Sidebar vira gaveta modal (Radix Dialog): foco preso, Esc fecha, conteúdo de trás inerte, foco volta a quem abriu e botão visível "Fechar menu" (44×44). No desktop renderiza um landmark `<nav aria-label="Menu lateral">`. `SidebarMenuButton isActive` gera `aria-current="page"`; `tooltip` aparece só no modo recolhido (`collapsible="icon"`). `SidebarTrigger` (44×44) expõe `aria-expanded` e `aria-controls`.
 
@@ -9979,7 +10072,7 @@ import { LayoutDashboard } from "lucide-react";
         {/* Gatilho e marca num grupo à esquerda (o Header é justify-between) */}
         <div className="flex min-w-0 items-center gap-2">
           <SidebarTrigger />
-          <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+          <HeaderBrand orgName="SEMEC" href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
         </div>
       </Header>
       <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-[75rem] px-4 py-8">
@@ -10883,6 +10976,10 @@ React 19 + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Token
 
 São 5 passos. Pular qualquer um deles faz os componentes saírem sem estilo, sem fonte ou sem funcionar.
 
+### Sem React (Vue, Angular, Svelte, HTML)
+
+Use os tokens e a fonte pelos subpaths `@semec/ds/lite/tokens.css` e `@semec/ds/lite/fonts.css`. A orientação para esses projetos está na skill lite: `node_modules/@semec/ds/dist/lite/semec-ds-lite/SKILL.md` (export `@semec/ds/lite/skills/semec-ds-lite`). Os componentes React não rodam nesses frameworks; a lite fornece tokens e orientações de acessibilidade, não componentes prontos nem CSS de componentes. Sem bundler, veja [Via CDN](#via-cdn).
+
 ### 1. Instalar
 
 ```bash
@@ -10944,6 +11041,47 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 **Logo no Next:** os exemplos usam `logo={<img src="/marca.svg" alt="…" />}`, que é válido, mas o `eslint-config-next` avisa `@next/next/no-img-element`. O `logo` aceita qualquer nó: use `<Image src="/marca.svg" alt="Prefeitura de Porto Velho" width={120} height={36} />` do `next/image`, ou ignore o aviso para SVG estático. É só aviso de lint; o build passa.
 
+**Next com export estático:** remova `cacheComponents` e `experimental.partialPrefetching` se vierem no template; PPR não é compatível com `output: "export"`. Exemplo para hospedar numa subpasta:
+
+```js
+// next.config.mjs
+export default {
+  output: "export",
+  basePath: "/meu-sistema",
+  images: { unoptimized: true },
+};
+```
+
+Use `basePath: ""` se publicar na raiz. O `basePath` é definido no build: inclua-o também nos caminhos de imagens e assets de `public/` usados pelo app. `next build` gera `out/`. Export estático não tem servidor por requisição e não suporta o fluxo de nonce da seção CSP.
+
+**React Router v7 / Remix** (Vite): configure `@tailwindcss/vite` junto do plugin do framework. No React Router v7, o `vite.config.ts` fica assim:
+
+```ts
+import { reactRouter } from "@react-router/dev/vite";
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  plugins: [tailwindcss(), reactRouter()],
+});
+```
+
+Em `app/app.css`, **substitua todo o CSS do template** pelas linhas do kit e da fonte (passo 3): remova `@theme` com Inter, `html, body`, `dark:bg-gray-950` e regras de modo escuro. Em `app/root.tsx`, retire os links/preconnects do Google Fonts, importe `./app.css`, use `<html lang="pt-BR">` e envolva `<Outlet />` com os `Providers` do passo 4, uma vez no root. O `@source` em `app/app.css` é `"../node_modules/@semec/ds/dist/react"`. No Remix com Vite, mantenha o plugin e os imports do Remix; aplique a mesma limpeza do CSS, fonte, idioma e providers. O exemplo completo de root com SSR está em [Segurança (CSP)](#segurança-csp).
+
+**Parcel 2:** instale `tailwindcss` e `@tailwindcss/postcss` como dependências de desenvolvimento. Crie `.postcssrc`:
+
+```json
+{ "plugins": { "@tailwindcss/postcss": {} } }
+```
+
+Acrescente ao `package.json` do app (mescle com os campos existentes):
+
+```json
+{ "@parcel/resolver-default": { "packageExports": true } }
+```
+
+Isso habilita a [resolução de `exports` do Parcel](https://parceljs.org/features/dependency-resolution/#package-exports); sem ela, `@semec/ds/react` não resolve. Importe o CSS global em `src/main.tsx` e use as mesmas linhas e caminho de `@source` do Vite.
+
 **As linhas do kit**, no arquivo CSS global (`src/index.css` no Vite, `app/globals.css` no Next), não via `import` em JS:
 
 ```css
@@ -10992,7 +11130,8 @@ Sem carregar a fonte, o texto cai no `system-ui` (Segoe UI no Windows) e o layou
 O `SemecProvider` **não** inclui `Toaster` nem `TooltipProvider`; monte-os à parte.
 
 ```tsx
-import { Toaster, TooltipProvider } from "@semec/ds/react";
+import { Toaster } from "@semec/ds/react/toast";
+import { TooltipProvider } from "@semec/ds/react/tooltip";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -11125,6 +11264,8 @@ import { cn } from "@semec/ds/react";
 
 Metadados de componente (o que versões anteriores deste README chamavam de `getComponentMetadata()`, função que nunca existiu) vêm de `@semec/ds/skills`: `dsBySlug["botoes"]`, `dsComponents`.
 
+Para abrir os artefatos no disco após instalar, use `node_modules/@semec/ds/dist/skills/semec-ds/SKILL.md` (skill completa) e `node_modules/@semec/ds/dist/skills/components/<slug>.md` (por exemplo, `botoes.md`). São arquivos Markdown, não módulos JS. Os caminhos de `exports` da tabela são aliases do pacote, não pastas físicas.
+
 ## Componentes
 
 <!-- ds:component-list:start -->
@@ -11166,6 +11307,21 @@ Link solto no texto (`<a>` sem `class`) é sublinhado pelo `tokens.css`; com cla
 
 Os tokens do pacote (`tokens.css`) são tema **claro**. Não há `shadcn.css` no pacote (removido na 2.0.0).
 
+### Via CDN
+
+CDNs servem os arquivos físicos do pacote, não os aliases de `exports`: no jsDelivr, `/react/tokens.css` dá 404. Para HTML sem bundler, use `/dist/react/…`, versão fixa e SRI. Este exemplo usa os arquivos publicados da **4.2.0**, com hashes SHA-384 calculados desses URLs (não inclui correções posteriores):
+
+```html
+<link rel="stylesheet" crossorigin="anonymous"
+  href="https://cdn.jsdelivr.net/npm/@semec/ds@4.2.0/dist/react/fonts.css"
+  integrity="sha384-coHk15sImpWgFqHojyN0dEPSRz68H46mEHmXdN7WXJbJhGuTfZUottZYt30RGkgk">
+<link rel="stylesheet" crossorigin="anonymous"
+  href="https://cdn.jsdelivr.net/npm/@semec/ds@4.2.0/dist/react/tokens.css"
+  integrity="sha384-TlzewAcAUnI8BjIUgRHt1S+sCjOPnYiKyLyv4we2JRsPU4R0ryKWcvsU5rUppu6q">
+```
+
+Ao atualizar a versão, recalcule o SRI a partir dos arquivos publicados e teste o carregamento; não reutilize os hashes acima com outro URL. As fontes são buscadas em `dist/react/fonts/`, relativamente ao `fonts.css`. Se houver CSP, autorize `https://cdn.jsdelivr.net` em `style-src` e `font-src`. O SRI valida o CSS do link, não os arquivos de fonte referenciados. Esse uso entrega variáveis CSS e fonte; não gera utilitários Tailwind nem fornece componentes React prontos para `<script>`. O caminho físico é para HTTP/CDN; nos imports do bundler continue usando os subpaths da tabela.
+
 ## Validação (Zod)
 
 Schemas Zod ficam no entry **`@semec/ds/react/validacao`** — o entry principal não importa `zod`. O `zod` é peer opcional, `^3.23.0 || ^4.0.0` (o kit é testado com o 3 e o 4): instale-o (`npm install zod`) só se usar esse entry.
@@ -11173,27 +11329,181 @@ Schemas Zod ficam no entry **`@semec/ds/react/validacao`** — o entry principal
 A receita de formulário da skill `semec-ds` (React Hook Form + Zod + `FormField` + `ErrorSummary`) usa também `react-hook-form` e `@hookform/resolvers`, que não vêm com o kit (opcionais, só para a receita):
 
 ```bash
-npm install react-hook-form @hookform/resolvers zod
+npm install react-hook-form @hookform/resolvers@^5 zod@^4
 ```
+
+Essa combinação foi validada; o resolvers 6.0.0 causa `ERESOLVE` no npm 11 pelo conflito do peer opcional `effect@^4` com `effect@3` (integração de 19/10/2026).
 
 ```ts
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
 import { validateCPF } from "@semec/ds/react"; // helpers puros, sem zod
 ```
 
-## Segurança (CSP)
+### React Hook Form: controles compostos
 
-Alguns componentes Radix injetam `<style>` dinamicamente (scrollbar hiding, scroll locking). Para ambientes com **Content Security Policy** estrita, use o `SemecProvider` com o nonce do servidor:
+Use `Controller` para ligar os valores do RHF aos controles. `Select` e `RadioGroup` recebem `value`/`onValueChange`; `Checkbox` recebe `checked`/`onCheckedChange`; `FileUpload` recebe `File[]` em `value`/`onValueChange`. Não espalhe `field` nesses controles: `onChange` não é o callback de valor deles.
 
 ```tsx
-import { SemecProvider } from "@semec/ds/react";
+"use client";
 
-function RootLayout({ nonce }) {
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@semec/ds/react/button";
+import { Checkbox } from "@semec/ds/react/checkbox";
+import { ErrorSummary } from "@semec/ds/react/error-summary";
+import { FileUpload } from "@semec/ds/react/file-upload";
+import { FormField } from "@semec/ds/react/form-field";
+import { Label } from "@semec/ds/react/label";
+import { RadioGroup, RadioGroupItem } from "@semec/ds/react/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@semec/ds/react/select";
+
+const schema = z.object({
+  city: z.string().min(1, "Escolha o município."),
+  shift: z.string().min(1, "Escolha o turno."),
+  accepted: z.boolean().refine(Boolean, "Confirme as informações."),
+  files: z.array(z.custom<File>()).min(1, "Anexe um documento."),
+});
+type FormValues = z.infer<typeof schema>;
+const initialValues: FormValues = { city: "", shift: "", accepted: false, files: [] };
+const fieldOrder = ["city", "shift", "accepted", "files"] as const;
+
+export function RequestForm() {
+  const [attempt, setAttempt] = useState(0);
+  const { control, handleSubmit, reset, clearErrors, formState: { errors } } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: initialValues,
+    shouldFocusError: false, // o ErrorSummary recebe o foco no envio inválido
+  });
+  const summary = fieldOrder.flatMap((id) => {
+    const message = errors[id]?.message;
+    return message ? [{ id, message }] : [];
+  });
+
+  function clearForm() {
+    reset(initialValues, { keepErrors: false });
+    setTimeout(() => clearErrors(), 0);
+  }
+
   return (
-    <html>
+    <form noValidate onSubmit={handleSubmit(
+      () => clearForm(), // no app, salve os dados e só limpe após sucesso
+      () => setAttempt((value) => value + 1),
+    )} className="grid gap-4">
+      <ErrorSummary errors={summary} focusKey={attempt} />
+      <Controller name="city" control={control} render={({ field }) => (
+        <FormField label="Município" htmlFor="city" error={errors.city?.message} required>
+          <Select name={field.name} value={field.value} onValueChange={field.onChange}>
+            <SelectTrigger id="city" ref={field.ref} onBlur={field.onBlur}>
+              <SelectValue placeholder="Selecione" />
+            </SelectTrigger>
+            <SelectContent><SelectItem value="porto-velho">Porto Velho</SelectItem></SelectContent>
+          </Select>
+        </FormField>
+      )} />
+      <Controller name="shift" control={control} render={({ field }) => (
+        <FormField label="Turno" htmlFor="shift" error={errors.shift?.message} required>
+          <RadioGroup id="shift" name={field.name} value={field.value}
+            onValueChange={field.onChange} onBlur={field.onBlur} ref={field.ref}>
+            <div className="flex min-h-11 items-center gap-2">
+              <RadioGroupItem id="shift-morning" value="morning" />
+              <Label htmlFor="shift-morning">Manhã</Label>
+            </div>
+            <div className="flex min-h-11 items-center gap-2">
+              <RadioGroupItem id="shift-afternoon" value="afternoon" />
+              <Label htmlFor="shift-afternoon">Tarde</Label>
+            </div>
+          </RadioGroup>
+        </FormField>
+      )} />
+      <Controller name="accepted" control={control} render={({ field }) => (
+        <FormField error={errors.accepted?.message}>
+          <div className="flex min-h-11 items-center gap-2">
+            <Checkbox id="accepted" name={field.name} checked={field.value}
+              onCheckedChange={(checked) => field.onChange(checked === true)}
+              onBlur={field.onBlur} ref={field.ref} />
+            <Label htmlFor="accepted">Confirmo as informações (obrigatório)</Label>
+          </div>
+        </FormField>
+      )} />
+      <Controller name="files" control={control} render={({ field }) => (
+        <FormField label="Documento" htmlFor="files" error={errors.files?.message} required>
+          <FileUpload id="files" name={field.name} value={field.value}
+            onValueChange={field.onChange} inputProps={{ onBlur: field.onBlur }} />
+        </FormField>
+      )} />
+      <Button type="submit">Enviar</Button>
+      <Button type="button" variant="outline" onClick={clearForm}>Limpar</Button>
+    </form>
+  );
+}
+```
+
+Os IDs do resumo são os controles: `city` fica no **SelectTrigger**, `shift` no **RadioGroup** (o resumo foca a opção dentro dele), `accepted` no Checkbox e `files` no input nativo do FileUpload. Cada RadioGroupItem tem um ID próprio para seu Label. As linhas de opção têm altura mínima de 44 px.
+
+**Depois de `reset()`:** o reset nativo pode disparar callbacks do Select/RadioGroup/Checkbox e fazer o RHF revalidar os valores vazios (INT-D-04). Defina `defaultValues`, passe os valores iniciais ao `reset` e chame `clearErrors()` no próximo ciclo, como acima; confira envio inválido → preenchimento → envio válido → formulário limpo no navegador. Esse contorno limpa as mensagens, não muda o schema nem torna valores vazios válidos. Arquivos também precisam de validação no servidor.
+
+## Segurança (CSP)
+
+### SSR e limites do nonce
+
+O nonce autoriza elementos `<script>`/`<style>` que carregam o mesmo valor da política. **Não autoriza atributos `style`**: no HTML gerado por SSR, eles são controlados por `style-src-attr` (ou por `style-src` quando aquela diretiva está ausente). Portanto, passar `nonce` ao `SemecProvider` não garante ausência de violações nem corrige atributos bloqueados antes da hidratação.
+
+Com as correções CSP da 4.2.1 (onda 0 da integração de 19/10/2026):
+
+| Componente | Resultado com SSR e política estrita |
+|---|---|
+| Toast / Toaster | Classes estáticas liberam cliques sob a região vazia e preservam ações e fechamento do aviso (INT-B2-01) |
+| Checkbox, Switch, RadioGroup, Slider | CSS estático esconde os inputs nativos auxiliares mesmo com os atributos inline bloqueados (INT-B2-02) |
+| Progress / Slider | O preenchimento usa SVG e permanece visível no SSR sob CSP estrita |
+| Select | O `<style>` do viewport recebe o nonce do SemecProvider; `SelectContent nonce` explícito prevalece (INT-B2-08). Atributos inline ainda podem ser bloqueados |
+| ScrollArea | O `<style>` do viewport recebe o nonce, inclusive no SSR; precedência: `viewportProps.nonce` → `nonce` → SemecProvider |
+| Dialog, AlertDialog, Drawer, Sheet, DropdownMenu | O bloqueio de rolagem usa `<style>` dinâmico: passe o nonce pelo `SemecProvider` |
+| Popover | Zero violações na prova anterior, sem nonce; isso não é garantia para toda composição |
+
+Essas correções preservam os cenários acima, mas os atributos `style` emitidos pelo Radix ainda podem gerar violações de `style-src-attr`. Valide a versão instalada em produção: carregue por SSR, clique num link sob a região de notificações, marque o Checkbox e abra o Select e o Dialog. Testar só SPA ou servidor de desenvolvimento não reproduz os bloqueios de atributos no HTML inicial. Não acrescente `'unsafe-inline'` para esconder esses achados; mantenha `style-src-attr 'none'` e verifique os componentes usados pelo seu app.
+
+### Next.js App Router (servidor por requisição)
+
+Gere um nonce aleatório novo por resposta. O [fluxo de CSP do Next](https://nextjs.org/docs/app/guides/content-security-policy) exige a política também no request interno para aplicar o nonce aos scripts do framework. Exemplo de produção:
+
+```ts
+// proxy.ts (ao lado de app/)
+import { randomBytes } from "node:crypto";
+import { NextResponse, type NextRequest } from "next/server";
+
+export function proxy(request: NextRequest) {
+  const nonce = randomBytes(16).toString("base64");
+  const policy = `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'nonce-${nonce}'; style-src-attr 'none'; font-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'`;
+  const headers = new Headers(request.headers);
+  headers.set("x-nonce", nonce);
+  headers.set("Content-Security-Policy", policy);
+  const response = NextResponse.next({ request: { headers } });
+  response.headers.set("Content-Security-Policy", policy);
+  response.headers.set("Cache-Control", "private, no-store");
+  return response;
+}
+
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+};
+```
+
+```tsx
+// app/layout.tsx
+import { headers } from "next/headers";
+import { SemecProvider } from "@semec/ds/react/semec-provider";
+import { Providers } from "./providers"; // arquivo do passo 4
+import "./globals.css";
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  return (
+    <html lang="pt-BR">
       <body>
         <SemecProvider nonce={nonce}>
-          <App />
+          <Providers>{children}</Providers>
         </SemecProvider>
       </body>
     </html>
@@ -11201,11 +11511,122 @@ function RootLayout({ nonce }) {
 }
 ```
 
-Medido na prova com política estrita (SEM-752/SEM-780):
+Não combine esse layout com `output: "export"`: `headers()` exige uma requisição. Não compartilhe HTML com nonce por cache/CDN. O modo de desenvolvimento do Next precisa de permissões adicionais para depuração; valide a política de produção com `next build` e `next start`.
 
-- **Popover** — 0 violações de política (sem nonce).
-- **ScrollArea, Select** — 1 violação cada, mesmo com nonce (continuam com scrollbar CSS estático no `tokens.css`).
-- **Dialog, AlertDialog, Drawer, Sheet, DropdownMenu** — scroll locking do body; use `SemecProvider` com nonce.
+### React Router v7: nonce ponta a ponta
+
+Exemplo de produção com SSR, Express e o contexto clássico `AppLoadContext` (sem `future.v8_middleware`). Instale `express@^5 @react-router/express@^7 @react-router/node@^7` com a mesma versão 7.x dos demais pacotes React Router. O nonce percorre `getLoadContext` → `loader` → `useRouteLoaderData` → provider; também chega ao renderizador e aos scripts, conforme a [documentação de segurança do React Router v7](https://reactrouter.com/7.18.4/how-to/security).
+
+```js
+// server.mjs — depois de npm run build, execute node server.mjs
+import { randomBytes } from "node:crypto";
+import express from "express";
+import { createRequestHandler } from "@react-router/express";
+import * as build from "./build/server/index.js";
+
+const app = express();
+app.use(express.static("build/client"));
+app.use((request, response, next) => {
+  const nonce = randomBytes(16).toString("base64");
+  response.locals.nonce = nonce;
+  response.setHeader("Content-Security-Policy",
+    `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'nonce-${nonce}'; style-src-attr 'none'; font-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'`);
+  response.setHeader("Cache-Control", "private, no-store");
+  next();
+});
+app.use(createRequestHandler({
+  build,
+  getLoadContext: (_request, response) => ({ nonce: response.locals.nonce }),
+}));
+app.listen(3000);
+```
+
+```tsx
+// app/root.tsx
+import {
+  Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteLoaderData,
+} from "react-router";
+import type { LoaderFunctionArgs } from "react-router";
+import { SemecProvider } from "@semec/ds/react/semec-provider";
+import { Providers } from "./providers"; // arquivo do passo 4
+import "./app.css";
+
+export function loader({ context }: LoaderFunctionArgs) {
+  return { nonce: typeof context.nonce === "string" ? context.nonce : undefined };
+}
+
+// Este loader contém só o nonce do documento; preserve-o nas navegações.
+export function shouldRevalidate() { return false; }
+
+export function Layout({ children }: { children: React.ReactNode }) {
+  const nonce = useRouteLoaderData<typeof loader>("root")?.nonce;
+  return (
+    <html lang="pt-BR">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <SemecProvider nonce={nonce}>{children}</SemecProvider>
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
+      </body>
+    </html>
+  );
+}
+
+export default function App() {
+  return <Providers><Outlet /></Providers>;
+}
+```
+
+No `app/entry.server.tsx`, use o mesmo `loadContext.nonce` também em `ServerRouter` e nas opções de streaming. Este entry completo espera todo o conteúdo antes de responder, para simplificar o exemplo:
+
+```tsx
+// app/entry.server.tsx
+import { PassThrough } from "node:stream";
+import { renderToPipeableStream } from "react-dom/server";
+import { createReadableStreamFromReadable } from "@react-router/node";
+import { ServerRouter, type AppLoadContext, type EntryContext } from "react-router";
+
+export default function handleRequest(
+  request: Request,
+  status: number,
+  headers: Headers,
+  routerContext: EntryContext,
+  loadContext: AppLoadContext,
+): Promise<Response> {
+  const nonce = typeof loadContext.nonce === "string" ? loadContext.nonce : undefined;
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => abort(), 10_000);
+    const { pipe, abort } = renderToPipeableStream(
+      <ServerRouter context={routerContext} url={request.url} nonce={nonce} />,
+      {
+        nonce,
+        onAllReady() {
+          clearTimeout(timeout);
+          const body = new PassThrough();
+          headers.set("Content-Type", "text/html; charset=utf-8");
+          resolve(new Response(createReadableStreamFromReadable(body), { status, headers }));
+          pipe(body);
+        },
+        onShellError(error) {
+          clearTimeout(timeout);
+          reject(error);
+        },
+        onError(error) {
+          status = 500;
+          console.error(error);
+        },
+      },
+    );
+  });
+}
+```
+
+Mantenha o nonce do documento durante as navegações no cliente: não revalide o loader do root só para obter outro nonce; a CSP em vigor é a da resposta HTML. Teste também navegação e revalidação se o root carregar outros dados. O fluxo acima demonstra o transporte do nonce; os limites de `style-src-attr` da tabela continuam valendo.
 
 ## Acessibilidade
 
@@ -11254,6 +11675,8 @@ Com `axe-core` direto (ou `jest-axe`/`vitest-axe`), o equivalente é passar `{ r
 
 ## Dependências
 
+O pacote é **somente ESM**. Para TypeScript, use `moduleResolution: "bundler"` com `module: "ESNext"`, ou os pares `moduleResolution: "nodenext"` / `module: "NodeNext"` e `moduleResolution: "node16"` / `module: "Node16"`, com `"type": "module"` no `package.json` do consumidor. A resolução antiga `node`/`node10` não resolve os subpaths; `node16` em projeto CommonJS produz TS1479. Não há build CJS publicado.
+
 - **Peers obrigatórios**: `react` ^19, `react-dom` ^19, `tailwindcss` ^4 e `lucide-react` `>=0.468.0 <2`. O npm 7+ instala peer ausente sozinho; o pnpm só com `auto-install-peers=true`; o Yarn (clássico e Berry) nunca. Por isso o passo 1 instala `lucide-react` explicitamente
 - **Peer opcional**: `zod` `^3.23.0 || ^4.0.0` (testado com o 3 e o 4) — só se usar `@semec/ds/react/validacao`
 - **Plugin do Tailwind** (do seu build, não do kit): `@tailwindcss/vite` no Vite; `@tailwindcss/postcss` ou `@tailwindcss/turbopack` no Next. O `@source` aponta para `node_modules/@semec/ds/dist/react`, com caminho relativo ao CSS
@@ -11267,6 +11690,8 @@ Com `axe-core` direto (ou `jest-axe`/`vitest-axe`), o equivalente é passar `{ r
 ## Migração para a 4.0 e depreciações
 
 **Guia: [docs/migracao-4.0.md](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/migracao-4.0.md)**, com antes/depois, tabela primitivo → semântico e o codemod:
+
+Quem vem da 3.0 ou 3.1 deve começar por [Vindo direto da 3.0 ou da 3.1](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/migracao-4.0.md#vindo-direto-da-30-ou-da-31). O destino é o arquivo versionado em `docs/migracao-4.0.md`, disponível em `main` após o merge desta entrega.
 
 ```bash
 # funciona com a 3.x ainda instalada (o -p traz a 4.0 e o TypeScript 5 só para o comando)
