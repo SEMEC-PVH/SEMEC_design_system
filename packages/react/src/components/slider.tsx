@@ -49,6 +49,16 @@ const Slider = React.forwardRef<
       { labelable: false }
     );
     const ariaLabelledBy = field["aria-labelledby"] ?? ariaLabelledByProp;
+    // O preenchimento SVG não depende dos atributos style bloqueados no SSR.
+    // O Radix continua responsável pelo estado, teclado e inputs do formulário.
+    const [uncontrolledValue, setUncontrolledValue] = React.useState(props.defaultValue ?? [0]);
+    const values = props.value ?? uncontrolledValue;
+    const min = props.min ?? 0;
+    const max = props.max ?? 100;
+    const percentages = values.map((value) => max > min ? Math.min(100, Math.max(0, (value - min) / (max - min) * 100)) : 0);
+    const start = percentages.length > 1 ? Math.min(...percentages) : 0;
+    const end = percentages.length ? Math.max(...percentages) : 0;
+    const vertical = props.orientation === "vertical";
     // Um polegar por valor (range com 2 valores = 2 polegares).
     const count = Math.max((props.value ?? props.defaultValue ?? [0]).length, 1);
 
@@ -66,10 +76,33 @@ const Slider = React.forwardRef<
           className
         )}
         {...props}
+        onValueChange={(value) => {
+          setUncontrolledValue(value);
+          props.onValueChange?.(value);
+        }}
+        data-semec-slider=""
         id={field.id ?? props.id}
       >
         <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
-          <SliderPrimitive.Range className="absolute h-full bg-primary" />
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            data-inverted={props.inverted || undefined}
+            className={cn(
+              "absolute inset-0 h-full w-full",
+              vertical
+                ? "data-[inverted=true]:-scale-y-100"
+                : "data-[inverted=true]:-scale-x-100 rtl:-scale-x-100 rtl:data-[inverted=true]:scale-x-100"
+            )}
+          >
+            <rect
+              x={vertical ? 0 : `${start}%`}
+              y={vertical ? `${100 - end}%` : 0}
+              width={vertical ? "100%" : `${end - start}%`}
+              height={vertical ? `${end - start}%` : "100%"}
+              className="fill-primary"
+            />
+          </svg>
         </SliderPrimitive.Track>
         {Array.from({ length: count }, (_, index) => (
           <SliderPrimitive.Thumb
