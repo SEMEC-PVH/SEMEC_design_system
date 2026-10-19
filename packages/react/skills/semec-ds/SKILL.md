@@ -771,6 +771,10 @@ Regenerar: `npm run generate:llms`. Contagem e lista de componentes vêm do mani
 
 Publicados com o pacote: `@semec/ds/skills/llms.txt` (índice), `@semec/ds/skills/llms-full.txt` (dump completo), `@semec/ds/skills/manifest.json` (JSON), `@semec/ds/skills/components/<slug>.md` (um por componente) e esta skill (`@semec/ds/skills/semec-ds`). Site de documentação: {{ds:homepage}}.
 
+## Anatomia sem React
+
+Para HTML, PHP, Vue ou outros ambientes sem React, consulte [Anatomia dos componentes (sem React)]({{ds:homepage}}skills/semec-ds-lite/SKILL.md#anatomia-dos-componentes-sem-react) na skill lite. O campo `classes` do manifest full/lite contém as mesmas classes extraídas do TSX/CVA, HTML acessível e CSS puro com tokens. No pacote, a seção fica em `dist/lite/semec-ds-lite/SKILL.md`.
+
 ## Licença e crédito
 
 O pacote é **MIT**: use, modifique e redistribua à vontade, mantendo o aviso de copyright e a licença nas cópias do código do pacote. O crédito à SEMEC no projeto consumidor é **recomendado, não obrigatório** (a MIT não exige; decisão AMB-09, 15/10/2026). Ao criar um projeto com estes tokens, sugira à pessoa incluir no README.md, sem impor nem bloquear a entrega por isso:
