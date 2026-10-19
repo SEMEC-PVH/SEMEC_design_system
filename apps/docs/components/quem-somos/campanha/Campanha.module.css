@@ -1,0 +1,1092 @@
+/* Mini game "Campanha da SEMEC" (quest da Emily).
+   Clima de app de rede social com a cara da Vila: cartões brancos com a
+   moldura dupla de RPG, roxo do microfone da Emily e confete.
+   Só tokens: o roxo é mistura de --pv-blue-hero com --pv-red-600 (não há
+   roxo na paleta). Paleta fixa e clara nos dois temas do site (como a
+   batalha). Contrastes (WCAG AA):
+   - branco sobre --roxo ≈ 9,0:1; --roxo sobre branco ≈ 9,0:1 e sobre
+     --roxo-claro ≈ 7,6:1;
+   - amarelo-400 e branco sobre blue-950 ≥ 12:1;
+   - bordas das opções gray-400 sobre branco 3,7:1 (componente, 3:1);
+   - contorno de foco blue-hero sobre branco 10:1; amarelo-400 sobre
+     blue-950 12:1.
+   Única exceção proposital: .tituloApagado, a prévia do erro da escolha de
+   arte "apagado" (é o que a rodada ensina). */
+
+.fundo {
+  --roxo: color-mix(in srgb, var(--pv-blue-hero) 62%, var(--pv-red-600));
+  --roxo-escuro: color-mix(in srgb, var(--roxo) 70%, var(--pv-black));
+  --roxo-claro: color-mix(in srgb, var(--roxo) 12%, var(--pv-white));
+  --rosa: color-mix(in srgb, var(--pv-red-400) 55%, var(--pv-white));
+  --tinta: var(--pv-gray-950);
+  --tinta-suave: var(--pv-gray-700);
+  --foco: var(--pv-blue-hero);
+  --moldura: var(--pv-gray-900);
+  color-scheme: light;
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  font-family: var(--font-family-sans);
+  line-height: 1.45;
+  color: var(--tinta);
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--pv-yellow-400) 55%, transparent) 0 3px, transparent 4px) 0 0 / 5.5rem 5.5rem,
+    radial-gradient(circle, color-mix(in srgb, var(--rosa) 50%, transparent) 0 3px, transparent 4px) 2.75rem 1.6rem / 5.5rem 5.5rem,
+    radial-gradient(circle, color-mix(in srgb, var(--pv-green-500) 45%, transparent) 0 2px, transparent 3px) 1.3rem 3.6rem / 5.5rem 5.5rem,
+    linear-gradient(160deg, var(--pv-blue-950) 0%, var(--roxo-escuro) 100%);
+}
+
+/* O site aplica margens e larguras máximas em p/ul/ol/h2/h3 dentro de
+   .content; a classe dobrada devolve o controle ao módulo. */
+.campanha.campanha :is(p, ul, ol, h2, h3) {
+  max-width: none;
+  margin: 0;
+}
+.campanha.campanha :is(ul, ol, h2, h3) {
+  padding: 0;
+  border: 0;
+}
+.campanha.campanha :is(ul, ol) {
+  list-style: none;
+}
+
+.campanha {
+  container: campanha / inline-size;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: 100%;
+  height: 100%;
+}
+
+.srOnly {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Topo ------------------------------------------------------------------ */
+.topo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem clamp(0.75rem, 2.5cqw, 1.5rem);
+  border-bottom: 4px solid var(--moldura);
+  background: var(--pv-blue-950);
+  color: var(--pv-white);
+}
+.topoMic {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  overflow: hidden;
+  border: 2px solid var(--pv-yellow-400);
+  border-radius: var(--radius-full);
+  background: var(--roxo-claro);
+}
+.topoMicImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  transform: scale(1.5);
+}
+.campanha .marca {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--pv-yellow-400);
+  text-shadow: 0 2px 0 var(--pv-black);
+}
+.placar {
+  display: flex;
+  gap: 0.35rem;
+}
+.placar li {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 2px solid var(--pv-blue-200);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  color: var(--pv-blue-100);
+}
+.placar li[data-estado="atual"] {
+  border-color: var(--pv-yellow-400);
+  background: var(--pv-yellow-400);
+  color: var(--pv-black);
+}
+.placar li[data-estado="feita"] {
+  border-color: var(--pv-green-500);
+  background: var(--pv-green-500);
+  color: var(--pv-black);
+}
+.sair {
+  flex-shrink: 0;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.9rem;
+  border: 2px solid var(--pv-white);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--pv-white);
+  font: inherit;
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+.sair:hover {
+  background: color-mix(in srgb, var(--pv-white) 15%, transparent);
+}
+.sair:focus-visible {
+  outline: 3px solid var(--pv-yellow-400);
+  outline-offset: 2px;
+}
+
+/* ---- Palco ----------------------------------------------------------------- */
+.palco {
+  /* Unidade que cresce com a tela (16 px no notebook, até ~23 px em tela
+     cheia num monitor grande): medidas das telas = múltiplos dela. */
+  --u: clamp(1rem, 1.15cqw, 1.45rem);
+  display: grid;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: clamp(0.75rem, 2.2cqw, 2.25rem);
+}
+/* Cada tela ocupa a largura útil e fica centrada na altura que sobra. */
+.palco > * {
+  align-self: center;
+  width: 100%;
+}
+
+.telaTitulo {
+  /* Cresce com a tela (tela cheia em monitor grande). */
+  font-size: clamp(var(--font-size-xl), 2.3cqw, var(--font-size-2xl));
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--tinta);
+}
+.telaTitulo:focus {
+  outline: none;
+}
+.sobretitulo {
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--roxo);
+}
+
+/* Caixa de RPG: borda escura, filete branco e filete roxo por dentro,
+   sombra dura por fora. */
+.balao,
+.formulario,
+.resultadoPainel,
+.finalCartao {
+  box-sizing: border-box;
+  padding: clamp(1rem, calc(var(--u) * 1.4), 2rem);
+  border: 3px solid var(--moldura);
+  border-radius: var(--radius-xl);
+  background: var(--pv-white);
+  box-shadow:
+    inset 0 0 0 4px var(--pv-white),
+    inset 0 0 0 6px var(--roxo),
+    0 6px 0 var(--moldura);
+}
+
+/* ---- Botões ---------------------------------------------------------------- */
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+.botaoPrimario,
+.botaoSecundario {
+  min-height: 2.75rem;
+  padding: 0.55rem 1.3rem;
+  border: 3px solid var(--moldura);
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-weight: 800;
+  font-size: clamp(var(--font-size-base), 1.15cqw, var(--font-size-lg));
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--moldura);
+}
+.botaoPrimario {
+  background: var(--roxo);
+  color: var(--pv-white);
+}
+.botaoPrimario:hover:not(:disabled) {
+  background: var(--roxo-escuro);
+}
+.botaoPrimario:disabled {
+  border-color: var(--pv-gray-400);
+  background: var(--pv-gray-200);
+  color: var(--pv-gray-600);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.botaoSecundario {
+  background: var(--pv-white);
+  color: var(--roxo);
+}
+.botaoSecundario:hover {
+  background: var(--roxo-claro);
+}
+:is(.botaoPrimario, .botaoSecundario):active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--moldura);
+}
+:is(.botaoPrimario, .botaoSecundario):focus-visible {
+  outline: 3px solid var(--foco);
+  outline-offset: 3px;
+}
+
+/* ---- Briefing -------------------------------------------------------------- */
+.briefing {
+  display: grid;
+  grid-template-columns: auto minmax(0, calc(var(--u) * 38));
+  justify-content: center;
+  align-items: end;
+  gap: calc(var(--u) * 1.5);
+  min-height: 100%;
+  align-content: center;
+}
+.briefingPersonagens {
+  position: relative;
+  width: calc(var(--u) * 12);
+  height: calc(var(--u) * 17.5);
+}
+.briefingEmily,
+.briefingMic,
+.finalEmily,
+.finalMic {
+  position: absolute;
+  bottom: 0;
+  object-fit: cover;
+  border: 3px solid var(--moldura);
+  background: var(--pv-blue-100);
+}
+.briefingEmily,
+.finalEmily {
+  left: 0;
+  width: calc(var(--u) * 9.25);
+  height: calc(var(--u) * 13.9);
+  border-radius: var(--radius-xl);
+}
+.briefingMic,
+.finalMic {
+  right: 0;
+  width: calc(var(--u) * 5.5);
+  height: calc(var(--u) * 8.2);
+  border-radius: var(--radius-lg);
+  background: var(--roxo-claro);
+}
+.balao {
+  position: relative;
+  display: grid;
+  gap: 0.6rem;
+}
+/* Rabinho do balão apontando para a Emily. */
+.balao::before {
+  content: "";
+  position: absolute;
+  left: -1.1rem;
+  bottom: 2rem;
+  width: 1.1rem;
+  height: 1.4rem;
+  background: var(--moldura);
+  clip-path: polygon(100% 0, 100% 100%, 0 50%);
+}
+.briefingTexto {
+  font-size: clamp(var(--font-size-md), 1.45cqw, var(--font-size-xl));
+}
+.briefingDica {
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  background: var(--roxo-claro);
+  color: var(--roxo-escuro);
+  font-size: clamp(var(--font-size-sm), 1.05cqw, var(--font-size-md));
+  font-weight: 600;
+}
+
+/* ---- Montagem: pauta | pergunta | prévia ----------------------------------- */
+.montagem {
+  display: grid;
+  grid-template-columns: minmax(15rem, 0.8fr) minmax(0, 1.35fr) minmax(19rem, 1fr);
+  align-items: stretch;
+  gap: clamp(1rem, 2cqw, 2rem);
+  max-width: 100rem;
+  margin: 0 auto;
+}
+
+/* Pauta da Emily: cartão escuro com o retrato, o briefing e os 5 passos. */
+.pauta {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  padding: clamp(1rem, 1.6cqw, 1.5rem);
+  border: 3px solid var(--moldura);
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--pv-blue-950) 85%, var(--roxo));
+  color: var(--pv-white);
+  box-shadow: 0 6px 0 var(--moldura);
+}
+.pautaTopo {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+.pautaRetratos {
+  position: relative;
+  flex-shrink: 0;
+  width: 4.5rem;
+  height: 4.5rem;
+}
+.pautaEmily {
+  width: 4.5rem;
+  height: 4.5rem;
+  border: 3px solid var(--pv-yellow-400);
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  object-position: 50% 8%;
+  background: var(--pv-white);
+}
+.pautaMic {
+  position: absolute;
+  right: -0.6rem;
+  bottom: -0.4rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 2px solid var(--pv-white);
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  object-position: 50% 15%;
+  background: var(--roxo-claro);
+}
+.pautaTitulos {
+  display: grid;
+  gap: 0.15rem;
+}
+.pauta .sobretitulo {
+  color: var(--pv-yellow-400);
+}
+.pautaCampanha {
+  font-size: clamp(var(--font-size-lg), 1.7cqw, var(--font-size-2xl));
+  font-weight: 800;
+  line-height: 1.15;
+}
+.pautaBriefing {
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--pv-white) 10%, transparent);
+  font-size: clamp(var(--font-size-sm), 1.05cqw, var(--font-size-md));
+  line-height: 1.45;
+}
+.passos {
+  display: grid;
+  gap: 0.45rem;
+}
+.passoItem {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--radius-md);
+  color: var(--pv-gray-300);
+}
+.passoItem[data-estado="atual"] {
+  background: var(--pv-white);
+  color: var(--tinta);
+  box-shadow: 0 3px 0 var(--pv-yellow-400);
+}
+.passoNumero {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid currentColor;
+  border-radius: var(--radius-full);
+  font-weight: 800;
+  font-size: var(--font-size-sm);
+}
+.passoItem[data-estado="feito"] .passoNumero {
+  border-color: var(--pv-green-500);
+  background: var(--pv-green-500);
+  color: var(--pv-gray-950);
+}
+.passoItem[data-estado="atual"] .passoNumero {
+  border-color: var(--roxo);
+  background: var(--roxo);
+  color: var(--pv-white);
+}
+.passoTexto {
+  display: grid;
+  min-width: 0;
+  line-height: 1.25;
+}
+.passoNome {
+  font-weight: 800;
+  font-size: clamp(var(--font-size-sm), 1cqw, var(--font-size-base));
+}
+.passoItem[data-estado="feito"] .passoNome {
+  color: var(--pv-white);
+}
+.passoEscolha {
+  overflow: hidden;
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--pv-gray-300);
+}
+
+/* Pergunta e opções. */
+.formulario {
+  display: grid;
+  align-content: start;
+  gap: clamp(0.9rem, 1.4cqw, 1.4rem);
+}
+.progressoTexto {
+  font-size: clamp(var(--font-size-sm), 1.05cqw, var(--font-size-base));
+  font-weight: 800;
+  color: var(--roxo);
+}
+.grupo {
+  display: grid;
+  gap: clamp(0.9rem, 1.4cqw, 1.4rem);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.opcoes {
+  display: grid;
+  gap: clamp(0.6rem, 1cqw, 0.9rem);
+}
+.opcao {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  min-height: clamp(3.5rem, 5.5cqw, 5.25rem);
+  padding: 0.75rem 1.1rem;
+  border: 2px solid var(--pv-gray-400);
+  border-radius: var(--radius-lg);
+  background: var(--pv-white);
+  cursor: pointer;
+  box-shadow: 0 3px 0 var(--pv-gray-300);
+  transition: transform var(--pv-duration-fast) ease;
+}
+.opcao:hover {
+  border-color: var(--roxo);
+  background: color-mix(in srgb, var(--roxo) 5%, var(--pv-white));
+  transform: translateY(-1px);
+}
+.opcao[data-marcada] {
+  border-color: var(--roxo);
+  border-width: 3px;
+  padding: calc(0.75rem - 1px) calc(1.1rem - 1px);
+  background: var(--roxo-claro);
+  box-shadow: 0 4px 0 var(--roxo);
+}
+.opcao:has(.radio:focus-visible) {
+  outline: 3px solid var(--foco);
+  outline-offset: 3px;
+}
+/* Rádio nativo, só escondido do olho (segue no teclado e no leitor). */
+.radio {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  pointer-events: none;
+}
+/* Letra da opção (A, B, C), no lugar da bolinha do rádio. */
+.opcaoLetra {
+  display: grid;
+  place-items: center;
+  width: clamp(2.1rem, 2.8cqw, 2.75rem);
+  height: clamp(2.1rem, 2.8cqw, 2.75rem);
+  border: 2px solid var(--pv-gray-600);
+  border-radius: var(--radius-md);
+  background: var(--pv-white);
+  color: var(--pv-gray-700);
+  font-weight: 800;
+  font-size: clamp(var(--font-size-base), 1.3cqw, var(--font-size-lg));
+}
+.opcao[data-marcada] .opcaoLetra {
+  border-color: var(--roxo);
+  background: var(--roxo);
+  color: var(--pv-white);
+}
+.opcaoTexto {
+  font-size: clamp(var(--font-size-base), 1.35cqw, var(--font-size-xl));
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.dica {
+  font-size: var(--font-size-sm);
+  color: var(--tinta-suave);
+}
+.dica[data-oculta] {
+  visibility: hidden;
+}
+.formulario .acoes {
+  margin-top: auto;
+  justify-content: space-between;
+}
+.formulario :is(.botaoPrimario, .botaoSecundario) {
+  min-width: 9rem;
+  font-size: clamp(var(--font-size-base), 1.2cqw, var(--font-size-lg));
+}
+
+/* Prévia: o post dentro de um "celular". */
+.previa {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 0.6rem;
+}
+.previaRotulo {
+  padding: 0.2rem 0.75rem;
+  border-radius: var(--radius-full);
+  background: var(--pv-yellow-400);
+  color: var(--pv-black);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.celular {
+  width: min(100%, 26rem);
+  padding: 0.75rem 0.6rem 1.1rem;
+  border: 3px solid var(--moldura);
+  border-radius: 2rem;
+  background: var(--pv-gray-900);
+  box-shadow:
+    inset 0 0 0 2px var(--pv-gray-700),
+    0 8px 0 var(--moldura);
+}
+/* Alto-falante do "celular". */
+.celular::before {
+  content: "";
+  display: block;
+  width: 3.5rem;
+  height: 0.35rem;
+  margin: 0 auto 0.6rem;
+  border-radius: var(--radius-full);
+  background: var(--pv-gray-600);
+}
+.celular .post {
+  border-width: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: none;
+}
+
+/* ---- Post (prévia e publicado) --------------------------------------------- */
+.post {
+  overflow: hidden;
+  border: 3px solid var(--moldura);
+  border-radius: var(--radius-xl);
+  background: var(--pv-white);
+  box-shadow: 0 6px 0 var(--moldura);
+}
+.postTopo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+}
+.postAvatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-full);
+  background: var(--pv-blue-hero);
+  color: var(--pv-white);
+  font-weight: 800;
+  box-shadow: 0 0 0 2px var(--pv-white), 0 0 0 4px var(--pv-yellow-500);
+}
+.postPerfil {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.2;
+}
+.postNome {
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+}
+.postSub {
+  font-size: var(--font-size-xs);
+  color: var(--tinta-suave);
+}
+.selo {
+  max-width: 45%;
+  padding: 0.2rem 0.55rem;
+  border: 2px solid var(--roxo);
+  border-radius: var(--radius-full);
+  background: var(--roxo-claro);
+  color: var(--roxo-escuro);
+  font-size: var(--font-size-2xs);
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
+}
+.selo[data-vazio] {
+  border-style: dashed;
+  border-color: var(--pv-gray-400);
+  background: var(--pv-white);
+  color: var(--pv-gray-600);
+}
+
+.postMidia {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--pv-gray-200);
+}
+.foto {
+  position: absolute;
+  inset: 0;
+}
+.fotoFalsa {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(150deg, var(--pv-blue-200), var(--pv-yellow-400));
+}
+.foto[data-rodada="vacina"] .fotoFalsa {
+  background: linear-gradient(150deg, var(--pv-green-500), var(--pv-blue-200));
+}
+.foto[data-rodada="robotica"] .fotoFalsa {
+  background: linear-gradient(150deg, var(--rosa), var(--pv-blue-400));
+}
+.fotoIcone {
+  font-size: 4.5rem;
+  line-height: 1;
+}
+.fotoImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+.foto[data-estado="carregando"] .fotoImg {
+  opacity: 0;
+}
+/* Arte "destaque": título grande e escuro numa faixa clara. */
+.faixaDestaque {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.6rem 0.85rem 0.7rem;
+  border-top: 4px solid var(--pv-yellow-500);
+  background: color-mix(in srgb, var(--pv-white) 94%, transparent);
+  color: var(--pv-black);
+  font-size: clamp(1.05rem, 4.2cqw, 1.35rem);
+  font-weight: 800;
+  line-height: 1.15;
+}
+/* Arte "apagado": o erro que a escolha ensina (título pequeno e claro sobre
+   a foto, de propósito pouco legível). */
+.tituloApagado {
+  position: absolute;
+  top: 0.8rem;
+  left: 0.9rem;
+  right: 35%;
+  color: var(--pv-gray-200);
+  font-size: var(--font-size-2xs);
+  font-weight: 400;
+  line-height: 1.2;
+}
+.postTexto {
+  display: grid;
+  align-content: center;
+  gap: 0.5rem;
+  aspect-ratio: 4 / 3;
+  padding: 1rem 1.1rem;
+  background: var(--pv-blue-50);
+}
+.postTextoTitulo {
+  font-weight: 800;
+  font-size: var(--font-size-base);
+}
+.postTextoCorpo {
+  font-size: var(--font-size-sm);
+  color: var(--tinta-suave);
+}
+.postCorpo {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.6rem 0.75rem 0.3rem;
+}
+.postLegenda {
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+.postLegenda[data-vazio] {
+  color: var(--pv-gray-600);
+  font-style: italic;
+}
+.postAlt {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: var(--font-size-xs);
+  color: var(--tinta-suave);
+  overflow-wrap: anywhere;
+}
+.postAltRotulo {
+  flex-shrink: 0;
+  padding: 0 0.3rem;
+  border-radius: 0.25rem;
+  background: var(--pv-gray-900);
+  color: var(--pv-white);
+  font-size: var(--font-size-2xs);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+.postRodape {
+  padding: 0.5rem 0.75rem 0.65rem;
+  border-top: 1px solid var(--pv-gray-200);
+}
+.contadores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.contador {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--tinta-suave);
+}
+.contadorIcone {
+  font-size: var(--font-size-base);
+}
+.post[data-publicado] .contador {
+  color: var(--tinta);
+}
+.post[data-publicado] .contador:first-child .contadorIcone {
+  color: var(--pv-red-600);
+}
+
+/* ---- Resultado da rodada --------------------------------------------------- */
+.resultado {
+  display: grid;
+  grid-template-columns: minmax(0, calc(var(--u) * 24)) minmax(0, 1fr);
+  align-items: start;
+  gap: calc(var(--u) * 1.75);
+  max-width: calc(var(--u) * 68);
+  margin: 0 auto;
+}
+.resultadoPainel {
+  display: grid;
+  gap: 0.5rem;
+}
+.resultadoPainel .acoes {
+  margin-top: 0.4rem;
+}
+.nota {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.75rem;
+  row-gap: 0.25rem;
+}
+.estrelas {
+  display: flex;
+  align-items: center;
+  font-size: var(--font-size-lg);
+  line-height: 1;
+}
+.estrelas[data-grande] {
+  font-size: var(--font-size-2xl);
+}
+.estrela {
+  color: var(--pv-gray-400);
+}
+.estrela[data-acesa="true"] {
+  color: var(--pv-yellow-500);
+  text-shadow: 0 2px 0 var(--pv-yellow-800);
+}
+.recado {
+  font-weight: 700;
+}
+.pontos {
+  font-weight: 500;
+  color: var(--tinta-suave);
+}
+.analise {
+  display: grid;
+  gap: 0.35rem;
+}
+.analiseItem {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: start;
+  padding: 0.35rem 0.6rem;
+  border-left: 5px solid var(--cor);
+  border-radius: var(--radius-md);
+  background: var(--fundo-item);
+  font-size: clamp(var(--font-size-sm), 1.05cqw, var(--font-size-md));
+  line-height: 1.35;
+}
+.analiseItem[data-nivel="bom"] {
+  --cor: var(--pv-green-800);
+  --fundo-item: var(--pv-green-50);
+}
+.analiseItem[data-nivel="medio"] {
+  --cor: var(--pv-yellow-800);
+  --fundo-item: color-mix(in srgb, var(--pv-yellow-400) 22%, var(--pv-white));
+}
+.analiseItem[data-nivel="ruim"] {
+  --cor: var(--pv-red-700);
+  --fundo-item: var(--pv-red-50);
+}
+.analiseMarca {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-full);
+  background: var(--cor);
+  color: var(--pv-white);
+  font-weight: 800;
+}
+.analiseTexto {
+  display: grid;
+  gap: 0.05rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.analisePorque {
+  color: var(--tinta-suave);
+}
+
+/* ---- Final ----------------------------------------------------------------- */
+.final {
+  display: grid;
+  grid-template-columns: auto minmax(0, calc(var(--u) * 36));
+  justify-content: center;
+  align-items: end;
+  align-content: center;
+  gap: calc(var(--u) * 1.5);
+  min-height: 100%;
+}
+.finalPersonagens {
+  position: relative;
+  width: 11rem;
+  height: 16rem;
+}
+.finalCartao {
+  display: grid;
+  gap: 0.75rem;
+}
+.campanha .finalTitulo {
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--roxo);
+}
+.finalTitulo:focus {
+  outline: none;
+}
+.finalTexto {
+  font-size: var(--font-size-md);
+}
+.finalLista {
+  display: grid;
+  gap: 0.3rem;
+}
+.finalLista li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-md);
+  background: var(--pv-gray-50);
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+}
+.final[data-venceu="true"] .finalCartao {
+  box-shadow:
+    inset 0 0 0 4px var(--pv-white),
+    inset 0 0 0 6px var(--pv-yellow-500),
+    0 6px 0 var(--moldura);
+}
+
+/* ---- Movimento (só com movimento permitido) -------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .briefing,
+  .montagem,
+  .resultado,
+  .final {
+    animation: entrar var(--pv-duration-base, 200ms) ease-out both;
+  }
+  .opcao {
+    transition: background-color 120ms ease, border-color 120ms ease;
+  }
+  .briefingMic,
+  .finalMic {
+    animation: timido 2.6s ease-in-out infinite;
+  }
+  .final[data-venceu="true"] .finalMic {
+    animation: pular 700ms ease-in-out infinite;
+  }
+  .post[data-publicado] {
+    animation: publicar 420ms ease-out both;
+  }
+}
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes timido {
+  0%,
+  70%,
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+  80% {
+    transform: translateX(-3px) rotate(-4deg);
+  }
+  90% {
+    transform: translateX(2px) rotate(3deg);
+  }
+}
+@keyframes pular {
+  50% {
+    transform: translateY(-14px);
+  }
+}
+@keyframes publicar {
+  from {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+}
+
+/* ---- Telas estreitas ------------------------------------------------------- */
+@container campanha (max-width: 1100px) {
+  .montagem {
+    grid-template-columns: minmax(0, 1.3fr) minmax(17rem, 1fr);
+  }
+  .pauta {
+    grid-column: 1 / -1;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+  }
+  .pautaBriefing {
+    display: none;
+  }
+  .passos {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .passoItem {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+  .passoEscolha {
+    display: none;
+  }
+}
+@container campanha (max-width: 760px) {
+  .pauta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .passoNome {
+    display: none;
+  }
+  .campanha .marca {
+    font-size: var(--font-size-base);
+  }
+  .briefing,
+  .final {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    justify-items: stretch;
+  }
+  .briefingPersonagens,
+  .finalPersonagens {
+    justify-self: center;
+    width: 9rem;
+    height: 8.5rem;
+  }
+  .briefingEmily,
+  .finalEmily {
+    width: 5.5rem;
+    height: 8.25rem;
+    object-position: 50% 0;
+  }
+  .briefingMic,
+  .finalMic {
+    width: 3.5rem;
+    height: 5.25rem;
+  }
+  .balao::before {
+    left: calc(50% - 0.7rem);
+    top: -1.1rem;
+    bottom: auto;
+    width: 1.4rem;
+    height: 1.1rem;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  }
+  .montagem,
+  .resultado {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .previa {
+    position: static;
+  }
+  .postMidia,
+  .postTexto {
+    aspect-ratio: 16 / 10;
+  }
+  .acoes {
+    justify-content: stretch;
+  }
+  .acoes > * {
+    flex: 1 1 auto;
+  }
+  .campanha .finalTitulo {
+    font-size: var(--font-size-xl);
+  }
+}
+@container campanha (max-width: 420px) {
+  .placar {
+    display: none;
+  }
+}

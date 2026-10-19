@@ -1,0 +1,472 @@
+/* Correção de bug de acessibilidade (quest do Rafa). Cores só de tokens --pv-*.
+   Cartão de paleta fixa clara nos dois temas (como a OficinaBike e a
+   StackDex), então o contraste abaixo vale com o site claro ou escuro:
+   - gray-950 sobre white ≈ 19:1; gray-700 sobre white ≈ 10:1 (notas);
+   - white sobre blue-700 ≈ 7:1 (botão principal);
+   - contorno de foco blue-hero sobre white ≈ 10:1 (≥ 3:1, 2.4.7/1.4.11);
+   - red-800 sobre red-50 e green-800 sobre green-50 ≥ 7:1 (rótulos);
+   - EXCEÇÃO de propósito: .textoApagado (gray-300 sobre white ≈ 1,5:1) é a
+     ilustração do bug de contraste, decorativa e aria-hidden; o mesmo texto
+     aparece legível em .transcricao (ver o comentário em CorrigirBug.jsx). */
+
+.bug {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: min(30rem, 100%);
+  max-width: 48rem;
+  padding: 1rem;
+  border: 3px solid var(--pv-gray-950);
+  border-radius: var(--radius-md);
+  color: var(--pv-gray-950);
+  background: var(--pv-white);
+}
+
+.onde {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+.problema {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+/* ---- Antes / Depois ------------------------------------------------------ */
+
+.comparacao {
+  display: grid;
+  gap: 0.75rem;
+}
+@media (min-width: 40rem) {
+  .comparacao[data-corrigido] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.previa {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0.75rem;
+  border: 2px solid var(--pv-red-700);
+  border-radius: var(--radius-md);
+  background: var(--pv-red-50);
+}
+.previa[data-tipo="depois"] {
+  border-color: var(--pv-green-700);
+  background: var(--pv-green-50);
+}
+/* Bug de foco: o botão do "Antes" some no foco (o bug); a moldura da prévia
+   mostra onde o foco está, para o foco real do modal nunca ficar invisível. */
+.previa[data-foco]:focus-within {
+  outline: 3px dashed var(--pv-blue-hero);
+  outline-offset: 3px;
+}
+
+.legenda {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--pv-red-800);
+}
+.previa[data-tipo="depois"] .legenda {
+  color: var(--pv-green-800);
+}
+.legendaNota {
+  font-weight: 400;
+  color: var(--pv-gray-700);
+}
+.depoisTitulo {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--pv-green-800);
+}
+.depoisTitulo:focus-visible {
+  outline: 3px solid var(--pv-blue-hero);
+  outline-offset: 2px;
+}
+
+/* Área onde o componente aparece (fundo branco, como numa tela de verdade). */
+.palco {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--pv-gray-400);
+  border-radius: var(--radius-md);
+  background: var(--pv-white);
+  overflow-wrap: anywhere;
+}
+
+/* Ilha clara para os componentes do kit. No site, as utilities do kit vêm de
+   public/proto/proto.css (carregado pelo CorrigirBug.jsx, como no
+   ComponentDoc), cujo @theme inline lê os tokens do site em runtime:
+   --bg, --fg, --surface… e os L1 --color-*. O tema escuro troca esses
+   tokens no :root/[data-theme]; aqui eles voltam aos valores claros (os do
+   app/tokens.css), só com primitivos --pv-*, para o kit combinar com o
+   cartão claro. Contraste: gray-950 sobre white ≈ 19:1; white sobre blue-700
+   (Button) ≈ 7:1; borda do Input gray-600 sobre white ≈ 7,6:1; anel de foco
+   blue-hero ≈ 10:1; red-700 (ícone/borda do Alert) sobre red-50 ≥ 5:1. */
+.ilhaKit {
+  --bg: var(--pv-white);
+  --fg: var(--pv-gray-950);
+  --surface: var(--pv-white);
+  --surface-alt: var(--pv-gray-100);
+  --border: var(--pv-gray-200);
+  --text-muted: var(--pv-gray-600);
+  --tint: var(--pv-blue-50);
+  --text-strong: var(--pv-black);
+  --brand-hero: var(--pv-blue-hero);
+  --color-text-on-brand: var(--pv-white);
+  --color-border-strong: var(--pv-gray-600);
+  --color-focus-ring: var(--pv-blue-hero);
+  --color-action-primary: var(--pv-blue-700);
+  --color-action-primary-hover: var(--pv-blue-800);
+  --color-action-primary-active: var(--pv-blue-900);
+  --color-feedback-danger: var(--pv-red-700);
+  --color-feedback-danger-surface: var(--pv-red-50);
+  --color-feedback-info: var(--pv-blue-600);
+  --color-feedback-info-surface: var(--pv-blue-50);
+  --color-feedback-success: var(--pv-green-800);
+  --color-feedback-success-surface: var(--pv-green-50);
+  color: var(--pv-gray-950);
+}
+/* O globals.css (sem camada) zera a cor e o sublinhado de todo <a> e vence a
+   utility text-primary do Link (em @layer utilities). Aqui o link do kit
+   volta a ser azul e sublinhado: no meio da frase, a cor sozinha não basta
+   para distinguir um link (1.4.1). blue-700 sobre white ≈ 7:1. */
+.ilhaKit a {
+  color: var(--color-action-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.pilha {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.pilha > * {
+  max-width: 100%;
+}
+
+.nota {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--pv-gray-700);
+}
+.resultado {
+  min-height: 1.4em;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+/* Placas (contraste e link). */
+.placa {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.placaTitulo,
+.quiosqueTitulo {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pv-gray-700);
+}
+.placaTexto {
+  margin: 0;
+  font-size: var(--font-size-base);
+}
+/* O bug de contraste, de propósito (decorativo, aria-hidden). */
+.textoApagado {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: var(--pv-gray-300);
+}
+.transcricao {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+.transcricaoRotulo {
+  font-weight: 700;
+}
+.linkFalso {
+  color: var(--pv-blue-700);
+  text-decoration: underline;
+}
+.destino {
+  margin: 0;
+  padding: 0.5rem;
+  border-left: 4px solid var(--pv-blue-700);
+  font-size: var(--font-size-sm);
+  background: var(--pv-blue-50);
+}
+.destino:focus-visible {
+  outline: 3px solid var(--pv-blue-hero);
+  outline-offset: 2px;
+}
+
+/* Quiosque (foco). O bug: o contorno de foco foi removido. */
+.quiosque {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.botaoSemFoco {
+  min-height: 2.75rem;
+  padding: 0.5rem 1.25rem;
+  border: 0;
+  border-radius: var(--radius-full);
+  font: inherit;
+  font-weight: 600;
+  color: var(--pv-white);
+  background: var(--pv-blue-700);
+  cursor: pointer;
+}
+.botaoSemFoco:focus,
+.botaoSemFoco:focus-visible {
+  outline: none;
+}
+
+/* Cartaz (alt). */
+.cartaz {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  border: 2px solid var(--pv-gray-950);
+  border-radius: var(--radius-md);
+  background: var(--pv-blue-50);
+}
+.fotos {
+  display: flex;
+  gap: 0.4rem;
+}
+.foto {
+  width: 4rem;
+  height: 4rem;
+  border: 2px solid var(--pv-white);
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  background: var(--pv-gray-100);
+}
+.cartazTexto {
+  margin: 0;
+  font-weight: 700;
+}
+/* Balão do leitor de tela. */
+.balao {
+  position: relative;
+  align-self: flex-start;
+  margin: 0.4rem 0 0;
+  padding: 0.4rem 0.7rem;
+  border: 2px solid var(--pv-gray-950);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  background: var(--pv-yellow-400);
+}
+.balaoRotulo {
+  font-weight: 700;
+}
+
+/* Campos falsos do "Antes" (cor e label): não são campos de verdade, para
+   ninguém tentar preencher um exemplo quebrado. */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.campoNome,
+.estadoRotulo {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+.estadoRotulo {
+  font-size: var(--font-size-xs);
+  color: var(--pv-gray-700);
+}
+.estados {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.campoFalso {
+  min-height: 2.75rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--pv-gray-600);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  background: var(--pv-white);
+}
+.campoFalso[data-erro] {
+  border: 2px solid var(--pv-red-600);
+}
+.campoFalso[data-placeholder] {
+  color: var(--pv-gray-600);
+}
+
+.cartaoKit {
+  width: 100%;
+}
+
+/* ---- Pergunta ------------------------------------------------------------ */
+
+.pergunta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.grupo {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.perguntaTexto {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  font-size: var(--font-size-md);
+  font-weight: 700;
+}
+.opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.opcao {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--pv-gray-600);
+  border-radius: var(--radius-md);
+  background: var(--pv-white);
+  cursor: pointer;
+}
+.opcao:hover {
+  border-color: var(--pv-blue-700);
+  background: var(--pv-blue-50);
+}
+.opcao[data-marcada] {
+  border-color: var(--pv-blue-700);
+  border-width: 3px;
+  padding: calc(0.5rem - 1px) calc(0.75rem - 1px);
+  background: var(--pv-blue-50);
+}
+.opcao:has(.radio:focus-visible) {
+  outline: 3px solid var(--pv-blue-hero);
+  outline-offset: 3px;
+}
+/* Rádio nativo, só escondido do olho (segue no teclado e no leitor). */
+.radio {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  pointer-events: none;
+}
+.opcaoLetra {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--pv-gray-600);
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  color: var(--pv-gray-700);
+  background: var(--pv-white);
+}
+.opcao[data-marcada] .opcaoLetra {
+  border-color: var(--pv-blue-700);
+  color: var(--pv-white);
+  background: var(--pv-blue-700);
+}
+.opcaoTexto {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+/* ---- Final --------------------------------------------------------------- */
+
+.final {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.wcag {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-weight: 700;
+}
+.wcagRotulo {
+  padding: 0.1rem 0.5rem;
+  border: 2px solid var(--pv-gray-950);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pv-white);
+  background: var(--pv-blue-800);
+}
+.explicacao {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+/* Botão principal (igual ao .agora da OficinaBike). */
+.botao {
+  align-self: center;
+  min-width: 10rem;
+  min-height: 2.75rem;
+  padding: 0.55rem 1.4rem;
+  border: 3px solid var(--pv-gray-950);
+  border-bottom-width: 6px;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pv-white);
+  background: var(--pv-blue-700);
+  cursor: pointer;
+}
+.botao:hover {
+  background: var(--pv-blue-800);
+}
+.botao:focus-visible {
+  outline: 3px solid var(--pv-blue-hero);
+  outline-offset: 3px;
+}
+
+.aviso {
+  min-height: 1.5em;
+  margin: 0;
+  font-weight: 700;
+  text-align: center;
+  color: var(--pv-red-800);
+}
