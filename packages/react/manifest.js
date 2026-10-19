@@ -141,7 +141,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Caixa de texto",
     file: "src/components/input.tsx",
     category: "formularios",
-    desc: "Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string.",
+    desc: "Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` e `aria-invalid` automaticamente: sem erro, `aria-describedby` aponta para a dica; com erro, a dica sai e ele aponta só para a mensagem de erro. `onChange` é o evento nativo; `onValueChange` recebe só a string.",
     variants: [
       { prop: "estados", values: "padrão · inválido (invalid / aria-invalid) · disabled" },
       { prop: "contrato", values: "value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required" },
@@ -427,7 +427,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     label: "Campo de formulário",
     file: "src/components/form-field.tsx",
     category: "formularios",
-    desc: "Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio.",
+    desc: "Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (sem erro, a dica; com erro, a dica sai e ele aponta só para a mensagem de erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio.",
     variants: [
       { prop: "props", values: "label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · errorRole (\"alert\" | undefined) · id" },
       { prop: "hooks", values: "useFormField · useFormFieldControl (para campos próprios)" },
@@ -437,7 +437,7 @@ import { Download, Search, Trash2 } from "lucide-react";
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import * as z from "zod";
 import { useState } from "react";
 
 // npm install react-hook-form @hookform/resolvers@^5 zod@^4 (opcionais, só para esta receita)

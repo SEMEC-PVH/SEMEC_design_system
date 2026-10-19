@@ -522,6 +522,7 @@ function llmsIndex({ site = false, lite = false } = {}) {
       "",
       "Versão sem componentes React. Fornece tokens CSS, regras de acessibilidade",
       "e padrões responsive para aplicações com a identidade visual da Prefeitura de Porto Velho.",
+      "Use em Vue, Angular, Svelte, HTML ou qualquer app sem React.",
       "",
       "## Instalação",
       "",
@@ -770,7 +771,7 @@ function buildDist() {
         version,
         generatedAt,
         description:
-          "Tokens, acessibilidade, responsive e padrões visuais. Sem componentes React.",
+          "Tokens, acessibilidade, responsive e padrões visuais. Sem componentes React: use em Vue, Angular, Svelte, HTML ou qualquer app sem React.",
         categories: dsCategories,
         unreleased: pending
           ? {
