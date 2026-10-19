@@ -38,11 +38,11 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, "http://localhost").pathname;
   const assets = { "/recipe.css": [classes.css, "text/css"], "/tailwind.css": [tailwindCss, "text/css"], "/app.js": [bundle.outputFiles[0].text, "text/javascript"], "/behavior.js": [behavior, "text/javascript"] };
   if (assets[url]) { res.setHeader("Content-Type", assets[url][1]); res.end(assets[url][0]); return; }
-  if (url === "/fonts.css" || url === "/tokens.css" || /^\/fonts\/[\w.-]+\.woff2$/.test(url)) { res.setHeader("Content-Type", url.endsWith("css") ? "text/css" : "font/woff2"); res.end(fs.readFileSync(path.join(reactDir, url.slice(1)))); return; }
+  if (url === "/fonts.css" || url === "/variables.css" || url === "/base.css" || /^\/fonts\/[\w.-]+\.woff2$/.test(url)) { res.setHeader("Content-Type", url.endsWith("css") ? "text/css" : "font/woff2"); res.end(fs.readFileSync(path.join(reactDir, url.slice(1)))); return; }
   const react = ["/react", "/parity"].includes(url);
   const tw = url === "/tailwind";
   res.setHeader("Content-Type", "text/html; charset=utf-8");
-  res.end(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Receitas SEMEC</title><link rel="stylesheet" href="/fonts.css">${!react && !tw ? '<link rel="stylesheet" href="/tokens.css">' : ""}<link rel="stylesheet" href="/${react || tw ? "tailwind" : "recipe"}.css"></head><body>${react ? '<div id="root"></div><script>window.recipeData=' + JSON.stringify(classes).replaceAll("<", "\\u003c") + '</script><script src="/app.js"></script>' : screen(tw) + '<script src="/behavior.js"></script>'}</body></html>`);
+  res.end(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Receitas SEMEC</title><link rel="stylesheet" href="/fonts.css">${!react && !tw ? '<link rel="stylesheet" href="/variables.css"><link rel="stylesheet" href="/base.css">' : ""}<link rel="stylesheet" href="/${react || tw ? "tailwind" : "recipe"}.css"></head><body>${react ? '<div id="root"></div><script>window.recipeData=' + JSON.stringify(classes).replaceAll("<", "\\u003c") + '</script><script src="/app.js"></script>' : screen(tw) + '<script src="/behavior.js"></script>'}</body></html>`);
 });
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 let browser;

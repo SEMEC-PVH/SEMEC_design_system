@@ -150,7 +150,7 @@ O `@theme inline` do `tokens.css` gera utilitários para cor, espaçamento (`p-s
 | Sucesso em destaque (fundo cheio, texto 5,85:1) | `--feedback-success-emphasis` / `--text-on-success-emphasis` | `bg-success-emphasis text-success-emphasis-foreground` (nunca o verde cheio como texto: 2,13:1) |
 | Superfície colorida leve | `--tint` | `bg-tint` |
 
-**Armadilha (AUD-30):** **nunca** use `text-muted` nem `text-secondary` para texto: eles **compilam para a cor de fundo** `--surface-alt` (1,09:1, texto invisível), porque `--color-muted` e `--color-secondary` são cores de superfície no estilo shadcn. Use `text-text-muted`, `text-text-secondary` e `text-text-strong`.
+**Armadilha (AUD-30):** **não** use `text-muted` nem `text-secondary` para texto. Desde a 4.3.0 essas classes **não geram CSS** (o texto herda a cor do pai, sem aviso); até a 4.2 compilavam para a cor de fundo `--surface-alt` (1,09:1, texto invisível), porque `--color-muted` e `--color-secondary` são cores de superfície no estilo shadcn. Use `text-text-muted`, `text-text-secondary` e `text-text-strong`; `bg-muted` e `bg-secondary` continuam como fundos.
 
 **Espaçamento:** `--space-N` → `p-space-N`, `gap-space-N`, `mt-space-N` etc. (degraus 0, 1, 2, 3, 4, 6, 8, 12, 16). A escala do Tailwind continua valendo e tem os mesmos valores (`p-4` = `p-space-4` = 16px); use esses degraus no layout do app. Exceções do kit que devem ser preservadas: botão médio `px-5` (20px), botão pequeno `py-1.5` (6px) e `FormField` `gap-1.5` (6px).
 

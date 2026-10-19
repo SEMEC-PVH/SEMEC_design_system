@@ -36,9 +36,11 @@ O Tailwind v4 precisa estar ligado ao bundler (Vite: `npm install -D tailwindcss
 
 O `npm install` traz junto as dependências do kit React (o pacote é um só) e, no npm 7+, também os peers dele (`react`, `react-dom`, `lucide-react`); a variante lite não os importa, então nada disso entra no seu bundle. No pnpm e no Yarn, o aviso de peer ausente desses pacotes pode ser ignorado na lite.
 
+**Só CSS, sem React (npm 7+):** `npm install @semec/ds --omit=peer` não instala os peers React (`react`, `react-dom`, `lucide-react`). As dependências diretas (Radix etc.) continuam vindo, porque o pacote é um só. Repita `--omit=peer` no `npm ci`/`npm install` seguinte para manter essa instalação. Com Tailwind, instale-o à parte com o plugin do bundler.
+
 **Preset JS (opcional):** `@config "@semec/ds/lite/pv-preset";` no CSS global, depois dos imports. O `tokens.css` já gera os utilitários pelo `@theme inline`; o preset (o mesmo `pv-preset` da variante React) só serve a quem ainda configura o Tailwind por JS. Sem Tailwind, ignore.
 
-**Com `@tailwindcss/cli`:** a CLI não copia os arquivos de fonte. Depois de gerar o CSS final, copie `node_modules/@semec/ds/dist/react/fonts/` para `fonts/` ao lado desse CSS (por exemplo, `public/css/fonts/` para `public/css/app.css`). Preserve as URLs relativas `./fonts/…` e confira no navegador que os `.woff2` respondem 200.
+**Com `@tailwindcss/cli`:** a CLI não copia os arquivos de fonte. Depois de gerar o CSS final, rode `npx semec-ds copiar-fontes <pasta-do-css>` (por exemplo, `npx semec-ds copiar-fontes public/css` para `public/css/app.css`), que copia `fonts.css` e a pasta `fonts/` com a licença; ou copie `node_modules/@semec/ds/dist/react/fonts/` à mão para `fonts/` ao lado desse CSS. Preserve as URLs relativas `./fonts/…` e confira no navegador que os `.woff2` respondem 200.
 
 **Fonte:** `@semec/ds/lite/fonts.css` (o mesmo arquivo de `@semec/ds/react/fonts.css`) traz a Poppins 400/500/600/700 (SIL OFL) e vai **antes** do `tokens.css`. Sem ela, o texto cai em `system-ui`. Não existem pesos 800/900.
 
@@ -46,16 +48,52 @@ O `npm install` traz junto as dependências do kit React (o pacote é um só) e,
 
 **CSS legado e foco:** uma regra `:focus { outline: 0 }` fora de `@layer` vence o foco do kit, que está em `@layer base`, mesmo carregada antes dele. Remova essa regra ou substitua-a por um foco visível equivalente. Não basta passar no axe: percorra a tela com Tab e Shift+Tab e confira o anel em cada controle.
 
-As variáveis do `:root` (`--bg`, `--action-primary`…) e a camada base (foco visível, links, reduced motion) funcionam em CSS puro com `var()`; os blocos `@theme` e `@utility` são ignorados pelo navegador, e os utilitários da tabela abaixo só existem com o Tailwind v4 processando o `tokens.css`.
+Sem Tailwind, **não use o `tokens.css`**: ele traz `@theme` e `@utility`, que o navegador ignora e que o bundler acusa (Vite e PostCSS mostram uns 30 avisos `Unknown at rule`). Use os dois arquivos portáveis:
 
-Os subpaths `@semec/ds/lite/*.css` só resolvem **num bundler** (Vite, Next, webpack): `import "@semec/ds/lite/fonts.css"; import "@semec/ds/lite/tokens.css";` no JS de entrada, ou `@import` num CSS que o bundler processa. Num `<link>` (HTML estático, servidor sem bundler) o navegador não conhece o `exports` do pacote; aponte para os arquivos reais, `fonts.css` antes do `tokens.css`:
+- **`variables.css`**: só as variáveis `:root` (`--bg`, `--action-primary`, `--pv-*`…). Não mexe em margens, links, fonte ou fundo da página. Basta ele para usar os tokens com `var()` num sistema existente.
+- **`base.css`** (opcional, depende do `variables.css`): reset, tipografia, links, foco visível, anel inverso sobre a marca e reduced motion. Adote-o de forma explícita; é a camada base que o `tokens.css` aplicava.
+
+Num bundler (Vite, Next, webpack), importe no JS de entrada, nesta ordem:
+
+```js
+import "@semec/ds/lite/fonts.css";
+import "@semec/ds/lite/variables.css";
+import "@semec/ds/lite/base.css"; // opcional
+```
+
+Os subpaths `@semec/ds/lite/*.css` só resolvem num bundler (ou num `@import` que ele processa). Num `<link>` (HTML estático, PHP, servidor sem bundler) o navegador não conhece o `exports` do pacote; aponte para os arquivos reais, `fonts.css` primeiro:
 
 ```html
 <link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/fonts.css" />
-<link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/tokens.css" />
+<link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/variables.css" />
+<link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/base.css" />
 ```
 
-O caminho em `dist/` não é contrato público (o `exports` não o expõe) e pode mudar numa versão futura: fixe a versão do pacote (`"@semec/ds": "{{ds:version}}"`, sem `^`) ou copie os arquivos. Se o servidor não publica `node_modules`, copie `dist/react/tokens.css`, `dist/react/fonts.css` e a pasta `dist/react/fonts/` para a pasta estática, mantendo `fonts/` ao lado do `fonts.css` (as URLs dos `.woff2` são relativas a ele).
+O caminho em `dist/` não é contrato público (o `exports` não o expõe) e pode mudar numa versão futura: fixe a versão do pacote (`"@semec/ds": "{{ds:version}}"`, sem `^`) ou copie os arquivos. Se o servidor não publica `node_modules`, copie `dist/react/variables.css` e `dist/react/base.css` para a pasta estática e use `npx semec-ds copiar-fontes <pasta>` para levar `fonts.css` e `fonts/` juntos (as URLs dos `.woff2` são relativas ao `fonts.css`).
+
+**Via CDN** (sem `npm install`): o jsDelivr serve os arquivos físicos, não os aliases do `exports` (`/lite/variables.css` dá 404). Use o caminho `dist/react/`, versão fixa e SRI:
+
+```html
+<link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@semec/ds@{{ds:version}}/dist/react/fonts.css" integrity="sha384-…" />
+<link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@semec/ds@{{ds:version}}/dist/react/variables.css" integrity="sha384-…" />
+<link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@semec/ds@{{ds:version}}/dist/react/base.css" integrity="sha384-…" />
+```
+
+Calcule o SRI a partir dos arquivos publicados dessa versão (`variables.css` e `base.css` existem a partir da 4.3.0) e teste o carregamento. As fontes vêm de `dist/react/fonts/`, relativas ao `fonts.css`. Com CSP, autorize `https://cdn.jsdelivr.net` em `style-src` e `font-src`.
+
+### Tokens como dados (sem CSS)
+
+Para Figma/Tokens Studio, apps mobile, back-end, PDF ou e-mail, use os tokens como dados:
+
+```js
+import dtcg from "@semec/ds/tokens.json" with { type: "json" }; // DTCG 2025.10, grupos L0/L1
+import { tokens } from "@semec/ds/tokens"; // valores CSS resolvidos, tipados
+
+const primary = tokens["action-primary"]; // sem var()
+const reference = dtcg.L1["action-primary"].$value; // {L0.pv-blue-600}
+```
+
+Os dois são gerados do `:root` do `tokens.css`, que continua sendo a fonte de verdade. O arquivo físico é `dist/tokens/tokens.json`. A conversão para Android/iOS fica com o app.
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0).
 
@@ -188,7 +226,7 @@ Use os degraus de espaçamento no layout do app. Preserve as exceções do kit: 
 | `rounded-sm/md/lg/full` | `--radius-*` |
 | `shadow-elevation-1/2/3` | `--elevation-*` |
 
-**Armadilha:** **nunca** use `text-muted` nem `text-secondary` para texto: compilam para a cor de fundo `--surface-alt` (1,09:1). Use `text-text-muted` e `text-text-secondary`.
+**Armadilha:** `text-muted` e `text-secondary` **não geram CSS** desde a 4.3.0 (até a 4.2 compilavam para a cor de fundo `--surface-alt`, 1,09:1). A classe não dá erro: o texto só herda a cor do pai, e a intenção de texto de apoio se perde sem aviso. Use `text-text-muted` e `text-text-secondary`. Os fundos `bg-muted` e `bg-secondary` continuam.
 
 ## Tema
 
