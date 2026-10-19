@@ -173,5 +173,96 @@
     "shadcn",
     "semec",
     "portovelho"
-  ]
+  ],
+  "typesVersions": {
+    "*": {
+      "react": [
+        "./dist/react/index.d.ts"
+      ],
+      "react/validacao": [
+        "./dist/react/validacao.d.ts"
+      ],
+      "react/tokens.css": [
+        "./dist/react/tokens.css"
+      ],
+      "react/fonts.css": [
+        "./dist/react/fonts.css"
+      ],
+      "react/fonts/*": [
+        "./dist/react/fonts/*"
+      ],
+      "react/pv-preset": [
+        "./dist/react/pv-preset.d.ts"
+      ],
+      "react/pv-preset.ts": [
+        "./pv-preset.ts"
+      ],
+      "react/server": [
+        "./dist/react/server.d.ts"
+      ],
+      "react/button-loading": [
+        "./__not_exported__"
+      ],
+      "react/*": [
+        "./dist/react/components/*.d.ts"
+      ],
+      "skills": [
+        "./dist/skills/index.d.ts"
+      ],
+      "skills/llms.txt": [
+        "./dist/skills/llms.txt"
+      ],
+      "skills/llms-full.txt": [
+        "./dist/skills/llms-full.txt"
+      ],
+      "skills/manifest.json": [
+        "./dist/skills/manifest.json"
+      ],
+      "skills/manifest.js": [
+        "./dist/skills/manifest.js"
+      ],
+      "skills/components/*": [
+        "./dist/skills/components/*"
+      ],
+      "skills/semec-ds": [
+        "./dist/skills/semec-ds/SKILL.md"
+      ],
+      "skills/ds-semec-skill": [
+        "./dist/skills/semec-ds/SKILL.md"
+      ],
+      "lite/tokens.css": [
+        "./dist/react/tokens.css"
+      ],
+      "lite/fonts.css": [
+        "./dist/react/fonts.css"
+      ],
+      "lite/pv-preset": [
+        "./dist/react/pv-preset.d.ts"
+      ],
+      "lite/pv-preset.ts": [
+        "./pv-preset.ts"
+      ],
+      "lite/skills": [
+        "./dist/lite/skills.d.ts"
+      ],
+      "lite/skills/llms.txt": [
+        "./dist/lite/llms.txt"
+      ],
+      "lite/skills/manifest.json": [
+        "./dist/lite/manifest.json"
+      ],
+      "lite/skills/semec-ds-lite": [
+        "./dist/lite/semec-ds-lite/SKILL.md"
+      ],
+      "lite/skills/ds-semec-skill": [
+        "./dist/lite/semec-ds-lite/SKILL.md"
+      ],
+      "package.json": [
+        "./package.json"
+      ],
+      "*": [
+        "./__not_exported__"
+      ]
+    }
+  }
 }

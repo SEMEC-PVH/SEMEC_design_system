@@ -384,6 +384,8 @@ Com `axe-core` direto (ou `jest-axe`/`vitest-axe`), o equivalente é passar `{ r
 - **Plugin do Tailwind** (do seu build, não do kit): `@tailwindcss/vite` no Vite; `@tailwindcss/postcss` ou `@tailwindcss/turbopack` no Next. O `@source` aponta para `node_modules/@semec/ds/dist/react`, com caminho relativo ao CSS
 - **Dependências (vêm automaticamente)**: todos os `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `get-nonce`
 
+**TypeScript:** os subpaths tipados resolvem com `moduleResolution: "bundler"`, `"nodenext"` e `"node"` (node10), preservando a validação de variantes mesmo com `skipLibCheck: false`. Ao usar Zod 4 em `@semec/ds/react/validacao` com node10, habilite `esModuleInterop: true`, exigido pelas declarações do Zod. O suporte ao resolver legado não muda o formato ESM do pacote nem habilita `require()`.
+
 ## Limitações conhecidas
 
 - **Windows: caminho longo no `next build`.** Com o projeto numa pasta funda, o Turbopack pode falhar com `exceeds max length of filesystem` em `.next/server/chunks/ssr` (limite de 260 caracteres do Windows). Não é do kit: mova o projeto para um caminho curto (ex.: `C:\dev\app`), habilite caminhos longos no Windows (`LongPathsEnabled`) ou use `next build --webpack`.
