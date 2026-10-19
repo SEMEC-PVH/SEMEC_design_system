@@ -726,7 +726,7 @@ import { FormField, Combobox, InputOTP, InputOTPGroup, InputOTPSlot } from "@sem
 - Tooltip: exige `<TooltipProvider>` acima na árvore
 - DatePicker: nativo `type="date"` (ISO YYYY-MM-DD); período = 2 campos
 - Sem hex solto, sem `rgba()`, sem `style` inline — use tokens L1
-- CSP: Dialog/Drawer/Sheet/DropdownMenu usam `SemecProvider` com nonce. Medido (SEM-752/780): Popover 0 violações; ScrollArea e Select 1 cada, mesmo com nonce (CSS estático de scrollbar no `tokens.css`).
+- CSP: Dialog/Drawer/Sheet/DropdownMenu usam `SemecProvider` com nonce. Na 4.2.1, o provider também repassa o nonce aos elementos `<style>` dos viewports de Select e ScrollArea, inclusive no SSR. `SelectContent nonce` explícito prevalece; em ScrollArea, a ordem é `viewportProps.nonce` → `nonce` → provider. O nonce não autoriza atributos `style` do Radix: ainda podem ocorrer violações de `style-src-attr`. Valide SSR e interações com a política de produção.
 
 ## Removido na 4.0 e depreciações anunciadas
 

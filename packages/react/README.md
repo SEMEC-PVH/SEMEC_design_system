@@ -482,18 +482,19 @@ Os IDs do resumo são os controles: `city` fica no **SelectTrigger**, `shift` no
 
 O nonce autoriza elementos `<script>`/`<style>` que carregam o mesmo valor da política. **Não autoriza atributos `style`**: no HTML gerado por SSR, eles são controlados por `style-src-attr` (ou por `style-src` quando aquela diretiva está ausente). Portanto, passar `nonce` ao `SemecProvider` não garante ausência de violações nem corrige atributos bloqueados antes da hidratação.
 
-Na integração de 19/10/2026, com o pacote anterior às correções CSP da 4.2.1:
+Com as correções CSP da 4.2.1 (onda 0 da integração de 19/10/2026):
 
 | Componente | Resultado com SSR e política estrita |
 |---|---|
-| Toast / Toaster | O atributo de `pointer-events` da região é bloqueado; o viewport pode interceptar cliques no cabeçalho (INT-B2-01) |
-| Checkbox | O estilo do input nativo auxiliar é bloqueado e ele aparece duplicado (INT-B2-02) |
-| Select | Atributos inline bloqueados e `<style>` do viewport sem nonce mesmo com provider (INT-B2-08); o CSS estático do kit esconde a scrollbar |
-| ScrollArea | Na prova anterior, um `<style>` sem nonce; o CSS estático do kit esconde a scrollbar |
+| Toast / Toaster | Classes estáticas liberam cliques sob a região vazia e preservam ações e fechamento do aviso (INT-B2-01) |
+| Checkbox, Switch, RadioGroup, Slider | CSS estático esconde os inputs nativos auxiliares mesmo com os atributos inline bloqueados (INT-B2-02) |
+| Progress / Slider | O preenchimento usa SVG e permanece visível no SSR sob CSP estrita |
+| Select | O `<style>` do viewport recebe o nonce do SemecProvider; `SelectContent nonce` explícito prevalece (INT-B2-08). Atributos inline ainda podem ser bloqueados |
+| ScrollArea | O `<style>` do viewport recebe o nonce, inclusive no SSR; precedência: `viewportProps.nonce` → `nonce` → SemecProvider |
 | Dialog, AlertDialog, Drawer, Sheet, DropdownMenu | O bloqueio de rolagem usa `<style>` dinâmico: passe o nonce pelo `SemecProvider` |
 | Popover | Zero violações na prova anterior, sem nonce; isso não é garantia para toda composição |
 
-As correções de Toast, Checkbox e propagação do nonce no Select são tratadas no kit. Valide a versão instalada em produção: carregue por SSR, clique num link sob a região de notificações, marque o Checkbox e abra o Select e o Dialog. Testar só SPA ou servidor de desenvolvimento não reproduz os bloqueios de atributos no HTML inicial. Não acrescente `'unsafe-inline'` para esconder esses achados; mantenha `style-src-attr 'none'` e verifique os componentes usados pelo seu app.
+Essas correções preservam os cenários acima, mas os atributos `style` emitidos pelo Radix ainda podem gerar violações de `style-src-attr`. Valide a versão instalada em produção: carregue por SSR, clique num link sob a região de notificações, marque o Checkbox e abra o Select e o Dialog. Testar só SPA ou servidor de desenvolvimento não reproduz os bloqueios de atributos no HTML inicial. Não acrescente `'unsafe-inline'` para esconder esses achados; mantenha `style-src-attr 'none'` e verifique os componentes usados pelo seu app.
 
 ### Next.js App Router (servidor por requisição)
 
