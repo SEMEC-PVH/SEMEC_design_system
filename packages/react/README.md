@@ -6,7 +6,7 @@ React 19 + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Token
 
 ## Comece aqui
 
-São 5 passos. Pular qualquer um deles faz os componentes saírem sem estilo, sem fonte ou sem funcionar.
+São 5 passos para o caminho Tailwind v4. Para usar o CSS pronto, siga [Sem Tailwind](#sem-tailwind) e mantenha os providers do passo 4.
 
 ### 1. Instalar
 
@@ -22,7 +22,7 @@ npm install @semec/ds lucide-react
 - **pnpm** só instala peers com `auto-install-peers=true` (padrão desde o pnpm 8, mas muitos projetos e monorepos usam `false`);
 - **Yarn** (clássico e Berry) **não** instala peers: só avisa.
 
-Os peers obrigatórios são `react` e `react-dom` ^19 (o app já tem), `tailwindcss` ^4 (entra no passo 2, com o plugin do seu bundler) e `lucide-react`. Peer opcional: `zod` `^3.23.0 || ^4.0.0`, só se usar `@semec/ds/react/validacao`. Os pacotes Radix UI, `class-variance-authority`, `clsx`, `tailwind-merge` e `get-nonce` são **dependências** do `@semec/ds` e vêm automaticamente: não instale a lista de `@radix-ui/*` à mão.
+Os peers obrigatórios são `react` e `react-dom` ^19 (o app já tem) e `lucide-react`. Peers opcionais: `tailwindcss` ^4 (necessário apenas para compilar o CSS no app, passo 2) e `zod` `^3.23.0 || ^4.0.0` (só se usar `@semec/ds/react/validacao`). Os pacotes Radix UI, `class-variance-authority`, `clsx`, `tailwind-merge` e `get-nonce` são **dependências** do `@semec/ds` e vêm automaticamente: não instale a lista de `@radix-ui/*` à mão.
 
 ### 2. CSS global (Tailwind v4)
 
@@ -143,6 +143,19 @@ Na 3.0 e na 3.1 o `dist` era um bundle único sem `"use client"` e importar o ki
 
 Em Vite/SPA nada disso se aplica.
 
+## Sem Tailwind
+
+Instale `@semec/ds` e `lucide-react` no app React 19. Importe uma vez, no ponto de entrada do app (ou no layout raiz do Next):
+
+```tsx
+import "@semec/ds/react/fonts.css";
+import "@semec/ds/react/styles.css";
+```
+
+`styles.css` já inclui os tokens, o reset global do Tailwind v4 e as classes usadas pelos componentes publicados, minificados. Não precisa de plugin Tailwind, `@source` nem de importar `tokens.css` à parte. Os componentes e providers são os mesmos do caminho oficial.
+
+As classes de layout do **app** ficam por conta do app: use CSS próprio ou seu compilador de estilos. Classes passadas em `className` que não aparecem no kit não são incluídas nesse arquivo. Escolha entre este CSS pronto e a compilação Tailwind v4 para evitar duplicar reset e utilitários. O CSS pronto mantém os [requisitos de navegador do Tailwind v4](https://tailwindcss.com/docs/compatibility) (Safari 16.4+, Chrome 111+, Firefox 128+); não é um modo de compatibilidade com navegadores antigos.
+
 ## Uso rápido
 
 ```tsx
@@ -233,6 +246,7 @@ import { cn } from "@semec/ds/react";
 | `@semec/ds/react/<componente>` | Um componente só, pelo nome do arquivo em `src/components` (ex.: `@semec/ds/react/button`, `@semec/ds/react/dialog`, `@semec/ds/react/form-field`). Desde a 3.2 |
 | `@semec/ds/react/validacao` | Schemas Zod (exige o peer `zod`) |
 | `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) + utilitários de animação |
+| `@semec/ds/react/styles.css` | CSS pronto minificado: tokens, reset e classes dos componentes, sem compilador Tailwind no app |
 | `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS config) |
 | `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 (arquivo TS original) |
 | `@semec/ds/react/server` | **Depreciado na 4.1, sai na 5.0** (TST-34b). Uso interno do monorepo: só tem `dsPackageRootResolve()`, que procura `packages/react` a partir do `cwd` e lança erro fora do repositório. Em desenvolvimento, avisa no console. Não use em apps consumidores |
