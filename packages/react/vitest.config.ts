@@ -3,6 +3,12 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
+// O job React 18 usa seu próprio checkout e força o mesmo runtime nas demos.
+const react18Root = process.env.SEMEC_REACT18_ROOT;
+const reactAliases = react18Root ? ["react", "react-dom"].map((name) => ({
+  find: new RegExp(`^${name}(?=/|$)`),
+  replacement: path.join(react18Root, "node_modules", name).replaceAll("\\", "/"),
+})) : [];
 
 /**
  * Suíte do @semec/ds (AUD-45). Testes em `test/` (pasta separada, para não
@@ -28,7 +34,7 @@ const demoAlias = {
 };
 
 export default defineConfig({
-  resolve: { alias: [distToSrc, demoAlias] },
+  resolve: { alias: [...reactAliases, distToSrc, demoAlias] },
   test: {
     projects: [
       {

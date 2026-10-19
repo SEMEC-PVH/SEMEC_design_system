@@ -2,7 +2,7 @@
 
 Design System SEMEC — componentes React + tokens CSS + artefatos para agentes de IA.
 
-React 19 + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Tokens `pv-*` (tema claro).
+React 18.3 ou 19 + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Tokens `pv-*` (tema claro).
 
 ## Comece aqui
 
@@ -22,7 +22,7 @@ npm install @semec/ds lucide-react
 - **pnpm** só instala peers com `auto-install-peers=true` (padrão desde o pnpm 8, mas muitos projetos e monorepos usam `false`);
 - **Yarn** (clássico e Berry) **não** instala peers: só avisa.
 
-Os peers obrigatórios são `react` e `react-dom` ^19 (o app já tem), `tailwindcss` ^4 (entra no passo 2, com o plugin do seu bundler) e `lucide-react`. Peer opcional: `zod` `^3.23.0 || ^4.0.0`, só se usar `@semec/ds/react/validacao`. Os pacotes Radix UI, `class-variance-authority`, `clsx`, `tailwind-merge` e `get-nonce` são **dependências** do `@semec/ds` e vêm automaticamente: não instale a lista de `@radix-ui/*` à mão.
+Os peers obrigatórios são `react` e `react-dom` `^18.3.0 || ^19.0.0` (o app já tem), `tailwindcss` ^4 (entra no passo 2, com o plugin do seu bundler) e `lucide-react`. Peer opcional: `zod` `^3.23.0 || ^4.0.0`, só se usar `@semec/ds/react/validacao`. Os pacotes Radix UI, `class-variance-authority`, `clsx`, `tailwind-merge` e `get-nonce` são **dependências** do `@semec/ds` e vêm automaticamente: não instale a lista de `@radix-ui/*` à mão.
 
 ### 2. CSS global (Tailwind v4)
 
@@ -379,7 +379,7 @@ Com `axe-core` direto (ou `jest-axe`/`vitest-axe`), o equivalente é passar `{ r
 
 ## Dependências
 
-- **Peers obrigatórios**: `react` ^19, `react-dom` ^19, `tailwindcss` ^4 e `lucide-react` `>=0.468.0 <2`. O npm 7+ instala peer ausente sozinho; o pnpm só com `auto-install-peers=true`; o Yarn (clássico e Berry) nunca. Por isso o passo 1 instala `lucide-react` explicitamente
+- **Peers obrigatórios**: `react` e `react-dom` `^18.3.0 || ^19.0.0` (use a mesma versão nos dois), `tailwindcss` ^4 e `lucide-react` `>=0.468.0 <2`. O npm 7+ instala peer ausente sozinho; o pnpm só com `auto-install-peers=true`; o Yarn (clássico e Berry) nunca. Por isso o passo 1 instala `lucide-react` explicitamente
 - **Peer opcional**: `zod` `^3.23.0 || ^4.0.0` (testado com o 3 e o 4) — só se usar `@semec/ds/react/validacao`
 - **Plugin do Tailwind** (do seu build, não do kit): `@tailwindcss/vite` no Vite; `@tailwindcss/postcss` ou `@tailwindcss/turbopack` no Next. O `@source` aponta para `node_modules/@semec/ds/dist/react`, com caminho relativo ao CSS
 - **Dependências (vêm automaticamente)**: todos os `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `get-nonce`
@@ -388,6 +388,7 @@ Com `axe-core` direto (ou `jest-axe`/`vitest-axe`), o equivalente é passar `{ r
 
 ## Limitações conhecidas
 
+- **React 18: aviso do Radix no NavigationMenu em desenvolvimento (INT-B1-03).** Pode aparecer `Function components cannot be given refs`. A abertura e o fechamento do menu passaram no catálogo React 18.3.1; o aviso permanece como limitação da dependência.
 - **Windows: caminho longo no `next build`.** Com o projeto numa pasta funda, o Turbopack pode falhar com `exceeds max length of filesystem` em `.next/server/chunks/ssr` (limite de 260 caracteres do Windows). Não é do kit: mova o projeto para um caminho curto (ex.: `C:\dev\app`), habilite caminhos longos no Windows (`LongPathsEnabled`) ou use `next build --webpack`.
 - **3.0 e 3.1: bundle único e sem fronteira RSC.** Importar uma peça carregava o kit inteiro e importar `@semec/ds/react` num Server Component quebrava. Corrigido na 3.2 (saída por módulo, `"use client"` por componente e subpaths `@semec/ds/react/*`; ver o passo 5 de [Comece aqui](#comece-aqui) e [Subpath exports](#subpath-exports)).
 
