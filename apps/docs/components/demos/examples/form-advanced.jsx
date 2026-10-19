@@ -139,10 +139,14 @@ export function FormAdvanced() {
         <FormField label="CEP" htmlFor="f-cep" hint="00000-000">
           <InputMask id="f-cep" mask="cep" autoComplete="postal-code" value={cep} onValueChange={(_masked, raw) => setCep(raw)} />
         </FormField>
-        <FormField label="Valor estimado" htmlFor="f-valor" hint="Máscara moeda">
-          <Input id="f-valor" inputMode="numeric" placeholder="R$ 0,00" value={valor} onChange={(e) => setValor(maskCurrency(e.target.value))} />
+        <FormField label="Data prevista" htmlFor="f-data" hint="DD/MM/AAAA">
+          <InputMask id="f-data" mask="data" placeholder="DD/MM/AAAA" />
         </FormField>
       </div>
+
+      <FormField label="Valor estimado" htmlFor="f-valor" hint="Máscara moeda">
+        <Input id="f-valor" inputMode="numeric" placeholder="R$ 0,00" value={valor} onChange={(e) => setValor(maskCurrency(e.target.value))} />
+      </FormField>
 
       <FormField label="Município" htmlFor="f-municipio">
         <Select defaultValue="pbh">

@@ -2,7 +2,7 @@
 "@semec/ds": patch
 ---
 
-Correções para a 4.2.1: validação da 4.2.0 como consumidor (Next 16, Vite 8, WebKit/Firefox e migração do semec-digital) e integração da onda 0 de 19/10/2026 (#63, #64 e #72).
+Correções para a 4.3.0: validação da 4.2.0 como consumidor (Next 16, Vite 8, WebKit/Firefox e migração do semec-digital) e integração da onda 0 de 19/10/2026 (#63, #64 e #72).
 
 - **Foco e interação sob CSP (#63, #64, #72).** Corrige o contraste do foco em superfícies `bg-brand-hero` sem Tailwind e libera cliques sob a região vazia do Toast. Esconde os inputs auxiliares de Checkbox, Switch, RadioGroup e Slider por CSS estático e mantém os preenchimentos de Progress e Slider no SSR sem depender de atributos `style`. O preenchimento de Progress passa a SVG, com borda final reta e sem a antiga transição por `transform`.
 - **Nonce e cabeçalho (#72).** Distribui o nonce do SemecProvider aos viewports de SelectContent e ScrollArea, com precedência para valores explícitos. Isso autoriza os elementos `style`, mas não os atributos inline do Radix. Alinha o nome acessível padrão de HeaderNav a "Menu principal" e documenta "SEMEC" como nome padrão de HeaderBrand.

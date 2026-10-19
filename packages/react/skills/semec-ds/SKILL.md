@@ -66,7 +66,7 @@ Sem a fonte, o texto cai em `system-ui` (fallback do token `--font-family-sans`)
 
 **Providers no root (quando usar):** `<Toaster />` se usar `useToast()`; `<TooltipProvider>` em volta do app se usar `Tooltip`; `<SemecProvider nonce>` só para CSP estrita. O `SemecProvider` não inclui os outros dois.
 
-**Next.js App Router:** desde a 3.2 o `dist` sai por módulo e cada componente interativo já traz `"use client"`; importar `@semec/ds/react` num Server Component funciona (apresentacionais como `Heading`, `Card`, `Badge`, `Button`, `Link`, `Table` renderizam no servidor). Passar handler (`onClick`, `onValueChange`…) ou usar hook continua exigindo um arquivo `"use client"` seu. Não use `export *` do kit num arquivo `"use client"`. Um componente só: `@semec/ds/react/<arquivo>` (ex.: `@semec/ds/react/button`). Peso no cliente: com Turbopack (padrão do Next 16) e kit 4.2.1+, a raiz num Server Component custa o mesmo que o subpath; com `next build --webpack` ou kit 4.2.0, prefira o subpath nos Server Components (ou `experimental.optimizePackageImports: ["@semec/ds/react"]`), senão o kit inteiro vai para o cliente. Na 3.0/3.1 (bundle único, sem `"use client"`) o kit só funcionava em arquivos `"use client"`.
+**Next.js App Router:** desde a 3.2 o `dist` sai por módulo e cada componente interativo já traz `"use client"`; importar `@semec/ds/react` num Server Component funciona (apresentacionais como `Heading`, `Card`, `Badge`, `Button`, `Link`, `Table` renderizam no servidor). Passar handler (`onClick`, `onValueChange`…) ou usar hook continua exigindo um arquivo `"use client"` seu. Não use `export *` do kit num arquivo `"use client"`. Um componente só: `@semec/ds/react/<arquivo>` (ex.: `@semec/ds/react/button`). Peso no cliente: com Turbopack (padrão do Next 16) e kit 4.3.0+, a raiz num Server Component custa o mesmo que o subpath; com `next build --webpack` ou kit 4.2.0, prefira o subpath nos Server Components (ou `experimental.optimizePackageImports: ["@semec/ds/react"]`), senão o kit inteiro vai para o cliente. Na 3.0/3.1 (bundle único, sem `"use client"`) o kit só funcionava em arquivos `"use client"`.
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0). Use só `tokens.css` (+ `@source`). Preset JS opcional: `@config "@semec/ds/react/pv-preset"`.
 
@@ -701,7 +701,9 @@ import { FormField, Combobox, InputOTP, InputOTPGroup, InputOTPSlot } from "@sem
   </InputOTP>
 </FormField>
 ```
-- Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`, `cpfCnpjSchema`
+- Máscaras prontas (`InputMask`): `mask="cpf"`, `mask="cnpj"`, `mask="cep"`, `mask="data"` (DD/MM/AAAA), `mask="data-mes-ano"` (MM/AAAA), `mask="data-hora"` (DD/MM/AAAA HH:MM), `mask="hora"` (HH:MM), `mask="telefone"`
+- Funções utilitárias de máscara (`@semec/ds/react`): `maskCPF`, `maskCNPJ`, `maskCEP`, `maskDate`, `maskDateMonthYear`, `maskDateTime`, `maskTime`, `maskCurrency`, `applyInputMask`
+- Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`, `cpfCnpjSchema`, `dateBRSchema`, `dateMonthYearSchema`, `timeSchema`, `dateSchema`
 
 ## Responsive / Mobile
 
@@ -728,7 +730,7 @@ import { FormField, Combobox, InputOTP, InputOTPGroup, InputOTPSlot } from "@sem
 - Tooltip: exige `<TooltipProvider>` acima na árvore
 - DatePicker: nativo `type="date"` (ISO YYYY-MM-DD); período = 2 campos
 - Sem hex solto, sem `rgba()`, sem `style` inline — use tokens L1
-- CSP: Dialog/Drawer/Sheet/DropdownMenu usam `SemecProvider` com nonce. Na 4.2.1, o provider também repassa o nonce aos elementos `<style>` dos viewports de Select e ScrollArea, inclusive no SSR. `SelectContent nonce` explícito prevalece; em ScrollArea, a ordem é `viewportProps.nonce` → `nonce` → provider. O nonce não autoriza atributos `style` do Radix: ainda podem ocorrer violações de `style-src-attr`. Valide SSR e interações com a política de produção.
+- CSP: Dialog/Drawer/Sheet/DropdownMenu usam `SemecProvider` com nonce. Na 4.3.0, o provider também repassa o nonce aos elementos `<style>` dos viewports de Select e ScrollArea, inclusive no SSR. `SelectContent nonce` explícito prevalece; em ScrollArea, a ordem é `viewportProps.nonce` → `nonce` → provider. O nonce não autoriza atributos `style` do Radix: ainda podem ocorrer violações de `style-src-attr`. Valide SSR e interações com a política de produção.
 
 ## Removido na 4.0 e depreciações anunciadas
 

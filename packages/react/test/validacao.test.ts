@@ -72,4 +72,54 @@ describe(`@semec/ds/react/validacao com zod ${process.env.ZOD_MAJOR}`, () => {
     expect(validateCPF("529.982.247-25")).toBe(true);
     expect(validateCNPJ("11.222.333/0001-81")).toBe(true);
   });
+
+  it("dateBRSchema valida formato DD/MM/AAAA e calendário gregoriano", async () => {
+    const { dateBRSchema, validateDateBR } = await import("../src/validacao");
+    expect(validateDateBR("15/10/2026")).toBe(true);
+    expect(validateDateBR("29/02/2024")).toBe(true); // bissexto
+    expect(validateDateBR("29/02/2023")).toBe(false); // não bissexto
+    expect(validateDateBR("31/04/2026")).toBe(false); // abril tem 30 dias
+    expect(validateDateBR("32/01/2026")).toBe(false);
+    expect(dateBRSchema.safeParse("15/10/2026").success).toBe(true);
+    expect(dateBRSchema.safeParse("31/02/2026").success).toBe(false);
+  });
+
+  it("dateMonthYearSchema valida formato MM/AAAA", async () => {
+    const { dateMonthYearSchema, validateDateMonthYear } = await import("../src/validacao");
+    expect(validateDateMonthYear("10/2026")).toBe(true);
+    expect(validateDateMonthYear("13/2026")).toBe(false);
+    expect(dateMonthYearSchema.safeParse("10/2026").success).toBe(true);
+    expect(dateMonthYearSchema.safeParse("00/2026").success).toBe(false);
+  });
+
+  it("timeSchema valida formato HH:MM", async () => {
+    const { timeSchema, validateTime } = await import("../src/validacao");
+    expect(validateTime("14:30")).toBe(true);
+    expect(validateTime("23:59")).toBe(true);
+    expect(validateTime("24:00")).toBe(false);
+    expect(validateTime("12:60")).toBe(false);
+    expect(timeSchema.safeParse("14:30").success).toBe(true);
+    expect(timeSchema.safeParse("25:00").success).toBe(false);
+  });
+
+  it("dateSchema aceita tanto DD/MM/AAAA quanto AAAA-MM-DD", async () => {
+    const { dateSchema } = await import("../src/validacao");
+    expect(dateSchema.safeParse("15/10/2026").success).toBe(true);
+    expect(dateSchema.safeParse("2026-10-15").success).toBe(true);
+    expect(dateSchema.safeParse("2026-02-31").success).toBe(false);
+    expect(dateSchema.safeParse("invalido").success).toBe(false);
+  });
+
+  it("schemas de data e hora separam campo vazio de valor inválido (V42-VITE-06)", async () => {
+    const { dateBRSchema, dateMonthYearSchema, timeSchema, dateSchema } = await import("../src/validacao");
+    const mensagens = (r: { error?: { issues: { message: string }[] } }) =>
+      r.error?.issues.map((i) => i.message);
+    expect(mensagens(dateBRSchema.safeParse(""))).toEqual(["Informe a data."]);
+    expect(mensagens(dateBRSchema.safeParse("31/02/2026"))).toEqual(["Data inválida. Use o formato DD/MM/AAAA."]);
+    expect(mensagens(dateMonthYearSchema.safeParse(" "))).toEqual(["Informe o mês e o ano."]);
+    expect(mensagens(timeSchema.safeParse(""))).toEqual(["Informe o horário."]);
+    expect(mensagens(timeSchema.safeParse("25:00"))).toEqual(["Horário inválido. Use o formato HH:MM."]);
+    expect(mensagens(dateSchema.safeParse(""))).toEqual(["Informe a data."]);
+    expect(mensagens(dateSchema.safeParse("2026-02-31"))).toEqual(["Data inválida."]);
+  });
 });

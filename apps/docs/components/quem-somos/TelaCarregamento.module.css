@@ -1,0 +1,433 @@
+/* Tela de carregamento da Vila SEMEC — mesma linguagem da tela de título
+   (logo de cartucho, caixa de RPG de moldura dupla). Cores só de tokens
+   --pv-*. Contraste: gray-950 sobre white ≈ 19:1; blue-700 sobre white ≈ 7:1;
+   gray-700 sobre white ≈ 9:1; blocos blue-600 sobre gray-100 ≥ 3:1. */
+
+.tela {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.8rem, 3vh, 1.6rem);
+  padding: 1rem;
+  overflow: hidden;
+  color: var(--pv-white);
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 38%, var(--pv-blue-700), transparent 70%),
+    linear-gradient(to bottom, var(--pv-blue-900), var(--pv-blue-950));
+}
+
+/* Nuvens claras passando devagar (só transform). */
+.nuvens span {
+  position: absolute;
+  height: 2.2rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pv-white) 10%, transparent);
+}
+.nuvens span::before,
+.nuvens span::after {
+  content: "";
+  position: absolute;
+  bottom: 40%;
+  border-radius: 50%;
+  background: inherit;
+}
+.nuvens span::before {
+  left: 18%;
+  width: 45%;
+  height: 160%;
+}
+.nuvens span::after {
+  right: 15%;
+  width: 32%;
+  height: 120%;
+}
+.nuvens span:nth-child(1) {
+  top: 12%;
+  left: -10%;
+  width: 11rem;
+}
+.nuvens span:nth-child(2) {
+  top: 30%;
+  left: 70%;
+  width: 8rem;
+}
+.nuvens span:nth-child(3) {
+  top: 78%;
+  left: 20%;
+  width: 13rem;
+}
+
+/* ---- Logo (igual ao da tela de título) ------------------------------------ */
+.tela .logo {
+  position: relative;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.82;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.logoTop,
+.logoMain {
+  display: block;
+  paint-order: stroke fill;
+  -webkit-text-stroke: 0.14em var(--pv-blue-950);
+  letter-spacing: 0.02em;
+}
+.logoTop {
+  font-size: clamp(1.2rem, min(3.6vw, 3.6vh), 2.1rem);
+  color: var(--pv-white);
+  transform: rotate(-4deg) translateX(-28%);
+  text-shadow:
+    0 0.06em 0 var(--pv-blue-950),
+    0 0.12em 0 var(--pv-blue-950);
+}
+.logoMain {
+  font-size: clamp(2.4rem, min(9vw, 9vh), 5.5rem);
+  color: var(--pv-yellow-400);
+  text-shadow:
+    0 0.03em 0 var(--pv-yellow-600),
+    0 0.06em 0 var(--pv-yellow-800),
+    0 0.09em 0 var(--pv-blue-950),
+    0 0.12em 0 var(--pv-blue-950),
+    0 0.2em 0.25em color-mix(in srgb, var(--pv-black) 45%, transparent);
+}
+
+/* ---- Caixa de RPG ------------------------------------------------------------ */
+.caixa {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: min(34rem, 100%);
+  padding: 1.1rem 1.4rem 1.2rem;
+  box-sizing: border-box;
+  color: var(--pv-gray-950);
+  background: var(--pv-white);
+  border: 4px solid var(--pv-blue-950);
+  border-radius: var(--radius-md);
+  box-shadow:
+    inset 0 0 0 3px var(--pv-white),
+    inset 0 0 0 6px var(--pv-blue-600),
+    0 6px 0 var(--pv-blue-950);
+}
+.caixa > * {
+  margin: 0;
+}
+.tela .titulo {
+  margin: 0;
+  border: none;
+  padding: 0;
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--pv-blue-700);
+}
+
+/* Equipe chegando: retrato apagado até a vez dele; acende com um pulinho. */
+.equipe {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.equipe li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  margin: 0;
+  min-width: 0;
+}
+.avatar {
+  display: block;
+  width: 100%;
+  max-width: 3.4rem;
+  aspect-ratio: 1;
+  border: 3px solid var(--pv-gray-400);
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--pv-gray-100);
+  opacity: 0.35;
+  transition:
+    opacity 0.3s ease,
+    border-color 0.3s ease;
+}
+.avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1);
+  transition: filter 0.3s ease;
+}
+.nome {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--pv-gray-700);
+}
+.equipe li[data-chegou] .avatar {
+  opacity: 1;
+  border-color: var(--pv-blue-950);
+  background: var(--pv-yellow-400);
+}
+.equipe li[data-chegou] .avatar img {
+  filter: none;
+}
+.equipe li[data-chegou] .nome {
+  color: var(--pv-gray-950);
+}
+
+/* Barra em blocos (o <progress> continua sendo a barra para leitor de tela). */
+.barraLinha {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.barra {
+  flex: 1;
+  width: 100%;
+  height: 1.35rem;
+  border: 3px solid var(--pv-gray-950);
+  border-radius: var(--radius-sm);
+  background: var(--pv-gray-100);
+  appearance: none;
+  overflow: hidden;
+}
+.barra::-webkit-progress-bar {
+  background: var(--pv-gray-100);
+}
+.barra::-webkit-progress-value {
+  background: var(--pv-blue-600);
+  transition: width 0.25s ease;
+}
+.barra::-moz-progress-bar {
+  background: var(--pv-blue-600);
+}
+/* Divisões dos 10 blocos por cima da barra inteira (tamanho fixo). */
+.barraBox {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+.barraBox::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to right,
+    transparent 0 calc(10% - 3px),
+    var(--pv-gray-100) calc(10% - 3px) 10%
+  );
+}
+.pct {
+  min-width: 3.2ch;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--pv-blue-700);
+}
+
+/* Etapas: ✓ no que acabou, roda girando na atual, apagado no que falta. */
+.etapas {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+.etapas li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  color: var(--pv-gray-700);
+}
+.marca {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--pv-gray-400);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.etapas li[data-estado="feito"] {
+  color: var(--pv-gray-950);
+}
+.etapas li[data-estado="feito"] .marca {
+  border-color: var(--pv-green-700);
+  background: var(--pv-green-700);
+  color: var(--pv-white);
+}
+.etapas li[data-estado="atual"] {
+  color: var(--pv-blue-800);
+  font-weight: 700;
+}
+.etapas li[data-estado="atual"] .marca {
+  border-color: var(--pv-blue-700);
+  border-top-color: transparent;
+}
+
+/* Dica do jogo (troca a cada poucos segundos). */
+.dica {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  min-height: 2.6em;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--radius-sm);
+  background: var(--pv-blue-50);
+  font-size: var(--font-size-sm);
+}
+.dicaRotulo {
+  flex: none;
+  padding: 0.05rem 0.45rem;
+  border-radius: var(--radius-sm);
+  background: var(--pv-blue-700);
+  color: var(--pv-white);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.dicaTexto {
+  color: var(--pv-gray-950);
+}
+
+.pular {
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.45rem 1.1rem;
+  border: 3px solid var(--pv-gray-950);
+  border-bottom-width: 5px;
+  border-radius: var(--radius-md);
+  background: var(--pv-yellow-400);
+  color: var(--pv-gray-950);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pular:hover {
+  background: var(--pv-yellow-500);
+}
+.pular:focus-visible {
+  outline: 3px solid var(--pv-blue-700);
+  outline-offset: 3px;
+}
+.pularNota {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+/* ---- Movimento (só transform/opacity) ------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .logoMain {
+    animation: flutua 3.6s ease-in-out infinite;
+  }
+  .nuvens span {
+    animation: passa 38s linear infinite;
+  }
+  .nuvens span:nth-child(2) {
+    animation-duration: 52s;
+    animation-delay: -20s;
+  }
+  .nuvens span:nth-child(3) {
+    animation-duration: 64s;
+    animation-delay: -35s;
+  }
+  .equipe li[data-chegou] .avatar {
+    animation: chega 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+  }
+  .etapas li[data-estado="atual"] .marca {
+    animation: gira 0.9s linear infinite;
+  }
+  .dicaTexto {
+    animation: aparece 0.35s ease-out both;
+  }
+}
+@keyframes flutua {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@keyframes passa {
+  from {
+    transform: translateX(-20vw);
+  }
+  to {
+    transform: translateX(120vw);
+  }
+}
+@keyframes chega {
+  0% {
+    transform: translateY(8px) scale(0.85);
+  }
+  60% {
+    transform: translateY(-5px) scale(1.06);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes gira {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes aparece {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/* Celular: equipe numa linha só (avatares menores, sem nomes), caixa mais
+   justa e rolagem se mesmo assim faltar altura. */
+@media (max-width: 640px) {
+  .tela {
+    justify-content: flex-start;
+    overflow-y: auto;
+    padding-top: 1.25rem;
+  }
+  .equipe {
+    gap: 0.25rem;
+  }
+  .avatar {
+    border-width: 2px;
+  }
+  .nome {
+    display: none;
+  }
+  .caixa {
+    gap: 0.7rem;
+    padding: 0.9rem 1rem 1rem;
+  }
+}
+@media (max-height: 560px) {
+  .tela .logo {
+    display: none;
+  }
+}

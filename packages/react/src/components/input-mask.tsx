@@ -10,6 +10,9 @@ export type InputMaskPreset =
   | "cnpj"
   | "cep"
   | "data"
+  | "data-mes-ano"
+  | "data-hora"
+  | "hora"
   | "telefone"
   | "telefone-fixo"
   | "celular";
@@ -20,6 +23,9 @@ export const inputMaskPatterns: Record<Exclude<InputMaskPreset, "telefone">, str
   cnpj: "99.999.999/9999-99",
   cep: "99999-999",
   data: "99/99/9999",
+  "data-mes-ano": "99/9999",
+  "data-hora": "99/99/9999 99:99",
+  hora: "99:99",
   "telefone-fixo": "(99) 9999-9999",
   celular: "(99) 99999-9999",
 };
@@ -190,6 +196,9 @@ const presetInputMode: Record<InputMaskPreset, React.HTMLAttributes<HTMLInputEle
   cnpj: "numeric",
   cep: "numeric",
   data: "numeric",
+  "data-mes-ano": "numeric",
+  "data-hora": "numeric",
+  hora: "numeric",
   telefone: "tel",
   "telefone-fixo": "tel",
   celular: "tel",
