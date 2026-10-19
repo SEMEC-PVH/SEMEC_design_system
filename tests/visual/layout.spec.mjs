@@ -55,7 +55,7 @@ test.describe("layout de consumidor", () => {
     const medida = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,
       clientWidth: document.documentElement.clientWidth,
-      navRight: document.querySelector("nav[aria-label='Principal']").getBoundingClientRect().right,
+      navRight: document.querySelector("nav[aria-label='Menu principal']").getBoundingClientRect().right,
     }));
     expect(medida.scrollWidth, JSON.stringify(medida)).toBeLessThanOrEqual(medida.clientWidth);
     expect(medida.navRight).toBeLessThanOrEqual(medida.clientWidth);
