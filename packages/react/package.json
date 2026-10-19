@@ -19,6 +19,7 @@
       "default": "./dist/react/validacao.js"
     },
     "./react/tokens.css": "./dist/react/tokens.css",
+    "./react/styles.css": "./dist/react/styles.css",
     "./react/fonts.css": "./dist/react/fonts.css",
     "./react/fonts/*": "./dist/react/fonts/*",
     "./react/pv-preset": {
@@ -97,8 +98,9 @@
     "**/*.css"
   ],
   "scripts": {
-    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && node scripts/build-tokens.mjs && tsup && node scripts/explicit-barrel.mjs && npm run build:types && node scripts/build-artifacts.mjs",
-    "build:react": "node scripts/build-tokens.mjs && tsup && node scripts/explicit-barrel.mjs",
+    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && node scripts/build-tokens.mjs && tsup && node scripts/explicit-barrel.mjs && npm run build:css && npm run build:types && node scripts/build-artifacts.mjs",
+    "build:react": "node scripts/build-tokens.mjs && tsup && node scripts/explicit-barrel.mjs && npm run build:css",
+    "build:css": "tailwindcss -i scripts/styles.css -o dist/react/styles.css --minify",
     "build:types": "node scripts/build-tokens.mjs && tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/fix-dts-extensions.mjs && node scripts/build-skills-types.mjs",
     "build:skills": "node scripts/build-artifacts.mjs",
     "dev": "tsup --watch",
@@ -109,7 +111,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:csp": "node scripts/check-integracao-csp.mjs --browser",
-    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-barrel.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs && node scripts/check-css.mjs && node scripts/check-fonts.mjs && node scripts/check-tokens.mjs && node scripts/check-token-utilities.mjs && node scripts/check-integracao-csp.mjs && node scripts/check-artifact-examples.mjs"
+    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-barrel.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs && node scripts/check-css.mjs && node scripts/check-fonts.mjs && node scripts/check-styles.mjs && node scripts/check-preset.mjs && node scripts/check-tokens.mjs && node scripts/check-token-utilities.mjs && node scripts/check-integracao-csp.mjs && node scripts/check-artifact-examples.mjs"
   },
   "peerDependencies": {
     "lucide-react": ">=0.468.0 <2",
@@ -119,6 +121,9 @@
     "zod": "^3.23.0 || ^4.0.0"
   },
   "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    },
     "zod": {
       "optional": true
     }
@@ -151,6 +156,7 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.3",
