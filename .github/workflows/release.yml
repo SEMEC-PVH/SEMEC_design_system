@@ -8,12 +8,16 @@ name: Release
 #    generate:llms na mesma passada).
 #    Este workflow NÃO cria branch, commit nem PR: a organização bloqueia PR aberto por
 #    workflow, e o push do PR de versão com PAT deu 403 (AUD-12, run 38615303248).
-# 3. Depois que a CI fica verde num push ao main, este workflow só decide e publica:
+# 3. Depois que a CI fica verde num push ao main, este workflow só decide e publica,
+#    olhando TODOS os pacotes públicos do workspace (@semec/ds, @semec/ds-tokens,
+#    @semec/ds-css…; plano em scripts/release/plano.mjs, com teste unitário):
 #    - changesets pendentes  → resume o plano (`changeset status`) e termina com sucesso;
-#    - nenhum pendente e versão do package.json ainda não está no npm → publica
-#      (`changeset publish`), confere o registry, envia a tag @semec/ds@x.y.z e cria a
-#      GitHub Release;
-#    - nenhum pendente e versão já publicada → não faz nada.
+#    - nenhum pendente e ao menos um pacote com a versão do package.json fora do npm →
+#      publica (`changeset publish`, que pula o que já está no npm), confere cada
+#      versão no registry, envia uma tag <nome>@<versão> e cria uma GitHub Release
+#      por pacote publicado;
+#    - nenhum pendente e tudo já publicado → não faz nada.
+#    Pacote em 0.0.0 (novo, antes do PR de versão) nunca é publicado.
 # Só roda a partir de CI verde: não há gatilho por push direto nem workflow_dispatch.
 #
 # Segurança:
@@ -78,74 +82,24 @@ jobs:
         id: plan
         env:
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        # Lógica em scripts/release/plano.mjs (teste: npm run test:release).
+        # Percorre todos os pacotes públicos do workspace (packages/*), consulta
+        # `npm view <nome>@<versão>` um a um (E404 = não publicado; outro erro aborta,
+        # para nunca decidir publicar às cegas; 0.0.0 nunca publica) e escreve as
+        # saídas mode (pending/publish/noop), count e publish ("<nome> <versão> <dir>"
+        # por linha).
+        run: node scripts/release/plano.mjs
+
+      - name: Resumo dos changesets pendentes
+        if: steps.plan.outputs.mode == 'pending'
         run: |
-          count=$(find .changeset -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l)
-          version=$(node -p "require('./packages/react/package.json').version")
-          name=$(node -p "require('./packages/react/package.json').name")
-
-          # A versão local já está no npm? E404 = não publicada; outro erro = aborta,
-          # para não decidir publicar às cegas (o changeset publish recusaria de todo modo).
-          err="$RUNNER_TEMP/npm-view.err"
-          if out=$(npm view "${name}@${version}" version 2>"$err"); then
-            # Pacote existe: saída vazia = essa versão não existe.
-            if [ "$out" = "$version" ]; then published=true; else published=false; fi
-          elif grep -q 'E404' "$err"; then
-            published=false
-          else
-            cat "$err"
-            echo "::error::Não foi possível consultar ${name}@${version} no npm."
-            exit 1
-          fi
-
-          if [ "$count" -gt 0 ]; then
-            mode=pending
-          elif [ "$published" = "false" ]; then
-            mode=publish
-          else
-            mode=noop
-          fi
-
           {
-            echo "version=$version"
-            echo "tag=${name}@${version}"
-            echo "mode=$mode"
-          } >> "$GITHUB_OUTPUT"
-
-          {
-            echo "## Release ${name}"
+            echo "### Changesets pendentes"
             echo ""
-            echo "- commit: \`$HEAD_SHA\`"
-            echo "- versão no package.json: \`$version\`"
-            echo "- já publicada no npm: \`$published\`"
-            echo "- changesets pendentes: \`$count\`"
-            echo "- modo: \`$mode\`"
-            echo ""
+            echo '```'
+            npx changeset status --verbose 2>&1 || true
+            echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-
-          case "$mode" in
-            pending)
-              {
-                echo "### Changesets pendentes"
-                echo ""
-                echo "Nada é publicado enquanto houver changesets em \`.changeset/\`. Para lançar,"
-                echo "um mantenedor roda \`npm run version-packages\` numa branch"
-                echo "\`changeset-release/<versão>\` e abre o PR de versão (ver CONTRIBUTING.md)."
-                echo ""
-                echo '```'
-                npx changeset status --verbose 2>&1 || true
-                echo '```'
-              } >> "$GITHUB_STEP_SUMMARY"
-              if [ "$published" = "false" ]; then
-                echo "::warning::${name}@${version} ainda não está no npm, mas há changesets pendentes; nada foi publicado. Versione no PR de versão (a próxima versão inclui estas mudanças) ou publique ${version} pelo fallback local do CONTRIBUTING.md."
-              fi
-              ;;
-            publish)
-              echo "Publicando ${name}@${version}." >> "$GITHUB_STEP_SUMMARY"
-              ;;
-            noop)
-              echo "${name}@${version} já está no npm e não há changesets pendentes: nada a fazer." >> "$GITHUB_STEP_SUMMARY"
-              ;;
-          esac
 
       - name: Autenticar npm
         # O ~/.npmrc é escrito depois do npm ci, então só os passos seguintes o enxergam.
@@ -167,76 +121,95 @@ jobs:
       - name: Publicar
         if: steps.plan.outputs.mode == 'publish'
         run: |
-          # O changeset publish cria a tag anotada localmente: precisa de identidade git.
+          # O changeset publish cria uma tag anotada local por pacote publicado:
+          # precisa de identidade git. Ele mesmo pula o que já está no npm.
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           npm run release
 
-      - name: Conferir versão no npm
+      - name: Conferir versões no npm
         if: steps.plan.outputs.mode == 'publish'
         env:
-          EXPECTED: ${{ steps.plan.outputs.version }}
+          PUBLISH: ${{ steps.plan.outputs.publish }}
         run: |
           # O registry pode levar alguns minutos para refletir a publicação
-          # (na 3.1.0 passou de 60s). Espera até 5 min e consulta sem cache.
-          published=""
-          for attempt in $(seq 1 30); do
-            published=$(npm view "@semec/ds@${EXPECTED}" version --prefer-online 2>/dev/null || true)
-            [ "$published" = "$EXPECTED" ] && break
-            echo "tentativa $attempt: registry ainda sem ${EXPECTED}; aguardando 10s"
-            sleep 10
-          done
-          echo "- npm: esperado \`$EXPECTED\`, encontrado \`${published:-nada}\`" | tee -a "$GITHUB_STEP_SUMMARY"
-          if [ "$published" != "$EXPECTED" ]; then
-            echo "::error::@semec/ds@${EXPECTED} não apareceu no npm depois do publish."
-            exit 1
-          fi
+          # (na 3.1.0 passou de 60s). Espera até 5 min por pacote, sem cache.
+          failed=0
+          while read -r name version dir; do
+            [ -n "$name" ] || continue
+            published=""
+            for attempt in $(seq 1 30); do
+              published=$(npm view "${name}@${version}" version --prefer-online 2>/dev/null || true)
+              [ "$published" = "$version" ] && break
+              echo "tentativa $attempt: registry ainda sem ${name}@${version}; aguardando 10s"
+              sleep 10
+            done
+            echo "- npm \`${name}\`: esperado \`$version\`, encontrado \`${published:-nada}\`" | tee -a "$GITHUB_STEP_SUMMARY"
+            if [ "$published" != "$version" ]; then
+              echo "::error::${name}@${version} não apareceu no npm depois do publish."
+              failed=1
+            fi
+          done <<< "$PUBLISH"
+          exit "$failed"
 
-      - name: Enviar tag
+      - name: Enviar tags
         # Tag não é bloqueada como PR: vai com o GITHUB_TOKEN (contents: write).
-        # O pacote já está no npm neste ponto, então falha aqui é aviso, não erro:
-        # a tag pode ser enviada depois à mão (ver CONTRIBUTING.md).
+        # Uma tag "<nome>@<versão>" por pacote publicado. Os pacotes já estão no npm
+        # neste ponto, então falha aqui é aviso, não erro: a tag pode ser enviada
+        # depois à mão (ver CONTRIBUTING.md).
         if: steps.plan.outputs.mode == 'publish'
         env:
-          TAG: ${{ steps.plan.outputs.tag }}
+          PUBLISH: ${{ steps.plan.outputs.publish }}
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
           PUSH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if ! git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
-            git tag -a "$TAG" -m "$TAG" "$HEAD_SHA"
-          fi
           auth=$(printf 'x-access-token:%s' "$PUSH_TOKEN" | base64 -w0)
           echo "::add-mask::$auth"
           git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic $auth"
-          if git push origin "refs/tags/${TAG}"; then
-            echo "- tag: \`$TAG\` enviada" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "::warning::Pacote publicado, mas o push da tag $TAG falhou. Envie à mão: git tag -a '$TAG' -m '$TAG' $HEAD_SHA && git push origin 'refs/tags/$TAG'"
-            echo "- tag: \`$TAG\` **não enviada** (ver aviso)" >> "$GITHUB_STEP_SUMMARY"
-          fi
+          while read -r name version dir; do
+            [ -n "$name" ] || continue
+            tag="${name}@${version}"
+            if ! git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
+              git tag -a "$tag" -m "$tag" "$HEAD_SHA"
+            fi
+            if git push origin "refs/tags/${tag}"; then
+              echo "- tag: \`$tag\` enviada" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "::warning::Pacote publicado, mas o push da tag $tag falhou. Envie à mão: git tag -a '$tag' -m '$tag' $HEAD_SHA && git push origin 'refs/tags/$tag'"
+              echo "- tag: \`$tag\` **não enviada** (ver aviso)" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done <<< "$PUBLISH"
           git config --local --unset-all http.https://github.com/.extraheader || true
 
-      - name: Criar GitHub Release
+      - name: Criar GitHub Releases
         # Também é aviso: o que importa (npm) já foi publicado e conferido.
+        # Uma Release por pacote, com as notas da seção "## <versão>" do CHANGELOG dele.
         if: steps.plan.outputs.mode == 'publish'
         env:
-          TAG: ${{ steps.plan.outputs.tag }}
-          VERSION: ${{ steps.plan.outputs.version }}
+          PUBLISH: ${{ steps.plan.outputs.publish }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if ! git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null; then
-            echo "::warning::Tag $TAG não está no GitHub; GitHub Release não criada."
-            exit 0
-          fi
-          # Notas = seção "## <versão>" do CHANGELOG do pacote.
-          awk -v v="## ${VERSION}" '
-            $0 == v { on = 1; next }
-            on && /^## / { exit }
-            on { print }
-          ' packages/react/CHANGELOG.md > "$RUNNER_TEMP/notes.md"
-          if ! gh release create "$TAG" --verify-tag --title "$TAG" --notes-file "$RUNNER_TEMP/notes.md"; then
-            echo "::warning::Pacote publicado, mas a GitHub Release de $TAG não foi criada. Crie à mão em Releases."
-          fi
+          while read -r name version dir; do
+            [ -n "$name" ] || continue
+            tag="${name}@${version}"
+            if ! git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null; then
+              echo "::warning::Tag $tag não está no GitHub; GitHub Release não criada."
+              continue
+            fi
+            notes="$RUNNER_TEMP/notes-$(printf '%s' "$name" | tr '@/' '__').md"
+            if [ -f "$dir/CHANGELOG.md" ]; then
+              awk -v v="## ${version}" '
+                $0 == v { on = 1; next }
+                on && /^## / { exit }
+                on { print }
+              ' "$dir/CHANGELOG.md" > "$notes"
+            else
+              echo "Primeira versão de ${name}." > "$notes"
+            fi
+            if ! gh release create "$tag" --verify-tag --title "$tag" --notes-file "$notes"; then
+              echo "::warning::Pacote publicado, mas a GitHub Release de $tag não foi criada. Crie à mão em Releases."
+            fi
+          done <<< "$PUBLISH"
 
       - name: Limpar credenciais
         if: always()

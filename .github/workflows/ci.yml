@@ -2,8 +2,9 @@ name: CI
 
 # Cobre o checklist de PR do AGENTS.md/CONTRIBUTING.md:
 # build:ds, typecheck, lint, build do site, deriva dos artefatos de agentes,
-# changeset obrigatório para mudança publicada do @semec/ds, testes do kit, o gate de qualidade
-# e a regressão visual (contêiner do Playwright).
+# changeset obrigatório por pacote publicado (@semec/ds, @semec/ds-tokens, @semec/ds-css),
+# testes do kit, build e testes dos pacotes sem React, teste do plano de release,
+# o gate de qualidade e a regressão visual (contêiner do Playwright).
 # O workflow "Release" só roda depois que este termina verde no main.
 
 on:
@@ -50,6 +51,17 @@ jobs:
             echo "::error title=Changeset ausente::Este PR altera arquivos publicados do @semec/ds sem changeset. Rode 'npm run changeset' e commite o arquivo em .changeset/. Se a mudança realmente não precisa de release, use 'npx changeset add --empty'."
             exit 1
           fi
+
+      - name: Verificar changeset por pacote
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          # O `changeset status` acima só falha quando não há NENHUM changeset. Este
+          # passo exige um changeset para CADA pacote público mudado: um changeset do
+          # @semec/ds não cobre mudança no @semec/ds-tokens ou no @semec/ds-css. Mudança
+          # em packages/react/tokens.css ou packages/react/fonts/ conta também para o
+          # @semec/ds-tokens, que é gerado a partir deles (scripts/release/checar-changesets.mjs).
+          node scripts/release/checar-changesets.mjs --since="origin/${BASE_REF}"
 
   lint:
     name: lint
@@ -102,6 +114,10 @@ jobs:
       - name: Testes do @semec/ds (Vitest + Testing Library + axe, zod 3 e 4)
         run: npm test
 
+      - name: Teste do plano de release e da checagem de changeset
+        # scripts/release/plano.mjs decide o que o workflow Release publica.
+        run: npm run test:release
+
   build:
     name: build
     runs-on: ubuntu-latest
@@ -124,6 +140,25 @@ jobs:
 
       - name: Instalar Chromium (paridade das receitas sem React)
         run: npx playwright install --with-deps chromium
+
+      - name: Build dos pacotes sem React (@semec/ds-tokens, @semec/ds-css)
+        # O ds-tokens lê packages/react/tokens.css e packages/react/fonts/; o ds-css
+        # importa o ds-tokens, por isso vem depois.
+        run: npm run build:pacotes
+
+      - name: Testes dos pacotes sem React (@semec/ds-tokens, @semec/ds-css)
+        # Inclui a paridade de estilo das classes .semec-* com os componentes React
+        # (precisa do build:ds e do Chromium instalados acima).
+        run: npm run test:pacotes
+
+      - name: Build dos pacotes não altera arquivos versionados
+        # Tudo que o build gera vai para dist/ (ignorado). Se um build reescrever um
+        # arquivo commitado em packages/tokens ou packages/css, o commit está desatualizado.
+        run: |
+          if ! git --no-pager diff --exit-code --stat -- packages/tokens packages/css; then
+            echo "::error title=Pacote desatualizado::O build de @semec/ds-tokens ou @semec/ds-css alterou arquivos versionados. Rode 'npm run build:pacotes' e commite o resultado."
+            exit 1
+          fi
 
       - name: Testes do dist (fronteira RSC + poda por módulo)
         # check-rsc: importa @semec/ds/react na camada react-server, com os módulos
