@@ -164,8 +164,13 @@ export default {
       transitionTimingFunction: {
         standard: "var(--easing-standard)",
       },
-      // Mesmos valores de --animate-* e @keyframes em tokens.css.
-      // Os modificadores @utility (fade/zoom/slide) continuam exigindo v4.
+      // Mesmos valores de --animate-* e @keyframes em tokens.css, com uma
+      // diferença em enter/exit (RT1-R-01): na v3, -translate-x-1/2 vive em
+      // `transform`, que o keyframe sobrescrevia, e o Dialog entrava fora do
+      // centro. O keyframe devolve a translação do elemento pela propriedade
+      // `translate` (var(--tw-translate-x/y)). Na v4, que já usa `translate`
+      // com essas variáveis, o valor é o mesmo do elemento e nada muda. Os
+      // modificadores @utility (fade/zoom/slide) continuam exigindo v4.
       animation: {
         in: "enter var(--tw-animation-duration, var(--tw-duration, 0.15s)) var(--tw-ease, ease) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none)",
         out: "exit var(--tw-animation-duration, var(--tw-duration, 0.15s)) var(--tw-ease, ease) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none)",
@@ -178,12 +183,14 @@ export default {
         enter: {
           from: {
             opacity: "var(--tw-enter-opacity, 1)",
+            translate: "var(--tw-translate-x, 0) var(--tw-translate-y, 0)",
             transform: "translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0) scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), var(--tw-enter-scale, 1)) rotate(var(--tw-enter-rotate, 0))",
           },
         },
         exit: {
           to: {
             opacity: "var(--tw-exit-opacity, 1)",
+            translate: "var(--tw-translate-x, 0) var(--tw-translate-y, 0)",
             transform: "translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0) scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1)) rotate(var(--tw-exit-rotate, 0))",
           },
         },

@@ -35,6 +35,12 @@ assert.deepEqual(preset.theme.extend.animation, animations, "Animações: parida
 const frames = Object.fromEntries([...css.matchAll(/@keyframes\s+([\w-]+)\s*\{((?:[^{}]|\{[^{}]*\})*)\}/g)]
   .map(([, name, body]) => [name, Object.fromEntries([...body.matchAll(/([\w%, -]+)\{([^{}]*)\}/g)]
     .map(([, step, rules]) => [step.trim(), declarations(rules)]))]));
-assert.deepEqual(preset.theme.extend.keyframes, frames, "Keyframes: paridade com tokens.css");
+// enter/exit do preset devolvem a translação do elemento pela propriedade
+// `translate` (RT1-R-01, v3); o `transform` é o mesmo do tokens.css.
+const presetFrames = structuredClone(frames);
+for (const name of ["enter", "exit"]) {
+  for (const step of Object.values(presetFrames[name])) step.translate = "var(--tw-translate-x, 0) var(--tw-translate-y, 0)";
+}
+assert.deepEqual(preset.theme.extend.keyframes, presetFrames, "Keyframes: paridade com tokens.css (enter/exit com a translação do elemento)");
 assert.deepEqual(keys(frames), [...new Set(Object.values(animations).map((value) => value.split(" ")[0]))].sort());
 console.log(`check-preset: ok (${keys(colors).length} cores, ${keys(backgrounds).length} fundos, ${keys(animations).length} animações e ${keys(frames).length} keyframes; fontes sincronizadas).`);
