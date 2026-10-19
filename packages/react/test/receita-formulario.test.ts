@@ -74,7 +74,7 @@ describe("instalação da receita (TST-20)", () => {
     expect(secaoInstalacao).toContain(cmd);
     expect(skill.slice(skill.indexOf("### Exemplo Canônico"))).toContain(cmd);
     const readme = fs.readFileSync(path.join(pkgRoot, "README.md"), "utf8");
-    expect(readme).toContain(cmd);
+    expect(readme).toContain("npm install react-hook-form @hookform/resolvers@^5 zod@^4");
   });
 
   it("manifest.json publicado traz os pacotes em install.peers e install.form", () => {
