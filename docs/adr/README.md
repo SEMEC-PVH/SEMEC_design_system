@@ -33,7 +33,8 @@ A regra deste repositório é simples: **decisão estrutural entra como ADR novo
 | [023](0023-pipeline-unico-artefatos-ia.md) | Pipeline único de artefatos de IA e skills canônicas | Aceito |
 | [024](0024-vermelho-de-perigo-pv-red-700.md) | Vermelho de perigo: escala `pv-red` (`pv-red-700`) | Aceito (errata de 15/10/2026: `--pv-red-400` só no site) |
 | [025](0025-tema-unico-claro.md) | Tema único claro no pacote `@semec/ds` | Aceito |
-| [026](0026-pacote-ds-tokens-saidas-por-plataforma.md) | Pacote `@semec/ds-tokens` e saídas por plataforma | Aceito |
+| [026](0026-pacote-ds-tokens-saidas-por-plataforma.md) | Pacote `@semec/ds-tokens` e saídas por plataforma (CSS como fonte, JSON derivado) | Aceito |
+| [027](0027-sem-build-commonjs.md) | Sem build CommonJS: `@semec/ds` somente ESM, `require(esm)` no Node 22.12+ | Aceito |
 | [028](0028-pacote-ds-css-classes-semec.md) | Pacote `@semec/ds-css` e contrato de classes `.semec-*` | Aceito |
 
 ---
