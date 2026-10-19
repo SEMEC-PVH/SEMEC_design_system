@@ -122,6 +122,7 @@ export default defineConfig([
     entry: {
       "lite/skills": "src/lite/skills.ts",
     },
+    external: ["@semec/ds/tokens"],
     outDir: "dist",
     format: "esm",
     dts: false,

@@ -76,7 +76,13 @@
     "./react/source.css": "./dist/react/source.css",
     "./lite/variables.css": "./dist/react/variables.css",
     "./lite/base.css": "./dist/react/base.css",
-    "./lite/source.css": "./dist/react/source.css"
+    "./lite/source.css": "./dist/react/source.css",
+    "./tokens.json": "./dist/tokens/tokens.json",
+    "./tokens": {
+      "types": "./dist/tokens/tokens.d.ts",
+      "import": "./dist/tokens/tokens.js",
+      "default": "./dist/tokens/tokens.js"
+    }
   },
   "files": [
     "dist",
@@ -91,19 +97,19 @@
     "**/*.css"
   ],
   "scripts": {
-    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsup && node scripts/explicit-barrel.mjs && npm run build:types && node scripts/build-artifacts.mjs",
-    "build:react": "tsup && node scripts/explicit-barrel.mjs",
-    "build:types": "tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/fix-dts-extensions.mjs && node scripts/build-skills-types.mjs",
+    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && node scripts/build-tokens.mjs && tsup && node scripts/explicit-barrel.mjs && npm run build:types && node scripts/build-artifacts.mjs",
+    "build:react": "node scripts/build-tokens.mjs && tsup && node scripts/explicit-barrel.mjs",
+    "build:types": "node scripts/build-tokens.mjs && tsc --emitDeclarationOnly --rootDir src --outDir dist/react && node scripts/fix-dts-extensions.mjs && node scripts/build-skills-types.mjs",
     "build:skills": "node scripts/build-artifacts.mjs",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit && tsc -p tsconfig.skills.json --noEmit",
+    "typecheck": "node scripts/build-tokens.mjs && tsc --noEmit && tsc -p tsconfig.skills.json --noEmit",
     "lint": "eslint src --max-warnings 0",
     "prepublishOnly": "npm run build",
     "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:csp": "node scripts/check-integracao-csp.mjs --browser",
-    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-barrel.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs && node scripts/check-css.mjs && node scripts/check-fonts.mjs && node scripts/check-integracao-csp.mjs && node scripts/check-artifact-examples.mjs"
+    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-barrel.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs && node scripts/check-css.mjs && node scripts/check-fonts.mjs && node scripts/check-tokens.mjs && node scripts/check-token-utilities.mjs && node scripts/check-integracao-csp.mjs && node scripts/check-artifact-examples.mjs"
   },
   "peerDependencies": {
     "lucide-react": ">=0.468.0 <2",

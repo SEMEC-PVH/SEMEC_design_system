@@ -418,14 +418,14 @@ As masks têm a assinatura `(value: string) => string` (tipo `MaskFn`): recebem 
 
 ## Tokens
 
-O que existe no pacote está em `tokens.css` (camadas L0 `--pv-*` e L1 semânticas). O `@theme inline` expõe os tokens como utilitários (o preset JS gera os mesmos nomes):
+O que existe no pacote está em `tokens.css` (camadas L0 `--pv-*` e L1 semânticas). No Tailwind v4, o `@theme inline` expõe os tokens como utilitários:
 
 | Token | Utilitário | Observação |
 |---|---|---|
 | `--space-0` … `--space-16` | `p-space-4`, `gap-space-2`, `mt-space-12`… | Dialeto do sistema. `p-4` dá o mesmo valor, mas só os nove degraus (0, 1, 2, 3, 4, 6, 8, 12, 16) fazem parte da escala |
 | `--text-xs` … `--text-2xl`, `--text-3xl` (32px), `--text-display` (40px) | `text-xs` … `text-3xl`, `text-display` | Tamanho **e** entrelinha do degrau (`--leading-*`); `leading-*` sobrescreve |
 | `--font-regular` … `--font-bold` | `font-regular`, `font-medium`, `font-semibold`, `font-bold` | 400–700 |
-| `--text-muted`, `--text-secondary`, `--text-strong` | `text-text-muted`, `text-text-secondary`, `text-text-strong` | **Não** use `text-muted`/`text-secondary`: são a cor de fundo `--surface-alt` (1,09:1). `bg-muted`/`bg-secondary` seguem valendo |
+| `--text-muted`, `--text-secondary`, `--text-strong` | `text-text-muted`, `text-text-secondary`, `text-text-strong` | `text-muted`/`text-secondary` não são gerados pelo CSS v4, para evitar texto com cor de fundo (1,09:1). `bg-muted`/`bg-secondary` seguem valendo, inclusive com opacidade |
 | `--surface-sunken` | `bg-surface-sunken` | Skeleton, trilha de Progress/Slider (1,47:1 sobre `--surface`) |
 | `--focus-ring-inverse` | `ring-ring-inverse` | Automático dentro de `data-surface="brand"` ou `bg-brand-hero` (9,38:1); `data-surface="default"` volta ao anel padrão |
 | `--text-brand` | `text-text-brand` | Título institucional escuro (12,43:1). Novo na 4.0 |
@@ -434,6 +434,31 @@ O que existe no pacote está em `tokens.css` (camadas L0 `--pv-*` e L1 semântic
 Primitivos `--pv-*` não geram utilitário desde a 4.0 (não há `bg-pv-*`).
 
 Link solto no texto (`<a>` sem `class`) é sublinhado pelo `tokens.css`; com classe, o sublinhado é do componente/utilitário (`underline`). Tokens de layout que aparecem no site de documentação (`--container-max`, `--measure`, `--control-height-*`, `data-density`) **não fazem parte do pacote**; use os utilitários do Tailwind indicados na skill `semec-ds` (seção "Responsive / Mobile").
+
+### Tokens como dados (sem React)
+
+O build gera `dist/tokens/tokens.json`, `tokens.js` e `tokens.d.ts` a partir do `:root` de `tokens.css`, que continua sendo a fonte de verdade. Os exports públicos são:
+
+```js
+import dtcg from "@semec/ds/tokens.json" with { type: "json" };
+import { tokens } from "@semec/ds/tokens";
+import { dsTokens } from "@semec/ds/lite/skills";
+
+const primary = tokens["action-primary"]; // valor CSS resolvido, sem var()
+const reference = dtcg.L1["action-primary"].$value; // {L0.pv-blue-600}
+const samePrimary = dsTokens.values["--action-primary"];
+const semanticNames = dsTokens.semantic; // todos os L1, incluindo pv-text/radius/leading/duration
+```
+
+O JSON segue [DTCG 2025.10](https://www.designtokens.org/tr/2025.10/format/), com grupos `L0`/`L1` e referências por caminho completo (`{L0.pv-blue-600}`). Cores usam sRGB; dimensões e durações têm valor e unidade; fontes, pesos, entrelinhas, curvas e sombras têm tipos próprios. Cada token preserva o CSS original em `$extensions["br.gov.portovelho.semec"].css` e o valor CSS resolvido em `.resolved`. O auxiliar `pv-gray-900-rgb` é uma cor sRGB no DTCG e mantém os canais no valor CSS; `elevation-0` é uma sombra transparente de dimensão zero (CSS `none`).
+
+- **Figma / Tokens Studio:** use `dist/tokens/tokens.json` como entrada de uma ferramenta ou integração compatível com DTCG 2025.10, mantendo os grupos e as referências. Versões que usam o formato legado precisam de conversão antes da importação.
+- **Mobile:** transforme as cores sRGB, dimensões (`px`/`rem`) e demais valores tipados para os recursos da plataforma. A conversão para Android/iOS e a escolha da base de `rem` ficam com o consumidor; o pacote ainda não gera XML ou Swift.
+- **Back-end, PDF e e-mail:** importe `tokens` em Node ou leia o JSON com a linguagem do serviço. Os valores em `tokens` e `dsTokens.values` são strings CSS resolvidas; não precisam de DOM, React ou Tailwind em execução.
+
+O catálogo lite mantém as listas `colors`, `semantic`, `typography`, `spacing`, `radii` e `elevation`, agora geradas e completas, e acrescenta `motion` e `values`. `colors` enumera nomes concretos em vez de padrões com `*`.
+
+No CSS v4, `rounded-xs`, `rounded-xl`, `rounded-2xl` e os demais raios nomeados fora da escala deixam de ser gerados. Use `rounded-sm` (2px), `rounded-md` (8px), `rounded-lg` (12px) ou `rounded-full`. `text-fg` e `bg-bg` são apelidos de `text-foreground` e `bg-background`. Não foi adicionado `--color-action-primary`: esse nome já pertence ao tema próprio do site de documentação; para a ação do kit, use `bg-primary`.
 
 ## Tema
 

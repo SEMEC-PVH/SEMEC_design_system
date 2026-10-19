@@ -27,6 +27,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { assertNoConflictMarkers, listFilesRecursive } from "./conflict-markers.mjs";
+import { buildTokens } from "./build-tokens.mjs";
 import { pendingRelease, unreleasedNote } from "./release-status.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -403,7 +404,7 @@ function buildManifest() {
         "Opcional, no CSS global depois dos imports. O tokens.css já gera os utilitários; o preset só serve a quem ainda configura o Tailwind por JS.",
       utils: 'import { cn } from "@semec/ds/react";',
     },
-    tokens: { files: ["tokens.css", "fonts.css", "pv-preset.ts"] },
+    tokens: { files: ["tokens.css", "fonts.css", "pv-preset.ts", "tokens/tokens.json", "tokens/tokens.js"] },
   };
 }
 
@@ -701,6 +702,7 @@ function writeLlmsFullForTarget(outDir, { lite = false } = {}) {
 
 // --- dist (npm) ---
 async function buildDist() {
+  buildTokens();
   console.log("→ dist (npm)");
   syncPackageReadme();
   syncObjetivo();
@@ -785,7 +787,7 @@ async function buildDist() {
             "Os subpaths @semec/ds/lite/*.css só resolvem num bundler. Num <link>, use node_modules/@semec/ds/dist/react/fonts.css e node_modules/@semec/ds/dist/react/tokens.css (ou copie esses arquivos e a pasta fonts/ para a pasta estática).",
         },
         tokens: {
-          files: ["tokens.css", "fonts.css", "pv-preset.ts"],
+          files: ["tokens.css", "fonts.css", "pv-preset.ts", "tokens/tokens.json", "tokens/tokens.js"],
           primitives: "pv-* prefixed (L0)",
           semantic: "L1 — --bg, --fg, --surface, --action-primary, --feedback-*, etc.",
         },

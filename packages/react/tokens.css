@@ -161,9 +161,9 @@
   --focus-ring-inverse: var(--pv-white);
 
   /* ATENÇÃO (AUD-30): estes três NÃO viram `text-muted`/`text-secondary`.
-     No Tailwind, `text-muted` lê --color-muted e `text-secondary` lê
-     --color-secondary, que são cores de FUNDO (--surface-alt): 1,09:1,
-     texto invisível. `bg-muted`/`bg-secondary` continuam valendo.
+     Os nomes --color-muted/--color-secondary são anulados no @theme
+     para não gerar texto com cor de FUNDO (--surface-alt): 1,09:1.
+     `bg-muted`/`bg-secondary` continuam como utilitários próprios.
        --text-muted      → text-text-muted  (ou text-muted-foreground)  7,56:1
        --text-secondary  → text-text-secondary                          10,31:1
        --text-strong     → text-text-strong (ou text-foreground)        15,77:1
@@ -340,6 +340,8 @@
   /* -- Semânticos (uso shadcn: bg-card, text-muted-foreground, etc.) -- */
   --color-background:           var(--bg);
   --color-foreground:           var(--fg);
+  --color-bg:                   var(--bg);
+  --color-fg:                   var(--fg);
   --color-card:                 var(--surface);
   --color-card-foreground:      var(--fg);
   --color-popover:              var(--surface);
@@ -347,11 +349,13 @@
   --color-surface:              var(--surface);
   --color-surface-alt:          var(--surface-alt);
   --color-surface-sunken:       var(--surface-sunken);
-  --color-secondary:            var(--surface-alt);
+  --color-secondary:            initial;
+  --semec-background-secondary: var(--surface-alt);
   --color-secondary-foreground: var(--fg);
   --color-accent:               var(--surface-alt);
   --color-accent-foreground:    var(--fg);
-  --color-muted:                var(--surface-alt);
+  --color-muted:                initial;
+  --semec-background-muted:     var(--surface-alt);
   --color-muted-foreground:     var(--text-muted);
   --color-border:               var(--border);
   --color-border-strong:        var(--border-strong);
@@ -366,7 +370,7 @@
   --color-tint:                 var(--tint);
 
   /* Cor de texto (AUD-30): text-text-muted, text-text-secondary…
-     `text-muted`/`text-secondary` são cor de fundo — não use para texto. */
+     `text-muted`/`text-secondary` não são gerados (INT-A-14). */
   --color-text-muted:           var(--text-muted);
   --color-text-secondary:       var(--text-secondary);
   --color-text-strong:          var(--text-strong);
@@ -438,6 +442,9 @@
   --spacing-space-12: var(--space-12);
   --spacing-space-16: var(--space-16);
 
+  /* INT-A-14: remova os defaults fora da escala, inclusive raios direcionais. */
+  --radius-*: initial;
+
   /* -- Forma (AUD-57): aponta para --pv-radius-*, nunca para si mesmo -- */
   --radius-sm:   var(--pv-radius-sm);
   --radius-md:   var(--pv-radius-md);
@@ -467,6 +474,14 @@
 /* ==========================================================================
    Utilitários customizados (Tailwind v4 @utility)
    ========================================================================== */
+
+/* Fundos legados do kit, sem expor text-muted/text-secondary.
+   --modifier mantém bg-muted/50, hover:bg-secondary/80 e opacidades arbitrárias. */
+@utility bg-* {
+  background-color: --value(--semec-background-*);
+  background-color: color-mix(in oklab, --value(--semec-background-*) calc(--modifier(integer) * 1%), transparent);
+  background-color: color-mix(in oklab, --value(--semec-background-*) --modifier([percentage]), transparent);
+}
 
 @utility duration-fast {
   transition-duration: var(--pv-duration-fast);
