@@ -18,7 +18,10 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const pkgRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+// Aceita a raiz de um pacote instalado de npm pack para reproduzir o consumidor.
+const pkgRoot = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 if (!fs.existsSync(path.join(pkgRoot, "dist", "react", "index.d.ts"))) {
   console.error("check-dts: dist/react/index.d.ts não existe. Rode `npm run build:ds` antes.");
@@ -27,6 +30,19 @@ if (!fs.existsSync(path.join(pkgRoot, "dist", "react", "index.d.ts"))) {
 
 const tsc = createRequire(path.join(pkgRoot, "package.json")).resolve("typescript/bin/tsc");
 const dir = fs.mkdtempSync(path.join(pkgRoot, ".check-dts-"));
+const pkg = JSON.parse(fs.readFileSync(path.join(pkgRoot, "package.json"), "utf8"));
+// Confere cada subpath tipado, inclusive server, validação, presets e skills.
+const typedSubpaths = Object.entries(pkg.exports).flatMap(([key, value]) => {
+  if (!value?.types) return [];
+  if (!key.includes("*")) return [key];
+  return fs.readdirSync(path.join(pkgRoot, "dist/react/components"))
+    .filter((file) => file.endsWith(".d.ts"))
+    .map((file) => key.replace("*", file.slice(0, -5)))
+    .filter((subpath) => pkg.exports[subpath] !== null);
+});
+const subpathImports = typedSubpaths.map((key, i) =>
+  `import type * as Subpath${i} from "@semec/ds/${key.slice(2)}";`
+).join("\n");
 
 const consumer = `import * as React from "react";
 import { Button, IconButton, Spinner, Stepper, PasswordInput, InputMask, Input, FormField, DataTable } from "@semec/ds/react";
@@ -62,6 +78,17 @@ const preset: InputMaskPreset = "cpf";
 const masked: string = applyInputMask("12345678901", preset).masked;
 const pattern: string = inputMaskPatterns.cep;
 const classes: string = buttonVariants({ variant: "outline", size: "sm" });
+const composedClasses: string = buttonVariants({ className: ["extra", { active: true }] });
+const nullableClasses: string = buttonVariants({ variant: null, size: undefined });
+// INT-B1-09: resolver o subpath sem preservar variantes não basta.
+// @ts-expect-error variante inexistente deve ser recusada, nunca virar any
+const invalidVariant = <SubButton variant="inexistente" />;
+// @ts-expect-error a receita de classes também preserva as variantes
+buttonVariants({ variant: "inexistente" });
+// @ts-expect-error tamanho inválido
+buttonVariants({ size: "inexistente" });
+// @ts-expect-error CVA aceita class OU className, não ambos
+buttonVariants({ class: "a", className: "b" });
 const buttonProps: ButtonProps = { loading: true, loadingText: "Enviando…" };
 const stepperProps: StepperProps = { steps: [{ label: "Dados" }], currentStep: 0 };
 const passwordProps: PasswordInputProps = { autoComplete: "current-password", defaultVisible: false };
@@ -145,10 +172,11 @@ export { oldCalendar, oldCombobox, oldOtp, oldUpload, oldDatePicker, newProps };
 export { same, masked, pattern, classes, useFormFieldControl, React };
 `;
 
-// O mesmo consumidor em nodenext (ESM puro do Node) e em bundler (Vite, Next).
+// O mesmo consumidor nos modos modernos e no resolver legado node10.
 const resolutions = [
   { module: "nodenext", moduleResolution: "nodenext" },
   { module: "esnext", moduleResolution: "bundler" },
+  { module: "commonjs", moduleResolution: "node10" },
 ];
 const tsconfigFor = (resolution) => ({
   compilerOptions: {
@@ -156,6 +184,7 @@ const tsconfigFor = (resolution) => ({
     target: "es2022",
     jsx: "react-jsx",
     strict: true,
+    esModuleInterop: true,
     noEmit: true,
     skipLibCheck: false,
     types: [],
@@ -174,7 +203,7 @@ export const d = <FileUpload onChange={(files: File[]) => files} />;
 
 let status = 1;
 try {
-  fs.writeFileSync(path.join(dir, "consumer.tsx"), consumer);
+  fs.writeFileSync(path.join(dir, "consumer.tsx"), subpathImports + "\n" + consumer);
   status = 0;
   for (const resolution of resolutions) {
     fs.writeFileSync(path.join(dir, "tsconfig.json"), JSON.stringify(tsconfigFor(resolution), null, 2));
@@ -199,7 +228,7 @@ try {
     console.error(out);
   }
   if (status === 0) {
-    console.log("check-dts: ok (@semec/ds/react e subpaths button, stepper, input-mask, password-input, form-field; DataTable com linha `interface`; @semec/ds/skills e @semec/ds/lite/skills tipados; button-loading fechado; onChange(valor) da 3.x recusado com erro que cita onValueChange; nodenext e bundler, skipLibCheck false).");
+    console.log(`check-dts: ok (${typedSubpaths.length} subpaths tipados; variantes inválidas recusadas; DataTable com linha interface; skills tipados; button-loading fechado; onChange removido cita onValueChange; nodenext, bundler e node10, skipLibCheck false).`);
   }
 } finally {
   fs.rmSync(dir, { recursive: true, force: true });

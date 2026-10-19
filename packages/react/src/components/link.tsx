@@ -2,8 +2,12 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 
-const linkVariants = cva(
+const linkVariants: VariantFunction<{
+  variant: "primary" | "onSurface" | "muted";
+  underline: boolean;
+}> = cva(
   // TST-10: abaixo de `sm`, um ::after centralizado de no mínimo 44×44 amplia a
   // área de toque (mesmo recurso do Button sm) sem mudar a altura da linha do
   // texto: um link tel/mailto sozinho num parágrafo media 21 px. No desktop o

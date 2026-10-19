@@ -20,7 +20,7 @@ Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailw
 
 ## Instalação
 
-Peer deps obrigatórios: `react ^19.0.0`, `react-dom ^19.0.0`, `tailwindcss ^4.0.0` e `lucide-react >=0.468.0 <2`. Peer **opcional**: `zod ^3.23.0 || ^4.0.0` (só se usar schemas em `@semec/ds/react/validacao`).
+Peer deps obrigatórios: `react ^18.3.0 || ^19.0.0`, `react-dom ^18.3.0 || ^19.0.0`, `tailwindcss ^4.0.0` e `lucide-react >=0.468.0 <2`. Peer **opcional**: `zod ^3.23.0 || ^4.0.0` (só se usar schemas em `@semec/ds/react/validacao`).
 
 ```bash
 npm install @semec/ds lucide-react   # pnpm add / yarn add: mesmos pacotes

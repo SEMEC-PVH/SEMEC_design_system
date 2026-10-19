@@ -1,9 +1,12 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
+import type { VariantFunction } from "../lib/variant-function";
 
 import { Button } from "./button";
 
-const iconButtonVariants = cva("", {
+const iconButtonVariants: VariantFunction<{
+  variant: "primary" | "secondary" | "outline" | "ghost" | "destructive" | "link";
+}> = cva("", {
   variants: {
     variant: {
       primary: "",
