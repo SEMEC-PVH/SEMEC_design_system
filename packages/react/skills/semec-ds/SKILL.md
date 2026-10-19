@@ -12,6 +12,8 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
+App em Vue, Angular, Svelte ou HTML sem React: use a skill lite (`@semec/ds/lite/skills/semec-ds-lite`), que traz só tokens, acessibilidade e padrões visuais.
+
 **Regra número 1: use os componentes do kit, não os reimplemente.** Importe de `@semec/ds/react`. Não copie o código-fonte de um componente para o app, não recrie um componente existente com `div` + classes e não troque o estilo dele por outro. Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 
 <!-- ds:maintainer:start -->
@@ -354,7 +356,7 @@ export function PainelDeProtocolos() {
 - **Cabeçalho do portal:** `bg-surface border-b border-border`, marca em `text-brand-hero font-bold` e link atual em `text-brand-hero font-semibold`.
 - **Marca = `brand-hero`.** Reserve `bg-brand-hero text-primary-foreground` para hero e faixas de destaque dentro da página. Não use `bg-primary` para marca.
 - **Ação = `primary`.** O botão principal de cada tela é `<Button variant="primary">` (`bg-primary`), **um** por grupo de ações; os demais são `outline` ou `ghost`. Não use `brand-hero` em botão.
-- **Foco sobre a marca:** o anel padrão (`--focus-ring` = `--pv-blue-hero`) some sobre a marca (1,00:1). Áreas com `bg-brand-hero` ou `data-surface="brand"` trocam o anel automaticamente para branco (9,38:1); fora disso, use `ring-ring-inverse` (`--focus-ring-inverse`) em controles sobre fundo de marca.
+- **Foco sobre a marca:** o anel padrão (`--focus-ring` = `--pv-blue-hero`) some sobre a marca (1,00:1). Áreas com `bg-brand-hero` ou `data-surface="brand"` trocam o anel automaticamente para branco (9,38:1). O `data-surface="brand"` não pinta o fundo: use-o junto de `bg-brand-hero` (ou `background: var(--brand-hero)`), senão o anel branco fica com 1,08:1 sobre o fundo claro; fora disso, use `ring-ring-inverse` (`--focus-ring-inverse`) em controles sobre fundo de marca.
 
 ### Tabelas
 
@@ -505,7 +507,7 @@ import {
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import * as z from "zod";
 import { useState } from "react";
 
 const requerimentoSchema = z.object({

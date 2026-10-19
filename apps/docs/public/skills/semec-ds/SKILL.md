@@ -12,6 +12,8 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
+App em Vue, Angular, Svelte ou HTML sem React: use a skill lite (`@semec/ds/lite/skills/semec-ds-lite`), que traz só tokens, acessibilidade e padrões visuais.
+
 **Regra número 1: use os componentes do kit, não os reimplemente.** Importe de `@semec/ds/react`. Não copie o código-fonte de um componente para o app, não recrie um componente existente com `div` + classes e não troque o estilo dele por outro. Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 
 ## Instalação
@@ -208,7 +210,7 @@ Lista gerada do manifest (export principal, `code`, arquivo `.md` e descrição)
 
 ### Formulários (18)
 
-- `Input` (`input`, `components/caixa-de-texto.md`) — Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string.
+- `Input` (`input`, `components/caixa-de-texto.md`) — Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` e `aria-invalid` automaticamente: sem erro, `aria-describedby` aponta para a dica; com erro, a dica sai e ele aponta só para a mensagem de erro. `onChange` é o evento nativo; `onValueChange` recebe só a string.
 - `PasswordInput` (`password-input`, `components/campo-de-senha.md`) — Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Desliga corretor e maiúscula automática (`spellCheck={false}`, `autoCapitalize="none"`, `autoCorrect="off"`, sobrescrevíveis), que alterariam a senha visível. Repassa todas as props do `Input`, inclusive `autoComplete`.
 - `InputMask` (`input-mask`, `components/campo-com-mascara.md`) — Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
 - `Textarea` (`textarea`, `components/area-de-texto.md`) — Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`).
@@ -220,7 +222,7 @@ Lista gerada do manifest (export principal, `code`, arquivo `.md` e descrição)
 - `RadioGroup` (`radio-group`, `components/botao-de-opcao.md`) — Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`.
 - `Switch` (`switch`, `components/interruptor.md`) — Interruptor on/off para ativação imediata. API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.
 - `Label` (`label`, `components/rotulo.md`) — Rótulo acessível vinculado ao campo.
-- `FormField` (`form-field`, `components/campo-de-formulario.md`) — Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio.
+- `FormField` (`form-field`, `components/campo-de-formulario.md`) — Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (sem erro, a dica; com erro, a dica sai e ele aponta só para a mensagem de erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio.
 - `ErrorSummary` (`error-summary`, `components/error-summary.md`) — Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role="alert"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco. Título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className="mb-6"`).
 - `Toggle` (`toggle`, `components/toggle.md`) — Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. Ligado = fundo `tint` + contorno de 2px em `primary` (5,00:1 sobre `--bg`, 5,42:1 sobre branco) e texto `foreground`; o estado vai ao leitor de tela por `aria-pressed`.
 - `Slider` (`slider`, `components/slider.md`) — Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares.
@@ -416,7 +418,7 @@ export function PainelDeProtocolos() {
 - **Cabeçalho do portal:** `bg-surface border-b border-border`, marca em `text-brand-hero font-bold` e link atual em `text-brand-hero font-semibold`.
 - **Marca = `brand-hero`.** Reserve `bg-brand-hero text-primary-foreground` para hero e faixas de destaque dentro da página. Não use `bg-primary` para marca.
 - **Ação = `primary`.** O botão principal de cada tela é `<Button variant="primary">` (`bg-primary`), **um** por grupo de ações; os demais são `outline` ou `ghost`. Não use `brand-hero` em botão.
-- **Foco sobre a marca:** o anel padrão (`--focus-ring` = `--pv-blue-hero`) some sobre a marca (1,00:1). Áreas com `bg-brand-hero` ou `data-surface="brand"` trocam o anel automaticamente para branco (9,38:1); fora disso, use `ring-ring-inverse` (`--focus-ring-inverse`) em controles sobre fundo de marca.
+- **Foco sobre a marca:** o anel padrão (`--focus-ring` = `--pv-blue-hero`) some sobre a marca (1,00:1). Áreas com `bg-brand-hero` ou `data-surface="brand"` trocam o anel automaticamente para branco (9,38:1). O `data-surface="brand"` não pinta o fundo: use-o junto de `bg-brand-hero` (ou `background: var(--brand-hero)`), senão o anel branco fica com 1,08:1 sobre o fundo claro; fora disso, use `ring-ring-inverse` (`--focus-ring-inverse`) em controles sobre fundo de marca.
 
 ### Tabelas
 
@@ -566,7 +568,7 @@ import {
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import * as z from "zod";
 import { useState } from "react";
 
 const requerimentoSchema = z.object({

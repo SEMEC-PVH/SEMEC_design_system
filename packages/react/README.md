@@ -73,15 +73,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 **Logo no Next:** os exemplos usam `logo={<img src="/marca.svg" alt="…" />}`, que é válido, mas o `eslint-config-next` avisa `@next/next/no-img-element`. O `logo` aceita qualquer nó: use `<Image src="/marca.svg" alt="Prefeitura de Porto Velho" width={120} height={36} />` do `next/image`, ou ignore o aviso para SVG estático. É só aviso de lint; o build passa.
 
-**Next com export estático:** remova `cacheComponents` e `experimental.partialPrefetching` se vierem no template; PPR não é compatível com `output: "export"`. Exemplo para hospedar numa subpasta:
+**Next com export estático:** acrescente as linhas abaixo ao `next.config` que o template já tem; não troque o arquivo inteiro. O config do template pode trazer a ligação do Tailwind, e sem ela o build passa, mas o CSS sai sem estilo. Remova `cacheComponents` e `partialPrefetching` se vierem no template, porque PPR não é compatível com `output: "export"`. No `create-next-app` 16.4, o `partialPrefetching` fica no nível de cima do objeto de config, ao lado de `output`; em templates mais antigos, dentro de `experimental`. Exemplo para hospedar numa subpasta:
 
 ```js
-// next.config.mjs
-export default {
+// next.config.mjs: acrescente ao objeto que o template gerou
+const nextConfig = {
+  // ...mantenha o que o template já trouxe
   output: "export",
   basePath: "/meu-sistema",
   images: { unoptimized: true },
 };
+
+export default nextConfig;
 ```
 
 Use `basePath: ""` se publicar na raiz. O `basePath` é definido no build: inclua-o também nos caminhos de imagens e assets de `public/` usados pelo app. `next build` gera `out/`. Export estático não tem servidor por requisição e não suporta o fluxo de nonce da seção CSP.
@@ -113,6 +116,8 @@ Acrescente ao `package.json` do app (mescle com os campos existentes):
 ```
 
 Isso habilita a [resolução de `exports` do Parcel](https://parceljs.org/features/dependency-resolution/#package-exports); sem ela, `@semec/ds/react` não resolve. Importe o CSS global em `src/main.tsx` e use as mesmas linhas e caminho de `@source` do Vite.
+
+Com `zod`, importe como `import * as z from "zod"` (é o que a [receita de formulário](#react-hook-form-controles-compostos) usa). Com `import { z } from "zod"`, o Parcel 2 (de 2.12 a 2.16) descarta o zod do bundle e a tela fica branca com `ReferenceError: $…$exports is not defined`. O defeito é do Parcel com o reexport do zod, não do kit; o `import * as z` funciona em todos os bundlers.
 
 **As linhas do kit**, no arquivo CSS global (`src/index.css` no Vite, `app/globals.css` no Next), não via `import` em JS:
 
@@ -540,7 +545,7 @@ Use `Controller` para ligar os valores do RHF aos controles. `Select` e `RadioGr
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import * as z from "zod";
 import { Button } from "@semec/ds/react/button";
 import { Checkbox } from "@semec/ds/react/checkbox";
 import { ErrorSummary } from "@semec/ds/react/error-summary";

@@ -105,7 +105,7 @@ export interface HeaderBrandProps extends React.HTMLAttributes<HTMLElement> {
   orgName?: string;
   serviceName?: string;
   /**
-   * Logo do órgão (ex.: `<img src="/logo.svg" alt="Prefeitura de Porto Velho" />`).
+   * Logo do órgão (ex.: `<img src="/marca.svg" alt="Prefeitura de Porto Velho" />`).
    * Sem logo, aparece um placeholder decorativo e um aviso no console em
    * desenvolvimento.
    */

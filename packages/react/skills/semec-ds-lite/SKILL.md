@@ -1,6 +1,6 @@
 ---
 name: semec-ds-lite
-description: Identidade visual SEMEC Design System sem React — tokens pv-*, acessibilidade WCAG 2.1 AA, padrões de tela e responsive. Use em apps que consomem só os tokens CSS (@semec/ds/lite/tokens.css).
+description: Identidade visual SEMEC Design System sem React — tokens pv-*, acessibilidade WCAG 2.1 AA, padrões de tela e responsive. Use em Vue, Angular, HTML ou qualquer app sem React (Svelte, PHP, templates de servidor) que consuma os tokens CSS (@semec/ds/lite/tokens.css).
 author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 ---
 
@@ -11,6 +11,8 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 <!-- ds:release-status -->
 
 Tokens, acessibilidade, responsive e padrões visuais para interfaces da Prefeitura de Porto Velho. **Sem componentes React.**
+
+Serve para Vue, Angular, Svelte, HTML puro ou páginas geradas no servidor (PHP, templates): qualquer app que não use React. Os componentes React do kit não rodam nesses frameworks; monte a marcação com os tokens e as regras de acessibilidade desta skill.
 
 Para UI com o kit React (`@semec/ds`), use a skill `semec-ds`.
 
@@ -200,6 +202,7 @@ Use os degraus de espaçamento no layout do app. Preserve as exceções do kit: 
 - Texto grande: **3:1**. Texto grande é **≥ 24px (18pt) regular** ou **≥ 18,66px (14pt) bold**; 18px bold **não** é texto grande
 - UI (bordas, ícones): **3:1** (WCAG 1.4.11)
 - Anel de foco `--focus-ring` (`--pv-blue-hero`): **9,38:1** sobre branco; sobre a marca, `bg-brand-hero` ou `data-surface="brand"` trocam o anel para branco (9,38:1) automaticamente, e `ring-ring-inverse` faz o mesmo por classe
+- **`data-surface="brand"` não pinta o fundo.** Ele só troca o anel para branco. O elemento precisa do fundo de marca próprio (`background: var(--brand-hero)` ou `bg-brand-hero`); sem ele, o anel branco fica sobre o fundo claro da página com **1,08:1** e o foco some
 
 ### Navegação por teclado
 

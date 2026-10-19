@@ -9,7 +9,7 @@ variants: "props: label · htmlFor · required · hint · error (mensagem; impli
 
 # Campo de formulário — `form-field`
 
-> Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio.
+> Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (sem erro, a dica; com erro, a dica sai e ele aponta só para a mensagem de erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio.
 
 **Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/form-field.tsx) | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/campo-de-formulario/
 
@@ -45,7 +45,7 @@ import { FormField, Input, ErrorSummary, Button, useToast, maskCurrency } from "
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import * as z from "zod";
 import { useState } from "react";
 
 // npm install react-hook-form @hookform/resolvers@^5 zod@^4 (opcionais, só para esta receita)
@@ -147,7 +147,7 @@ export function FormularioExemplo() {
 ## Prompt para IA
 
 ```text
-Use o componente `FormField` (Campo de formulário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio. API e variantes: props: label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · errorRole ("alert" | undefined) · id · hooks: useFormField · useFormFieldControl (para campos próprios) · padrões: 1. Inline (FormField error) · 2. Resumo topo (ErrorSummary) · 3. Servidor (Alert destructive) · Legenda de ação no botão. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `FormField` (Campo de formulário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (sem erro, a dica; com erro, a dica sai e ele aponta só para a mensagem de erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio. API e variantes: props: label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · errorRole ("alert" | undefined) · id · hooks: useFormField · useFormFieldControl (para campos próprios) · padrões: 1. Inline (FormField error) · 2. Resumo topo (ErrorSummary) · 3. Servidor (Alert destructive) · Legenda de ação no botão. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
