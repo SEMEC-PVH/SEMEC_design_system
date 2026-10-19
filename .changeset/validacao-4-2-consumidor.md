@@ -2,7 +2,14 @@
 "@semec/ds": patch
 ---
 
-Correções da validação da 4.2.0 como consumidor (Next 16, Vite 8, WebKit/Firefox e migração do semec-digital):
+Correções para a 4.2.1: validação da 4.2.0 como consumidor (Next 16, Vite 8, WebKit/Firefox e migração do semec-digital) e integração da onda 0 de 19/10/2026 (#63, #64 e #72).
+
+- **Foco e interação sob CSP (#63, #64, #72).** Corrige o contraste do foco em superfícies `bg-brand-hero` sem Tailwind e libera cliques sob a região vazia do Toast. Esconde os inputs auxiliares de Checkbox, Switch, RadioGroup e Slider por CSS estático e mantém os preenchimentos de Progress e Slider no SSR sem depender de atributos `style`. O preenchimento de Progress passa a SVG, com borda final reta e sem a antiga transição por `transform`.
+- **Nonce e cabeçalho (#72).** Distribui o nonce do SemecProvider aos viewports de SelectContent e ScrollArea, com precedência para valores explícitos. Isso autoriza os elementos `style`, mas não os atributos inline do Radix. Alinha o nome acessível padrão de HeaderNav a "Menu principal" e documenta "SEMEC" como nome padrão de HeaderBrand.
+- **Receitas de adoção (#72).** Fixa a receita de formulário em `@hookform/resolvers@^5 zod@^4` e documenta a ligação de Select, RadioGroup, Checkbox e FileUpload ao React Hook Form. Explica o contorno `reset()` seguido de `clearErrors()` no próximo ciclo; os callbacks do reset nativo continuam podendo revalidar campos vazios. Acrescenta orientações para Parcel, React Router/Remix, export estático no Next, SSR com nonce, providers por subpath, Jest, resoluções TypeScript, ESM, Yarn PnP, caminhos `@source`, CDN com SRI e migração.
+- **Documentação para agentes (#72).** Corrige exemplos de tabela rolável por teclado, Checkbox, Radio, Select, botão, marca e nome do órgão. As skills completa e lite esclarecem tipografia, raios, cabeçalho, bordas, estados de erro, foco com CSS legado e fontes com Tailwind CLI; a lite inclui equivalentes dos padrões em CSS puro. Os artefatos passam a publicar URLs absolutas de fontes e documentação. Componentes prontos sem React continuam fora deste patch.
+
+Correções anteriores da validação, preservadas no mesmo patch:
 
 - **Barrel com nomes explícitos (NEXT42-01).** `dist/react/index.js` deixa de usar `export *` e reexporta cada componente por nome. Num Server Component do Next 16 (Turbopack), `import { Heading, NavigationMenu } from "@semec/ds/react"` levava ao cliente todos os módulos `"use client"` do kit (+77 kB gzip medidos); agora custa o mesmo que o subpath. Com `next build --webpack`, use o subpath ou `experimental.optimizePackageImports: ["@semec/ds/react"]` (README, passo 5). `npm run test:dist` confere o barrel (`check-barrel`).
 - **HeaderNav quebra linha (NEXT42-02 / V42-VITE-01, WCAG 1.4.10).** Com 4 links curtos, o `<nav>` estourava 320 px e a página rolava na horizontal (scrollWidth 395 para 320 na bancada). Agora tem `flex-wrap`: os links descem para uma segunda linha. Mudança visual só quando os links não cabem.
