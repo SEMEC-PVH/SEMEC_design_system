@@ -37,7 +37,7 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 
 No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
-> Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (patch) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.2.1. Confira a versão instalada com `npm ls @semec/ds`.
+> Não publicado: este conteúdo vem do repositório e inclui 2 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.
 
 ## Uso
 
@@ -73,6 +73,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 
 // Rótulos PT-BR padrão (ADR-016). Os padrões do Radix são em inglês
 // ("Notification", "Notifications ({hotkey})") e seriam lidos pelo leitor de tela.
@@ -104,7 +105,9 @@ const ToastViewport = React.forwardRef<
 ));
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 
-const toastVariants = cva(
+const toastVariants: VariantFunction<{
+  variant: "default" | "success" | "warning" | "destructive";
+}> = cva(
   "group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-[12px] border border-border bg-card p-4 text-card-foreground shadow-elevation-2 font-sans transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out",
   {
     variants: {

@@ -37,7 +37,7 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 
 No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
-> Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (patch) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.2.1. Confira a versão instalada com `npm ls @semec/ds`.
+> Não publicado: este conteúdo vem do repositório e inclui 2 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.
 
 ## Uso
 
@@ -98,6 +98,7 @@ import { X } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 
 const Sheet = DialogPrimitive.Root;
 
@@ -122,7 +123,9 @@ const SheetOverlay = React.forwardRef<
 ));
 SheetOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
-const sheetVariants = cva(
+const sheetVariants: VariantFunction<{
+  side: "top" | "bottom" | "left" | "right";
+}> = cva(
   "fixed z-50 gap-4 overflow-y-auto bg-card p-6 shadow-elevation-3 duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
   {
     variants: {

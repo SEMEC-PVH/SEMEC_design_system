@@ -8,7 +8,7 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 > Gerado para `@semec/ds@4.2.0` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
 
-> **Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (patch) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.2.1. Confira a versão instalada com `npm ls @semec/ds`.**
+> **Não publicado: este conteúdo vem do repositório e inclui 2 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.**
 
 Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
@@ -16,7 +16,7 @@ Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailw
 
 ## Instalação
 
-Peer deps obrigatórios: `react ^19.0.0`, `react-dom ^19.0.0`, `tailwindcss ^4.0.0` e `lucide-react >=0.468.0 <2`. Peer **opcional**: `zod ^3.23.0 || ^4.0.0` (só se usar schemas em `@semec/ds/react/validacao`).
+Peer deps obrigatórios: `react ^18.3.0 || ^19.0.0`, `react-dom ^18.3.0 || ^19.0.0`, `tailwindcss ^4.0.0` e `lucide-react >=0.468.0 <2`. Peer **opcional**: `zod ^3.23.0 || ^4.0.0` (só se usar schemas em `@semec/ds/react/validacao`).
 
 ```bash
 npm install @semec/ds lucide-react   # pnpm add / yarn add: mesmos pacotes
@@ -807,6 +807,10 @@ Depreciado, sai na 5.0 (não gere código novo com isto):
 ## Arquivos para IA
 
 Publicados com o pacote: `@semec/ds/skills/llms.txt` (índice), `@semec/ds/skills/llms-full.txt` (dump completo), `@semec/ds/skills/manifest.json` (JSON), `@semec/ds/skills/components/<slug>.md` (um por componente) e esta skill (`@semec/ds/skills/semec-ds`). Site de documentação: https://semec-pvh.github.io/SEMEC_design_system/.
+
+## Anatomia sem React
+
+Para HTML, PHP, Vue ou outros ambientes sem React, consulte [Anatomia dos componentes (sem React)](https://semec-pvh.github.io/SEMEC_design_system/skills/semec-ds-lite/SKILL.md#anatomia-dos-componentes-sem-react) na skill lite. O campo `classes` do manifest full/lite contém as mesmas classes extraídas do TSX/CVA, HTML acessível e CSS puro com tokens. No pacote, a seção fica em `dist/lite/semec-ds-lite/SKILL.md`.
 
 ## Licença e crédito
 
