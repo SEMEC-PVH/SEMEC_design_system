@@ -684,7 +684,9 @@ Todo controle de formulário do kit fala a mesma língua: `value` / `defaultValu
   </InputOTP>
 </FormField>
 ```
-- Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`, `cpfCnpjSchema`
+- Máscaras prontas (`InputMask`): `mask="cpf"`, `mask="cnpj"`, `mask="cep"`, `mask="data"` (DD/MM/AAAA), `mask="data-mes-ano"` (MM/AAAA), `mask="data-hora"` (DD/MM/AAAA HH:MM), `mask="hora"` (HH:MM), `mask="telefone"`
+- Funções utilitárias de máscara (`@semec/ds/react`): `maskCPF`, `maskCNPJ`, `maskCEP`, `maskDate`, `maskDateMonthYear`, `maskDateTime`, `maskTime`, `maskCurrency`, `applyInputMask`
+- Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`, `cpfCnpjSchema`, `dateBRSchema`, `dateMonthYearSchema`, `timeSchema`, `dateSchema`
 
 ## Responsive / Mobile
 

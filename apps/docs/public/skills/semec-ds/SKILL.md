@@ -8,6 +8,8 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 > Gerado para `@semec/ds@4.2.0` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
 
+> **Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.**
+
 Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
 **Regra número 1: use os componentes do kit, não os reimplemente.** Importe de `@semec/ds/react`. Não copie o código-fonte de um componente para o app, não recrie um componente existente com `div` + classes e não troque o estilo dele por outro. Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
@@ -21,6 +23,12 @@ npm install @semec/ds lucide-react   # pnpm add / yarn add: mesmos pacotes
 ```
 
 Instale `lucide-react` **sempre** junto: é peer (os componentes importam os ícones), e sem ele o build quebra. O npm 7+ instala peer ausente sozinho; o pnpm só com `auto-install-peers=true`; o Yarn (clássico e Berry) nunca. Os pacotes `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge` e `get-nonce` são dependências do `@semec/ds` e vêm automaticamente. **Não** instale lista de Radix à mão.
+
+Formulários com a receita oficial (React Hook Form + Zod, seção "Padrão de formulários"): instale também os pacotes da receita, que são **opcionais** e não vêm com o kit:
+
+```bash
+npm install react-hook-form @hookform/resolvers zod
+```
 
 **Tailwind v4 no bundler:**
 
@@ -170,6 +178,21 @@ import { validateCPF, validateCNPJ, validateEmail } from "@semec/ds/react";
 import { cpfSchema, cnpjSchema, cpfCnpjSchema, emailSchema, cepSchema } from "@semec/ds/react/validacao";
 ```
 
+As máscaras têm a mesma assinatura, `(value: string) => string` (tipo `MaskFn`): recebem o texto digitado (com ou sem máscara) e devolvem o texto formatado. Aplique no `onValueChange` do `Input`: `onValueChange={(v) => setValor(maskCurrency(v))}`.
+
+- `maskCPF` → `000.000.000-00` · `maskCNPJ` → `00.000.000/0000-00` · `maskCEP` → `00000-000` (só os dígitos contam; o excesso é cortado).
+- `maskCurrency(value: string): string` → moeda BRL: guarda até 12 dígitos e lê os 2 últimos como centavos (`"123456"` → `"R$ 1.234,56"`). Entrada sem dígitos significativos (`""`, `"abc"`, só zeros como `"R$ 0,0"` ao apagar com Backspace) devolve `""` (desde a 4.1.0; até a 4.0.1 devolvia `"R$ 0,00"`), então o campo volta a vazio e `z.string().min(1)` barra o envio. A saída vem do `Intl` (`toLocaleString("pt-BR", { style: "currency", currency: "BRL" })`), com espaço não separável (U+00A0) depois de `R$`: compare com o mesmo `Intl` ou só com os dígitos, nunca com um literal digitado com espaço comum. O valor é texto: converta para número no envio (`Number(valor.replace(/\D/g, "")) / 100`).
+
+```tsx
+const [valor, setValor] = useState("");
+
+<FormField label="Valor da taxa" htmlFor="valor" required hint="Somente números; os centavos entram sozinhos">
+  <Input id="valor" inputMode="numeric" value={valor} onValueChange={(v) => setValor(maskCurrency(v))} />
+</FormField>
+```
+
+Com React Hook Form, o campo R$ está no exemplo canônico (seção "Padrão de formulários").
+
 ## Componentes (55)
 
 Lista gerada do manifest (export principal, `code` e descrição). Detalhes, variantes e exemplo de uso de cada um: `components/<slug>.md` ou `manifest.json`.
@@ -255,6 +278,12 @@ Coisas que o componente faz sozinho e que mudam como você monta a tela. Leve em
 - **`HeaderBrand` sem `logo`** mostra um placeholder decorativo (`aria-hidden`) e avisa no console em desenvolvimento. Passe sempre `logo` com o asset real (`<img alt="Prefeitura de Porto Velho">`). O nome quebra linha no mobile (use `truncate` para cortar).
 - **`NavigationMenu`** é `<nav aria-label="Menu principal">` por padrão; passe outro `aria-label` se houver mais de um menu na página.
 - **`FormField`** liga dica e erro ao controle sozinho (contexto com `useId`): o controle filho recebe `id`, `aria-describedby`, `aria-invalid` e `aria-required`. Não monte `aria-describedby` à mão; o que você passar explicitamente vence.
+- **`Toggle` ligado** (`pressed`) tem fundo `tint`, contorno de 2px em `primary` e texto `foreground`: o contorno tem 5,00:1 sobre `--bg` e 5,42:1 sobre branco, então ligado e solto se distinguem sem depender só do cinza. O estado vai para o leitor de tela por `aria-pressed`. Não troque o visual do ligado por `className` com `bg-accent` (1,01:1 contra o fundo).
+- **`Button` com rótulo longo** quebra em linhas balanceadas em vez de criar rolagem horizontal: os tamanhos usam altura **mínima** (`min-h-9`/`min-h-11`/`min-h-12`). Para reduzir a altura por `className`, sobrescreva o `min-h-*` junto com o `h-*`. Mesmo assim, prefira rótulos curtos (verbo + objeto).
+- **`ScrollArea`** vira parada de Tab sozinha quando não há nada focável dentro (`focusable="auto"`, o padrão): quem usa teclado consegue rolar texto puro. Dê nome à região com `viewportProps={{ "aria-label": "Termos de uso" }}`. `focusable` aceita `true` (sempre focável) e `false` (nunca; só se o conteúdo garantir outro caminho de teclado).
+- **`Avatar` com foto quebrada:** o `AvatarFallback` anuncia o `alt` da `AvatarImage` (as iniciais ficam só visuais). Um `aria-label` no `AvatarFallback` continua aceito e tem prioridade. `alt=""` (foto decorativa) não anuncia nada.
+- **`NavigationMenuLink`** já vem com alvo de 44px (`min-h-11`), `px-4`, hover/foco em `tint` e anel de foco por dentro (`navigationMenuLinkStyle`, exportado). `active` marca a página atual (`aria-current="page"`). Para o visual de gatilho, use `className={navigationMenuTriggerStyle()}`.
+- **`Pagination`:** `siblingCount` aceita `0` (padrão `1`; negativo conta como `0`). Abaixo de `sm` ficam só as setas e a página atual ± 1: primeira, última e elipses somem, para as setas não encolherem.
 
 ## Padrões de tela
 
@@ -305,7 +334,65 @@ export function PaginaDeServico() {
 ```
 
 - **Landmarks:** um `banner`, um `main`, um `contentinfo`; cada `<nav>` com `aria-label` distinto ("Menu principal", "Menu lateral", "Trilha de navegação", "Paginação"). O `tabIndex={-1}` no `<main>` deixa o link de pular mover o foco de fato.
-- **Com `Sidebar`:** o `SidebarInset` faz o papel do `<main>` (dê a ele `id="conteudo"` e `tabIndex={-1}`); o `SkipLink` e o `Header` ficam antes do `SidebarProvider` ou no topo do `SidebarInset`.
+- **Com `Sidebar`:** use a composição de "Esqueleto com Sidebar", logo abaixo. É a única testada.
+
+### Esqueleto com Sidebar (painéis administrativos)
+
+Uma composição só (TST-04): **`SkipLink` antes do `SidebarProvider`** e **`Header` dentro do `SidebarInset`**, com o `SidebarInset` como `div` e o `<main id="conteudo">` dentro dele, depois do `Header`.
+
+```tsx
+import {
+  SkipLink, Header, HeaderBrand, HeaderNav, HeaderNavLink, Heading,
+  SidebarProvider, Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel,
+  SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton,
+  SidebarInset, SidebarTrigger,
+} from "@semec/ds/react";
+
+export function PainelDeProtocolos() {
+  return (
+    <>
+      {/* 1ª parada de Tab, fora do SidebarProvider */}
+      <SkipLink />
+      <SidebarProvider>
+        <Sidebar>
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel>Gestão</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive>
+                      <a href="/protocolos">Protocolos</a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
+        {/* "div": o <main> é o de baixo, depois do Header (banner fora do main) */}
+        <SidebarInset as="div">
+          <Header>
+            <SidebarTrigger />
+            <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+            <HeaderNav aria-label="Menu principal">
+              <HeaderNavLink href="/ajuda">Ajuda</HeaderNavLink>
+            </HeaderNav>
+          </Header>
+          <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-[75rem] px-4 py-8">
+            <Heading level={1}>Protocolos</Heading>
+            {/* conteúdo */}
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
+    </>
+  );
+}
+```
+
+- **Por que assim:** no desktop a `Sidebar` é `fixed` desde o topo da janela (`inset-y-0`). Um `Header` antes do `SidebarProvider` ocupa a largura toda e fica com o começo **embaixo** da barra: a marca do `HeaderBrand` recebe o foco sem aparecer (WCAG 2.4.7), e o axe não acusa. Dentro do `SidebarInset`, o `Header` começa depois da barra.
+- **Resultado (Chromium, 1280 e 390 px):** o `SkipLink` é a 1ª parada de Tab e leva o foco ao `<main id="conteudo">`; o `Header` e a marca ficam visíveis e focáveis; há um `banner` e um `main`; axe sem violação serious ou critical. No desktop a ordem segue com os itens da `Sidebar` e depois o `Header`; no mobile a barra vira gaveta e o `SidebarTrigger` do `Header` é a 2ª parada.
+- **Não faça:** `Header` antes do `SidebarProvider` (fica sob a barra) nem `SkipLink` dentro do `SidebarInset` (deixa de ser a 1ª parada, porque a `Sidebar` vem antes no DOM). O `SidebarTrigger` só funciona dentro do `SidebarProvider`.
 
 ### Container e largura de leitura
 
@@ -329,10 +416,12 @@ export function PaginaDeServico() {
 - Use `Table` (ou `DataTable` para ordenar e paginar) com `TableCaption` ou `caption` descrevendo o conteúdo; cabeçalhos em `TableHead`.
 - A `Table` já rola na horizontal (wrapper `overflow-auto`), mas esse wrapper não recebe foco: se a tabela não tiver nenhum elemento focável, quem usa só teclado não consegue rolar. Em telas estreitas, prefira **menos colunas** (as secundárias vão para uma tela de detalhe) ou uma **lista de `Card`** abaixo de `md:`, mantendo a `Table` a partir de `md:`.
 - Quando a linha tem várias ações, use uma coluna "Ações" com `Button`, não a linha inteira clicável.
+- **`DataTable` com `onRowClick`:** passe também `rowLabel` (ex.: `rowLabel={(p) => \`Abrir protocolo ${p.numero}\`}`). A linha clicável é focável, mas sem `rowLabel` não tem nome e o leitor de tela não diz o que o Enter faz. Cliques e teclas em controles da célula (botão, link, campo, menu aberto por ela) **não** ativam a linha.
+- **Ordenação do `DataTable`:** o `columnheader` e o botão de ordenar se chamam só pelo nome da coluna; a instrução "Ordenar por …" (`labels.sortBy`) é a **descrição** do botão (`aria-describedby`), e a ordem atual vem em `aria-sort`. Num cabeçalho ordenável feito à mão, faça igual: não ponha "Ordenar por X" no `aria-label` do botão (vira o nome do cabeçalho e se repete em cada célula).
 
 ### Sidebar (painéis administrativos)
 
-- `SidebarProvider` > `Sidebar` + `SidebarInset`. Abaixo de 768px (48rem, `matchMedia`; o complemento exato do `md:`) a barra vira gaveta: um diálogo modal com foco preso, Esc para fechar e botão "Fechar menu". O `SidebarTrigger` tem 44px e `aria-expanded`.
+- `SidebarProvider` > `Sidebar` + `SidebarInset`, com `SkipLink` antes do provider e `Header` dentro do `SidebarInset` (ver "Esqueleto com Sidebar"). Abaixo de 768px (48rem, `matchMedia`; o complemento exato do `md:`) a barra vira gaveta: um diálogo modal com foco preso, Esc para fechar e botão "Fechar menu". O `SidebarTrigger` tem 44px e `aria-expanded`.
 - O `SidebarInset` já traz `min-w-0`: conteúdo largo (tabelas, gráficos) rola dentro dele em vez de empurrar a largura da página.
 
 ## Workflow IA
@@ -391,7 +480,8 @@ Nunca `outline: none` sem alternativa visível com 3:1.
 ### Áreas clicáveis
 
 - **Régua do DS: 44×44px** nos controles interativos (`min-h-11 min-w-11`, `h-11`, `size-11`). É **decisão do projeto**, mais exigente que o AA: o WCAG 2.1 AA não tem critério de tamanho de alvo; o critério de 44px (2.5.5 Target Size) é **AAA**. (No WCAG 2.2, o 2.5.8, AA, pede 24×24px.)
-- Os padrões do kit já seguem a régua: Pagination, Tabs, Toggle, NavigationMenuTrigger e o X dos overlays têm 44px; o `Button size="sm"` mantém 36px visuais com área de toque de 44px
+- Os padrões do kit já seguem a régua: Pagination, Tabs, Toggle, NavigationMenuTrigger, `NavigationMenuLink`, os itens do `DropdownMenu` (inclusive Checkbox e Radio), o botão de ordenação do `DataTable`, o polegar do `Slider` e o X dos overlays têm 44px; o `Button size="sm"` mantém 36px visuais com área de toque de 44px
+- Abaixo de `sm`, o `Link` e os links do `Breadcrumb` ganham área de toque de no mínimo 44×44px sem mudar o visual (no `Link`, um `::after`, sem alterar a altura da linha; no `Breadcrumb`, `min-h-11` mais um `::after` de largura)
 - Espaçamento entre alvos: 8px (regra do DS)
 - O pacote não define `--control-height-*`; use os utilitários acima
 
@@ -401,7 +491,7 @@ O `tokens.css` já reduz animações e transições globalmente com `@media (pre
 
 ### Não uso exclusivo de cores
 
-Complementar cor com ícone, texto ou padrão (erro com mensagem, status com rótulo). O `Link` é sublinhado por padrão; `underline={false}` só em navegação (menus, cabeçalho), nunca em texto corrido. A aba ativa do `Tabs` tem barra de 3px, além da cor.
+Complementar cor com ícone, texto ou padrão (erro com mensagem, status com rótulo). O `Link` é sublinhado por padrão; `underline={false}` só em navegação (menus, cabeçalho), nunca em texto corrido. A aba ativa do `Tabs` tem barra de 3px, além da cor. O `Toggle` ligado tem contorno `primary` de 2px, além do fundo `tint`.
 
 ## Padrão de formulários e feedback (Validação + Toast)
 
@@ -417,8 +507,10 @@ Nos formulários do SEMEC DS, o ciclo de validação e feedback segue três padr
 
 2. **Padrão 2: Resumo Consolidado no Topo (`ErrorSummary`)**:
    - Obrigatório quando houver múltiplos campos ou formulários longos.
-   - Posicionado no início do `<form>`, com `role="alert"` e foco programático automático (`autoFocus` e `focusKey={tentativa}`).
-   - Cada erro é um link (`<a href="#<id>">`) com scroll suave e transferência de foco direta ao primeiro campo inválido.
+   - Posicionado no início do `<form>`, com `role="alert"` e foco programático (`autoFocus`, padrão `true`). Com `focusKey` (passe `focusKey={tentativa}`, somado a cada envio inválido), o resumo puxa o foco **só** quando o `focusKey` muda. Enquanto a pessoa digita, a lista muda, o resumo some e volta (0 → N erros), e ele **não** rouba o foco. Sem `focusKey`, o resumo foca ao passar de 0 para N erros; por isso, com validação ao vivo, passe sempre o `focusKey`.
+   - Com React Hook Form, use `shouldFocusError: false` no `useForm`: senão o RHF foca o 1º campo inválido e o resumo nunca recebe o foco.
+   - Os itens seguem a ordem dos campos na tela (lista fixa de ids), não a ordem de `Object.entries(errors)`.
+   - Cada erro é um link (`<a href="#<id>">`) com scroll suave e transferência de foco direta ao campo correspondente.
 
 3. **Padrão 3: Erro de Submissão do Servidor (`Alert variant="destructive"`)**:
    - Falhas globais de comunicação (timeout, 500, indisponibilidade) não pertencem a um campo isolado.
@@ -433,8 +525,31 @@ Quando o botão de submissão do formulário disparar uma ação de efeito secun
 
 ### Exemplo Canônico: React Hook Form + Zod + SEMEC DS
 
+A receita usa três pacotes que **não** vêm com o kit. Instale-os junto (são opcionais: só para esta receita de formulário):
+
+```bash
+npm install react-hook-form @hookform/resolvers zod
+```
+
+Três regras da receita (TST-17):
+
+- **`shouldFocusError: false`** no `useForm`. Sem isso, o RHF foca o 1º campo inválido no envio e o `ErrorSummary` nunca recebe o foco.
+- **`focusKey={tentativa}`**, com `tentativa` somada no callback de envio inválido (`handleSubmit(onSubmit, onInvalid)`). O `ErrorSummary` só puxa o foco quando o `focusKey` muda. Enquanto a pessoa corrige os campos, a lista se atualiza sem roubar o foco, mesmo quando o resumo some e volta porque ela apagou um campo e redigitou. O último `focusKey` focado fica guardado no `<form>`, então a renderização condicional abaixo funciona.
+- **Ordem fixa dos itens**: monte a lista a partir de um array com os ids na ordem da tela (`ORDEM_CAMPOS`), nunca de `Object.entries(errors)`, que segue a ordem em que o resolver devolveu os erros.
+
 ```tsx
-import { FormField, Input, ErrorSummary, Alert, AlertTitle, AlertDescription, Button, useToast } from "@semec/ds/react";
+import {
+  FormField,
+  Input,
+  ErrorSummary,
+  Alert,
+  AlertTitle,
+  AlertDescription,
+  Button,
+  useToast,
+  maskCPF,
+  maskCurrency,
+} from "@semec/ds/react";
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -445,9 +560,13 @@ const requerimentoSchema = z.object({
   nome: z.string().min(3, "Informe o nome completo (ao menos 3 caracteres)."),
   email: emailSchema,
   cpf: cpfSchema,
+  valor: z.string().min(1, "Informe o valor da taxa."),
 });
 
 type RequerimentoForm = z.infer<typeof requerimentoSchema>;
+
+// Ids dos campos na ordem em que aparecem na tela (ordem do ErrorSummary).
+const ORDEM_CAMPOS = ["nome", "email", "cpf", "valor"] as const satisfies readonly (keyof RequerimentoForm)[];
 
 export function FormularioRequerimento() {
   const { toast } = useToast();
@@ -461,19 +580,23 @@ export function FormularioRequerimento() {
     formState: { errors },
   } = useForm<RequerimentoForm>({
     resolver: zodResolver(requerimentoSchema),
+    defaultValues: { nome: "", email: "", cpf: "", valor: "" },
+    // O foco do envio inválido vai para o ErrorSummary, não para o 1º campo.
+    shouldFocusError: false,
   });
 
-  // Padrão 2: Resumo de erros para o topo
-  const errorSummaryItems = Object.entries(errors).map(([id, err]) => ({
-    id,
-    message: String(err?.message || "Campo inválido"),
-  }));
+  // Padrão 2: Resumo de erros para o topo, na ordem da tela
+  const errorSummaryItems = ORDEM_CAMPOS.flatMap((id) => {
+    const message = errors[id]?.message;
+    return message ? [{ id, message }] : [];
+  });
 
   const onSubmit = async (dados: RequerimentoForm) => {
     try {
       setErroServidor(null);
       // Simulação de envio da API:
       // await api.post("/requerimentos", dados);
+      void dados;
 
       // Sucesso na submissão pós-envio via Toast:
       toast({
@@ -487,12 +610,12 @@ export function FormularioRequerimento() {
     }
   };
 
+  // Cada envio inválido muda o focusKey: o ErrorSummary volta a receber o foco.
+  const onInvalid = () => setTentativa((t) => t + 1);
+
   return (
     <form
-      onSubmit={(e) => {
-        setTentativa((t) => t + 1);
-        handleSubmit(onSubmit)(e);
-      }}
+      onSubmit={handleSubmit(onSubmit, onInvalid)}
       noValidate
       className="max-w-3xl space-y-4"
     >
@@ -546,7 +669,40 @@ export function FormularioRequerimento() {
             hint="000.000.000-00"
             error={errors.cpf?.message}
           >
-            <Input id="cpf" inputMode="numeric" {...field} />
+            <Input
+              id="cpf"
+              inputMode="numeric"
+              name={field.name}
+              ref={field.ref}
+              onBlur={field.onBlur}
+              value={field.value}
+              onValueChange={(v) => field.onChange(maskCPF(v))}
+            />
+          </FormField>
+        )}
+      />
+
+      {/* Campo R$: maskCurrency devolve "" quando não há dígitos, então min(1) barra o vazio */}
+      <Controller
+        name="valor"
+        control={control}
+        render={({ field }) => (
+          <FormField
+            label="Valor da taxa"
+            htmlFor="valor"
+            required
+            hint="Somente números; os centavos entram sozinhos"
+            error={errors.valor?.message}
+          >
+            <Input
+              id="valor"
+              inputMode="numeric"
+              name={field.name}
+              ref={field.ref}
+              onBlur={field.onBlur}
+              value={field.value}
+              onValueChange={(v) => field.onChange(maskCurrency(v))}
+            />
           </FormField>
         )}
       />
@@ -588,6 +744,7 @@ Todo controle de formulário do kit fala a mesma língua: `value` / `defaultValu
     </InputOTPGroup>
   </InputOTP>
 </FormField>
+```
 - Máscaras prontas (`InputMask`): `mask="cpf"`, `mask="cnpj"`, `mask="cep"`, `mask="data"` (DD/MM/AAAA), `mask="data-mes-ano"` (MM/AAAA), `mask="data-hora"` (DD/MM/AAAA HH:MM), `mask="hora"` (HH:MM), `mask="telefone"`
 - Funções utilitárias de máscara (`@semec/ds/react`): `maskCPF`, `maskCNPJ`, `maskCEP`, `maskDate`, `maskDateMonthYear`, `maskDateTime`, `maskTime`, `maskCurrency`, `applyInputMask`
 - Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`, `cpfCnpjSchema`, `dateBRSchema`, `dateMonthYearSchema`, `timeSchema`, `dateSchema`
@@ -631,6 +788,8 @@ Depreciado, sai na 5.0 (não gere código novo com isto):
 
 - `Combobox`: `ariaLabel` (use rótulo visível ou o atributo `aria-label`) e `emptyMessage` (use `emptyText`).
 - `AlertDialog` `modal` e `AlertDialogContent` `onPointerDownOutside` / `onInteractOutside`: já são ignorados.
+- `digits` (de `@semec/ds/react` e `@semec/ds/react/validacao`): use `valor.replace(/\D/g, "")` no seu código. Anunciado na 4.1; avisa no console em desenvolvimento.
+- Subpath `@semec/ds/react/server` (`dsPackageRootResolve`): uso interno do monorepo, sem substituto no pacote. Anunciado na 4.1; avisa no console em desenvolvimento.
 
 ## Arquivos para IA
 
