@@ -11,7 +11,7 @@ A regra deste repositório é simples: **decisão estrutural entra como ADR novo
 | [001](0001-ds-proprio-inspirado-no-govbr.md) | DS próprio, inspirado no gov.br | Aceito |
 | [002](0002-monorepo-pnpm-multiplos-pacotes.md) | Monorepo pnpm, múltiplos pacotes | Substituído por [017](0017-workspace-apps-packages.md) |
 | [003](0003-design-tokens-tres-niveis-dtcg.md) | Tokens em três níveis, DTCG | Aceito (atualizado pelo [026](0026-pacote-ds-tokens-saidas-por-plataforma.md): CSS é a fonte, JSON derivado) |
-| [004](0004-tailwind-v4-cva-css-compilado.md) | Tailwind v4 + CVA, CSS compilado | Aceito (alvo; `ds-css` ainda não existe) |
+| [004](0004-tailwind-v4-cva-css-compilado.md) | Tailwind v4 + CVA, CSS compilado | Aceito (fase F4 entregue no [028](0028-pacote-ds-css-classes-semec.md): `@semec/ds-css`) |
 | [005](0005-radix-ui-base-comportamento-acessibilidade.md) | Radix UI como base | Aceito |
 | [006](0006-react-19-fronteira-cliente-rsc.md) | React 19 com fronteira RSC | Aceito (implementado na 3.2.0: `"use client"` por componente e subpaths `@semec/ds/react/*`, AUD-20) |
 | [007](0007-distribuicao-registry-npm-gitea.md) | Registry npm do Gitea | Substituído por [022](0022-publicacao-npm-publico.md) |
@@ -34,6 +34,7 @@ A regra deste repositório é simples: **decisão estrutural entra como ADR novo
 | [024](0024-vermelho-de-perigo-pv-red-700.md) | Vermelho de perigo: escala `pv-red` (`pv-red-700`) | Aceito (errata de 15/10/2026: `--pv-red-400` só no site) |
 | [025](0025-tema-unico-claro.md) | Tema único claro no pacote `@semec/ds` | Aceito |
 | [026](0026-pacote-ds-tokens-saidas-por-plataforma.md) | Pacote `@semec/ds-tokens` e saídas por plataforma | Aceito |
+| [028](0028-pacote-ds-css-classes-semec.md) | Pacote `@semec/ds-css` e contrato de classes `.semec-*` | Aceito |
 
 ---
 
