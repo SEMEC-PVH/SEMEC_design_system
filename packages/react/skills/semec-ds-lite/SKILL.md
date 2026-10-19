@@ -306,6 +306,8 @@ Em CSS puro, aplique as declarações abaixo em classes do app, no arquivo CSS. 
 - Semântica > aparência
 - `className` escapatória sempre permitida
 
+<!-- ds:component-recipes -->
+
 ## Licença e crédito
 
 O pacote é **MIT**: use, modifique e redistribua à vontade, mantendo o aviso de copyright e a licença nas cópias do código do pacote. O crédito à SEMEC no projeto consumidor é **recomendado, não obrigatório** (a MIT não exige; decisão AMB-09, 15/10/2026). Ao criar um projeto com estes tokens, sugira à pessoa incluir no README.md, sem impor nem bloquear a entrega por isso:

@@ -29,6 +29,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { assertNoConflictMarkers, listFilesRecursive } from "./conflict-markers.mjs";
 import { buildTokens } from "./build-tokens.mjs";
 import { pendingRelease, unreleasedNote } from "./release-status.mjs";
+import { buildComponentRecipes, componentRecipesMarkdown } from "./component-recipes.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgRoot = path.resolve(__dirname, "..");
@@ -166,6 +167,7 @@ const tokensCss = readBase("packages/react/tokens.css") ?? readPkgRootBase("toke
 const pvPreset = readBase("packages/react/pv-preset.ts") ?? readPkgRootBase("pv-preset.ts");
 const baseReadme = readBase("packages/react/README.md") ?? readPkgRootBase("README.md");
 const baseIndex = readBase("packages/react/src/index.ts") ?? "";
+const componentClasses = await buildComponentRecipes(pkgRoot);
 
 const COMPONENT_SOURCE_PREFIX = "packages/react/";
 
@@ -285,6 +287,7 @@ function renderSkill(src, { maintainer = false } = {}) {
     .replaceAll("{{ds:component-count}}", String(componentCount))
     .replaceAll("{{ds:homepage}}", homepage)
     .replaceAll("{{ds:version}}", version)
+    .replace("<!-- ds:component-recipes -->", componentRecipesMarkdown(componentClasses))
     .replace("<!-- ds:component-list -->", skillComponentList())
     .replace("<!-- ds:release-status -->", unreleased ? `> **${unreleased}**` : "");
   out = maintainer
@@ -363,6 +366,7 @@ function buildManifest() {
     version,
     generatedAt,
     componentCount,
+    classes: componentClasses,
     categories: dsCategories,
     components: dsComponents.map((c) => ({
       code: c.code,
@@ -769,6 +773,7 @@ async function buildDist() {
         description:
           "Tokens, acessibilidade, responsive e padrões visuais. Sem componentes React.",
         categories: dsCategories,
+        classes: componentClasses,
         unreleased: pending
           ? {
               pendingChangesets: pending.count,

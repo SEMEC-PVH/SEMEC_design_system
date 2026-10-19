@@ -122,6 +122,9 @@ jobs:
       - name: Verify dist exists
         run: test -f packages/react/dist/react/index.js
 
+      - name: Instalar Chromium (paridade das receitas sem React)
+        run: npx playwright install --with-deps chromium
+
       - name: Testes do dist (fronteira RSC + poda por módulo)
         # check-rsc: importa @semec/ds/react na camada react-server, com os módulos
         # "use client" trocados por client references. check-treeshake: falha se

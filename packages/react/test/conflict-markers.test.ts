@@ -1,6 +1,5 @@
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
@@ -30,7 +29,7 @@ const conflito = ["antes", OURS, "lado A", SEP, "lado B", THEIRS, "depois"].join
 
 const tmpDirs: string[] = [];
 function tmpDir() {
-  const d = fs.mkdtempSync(path.join(os.tmpdir(), "semec-markers-"));
+  const d = fs.mkdtempSync(path.join(here, ".tmp-semec-markers-"));
   tmpDirs.push(d);
   return d;
 }
@@ -78,6 +77,8 @@ function arvoreTemporaria() {
     "scripts/token-data.mjs",
     "scripts/conflict-markers.mjs",
     "scripts/release-status.mjs",
+    "scripts/component-recipes.mjs",
+    "tokens.css",
     "manifest.js",
     "package.json",
     "README.md",
@@ -86,6 +87,7 @@ function arvoreTemporaria() {
     fs.copyFileSync(path.join(pkgRoot, rel), path.join(pkg, rel));
   }
   fs.cpSync(path.join(pkgRoot, "skills"), path.join(pkg, "skills"), { recursive: true });
+  fs.cpSync(path.join(pkgRoot, "src/components"), path.join(pkg, "src/components"), { recursive: true });
   return { root, pkg };
 }
 
