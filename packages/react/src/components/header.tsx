@@ -26,6 +26,7 @@ export interface HeaderBrandProps extends React.HTMLAttributes<HTMLElement> {
    * renderizar a marca sem link (ex.: já na página inicial).
    */
   href?: string | null;
+  /** Nome do órgão. @default "SEMEC" */
   orgName?: string;
   serviceName?: string;
   /**
@@ -137,7 +138,7 @@ const HeaderNav = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement
   ({ className, children, ...props }, ref) => (
     <nav
       ref={ref}
-      aria-label="Principal"
+      aria-label="Menu principal"
       className={cn("flex flex-wrap items-center gap-2", className)}
       {...props}
     >

@@ -107,7 +107,7 @@ describe("Header", () => {
         <HeaderNavLink href="/servicos">Serviços</HeaderNavLink>
       </HeaderNav>
     );
-    const nav = screen.getByRole("navigation", { name: "Principal" });
+    const nav = screen.getByRole("navigation", { name: "Menu principal" });
     expect(within(nav).getByRole("link", { name: "Prefeitura" })).toHaveAttribute("aria-current", "page");
     expect(within(nav).getByRole("link", { name: "Serviços" })).not.toHaveAttribute("aria-current");
     expect(within(nav).getByRole("link", { name: "Serviços" })).toHaveClass("min-h-11");
