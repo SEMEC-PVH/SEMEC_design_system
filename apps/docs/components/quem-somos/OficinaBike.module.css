@@ -1,0 +1,196 @@
+/* Oficina da bicicleta (minigame de precisão). Cores só de tokens --pv-*.
+   Contraste: gray-950 sobre white ≈ 19:1; white sobre blue-700 ≈ 7:1;
+   faixa green-600 e cursor gray-950 sobre gray-100 ≥ 3:1 (componente de UI). */
+
+/* Cartão de paleta fixa (claro nos dois temas, como a StackDex): o contraste
+   calculado acima vale com o site claro ou escuro. */
+.oficina {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: min(26rem, 100%);
+  padding: 1rem;
+  border: 3px solid var(--pv-gray-950);
+  border-radius: var(--radius-md);
+  color: var(--pv-gray-950);
+  background: var(--pv-white);
+}
+
+.passos {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+.passos li {
+  flex: 1;
+  padding: 0.25rem 0.4rem;
+  border: 2px solid var(--pv-gray-400);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  color: var(--pv-gray-700);
+}
+.passos li[data-estado="atual"] {
+  border-color: var(--pv-blue-700);
+  color: var(--pv-blue-800);
+}
+.passos li[data-estado="feito"] {
+  border-color: var(--pv-green-700);
+  background: var(--pv-green-50);
+  color: var(--pv-green-800);
+}
+
+.etapa {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+.texto,
+.dica {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+.dica {
+  color: var(--pv-gray-700);
+}
+
+/* Barra: faixa verde (posição/largura por etapa) e cursor em vaivém. */
+.barra {
+  position: relative;
+  height: 2.25rem;
+  margin: 0.3rem 0;
+  border: 3px solid var(--pv-gray-950);
+  border-radius: var(--radius-md);
+  background: var(--pv-gray-100);
+  overflow: hidden;
+}
+.faixa {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--pv-green-600);
+}
+.barra[data-etapa="0"] .faixa {
+  left: 58%;
+  width: 22%;
+}
+.barra[data-etapa="1"] .faixa {
+  left: 18%;
+  width: 16%;
+}
+.barra[data-etapa="2"] .faixa {
+  left: 64%;
+  width: 12%;
+}
+.cursor {
+  position: absolute;
+  top: -0.2rem;
+  bottom: -0.2rem;
+  left: 0;
+  width: 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--pv-gray-950);
+  box-shadow: 0 0 0 2px var(--pv-white);
+  animation: vaivem 1.6s ease-in-out infinite alternate;
+}
+.barra[data-etapa="1"] .cursor {
+  animation-duration: 1.3s;
+}
+.barra[data-etapa="2"] .cursor {
+  animation-duration: 1.05s;
+}
+.cursor[data-parado] {
+  animation-play-state: paused;
+}
+@keyframes vaivem {
+  from {
+    left: 0;
+  }
+  to {
+    left: calc(100% - 0.5rem);
+  }
+}
+
+/* Movimento reduzido: cursor mais lento, vaivém linear e faixas mais largas. */
+@media (prefers-reduced-motion: reduce) {
+  .cursor {
+    animation-duration: 3s;
+    animation-timing-function: linear;
+  }
+  .barra[data-etapa="1"] .cursor {
+    animation-duration: 2.6s;
+  }
+  .barra[data-etapa="2"] .cursor {
+    animation-duration: 2.2s;
+  }
+  .barra[data-etapa="0"] .faixa {
+    width: 28%;
+  }
+  .barra[data-etapa="1"] .faixa {
+    width: 22%;
+  }
+  .barra[data-etapa="2"] .faixa {
+    width: 18%;
+  }
+}
+
+.agora {
+  align-self: center;
+  min-width: 10rem;
+  padding: 0.55rem 1.4rem;
+  border: 3px solid var(--pv-gray-950);
+  border-bottom-width: 6px;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pv-white);
+  background: var(--pv-blue-700);
+  cursor: pointer;
+}
+.agora:hover {
+  background: var(--pv-blue-800);
+}
+.agora:focus-visible {
+  outline: 3px solid var(--pv-yellow-500);
+  outline-offset: 3px;
+}
+.agora:disabled {
+  cursor: default;
+}
+
+.aviso {
+  min-height: 1.5em;
+  margin: 0;
+  font-weight: 700;
+  text-align: center;
+  color: var(--pv-gray-950);
+}
+.aviso[data-acerto] {
+  color: var(--pv-green-800);
+}
+
+.vitoria {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--pv-green-800);
+  text-align: center;
+}
+.tecla {
+  display: inline-block;
+  min-width: 1.5em;
+  padding: 0 0.3em;
+  border: 2px solid var(--pv-gray-950);
+  border-bottom-width: 4px;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-weight: 700;
+  text-align: center;
+  background: var(--pv-gray-50);
+}

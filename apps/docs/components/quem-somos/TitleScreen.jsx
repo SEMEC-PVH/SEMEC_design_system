@@ -1,0 +1,249 @@
+"use client";
+
+// Tela de título da Vila SEMEC, no formato dos jogos de console:
+//   1. "Pressione Start" — logo sobre a vila em modo vitrine (o motor
+//      sobrevoa o mapa ao fundo);
+//   2. menu em caixa de RPG (moldura dupla, cursor ▶) — Novo jogo, Como
+//      jogar, Gráficos, Ver equipe em lista. Setas movem o cursor, Enter
+//      escolhe (em Gráficos, troca o nível; ←/→ também), Esc volta;
+//   3. "Novo jogo" abre a escolha de personagem (EscolhaPersonagem).
+// O VilaSemec controla `started`; aqui só chamamos onStart(jogador).
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import EscolhaPersonagem from "./EscolhaPersonagem";
+import FullscreenButton from "./FullscreenButton";
+import { OPCOES, ROTULO, ehLeve } from "./scene/qualidade";
+import { assinarSom, lerSom, proximaOpcaoSom, ROTULO_SOM, salvarSom } from "./som/som";
+import { tocar } from "./som/sfx";
+import styles from "./TitleScreen.module.css";
+
+const YEAR = 2026;
+
+// graficos: preferência atual ("auto" ou nível, scene/qualidade.js);
+// nivelAtual: o nível que o motor está usando; onGraficos(nova) salva.
+// baseUrl: pasta dos GLBs (escolha de personagem).
+export default function TitleScreen({
+  onStart,
+  graficos = "auto",
+  nivelAtual = null,
+  semAceleracao = false,
+  onGraficos,
+  baseUrl = "",
+}) {
+  const [stage, setStage] = useState("press"); // "press" | "menu" | "help" | "personagem"
+  const menuRef = useRef(null);
+  const pressRef = useRef(null);
+
+  const openMenu = useCallback(() => {
+    tocar("ui-ok");
+    setStage("menu");
+  }, []);
+  const somPref = useSyncExternalStore(assinarSom, lerSom, () => "tudo");
+  // Troca de tela do menu com o som de confirmação (ou de voltar).
+  const irPara = (nova, voltar = false) => {
+    tocar(voltar ? "ui-voltar" : "ui-ok");
+    setStage(nova);
+  };
+
+  // Teclado na captura da janela (o VilaSemec também escuta Enter e
+  // começaria o jogo direto):
+  //   - "Pressione Start": Enter/Espaço abre o menu;
+  //   - menu/ajuda: Esc volta; Enter fora de um item leva o foco ao menu.
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.repeat) return;
+      const t = e.target;
+      if (t.closest?.("input, textarea, select, [contenteditable='true']")) return;
+      const inBox = Boolean(t.closest?.(`.${styles.box}`));
+      if (stage === "press") {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        if (t.closest?.("a, button") && t !== pressRef.current) return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        openMenu();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        tocar("ui-voltar");
+        setStage(stage === "menu" ? "press" : "menu");
+      } else if ((e.key === "Enter" || e.key === " ") && !inBox && !t.closest?.("a, button")) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        (menuRef.current?.querySelector('[aria-checked="true"]') ?? menuRef.current?.querySelector("button, a"))?.focus({
+          preventScroll: true,
+        });
+      }
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, [stage, openMenu]);
+
+  // Ao abrir o menu, a ajuda ou a escolha (ação do usuário), o foco vai para
+  // o primeiro item ("Novo jogo" / "Voltar" / o personagem marcado).
+  useEffect(() => {
+    if (stage === "press") return;
+    const alvo = menuRef.current?.querySelector('[aria-checked="true"]') ?? menuRef.current?.querySelector("button, a");
+    alvo?.focus({ preventScroll: true });
+  }, [stage]);
+
+  // Próximo (ou anterior) nível gráfico, em volta.
+  const trocarGraficos = (passo) => {
+    const i = OPCOES.indexOf(graficos);
+    onGraficos?.(OPCOES[(i + passo + OPCOES.length) % OPCOES.length]);
+  };
+  const rotuloGraficos =
+    graficos === "auto" && nivelAtual ? `${ROTULO.auto} (${ROTULO[nivelAtual]})` : ROTULO[graficos];
+
+  // Navegação do menu como em console: setas sobem/descem, Esc volta.
+  const onMenuKey = (e) => {
+    const items = [...(menuRef.current?.querySelectorAll("button, a") ?? [])];
+    const i = items.indexOf(document.activeElement);
+    if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && e.target.dataset.graficos) {
+      e.preventDefault();
+      tocar("ui-mover");
+      trocarGraficos(e.key === "ArrowRight" ? 1 : -1);
+    } else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && e.target.dataset.som) {
+      e.preventDefault();
+      salvarSom(proximaOpcaoSom(somPref));
+      tocar("ui-mover");
+    } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const next = (i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+      tocar("ui-mover");
+      items[next]?.focus({ preventScroll: true });
+    }
+  };
+
+  return (
+    <div className={styles.root} data-stage={stage}>
+      <div className={styles.vignette} aria-hidden="true" />
+      <FullscreenButton className={styles.fullscreen} />
+
+      <header className={styles.brand}>
+        <h1 id="vila-titulo" className={styles.ribbon}>
+          Quem Somos
+        </h1>
+        <p className={styles.logo} aria-hidden="true">
+          <span className={styles.logoTop}>Vila</span>
+          <span className={styles.logoMain}>SEMEC</span>
+        </p>
+        <p className={styles.tagline}>O time do Design System</p>
+      </header>
+
+      {stage === "press" && (
+        <button ref={pressRef} type="button" className={styles.press} onClick={openMenu}>
+          <span className={styles.pressText}>
+            Pressione <span className={styles.key}>Enter</span>
+          </span>
+          <span className={styles.pressTouch}>Toque para começar</span>
+        </button>
+      )}
+
+      {stage !== "press" && (
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- navegação por setas dentro do menu (os itens são botões/links)
+        <div className={styles.box} data-largo={stage === "personagem" || undefined} onKeyDown={onMenuKey}>
+          {stage === "personagem" ? (
+            <div ref={menuRef}>
+              <EscolhaPersonagem
+                baseUrl={baseUrl}
+                leve={ehLeve(nivelAtual)}
+                onConfirm={onStart}
+                onVoltar={() => irPara("menu", true)}
+              />
+            </div>
+          ) : stage === "menu" ? (
+            <nav aria-label="Menu do jogo">
+              <ul ref={menuRef} className={styles.menu}>
+                <li>
+                  <button type="button" className={styles.item} onClick={() => irPara("personagem")}>
+                    Novo jogo
+                  </button>
+                </li>
+                <li>
+                  <button type="button" className={styles.item} onClick={() => irPara("help")}>
+                    Como jogar
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className={styles.item}
+                    data-graficos="true"
+                    aria-describedby="vila-graficos-dica"
+                    onClick={() => {
+                      tocar("ui-mover");
+                      trocarGraficos(1);
+                    }}
+                  >
+                    Gráficos: <span className={styles.valor}>{rotuloGraficos}</span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className={styles.item}
+                    data-som="true"
+                    onClick={() => {
+                      salvarSom(proximaOpcaoSom(somPref));
+                      tocar("ui-mover");
+                    }}
+                  >
+                    Som: <span className={styles.valor}>{ROTULO_SOM[somPref]}</span>
+                  </button>
+                </li>
+                <li>
+                  <a className={styles.item} href="#equipe">
+                    Ver equipe em lista
+                  </a>
+                </li>
+              </ul>
+              <p id="vila-graficos-dica" className={styles.nota}>
+                {semAceleracao
+                  ? "Este navegador está sem aceleração de vídeo: o jogo usa o modo mais leve."
+                  : "Computador lento? Escolha Baixo ou Mínimo."}
+              </p>
+            </nav>
+          ) : (
+            <div ref={menuRef}>
+              <p className={styles.helpTitle}>Como jogar</p>
+              <dl className={styles.help}>
+                <dt>
+                  <kbd>←</kbd>
+                  <kbd>↑</kbd>
+                  <kbd>↓</kbd>
+                  <kbd>→</kbd> / <kbd>WASD</kbd>
+                </dt>
+                <dd>Andar</dd>
+                <dt>
+                  <kbd>Shift</kbd>
+                </dt>
+                <dd>Correr</dd>
+                <dt>
+                  <kbd>B</kbd>
+                </dt>
+                <dd>Bicicleta (conserte a do bicicletário)</dd>
+                <dt>
+                  <kbd>Espaço</kbd> / <kbd>Enter</kbd>
+                </dt>
+                <dd>Conversar e ler placas</dd>
+                <dt>
+                  <kbd>Esc</kbd>
+                </dt>
+                <dd>Fechar diálogo</dd>
+                <dt>Clique</dt>
+                <dd>Andar até o ponto</dd>
+              </dl>
+              <button type="button" className={styles.item} onClick={() => irPara("menu", true)}>
+                Voltar
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      <footer className={styles.footer} aria-hidden="true">
+        <span>© {YEAR} SEMEC Porto Velho</span>
+        <span>v1.0</span>
+      </footer>
+    </div>
+  );
+}

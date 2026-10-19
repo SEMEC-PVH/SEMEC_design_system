@@ -2352,6 +2352,8 @@ footer {
   flex-shrink: 0;
   border-radius: 50%;
   object-fit: cover;
+  /* Retratos têm fundo transparente. */
+  background: var(--pv-blue-100);
 }
 .team-avatar--lg {
   width: 80px;
@@ -2391,6 +2393,17 @@ footer {
   color: var(--text-muted);
   margin: 0;
 }
+.team-card-bio {
+  margin: 0.15rem 0 0;
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+  color: var(--fg);
+}
+.team-card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+}
 .team-card-linkedin {
   display: inline-flex;
   align-items: center;
@@ -2405,10 +2418,1119 @@ footer {
   color: var(--color-action-primary);
 }
 
-/* Quem Somos — Arte de fundo (marca d'água) */
+/* Quem Somos — Vila SEMEC (cenário 3D em three.js)
+   O mapa vaza o padding do .content e ocupa a altura útil da janela; a
+   lista da equipe logo abaixo é a alternativa acessível (e o fallback sem
+   WebGL). Cores do HUD vêm dos tokens semânticos — seguem o tema. */
+.content-inner > .container:has(> .quem-somos-wrapper) {
+  width: 100%;
+}
 .quem-somos-wrapper {
   position: relative;
   overflow: hidden;
+  margin: calc(-1 * var(--space-8)) calc(-1 * var(--space-6)) 0;
+}
+@media (max-width: 900px) {
+  .quem-somos-wrapper {
+    margin: -2rem -1rem 0;
+  }
+}
+.vila {
+  position: relative;
+  height: calc(100dvh - var(--header-h));
+  min-height: 26rem;
+  overflow: hidden;
+  background: var(--pv-blue-100);
+}
+.vila-stage,
+.vila-canvas {
+  position: absolute;
+  inset: 0;
+}
+.vila-stage:focus {
+  outline: none;
+}
+.vila-stage:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: -3px;
+}
+.vila-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.vila-canvas canvas.is-pointer {
+  cursor: pointer;
+}
+
+.vila-hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  pointer-events: none;
+}
+.vila-hud--top {
+  top: 0;
+}
+.vila-panel {
+  pointer-events: auto;
+  background: var(--surface);
+  color: var(--text-strong);
+  border: 2px solid var(--text-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 0 var(--text-strong);
+}
+.vila-title {
+  padding: 0.6rem 1rem;
+}
+.vila-title h1 {
+  font-size: var(--font-size-lg);
+  line-height: 1.2;
+  margin: 0;
+  border: none;
+  padding: 0;
+}
+.vila-counter {
+  margin: 0.15rem 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+.vila-counter strong {
+  color: var(--text-strong);
+}
+.vila-clock {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0.15rem 0 0;
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+/* O site põe 16px abaixo de todo `.content p`: no painel do HUD, compacto. */
+.content .vila-title p {
+  margin-bottom: 0;
+}
+/* Jornada no HUD: linguagem atual e as quatro Stacks. */
+.vila-lang {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.4rem 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-strong);
+}
+.vila-lang--vazia {
+  color: var(--text-muted);
+}
+.vila-lang-nivel {
+  font-variant-numeric: tabular-nums;
+}
+.vila-lang-tipo {
+  padding: 0 0.4rem;
+  border: 1px solid var(--text-strong);
+  border-radius: 999px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+/* "Preparando a Vila" (depois de escolher o personagem, se o motor ainda
+   não terminou de carregar e aquecer a cena). Caixa de RPG da tela de título,
+   paleta fixa: gray-950 sobre white ≈ 19:1; barra blue-700 sobre gray-100. */
+.vila-preparo {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--pv-blue-950) 55%, transparent);
+}
+.vila-preparo-caixa {
+  display: grid;
+  justify-items: center;
+  gap: 0.55rem;
+  width: min(22rem, 100%);
+  padding: 1rem 1.25rem 1.1rem;
+  border: 4px solid var(--pv-blue-950);
+  border-radius: var(--radius-md);
+  background: var(--pv-white);
+  color: var(--pv-gray-950);
+  box-shadow:
+    inset 0 0 0 3px var(--pv-white),
+    inset 0 0 0 6px var(--pv-blue-600),
+    0 6px 0 var(--pv-blue-950);
+  box-sizing: border-box;
+}
+.vila-preparo-caixa > * {
+  margin: 0;
+}
+.vila-preparo-titulo {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.vila-preparo-barra {
+  width: 100%;
+  height: 1rem;
+  border: 2px solid var(--pv-gray-950);
+  border-radius: var(--radius-sm);
+  background: var(--pv-gray-100);
+  appearance: none;
+  overflow: hidden;
+}
+.vila-preparo-barra::-webkit-progress-bar {
+  background: var(--pv-gray-100);
+}
+.vila-preparo-barra::-webkit-progress-value {
+  background: var(--pv-blue-700);
+  transition: width 0.2s ease;
+}
+.vila-preparo-barra::-moz-progress-bar {
+  background: var(--pv-blue-700);
+}
+.vila-preparo-fase {
+  font-size: var(--font-size-sm);
+  color: var(--pv-gray-700);
+}
+.vila-preparo-pular {
+  margin-top: 0.4rem;
+  padding: 0.45rem 1rem;
+  border: 3px solid var(--pv-gray-950);
+  border-bottom-width: 5px;
+  border-radius: var(--radius-md);
+  background: var(--pv-yellow-400);
+  color: var(--pv-gray-950);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.vila-preparo-pular:hover {
+  background: var(--pv-yellow-500);
+}
+.vila-preparo-pular:focus-visible {
+  outline: 3px solid var(--pv-white);
+  outline-offset: 3px;
+}
+.vila-preparo-pular-nota {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vila-preparo-barra::-webkit-progress-value {
+    transition: none;
+  }
+}
+
+/* Na Pista, o painel de título some (o HUD da corrida ocupa o topo), mas
+   guarda o lugar: os botões da direita não escorregam para o meio. */
+.vila-title[data-oculto] {
+  visibility: hidden;
+}
+
+/* Bicicleta (conquistada na oficina do bicicletário): acima da StackDex.
+   Paleta fixa como a da StackDex: gray-950 sobre yellow-400 ≈ 13:1; montado
+   (aria-pressed), white sobre blue-700 ≈ 7:1. */
+.vila-bike-icone {
+  position: absolute;
+  left: 1.4rem;
+  bottom: 8.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+}
+.vila-bike-icone-roda {
+  display: grid;
+  place-items: center;
+  width: 3.75rem;
+  height: 3.75rem;
+  border: 3px solid var(--pv-gray-950);
+  border-radius: 50%;
+  background: var(--pv-yellow-400);
+  color: var(--pv-gray-950);
+  box-shadow: 0 4px 0 var(--pv-gray-950);
+  transition: transform 0.15s ease;
+}
+.vila-bike-icone[aria-pressed="true"] .vila-bike-icone-roda {
+  background: var(--pv-blue-700);
+  color: var(--pv-white);
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--pv-gray-950);
+}
+.vila-bike-icone-nome {
+  padding: 0.05rem 0.45rem;
+  border: 2px solid var(--pv-gray-950);
+  border-radius: var(--radius-md);
+  background: var(--pv-gray-950);
+  color: var(--pv-white);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+.vila-bike-icone:hover .vila-bike-icone-roda {
+  transform: translateY(-2px);
+}
+.vila-bike-icone:focus-visible {
+  outline: 3px solid var(--pv-yellow-400);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vila-bike-icone-roda {
+    transition: none;
+  }
+}
+
+/* Ícone da StackDex no canto inferior esquerdo (abre a mesma coleção).
+   Paleta fixa da StackDex nos dois temas: branco sobre blue-hero ≈ 10:1;
+   gray-950 sobre yellow-400 ≈ 13:1; moldura gray-950 sobre o mapa. */
+.vila-dex-icone {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+}
+.vila-dex-icone-aparelho {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 4.75rem;
+  height: 4.75rem;
+  border: 3px solid var(--pv-gray-950);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--pv-blue-hero) 70%, var(--pv-blue-400)), var(--pv-blue-hero) 70%);
+  box-shadow: 0 4px 0 var(--pv-gray-950);
+  transition: transform 0.15s ease;
+}
+.vila-dex-icone-lente {
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 3px solid var(--pv-white);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--pv-blue-100) 0 18%, var(--pv-blue-400) 20%, var(--pv-blue-700) 100%);
+  box-shadow: 0 0 0 2px var(--pv-gray-950);
+}
+.vila-dex-icone-leds {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.85rem;
+  display: flex;
+  gap: 0.15rem;
+}
+.vila-dex-icone-leds span {
+  width: 0.35rem;
+  height: 0.35rem;
+  border: 1px solid var(--pv-gray-950);
+  border-radius: 50%;
+  background: var(--pv-red-500);
+}
+.vila-dex-icone-leds span:nth-child(2) {
+  background: var(--pv-yellow-400);
+}
+.vila-dex-icone-leds span:nth-child(3) {
+  background: var(--pv-green-500);
+}
+.vila-dex-icone-nome {
+  padding: 0.05rem 0.45rem;
+  border: 2px solid var(--pv-gray-950);
+  border-radius: var(--radius-md);
+  background: var(--pv-blue-hero);
+  color: var(--pv-white);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  line-height: 1.4;
+}
+.vila-dex-icone-contagem {
+  position: absolute;
+  top: -0.3rem;
+  right: -0.6rem;
+  padding: 0 0.4rem;
+  border: 2px solid var(--pv-gray-950);
+  border-radius: var(--radius-full);
+  background: var(--pv-yellow-400);
+  color: var(--pv-gray-950);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+}
+.vila-dex-icone:hover .vila-dex-icone-aparelho {
+  transform: translateY(-2px) rotate(-6deg);
+}
+.vila-dex-icone:active .vila-dex-icone-aparelho {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--pv-gray-950);
+}
+.vila-dex-icone:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vila-dex-icone-aparelho {
+    transition: none;
+  }
+  .vila-dex-icone:hover .vila-dex-icone-aparelho {
+    transform: none;
+  }
+}
+/* Íris de entrada/saída da Galeria da Equipe (VilaSemec.jsx): um círculo
+   transparente cercado por uma sombra enorme fecha sobre o jogador (centro da
+   tela), mostra o nome do lugar no escuro e abre do outro lado. Durações
+   iguais às de TRANSICAO em vila-engine.js. Branco sobre gray-950 ≈ 19:1. */
+.vila-iris {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+.vila-iris::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 300vmax var(--pv-gray-950);
+  transform: translate(-50%, -50%);
+}
+.vila-iris[data-fase="fechar"]::before {
+  animation: vila-iris-fecha 0.7s ease-in both;
+}
+.vila-iris[data-fase="abrir"]::before {
+  animation: vila-iris-abre 0.7s ease-out both;
+}
+.vila .vila-iris-titulo {
+  position: relative;
+  margin: 0;
+  max-width: none;
+  color: var(--pv-white);
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  opacity: 0;
+}
+.vila-iris[data-fase="fechar"] .vila-iris-titulo {
+  animation: vila-iris-titulo 0.3s ease-out 0.55s both;
+}
+.vila-iris[data-fase="abrir"] .vila-iris-titulo {
+  opacity: 1;
+  animation: vila-iris-titulo 0.25s ease-in reverse both;
+}
+@keyframes vila-iris-fecha {
+  from {
+    width: 260vmax;
+    height: 260vmax;
+  }
+  to {
+    width: 0;
+    height: 0;
+  }
+}
+@keyframes vila-iris-abre {
+  from {
+    width: 0;
+    height: 0;
+  }
+  to {
+    width: 260vmax;
+    height: 260vmax;
+  }
+}
+@keyframes vila-iris-titulo {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vila-iris[data-fase]::before {
+    animation-duration: 0.2s;
+  }
+  .vila-iris[data-fase] .vila-iris-titulo {
+    animation: none;
+    opacity: 1;
+  }
+}
+/* Viagem de elevador no prédio da SEMFAZ: toda no 3D (vila-engine.js,
+   ELEVADOR_IDA/_VOLTA). Aqui só o escurecer da troca de andar, uma cor
+   sólida: escurece em 0,24 s no fim da partida (ELEVADOR_ESCURECER) e clareia
+   em 0,3 s na chegada (ELEVADOR_CLAREAR), com a câmera deslizando. Com
+   movimento reduzido, corte seco: escuro e some. Decorativo (aria-hidden). */
+.vila-elevador {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background: var(--pv-gray-950);
+  opacity: 0;
+}
+.vila-elevador[data-fase="fechar"] {
+  animation: vila-elevador-escurece 0.24s ease-in both;
+}
+.vila-elevador[data-fase="abrir"] {
+  animation: vila-elevador-clareia 0.3s ease-out both;
+}
+@keyframes vila-elevador-escurece {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes vila-elevador-clareia {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vila-elevador[data-fase] {
+    animation: none;
+  }
+  .vila-elevador[data-fase="fechar"] {
+    opacity: 1;
+  }
+}
+/* Canto direito do HUD: ações em cima, painel da quest embaixo. */
+.vila-hud-direita {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+/* Painel da quest (aparece perto do Pedro e durante a busca). */
+.vila-quest {
+  width: min(17rem, 60vw);
+  box-sizing: border-box;
+  padding: 0.6rem 0.85rem 0.7rem;
+  border-left-width: 6px;
+  border-left-color: var(--pv-yellow-400);
+  animation: vila-quest-entra 260ms ease-out both;
+}
+.content .vila-quest :is(p, h2) {
+  margin: 0;
+  border: none;
+  padding: 0;
+}
+.vila-quest-tag {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--pv-yellow-400);
+  color: var(--pv-gray-950);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.content .vila-quest .vila-quest-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  font-size: var(--font-size-base);
+  line-height: 1.25;
+  color: var(--text-strong);
+}
+.vila-quest-icone {
+  color: var(--pv-yellow-500);
+}
+.content .vila-quest .vila-quest-objetivo {
+  margin-top: 0.3rem;
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+.content .vila-quest .vila-quest-recompensa {
+  margin-top: 0.4rem;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+.vila-quest-recompensa strong {
+  color: var(--text-strong);
+}
+@keyframes vila-quest-entra {
+  from {
+    opacity: 0;
+    transform: translateX(1rem);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vila-quest {
+    animation: none;
+  }
+}
+/* Ações do canto direito do HUD: lista da equipe e tela cheia. */
+.vila-hud-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.vila-skip {
+  padding: 0.5rem 0.85rem;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-decoration: none;
+}
+.vila-skip:hover {
+  color: var(--color-action-primary);
+}
+.vila-skip:focus-visible,
+.vila-dialog-link:focus-visible,
+.vila-dialog-next:focus-visible,
+.vila-pad-btn:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.vila-status,
+.vila-chip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: var(--text-strong);
+  color: var(--surface);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.vila-status {
+  top: 50%;
+}
+.vila-chip {
+  bottom: 1.25rem;
+}
+.vila-chip--hint {
+  bottom: 3.75rem;
+}
+
+/* Caixa de diálogo de RPG: moldura grossa dupla, plaquinha com o nome
+   encaixada na borda de cima e o retrato grande "em pé" sobre a caixa. */
+.vila-dialog {
+  --retrato: 10.5rem;
+  position: absolute;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translateX(-50%);
+  width: min(54rem, calc(100% - 2rem));
+  min-height: 8.5rem;
+  padding: 1.6rem 1.75rem 1rem;
+  background: var(--surface);
+  color: var(--text-strong);
+  border: 4px solid var(--text-strong);
+  border-radius: 1rem;
+  box-shadow:
+    inset 0 0 0 5px var(--surface),
+    inset 0 0 0 8px var(--color-action-primary),
+    0 6px 0 var(--text-strong);
+}
+/* Plaquinha do nome (sempre com contraste fixo, nos dois temas). */
+.vila-dialog-title {
+  position: absolute;
+  top: -1.2rem;
+  left: 1.5rem;
+  max-width: calc(100% - 3rem);
+  margin: 0;
+  padding: 0.3rem 1rem;
+  border: 3px solid var(--text-strong);
+  border-radius: 0.6rem;
+  background: var(--pv-blue-600);
+  color: var(--pv-white);
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 3px 0 var(--text-strong);
+}
+.vila-dialog--retrato .vila-dialog-title {
+  left: calc(var(--retrato) + 1.75rem);
+  max-width: calc(100% - var(--retrato) - 3.25rem);
+}
+.content .vila-dialog-text {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--text-strong);
+}
+.vila-dialog-actions {
+  flex-wrap: wrap;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.6rem;
+}
+.vila-dialog-link {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-action-primary);
+}
+.vila-dialog-next {
+  border: 2px solid var(--text-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-strong);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  padding: 0.45rem 1rem;
+  box-shadow: 0 3px 0 var(--text-strong);
+  cursor: pointer;
+}
+.vila-dialog-next:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--text-strong);
+}
+.vila-dialog-next:hover {
+  border-color: var(--color-action-primary);
+  color: var(--color-action-primary);
+}
+/* Escolha principal ("Batalhar!", "Escolher minha linguagem"). */
+.vila-dialog-next--primary {
+  border-color: var(--color-action-primary);
+  background: var(--color-action-primary);
+  color: var(--surface);
+}
+.vila-dialog-next--primary:hover {
+  border-color: var(--text-strong);
+  color: var(--surface);
+}
+.vila-dialog-next span {
+  display: inline-block;
+  font-size: 0.7em;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vila-dialog-next span {
+    animation: vila-blink 1s steps(2, start) infinite;
+  }
+}
+@keyframes vila-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+/* Retrato: busto grande apoiado na borda de cima da caixa. */
+.vila-retrato {
+  position: absolute;
+  left: 1.25rem;
+  bottom: calc(100% + 4px);
+  width: var(--retrato);
+  height: var(--retrato);
+  pointer-events: none;
+}
+.vila-retrato-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 3px 0 var(--text-strong));
+}
+.vila-retrato-img[data-oculta="true"] {
+  visibility: hidden;
+}
+.vila-retrato-sigla {
+  position: absolute;
+  inset: auto 1rem 0;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 4px solid var(--text-strong);
+  border-radius: 50% 50% 0.75rem 0.75rem;
+  background: var(--pv-blue-100);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--pv-blue-900);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vila-retrato {
+    animation: vila-retrato-entra 0.3s ease-out both;
+  }
+  /* Falando: a cabeça balança no ritmo das sílabas. */
+  .vila-retrato[data-falando="true"] .vila-retrato-img {
+    animation: vila-retrato-fala 0.18s ease-in-out infinite alternate;
+  }
+}
+@keyframes vila-retrato-entra {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+}
+@keyframes vila-retrato-fala {
+  to {
+    transform: translateY(-3px) scaleY(1.015);
+  }
+}
+@media (max-width: 40rem) {
+  .vila-dialog {
+    --retrato: 6.5rem;
+    width: calc(100% - 1rem);
+    padding: 1.5rem 1.1rem 0.85rem;
+  }
+  .content .vila-dialog-text {
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* Fala "digitada": a fala inteira invisível reserva a altura da caixa. */
+.vila-dialog-digitacao {
+  display: grid;
+}
+.vila-dialog-digitacao > span {
+  grid-area: 1 / 1;
+}
+.vila-dialog-fantasma {
+  visibility: hidden;
+}
+
+/* Ficha de personagem/mascote (clique no boneco): modal dentro do palco,
+   também em tela cheia. Imagem 2:3 à esquerda; empilha em palco estreito. */
+.vila-ficha-fundo {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 0.75rem;
+  container-type: inline-size;
+  background: color-mix(in srgb, var(--pv-gray-900) 55%, transparent);
+}
+.vila-ficha {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(8rem, 15rem) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: center;
+  width: min(44rem, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 1.25rem;
+  border-width: 4px;
+  border-radius: 1rem;
+  box-shadow:
+    inset 0 0 0 5px var(--surface),
+    inset 0 0 0 8px var(--color-action-primary),
+    0 6px 0 var(--text-strong);
+}
+.vila-ficha-figura {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border: 3px solid var(--text-strong);
+  border-radius: 0.75rem;
+  background: var(--surface-alt);
+}
+.vila-ficha-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.vila-ficha-sem-imagem {
+  display: grid;
+  place-items: center;
+  width: 55%;
+  aspect-ratio: 1;
+  border: 4px solid var(--text-strong);
+  border-radius: 50%;
+  background: var(--pv-blue-100);
+  color: var(--pv-blue-900);
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+}
+.vila-ficha-corpo {
+  min-width: 0;
+}
+.content .vila-ficha-corpo p {
+  margin: 0;
+}
+.content .vila-ficha-etiqueta {
+  display: inline-block;
+  padding: 0.15rem 0.65rem;
+  border: 2px solid var(--text-strong);
+  border-radius: 999px;
+  background: var(--pv-blue-600);
+  color: var(--pv-white);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.content .vila-ficha-nome {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  border: none;
+  font-size: var(--font-size-xl);
+  line-height: 1.2;
+  color: var(--text-strong);
+}
+/* Recebe o foco só por programa (tabIndex -1), para o leitor de tela. */
+.vila-ficha-nome:focus {
+  outline: none;
+}
+.content .vila-ficha-nome-completo {
+  margin-top: 0.15rem;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-strong);
+}
+.content .vila-ficha-subtitulo {
+  margin-top: 0.15rem;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+.content .vila-ficha-descricao {
+  margin-top: 0.75rem;
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--text-strong);
+}
+.vila-ficha-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+@container (max-width: 35rem) {
+  .vila-ficha {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.85rem;
+    padding: 1rem;
+  }
+  .vila-ficha-figura {
+    width: min(9rem, 45%);
+    justify-self: center;
+  }
+  .content .vila-ficha-nome {
+    font-size: var(--font-size-lg);
+  }
+  .content .vila-ficha-descricao {
+    font-size: var(--font-size-sm);
+  }
+}
+/* Palco baixo (celular deitado): imagem menor, para caber sem rolar. */
+@container (min-width: 35.0625rem) {
+  @media (max-height: 30rem) {
+    .vila-ficha {
+      grid-template-columns: minmax(6rem, 9rem) minmax(0, 1fr);
+    }
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vila-ficha-fundo {
+    animation: vila-ficha-fundo-entra 0.2s ease-out both;
+  }
+  .vila-ficha {
+    animation: vila-ficha-entra 0.25s ease-out both;
+  }
+}
+@keyframes vila-ficha-fundo-entra {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes vila-ficha-entra {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.97);
+  }
+}
+
+/* Cena (cutscene): faixas pretas de cinema + botão de pular. */
+.vila-cena-barra {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 9%;
+  background: var(--pv-black);
+  pointer-events: none;
+}
+.vila-cena-barra--topo {
+  top: 0;
+  transform-origin: top;
+}
+.vila-cena-barra--base {
+  bottom: 0;
+  transform-origin: bottom;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vila-cena-barra {
+    animation: vila-cena-entra 0.45s ease-out both;
+  }
+}
+@keyframes vila-cena-entra {
+  from {
+    transform: scaleY(0);
+  }
+}
+/* Cena da ocarina (cenas.js, cenaOcarina): tom sépia no passado e relógio
+   correndo enquanto a época é construída. */
+.vila .vila-canvas {
+  transition: filter 0.8s ease;
+}
+.vila[data-sepia] .vila-canvas {
+  filter: sepia(0.8) saturate(0.75) contrast(1.05) brightness(1.02);
+}
+.vila-cena-relogio {
+  position: absolute;
+  top: calc(9% + 0.75rem);
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.4rem 1rem;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.vila-cena-relogio-seta {
+  font-size: var(--font-size-sm);
+  color: var(--color-action-primary);
+}
+@media (prefers-reduced-motion: reduce) {
+  .vila .vila-canvas {
+    transition: none;
+  }
+}
+.vila-cena-pular {
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+.vila-cena-pular kbd {
+  font: inherit;
+  font-size: 0.85em;
+  padding: 0 0.3rem;
+  border: 1px solid currentColor;
+  border-radius: 0.25rem;
+}
+.vila-cena-pular:hover {
+  color: var(--color-action-primary);
+}
+.vila-cena-pular:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Direcional de toque: só em telas de toque. */
+.vila-pad {
+  display: none;
+}
+@media (pointer: coarse) {
+  .vila-pad {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, 3rem);
+    grid-template-rows: repeat(3, 3rem);
+    gap: 0.25rem;
+  }
+  .vila:has(.vila-dialog) .vila-pad {
+    bottom: 11rem;
+  }
+  /* Os avisos ficam à direita do ícone da StackDex. */
+  .vila-chip {
+    left: 6.5rem;
+    transform: none;
+  }
+}
+.vila-pad-btn {
+  border: 2px solid var(--text-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-strong);
+  font: inherit;
+  font-weight: 700;
+  touch-action: none;
+  user-select: none;
+}
+.vila-pad-btn:active {
+  background: var(--text-strong);
+  color: var(--surface);
+}
+.vila-pad-btn--up { grid-area: 1 / 2; }
+.vila-pad-btn--left { grid-area: 2 / 1; }
+.vila-pad-btn--right { grid-area: 2 / 3; }
+.vila-pad-btn--down { grid-area: 3 / 2; }
+.vila-pad-btn--b { grid-area: 1 / 3; }
+.vila-pad-btn--b[aria-pressed="true"] {
+  background: var(--text-strong);
+  color: var(--surface);
+}
+.vila-pad-btn--a {
+  grid-area: 3 / 3;
+  border-radius: 50%;
+  background: var(--color-action-primary);
+  border-color: var(--color-action-primary);
+  color: var(--pv-white);
+}
+
+@media (max-width: 640px) {
+  .vila-hud {
+    padding: 0.75rem;
+  }
+  .vila-title h1 {
+    font-size: var(--font-size-base);
+  }
+}
+
+.quem-somos-lista {
+  width: min(var(--container-docs), 100% - 2rem);
+  margin: 0 auto;
+  padding-top: 3rem;
 }
 .quem-somos-content {
   position: relative;

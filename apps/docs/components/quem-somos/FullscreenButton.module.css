@@ -1,0 +1,27 @@
+/* Mesmo visual dos painéis do HUD da vila (.vila-panel): moldura e sombra
+   "de jogo". Área de toque ≥ 44 px. */
+.btn {
+  pointer-events: auto;
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  background: var(--surface);
+  color: var(--text-strong);
+  border: 2px solid var(--text-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 0 var(--text-strong);
+  cursor: pointer;
+}
+.btn:hover {
+  color: var(--color-action-primary);
+}
+.btn:active {
+  translate: 0 2px;
+  box-shadow: 0 2px 0 var(--text-strong);
+}
+.btn:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
