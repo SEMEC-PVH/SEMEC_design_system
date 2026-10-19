@@ -116,10 +116,6 @@ export default function QuemSomosPage() {
           ))}
         </div>
       </section>
-
-      <div className="quem-somos-bg" aria-hidden="true">
-        <Image src="/PortoVelhoPintura.svg" alt="" width={1536} height={1024} priority />
-      </div>
     </div>
   );
 }
