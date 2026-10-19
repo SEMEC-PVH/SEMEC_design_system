@@ -16,9 +16,13 @@ export type HeadingTag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div" | "p";
 const headingVariants = cva("text-foreground", {
   variants: {
     size: {
-      1: "text-2xl font-bold leading-tight tracking-tight",
-      2: "text-xl font-bold leading-snug",
-      3: "text-lg font-semibold leading-snug",
+      // TST-16: alinhado à escala do tokens.css e à SKILL (3xl = título de
+      // página/h1 32px · 2xl = seção/h2 24px · xl = subtítulo/h3 20px). Até a
+      // 4.0.1 o h1 saía com 24px, o h2 com 20px e o h3 com 18px. A entrelinha
+      // vem do par `--text-*--line-height` da escala.
+      1: "text-3xl font-bold tracking-tight",
+      2: "text-2xl font-bold",
+      3: "text-xl font-semibold",
       4: "text-base font-semibold leading-normal",
       5: "text-sm font-semibold leading-normal",
       6: "text-xs font-semibold uppercase leading-normal tracking-wide",

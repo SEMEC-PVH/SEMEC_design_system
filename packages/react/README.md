@@ -226,13 +226,13 @@ import { cn } from "@semec/ds/react";
 
 | Import | O que é |
 |---|---|
-| `@semec/ds/react` | Todos os componentes, `cn()`, masks e validadores puros |
+| `@semec/ds/react` | Todos os componentes, `cn()`, masks e validadores puros (`digits` está depreciado e sai na 5.0) |
 | `@semec/ds/react/<componente>` | Um componente só, pelo nome do arquivo em `src/components` (ex.: `@semec/ds/react/button`, `@semec/ds/react/dialog`, `@semec/ds/react/form-field`). Desde a 3.2 |
 | `@semec/ds/react/validacao` | Schemas Zod (exige o peer `zod`) |
 | `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) + utilitários de animação |
 | `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS config) |
 | `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 (arquivo TS original) |
-| `@semec/ds/react/server` | **Uso interno do monorepo.** Só tem `dsPackageRootResolve()`, que procura `packages/react` a partir do `cwd` e lança erro fora do repositório. Não use em apps consumidores |
+| `@semec/ds/react/server` | **Depreciado na 4.1, sai na 5.0** (TST-34b). Uso interno do monorepo: só tem `dsPackageRootResolve()`, que procura `packages/react` a partir do `cwd` e lança erro fora do repositório. Em desenvolvimento, avisa no console. Não use em apps consumidores |
 | `@semec/ds/skills` | Metadados dos componentes para agentes IA (`dsComponents`, `dsBySlug`, `dsCategories`…) |
 | `@semec/ds/skills/llms.txt` | Índice para IA |
 | `@semec/ds/skills/llms-full.txt` | Dump completo |
@@ -263,6 +263,8 @@ Metadados de componente (o que versões anteriores deste README chamavam de `get
 
 Mais: `SemecProvider`, `cn`, masks (`maskCPF`, `maskCNPJ`, `maskCEP`, `maskCurrency`) e validadores puros (`validateCPF`, `validateCNPJ`, `validateEmail`).
 
+As masks têm a assinatura `(value: string) => string` (tipo `MaskFn`): recebem o texto digitado e devolvem o formatado, para usar no `onValueChange` do `Input`. `maskCurrency` lê os dígitos como centavos (`"123456"` → `"R$ 1.234,56"`, com espaço não separável depois de `R$`) e, desde a 4.1.0, devolve `""` quando não há dígitos significativos (vazio, sem dígitos ou só zeros; antes, `"R$ 0,00"`).
+
 ## Tokens
 
 O que existe no pacote está em `tokens.css` (camadas L0 `--pv-*` e L1 semânticas). O `@theme inline` expõe os tokens como utilitários (o preset JS gera os mesmos nomes):
@@ -289,6 +291,12 @@ Os tokens do pacote (`tokens.css`) são tema **claro**. Não há `shadcn.css` no
 ## Validação (Zod)
 
 Schemas Zod ficam no entry **`@semec/ds/react/validacao`** — o entry principal não importa `zod`. O `zod` é peer opcional, `^3.23.0 || ^4.0.0` (o kit é testado com o 3 e o 4): instale-o (`npm install zod`) só se usar esse entry.
+
+A receita de formulário da skill `semec-ds` (React Hook Form + Zod + `FormField` + `ErrorSummary`) usa também `react-hook-form` e `@hookform/resolvers`, que não vêm com o kit (opcionais, só para a receita):
+
+```bash
+npm install react-hook-form @hookform/resolvers zod
+```
 
 ```ts
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
@@ -394,7 +402,7 @@ Removido na 4.0 (anunciado desde a 3.1.0, política de duas minors, ADR-013):
 - Utilitários de primitivo `bg-pv-*` / `text-pv-*` / `border-pv-*` e as variáveis `--color-pv-*` (do `@theme` e do `pv-preset`): use os semânticos. As variáveis `--pv-*` continuam. Semânticos novos: `text-text-brand`, `bg-success-emphasis`, `text-success-emphasis-foreground`.
 - Import por caminho de arquivo em `dist/`: o `exports` bloqueia (`ERR_PACKAGE_PATH_NOT_EXPORTED`); use `@semec/ds/react` ou `@semec/ds/react/<componente>`.
 
-Depreciado, sai na 5.0: `ariaLabel` e `emptyMessage` do `Combobox`; `modal` do `AlertDialog` e `onPointerDownOutside`/`onInteractOutside` do `AlertDialogContent` (já ignorados). Lista oficial: [CONTRIBUTING.md § Depreciações anunciadas](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/CONTRIBUTING.md#depreciações-anunciadas).
+Depreciado, sai na 5.0: `ariaLabel` e `emptyMessage` do `Combobox`; `modal` do `AlertDialog` e `onPointerDownOutside`/`onInteractOutside` do `AlertDialogContent` (já ignorados); `digits` de `@semec/ds/react` e `@semec/ds/react/validacao` (use `valor.replace(/\D/g, "")`); o subpath `@semec/ds/react/server` (`dsPackageRootResolve`, uso interno do monorepo). Os dois últimos foram anunciados na 4.1 e avisam no console em desenvolvimento. Lista oficial: [CONTRIBUTING.md § Depreciações anunciadas](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/CONTRIBUTING.md#depreciações-anunciadas).
 
 O que a 2.0.0 removeu sem aviso está na errata do [CHANGELOG](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/CHANGELOG.md).
 

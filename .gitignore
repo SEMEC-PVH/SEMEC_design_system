@@ -49,3 +49,8 @@ next-env.d.ts
 
 # Consumidor temporário do check-dts (packages/react/scripts/check-dts.mjs)
 .check-dts-*/
+
+# Regressão visual: bancada gerada, resultados e relatório (baselines em tests/visual/__screenshots__ SÃO versionadas)
+tests/visual/.harness/
+tests/visual/.results/
+tests/visual/.report/

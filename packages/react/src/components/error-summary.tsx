@@ -13,9 +13,30 @@ export interface ErrorSummaryItem {
 export interface ErrorSummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   errors?: ErrorSummaryItem[];
+  /**
+   * Foca o resumo automaticamente. Com `focusKey`, o foco vem **só** quando o
+   * `focusKey` muda (inclusive na montagem, se for um valor ainda não focado
+   * naquele formulário). Sem `focusKey`, foca quando o resumo aparece (de 0
+   * para N erros). Mudanças só na lista de erros (validação ao vivo) nunca
+   * movem o foco. Padrão: `true`.
+   */
   autoFocus?: boolean;
+  /**
+   * Valor que muda a cada envio inválido (ex.: `tentativa`, somada no callback
+   * de envio inválido do `handleSubmit`). É o único gatilho de foco quando
+   * informado: o resumo que some e volta durante a digitação (0 → N erros) não
+   * rouba o foco do campo (WCAG 3.2.2; TST-01). O último valor focado fica
+   * guardado no `<form>` (ou no elemento pai) e sobrevive à desmontagem, então
+   * a renderização condicional (`erros.length > 0 && <ErrorSummary … />`)
+   * também funciona.
+   */
   focusKey?: unknown;
 }
+
+// Último `focusKey` visto por âncora (o `<form>` ou o pai do resumo). Fica fora
+// do componente porque a receita monta o resumo só quando há erros: sem isso,
+// cada remontagem (0 → N erros na validação ao vivo) pareceria um envio novo.
+const focusKeyPorAncora = new WeakMap<Element, unknown>();
 
 // Primeiro elemento focável dentro do alvo (input hidden não conta).
 const FOCUSABLE =
@@ -39,11 +60,40 @@ const ErrorSummary = React.forwardRef<HTMLDivElement, ErrorSummaryProps>(
       [ref]
     );
 
+    // Gatilhos de foco (WCAG 3.2.2; TST-01, #48). Mudar só a contagem — a
+    // validação ao vivo do RHF ou do Formik revalida a cada tecla — nunca tira
+    // o foco do campo em que a pessoa digita.
+    // - Com `focusKey`: foca só quando ele difere do último valor visto naquela
+    //   âncora. O resumo que some e volta com o mesmo `focusKey` não foca.
+    // - Sem `focusKey`: foca na transição de 0 para N erros (comportamento
+    //   legado; com validação ao vivo, passe `focusKey`).
+    const prevCount = React.useRef(0);
+    const ultimaChave = React.useRef<{ valor: unknown } | null>(null);
+    const count = errors.length;
+    const temFocusKey = focusKey !== undefined;
     React.useEffect(() => {
-      if (autoFocus && errors.length > 0) {
-        internalRef.current?.focus();
+      const el = internalRef.current;
+      let deveFocar = false;
+      if (temFocusKey) {
+        // A chave só é consumida com erros na tela: no Formik o `submitCount`
+        // muda antes de os erros chegarem, e o foco espera por eles.
+        if (count > 0) {
+          const ancora = el?.closest("form") ?? el?.parentElement ?? null;
+          const vista =
+            ancora && focusKeyPorAncora.has(ancora)
+              ? { valor: focusKeyPorAncora.get(ancora) }
+              : ultimaChave.current;
+          deveFocar = vista === null || !Object.is(vista.valor, focusKey);
+          ultimaChave.current = { valor: focusKey };
+          if (ancora) focusKeyPorAncora.set(ancora, focusKey);
+        }
+      } else {
+        deveFocar = prevCount.current === 0 && count > 0;
       }
-    }, [autoFocus, errors.length, focusKey]);
+      prevCount.current = count;
+
+      if (autoFocus && deveFocar) el?.focus();
+    }, [autoFocus, count, focusKey, temFocusKey]);
 
     if (errors.length === 0) return null;
 

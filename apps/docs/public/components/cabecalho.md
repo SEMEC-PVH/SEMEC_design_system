@@ -4,20 +4,21 @@ code: "header"
 slug: "cabecalho"
 file: "src/components/header.tsx"
 category: "navegacao"
-variants: "composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ('' = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional)"
+variants: "composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ('' = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional) · com Sidebar: Header dentro do SidebarInset (as='div'), antes do <main id='conteudo'>; SkipLink antes do SidebarProvider. Antes do provider o Header fica sob a Sidebar fixa e a marca recebe foco sem aparecer"
 ---
 
 # Cabeçalho — `header`
 
 > Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.
 
-**Arquivo:** `src/components/header.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/cabecalho`
+**Arquivo:** `src/components/header.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/cabecalho/
 
 ## Variantes
 
 - **composição**: Header · HeaderBrand · HeaderNav · HeaderNavLink
 - **props**: HeaderBrand: orgName · serviceName · logo · href ("" = sem link) · truncate · homeLabel · HeaderNavLink: current
 - **a11y**: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional)
+- **com Sidebar**: Header dentro do SidebarInset (as="div"), antes do <main id="conteudo">; SkipLink antes do SidebarProvider. Antes do provider o Header fica sob a Sidebar fixa e a marca recebe foco sem aparecer
 
 ## Instalação (@semec/ds)
 
@@ -25,7 +26,7 @@ variants: "composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · 
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ```css
 @import "tailwindcss";
@@ -33,6 +34,10 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.
 
 ## Uso
 
@@ -61,7 +66,7 @@ import { Button } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `Header` (Cabeçalho) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav. API e variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ("" = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Header` (Cabeçalho) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav. API e variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ("" = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional) · com Sidebar: Header dentro do SidebarInset (as="div"), antes do <main id="conteudo">; SkipLink antes do SidebarProvider. Antes do provider o Header fica sob a Sidebar fixa e a marca recebe foco sem aparecer. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -158,7 +163,9 @@ const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
             Logo
           </span>
         )}
-        <span aria-hidden="true" className="h-7 w-px shrink-0 bg-border" />
+        {/* Espaços em texto: num contêiner flex não aparecem na tela, mas
+            separam as palavras no nome acessível do link (TST-12). */}{" "}
+        <span aria-hidden="true" className="h-7 w-px shrink-0 bg-border" />{" "}
         {children ?? (
           <span
             className={cn(
@@ -166,13 +173,11 @@ const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
               truncate ? "truncate" : "break-words"
             )}
           >
-            {orgName}
-            <span
-              aria-hidden="true"
-              className="mx-1 font-normal text-muted-foreground"
-            >
+            {/* O "|" é só visual; os espaços separam os nomes (TST-12). */}
+            {orgName}{" "}
+            <span aria-hidden="true" className="font-normal text-muted-foreground">
               |
-            </span>
+            </span>{" "}
             <span className="font-semibold text-foreground">{serviceName}</span>
           </span>
         )}
@@ -180,14 +185,14 @@ const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
     );
 
     const rootClass = cn(
-      "flex min-w-0 items-center gap-3 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+      "flex min-h-11 min-w-0 items-center gap-3 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       className
     );
 
     if (href) {
       return (
         <a ref={ref as React.Ref<HTMLAnchorElement>} href={href} className={rootClass} {...props}>
-          {content}
+          {content}{" "}
           <span className="sr-only">— {homeLabel}</span>
         </a>
       );

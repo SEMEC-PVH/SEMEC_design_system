@@ -244,9 +244,9 @@ export function ErrorSummaryExtras() {
       ]}
     >
       <p className="text-sm text-muted-foreground">
-        <code>id</code> é o do campo. <code>focusKey</code> muda a cada envio,
-        para que o resumo refoque quando a pessoa tenta de novo e a lista de
-        erros é a mesma.
+        <code>id</code> é o do campo. <code>focusKey</code> muda a cada envio
+        inválido e é o único gatilho de foco: o resumo refoca quando a pessoa
+        tenta de novo, mas não quando some e volta enquanto ela digita.
       </p>
     </Prose>
   );

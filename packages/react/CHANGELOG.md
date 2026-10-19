@@ -1,5 +1,81 @@
 # @semec/ds
 
+## 4.2.0
+
+### Minor Changes
+
+- 2b06f64: Dados e navegação: alvos de toque, `onRowClick` e nomes acessíveis (bateria de testes de 16/10/2026, onda 1, #55 e #56).
+  
+  - **DataTable — `rowLabel` (novo, aditivo, TST-28):** `rowLabel={(row) => "Abrir protocolo " + row.numero}` vira o `aria-label` da linha. Use junto com `onRowClick`: a linha focável não tinha nome e o leitor de tela não dizia o que o Enter fazia.
+  - **DataTable — nome do cabeçalho ordenável (TST-27):** o cabeçalho e o botão de ordenação passam a se chamar só pelo nome da coluna ("Nome"). A instrução "Ordenar por Nome" agora é a **descrição** do botão (`aria-describedby`), e não se repete mais a cada célula. `labels.sortBy` continua aceito, com a mesma assinatura, e passa a definir essa descrição. Se o seu teste consulta `getByRole("button", { name: "Ordenar por Nome" })`, troque por `getByRole("columnheader", { name: "Nome" })` e o botão dentro dele, ou confira a descrição com `toHaveAccessibleDescription` (TST-B4).
+  - **DataTable — `onRowClick` (TST-11):** o clique ou o Enter/Espaço num botão, link, campo ou outro controle dentro da célula não ativa mais a linha. O clique dentro de um portal aberto pela célula (menu, diálogo) também não.
+  - **DataTable — alvos e rodapé (TST-10, TST-23):** o botão de ordenação ganha `min-h-11 min-w-11` (44 px, dentro do cabeçalho que já tinha 44 px). Abaixo de `sm`, o rodapé da paginação vira coluna, os botões podem quebrar de linha e o texto deles não quebra mais dentro do botão.
+  - **Pagination (TST-07, TST-25):** setas, números e elipses têm `shrink-0` e não encolhem mais para 18–23 px em 390/320 px. Abaixo de `sm` ficam só as setas e a página atual ± 1: a primeira e a última página e as elipses somem (mudança visual no mobile). `siblingCount={0}` agora é respeitado (antes virava 1 em silêncio); valores negativos contam como 0.
+  - **Breadcrumb e Link (TST-10):** abaixo de `sm`, os links da trilha passam a ter 44 px de altura e de largura mínima. O `Link` ganha um `::after` de no mínimo 44×44 que amplia a área de toque sem mudar a altura da linha do texto (um tel/mailto sozinho num parágrafo media 21 px). No desktop, nada muda.
+- 2b06f64: Correções visuais e de acessibilidade da bateria de testes de 16/10/2026 (onda 1, #55).
+  
+  **Mudanças visuais (atualizar baselines):**
+  
+  - `Heading` (TST-16): a escala segue o `tokens.css` e a SKILL. `level={1}` passa de 24 px para **32 px** (`text-3xl`), `level={2}` de 20 px para 24 px (`text-2xl`) e `level={3}` de 18 px para 20 px (`text-xl`). Os níveis 4 a 6 não mudam. A entrelinha passa a vir da escala (`--text-*--line-height`). Quem usa `size` para fixar o visual não é afetado.
+  - `Toggle` (TST-03, #50): o estado ligado deixa de ser um cinza quase igual ao fundo (1,01:1). Agora usa fundo `tint`, contorno de 2 px em `primary` (borda + `inset-ring`) e texto `foreground`. Contraste: `primary` contra `background` 5,00:1, contra `surface` 5,42:1 e contra `tint` 4,89:1. O texto contra `tint` dá 14,24:1. Na variante `outline`, a borda solta (`input`) fica a 1,44:1 do `primary`, e por isso o anel interno: o pixel interno passa de superfície a `primary` (5,00:1 / 5,42:1). No hover solto, a borda vira `border-strong` (3,49:1 / 3,77:1) na `default` e `foreground` na `outline`. A variante `default` ganhou uma borda transparente de 1 px, o que deixa o botão 2 px mais largo.
+  - `DropdownMenu` (TST-09): `Item`, `CheckboxItem`, `RadioItem` e `SubTrigger` ganham alvo de 44 px (`min-h-11`), como o `SelectItem`. Antes mediam 33 px.
+  - `NavigationMenuLink` (TST-08): passa a ter estilo próprio, com `min-h-11`, `px-4`, hover e foco em `tint`, anel de foco interno e semibold quando `active`. Antes era o `Link` cru do Radix, com 23 px de altura. Também ganha o novo export `navigationMenuLinkStyle`. Quem passa `className={navigationMenuTriggerStyle()}` mantém o visual do gatilho.
+  - `Slider` (TST-22): a área de toque do polegar sobe de 40×40 para 44×44 (`after:-inset-3.5`). O visual do polegar não muda.
+  
+  **Comportamento:**
+  
+  - `ScrollArea` (TST-05, #52): a viewport recebe `tabIndex={0}` e um anel de foco interno quando não há nada focável dentro dela. Com isso, o axe deixa de acusar `scrollable-region-focusable` com overflow no Chromium. Há duas props novas: `focusable` (`"auto"` é o padrão, além de `true` e `false`) e `viewportProps`, que serve, por exemplo, para dar `aria-label` à região.
+  - `Button` (TST-21): um rótulo longo quebra em linhas balanceadas e não gera mais rolagem horizontal. Para isso, `whitespace-nowrap` sai e a altura fixa (`h-9`, `h-11`, `h-12`) vira altura mínima (`min-h-*`). Rótulos curtos ficam com o mesmo tamanho (36, 44 ou 48 px). Se você reduzia a altura com `className="h-*"`, agora também precisa sobrescrever o `min-h-*`.
+  - `TabsList` (TST-29): a lista não passa da largura do pai (`max-w-full`) e rola dentro de si (`overflow-x-auto`), então a página não rola mais em 320 px. `justify-center-safe` só centraliza quando as abas cabem.
+  - `Avatar` (TST-26): quando a foto quebra, o `AvatarFallback` anuncia o `alt` da `AvatarImage` em texto `sr-only` e esconde as iniciais do leitor de tela. Isso não acontece se o fallback já tiver `aria-label` ou `aria-labelledby`, nem se o `alt` for vazio.
+- 2b06f64: Depreciação (TST-34b, #57; ADR-013): `digits` (exportado por `@semec/ds/react` e `@semec/ds/react/validacao`) e o subpath `@semec/ds/react/server` (`dsPackageRootResolve`) ganham `@deprecated` no JSDoc e um `console.warn` único em desenvolvimento (`process.env.NODE_ENV !== "production"`; nada em produção), e **saem na 5.0**. O resultado das funções não muda nesta versão. Os dois entram na tabela de depreciações anunciadas do CONTRIBUTING.md, na SKILL e no README.
+  
+  - `digits(valor)`: troque por `valor.replace(/\D/g, "")` no seu código.
+  - `@semec/ds/react/server`: é uso interno do monorepo e só lança erro fora dele; não há substituto no pacote.
+- 2b06f64: Documentação e artefatos para IA da onda 1 da bateria de testes de 16/10/2026 (#51, #55):
+  
+  - **TST-04 (#51):** a SKILL `semec-ds` tem uma composição só de `Sidebar` + `Header` ("Esqueleto com Sidebar"): `SkipLink` antes do `SidebarProvider` e `Header` dentro do `SidebarInset` (`as="div"`), antes do `<main id="conteudo">`. A alternativa "Header antes do SidebarProvider" saiu: no desktop a `Sidebar` é `fixed` desde o topo e cobria a marca focada (WCAG 2.4.7). Provado em Chromium (1280 e 390 px): o `SkipLink` é a 1ª parada de Tab e leva ao `<main>`, o `Header` e a marca ficam visíveis e focáveis, axe sem serious/critical. O manifest (`header`, `sidebar`) traz a mesma composição.
+  - **TST-15:** enquanto houver changesets pendentes do `@semec/ds`, o `llms.txt`, o `llms-full.txt`, os `.md` por componente e as duas skills avisam que o conteúdo ainda não está no npm, e o `manifest.json` ganha o campo aditivo `unreleased` (`{ pendingChangesets, bump, nextVersion, note }` ou `null`). Sem changesets (como no tarball publicado), nada muda.
+  - **TST-18:** os links do `llms.txt` e os campos `url`/`md` do `manifest.json` do site passam a ser URLs completas a partir do `homepage` do pacote (com o `basePath` `/SEMEC_design_system` e a barra final). Antes, `/componentes/<slug>` dava 404.
+  - **TST-19:** `install` do `manifest.json`: o novo `install.css` tem as 4 linhas do CSS global (`tailwindcss`, `fonts.css`, `tokens.css`, `@source`); `install.tokens` deixa de ser um `import` em JS e vira a linha `@import` do CSS; `install.preset` passa a ser o `@config "@semec/ds/react/pv-preset"` (antes era o `@source`, agora em `install.source`); entram `install.fonts`, `install.cssNote` e `fonts.css` em `tokens.files`. O manifest lite ganha `install.preset` com `@semec/ds/lite/pv-preset`.
+  - **TST-30:** os exemplos controlados de `Dialog` e `Sheet` compilam em TS strict (`React.useRef<HTMLButtonElement>(null)` e `import * as React`).
+  - **TST-31:** a descrição do `Button` deriva o número de variantes da lista ("Sete variantes", antes "Seis").
+  - **TST-33:** a SKILL lite usa `--feedback-danger-surface`/`--feedback-danger` no erro de servidor (não os primitivos `--pv-red-*`), documenta o preset `@semec/ds/lite/pv-preset` e não fixa mais a versão à mão.
+  - **API da onda 1 documentada no manifest e na SKILL:** `Toggle` ligado (fundo `tint` + contorno `primary` de 2px, 5,00:1 e 5,42:1), `Heading` 32/24/20px, `Button` com rótulo longo em várias linhas (`min-h-*`), `ScrollArea` com `focusable` e `viewportProps`, `Avatar` que anuncia o `alt` com a foto quebrada, `NavigationMenuLink` estilizado e `navigationMenuLinkStyle`, `DataTable` com `rowLabel` e `labels.sortBy` como descrição (`aria-describedby`), `Pagination` com `siblingCount={0}` e versão mobile, alvos de 44px de `Link` e `Breadcrumb` no mobile.
+  - O README do pacote perdeu um trecho duplicado (a seção "Comece aqui" até "Componentes" aparecia duas vezes, efeito de um `$\`` na substituição da nota do `maskCurrency`).
+
+## 4.1.0
+
+### Minor Changes
+
+- 5f09e20: Padronização de formulários com React Hook Form, Zod e tratamento de erros em 3 níveis (SEM-817):
+  
+  - `FormField` ganha prop opcional `errorRole` ("alert" | undefined) para anúncio imediato por leitores de tela quando há validação assíncrona ou inline.
+  - Padrões de arquitetura documentados e integrados às skills do DS (`semec-ds` e `semec-ds-lite`) com:
+    - 3 níveis de feedback de erro: Inline (`FormField`), Resumo no topo (`ErrorSummary`) e Servidor/API (`Alert variant="destructive"`).
+    - Padrão oficial de validação com `react-hook-form` e `@hookform/resolvers/zod`.
+    - Legenda e texto de ajuda abaixo de botões de envio e exportação ("Campos com * são obrigatórios", "O download do arquivo inicia automaticamente").
+    - Foco programático no primeiro campo inválido ou no `ErrorSummary` ao submeter com erro.
+
+### Patch Changes
+
+- 422ae70: Correções da onda 0 da bateria de testes de 16/10/2026 (#54):
+  
+  - **ErrorSummary (TST-01, #48, bloqueante):** com `focusKey`, o resumo só recebe foco quando o `focusKey` muda (inclusive na montagem, se o valor ainda não foi focado naquele `<form>`). O resumo que some e volta durante a digitação (0 → N erros, ao apagar e redigitar um campo) não rouba mais o foco: o último `focusKey` focado fica guardado no `<form>` e sobrevive à renderização condicional da receita. Sem `focusKey`, o resumo foca ao passar de 0 para N erros, como antes. Mudar só a lista de erros nunca move o foco. Antes, a validação ao vivo (react-hook-form, Formik) mudava a contagem de erros a cada tecla depois do 1º envio e o foco saltava para o resumo, perdendo as teclas seguintes (o celular "69999998888" era gravado como "(69) 9999-9888"). Viola o WCAG 3.2.2.
+  - **HeaderBrand (TST-12, TST-10):** o nome acessível do link separa os nomes ("SEMEC Matrícula — ir para o início", antes "SEMECMatrícula— ir…"). O link da marca ganha `min-h-11` (44 px de alvo). Mudança visual: a marca passa a ter no mínimo 44 px de altura; o espaçamento em volta do "|" é o mesmo.
+  - **FileUpload (TST-13):** tamanhos com vírgula decimal PT-BR e no máximo 1 casa ("5 MB", "1,5 MB"), na lista e na mensagem de limite.
+  - **Progress (TST-14):** a barra preenche `value / max` (com `value={3}` e `max={4}`, 75%, o mesmo que o leitor de tela anuncia).
+  - **maskCurrency (TST-20):** sem dígitos significativos devolve `""` em vez de "R$ 0,00", então o campo volta a ficar vazio e falha em `z.string().min(1)`.
+  - **toast() (TST-24):** o `onOpenChange` passado a `toast()` é chamado junto com o handler interno, em vez de ser descartado.
+- 422ae70: Remove os marcadores de conflito de merge do exemplo canônico da SKILL `semec-ds` (TST-02, #49). O lado HEAD (código que não compilava: `errors.length` sobre objeto e `handleSubmit` sem callback) saiu; ficou o lado SEM-817. A SKILL publicada no tarball (`@semec/ds/skills/semec-ds`), no site e em `.claude/` / `.opencode/` volta a ter só código válido.
+  
+  - `build-artifacts.mjs` (roda no `build` do pacote) agora falha se encontrar marcadores (`<<<<<<<`, `=======`, `>>>>>>>` no início da linha) nas fontes dos artefatos (SKILLs, `manifest.js`, README, tokens, fontes dos componentes) ou nos artefatos gerados. As fontes são checadas antes de qualquer escrita.
+  - O gate (`npm run gate`) ganha a checagem `[marcadores]`, que varre todos os arquivos de texto versionados do repositório.
+- 422ae70: Corrige a receita oficial de formulário (React Hook Form + Zod + `FormField` + `ErrorSummary`) na SKILL `semec-ds`, no `manifest` (`form-field.usage`) e no README (TST-17 e TST-20, #54):
+  
+  - **TST-17:** o exemplo usa `shouldFocusError: false` no `useForm` (sem isso o RHF foca o 1º campo inválido e o `ErrorSummary` nunca recebe o foco), soma a `tentativa` do `focusKey` só no envio inválido (`handleSubmit(onSubmit, onInvalid)`) e monta os itens do resumo por uma lista fixa de ids na ordem da tela (`ORDEM_CAMPOS`), não por `Object.entries(errors)`. A descrição do `ErrorSummary` passa a dizer quando ele puxa o foco (0 → N erros e troca de `focusKey`; não durante a digitação).
+  - **TST-20:** as instruções de instalação (SKILL, README, `manifest.json` em `install.peers` e no novo campo aditivo `install.form`) incluem `npm install react-hook-form @hookform/resolvers zod`, opcionais e só para a receita. A assinatura de `maskCurrency(value: string): string` está documentada (centavos, `""` sem dígitos desde a 4.1.0, espaço não separável depois de `R$`), com um exemplo de campo R$ avulso e outro dentro da receita.
+
 ## 4.0.1
 
 ### Patch Changes

@@ -2,7 +2,8 @@ name: CI
 
 # Cobre o checklist de PR do AGENTS.md/CONTRIBUTING.md:
 # build:ds, typecheck, lint, build do site, deriva dos artefatos de agentes,
-# changeset obrigatório para mudança publicada do @semec/ds, testes do kit e o gate de qualidade.
+# changeset obrigatório para mudança publicada do @semec/ds, testes do kit, o gate de qualidade
+# e a regressão visual (contêiner do Playwright).
 # O workflow "Release" só roda depois que este termina verde no main.
 
 on:
@@ -131,6 +132,10 @@ jobs:
         # Chama o workspace direto: o "build" da raiz repetiria o build:ds no prebuild.
         run: npm run build --workspace @semec/docs
 
+      - name: Aviso "Não publicado" nas páginas do site (TST-15)
+        # Com changesets pendentes, toda página exportada mostra o aviso; sem eles, nenhuma.
+        run: npm run check:release-banner --workspace @semec/docs
+
       - name: Verificar deriva dos artefatos de agentes
         run: |
           # build:ds e o prebuild do site regeneram llms.txt, llms-full.txt,
@@ -148,6 +153,37 @@ jobs:
             echo "::error title=Artefatos desatualizados::apps/docs/public está desatualizado em relação a packages/react/manifest.js. Rode 'npm run build:ds' (ou 'npm run generate:llms') e commite apps/docs/public."
             exit 1
           fi
+
+  visual:
+    name: test:visual
+    # Regressão visual (TST-B1): as baselines são do Linux, geradas nesta mesma
+    # imagem. A tag acompanha a versão EXATA do @playwright/test no package.json;
+    # o tests/visual/docker.mjs confere a revisão do Chromium e falha se divergir.
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
+    env:
+      CI: "1"
+      HOME: /root
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install
+        run: npm ci
+
+      - name: Regressão visual (build:ds + Playwright no contêiner)
+        # O pretest:visual roda build:ds; dentro da imagem o docker.mjs chama o Playwright direto.
+        run: npm run test:visual
+
+      - name: Enviar diffs e relatório
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regressao-visual
+          path: |
+            tests/visual/.results
+            tests/visual/.report
+          retention-days: 14
 
   gate:
     name: gate

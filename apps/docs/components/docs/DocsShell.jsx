@@ -31,7 +31,7 @@ const readCollapsed = () => {
 };
 const serverCollapsed = () => false;
 
-export default function DocsShell({ children }) {
+export default function DocsShell({ children, banner = null }) {
   const [open, setOpen] = useState(false);
   const collapsed = useSyncExternalStore(
     subscribeCollapsed,
@@ -110,6 +110,7 @@ export default function DocsShell({ children }) {
           <div className="content-main">
             <div className="content-inner">
               <div className="container">
+                {banner}
                 {crumbs.length > 1 && (
                   <nav className="breadcrumbs" aria-label="Trilha de navegação">
                     {crumbs.map((c, i) => (

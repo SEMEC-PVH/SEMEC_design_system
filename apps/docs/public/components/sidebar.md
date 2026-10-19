@@ -11,7 +11,7 @@ variants: "side: left · right · variant: sidebar · floating · inset · colla
 
 > Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile. Abaixo de 768px (48rem, via `matchMedia`) a Sidebar vira gaveta modal (Radix Dialog): foco preso, Esc fecha, conteúdo de trás inerte, foco volta a quem abriu e botão visível "Fechar menu" (44×44). No desktop renderiza um landmark `<nav aria-label="Menu lateral">`. `SidebarMenuButton isActive` gera `aria-current="page"`; `tooltip` aparece só no modo recolhido (`collapsible="icon"`). `SidebarTrigger` (44×44) expõe `aria-expanded` e `aria-controls`.
 
-**Arquivo:** `src/components/sidebar.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/sidebar`
+**Arquivo:** `src/components/sidebar.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/sidebar/
 
 ## Variantes
 
@@ -32,7 +32,7 @@ variants: "side: left · right · variant: sidebar · floating · inset · colla
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ```css
 @import "tailwindcss";
@@ -41,10 +41,14 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @source "../node_modules/@semec/ds/dist/react";
 ```
 
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.
+
 ## Uso
 
 ```tsx
-import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@semec/ds/react";
+import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SkipLink, Header, HeaderBrand, Heading } from "@semec/ds/react";
 import { LayoutDashboard } from "lucide-react";
 
 <SidebarProvider>
@@ -74,6 +78,25 @@ import { LayoutDashboard } from "lucide-react";
     <div className="p-4">Conteúdo</div>
   </SidebarInset>
 </SidebarProvider>
+
+// Painel com Header (composição única, TST-04): SkipLink antes do SidebarProvider,
+// Header dentro do SidebarInset (as="div") e o <main> depois do Header.
+// Header antes do provider fica sob a Sidebar fixa (marca focada sem aparecer).
+<>
+  <SkipLink />
+  <SidebarProvider>
+    <Sidebar>{/* … */}</Sidebar>
+    <SidebarInset as="div">
+      <Header>
+        <SidebarTrigger />
+        <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+      </Header>
+      <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-[75rem] px-4 py-8">
+        <Heading level={1}>Protocolos</Heading>
+      </main>
+    </SidebarInset>
+  </SidebarProvider>
+</>
 
 // Item ativo com link (aria-current="page" vem de isActive) e tooltip no modo recolhido
 <Sidebar collapsible="icon" labels={{ navigation: "Menu do servidor" }}>

@@ -11,7 +11,7 @@ variants: "props: accept · maxSize · label · hint · error · invalid · onVa
 
 > Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio.
 
-**Arquivo:** `src/components/file-upload.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/envio-de-arquivos`
+**Arquivo:** `src/components/file-upload.tsx` | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/envio-de-arquivos/
 
 ## Variantes
 
@@ -24,7 +24,7 @@ variants: "props: accept · maxSize · label · hint · error · invalid · onVa
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ```css
 @import "tailwindcss";
@@ -32,6 +32,10 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.
 
 ## Uso
 
@@ -79,7 +83,7 @@ export interface FileUploadLabels {
   dropzoneAction: string;
   /** Erro de tipo não aceito. Padrão: "Tipo de arquivo não permitido.". */
   invalidType: string;
-  /** Erro de tamanho; recebe o limite já formatado (ex.: "5.0 MB"). */
+  /** Erro de tamanho; recebe o limite já formatado em PT-BR (ex.: "5 MB", "1,5 MB"). */
   tooLarge: (maxSize: string) => string;
 }
 
@@ -140,10 +144,14 @@ export interface FileUploadProps
   labels?: Partial<FileUploadLabels>;
 }
 
+// Vírgula decimal PT-BR e no máximo 1 casa (ADR-016; TST-13): "5 MB", "1,5 MB".
+const decimalPtBR = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
+
+/** Tamanho legível em PT-BR: `512 B`, `1,5 KB`, `5 MB`. */
 const formatBytes = (bytes: number) => {
   if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1024 * 1024) return `${decimalPtBR.format(bytes / 1024)} KB`;
+  return `${decimalPtBR.format(bytes / (1024 * 1024))} MB`;
 };
 
 // Mesma regra do atributo `accept`: extensões (".pdf"), MIME exato ou curinga ("image/*").

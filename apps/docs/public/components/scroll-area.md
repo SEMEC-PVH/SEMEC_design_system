@@ -4,19 +4,21 @@ code: "scroll-area"
 slug: "scroll-area"
 file: "src/components/scroll-area.tsx"
 category: "navegacao"
-variants: "composição: ScrollArea · ScrollBar · orientation: vertical · horizontal"
+variants: "composição: ScrollArea · ScrollBar · orientation: vertical · horizontal · focusable: 'auto' (padrão: focável só sem conteúdo focável dentro) · true (sempre) · false (nunca; só se o conteúdo garantir outro caminho de teclado) · viewportProps: props da viewport (ex.: aria-label da região focável, className)"
 ---
 
 # Área de scroll — `scroll-area`
 
-> Scroll customizado e consistente entre navegadores.
+> Scroll customizado e consistente entre navegadores. A região rolável é alcançável pelo teclado: sem nada focável dentro (ex.: texto puro), a viewport vira parada de Tab com anel de foco (`focusable="auto"`, o padrão). Dê nome à região com `viewportProps={{ "aria-label": "…" }}`.
 
-**Arquivo:** `src/components/scroll-area.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/scroll-area`
+**Arquivo:** `src/components/scroll-area.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/scroll-area/
 
 ## Variantes
 
 - **composição**: ScrollArea · ScrollBar
 - **orientation**: vertical · horizontal
+- **focusable**: "auto" (padrão: focável só sem conteúdo focável dentro) · true (sempre) · false (nunca; só se o conteúdo garantir outro caminho de teclado)
+- **viewportProps**: props da viewport (ex.: aria-label da região focável, className)
 
 ## Instalação (@semec/ds)
 
@@ -24,7 +26,7 @@ variants: "composição: ScrollArea · ScrollBar · orientation: vertical · hor
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ```css
 @import "tailwindcss";
@@ -33,12 +35,17 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 @source "../node_modules/@semec/ds/dist/react";
 ```
 
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
+> Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.
+
 ## Uso
 
 ```tsx
 import { ScrollArea } from "@semec/ds/react";
 
-<ScrollArea className="h-48">
+// Texto puro: a viewport recebe tabIndex=0; o aria-label nomeia a região
+<ScrollArea className="h-48" viewportProps={{ "aria-label": "Termos de uso" }}>
   <div className="p-4">Conteúdo longo aqui…</div>
 </ScrollArea>
 ```
@@ -46,7 +53,7 @@ import { ScrollArea } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `ScrollArea` (Área de scroll) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Scroll customizado e consistente entre navegadores. API e variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `ScrollArea` (Área de scroll) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Scroll customizado e consistente entre navegadores. A região rolável é alcançável pelo teclado: sem nada focável dentro (ex.: texto puro), a viewport vira parada de Tab com anel de foco (`focusable="auto"`, o padrão). Dê nome à região com `viewportProps={{ "aria-label": "…" }}`. API e variantes: composição: ScrollArea · ScrollBar · orientation: vertical · horizontal · focusable: "auto" (padrão: focável só sem conteúdo focável dentro) · true (sempre) · false (nunca; só se o conteúdo garantir outro caminho de teclado) · viewportProps: props da viewport (ex.: aria-label da região focável, className). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -59,22 +66,79 @@ import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
 import { cn } from "../lib/utils";
 
+// Seletor de elementos que já entram no Tab. Se a viewport contém algum, quem
+// usa teclado rola a área focando esses elementos e a viewport não precisa
+// virar mais uma parada de Tab.
+const FOCUSABLE_SELECTOR =
+  'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), iframe, summary, audio[controls], video[controls], [contenteditable]:not([contenteditable="false"]), [tabindex]:not([tabindex="-1"])';
+
+export interface ScrollAreaProps
+  extends React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> {
+  /**
+   * TST-05 (WCAG 2.1.1): a região rolável precisa ser alcançável pelo teclado.
+   * - `"auto"` (padrão): a viewport recebe `tabIndex={0}` e anel de foco só
+   *   quando não há nada focável dentro dela (ex.: texto puro).
+   * - `true`: a viewport é sempre focável.
+   * - `false`: nunca (use só se o conteúdo garantir outro caminho de teclado).
+   */
+  focusable?: boolean | "auto";
+  /** Props repassadas à viewport (ex.: `aria-label` da região rolável focável). */
+  viewportProps?: React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Viewport>;
+}
+
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
-  <ScrollAreaPrimitive.Root
-    ref={ref}
-    className={cn("relative overflow-hidden", className)}
-    {...props}
-  >
-    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
-      {children}
-    </ScrollAreaPrimitive.Viewport>
-    <ScrollBar />
-    <ScrollAreaPrimitive.Corner />
-  </ScrollAreaPrimitive.Root>
-));
+  ScrollAreaProps
+>(({ className, children, focusable = "auto", viewportProps, ...props }, ref) => {
+  const viewportRef = React.useRef<HTMLDivElement>(null);
+  // Começa focável (inclusive no HTML do servidor): sem JS, a área de texto
+  // continua alcançável. O efeito retira a parada quando há conteúdo focável.
+  const [hasFocusable, setHasFocusable] = React.useState(false);
+
+  React.useEffect(() => {
+    if (focusable !== "auto") return;
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const check = () => setHasFocusable(viewport.querySelector(FOCUSABLE_SELECTOR) !== null);
+    check();
+    if (typeof MutationObserver === "undefined") return;
+    const observer = new MutationObserver(check);
+    observer.observe(viewport, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["href", "disabled", "tabindex", "contenteditable", "controls", "type"],
+    });
+    return () => observer.disconnect();
+  }, [focusable]);
+
+  const isFocusable = focusable === "auto" ? !hasFocusable : focusable;
+  const { className: viewportClassName, ...restViewportProps } = viewportProps ?? {};
+
+  return (
+    <ScrollAreaPrimitive.Root
+      ref={ref}
+      className={cn("relative overflow-hidden", className)}
+      {...props}
+    >
+      <ScrollAreaPrimitive.Viewport
+        ref={viewportRef}
+        tabIndex={isFocusable ? 0 : undefined}
+        {...restViewportProps}
+        className={cn(
+          // Anel por dentro (`ring-inset`): a raiz tem overflow-hidden e
+          // cortaria um anel com offset.
+          "h-full w-full rounded-[inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+          viewportClassName
+        )}
+      >
+        {children}
+      </ScrollAreaPrimitive.Viewport>
+      <ScrollBar />
+      <ScrollAreaPrimitive.Corner />
+    </ScrollAreaPrimitive.Root>
+  );
+});
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
 
 const ScrollBar = React.forwardRef<

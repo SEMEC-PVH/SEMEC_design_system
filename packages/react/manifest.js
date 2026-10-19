@@ -40,6 +40,27 @@ export const dsCategories = [
   },
 ];
 
+/**
+ * Quantidade por extenso (PT-BR). Descrições que citam "N variantes" derivam o
+ * número da própria lista (TST-31: o Button dizia "Seis variantes" com sete).
+ * @param {number} n
+ * @param {"f" | "m"} genero gênero do substantivo contado
+ */
+function countPt(n, genero) {
+  const palavras = ["zero", genero === "f" ? "uma" : "um", genero === "f" ? "duas" : "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove", "dez"];
+  return palavras[n] ?? String(n);
+}
+const capitalize = (texto) => texto.charAt(0).toUpperCase() + texto.slice(1);
+
+/** Variantes e tamanhos do Button, na ordem do `buttonVariants` (button.tsx). */
+const BUTTON_VARIANTS = ["primary", "secondary", "outline", "ghost", "destructive", "success", "link"];
+const BUTTON_SIZES = [
+  ["sm", "36px visual, alvo 44px"],
+  ["md", "44px"],
+  ["lg", "48px"],
+  ["icon", "44×44px"],
+];
+
 export const dsComponents = [
   {
     code: "button",
@@ -47,10 +68,10 @@ export const dsComponents = [
     label: "Botões",
     file: "src/components/button.tsx",
     category: "acoes",
-    desc: "Ação principal. Seis variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.",
+    desc: `Ação principal. ${capitalize(countPt(BUTTON_VARIANTS.length, "f"))} variantes e ${countPt(BUTTON_SIZES.length, "m")} tamanhos; \`asChild\` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: \`sm\` mantém o visual de 36px com a área clicável estendida. A altura é mínima (\`min-h-*\`), não fixa: rótulo longo quebra em linhas balanceadas em vez de criar rolagem horizontal; para reduzir a altura com \`className\`, sobrescreva o \`min-h-*\` junto com o \`h-*\`. \`loading\` mostra um Spinner decorativo, aplica \`aria-busy\` e \`aria-disabled\` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.`,
     variants: [
-      { prop: "variant", values: "primary · secondary · outline · ghost · destructive · success · link" },
-      { prop: "size", values: "sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px)" },
+      { prop: "variant", values: BUTTON_VARIANTS.join(" · ") },
+      { prop: "size", values: BUTTON_SIZES.map(([size, nota]) => `${size} (${nota})`).join(" · ") },
       { prop: "loading", values: "false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento) · com asChild, o spinner entra no link e o onClick do filho não dispara · o clique ainda sobe aos ancestrais (só envio e navegação são cancelados)" },
     ],
     usage: `import { Button } from "@semec/ds/react";
@@ -103,6 +124,7 @@ import { Download, Search, Trash2 } from "lucide-react";
     variants: [
       { prop: "variant", values: "primary · onSurface · muted" },
       { prop: "underline", values: "true (padrão) · false (sublinha só no hover; use apenas em menus, rodapés e listas de navegação, nunca em texto corrido)" },
+      { prop: "alvo de toque", values: "abaixo de sm, área mínima de 44×44px por um ::after centralizado, sem mudar a altura da linha (ex.: link tel/mailto sozinho num parágrafo); no desktop o ::after não existe" },
     ],
     usage: `import { Link } from "@semec/ds/react";
 
@@ -419,39 +441,56 @@ import { Download, Search, Trash2 } from "lucide-react";
       { prop: "hooks", values: "useFormField · useFormFieldControl (para campos próprios)" },
       { prop: "padrões", values: "1. Inline (FormField error) · 2. Resumo topo (ErrorSummary) · 3. Servidor (Alert destructive) · Legenda de ação no botão" },
     ],
-    usage: `import { FormField, Input, ErrorSummary, Alert, AlertTitle, AlertDescription, Button, useToast } from "@semec/ds/react";
+    usage: `import { FormField, Input, ErrorSummary, Button, useToast, maskCurrency } from "@semec/ds/react";
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useState } from "react";
 
+// npm install react-hook-form @hookform/resolvers zod (opcionais, só para esta receita)
 const formSchema = z.object({
   nome: z.string().min(3, "Nome deve ter ao menos 3 caracteres"),
   email: emailSchema,
   cpf: cpfSchema,
+  valor: z.string().min(1, "Informe o valor"),
 });
+
+type FormValues = z.infer<typeof formSchema>;
+
+// Ordem dos campos na tela: o ErrorSummary segue esta lista (não a ordem do objeto errors)
+const ORDEM_CAMPOS = ["nome", "email", "cpf", "valor"] as const satisfies readonly (keyof FormValues)[];
 
 export function FormularioExemplo() {
   const { toast } = useToast();
-  const { register, control, handleSubmit, formState: { errors } } = useForm({
+  const [tentativa, setTentativa] = useState(0);
+  const { register, control, handleSubmit, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    defaultValues: { nome: "", email: "", cpf: "", valor: "" },
+    // Sem isto o RHF foca o 1º campo inválido e o ErrorSummary nunca recebe o foco
+    shouldFocusError: false,
   });
 
-  // Padrão 2: Resumo consolidado no topo
-  const errorSummaryItems = Object.entries(errors).map(([id, err]) => ({
-    id,
-    message: String(err?.message || "Campo inválido"),
-  }));
+  // Padrão 2: Resumo consolidado no topo, na ordem da tela
+  const errorSummaryItems = ORDEM_CAMPOS.flatMap((id) => {
+    const message = errors[id]?.message;
+    return message ? [{ id, message }] : [];
+  });
 
-  const onSubmit = async (data) => {
+  const onSubmit = (data: FormValues) => {
+    void data;
     // Padrão de sucesso via Toast:
     toast({ variant: "success", title: "Sucesso!", description: "Dados gravados com sucesso." });
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="max-w-xl space-y-4">
+    <form
+      onSubmit={handleSubmit(onSubmit, () => setTentativa((t) => t + 1))}
+      noValidate
+      className="max-w-xl space-y-4"
+    >
       {errorSummaryItems.length > 0 && (
-        <ErrorSummary title="Corrija os erros destacados" errors={errorSummaryItems} />
+        <ErrorSummary title="Corrija os erros destacados" errors={errorSummaryItems} focusKey={tentativa} />
       )}
 
       {/* Padrão 1: Erro inline ligado via aria-describedby e aria-invalid */}
@@ -469,7 +508,26 @@ export function FormularioExemplo() {
         control={control}
         render={({ field }) => (
           <FormField label="CPF" htmlFor="cpf" required error={errors.cpf?.message}>
-            <Input id="cpf" {...field} />
+            <Input id="cpf" inputMode="numeric" {...field} />
+          </FormField>
+        )}
+      />
+
+      {/* Campo R$: maskCurrency("") devolve "", então min(1) barra o vazio */}
+      <Controller
+        name="valor"
+        control={control}
+        render={({ field }) => (
+          <FormField label="Valor da taxa" htmlFor="valor" required error={errors.valor?.message}>
+            <Input
+              id="valor"
+              inputMode="numeric"
+              name={field.name}
+              ref={field.ref}
+              onBlur={field.onBlur}
+              value={field.value}
+              onValueChange={(v) => field.onChange(maskCurrency(v))}
+            />
           </FormField>
         )}
       />
@@ -491,7 +549,7 @@ export function FormularioExemplo() {
     label: "ErrorSummary",
     file: "src/components/error-summary.tsx",
     category: "formularios",
-    desc: "Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role=\"alert\"`, foco automático, título ligado por id gerado. Sem margem externa: espace pelo layout (ex.: `className=\"mb-6\"`).",
+    desc: "Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role=\"alert\"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco. Título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className=\"mb-6\"`).",
     variants: [{ prop: "props", values: "title · errors [{ id, message }] · autoFocus · focusKey" }],
     usage: `import { ErrorSummary } from "@semec/ds/react";
 
@@ -529,10 +587,10 @@ export function FormularioExemplo() {
     label: "Título",
     file: "src/components/heading.tsx",
     category: "conteudo-dados",
-    desc: "Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual.",
+    desc: "Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual. Escala: 1 = `text-3xl` (32px, título da página), 2 = `text-2xl` (24px), 3 = `text-xl` (20px), 4 = `text-base`, 5 = `text-sm`, 6 = `text-xs` em caixa alta.",
     variants: [
       { prop: "level", values: "1 · 2 (padrão) · 3 · 4 · 5 · 6" },
-      { prop: "size", values: "1–6 (padrão: igual ao level)" },
+      { prop: "size", values: "1–6 (padrão: igual ao level) · 1 = 32px · 2 = 24px · 3 = 20px · 4 = 16px · 5 = 14px · 6 = 12px" },
     ],
     usage: `import { Heading } from "@semec/ds/react";
 
@@ -652,7 +710,7 @@ import { Inbox } from "lucide-react";
     desc: "Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.",
     variants: [
       { prop: "props", values: "items: { label, href? }[]" },
-      { prop: "a11y", values: "aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores" },
+      { prop: "a11y", values: "aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores · abaixo de sm, links com alvo mínimo de 44×44px (min-h-11 + ::after de largura)" },
     ],
     usage: `import { Breadcrumb } from "@semec/ds/react";
 
@@ -673,6 +731,7 @@ import { Inbox } from "lucide-react";
       { prop: "composição", values: "Header · HeaderBrand · HeaderNav · HeaderNavLink" },
       { prop: "props", values: "HeaderBrand: orgName · serviceName · logo · href (\"\" = sem link) · truncate · homeLabel · HeaderNavLink: current" },
       { prop: "a11y", values: "sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional)" },
+      { prop: "com Sidebar", values: "Header dentro do SidebarInset (as=\"div\"), antes do <main id=\"conteudo\">; SkipLink antes do SidebarProvider. Antes do provider o Header fica sob a Sidebar fixa e a marca recebe foco sem aparecer" },
     ],
     usage: `import { Header, HeaderBrand, HeaderNav, HeaderNavLink } from "@semec/ds/react";
 import { Button } from "@semec/ds/react";
@@ -798,9 +857,10 @@ const etapas = [
     label: "Paginação",
     file: "src/components/pagination.tsx",
     category: "navegacao",
-    desc: "Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px. Textos em PT-BR, sobrescrevíveis por `labels`.",
+    desc: "Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px que não encolhem. Abaixo de `sm` ficam só as setas e a página atual ± 1 (primeira, última e elipses ocultas). Textos em PT-BR, sobrescrevíveis por `labels`.",
     variants: [
       { prop: "props", values: "page · pageCount · onPageChange · siblingCount · labels?: Partial<{ navigation, previous, next, page(n) }>" },
+      { prop: "siblingCount", values: "páginas de cada lado da atual · padrão 1 · aceita 0 (só a atual entre as elipses) · negativo conta como 0 · abaixo de sm, no máximo 1" },
       { prop: "a11y", values: "role=navigation · aria-label=Paginação · aria-current=page · aria-label \"Página N\" nos números · aria-label nos botões prev/next · aria-hidden nos elipses" },
     ],
     usage: `import { Pagination } from "@semec/ds/react";
@@ -843,7 +903,8 @@ const etapas = [
       { prop: "composição", values: "Dialog · DialogTrigger · DialogContent · DialogHeader · DialogTitle · DialogDescription · DialogFooter · DialogClose" },
       { prop: "closeLabel", values: "nome acessível do X de 44×44px (padrão \"Fechar\")" },
     ],
-    usage: `import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "@semec/ds/react";
+    usage: `import * as React from "react";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, Button } from "@semec/ds/react";
 
 // Para confirmação destrutiva use AlertDialog (role="alertdialog").
 <Dialog>
@@ -859,11 +920,24 @@ const etapas = [
 
 // Controlado SEM DialogTrigger: o Radix não sabe para onde devolver o foco.
 // Guarde o elemento de origem e devolva o foco em onCloseAutoFocus.
-const origemRef = React.useRef(null);
-<Button ref={origemRef} onClick={() => setAberto(true)}>Editar</Button>
-<Dialog open={aberto} onOpenChange={setAberto}>
-  <DialogContent onCloseAutoFocus={(e) => { e.preventDefault(); origemRef.current?.focus(); }}>…</DialogContent>
-</Dialog>`,
+function EdicaoControlada() {
+  const [aberto, setAberto] = React.useState(false);
+  // Tipe o ref (TS strict): sem o tipo, origemRef.current vira never.
+  const origemRef = React.useRef<HTMLButtonElement>(null);
+  return (
+    <>
+      <Button ref={origemRef} onClick={() => setAberto(true)}>Editar</Button>
+      <Dialog open={aberto} onOpenChange={setAberto}>
+        <DialogContent onCloseAutoFocus={(e) => { e.preventDefault(); origemRef.current?.focus(); }}>
+          <DialogHeader>
+            <DialogTitle>Editar contato</DialogTitle>
+            <DialogDescription>Atualize o telefone do responsável.</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}`,
   },
   {
     code: "toast",
@@ -1047,16 +1121,23 @@ import { HelpCircle } from "lucide-react";
     label: "Avatar",
     file: "src/components/avatar.tsx",
     category: "conteudo-dados",
-    desc: "Foto de perfil com fallback automático (iniciais).",
+    desc: "Foto de perfil com fallback automático (iniciais). Com a foto quebrada, o `AvatarFallback` anuncia o `alt` da `AvatarImage` (as iniciais ficam só visuais); um `aria-label` no `AvatarFallback` continua aceito e tem prioridade.",
     variants: [
       { prop: "composição", values: "Avatar · AvatarImage · AvatarFallback" },
+      { prop: "a11y", values: "alt da AvatarImage = nome da pessoa (vale também para o fallback) · alt vazio para foto decorativa (o fallback não anuncia) · aria-label no AvatarFallback vence o alt" },
       { prop: "tamanhos", values: "h-10 w-10 (padrão) — sobrescreva com className" },
     ],
     usage: `import { Avatar, AvatarImage, AvatarFallback } from "@semec/ds/react";
 
+// Se a foto falhar, o leitor de tela continua ouvindo "João Silva" (não "JS")
 <Avatar>
   <AvatarImage src="/foto.jpg" alt="João Silva" />
   <AvatarFallback>JS</AvatarFallback>
+</Avatar>
+
+// Sem foto: dê o nome no próprio fallback
+<Avatar>
+  <AvatarFallback aria-label="Maria Souza">MS</AvatarFallback>
 </Avatar>`,
   },
   {
@@ -1065,9 +1146,10 @@ import { HelpCircle } from "lucide-react";
     label: "Toggle",
     file: "src/components/toggle.tsx",
     category: "formularios",
-    desc: "Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos.",
+    desc: "Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. Ligado = fundo `tint` + contorno de 2px em `primary` (5,00:1 sobre `--bg`, 5,42:1 sobre branco) e texto `foreground`; o estado vai ao leitor de tela por `aria-pressed`.",
     variants: [
-      { prop: "variant", values: "default · outline" },
+      { prop: "variant", values: "default (solto sem borda) · outline (solto com borda input)" },
+      { prop: "estado ligado", values: "data-state=on · aria-pressed=true · fundo tint · contorno primary de 2px (borda + inset-ring) · hover escurece para primary-hover" },
       { prop: "size", values: "sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)" },
     ],
     usage: `import { Toggle } from "@semec/ds/react";
@@ -1180,14 +1262,17 @@ import { Bold } from "lucide-react";
     label: "Área de scroll",
     file: "src/components/scroll-area.tsx",
     category: "navegacao",
-    desc: "Scroll customizado e consistente entre navegadores.",
+    desc: "Scroll customizado e consistente entre navegadores. A região rolável é alcançável pelo teclado: sem nada focável dentro (ex.: texto puro), a viewport vira parada de Tab com anel de foco (`focusable=\"auto\"`, o padrão). Dê nome à região com `viewportProps={{ \"aria-label\": \"…\" }}`.",
     variants: [
       { prop: "composição", values: "ScrollArea · ScrollBar" },
       { prop: "orientation", values: "vertical · horizontal" },
+      { prop: "focusable", values: "\"auto\" (padrão: focável só sem conteúdo focável dentro) · true (sempre) · false (nunca; só se o conteúdo garantir outro caminho de teclado)" },
+      { prop: "viewportProps", values: "props da viewport (ex.: aria-label da região focável, className)" },
     ],
     usage: `import { ScrollArea } from "@semec/ds/react";
 
-<ScrollArea className="h-48">
+// Texto puro: a viewport recebe tabIndex=0; o aria-label nomeia a região
+<ScrollArea className="h-48" viewportProps={{ "aria-label": "Termos de uso" }}>
   <div className="p-4">Conteúdo longo aqui…</div>
 </ScrollArea>`,
   },
@@ -1259,7 +1344,8 @@ import { MoreHorizontal } from "lucide-react";
       { prop: "closeLabel", values: "nome acessível do X de 44×44px (padrão \"Fechar\")" },
       { prop: "rolagem", values: "overflow-y-auto; top/bottom com max-h 85dvh" },
     ],
-    usage: `import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "@semec/ds/react";
+    usage: `import * as React from "react";
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "@semec/ds/react";
 
 <Sheet>
   <SheetTrigger asChild><Button variant="outline">Abrir filtros</Button></SheetTrigger>
@@ -1279,7 +1365,7 @@ import { MoreHorizontal } from "lucide-react";
 // não sabe para onde devolver o foco. Guarde a origem e devolva em onCloseAutoFocus.
 function FiltrosControlados() {
   const [aberto, setAberto] = React.useState(false);
-  const origemRef = React.useRef(null);
+  const origemRef = React.useRef<HTMLButtonElement>(null);
   return (
     <>
       <Button ref={origemRef} onClick={() => setAberto(true)}>Filtros</Button>
@@ -1302,10 +1388,10 @@ function FiltrosControlados() {
     label: "Tabela de dados",
     file: "src/components/data-table.tsx",
     category: "conteudo-dados",
-    desc: "Tabela com ordenação, paginação e estados vazios.",
+    desc: "Tabela com ordenação, paginação e estados vazios. Com `onRowClick`, passe `rowLabel` para dar nome à linha clicável.",
     variants: [
-      { prop: "props", values: "columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · emptyMessage · caption · labels (sortBy · pageOf · previous · next)" },
-      { prop: "a11y", values: "ordenação por botão com aria-sort · linha focável e ativável por Enter/Espaço quando há onRowClick · paginação com alvos de 44px" },
+      { prop: "props", values: "columns · data · sortKey · sortDir · onSort · page · pageCount · onPageChange · onRowClick · rowLabel?: (row, index) => string (aria-label da linha; use com onRowClick) · emptyMessage · caption · labels (sortBy: descrição \"Ordenar por …\" do botão de ordenação, via aria-describedby, não o nome dele · pageOf · previous · next)" },
+      { prop: "a11y", values: "columnheader e botão de ordenação nomeados só pela coluna; \"Ordenar por …\" como descrição (aria-describedby) · aria-sort no cabeçalho ordenado · botão de ordenação com alvo de 44px · linha focável e ativável por Enter/Espaço quando há onRowClick · rowLabel nomeia a linha clicável · cliques e teclas em controles da célula (e em portais abertos por ela) não ativam a linha · rodapé empilha abaixo de sm · paginação com alvos de 44px" },
     ],
     usage: `import { DataTable, Button } from "@semec/ds/react";
 
@@ -1330,6 +1416,18 @@ function FiltrosControlados() {
   page={pagina}
   pageCount={totalPaginas}
   onPageChange={setPagina}
+/>
+
+// Linha inteira clicável (uma ação só): rowLabel diz ao leitor de tela o que o Enter faz
+<DataTable
+  caption="Protocolos abertos"
+  columns={[
+    { key: "numero", header: "Número", sortable: true },
+    { key: "status", header: "Status" },
+  ]}
+  data={protocolos}
+  onRowClick={(protocolo) => abrirProtocolo(protocolo)}
+  rowLabel={(protocolo) => "Abrir protocolo " + protocolo.numero}
 />`,
   },
   {
@@ -1375,9 +1473,10 @@ function FiltrosControlados() {
     label: "Menu de navegação",
     file: "src/components/navigation-menu.tsx",
     category: "navegacao",
-    desc: "Navegação principal com mega-menu e viewport animado. O `<nav>` se chama \"Menu principal\" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px.",
+    desc: "Navegação principal com mega-menu e viewport animado. O `<nav>` se chama \"Menu principal\" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. O `NavigationMenuLink` já vem estilizado: alvo de 44px (`min-h-11`), `px-4`, hover/foco em `tint` e anel de foco por dentro; `active` marca a página atual com `aria-current=\"page\"`.",
     variants: [
       { prop: "composição", values: "NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator" },
+      { prop: "estilos exportados", values: "navigationMenuTriggerStyle() (visual de gatilho, ex.: link solto na lista) · navigationMenuLinkStyle() (estilo padrão do NavigationMenuLink, para links próprios)" },
       { prop: "a11y", values: "aria-label padrão \"Menu principal\" · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix)" },
     ],
     usage: `import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@semec/ds/react";
@@ -1386,7 +1485,8 @@ function FiltrosControlados() {
   <NavigationMenuList>
     <NavigationMenuItem>
       <NavigationMenuTrigger>Serviços</NavigationMenuTrigger>
-      <NavigationMenuContent>
+      <NavigationMenuContent className="p-2">
+        {/* NavigationMenuLink já tem 44px de altura, px-4 e foco visível */}
         <NavigationMenuLink href="/iptu">IPTU</NavigationMenuLink>
         <NavigationMenuLink href="/alvara">Alvará</NavigationMenuLink>
       </NavigationMenuContent>
@@ -1413,7 +1513,7 @@ function FiltrosControlados() {
       { prop: "a11y", values: "landmark nav/aside com aria-label · gaveta mobile com focus trap, Esc e retorno de foco · aria-expanded/aria-controls no gatilho · aria-current=page no item ativo · alvos de 44px · barra offcanvas recolhida fica inert" },
       { prop: "composição", values: "SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail" },
     ],
-    usage: `import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@semec/ds/react";
+    usage: `import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SkipLink, Header, HeaderBrand, Heading } from "@semec/ds/react";
 import { LayoutDashboard } from "lucide-react";
 
 <SidebarProvider>
@@ -1443,6 +1543,25 @@ import { LayoutDashboard } from "lucide-react";
     <div className="p-4">Conteúdo</div>
   </SidebarInset>
 </SidebarProvider>
+
+// Painel com Header (composição única, TST-04): SkipLink antes do SidebarProvider,
+// Header dentro do SidebarInset (as="div") e o <main> depois do Header.
+// Header antes do provider fica sob a Sidebar fixa (marca focada sem aparecer).
+<>
+  <SkipLink />
+  <SidebarProvider>
+    <Sidebar>{/* … */}</Sidebar>
+    <SidebarInset as="div">
+      <Header>
+        <SidebarTrigger />
+        <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+      </Header>
+      <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-[75rem] px-4 py-8">
+        <Heading level={1}>Protocolos</Heading>
+      </main>
+    </SidebarInset>
+  </SidebarProvider>
+</>
 
 // Item ativo com link (aria-current="page" vem de isActive) e tooltip no modo recolhido
 <Sidebar collapsible="icon" labels={{ navigation: "Menu do servidor" }}>
