@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-19T14:05:26.000Z — packages/react/manifest.js + packages/react/* — versão 4.2.0
+> Gerado 2026-10-19T14:08:21.000Z — packages/react/manifest.js + packages/react/* — versão 4.2.0
 
 > **Não publicado: este conteúdo vem do repositório e inclui 2 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.**
 
@@ -875,14 +875,21 @@ import type { Config } from "tailwindcss";
 export default {
   theme: {
     extend: {
+      // INT-A-14: `muted`/`secondary` são só fundo (bg-muted, bg-secondary),
+      // como no @theme; `text-muted`/`text-secondary` não são gerados.
+      backgroundColor: {
+        muted: "var(--surface-alt)",
+        secondary: "var(--surface-alt)",
+      },
       colors: {
         background: "var(--bg)",
         foreground: "var(--fg)",
+        bg: "var(--bg)",
+        fg: "var(--fg)",
         card: "var(--surface)",
         "card-foreground": "var(--fg)",
         popover: "var(--surface)",
         "popover-foreground": "var(--fg)",
-        secondary: "var(--surface-alt)",
         "secondary-foreground": "var(--fg)",
         accent: "var(--surface-alt)",
         "accent-foreground": "var(--fg)",
@@ -899,7 +906,6 @@ export default {
           DEFAULT: "var(--focus-ring)",
           inverse: "var(--focus-ring-inverse)",
         },
-        muted: "var(--surface-alt)",
         "muted-foreground": "var(--text-muted)",
         // AUD-30: cor de TEXTO. `text-muted`/`text-secondary` são fundo.
         "text-muted": "var(--text-muted)",
