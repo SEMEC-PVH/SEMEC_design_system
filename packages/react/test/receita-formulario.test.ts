@@ -67,14 +67,19 @@ describe.each([
 });
 
 describe("instalação da receita (TST-20)", () => {
-  const cmd = "npm install react-hook-form @hookform/resolvers zod";
+  const cmd = "npm install react-hook-form @hookform/resolvers@^5 zod@^4";
 
-  it("SKILL e README mandam instalar react-hook-form, @hookform/resolvers e zod", () => {
+  it("SKILL fixa a receita em resolvers 5 e Zod 4 (INT-C-01)", () => {
     const secaoInstalacao = skill.slice(skill.indexOf("## Instalação"), skill.indexOf("**Tailwind v4 no bundler:**"));
     expect(secaoInstalacao).toContain(cmd);
     expect(skill.slice(skill.indexOf("### Exemplo Canônico"))).toContain(cmd);
+    expect(usoFormField).toContain(cmd);
+  });
+
+  it("README manda instalar os três pacotes opcionais (TST-20)", () => {
     const readme = fs.readFileSync(path.join(pkgRoot, "README.md"), "utf8");
-    expect(readme).toContain(cmd);
+    // TST-20 cobre a presença dos pacotes, com ou sem versão na receita.
+    expect(readme).toMatch(/npm install react-hook-form(?:@\S+)? @hookform\/resolvers(?:@\S+)? zod(?:@\S+)?/);
   });
 
   it("manifest.json publicado traz os pacotes em install.peers e install.form", () => {
