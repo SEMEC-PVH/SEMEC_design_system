@@ -164,7 +164,7 @@ Por que separar `css` de `react`: o alvo "HTML/CSS puro" não pode carregar Reac
 | Comportamento | Radix UI | Acessibilidade e foco resolvidos por especialistas |
 | Estilo | Tailwind CSS v4 + CVA | Tailwind v4 é CSS-first e lê custom properties nativamente |
 | Tokens | Style Dictionary + DTCG | Padrão de mercado, multi-saída |
-| Build | tsup (libs) / Vite (docs) | Rápido, ESM+CJS, `.d.ts` |
+| Build | tsup (libs) / Vite (docs) | Rápido, somente ESM, `.d.ts` |
 | Documentação | Storybook | Documentação viva, testes de interação, addon de acessibilidade |
 | Testes | Vitest + Testing Library + axe-core | Unidade, integração e acessibilidade automatizada |
 | Regressão visual | Playwright screenshots | Detecta quebra de estilo entre versões |

@@ -8,6 +8,10 @@ React 19 + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Token
 
 São 5 passos. Pular qualquer um deles faz os componentes saírem sem estilo, sem fonte ou sem funcionar.
 
+### Sem React (Vue, Angular, Svelte, HTML)
+
+Use os tokens e a fonte pelos subpaths `@semec/ds/lite/tokens.css` e `@semec/ds/lite/fonts.css`. A orientação para esses projetos está na skill lite: `node_modules/@semec/ds/dist/lite/semec-ds-lite/SKILL.md` (export `@semec/ds/lite/skills/semec-ds-lite`). Os componentes React não rodam nesses frameworks; a lite fornece tokens e orientações de acessibilidade, não componentes prontos nem CSS de componentes. Sem bundler, veja [Via CDN](#via-cdn).
+
 ### 1. Instalar
 
 ```bash
@@ -69,6 +73,47 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 **Logo no Next:** os exemplos usam `logo={<img src="/marca.svg" alt="…" />}`, que é válido, mas o `eslint-config-next` avisa `@next/next/no-img-element`. O `logo` aceita qualquer nó: use `<Image src="/marca.svg" alt="Prefeitura de Porto Velho" width={120} height={36} />` do `next/image`, ou ignore o aviso para SVG estático. É só aviso de lint; o build passa.
 
+**Next com export estático:** remova `cacheComponents` e `experimental.partialPrefetching` se vierem no template; PPR não é compatível com `output: "export"`. Exemplo para hospedar numa subpasta:
+
+```js
+// next.config.mjs
+export default {
+  output: "export",
+  basePath: "/meu-sistema",
+  images: { unoptimized: true },
+};
+```
+
+Use `basePath: ""` se publicar na raiz. O `basePath` é definido no build: inclua-o também nos caminhos de imagens e assets de `public/` usados pelo app. `next build` gera `out/`. Export estático não tem servidor por requisição e não suporta o fluxo de nonce da seção CSP.
+
+**React Router v7 / Remix** (Vite): configure `@tailwindcss/vite` junto do plugin do framework. No React Router v7, o `vite.config.ts` fica assim:
+
+```ts
+import { reactRouter } from "@react-router/dev/vite";
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  plugins: [tailwindcss(), reactRouter()],
+});
+```
+
+Em `app/app.css`, **substitua todo o CSS do template** pelas linhas do kit e da fonte (passo 3): remova `@theme` com Inter, `html, body`, `dark:bg-gray-950` e regras de modo escuro. Em `app/root.tsx`, retire os links/preconnects do Google Fonts, importe `./app.css`, use `<html lang="pt-BR">` e envolva `<Outlet />` com os `Providers` do passo 4, uma vez no root. O `@source` em `app/app.css` é `"../node_modules/@semec/ds/dist/react"`. No Remix com Vite, mantenha o plugin e os imports do Remix; aplique a mesma limpeza do CSS, fonte, idioma e providers. O exemplo completo de root com SSR está em [Segurança (CSP)](#segurança-csp).
+
+**Parcel 2:** instale `tailwindcss` e `@tailwindcss/postcss` como dependências de desenvolvimento. Crie `.postcssrc`:
+
+```json
+{ "plugins": { "@tailwindcss/postcss": {} } }
+```
+
+Acrescente ao `package.json` do app (mescle com os campos existentes):
+
+```json
+{ "@parcel/resolver-default": { "packageExports": true } }
+```
+
+Isso habilita a [resolução de `exports` do Parcel](https://parceljs.org/features/dependency-resolution/#package-exports); sem ela, `@semec/ds/react` não resolve. Importe o CSS global em `src/main.tsx` e use as mesmas linhas e caminho de `@source` do Vite.
+
 **As linhas do kit**, no arquivo CSS global (`src/index.css` no Vite, `app/globals.css` no Next), não via `import` em JS:
 
 ```css
@@ -117,7 +162,8 @@ Sem carregar a fonte, o texto cai no `system-ui` (Segoe UI no Windows) e o layou
 O `SemecProvider` **não** inclui `Toaster` nem `TooltipProvider`; monte-os à parte.
 
 ```tsx
-import { Toaster, TooltipProvider } from "@semec/ds/react";
+import { Toaster } from "@semec/ds/react/toast";
+import { TooltipProvider } from "@semec/ds/react/tooltip";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -250,6 +296,8 @@ import { cn } from "@semec/ds/react";
 
 Metadados de componente (o que versões anteriores deste README chamavam de `getComponentMetadata()`, função que nunca existiu) vêm de `@semec/ds/skills`: `dsBySlug["botoes"]`, `dsComponents`.
 
+Para abrir os artefatos no disco após instalar, use `node_modules/@semec/ds/dist/skills/semec-ds/SKILL.md` (skill completa) e `node_modules/@semec/ds/dist/skills/components/<slug>.md` (por exemplo, `botoes.md`). São arquivos Markdown, não módulos JS. Os caminhos de `exports` da tabela são aliases do pacote, não pastas físicas.
+
 ## Componentes
 
 <!-- ds:component-list:start -->
@@ -291,6 +339,21 @@ Link solto no texto (`<a>` sem `class`) é sublinhado pelo `tokens.css`; com cla
 
 Os tokens do pacote (`tokens.css`) são tema **claro**. Não há `shadcn.css` no pacote (removido na 2.0.0).
 
+### Via CDN
+
+CDNs servem os arquivos físicos do pacote, não os aliases de `exports`: no jsDelivr, `/react/tokens.css` dá 404. Para HTML sem bundler, use `/dist/react/…`, versão fixa e SRI. Este exemplo usa os arquivos publicados da **4.2.0**, com hashes SHA-384 calculados desses URLs (não inclui correções posteriores):
+
+```html
+<link rel="stylesheet" crossorigin="anonymous"
+  href="https://cdn.jsdelivr.net/npm/@semec/ds@4.2.0/dist/react/fonts.css"
+  integrity="sha384-coHk15sImpWgFqHojyN0dEPSRz68H46mEHmXdN7WXJbJhGuTfZUottZYt30RGkgk">
+<link rel="stylesheet" crossorigin="anonymous"
+  href="https://cdn.jsdelivr.net/npm/@semec/ds@4.2.0/dist/react/tokens.css"
+  integrity="sha384-TlzewAcAUnI8BjIUgRHt1S+sCjOPnYiKyLyv4we2JRsPU4R0ryKWcvsU5rUppu6q">
+```
+
+Ao atualizar a versão, recalcule o SRI a partir dos arquivos publicados e teste o carregamento; não reutilize os hashes acima com outro URL. As fontes são buscadas em `dist/react/fonts/`, relativamente ao `fonts.css`. Se houver CSP, autorize `https://cdn.jsdelivr.net` em `style-src` e `font-src`. O SRI valida o CSS do link, não os arquivos de fonte referenciados. Esse uso entrega variáveis CSS e fonte; não gera utilitários Tailwind nem fornece componentes React prontos para `<script>`. O caminho físico é para HTTP/CDN; nos imports do bundler continue usando os subpaths da tabela.
+
 ## Validação (Zod)
 
 Schemas Zod ficam no entry **`@semec/ds/react/validacao`** — o entry principal não importa `zod`. O `zod` é peer opcional, `^3.23.0 || ^4.0.0` (o kit é testado com o 3 e o 4): instale-o (`npm install zod`) só se usar esse entry.
@@ -298,27 +361,180 @@ Schemas Zod ficam no entry **`@semec/ds/react/validacao`** — o entry principal
 A receita de formulário da skill `semec-ds` (React Hook Form + Zod + `FormField` + `ErrorSummary`) usa também `react-hook-form` e `@hookform/resolvers`, que não vêm com o kit (opcionais, só para a receita):
 
 ```bash
-npm install react-hook-form @hookform/resolvers zod
+npm install react-hook-form @hookform/resolvers@^5 zod@^4
 ```
+
+Essa combinação foi validada; o resolvers 6.0.0 causa `ERESOLVE` no npm 11 pelo conflito do peer opcional `effect@^4` com `effect@3` (integração de 19/10/2026).
 
 ```ts
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
 import { validateCPF } from "@semec/ds/react"; // helpers puros, sem zod
 ```
 
-## Segurança (CSP)
+### React Hook Form: controles compostos
 
-Alguns componentes Radix injetam `<style>` dinamicamente (scrollbar hiding, scroll locking). Para ambientes com **Content Security Policy** estrita, use o `SemecProvider` com o nonce do servidor:
+Use `Controller` para ligar os valores do RHF aos controles. `Select` e `RadioGroup` recebem `value`/`onValueChange`; `Checkbox` recebe `checked`/`onCheckedChange`; `FileUpload` recebe `File[]` em `value`/`onValueChange`. Não espalhe `field` nesses controles: `onChange` não é o callback de valor deles.
 
 ```tsx
-import { SemecProvider } from "@semec/ds/react";
+"use client";
 
-function RootLayout({ nonce }) {
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@semec/ds/react/button";
+import { Checkbox } from "@semec/ds/react/checkbox";
+import { ErrorSummary } from "@semec/ds/react/error-summary";
+import { FileUpload } from "@semec/ds/react/file-upload";
+import { FormField } from "@semec/ds/react/form-field";
+import { Label } from "@semec/ds/react/label";
+import { RadioGroup, RadioGroupItem } from "@semec/ds/react/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@semec/ds/react/select";
+
+const schema = z.object({
+  city: z.string().min(1, "Escolha o município."),
+  shift: z.string().min(1, "Escolha o turno."),
+  accepted: z.boolean().refine(Boolean, "Confirme as informações."),
+  files: z.array(z.custom<File>()).min(1, "Anexe um documento."),
+});
+type FormValues = z.infer<typeof schema>;
+const initialValues: FormValues = { city: "", shift: "", accepted: false, files: [] };
+const fieldOrder = ["city", "shift", "accepted", "files"] as const;
+
+export function RequestForm() {
+  const [attempt, setAttempt] = useState(0);
+  const { control, handleSubmit, reset, clearErrors, formState: { errors } } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: initialValues,
+    shouldFocusError: false, // o ErrorSummary recebe o foco no envio inválido
+  });
+  const summary = fieldOrder.flatMap((id) => {
+    const message = errors[id]?.message;
+    return message ? [{ id, message }] : [];
+  });
+
+  function clearForm() {
+    reset(initialValues, { keepErrors: false });
+    setTimeout(() => clearErrors(), 0);
+  }
+
   return (
-    <html>
+    <form noValidate onSubmit={handleSubmit(
+      () => clearForm(), // no app, salve os dados e só limpe após sucesso
+      () => setAttempt((value) => value + 1),
+    )} className="grid gap-4">
+      <ErrorSummary errors={summary} focusKey={attempt} />
+      <Controller name="city" control={control} render={({ field }) => (
+        <FormField label="Município" htmlFor="city" error={errors.city?.message} required>
+          <Select name={field.name} value={field.value} onValueChange={field.onChange}>
+            <SelectTrigger id="city" ref={field.ref} onBlur={field.onBlur}>
+              <SelectValue placeholder="Selecione" />
+            </SelectTrigger>
+            <SelectContent><SelectItem value="porto-velho">Porto Velho</SelectItem></SelectContent>
+          </Select>
+        </FormField>
+      )} />
+      <Controller name="shift" control={control} render={({ field }) => (
+        <FormField label="Turno" htmlFor="shift" error={errors.shift?.message} required>
+          <RadioGroup id="shift" name={field.name} value={field.value}
+            onValueChange={field.onChange} onBlur={field.onBlur} ref={field.ref}>
+            <div className="flex min-h-11 items-center gap-2">
+              <RadioGroupItem id="shift-morning" value="morning" />
+              <Label htmlFor="shift-morning">Manhã</Label>
+            </div>
+            <div className="flex min-h-11 items-center gap-2">
+              <RadioGroupItem id="shift-afternoon" value="afternoon" />
+              <Label htmlFor="shift-afternoon">Tarde</Label>
+            </div>
+          </RadioGroup>
+        </FormField>
+      )} />
+      <Controller name="accepted" control={control} render={({ field }) => (
+        <FormField error={errors.accepted?.message}>
+          <div className="flex min-h-11 items-center gap-2">
+            <Checkbox id="accepted" name={field.name} checked={field.value}
+              onCheckedChange={(checked) => field.onChange(checked === true)}
+              onBlur={field.onBlur} ref={field.ref} />
+            <Label htmlFor="accepted">Confirmo as informações (obrigatório)</Label>
+          </div>
+        </FormField>
+      )} />
+      <Controller name="files" control={control} render={({ field }) => (
+        <FormField label="Documento" htmlFor="files" error={errors.files?.message} required>
+          <FileUpload id="files" name={field.name} value={field.value}
+            onValueChange={field.onChange} inputProps={{ onBlur: field.onBlur }} />
+        </FormField>
+      )} />
+      <Button type="submit">Enviar</Button>
+      <Button type="button" variant="outline" onClick={clearForm}>Limpar</Button>
+    </form>
+  );
+}
+```
+
+Os IDs do resumo são os controles: `city` fica no **SelectTrigger**, `shift` no **RadioGroup** (o resumo foca a opção dentro dele), `accepted` no Checkbox e `files` no input nativo do FileUpload. Cada RadioGroupItem tem um ID próprio para seu Label. As linhas de opção têm altura mínima de 44 px.
+
+**Depois de `reset()`:** o reset nativo pode disparar callbacks do Select/RadioGroup/Checkbox e fazer o RHF revalidar os valores vazios (INT-D-04). Defina `defaultValues`, passe os valores iniciais ao `reset` e chame `clearErrors()` no próximo ciclo, como acima; confira envio inválido → preenchimento → envio válido → formulário limpo no navegador. Esse contorno limpa as mensagens, não muda o schema nem torna valores vazios válidos. Arquivos também precisam de validação no servidor.
+
+## Segurança (CSP)
+
+### SSR e limites do nonce
+
+O nonce autoriza elementos `<script>`/`<style>` que carregam o mesmo valor da política. **Não autoriza atributos `style`**: no HTML gerado por SSR, eles são controlados por `style-src-attr` (ou por `style-src` quando aquela diretiva está ausente). Portanto, passar `nonce` ao `SemecProvider` não garante ausência de violações nem corrige atributos bloqueados antes da hidratação.
+
+Na integração de 19/10/2026, com o pacote anterior às correções CSP da 4.2.1:
+
+| Componente | Resultado com SSR e política estrita |
+|---|---|
+| Toast / Toaster | O atributo de `pointer-events` da região é bloqueado; o viewport pode interceptar cliques no cabeçalho (INT-B2-01) |
+| Checkbox | O estilo do input nativo auxiliar é bloqueado e ele aparece duplicado (INT-B2-02) |
+| Select | Atributos inline bloqueados e `<style>` do viewport sem nonce mesmo com provider (INT-B2-08); o CSS estático do kit esconde a scrollbar |
+| ScrollArea | Na prova anterior, um `<style>` sem nonce; o CSS estático do kit esconde a scrollbar |
+| Dialog, AlertDialog, Drawer, Sheet, DropdownMenu | O bloqueio de rolagem usa `<style>` dinâmico: passe o nonce pelo `SemecProvider` |
+| Popover | Zero violações na prova anterior, sem nonce; isso não é garantia para toda composição |
+
+As correções de Toast, Checkbox e propagação do nonce no Select são tratadas no kit. Valide a versão instalada em produção: carregue por SSR, clique num link sob a região de notificações, marque o Checkbox e abra o Select e o Dialog. Testar só SPA ou servidor de desenvolvimento não reproduz os bloqueios de atributos no HTML inicial. Não acrescente `'unsafe-inline'` para esconder esses achados; mantenha `style-src-attr 'none'` e verifique os componentes usados pelo seu app.
+
+### Next.js App Router (servidor por requisição)
+
+Gere um nonce aleatório novo por resposta. O [fluxo de CSP do Next](https://nextjs.org/docs/app/guides/content-security-policy) exige a política também no request interno para aplicar o nonce aos scripts do framework. Exemplo de produção:
+
+```ts
+// proxy.ts (ao lado de app/)
+import { randomBytes } from "node:crypto";
+import { NextResponse, type NextRequest } from "next/server";
+
+export function proxy(request: NextRequest) {
+  const nonce = randomBytes(16).toString("base64");
+  const policy = `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'nonce-${nonce}'; style-src-attr 'none'; font-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'`;
+  const headers = new Headers(request.headers);
+  headers.set("x-nonce", nonce);
+  headers.set("Content-Security-Policy", policy);
+  const response = NextResponse.next({ request: { headers } });
+  response.headers.set("Content-Security-Policy", policy);
+  response.headers.set("Cache-Control", "private, no-store");
+  return response;
+}
+
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+};
+```
+
+```tsx
+// app/layout.tsx
+import { headers } from "next/headers";
+import { SemecProvider } from "@semec/ds/react/semec-provider";
+import { Providers } from "./providers"; // arquivo do passo 4
+import "./globals.css";
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  return (
+    <html lang="pt-BR">
       <body>
         <SemecProvider nonce={nonce}>
-          <App />
+          <Providers>{children}</Providers>
         </SemecProvider>
       </body>
     </html>
@@ -326,11 +542,122 @@ function RootLayout({ nonce }) {
 }
 ```
 
-Medido na prova com política estrita (SEM-752/SEM-780):
+Não combine esse layout com `output: "export"`: `headers()` exige uma requisição. Não compartilhe HTML com nonce por cache/CDN. O modo de desenvolvimento do Next precisa de permissões adicionais para depuração; valide a política de produção com `next build` e `next start`.
 
-- **Popover** — 0 violações de política (sem nonce).
-- **ScrollArea, Select** — 1 violação cada, mesmo com nonce (continuam com scrollbar CSS estático no `tokens.css`).
-- **Dialog, AlertDialog, Drawer, Sheet, DropdownMenu** — scroll locking do body; use `SemecProvider` com nonce.
+### React Router v7: nonce ponta a ponta
+
+Exemplo de produção com SSR, Express e o contexto clássico `AppLoadContext` (sem `future.v8_middleware`). Instale `express@^5 @react-router/express@^7 @react-router/node@^7` com a mesma versão 7.x dos demais pacotes React Router. O nonce percorre `getLoadContext` → `loader` → `useRouteLoaderData` → provider; também chega ao renderizador e aos scripts, conforme a [documentação de segurança do React Router v7](https://reactrouter.com/7.18.4/how-to/security).
+
+```js
+// server.mjs — depois de npm run build, execute node server.mjs
+import { randomBytes } from "node:crypto";
+import express from "express";
+import { createRequestHandler } from "@react-router/express";
+import * as build from "./build/server/index.js";
+
+const app = express();
+app.use(express.static("build/client"));
+app.use((request, response, next) => {
+  const nonce = randomBytes(16).toString("base64");
+  response.locals.nonce = nonce;
+  response.setHeader("Content-Security-Policy",
+    `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'nonce-${nonce}'; style-src-attr 'none'; font-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'`);
+  response.setHeader("Cache-Control", "private, no-store");
+  next();
+});
+app.use(createRequestHandler({
+  build,
+  getLoadContext: (_request, response) => ({ nonce: response.locals.nonce }),
+}));
+app.listen(3000);
+```
+
+```tsx
+// app/root.tsx
+import {
+  Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteLoaderData,
+} from "react-router";
+import type { LoaderFunctionArgs } from "react-router";
+import { SemecProvider } from "@semec/ds/react/semec-provider";
+import { Providers } from "./providers"; // arquivo do passo 4
+import "./app.css";
+
+export function loader({ context }: LoaderFunctionArgs) {
+  return { nonce: typeof context.nonce === "string" ? context.nonce : undefined };
+}
+
+// Este loader contém só o nonce do documento; preserve-o nas navegações.
+export function shouldRevalidate() { return false; }
+
+export function Layout({ children }: { children: React.ReactNode }) {
+  const nonce = useRouteLoaderData<typeof loader>("root")?.nonce;
+  return (
+    <html lang="pt-BR">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <SemecProvider nonce={nonce}>{children}</SemecProvider>
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
+      </body>
+    </html>
+  );
+}
+
+export default function App() {
+  return <Providers><Outlet /></Providers>;
+}
+```
+
+No `app/entry.server.tsx`, use o mesmo `loadContext.nonce` também em `ServerRouter` e nas opções de streaming. Este entry completo espera todo o conteúdo antes de responder, para simplificar o exemplo:
+
+```tsx
+// app/entry.server.tsx
+import { PassThrough } from "node:stream";
+import { renderToPipeableStream } from "react-dom/server";
+import { createReadableStreamFromReadable } from "@react-router/node";
+import { ServerRouter, type AppLoadContext, type EntryContext } from "react-router";
+
+export default function handleRequest(
+  request: Request,
+  status: number,
+  headers: Headers,
+  routerContext: EntryContext,
+  loadContext: AppLoadContext,
+): Promise<Response> {
+  const nonce = typeof loadContext.nonce === "string" ? loadContext.nonce : undefined;
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => abort(), 10_000);
+    const { pipe, abort } = renderToPipeableStream(
+      <ServerRouter context={routerContext} url={request.url} nonce={nonce} />,
+      {
+        nonce,
+        onAllReady() {
+          clearTimeout(timeout);
+          const body = new PassThrough();
+          headers.set("Content-Type", "text/html; charset=utf-8");
+          resolve(new Response(createReadableStreamFromReadable(body), { status, headers }));
+          pipe(body);
+        },
+        onShellError(error) {
+          clearTimeout(timeout);
+          reject(error);
+        },
+        onError(error) {
+          status = 500;
+          console.error(error);
+        },
+      },
+    );
+  });
+}
+```
+
+Mantenha o nonce do documento durante as navegações no cliente: não revalide o loader do root só para obter outro nonce; a CSP em vigor é a da resposta HTML. Teste também navegação e revalidação se o root carregar outros dados. O fluxo acima demonstra o transporte do nonce; os limites de `style-src-attr` da tabela continuam valendo.
 
 ## Acessibilidade
 
@@ -379,6 +706,8 @@ Com `axe-core` direto (ou `jest-axe`/`vitest-axe`), o equivalente é passar `{ r
 
 ## Dependências
 
+O pacote é **somente ESM**. Para TypeScript, use `moduleResolution: "bundler"` com `module: "ESNext"`, ou os pares `moduleResolution: "nodenext"` / `module: "NodeNext"` e `moduleResolution: "node16"` / `module: "Node16"`, com `"type": "module"` no `package.json` do consumidor. A resolução antiga `node`/`node10` não resolve os subpaths; `node16` em projeto CommonJS produz TS1479. Não há build CJS publicado.
+
 - **Peers obrigatórios**: `react` ^19, `react-dom` ^19, `tailwindcss` ^4 e `lucide-react` `>=0.468.0 <2`. O npm 7+ instala peer ausente sozinho; o pnpm só com `auto-install-peers=true`; o Yarn (clássico e Berry) nunca. Por isso o passo 1 instala `lucide-react` explicitamente
 - **Peer opcional**: `zod` `^3.23.0 || ^4.0.0` (testado com o 3 e o 4) — só se usar `@semec/ds/react/validacao`
 - **Plugin do Tailwind** (do seu build, não do kit): `@tailwindcss/vite` no Vite; `@tailwindcss/postcss` ou `@tailwindcss/turbopack` no Next. O `@source` aponta para `node_modules/@semec/ds/dist/react`, com caminho relativo ao CSS
@@ -392,6 +721,8 @@ Com `axe-core` direto (ou `jest-axe`/`vitest-axe`), o equivalente é passar `{ r
 ## Migração para a 4.0 e depreciações
 
 **Guia: [docs/migracao-4.0.md](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/migracao-4.0.md)**, com antes/depois, tabela primitivo → semântico e o codemod:
+
+Quem vem da 3.0 ou 3.1 deve começar por [Vindo direto da 3.0 ou da 3.1](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/docs/migracao-4.0.md#vindo-direto-da-30-ou-da-31). O destino é o arquivo versionado em `docs/migracao-4.0.md`, disponível em `main` após o merge desta entrega.
 
 ```bash
 # funciona com a 3.x ainda instalada (o -p traz a 4.0 e o TypeScript 5 só para o comando)
