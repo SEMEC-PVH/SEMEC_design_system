@@ -6,16 +6,32 @@
 
    L0 — PRIMITIVOS (`--pv-*`)
         Valores brutos. Invariantes de tema. Nunca use primitivo direto
-        em componente.
+        em componente nem em tela: nem a variável `--pv-*`, nem utilitário.
+        Desde a 4.0 (AUD-55) o @theme não expõe primitivo: os utilitários
+        `bg-pv-*`, `text-pv-*`, `border-pv-*` deixaram de existir. As
+        variáveis `--pv-*` continuam aqui no :root, como base dos L1.
+        Tabela primitivo → semântico: docs/migracao-4.0.md.
 
    L1 — SEMÂNTICOS (`--bg`, `--fg`, `--surface`, `--border`, `--focus-ring`,
         `--feedback-*`, `--space-*`, `--text-*`, `--radius-*`, `--elevation-*`)
         Camada do dia a dia. Diz o papel, não a cor.
+        `--pv-radius-*`, `--pv-text-*`, `--pv-leading-*` e `--pv-duration-*`
+        são L1 com nome próprio: guardam o valor que o @theme expõe, sem
+        autorreferência (AUD-57). Os nomes públicos `--radius-*`,
+        `--text-*` e `--leading-*` continuam no :root, como apelidos.
 
    Uso no globals.css do site novo:
      @import "tailwindcss";
+     @import "@semec/ds/react/fonts.css";   (Poppins 400–700 auto-hospedada)
      @import "@semec/ds/react/tokens.css";
      @source "../node_modules/@semec/ds/dist/react";
+
+   Dialeto de utilitários (AUD-27/28/30):
+     espaçamento  p-space-4, gap-space-2, mt-space-12   (escala --space-*)
+     tipografia   text-xs … text-3xl, text-display       (tamanho + entrelinha)
+                  font-regular|medium|semibold|bold        (400–700; não há 800/900)
+     cor de texto text-text-muted, text-text-secondary, text-text-strong
+                  (NÃO use text-muted / text-secondary: ver aviso em L1 · Cor)
    ========================================================================= */
 
 /* =========================================================================
@@ -90,9 +106,14 @@
 
   /* ---- Verde — feedback ------------------------------------------------ */
   --pv-green-50:  #eef7e6;
+  --pv-green-500: #82C353;
   --pv-green-800: #3a6420;
 
+  /* ---- Azul institucional escuro --------------------------------------- */
+  --pv-blue-900:  #26325B;
+
   /* ---- Amarelo — feedback ---------------------------------------------- */
+  --pv-yellow-50:  #fdf6e3;
   --pv-yellow-800: #8a5a00;
 
   /* ---- Vermelho — feedback --------------------------------------------- */
@@ -103,10 +124,14 @@
   --pv-gray-50:  #f4f6f9;
   --pv-gray-100: #f5f5f5;
   --pv-gray-200: #e5e7eb;
+  --pv-gray-300: #d1d5db;
   --pv-gray-400: #78849a;
   --pv-gray-600: #4b5563;
   --pv-gray-700: #374151;
   --pv-gray-900: #14233a;
+  /* Canais RGB de --pv-gray-900 (#14233a = 20 35 58), para sombra com
+     alfa sem color-mix (ver Elevação). Mude junto com --pv-gray-900. */
+  --pv-gray-900-rgb: 20 35 58;
 
   --pv-white: #ffffff;
   --pv-black: #000000;
@@ -119,14 +144,45 @@
   --fg:                var(--pv-gray-900);
   --surface:           var(--pv-white);
   --surface-alt:       var(--pv-gray-100);
+  /* Superfície rebaixada (AUD-53): placeholder de Skeleton, trilha de
+     Progress/Slider. 1,47:1 sobre --surface e 1,36:1 sobre --bg —
+     perceptível, ao contrário de --surface-alt (1,09:1). Preenchimento
+     --action-primary sobre ela: 3,68:1 (WCAG 1.4.11). Para delimitar a
+     extensão da trilha, contorne com --border-strong (3,77:1 sobre
+     --surface). Texto --text-muted sobre ela: 5,13:1. */
+  --surface-sunken:    var(--pv-gray-300);
   --border:            var(--pv-gray-200);
   --border-strong:     var(--pv-gray-400);
   --focus-ring:        var(--pv-blue-hero);
+  /* Anel de foco sobre superfícies de marca (AUD-60). --focus-ring é a
+     própria cor de marca (1,00:1 sobre --brand-hero); o inverso dá 9,38:1
+     sobre --brand-hero. Aplicado automaticamente dentro de
+     [data-surface="brand"] e .bg-brand-hero (ver @layer base). */
+  --focus-ring-inverse: var(--pv-white);
+
+  /* ATENÇÃO (AUD-30): estes três NÃO viram `text-muted`/`text-secondary`.
+     No Tailwind, `text-muted` lê --color-muted e `text-secondary` lê
+     --color-secondary, que são cores de FUNDO (--surface-alt): 1,09:1,
+     texto invisível. `bg-muted`/`bg-secondary` continuam valendo.
+       --text-muted      → text-text-muted  (ou text-muted-foreground)  7,56:1
+       --text-secondary  → text-text-secondary                          10,31:1
+       --text-strong     → text-text-strong (ou text-foreground)        15,77:1
+     (contrastes sobre --surface; sobre --bg: 6,98 / 9,52 / 14,57:1) */
   --text-muted:        var(--pv-gray-600);
   --text-secondary:    var(--pv-gray-700);
   --text-strong:       var(--pv-gray-900);
   --text-on-brand:     var(--pv-white);
   --tint:              var(--pv-blue-50);
+
+  /* Título de seção em azul institucional escuro (SectionHeader). Criado
+     na 4.0 (AUD-55) para substituir `text-pv-blue-900`. 12,43:1 sobre
+     --surface e 11,48:1 sobre --bg.
+     Atenção: é COR, mas divide o prefixo --text-* com os TAMANHOS
+     (--text-xs … --text-display). Por isso fica só aqui no :root, como
+     --text-muted/--text-strong, e o @theme o expõe como --color-text-brand
+     (utilitário text-text-brand). Nunca declare --text-brand no @theme:
+     viraria o utilitário de tamanho text-brand. */
+  --text-brand:        var(--pv-blue-900);
 
   /* ---- Marca ----------------------------------------------------------- */
   --brand-hero:        var(--pv-blue-hero);
@@ -143,28 +199,67 @@
   --feedback-info:    var(--pv-blue-600);
 
   --feedback-success-surface: var(--pv-green-50);
-  --feedback-warning-surface: #fdf6e3;
+  --feedback-warning-surface: var(--pv-yellow-50);
   --feedback-danger-surface:  var(--pv-red-50);
   --feedback-info-surface:    var(--pv-blue-50);
+
+  /* Sucesso em destaque: fundo verde cheio do Toast `success` com texto
+     azul institucional escuro (5,85:1). Criados na 4.0 (AUD-55) para
+     substituir `bg-pv-green-500` / `text-pv-blue-900`. Não use o verde
+     cheio como cor de texto (2,13:1 sobre --surface). */
+  --feedback-success-emphasis:    var(--pv-green-500);
+  --text-on-success-emphasis:     var(--pv-blue-900);
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Tipografia
      ======================================================================= */
+  /* Poppins vem de `@semec/ds/react/fonts.css` (400–700, AUD-26). Sem ele,
+     o navegador cai no system-ui. Não existem 800/900 no sistema. */
   --font-family-sans: "Poppins", system-ui, -apple-system, sans-serif;
 
-  --text-xs:   0.75rem;
-  --text-sm:   0.875rem;
-  --text-base: 1rem;
-  --text-lg:   1.125rem;
-  --text-xl:   1.25rem;
-  --text-2xl:  1.5rem;
+  /* Escala (especificação-alvo): oito degraus, nada abaixo de 12px.
+     Papel: display = título da página inicial · 3xl = título de página (h1)
+     · 2xl = seção (h2) · xl = subtítulo · lg = destaque de corpo
+     · base = corpo (padrão) · sm = apoio/tabela densa · xs = rótulo/legenda */
+  /* Valor em --pv-text-* / --pv-leading-*; --text-* e --leading-* são os
+     nomes públicos (var(--text-sm), text-sm, leading-sm) e apontam para
+     eles, sem `--text-xs: var(--text-xs)` no @theme (AUD-57, mesmo caso
+     do raio). */
+  --pv-text-xs:      0.75rem;  /* 12px */
+  --pv-text-sm:      0.875rem; /* 14px */
+  --pv-text-base:    1rem;     /* 16px */
+  --pv-text-lg:      1.125rem; /* 18px */
+  --pv-text-xl:      1.25rem;  /* 20px */
+  --pv-text-2xl:     1.5rem;   /* 24px */
+  --pv-text-3xl:     2rem;     /* 32px (o default do Tailwind é 30px) */
+  --pv-text-display: 2.5rem;   /* 40px */
 
-  --leading-xs:   1.4;
-  --leading-sm:   1.5;
-  --leading-base: 1.5;
-  --leading-lg:   1.4;
-  --leading-xl:   1.3;
-  --leading-2xl:  1.25;
+  --pv-leading-xs:      1.4;
+  --pv-leading-sm:      1.5;
+  --pv-leading-base:    1.5;
+  --pv-leading-lg:      1.4;
+  --pv-leading-xl:      1.3;
+  --pv-leading-2xl:     1.25;
+  --pv-leading-3xl:     1.2;
+  --pv-leading-display: 1.1;
+
+  --text-xs:      var(--pv-text-xs);
+  --text-sm:      var(--pv-text-sm);
+  --text-base:    var(--pv-text-base);
+  --text-lg:      var(--pv-text-lg);
+  --text-xl:      var(--pv-text-xl);
+  --text-2xl:     var(--pv-text-2xl);
+  --text-3xl:     var(--pv-text-3xl);
+  --text-display: var(--pv-text-display);
+
+  --leading-xs:      var(--pv-leading-xs);
+  --leading-sm:      var(--pv-leading-sm);
+  --leading-base:    var(--pv-leading-base);
+  --leading-lg:      var(--pv-leading-lg);
+  --leading-xl:      var(--pv-leading-xl);
+  --leading-2xl:     var(--pv-leading-2xl);
+  --leading-3xl:     var(--pv-leading-3xl);
+  --leading-display: var(--pv-leading-display);
 
   --font-regular:  400;
   --font-medium:   500;
@@ -173,6 +268,9 @@
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Espaçamento
+     Utilitário: p-space-4, gap-space-2, mx-space-6… (AUD-27). Os números
+     p-1…p-16 do Tailwind dão o mesmo valor nos degraus da escala (4px × N),
+     mas só os nove degraus abaixo fazem parte do sistema (p-5, py-1.5 não).
      ======================================================================= */
   --space-0:  0;
   --space-1:  4px;
@@ -186,19 +284,37 @@
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Forma
+     Escala decidida em 15/10/2026 (AUD-57): sm 2px · md 8px · lg 12px ·
+     full. Papel: controle rounded-md, cartão rounded-lg, pílula
+     rounded-full. O valor mora em --pv-radius-*; --radius-* é o nome
+     público (var(--radius-md), rounded-md) e aponta para ele. Assim o
+     @theme não declara `--radius-sm: var(--radius-sm)`, que vira ciclo
+     (valor inválido) se este arquivo for importado dentro de @layer.
+     rounded-xs, rounded-xl, rounded-2xl… são o padrão do Tailwind, fora
+     da escala (rounded-xl = 12px, igual a rounded-lg): não use.
      ======================================================================= */
-  --radius-sm:   2px;
-  --radius-md:   8px;
-  --radius-lg:   12px;
-  --radius-full: 9999px;
+  --pv-radius-sm:   2px;
+  --pv-radius-md:   8px;
+  --pv-radius-lg:   12px;
+  --pv-radius-full: 9999px;
+
+  --radius-sm:   var(--pv-radius-sm);
+  --radius-md:   var(--pv-radius-md);
+  --radius-lg:   var(--pv-radius-lg);
+  --radius-full: var(--pv-radius-full);
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Elevação
-     ======================================================================= */
+     A sombra usa o azul-escuro do sistema (--pv-gray-900), nunca preto
+     puro, com alfa 8% / 10% / 14% (AUD-56). Escrita como rgb() com canais
+     do primitivo, sem hex e sem rgba() à mão: resulta exatamente em
+     rgba(20, 35, 58, .08 / .10 / .14). Não use color-mix aqui: o
+     Tailwind gera para ele um fallback sólido (sombra azul-marinho opaca)
+     em navegador sem color-mix, como Chrome < 111 em PCs antigos. */
   --elevation-0: none;
-  --elevation-1: 0 1px 2px rgba(20, 35, 58, .08);
-  --elevation-2: 0 4px 12px rgba(20, 35, 58, .10);
-  --elevation-3: 0 12px 32px rgba(20, 35, 58, .14);
+  --elevation-1: 0 1px 2px rgb(var(--pv-gray-900-rgb) / 0.08);
+  --elevation-2: 0 4px 12px rgb(var(--pv-gray-900-rgb) / 0.1);
+  --elevation-3: 0 12px 32px rgb(var(--pv-gray-900-rgb) / 0.14);
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Movimento
@@ -218,31 +334,8 @@
    valores: as utilities leem as custom properties acima em runtime.
    ========================================================================== */
 @theme inline {
-  /* -- Primitivos (uso direto: bg-pv-blue-600, text-pv-gray-900, etc.) -- */
-  --color-pv-blue-50:   var(--pv-blue-50);
-  --color-pv-blue-600:  var(--pv-blue-600);
-  --color-pv-blue-700:  var(--pv-blue-700);
-  --color-pv-blue-800:  var(--pv-blue-800);
-  --color-pv-blue-hero: var(--pv-blue-hero);
-
-  --color-pv-green-50:  var(--pv-green-50);
-  --color-pv-green-800: var(--pv-green-800);
-
-  --color-pv-yellow-800: var(--pv-yellow-800);
-
-  --color-pv-red-50:  var(--pv-red-50);
-  --color-pv-red-700: var(--pv-red-700);
-
-  --color-pv-gray-50:  var(--pv-gray-50);
-  --color-pv-gray-100: var(--pv-gray-100);
-  --color-pv-gray-200: var(--pv-gray-200);
-  --color-pv-gray-400: var(--pv-gray-400);
-  --color-pv-gray-600: var(--pv-gray-600);
-  --color-pv-gray-700: var(--pv-gray-700);
-  --color-pv-gray-900: var(--pv-gray-900);
-
-  --color-pv-white: var(--pv-white);
-  --color-pv-black: var(--pv-black);
+  /* -- Primitivos: nenhum. Desde a 4.0 (AUD-55) o @theme só expõe
+     semânticos; não há bg-pv-*, text-pv-*, border-pv-*. -- */
 
   /* -- Semânticos (uso shadcn: bg-card, text-muted-foreground, etc.) -- */
   --color-background:           var(--bg);
@@ -253,6 +346,7 @@
   --color-popover-foreground:   var(--fg);
   --color-surface:              var(--surface);
   --color-surface-alt:          var(--surface-alt);
+  --color-surface-sunken:       var(--surface-sunken);
   --color-secondary:            var(--surface-alt);
   --color-secondary-foreground: var(--fg);
   --color-accent:               var(--surface-alt);
@@ -263,6 +357,7 @@
   --color-border-strong:        var(--border-strong);
   --color-input:                var(--border-strong);
   --color-ring:                 var(--focus-ring);
+  --color-ring-inverse:         var(--focus-ring-inverse);
   --color-brand-hero:           var(--brand-hero);
   --color-primary:              var(--action-primary);
   --color-primary-foreground:   var(--text-on-brand);
@@ -270,12 +365,22 @@
   --color-destructive-foreground: var(--text-on-brand);
   --color-tint:                 var(--tint);
 
+  /* Cor de texto (AUD-30): text-text-muted, text-text-secondary…
+     `text-muted`/`text-secondary` são cor de fundo — não use para texto. */
+  --color-text-muted:           var(--text-muted);
+  --color-text-secondary:       var(--text-secondary);
+  --color-text-strong:          var(--text-strong);
+  --color-text-on-brand:        var(--text-on-brand);
+  --color-text-brand:           var(--text-brand);
+
   --color-destructive-surface: var(--feedback-danger-surface);
   --color-primary-hover:      var(--action-primary-hover);
   --color-primary-active:     var(--action-primary-active);
 
   --color-success:            var(--feedback-success);
   --color-success-surface:    var(--feedback-success-surface);
+  --color-success-emphasis:   var(--feedback-success-emphasis);
+  --color-success-emphasis-foreground: var(--text-on-success-emphasis);
   --color-warning:            var(--feedback-warning);
   --color-warning-surface:    var(--feedback-warning-surface);
   --color-info:               var(--feedback-info);
@@ -285,14 +390,59 @@
   --color-sidebar-foreground:  var(--fg);
   --color-sidebar-ring:        var(--focus-ring);
 
-  /* -- Tipografia -- */
+  /* -- Tipografia (AUD-28) -- */
   --font-sans: var(--font-family-sans);
 
-  /* -- Forma -- */
-  --radius-sm:   var(--radius-sm);
-  --radius-md:   var(--radius-md);
-  --radius-lg:   var(--radius-lg);
-  --radius-full: var(--radius-full);
+  /* text-* aplica tamanho + entrelinha do degrau (leading-* sobrescreve). */
+  --text-xs:                    var(--pv-text-xs);
+  --text-xs--line-height:       var(--pv-leading-xs);
+  --text-sm:                    var(--pv-text-sm);
+  --text-sm--line-height:       var(--pv-leading-sm);
+  --text-base:                  var(--pv-text-base);
+  --text-base--line-height:     var(--pv-leading-base);
+  --text-lg:                    var(--pv-text-lg);
+  --text-lg--line-height:       var(--pv-leading-lg);
+  --text-xl:                    var(--pv-text-xl);
+  --text-xl--line-height:       var(--pv-leading-xl);
+  --text-2xl:                   var(--pv-text-2xl);
+  --text-2xl--line-height:      var(--pv-leading-2xl);
+  --text-3xl:                   var(--pv-text-3xl);
+  --text-3xl--line-height:      var(--pv-leading-3xl);
+  --text-display:               var(--pv-text-display);
+  --text-display--line-height:  var(--pv-leading-display);
+
+  /* leading-xs … leading-display (as nomeadas do Tailwind seguem valendo). */
+  --leading-xs:      var(--pv-leading-xs);
+  --leading-sm:      var(--pv-leading-sm);
+  --leading-base:    var(--pv-leading-base);
+  --leading-lg:      var(--pv-leading-lg);
+  --leading-xl:      var(--pv-leading-xl);
+  --leading-2xl:     var(--pv-leading-2xl);
+  --leading-3xl:     var(--pv-leading-3xl);
+  --leading-display: var(--pv-leading-display);
+
+  /* font-regular (400) + font-medium/semibold/bold do Tailwind, nos tokens. */
+  --font-weight-regular:  var(--font-regular);
+  --font-weight-medium:   var(--font-medium);
+  --font-weight-semibold: var(--font-semibold);
+  --font-weight-bold:     var(--font-bold);
+
+  /* -- Espaçamento (AUD-27): p-space-4, gap-space-2, my-space-12… -- */
+  --spacing-space-0:  var(--space-0);
+  --spacing-space-1:  var(--space-1);
+  --spacing-space-2:  var(--space-2);
+  --spacing-space-3:  var(--space-3);
+  --spacing-space-4:  var(--space-4);
+  --spacing-space-6:  var(--space-6);
+  --spacing-space-8:  var(--space-8);
+  --spacing-space-12: var(--space-12);
+  --spacing-space-16: var(--space-16);
+
+  /* -- Forma (AUD-57): aponta para --pv-radius-*, nunca para si mesmo -- */
+  --radius-sm:   var(--pv-radius-sm);
+  --radius-md:   var(--pv-radius-md);
+  --radius-lg:   var(--pv-radius-lg);
+  --radius-full: var(--pv-radius-full);
 
   /* -- Elevação -- */
   --shadow-elevation-1: var(--elevation-1);
@@ -490,14 +640,40 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Links (AUD-25): o reset fica em @layer base, então a classe `underline`
+     (camada utilities, usada pelo componente Link) sempre vence. Link solto
+     no texto, sem classe nenhuma, ganha sublinhado (WCAG 1.4.1). */
   a {
     color: inherit;
     text-decoration: none;
   }
 
+  a:not([class]) {
+    text-decoration-line: underline;
+    text-underline-offset: 0.2em;
+  }
+
   :focus-visible {
     outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
+  }
+
+  /* Superfícies de marca (AUD-60): dentro delas o anel de foco passa a
+     --focus-ring-inverse (branco, 9,38:1 sobre --brand-hero). Vale para o
+     outline global e para ring-ring/ring-sidebar-ring dos componentes.
+     Marque a área com data-surface="brand" (ou use bg-brand-hero).
+     Uma superfície clara aninhada volta ao anel padrão com
+     data-surface="default". */
+  [data-surface="brand"],
+  .bg-brand-hero {
+    --focus-ring: var(--focus-ring-inverse);
+  }
+
+  /* O próprio elemento bg-brand-hero focado desenha o anel por fora, sobre
+     o fundo da página: mantém o anel padrão (9,38:1 sobre --surface). */
+  .bg-brand-hero:focus-visible,
+  [data-surface="default"] {
+    --focus-ring: var(--pv-blue-hero);
   }
 }
 

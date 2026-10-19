@@ -1,8 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
-import PreviewFrame from "@/components/docs/PreviewFrame";
-import CodeBlock from "@/components/docs/CodeBlock";
+import PatternDemo from "@/components/docs/PatternDemo";
 import { TableAdvanced } from "@/components/demos/examples/table-advanced";
-import { tableAdvancedUsage } from "@/components/demos/examples/table-advanced-data";
 
 export const metadata = { title: "Tabelas" };
 
@@ -42,14 +40,9 @@ export default function TabelasPage() {
         ]}
         note="Tabelas são para comparar e localizar; combine com ordenação e filtros para escalar."
       />
-      <h2>Exemplo interativo — Tabela avançada [KIT SEM-504]</h2>
-      <p>Ordenação, filtros (busca + status), paginação, seleção em lote, export CSV, EmptyState e Skeleton. Copie snippet.</p>
-      <PreviewFrame>
-        <div style={{ padding: "1rem" }}>
-          <TableAdvanced />
-        </div>
-      </PreviewFrame>
-      <CodeBlock code={tableAdvancedUsage} filename="TableAdvanced.jsx" prompt="Crie Tabela avançada com ordenação, filtros, paginação, seleção, EmptyState e Skeleton usando semec-ds-react" />
+      <PatternDemo id="dados/tabelas">
+        <TableAdvanced />
+      </PatternDemo>
     </>
   );
 }

@@ -4,37 +4,43 @@ code: "radio-group"
 slug: "botao-de-opcao"
 file: "src/components/radio-group.tsx"
 category: "formularios"
-variants: "composição: RadioGroup · RadioGroupItem + Label"
+variants: "composição: RadioGroup · RadioGroupItem + Label · contrato: value · defaultValue · onValueChange · name · id · invalid · disabled · required"
 ---
 
 # Botão de opção — `radio-group`
 
-> Escolha única entre duas ou mais opções.
+> Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`.
 
-**Arquivo:** `src/components/radio-group.tsx` | **Categoria:** Formulários | **Rota:** `/componentes/botao-de-opcao`
+**Arquivo:** `src/components/radio-group.tsx` | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/botao-de-opcao/
 
 ## Variantes
 
 - **composição**: RadioGroup · RadioGroupItem + Label
+- **contrato**: value · defaultValue · onValueChange · name · id · invalid · disabled · required
 
 ## Instalação (@semec/ds)
 
 ```bash
-npm install @semec/ds
+npm install @semec/ds lucide-react
 ```
+
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
 ## Uso
 
 ```tsx
 import { RadioGroup, RadioGroupItem, Label } from "@semec/ds/react";
 
-<RadioGroup defaultValue="pessoa-fisica">
+<RadioGroup name="tipoPessoa" defaultValue="pessoa-fisica" onValueChange={setTipoPessoa}>
   <div className="flex items-center gap-2">
     <RadioGroupItem value="pessoa-fisica" id="pf" />
     <Label htmlFor="pf">Pessoa física</Label>
@@ -45,26 +51,39 @@ import { RadioGroup, RadioGroupItem, Label } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Crie um radio-group (Botão de opção) usando @semec/ds/react (`src/components/radio-group.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: RadioGroup · RadioGroupItem + Label. Escolha única entre duas ou mais opções.
+Use o componente `RadioGroup` (Botão de opção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`. API e variantes: composição: RadioGroup · RadioGroupItem + Label · contrato: value · defaultValue · onValueChange · name · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Circle } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import { useFormFieldControl } from "./form-field";
 
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
->(({ className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root> & {
+  /** Contrato de formulário (ADR-015): `true` vira `aria-invalid="true"` e o estilo de erro. */
+  invalid?: boolean;
+  }
+>(({ className, invalid, ...props }, ref) => {
+  // Dentro de um FormField: o grupo (div) não é rotulável por <label for>,
+  // então recebe aria-labelledby do rótulo, além de describedby/invalid/required.
+  const field = useFormFieldControl(
+    { ...props, invalid },
+    { labelable: false, supportsRequired: true }
+  );
   return (
     <RadioGroupPrimitive.Root
-      className={cn("grid gap-2", className)}
+      className={cn("group/radio-group grid gap-2", className)}
       {...props}
+      {...field}
       ref={ref}
     />
   );
@@ -75,17 +94,19 @@ const RadioGroupItem = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
 >(({ className, ...props }, ref) => {
+  // O `aria-invalid` fica no grupo (radiogroup), não no item: o estilo de erro
+  // vem do grupo nomeado `group/radio-group`, como no Checkbox inválido.
   return (
     <RadioGroupPrimitive.Item
       ref={ref}
       className={cn(
-        "aspect-square h-5 w-5 rounded-full border border-input text-primary shadow-sm transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive",
+        "aspect-square h-5 w-5 rounded-full border border-input bg-surface text-primary shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive group-aria-[invalid=true]/radio-group:border-destructive",
         className
       )}
       {...props}
     >
       <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-        <Circle className="h-3 w-3 fill-current" />
+        <Circle className="h-3 w-3 fill-current" aria-hidden="true" />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   );

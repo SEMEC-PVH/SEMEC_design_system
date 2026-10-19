@@ -73,6 +73,7 @@
   --pv-green-800: #3a6420;  /* texto, e fundo com texto branco (WCAG AA) */
 
   /* ---- Amarelo — escala de destaque ------------------------------------ */
+  --pv-yellow-50:  #fdf6e3;  /* superfície de alerta (igual ao pacote, AUD-56) */
   --pv-yellow-400: #f6d56e;
   --pv-yellow-500: #f2c94c;
   --pv-yellow-600: #d9ad2e;
@@ -108,10 +109,29 @@
   --pv-gray-700: #374151;
   --pv-gray-800: #1f2937;
   --pv-gray-900: #14233a;  /* texto principal em uso no portal */
+  /* Canais RGB de --pv-gray-900 e --pv-black, para sombra com alfa sem
+     hex nem rgba() (AUD-56; mesmo padrão do pacote). Mude junto. */
+  --pv-gray-900-rgb: 20 35 58;
+  --pv-black-rgb:    0 0 0;
   --pv-gray-950: #0b1220;
 
   --pv-white: #ffffff;
   --pv-black: #000000;
+
+  /* ---- Escala gray (Tailwind) -------------------------------------------
+     O site referencia --color-gray-* no .proto-codeblock, mas a variável só
+     existia quando proto.css (tema Tailwind) era carregado — o que acontece
+     só nas páginas /componentes/*. Em /padroes e /fundamentos as regras base
+     ficavam sem background no tema escuro (só as regras [data-theme="light"]
+     tinham fallback). Valores idênticos ao @theme de app/proto/proto.css. */
+  --color-gray-50:  #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Cor (tema claro)
@@ -156,7 +176,7 @@
 
   /* Fundos suaves, para faixa de alerta e realce de linha */
   --color-feedback-success-surface: var(--pv-green-50);
-  --color-feedback-warning-surface: #fdf6e3;
+  --color-feedback-warning-surface: var(--pv-yellow-50);
   --color-feedback-danger-surface:  var(--pv-red-50);
   --color-feedback-info-surface:    var(--pv-blue-50);
 
@@ -197,7 +217,10 @@
   /* =======================================================================
      L1 — SEMÂNTICOS · Forma (estilo Luma — arrojado, macio)
      ======================================================================= */
-  --radius-sm:   12px;
+  /* sm alinhado ao pacote (2px, AUD-57). O 12px anterior era resto do
+     estilo Luma e nenhuma regra do site lia --radius-sm. --radius-xl é só
+     do site. */
+  --radius-sm:   2px;
   --radius-md:   8px;
   --radius-lg:   12px;
   --radius-xl:   16px;
@@ -208,9 +231,9 @@
      A sombra usa o azul-escuro do sistema, nunca preto puro, nunca cor.
      ======================================================================= */
   --elevation-0: none;
-  --elevation-1: 0 1px 2px rgba(20, 35, 58, .08);
-  --elevation-2: 0 4px 12px rgba(20, 35, 58, .10);
-  --elevation-3: 0 12px 32px rgba(20, 35, 58, .14);
+  --elevation-1: 0 1px 2px rgb(var(--pv-gray-900-rgb) / 0.08);
+  --elevation-2: 0 4px 12px rgb(var(--pv-gray-900-rgb) / 0.1);
+  --elevation-3: 0 12px 32px rgb(var(--pv-gray-900-rgb) / 0.14);
 
   /* =======================================================================
      L1 — SEMÂNTICOS · Movimento
@@ -285,7 +308,10 @@
   --color-text-primary:   #e2e8f0;
   --color-text-secondary: #cbd5e1;
   --color-text-muted:     #9ca3af;
-  --color-text-on-brand:  var(--pv-white);
+  /* No escuro as superfícies de marca ficam claras (action-primary, feedback),
+     então o texto sobre elas precisa ser escuro — senão os botões sólidos
+     reprovam: #fff sobre #7a9dc4 dá 2,82:1 e sobre #f87171, 2,77:1. */
+  --color-text-on-brand:  var(--pv-gray-950);
 
   --color-border-default: #2a2a2a;
   --color-border-strong:  #3f4756;
@@ -311,9 +337,9 @@
   --color-feedback-info-surface:    #14203a;
 
   /* A sombra precisa de mais peso para existir sobre fundo escuro */
-  --elevation-1: 0 1px 2px rgba(0, 0, 0, .40);
-  --elevation-2: 0 4px 12px rgba(0, 0, 0, .48);
-  --elevation-3: 0 12px 32px rgba(0, 0, 0, .56);
+  --elevation-1: 0 1px 2px rgb(var(--pv-black-rgb) / 0.4);
+  --elevation-2: 0 4px 12px rgb(var(--pv-black-rgb) / 0.48);
+  --elevation-3: 0 12px 32px rgb(var(--pv-black-rgb) / 0.56);
 }
 
 

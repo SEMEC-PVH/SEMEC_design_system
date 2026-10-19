@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronRight, Circle } from "lucide-react";
@@ -16,23 +18,44 @@ const DropdownMenuSub = DropdownMenuPrimitive.Sub;
 
 const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 
+export interface DropdownMenuSubTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> {
+  inset?: boolean;
+}
+
+export interface DropdownMenuContentProps
+  extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content> {
+  /** Container do Portal (ex.: body do iframe de preview). Padrão: body do site. */
+  portalContainer?: HTMLElement | null;
+}
+
+export interface DropdownMenuItemProps
+  extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> {
+  inset?: boolean;
+}
+
+export interface DropdownMenuLabelProps
+  extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label> {
+  inset?: boolean;
+}
+
+export type DropdownMenuShortcutProps = React.HTMLAttributes<HTMLSpanElement>;
+
 const DropdownMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
-    inset?: boolean;
-  }
+  DropdownMenuSubTriggerProps
 >(({ className, inset, children, ...props }, ref) => (
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent",
+      "flex min-h-11 cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-tint focus:ring-2 focus:ring-inset focus:ring-ring data-[state=open]:bg-accent",
       inset && "pl-8",
       className
     )}
     {...props}
   >
     {children}
-    <ChevronRight className="ml-auto h-4 w-4" />
+    <ChevronRight className="ml-auto h-4 w-4" aria-hidden="true" />
   </DropdownMenuPrimitive.SubTrigger>
 ));
 DropdownMenuSubTrigger.displayName =
@@ -56,10 +79,7 @@ DropdownMenuSubContent.displayName =
 
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content> & {
-    /** Container do Portal (ex.: body do iframe de preview). Padrão: body do site. */
-    portalContainer?: HTMLElement | null;
-  }
+  DropdownMenuContentProps
 >(({ className, sideOffset = 4, portalContainer, ...props }, ref) => (
   <DropdownMenuPrimitive.Portal container={portalContainer}>
     <DropdownMenuPrimitive.Content
@@ -75,16 +95,16 @@ const DropdownMenuContent = React.forwardRef<
 ));
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
+// TST-09: itens (inclusive Checkbox, Radio e SubTrigger) com alvo de 44px
+// (`min-h-11`), como o `SelectItem`. Antes `py-1.5` dava 33px.
 const DropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
-    inset?: boolean;
-  }
+  DropdownMenuItemProps
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex min-h-11 cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       inset && "pl-8",
       className
     )}
@@ -100,7 +120,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex min-h-11 cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     checked={checked}
@@ -108,7 +128,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" />
+        <Check className="h-4 w-4" aria-hidden="true" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}
@@ -124,14 +144,14 @@ const DropdownMenuRadioItem = React.forwardRef<
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex min-h-11 cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     {...props}
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
-        <Circle className="h-2 w-2 fill-current" />
+        <Circle className="h-2 w-2 fill-current" aria-hidden="true" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}
@@ -142,9 +162,7 @@ DropdownMenuRadioItem.displayName =
 
 const DropdownMenuLabel = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Label>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label> & {
-    inset?: boolean;
-  }
+  DropdownMenuLabelProps
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Label
     ref={ref}
@@ -174,9 +192,11 @@ DropdownMenuSeparator.displayName =
 const DropdownMenuShortcut = ({
   className,
   ...props
-}: React.HTMLAttributes<HTMLSpanElement>) => (
+}: DropdownMenuShortcutProps) => (
   <span
-    className={cn("ml-auto text-xs tracking-widest opacity-60", className)}
+    // AUD-39: `opacity-60` dava 4,28:1. `text-muted-foreground` dá 7,56:1 sobre
+    // `popover` e 6,82:1 sobre o item focado (`tint`).
+    className={cn("ml-auto text-xs tracking-widest text-muted-foreground", className)}
     {...props}
   />
 );

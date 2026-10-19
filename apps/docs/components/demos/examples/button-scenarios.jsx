@@ -18,7 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "semec-ds/react";
-import { Download, Loader2, Pencil, Plus, Printer, Send, Trash2 } from "lucide-react";
+import { Download, Pencil, Plus, Printer, Send, Trash2 } from "lucide-react";
 
 export function ButtonFormFooter() {
   return (
@@ -62,16 +62,17 @@ export function ButtonLoading() {
   return (
     <div className="flex flex-col items-start gap-3">
       <Button
-        disabled={loading}
+        loading={loading}
+        loadingText="Enviando…"
         onClick={() => {
           setLoading(true);
           setTimeout(() => setLoading(false), 2200);
         }}
       >
-        {loading ? (<><Loader2 className="animate-spin" /> Enviando…</>) : (<><Send /> Enviar requerimento</>)}
+        <Send /> Enviar requerimento
       </Button>
       <p className="text-xs text-muted-foreground">
-        Clique para ver o estado de carregamento — o botão desabilita enquanto processa.
+        Clique para ver o estado de carregamento: o botão ignora novos cliques, mas mantém o foco.
       </p>
     </div>
   );
@@ -102,7 +103,7 @@ export function ButtonToolbar() {
 export function IconToolbar() {
   return (
     <TooltipProvider>
-      <div className="flex gap-2">
+      <div className="flex items-center justify-center gap-2">
         <Tooltip>
           <TooltipTrigger asChild><IconButton label="Editar requerimento"><Pencil /></IconButton></TooltipTrigger>
           <TooltipContent>Editar</TooltipContent>

@@ -56,6 +56,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   EmptyState,
+  ErrorState,
   ErrorSummary,
   FileUpload,
   FormField,
@@ -65,6 +66,7 @@ import {
   HeaderNavLink,
   IconButton,
   Input,
+  InputMask,
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
@@ -78,6 +80,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   Pagination,
+  PasswordInput,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -108,8 +111,10 @@ import {
   SidebarProvider,
   SidebarToggleButton,
   Skeleton,
+  SkipLink,
   Slider,
   Spinner,
+  Stepper,
   Switch,
   Table,
   TableBody,
@@ -130,22 +135,23 @@ import {
   TimelineItem,
   TimelineSeparator,
   TimelineTitle,
-  Toast,
-  ToastAction,
-  ToastClose,
-  ToastDescription,
-  ToastProvider,
-  ToastTitle,
-  ToastViewport,
   Toggle,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
   useToast,
+  Footer,
+  FooterBottom,
+  FooterContent,
+  FooterLink,
+  FooterLinks,
+  FooterSection,
+  Heading,
 } from "semec-ds/react";
 import { Bell, Download, HelpCircle, Inbox, MoreHorizontal, Plus, Printer, Search, Trash2 } from "lucide-react";
 import PreviewFrame, { usePreviewPortalContainer } from "@/components/docs/PreviewFrame";
+import PreviewToaster from "@/components/demos/PreviewToaster";
 
 const ROW = "flex flex-wrap items-center gap-3";
 
@@ -179,7 +185,15 @@ function ButtonPreview() {
           <Button size="sm">Pequeno</Button>
           <Button size="md">Médio</Button>
           <Button size="lg">Grande</Button>
-          <Button disabled>Enviando…</Button>
+          <Button disabled>Desabilitado</Button>
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        <p className="text-xs font-medium text-muted-foreground">Carregando (loading)</p>
+        <div className={ROW}>
+          <Button loading loadingText="Enviando…">Enviar</Button>
+          <Button variant="outline" loading>Salvar rascunho</Button>
+          <IconButton label="Baixar carnê" loading><Download /></IconButton>
         </div>
       </div>
       <div className="space-y-1.5">
@@ -236,6 +250,41 @@ function InputPreview() {
   );
 }
 
+function PasswordInputPreview() {
+  return (
+    <div className="w-full max-w-sm rounded-lg border border-border bg-surface p-4 text-left">
+      <FormField label="Senha" hint="Mínimo de 8 caracteres">
+        <PasswordInput autoComplete="current-password" />
+      </FormField>
+    </div>
+  );
+}
+
+function InputMaskPreview() {
+  const [cpf, setCpf] = useState({ masked: "", raw: "" });
+  return (
+    <div className="w-full max-w-sm rounded-lg border border-border bg-surface p-4 text-left">
+      <div className="flex flex-col gap-3">
+        <FormField label="CPF" hint="Somente números">
+          <InputMask mask="cpf" onValueChange={(masked, raw) => setCpf({ masked, raw })} />
+        </FormField>
+        <p className="text-xs text-muted-foreground">
+          Valor sem máscara: <code>{cpf.raw || "—"}</code>
+        </p>
+        <FormField label="Telefone">
+          <InputMask mask="telefone" autoComplete="tel-national" />
+        </FormField>
+        <FormField label="CEP">
+          <InputMask mask="cep" autoComplete="postal-code" />
+        </FormField>
+        <FormField label="Data de nascimento" hint="dd/mm/aaaa">
+          <InputMask mask="data" autoComplete="bday" />
+        </FormField>
+      </div>
+    </div>
+  );
+}
+
 function TextareaPreview() {
   return (
     <div className="w-full max-w-md rounded-lg border border-border bg-surface p-4 text-left">
@@ -276,7 +325,7 @@ function ComboboxPreview() {
           { value: "os", label: "Ordem bancária" },
         ]}
         value={value}
-        onChange={setValue}
+        onValueChange={setValue}
       />
       <p className="mt-2 text-xs text-muted-foreground">Selecionado: {value || "—"}</p>
     </div>
@@ -364,16 +413,150 @@ function LabelPreview() {
 }
 
 function FormFieldPreview() {
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [tentativa, setTentativa] = useState(0);
+  const [erros, setErros] = useState({});
+  const [erroServidor, setErroServidor] = useState(null);
+  const [sucesso, setSucesso] = useState(false);
+
+  function validar(valores) {
+    const novos = {};
+    if (!valores.nome.trim()) {
+      novos.nome = "O nome completo é obrigatório.";
+    } else if (valores.nome.trim().length < 3) {
+      novos.nome = "Informe ao menos 3 caracteres.";
+    }
+    if (!valores.email.trim()) {
+      novos.email = "O e-mail é obrigatório.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valores.email)) {
+      novos.email = "Informe um endereço de e-mail válido (ex: nome@semec.pvh.br).";
+    }
+    const cpfDigitos = valores.cpf.replace(/\D/g, "");
+    if (!cpfDigitos) {
+      novos.cpf = "O CPF é obrigatório.";
+    } else if (cpfDigitos.length !== 11) {
+      novos.cpf = "O CPF precisa conter 11 dígitos.";
+    }
+    return novos;
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    setSucesso(false);
+    setErroServidor(null);
+    setTentativa((t) => t + 1);
+
+    const listaErros = validar({ nome, email, cpf });
+    setErros(listaErros);
+
+    const keys = Object.keys(listaErros);
+    if (keys.length > 0) {
+      return;
+    }
+
+    if (email.includes("erro@")) {
+      setErroServidor("Não foi possível conectar ao servidor da SEMEC. Tente novamente mais tarde.");
+      return;
+    }
+
+    setSucesso(true);
+  }
+
+  const errorSummaryItems = [
+    erros.nome ? { id: "preview-nome", message: erros.nome } : null,
+    erros.email ? { id: "preview-email", message: erros.email } : null,
+    erros.cpf ? { id: "preview-cpf", message: erros.cpf } : null,
+  ].filter(Boolean);
+
   return (
-    <div className="w-full max-w-xs rounded-lg border border-border bg-surface p-4 text-left">
-      <div className="flex flex-col gap-5">
-        <FormField label="E-mail" htmlFor="p-email" required hint="Usado para enviar o comprovante">
-          <Input id="p-email" type="email" />
+    <div className="w-full max-w-lg rounded-lg border border-border bg-surface p-6 text-left shadow-elevation-1">
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
+        {/* Padrão 2: Resumo consolidado no topo */}
+        {errorSummaryItems.length > 0 && (
+          <ErrorSummary
+            title="Corrija os campos abaixo antes de enviar"
+            errors={errorSummaryItems}
+            focusKey={tentativa}
+          />
+        )}
+
+        {/* Padrão 3: Erro de submissão do servidor */}
+        {erroServidor && (
+          <Alert variant="destructive">
+            <AlertTitle>Falha na comunicação</AlertTitle>
+            <AlertDescription>{erroServidor}</AlertDescription>
+          </Alert>
+        )}
+
+        {sucesso && (
+          <Alert variant="success">
+            <AlertTitle>Requerimento protocolado!</AlertTitle>
+            <AlertDescription>
+              Os dados foram validados e o documento PDF foi gerado.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Padrão 1: Erros inline com FormField */}
+        <FormField
+          label="Nome completo"
+          htmlFor="preview-nome"
+          required
+          hint="Como consta no documento oficial"
+          error={erros.nome}
+        >
+          <Input
+            id="preview-nome"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            placeholder="Ex: Maria Pereira da Silva"
+          />
         </FormField>
-        <FormField label="Telefone" htmlFor="p-tel" error="Formato inválido. Use (RO) 90000-0000.">
-          <Input id="p-tel" aria-invalid="true" defaultValue="123" />
+
+        <FormField
+          label="E-mail para comprovante"
+          htmlFor="preview-email"
+          required
+          hint="Digite erro@... para simular falha no servidor"
+          error={erros.email}
+        >
+          <Input
+            id="preview-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="contribuinte@pvh.ro.gov.br"
+          />
         </FormField>
-      </div>
+
+        <FormField
+          label="CPF do titular"
+          htmlFor="preview-cpf"
+          required
+          hint="Apenas números (000.000.000-00)"
+          error={erros.cpf}
+        >
+          <Input
+            id="preview-cpf"
+            inputMode="numeric"
+            value={cpf}
+            onChange={(e) => setCpf(e.target.value)}
+            placeholder="000.000.000-00"
+          />
+        </FormField>
+
+        {/* Padrão de Ação + Legenda Auxiliar de Ação / Download */}
+        <div className="pt-2 space-y-2">
+          <Button type="submit" variant="primary">
+            Gerar e baixar requerimento
+          </Button>
+          <p className="text-xs text-text-muted">
+            Ao clicar, o arquivo PDF do requerimento será gerado e baixado automaticamente.
+          </p>
+        </div>
+      </form>
     </div>
   );
 }
@@ -454,6 +637,39 @@ function EmptyStatePreview() {
   );
 }
 
+function ErrorStatePreview() {
+  const [tentando, setTentando] = useState(false);
+
+  const handleRetry = () => {
+    setTentando(true);
+    setTimeout(() => setTentando(false), 1000);
+  };
+
+  return (
+    <div className="flex w-full flex-col gap-6">
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Variante Padrão (com onRetry)</p>
+        <ErrorState
+          title="Não foi possível carregar os protocolos"
+          description={tentando ? "Tentando restabelecer conexão com o servidor..." : "O servidor demorou muito para responder (timeout). Verifique sua conexão e tente novamente."}
+          onRetry={handleRetry}
+          retryLabel={tentando ? "Reconectando..." : "Tentar novamente"}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Variante Inline</p>
+        <ErrorState
+          variant="inline"
+          title="Falha ao sincronizar dados da certidão"
+          description="Os dados exibidos podem estar desatualizados."
+          onRetry={handleRetry}
+        />
+      </div>
+    </div>
+  );
+}
+
 function BreadcrumbPreview() {
   return (
     <Breadcrumb
@@ -510,43 +726,42 @@ function DialogPreview() {
 }
 
 function ToastDemo() {
-  const { toasts, toast } = useToast();
+  const { toast } = useToast();
   return (
-    <>
-      <div className="flex flex-wrap gap-3">
-        <Button variant="outline" onClick={() => toast({ title: "Salvo com sucesso" })}>
-          default
-        </Button>
-        <Button variant="outline" onClick={() => toast({ variant: "success", title: "Protocolo enviado", description: "Guarde o número 2026.123." })}>
-          success
-        </Button>
-        <Button variant="outline" onClick={() => toast({ variant: "warning", title: "Sessão expira em 2 min" })}>
-          warning
-        </Button>
-        <Button variant="outline" onClick={() => toast({ variant: "destructive", title: "Falha ao anexar arquivo" })}>
-          destructive
-        </Button>
-      </div>
-      {toasts.map(({ id, title, description, variant, ...rest }) => (
-        <Toast key={id} variant={variant} {...rest}>
-          <div className="grid gap-1">
-            {title && <ToastTitle>{title}</ToastTitle>}
-            {description && <ToastDescription>{description}</ToastDescription>}
-          </div>
-          <ToastAction altText="Desfazer">Desfazer</ToastAction>
-          <ToastClose />
-        </Toast>
-      ))}
-    </>
+    <div className="flex flex-wrap gap-3">
+      <Button
+        variant="outline"
+        onClick={() =>
+          toast({
+            variant: "success",
+            title: "Protocolo enviado com sucesso",
+            description: "Suas alterações e comprovantes foram salvos com êxito.",
+          })
+        }
+      >
+        Disparar Toast de Sucesso
+      </Button>
+      <Button variant="outline" onClick={() => toast({ title: "Notificação padrão", description: "Mensagem informativa geral." })}>
+        Padrão
+      </Button>
+      <Button variant="outline" onClick={() => toast({ variant: "warning", title: "Sessão expira em 2 min" })}>
+        Aviso
+      </Button>
+      <Button variant="outline" onClick={() => toast({ variant: "destructive", title: "Falha ao anexar arquivo" })}>
+        Erro
+      </Button>
+    </div>
   );
 }
 
+// Padrão oficial: <Toaster /> uma vez + useToast() para disparar.
+// PreviewToaster garante um só Toaster por página do site.
 function ToastPreview() {
   return (
-    <ToastProvider>
+    <>
       <ToastDemo />
-      <ToastViewport />
-    </ToastProvider>
+      <PreviewToaster />
+    </>
   );
 }
 
@@ -555,7 +770,7 @@ function TooltipPreview() {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <IconButton aria-label="Ajuda" variant="outline"><HelpCircle /></IconButton>
+          <IconButton label="Ajuda" variant="outline"><HelpCircle /></IconButton>
         </TooltipTrigger>
         <TooltipContent>Explica o campo ao lado.</TooltipContent>
       </Tooltip>
@@ -661,10 +876,38 @@ function TogglePreview() {
 
 function SpinnerPreview() {
   return (
-    <div className={ROW}>
-      <Spinner />
-      <Spinner className="h-6 w-6" />
-      <Spinner className="h-8 w-8" />
+    <div className="flex flex-col items-center gap-3">
+      <div className={ROW}>
+        <Spinner />
+        <Spinner className="h-6 w-6" />
+        <Spinner className="h-8 w-8" />
+      </div>
+      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Spinner decorative /> Atualizando a lista…
+      </p>
+    </div>
+  );
+}
+
+const ETAPAS_REQUERIMENTO = [
+  { label: "Dados do estudante" },
+  { label: "Documentos", description: "RG, CPF e comprovante" },
+  { label: "Revisão e envio" },
+];
+
+function StepperPreview() {
+  const [etapa, setEtapa] = useState(1);
+  return (
+    <div className="w-full max-w-2xl space-y-4 text-left">
+      <Stepper steps={ETAPAS_REQUERIMENTO} currentStep={etapa} onStepClick={setEtapa} />
+      <div className="flex flex-wrap gap-3">
+        <Button variant="outline" size="sm" disabled={etapa === 0} onClick={() => setEtapa((e) => Math.max(0, e - 1))}>
+          Voltar
+        </Button>
+        <Button size="sm" disabled={etapa >= ETAPAS_REQUERIMENTO.length} onClick={() => setEtapa((e) => Math.min(ETAPAS_REQUERIMENTO.length, e + 1))}>
+          Avançar
+        </Button>
+      </div>
     </div>
   );
 }
@@ -699,7 +942,7 @@ function InputOTPPreview() {
     <div className="w-full max-w-sm space-y-4 text-left">
       <div className="space-y-2">
         <p className="text-xs font-medium text-muted-foreground">Código de verificação</p>
-        <InputOTP value={value} onChange={setValue} maxLength={6}>
+        <InputOTP value={value} onValueChange={setValue} maxLength={6}>
           <InputOTPGroup>
             <InputOTPSlot index={0} />
             <InputOTPSlot index={1} />
@@ -740,7 +983,7 @@ function CalendarPreview() {
   const [value, setValue] = useState(() => new Date());
   return (
     <div className="w-fit rounded-lg border border-border bg-surface p-2 text-left">
-      <Calendar value={value} onChange={setValue} />
+      <Calendar value={value} onValueChange={setValue} />
       <p className="mt-2 px-1 text-xs text-muted-foreground">
         Selecionado: {value.toLocaleDateString("pt-BR")}
       </p>
@@ -1126,12 +1369,52 @@ function ErrorSummaryPreview() {
   );
 }
 
+function HeadingPreview() {
+  return (
+    <div className="flex flex-col gap-2">
+      <Heading level={2} size={1}>Matrícula escolar</Heading>
+      <Heading level={3}>Documentos necessários</Heading>
+    </div>
+  );
+}
+
+function SkipLinkPreview() {
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <p className="text-sm text-muted-foreground">Pressione Tab dentro do preview para ver o link.</p>
+      <SkipLink href="#preview-conteudo" />
+      <div id="preview-conteudo" className="text-sm">Conteúdo principal</div>
+    </div>
+  );
+}
+
+function FooterPreview() {
+  return (
+    <Footer className="w-full">
+      <FooterContent>
+        <FooterSection title="Atendimento">
+          <p>Rua Exemplo, 100 · Centro · Porto Velho/RO</p>
+        </FooterSection>
+        <FooterSection title="Serviços">
+          <FooterLinks>
+            <FooterLink href="#">Matrícula</FooterLink>
+            <FooterLink href="#">Transporte escolar</FooterLink>
+          </FooterLinks>
+        </FooterSection>
+      </FooterContent>
+      <FooterBottom>© 2026 Prefeitura de Porto Velho</FooterBottom>
+    </Footer>
+  );
+}
+
 const PREVIEWS = {
   button: ButtonPreview,
   "icon-button": IconButtonPreview,
   link: LinkPreview,
   input: InputPreview,
   textarea: TextareaPreview,
+  "password-input": PasswordInputPreview,
+  "input-mask": InputMaskPreview,
   select: SelectPreview,
   combobox: ComboboxPreview,
   "date-picker": DatePickerPreview,
@@ -1147,6 +1430,7 @@ const PREVIEWS = {
   table: TablePreview,
   skeleton: SkeletonPreview,
   "empty-state": EmptyStatePreview,
+  "error-state": ErrorStatePreview,
   breadcrumb: BreadcrumbPreview,
   tabs: TabsPreview,
   pagination: PaginationPreview,
@@ -1175,6 +1459,10 @@ const PREVIEWS = {
   "dropdown-menu": DropdownMenuPreview,
   "data-table": DataTablePreview,
   "error-summary": ErrorSummaryPreview,
+  heading: HeadingPreview,
+  "skip-link": SkipLinkPreview,
+  stepper: StepperPreview,
+  footer: FooterPreview,
 };
 
 export default function BasePreview({ slug }) {

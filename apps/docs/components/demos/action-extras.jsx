@@ -21,13 +21,19 @@ import {
   linkListUsage,
 } from "@/components/demos/examples/button-scenarios-data";
 
-function Scenario({ title, desc, code, filename, prompt, children }) {
+function Scenario({ title, desc, code, filename, prompt, centered, children }) {
   return (
     <>
       <h4>{title}</h4>
       <p>{desc}</p>
       <PreviewFrame>
-        <div style={{ padding: "1rem" }}>{children}</div>
+        {centered ? (
+          <div className="box-border flex min-h-[96px] w-full items-center justify-center overflow-x-clip p-4">
+            {children}
+          </div>
+        ) : (
+          <div style={{ padding: "1rem" }}>{children}</div>
+        )}
       </PreviewFrame>
       <CodeBlock code={code} filename={filename} prompt={prompt} />
     </>
@@ -58,10 +64,10 @@ export function BotoesExtras() {
       </Scenario>
       <Scenario
         title="Ação com carregamento"
-        desc="Enquanto processa, o botão desabilita e mostra um indicador — evita duplo envio."
+        desc="Com `loading`, o botão mostra o indicador, ignora novos cliques (evita duplo envio) e continua focalizável, sem perder o foco de quem usa teclado."
         code={buttonLoadingUsage}
         filename="ButtonLoading.jsx"
-        prompt="Crie botão com estado de carregamento (spinner Loader2 animate-spin + disabled) usando semec-ds-react Button"
+        prompt="Crie botão com estado de carregamento usando a prop loading (e loadingText) do Button do semec-ds-react"
       >
         <ButtonLoading />
       </Scenario>
@@ -92,6 +98,7 @@ export function BotaoDeIconeExtras() {
     <>
       <h3>Exemplos em contexto</h3>
       <Scenario
+        centered
         title="Toolbar com tooltip"
         desc="Ícones agrupados na mesma ação de linha; o `label` nomeia cada botão e o tooltip reforça no hover."
         code={iconToolbarUsage}

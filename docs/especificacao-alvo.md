@@ -351,11 +351,11 @@ Três níveis. Não cinco.
 | Token | Sombra | Uso |
 |---|---|---|
 | `elevation-0` | nenhuma | Elemento no plano da página |
-| `elevation-1` | `0 1px 2px rgba(20,35,58,.08)` | Cartão, campo |
-| `elevation-2` | `0 4px 12px rgba(20,35,58,.10)` | Menu, popover, cartão em hover |
-| `elevation-3` | `0 12px 32px rgba(20,35,58,.14)` | Modal, painel lateral |
+| `elevation-1` | `0 1px 2px` · `gray-900` a 8% | Cartão, campo |
+| `elevation-2` | `0 4px 12px` · `gray-900` a 10% | Menu, popover, cartão em hover |
+| `elevation-3` | `0 12px 32px` · `gray-900` a 14% | Modal, painel lateral |
 
-A sombra sempre usa o azul-escuro neutro do sistema, nunca preto puro, e nunca cor.
+A sombra sempre usa o azul-escuro neutro do sistema, nunca preto puro, e nunca cor. Em CSS, a opacidade sai do primitivo, não de um `rgba()` escrito à mão: `rgb(var(--pv-gray-900-rgb) / 0.08)`, com `--pv-gray-900-rgb: 20 35 58` (canais de `--pv-gray-900`), que resulta exatamente em `rgba(20, 35, 58, .08)` (AUD-56). `color-mix()` foi descartado porque o Tailwind gera para ele um fallback de sombra opaca em navegadores sem suporte (Chrome < 111), comuns em PCs antigos.
 
 ---
 
@@ -363,12 +363,14 @@ A sombra sempre usa o azul-escuro neutro do sistema, nunca preto puro, e nunca c
 
 | Token | Valor | Uso |
 |---|---|---|
-| `radius-sm` | 4px | Chip, tag, campo pequeno |
-| `radius-md` | 8px | Botão, campo, cartão — **padrão** |
-| `radius-lg` | 16px | Cartão grande, modal |
-| `radius-full` | 9999px | Selo, avatar, botão circular |
+| `radius-sm` | 2px | Item de menu, marca pequena |
+| `radius-md` | 8px | Controle: campo, select, checkbox — **padrão** |
+| `radius-lg` | 12px | Cartão, modal, popover, alerta |
+| `radius-full` | 9999px | Botão, selo, avatar, pílula |
 
-Quatro valores. Qualquer outro é desvio.
+Quatro valores. Qualquer outro é desvio. Os utilitários do Tailwind fora da escala (`rounded-xs`, `rounded-xl`, `rounded-2xl`…) também são desvio: `rounded-xl` dá os mesmos 12px de `rounded-lg` por coincidência do padrão do Tailwind, não por decisão do sistema.
+
+> **Nota (15/10/2026, AUD-57).** A versão 0.1 desta especificação dizia `radius-sm` 4px e `radius-lg` 16px. O código publicado sempre usou 2px e 12px, e o mantenedor decidiu manter os valores do código; a tabela acima foi corrigida. No `tokens.css`, o valor mora em `--pv-radius-*` e o nome público continua `--radius-*` / `rounded-*`. Os usos da tabela seguem o código do kit: `Button` e `Badge` usam `rounded-full`; `Card`, `Dialog`, `Popover` e `Alert`, `rounded-lg`; `Input`, `Textarea` e `Checkbox`, `rounded-md`; itens do `DropdownMenu`, `rounded-sm`.
 
 ---
 
@@ -502,14 +504,16 @@ Altura mínima de 44px na variação padrão, atendendo ao alvo de toque recomen
 
 ### Estados
 
-`default` · `hover` (`action-primary-hover`) · `focus-visible` (anel de 2px em `color-focus-ring`, deslocado 2px) · `active` (`action-primary-active`) · `disabled` (opacidade 50%, cursor bloqueado) · `loading` (indicador substitui o ícone, rótulo permanece, botão fica inerte).
+`default` · `hover` (`action-primary-hover`) · `focus-visible` (anel de 2px em `color-focus-ring`, deslocado 2px) · `active` (`action-primary-active`) · `disabled` (atributo `disabled` nativo, opacidade 50%, cursor bloqueado) · `loading` (prop `loading`: indicador substitui o ícone, rótulo permanece, o clique é bloqueado e o botão continua focalizável).
 
 ### Acessibilidade
 
 - É um `<button>` de verdade. `<div>` clicável não é botão.
 - Ativado por Enter e Espaço.
-- Estado de carregamento comunicado por `aria-busy="true"`.
-- Estado desabilitado usa `aria-disabled` e permanece focalizável, para que o leitor de tela o anuncie.
+- Estado de carregamento (`loading`) comunicado por `aria-busy="true"` e `aria-disabled="true"`: o botão **continua focalizável** durante o carregamento, para o foco não se perder no meio da ação, e o componente ignora o clique. O indicador é decorativo; o nome acessível continua sendo o rótulo.
+- Estado desabilitado usa o atributo **`disabled` nativo**: sai da ordem de Tab e não recebe clique. Se a pessoa precisa saber por que a ação está indisponível, explique em texto visível perto do botão, não só no botão desabilitado.
+
+> **Nota (15/10/2026, AUD-63).** A versão 0.1 pedia `aria-disabled` focalizável para todo estado desabilitado. Decisão do mantenedor: o `Button` mantém `disabled` nativo e usa `aria-disabled` focalizável **só durante o `loading`**.
 - Botão só de ícone exige `aria-label`.
 
 ### Quando não usar
@@ -622,7 +626,7 @@ Verificação dos tokens hoje em uso no portal, sobre o fundo padrão `#f4f6f9`:
 - [ ] API tipada e documentada
 - [ ] Estados: padrão, hover, foco, ativo, desabilitado, erro, carregando, vazio
 - [ ] Responsivo nos quatro pontos de quebra
-- [ ] Tema claro e escuro
+- [ ] Tema claro (o pacote tem tema único claro: [ADR-025](adr/0025-tema-unico-claro.md))
 - [ ] Teclado documentado e testado
 - [ ] `axe` sem violações
 - [ ] Exemplo de uso e de mau uso

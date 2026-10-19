@@ -1,6 +1,10 @@
 import { dsCategories, dsComponents, dsPortal } from "semec-ds/skills";
 
-export function breadcrumbsFor(pathname) {
+export function breadcrumbsFor(pathnameArg) {
+  // trailingSlash: true — o pathname vem com "/" no final, o que derruba a
+  // igualdade exata com os hrefs do navigation (mesma normalização da Sidebar).
+  const pathname =
+    pathnameArg.length > 1 ? pathnameArg.replace(/\/+$/, "") : pathnameArg;
   const crumbs = [{ label: "Início", href: "/" }];
   for (const item of navigation) {
     if (item.href && pathname === item.href) {
@@ -56,6 +60,11 @@ export const navigation = [
     items: [
       { href: "/introducao", label: "Introdução" },
       { href: "/fundamentos", label: "Fundamentos" },
+      { href: "/fundamentos/cores", label: "Cores", sub: true },
+      { href: "/fundamentos/tipografia", label: "Tipografia", sub: true },
+      { href: "/fundamentos/layout", label: "Layout", sub: true },
+      { href: "/fundamentos/raios-sombras", label: "Raios, bordas e sombras", sub: true },
+      { href: "/fundamentos/animacoes", label: "Animações", sub: true },
     ],
   },
   {

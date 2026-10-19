@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import {
   Badge,
   Button,
@@ -51,6 +51,7 @@ export function TableAdvanced() {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("todos");
   const [sortDir, setSortDir] = useState("asc"); // por objeto
+  const ordenarId = useId();
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState(new Set());
   const [loading, setLoading] = useState(false);
@@ -100,7 +101,7 @@ export function TableAdvanced() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="w-full space-y-4">
       {/* Barra filtros */}
       <div className="flex flex-wrap items-end gap-3">
         <div className="min-w-48 flex-1">
@@ -134,14 +135,17 @@ export function TableAdvanced() {
                 <Checkbox aria-label="Selecionar todos da página" checked={allSelected ? true : someSelected ? "indeterminate" : false} onCheckedChange={toggleAll} />
               </TableHead>
               <TableHead aria-sort={sortDir === "asc" ? "ascending" : "descending"}>
+                {/* Como no DataTable (TST-27): o botão e o cabeçalho se chamam só
+                    "Objeto"; a instrução vai na descrição e o sentido, no aria-sort. */}
                 <button
                   type="button"
                   onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
-                  className="inline-flex items-center gap-1 font-medium hover:text-foreground"
-                  aria-label={`Ordenar por objeto, ${sortDir === "asc" ? "crescente" : "decrescente"}`}
+                  className="inline-flex min-h-11 items-center gap-1 font-medium hover:text-foreground"
+                  aria-describedby={ordenarId}
                 >
-                  Objeto <ArrowUpDown className="h-3.5 w-3.5" />
+                  Objeto <ArrowUpDown className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
+                <span id={ordenarId} hidden>Ordenar por objeto</span>
               </TableHead>
               <TableHead>ID</TableHead>
               <TableHead>Status</TableHead>

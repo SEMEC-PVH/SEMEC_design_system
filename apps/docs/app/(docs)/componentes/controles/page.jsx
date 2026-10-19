@@ -16,11 +16,11 @@ const CODE = `<div className="demo-controls -mt-12">
     <input
       type="search"
       placeholder="Buscar serviço ou informação…"
-      className="focus:ring-pv-green-500/20"
+      className="focus-visible:ring-2 focus-visible:ring-ring"
     />
   </div>
   <div className="chips">
-    <button className="bg-pv-blue-900 text-white">Todas</button>
+    <button className="bg-primary text-primary-foreground">Todas</button>
     <button>IPTU</button>
   </div>
 </div>`;
@@ -39,8 +39,8 @@ export default function ControlesPage() {
       </div>
       <p className="text-xs text-muted-foreground mt-3">
         Sobreposto ao herói com -mt-12 · aba ativa com indicador
-        bg-pv-green-600 · foco de input focus:ring-pv-green-500/20 · chip ativo
-        bg-pv-blue-900 text-white.
+        bg-success · foco de input focus-visible:ring-2 focus-visible:ring-ring
+        · chip ativo bg-primary text-primary-foreground.
       </p>
 
       <h3>Código</h3>

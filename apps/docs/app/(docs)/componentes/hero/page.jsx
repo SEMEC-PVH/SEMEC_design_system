@@ -3,12 +3,12 @@ import CodeBlock from "@/components/docs/CodeBlock";
 
 export const metadata = { title: "Componente Hero" };
 
-const CODE = `<section className="bg-[#223f99] px-6 py-10 text-white">
-  <span className="text-pv-yellow-500">● Portal de Serviços</span>
-  <h1 className="font-display text-4xl sm:text-5xl font-bold text-white">
+const CODE = `<section className="bg-brand-hero px-6 py-10 text-text-on-brand">
+  <span className="font-semibold text-text-on-brand">● Portal de Serviços</span>
+  <h1 className="text-3xl sm:text-display font-bold text-text-on-brand">
     A Secretaria de Economia está mais perto de você.
   </h1>
-  <p className="text-pv-blue-100">
+  <p className="text-text-on-brand">
     Formulários, informações, requerimentos, calculadoras e guias da SEMEC.
   </p>
 </section>`;
@@ -26,9 +26,9 @@ export default function HeroPage() {
         <DemoHero />
       </div>
       <p className="text-xs text-muted-foreground mt-3">
-        Fundo bg-[#223f99] · eyebrow text-pv-yellow-500 · título
-        font-display text-4xl sm:text-5xl font-bold text-white · subtítulo
-        text-pv-blue-100.
+        Fundo bg-brand-hero · eyebrow, título (text-3xl sm:text-display
+        font-bold) e subtítulo em text-text-on-brand. O amarelo e o azul-claro
+        do protótipo são do CSS do site, sem token no kit.
       </p>
 
       <h3>Código</h3>

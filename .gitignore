@@ -20,6 +20,7 @@ out/
 # production
 build/
 dist/
+gate-app/dist/
 
 # misc
 .DS_Store
@@ -62,3 +63,11 @@ next-env.d.ts
 # usa semfaz.exemplo.json (fictício).
 apps/docs/components/quem-somos/predio/semfaz.json
 apps/docs/public/quem-somos/semfaz/
+
+# Consumidor temporário do check-dts (packages/react/scripts/check-dts.mjs)
+.check-dts-*/
+
+# Regressão visual: bancada gerada, resultados e relatório (baselines em tests/visual/__screenshots__ SÃO versionadas)
+tests/visual/.harness/
+tests/visual/.results/
+tests/visual/.report/

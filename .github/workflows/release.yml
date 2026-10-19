@@ -1,72 +1,243 @@
 name: Release
 
+# Fluxo Changesets (ver CONTRIBUTING.md, "Publicação e versionamento", e ADR-022):
+# 1. PRs com mudança publicada trazem um arquivo em .changeset/ (a CI exige).
+# 2. Um mantenedor versiona num PR: roda `npm run version-packages` localmente numa
+#    branch `changeset-release/<versão>` e abre o PR com o bump, o CHANGELOG e o lockfile.
+#    Este workflow NÃO cria branch, commit nem PR: a organização bloqueia PR aberto por
+#    workflow, e o push do PR de versão com PAT deu 403 (AUD-12, run 38615303248).
+# 3. Depois que a CI fica verde num push ao main, este workflow só decide e publica:
+#    - changesets pendentes  → resume o plano (`changeset status`) e termina com sucesso;
+#    - nenhum pendente e versão do package.json ainda não está no npm → publica
+#      (`changeset publish`), confere o registry, envia a tag @semec/ds@x.y.z e cria a
+#      GitHub Release;
+#    - nenhum pendente e versão já publicada → não faz nada.
+# Só roda a partir de CI verde: não há gatilho por push direto nem workflow_dispatch.
+#
+# Segurança:
+# - workflow_run só é aceito para push no main deste repositório (nunca PR, nunca fork);
+#   além disso, o commit precisa estar no histórico de origin/main.
+# - Segredos não ficam no env do job: o npm ci roda sem nenhum token. NPM_TOKEN só entra
+#   no passo de autenticação npm; GITHUB_TOKEN só nos passos de tag e de GitHub Release.
+# - O checkout não persiste credencial; a credencial git é posta e retirada no passo da tag.
+
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
-  workflow_dispatch:
 
 concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: true
+  group: release-main
+  cancel-in-progress: false
 
 permissions:
   contents: read
 
 jobs:
-  publish:
+  release:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
-    env:
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    permissions:
+      # Só para o push da tag e a GitHub Release (GITHUB_TOKEN). Nenhum PR é criado.
+      contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          # O commit exato que a CI aprovou. Sem credencial persistida no .git/config:
+          # o npm ci (scripts de terceiros) não deve ver token nenhum.
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Conferir que o commit é do main
+        env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "$HEAD_SHA" origin/main; then
+            echo "::error::$HEAD_SHA não está no histórico de origin/main; release abortado."
+            exit 1
+          fi
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          registry-url: "https://registry.npmjs.org"
 
       - name: Install
         run: npm ci
 
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Build package
-        run: npm run build:ds
-
-      - name: Diagnóstico npm
+      - name: Plano de release
+        id: plan
+        env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
+          count=$(find .changeset -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l)
+          version=$(node -p "require('./packages/react/package.json').version")
+          name=$(node -p "require('./packages/react/package.json').name")
+
+          # A versão local já está no npm? E404 = não publicada; outro erro = aborta,
+          # para não decidir publicar às cegas (o changeset publish recusaria de todo modo).
+          err="$RUNNER_TEMP/npm-view.err"
+          if out=$(npm view "${name}@${version}" version 2>"$err"); then
+            # Pacote existe: saída vazia = essa versão não existe.
+            if [ "$out" = "$version" ]; then published=true; else published=false; fi
+          elif grep -q 'E404' "$err"; then
+            published=false
+          else
+            cat "$err"
+            echo "::error::Não foi possível consultar ${name}@${version} no npm."
+            exit 1
+          fi
+
+          if [ "$count" -gt 0 ]; then
+            mode=pending
+          elif [ "$published" = "false" ]; then
+            mode=publish
+          else
+            mode=noop
+          fi
+
           {
-            echo "## Release @semec/ds"
+            echo "version=$version"
+            echo "tag=${name}@${version}"
+            echo "mode=$mode"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## Release ${name}"
             echo ""
-            echo "- version local: \`$(node -p "require('./packages/react/package.json').version")\`"
-            echo "- npm whoami: \`$(npm whoami 2>&1 || echo '(não autenticado)')\`"
-            echo "- NODE_AUTH_TOKEN set: \`${NODE_AUTH_TOKEN:+yes}${NODE_AUTH_TOKEN:-no}\`"
+            echo "- commit: \`$HEAD_SHA\`"
+            echo "- versão no package.json: \`$version\`"
+            echo "- já publicada no npm: \`$published\`"
+            echo "- changesets pendentes: \`$count\`"
+            echo "- modo: \`$mode\`"
             echo ""
-            echo "### Publish plan"
-            echo '```'
-            npx changeset publish-plan
-            echo '```'
-          } | tee -a "$GITHUB_STEP_SUMMARY"
-          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          case "$mode" in
+            pending)
+              {
+                echo "### Changesets pendentes"
+                echo ""
+                echo "Nada é publicado enquanto houver changesets em \`.changeset/\`. Para lançar,"
+                echo "um mantenedor roda \`npm run version-packages\` numa branch"
+                echo "\`changeset-release/<versão>\` e abre o PR de versão (ver CONTRIBUTING.md)."
+                echo ""
+                echo '```'
+                npx changeset status --verbose 2>&1 || true
+                echo '```'
+              } >> "$GITHUB_STEP_SUMMARY"
+              if [ "$published" = "false" ]; then
+                echo "::warning::${name}@${version} ainda não está no npm, mas há changesets pendentes; nada foi publicado. Versione no PR de versão (a próxima versão inclui estas mudanças) ou publique ${version} pelo fallback local do CONTRIBUTING.md."
+              fi
+              ;;
+            publish)
+              echo "Publicando ${name}@${version}." >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            noop)
+              echo "${name}@${version} já está no npm e não há changesets pendentes: nada a fazer." >> "$GITHUB_STEP_SUMMARY"
+              ;;
+          esac
+
+      - name: Autenticar npm
+        # O ~/.npmrc é escrito depois do npm ci, então só os passos seguintes o enxergam.
+        if: steps.plan.outputs.mode == 'publish'
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "${NPM_TOKEN:-}" ]; then
             echo "::error::Secret NPM_TOKEN vazio ou ausente no repo."
             exit 1
           fi
-          if ! npm whoami >/dev/null 2>&1; then
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > "$HOME/.npmrc"
+          if ! who=$(npm whoami 2>&1); then
             echo "::error::Token presente mas npm whoami falhou. Verifique se o NPM_TOKEN é válido e tem publish em @semec."
             exit 1
           fi
+          echo "- npm whoami: \`$who\`" | tee -a "$GITHUB_STEP_SUMMARY"
 
-      - name: Publish to npm
-        run: npx changeset publish
-
-      - name: Verify version on npm
+      - name: Publicar
+        if: steps.plan.outputs.mode == 'publish'
         run: |
-          expected=$(node -p "require('./packages/react/package.json').version")
-          published=$(npm view @semec/ds version)
-          echo "expected=$expected published=$published" | tee -a "$GITHUB_STEP_SUMMARY"
-          if [ "$published" != "$expected" ]; then
-            echo "::error::@semec/ds no npm está em '$published', mas o repo espera '$expected'"
+          # O changeset publish cria a tag anotada localmente: precisa de identidade git.
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          npm run release
+
+      - name: Conferir versão no npm
+        if: steps.plan.outputs.mode == 'publish'
+        env:
+          EXPECTED: ${{ steps.plan.outputs.version }}
+        run: |
+          # O registry pode levar alguns minutos para refletir a publicação
+          # (na 3.1.0 passou de 60s). Espera até 5 min e consulta sem cache.
+          published=""
+          for attempt in $(seq 1 30); do
+            published=$(npm view "@semec/ds@${EXPECTED}" version --prefer-online 2>/dev/null || true)
+            [ "$published" = "$EXPECTED" ] && break
+            echo "tentativa $attempt: registry ainda sem ${EXPECTED}; aguardando 10s"
+            sleep 10
+          done
+          echo "- npm: esperado \`$EXPECTED\`, encontrado \`${published:-nada}\`" | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ "$published" != "$EXPECTED" ]; then
+            echo "::error::@semec/ds@${EXPECTED} não apareceu no npm depois do publish."
             exit 1
           fi
+
+      - name: Enviar tag
+        # Tag não é bloqueada como PR: vai com o GITHUB_TOKEN (contents: write).
+        # O pacote já está no npm neste ponto, então falha aqui é aviso, não erro:
+        # a tag pode ser enviada depois à mão (ver CONTRIBUTING.md).
+        if: steps.plan.outputs.mode == 'publish'
+        env:
+          TAG: ${{ steps.plan.outputs.tag }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          PUSH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ! git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            git tag -a "$TAG" -m "$TAG" "$HEAD_SHA"
+          fi
+          auth=$(printf 'x-access-token:%s' "$PUSH_TOKEN" | base64 -w0)
+          echo "::add-mask::$auth"
+          git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic $auth"
+          if git push origin "refs/tags/${TAG}"; then
+            echo "- tag: \`$TAG\` enviada" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::Pacote publicado, mas o push da tag $TAG falhou. Envie à mão: git tag -a '$TAG' -m '$TAG' $HEAD_SHA && git push origin 'refs/tags/$TAG'"
+            echo "- tag: \`$TAG\` **não enviada** (ver aviso)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          git config --local --unset-all http.https://github.com/.extraheader || true
+
+      - name: Criar GitHub Release
+        # Também é aviso: o que importa (npm) já foi publicado e conferido.
+        if: steps.plan.outputs.mode == 'publish'
+        env:
+          TAG: ${{ steps.plan.outputs.tag }}
+          VERSION: ${{ steps.plan.outputs.version }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ! git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null; then
+            echo "::warning::Tag $TAG não está no GitHub; GitHub Release não criada."
+            exit 0
+          fi
+          # Notas = seção "## <versão>" do CHANGELOG do pacote.
+          awk -v v="## ${VERSION}" '
+            $0 == v { on = 1; next }
+            on && /^## / { exit }
+            on { print }
+          ' packages/react/CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          if ! gh release create "$TAG" --verify-tag --title "$TAG" --notes-file "$RUNNER_TEMP/notes.md"; then
+            echo "::warning::Pacote publicado, mas a GitHub Release de $TAG não foi criada. Crie à mão em Releases."
+          fi
+
+      - name: Limpar credenciais
+        if: always()
+        run: |
+          rm -f "$HOME/.npmrc"
+          git config --local --unset-all http.https://github.com/.extraheader || true

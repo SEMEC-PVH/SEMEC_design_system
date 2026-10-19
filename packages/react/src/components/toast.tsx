@@ -7,16 +7,29 @@ import { X } from "lucide-react";
 
 import { cn } from "../lib/utils";
 
-const ToastProvider = ToastPrimitives.Provider;
+// Rótulos PT-BR padrão (ADR-016). Os padrões do Radix são em inglês
+// ("Notification", "Notifications ({hotkey})") e seriam lidos pelo leitor de tela.
+const TOAST_LABEL = "Notificação";
+const TOAST_VIEWPORT_LABEL = "Notificações ({hotkey})";
+const TOAST_CLOSE_LABEL = "Fechar notificação";
+
+const ToastProvider = ({
+  label = TOAST_LABEL,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof ToastPrimitives.Provider>) => (
+  <ToastPrimitives.Provider label={label} {...props} />
+);
+ToastProvider.displayName = ToastPrimitives.Provider.displayName;
 
 const ToastViewport = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Viewport>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport>
->(({ className, ...props }, ref) => (
+>(({ className, label = TOAST_VIEWPORT_LABEL, ...props }, ref) => (
   <ToastPrimitives.Viewport
     ref={ref}
+    label={label}
     className={cn(
-      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse gap-2 p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
+      "fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col gap-2 p-4 sm:top-4 sm:right-4 md:max-w-[420px]",
       className
     )}
     {...props}
@@ -25,12 +38,13 @@ const ToastViewport = React.forwardRef<
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-lg border border-border bg-card p-4 text-card-foreground shadow-elevation-2 transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out",
+  "group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-[12px] border border-border bg-card p-4 text-card-foreground shadow-elevation-2 font-sans transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out",
   {
     variants: {
       variant: {
         default: "border-border bg-card text-card-foreground",
-        success: "border-success/40 bg-success-surface text-foreground",
+        success:
+          "border-none bg-success-emphasis text-success-emphasis-foreground px-5 py-4 [&_[toast-close]]:text-success-emphasis-foreground [&_[toast-close]]:hover:bg-success-emphasis-foreground/10",
         warning: "border-warning/40 bg-warning-surface text-foreground",
         destructive: "border-destructive/40 bg-destructive-surface text-destructive",
       },
@@ -61,7 +75,7 @@ const ToastAction = React.forwardRef<
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      "inline-flex h-9 shrink-0 items-center justify-center rounded-full border border-border bg-transparent px-4 text-sm font-medium transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+      "inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-border bg-transparent px-4 text-sm font-medium transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
       className
     )}
     {...props}
@@ -76,10 +90,11 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      "shrink-0 rounded-lg p-1.5 text-muted-foreground opacity-60 transition-opacity duration-fast ease-standard hover:text-foreground hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      "-m-2 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
       className
     )}
     toast-close=""
+    aria-label={TOAST_CLOSE_LABEL}
     {...props}
   >
     <X className="h-4 w-4" aria-hidden="true" />
@@ -93,7 +108,7 @@ const ToastTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Title
     ref={ref}
-    className={cn("text-sm font-semibold", className)}
+    className={cn("text-base font-bold leading-tight", className)}
     {...props}
   />
 ));
@@ -105,7 +120,7 @@ const ToastDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Description
     ref={ref}
-    className={cn("text-sm opacity-90", className)}
+    className={cn("text-sm font-normal leading-[1.4] opacity-95", className)}
     {...props}
   />
 ));
@@ -193,11 +208,20 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">;
 
-function toast({ ...props }: Toast) {
+function toast({ onOpenChange: onOpenChangeProp, ...props }: Toast) {
   const id = genId();
-  const update = (props: ToasterToast) =>
-    dispatch({ type: "UPDATE_TOAST", toast: { ...props, id } });
+  // O `onOpenChange` de quem chama é composto com o interno (que tira o aviso
+  // da fila ao fechar), em vez de ser descartado (TST-24).
+  let userOnOpenChange = onOpenChangeProp;
   const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
+  const onOpenChange = (open: boolean) => {
+    if (!open) dismiss();
+    userOnOpenChange?.(open);
+  };
+  const update = ({ onOpenChange: next, ...rest }: ToasterToast) => {
+    if (next) userOnOpenChange = next;
+    dispatch({ type: "UPDATE_TOAST", toast: { ...rest, id } });
+  };
 
   dispatch({
     type: "ADD_TOAST",
@@ -205,9 +229,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss();
-      },
+      onOpenChange,
     },
   });
 
@@ -232,11 +254,24 @@ function useToast() {
   };
 }
 
-function Toaster() {
+export interface ToasterProps {
+  /** Prefixo anunciado pelo leitor de tela em cada aviso. Padrão: "Notificação". */
+  label?: string;
+  /** Nome da região de avisos; `{hotkey}` vira o atalho (F8). Padrão: "Notificações ({hotkey})". */
+  viewportLabel?: string;
+  /** Nome acessível do botão de fechar. Padrão: "Fechar notificação". */
+  closeLabel?: string;
+}
+
+function Toaster({
+  label = TOAST_LABEL,
+  viewportLabel = TOAST_VIEWPORT_LABEL,
+  closeLabel = TOAST_CLOSE_LABEL,
+}: ToasterProps = {}) {
   const { toasts } = useToast();
 
   return (
-    <ToastProvider>
+    <ToastProvider label={label}>
       {toasts.map(({ id, title, description, action, ...props }) => (
         <Toast key={id} {...props}>
           <div className="grid gap-1">
@@ -246,10 +281,10 @@ function Toaster() {
             )}
           </div>
           {action}
-          <ToastClose />
+          <ToastClose aria-label={closeLabel} />
         </Toast>
       ))}
-      <ToastViewport />
+      <ToastViewport label={viewportLabel} />
     </ToastProvider>
   );
 }

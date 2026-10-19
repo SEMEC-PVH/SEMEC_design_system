@@ -4,35 +4,43 @@ code: "sheet"
 slug: "sheet"
 file: "src/components/sheet.tsx"
 category: "feedback"
-variants: "side: left · right · top · bottom · composição: Sheet · Trigger · Content · Header · Footer · Title · Description · Close"
+variants: "side: left · right · top · bottom · composição: Sheet · Trigger · Content · Header · Footer · Title · Description · Close · closeLabel: nome acessível do X de 44×44px (padrão 'Fechar') · rolagem: overflow-y-auto; top/bottom com max-h 85dvh"
 ---
 
 # Sheet — `sheet`
 
 > Painel lateral modal com overlay. Variantes left/right/top/bottom.
 
-**Arquivo:** `src/components/sheet.tsx` | **Categoria:** Feedback e estados | **Rota:** `/componentes/sheet`
+**Arquivo:** `src/components/sheet.tsx` | **Categoria:** Feedback e estados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/sheet/
 
 ## Variantes
 
 - **side**: left · right · top · bottom
 - **composição**: Sheet · Trigger · Content · Header · Footer · Title · Description · Close
+- **closeLabel**: nome acessível do X de 44×44px (padrão "Fechar")
+- **rolagem**: overflow-y-auto; top/bottom com max-h 85dvh
 
 ## Instalação (@semec/ds)
 
 ```bash
-npm install @semec/ds
+npm install @semec/ds lucide-react
 ```
+
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
 
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
 ## Uso
 
 ```tsx
+import * as React from "react";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose, Button } from "@semec/ds/react";
 
 <Sheet>
@@ -48,17 +56,40 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescri
     </SheetFooter>
   </SheetContent>
 </Sheet>
+
+// Controlado SEM SheetTrigger (ex.: aberto por um item de tabela): o Radix
+// não sabe para onde devolver o foco. Guarde a origem e devolva em onCloseAutoFocus.
+function FiltrosControlados() {
+  const [aberto, setAberto] = React.useState(false);
+  const origemRef = React.useRef<HTMLButtonElement>(null);
+  return (
+    <>
+      <Button ref={origemRef} onClick={() => setAberto(true)}>Filtros</Button>
+      <Sheet open={aberto} onOpenChange={setAberto}>
+        <SheetContent
+          closeLabel="Fechar filtros"
+          onCloseAutoFocus={(e) => { e.preventDefault(); origemRef.current?.focus(); }}
+        >
+          <SheetHeader><SheetTitle>Filtros</SheetTitle></SheetHeader>
+          {/* conteúdo longo rola dentro do painel (overflow-y-auto) */}
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+}
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um sheet (Sheet) usando @semec/ds/react (`src/components/sheet.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: side: left · right · top · bottom · composição: Sheet · Trigger · Content · Header · Footer · Title · Description · Close. Painel lateral modal com overlay. Variantes left/right/top/bottom.
+Use o componente `Sheet` (Sheet) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Painel lateral modal com overlay. Variantes left/right/top/bottom. API e variantes: side: left · right · top · bottom · composição: Sheet · Trigger · Content · Header · Footer · Title · Description · Close · closeLabel: nome acessível do X de 44×44px (padrão "Fechar") · rolagem: overflow-y-auto; top/bottom com max-h 85dvh. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
@@ -90,13 +121,13 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 const sheetVariants = cva(
-  "fixed z-50 gap-4 bg-card p-6 shadow-elevation-3 duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
+  "fixed z-50 gap-4 overflow-y-auto bg-card p-6 shadow-elevation-3 duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
   {
     variants: {
       side: {
-        top: "inset-x-0 top-0 border-b border-border data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
+        top: "inset-x-0 top-0 max-h-[85dvh] border-b border-border data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
         bottom:
-          "inset-x-0 bottom-0 border-t border-border data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+          "inset-x-0 bottom-0 max-h-[85dvh] border-t border-border data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
         left: "inset-y-0 left-0 h-full w-3/4 border-r border-border data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
         right:
           "inset-y-0 right-0 h-full w-3/4 border-l border-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
@@ -110,12 +141,15 @@ const sheetVariants = cva(
 
 export interface SheetContentProps
   extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {}
+    VariantProps<typeof sheetVariants> {
+  /** Nome acessível do botão X de fechar. Padrão: "Fechar". */
+  closeLabel?: string;
+}
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   SheetContentProps
->(({ side = "right", className, children, ...props }, ref) => (
+>(({ side = "right", className, children, closeLabel = "Fechar", ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />
     <DialogPrimitive.Content
@@ -124,9 +158,9 @@ const SheetContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-lg text-muted-foreground transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none">
+      <DialogPrimitive.Close className="absolute right-3 top-3 inline-flex size-11 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none">
         <X className="h-4 w-4" aria-hidden="true" />
-        <span className="sr-only">Fechar</span>
+        <span className="sr-only">{closeLabel}</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </SheetPortal>
@@ -138,7 +172,7 @@ const SheetHeader = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn("flex flex-col space-y-2 text-left", className)}
+    className={cn("flex flex-col space-y-2 pr-8 text-left", className)}
     {...props}
   />
 );

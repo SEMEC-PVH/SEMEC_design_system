@@ -4,44 +4,53 @@ code: "spinner"
 slug: "spinner"
 file: "src/components/spinner.tsx"
 category: "feedback"
-variants: "—"
+variants: "label: texto anunciado (padrão 'Carregando') · decorative: false (padrão, role=status) · true (aria-hidden, sem nome; raiz <span>)"
 ---
 
 # Spinner — `spinner`
 
-> Indicador de carregamento inline.
+> Indicador de carregamento inline (role=status). Com `decorative`, é só visual (sem role, aria-label nem texto sr-only), para quando outro elemento já anuncia o carregamento; é o que o `Button` com `loading` usa.
 
-**Arquivo:** `src/components/spinner.tsx` | **Categoria:** Feedback e estados | **Rota:** `/componentes/spinner`
+**Arquivo:** `src/components/spinner.tsx` | **Categoria:** Feedback e estados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/spinner/
 
 ## Variantes
 
-_Sem variantes_
+- **label**: texto anunciado (padrão "Carregando")
+- **decorative**: false (padrão, role=status) · true (aria-hidden, sem nome; raiz <span>)
 
 ## Instalação (@semec/ds)
 
 ```bash
-npm install @semec/ds
+npm install @semec/ds lucide-react
 ```
+
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
 ## Uso
 
 ```tsx
 import { Spinner } from "@semec/ds/react";
 
-<Spinner />
+<Spinner label="Carregando protocolos" />
 <p className="text-muted-foreground">Carregando dados…</p>
+
+// Só visual: o texto ao lado já diz o que está acontecendo
+<p className="flex items-center gap-2"><Spinner decorative /> Atualizando a lista…</p>
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um spinner (Spinner) usando @semec/ds/react (`src/components/spinner.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Indicador de carregamento inline.
+Use o componente `Spinner` (Spinner) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Indicador de carregamento inline (role=status). Com `decorative`, é só visual (sem role, aria-label nem texto sr-only), para quando outro elemento já anuncia o carregamento; é o que o `Button` com `loading` usa. API e variantes: label: texto anunciado (padrão "Carregando") · decorative: false (padrão, role=status) · true (aria-hidden, sem nome; raiz <span>). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -51,41 +60,71 @@ import * as React from "react";
 
 import { cn } from "../lib/utils";
 
-const Spinner = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    role="status"
-    aria-label="Carregando"
-    className={cn("inline-flex items-center justify-center", className)}
-    {...props}
+export interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Texto anunciado por leitor de tela. Padrão: "Carregando". */
+  label?: string;
+  /**
+   * Só visual: sem `role="status"`, sem `aria-label` e sem texto `sr-only`
+   * (raiz `<span aria-hidden="true">`). Use quando outro elemento já comunica
+   * o carregamento, como o `Button` com `loading` (o nome do botão não ganha
+   * "Carregando"). Padrão: `false`.
+   */
+  decorative?: boolean;
+}
+
+const spinnerIcon = (
+  <svg
+    className="h-5 w-5 animate-spin text-current"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
   >
-    <svg
-      className="h-5 w-5 animate-spin text-current"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-      />
-    </svg>
-    <span className="sr-only">Carregando</span>
-  </div>
-));
+    <circle
+      className="opacity-25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="4"
+    />
+    <path
+      className="opacity-75"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+    />
+  </svg>
+);
+
+const Spinner = React.forwardRef<HTMLDivElement, SpinnerProps>(
+  ({ className, label = "Carregando", decorative = false, ...props }, ref) => {
+    if (decorative) {
+      // <span>: conteúdo fraseado, válido dentro de <button>.
+      return (
+        <span
+          ref={ref as React.Ref<HTMLSpanElement>}
+          aria-hidden="true"
+          className={cn("inline-flex items-center justify-center", className)}
+          {...props}
+        >
+          {spinnerIcon}
+        </span>
+      );
+    }
+    return (
+      <div
+        ref={ref}
+        role="status"
+        aria-label={label}
+        className={cn("inline-flex items-center justify-center", className)}
+        {...props}
+      >
+        {spinnerIcon}
+        <span className="sr-only">{label}</span>
+      </div>
+    );
+  }
+);
 Spinner.displayName = "Spinner";
 
 export { Spinner };

@@ -1,24 +1,83 @@
+"use client";
+
 import * as React from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
 import { cn } from "../lib/utils";
 
+// Seletor de elementos que já entram no Tab. Se a viewport contém algum, quem
+// usa teclado rola a área focando esses elementos e a viewport não precisa
+// virar mais uma parada de Tab.
+const FOCUSABLE_SELECTOR =
+  'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), iframe, summary, audio[controls], video[controls], [contenteditable]:not([contenteditable="false"]), [tabindex]:not([tabindex="-1"])';
+
+export interface ScrollAreaProps
+  extends React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> {
+  /**
+   * TST-05 (WCAG 2.1.1): a região rolável precisa ser alcançável pelo teclado.
+   * - `"auto"` (padrão): a viewport recebe `tabIndex={0}` e anel de foco só
+   *   quando não há nada focável dentro dela (ex.: texto puro).
+   * - `true`: a viewport é sempre focável.
+   * - `false`: nunca (use só se o conteúdo garantir outro caminho de teclado).
+   */
+  focusable?: boolean | "auto";
+  /** Props repassadas à viewport (ex.: `aria-label` da região rolável focável). */
+  viewportProps?: React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Viewport>;
+}
+
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
-  <ScrollAreaPrimitive.Root
-    ref={ref}
-    className={cn("relative overflow-hidden", className)}
-    {...props}
-  >
-    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
-      {children}
-    </ScrollAreaPrimitive.Viewport>
-    <ScrollBar />
-    <ScrollAreaPrimitive.Corner />
-  </ScrollAreaPrimitive.Root>
-));
+  ScrollAreaProps
+>(({ className, children, focusable = "auto", viewportProps, ...props }, ref) => {
+  const viewportRef = React.useRef<HTMLDivElement>(null);
+  // Começa focável (inclusive no HTML do servidor): sem JS, a área de texto
+  // continua alcançável. O efeito retira a parada quando há conteúdo focável.
+  const [hasFocusable, setHasFocusable] = React.useState(false);
+
+  React.useEffect(() => {
+    if (focusable !== "auto") return;
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const check = () => setHasFocusable(viewport.querySelector(FOCUSABLE_SELECTOR) !== null);
+    check();
+    if (typeof MutationObserver === "undefined") return;
+    const observer = new MutationObserver(check);
+    observer.observe(viewport, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["href", "disabled", "tabindex", "contenteditable", "controls", "type"],
+    });
+    return () => observer.disconnect();
+  }, [focusable]);
+
+  const isFocusable = focusable === "auto" ? !hasFocusable : focusable;
+  const { className: viewportClassName, ...restViewportProps } = viewportProps ?? {};
+
+  return (
+    <ScrollAreaPrimitive.Root
+      ref={ref}
+      className={cn("relative overflow-hidden", className)}
+      {...props}
+    >
+      <ScrollAreaPrimitive.Viewport
+        ref={viewportRef}
+        tabIndex={isFocusable ? 0 : undefined}
+        {...restViewportProps}
+        className={cn(
+          // Anel por dentro (`ring-inset`): a raiz tem overflow-hidden e
+          // cortaria um anel com offset.
+          "h-full w-full rounded-[inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+          viewportClassName
+        )}
+      >
+        {children}
+      </ScrollAreaPrimitive.Viewport>
+      <ScrollBar />
+      <ScrollAreaPrimitive.Corner />
+    </ScrollAreaPrimitive.Root>
+  );
+});
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
 
 const ScrollBar = React.forwardRef<

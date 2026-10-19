@@ -208,6 +208,27 @@ export function DropdownMenuExtras() {
   );
 }
 
+export function FormFieldExtras() {
+  return (
+    <Prose
+      quandoUsar="Para estruturar todo campo interativo de formulário (Input, Textarea, Select, Combobox, DatePicker, Checkbox, RadioGroup, Switch, FileUpload, InputOTP, Slider). Ele garante que rótulo, indicador obrigatório (*), texto de apoio e mensagem de erro estejam na ordem semântica correta e ligados via acessibilidade sem esforço manual."
+      quandoNaoUsar="Para botões de ação isolados ou links de navegação avulsos fora do contexto de campo rotulável. Não use FormField para exibir alertas globais de página — para isso utilize Alert, ErrorSummary ou ErrorState."
+      a11y={[
+        "Associação semântica completa: id, label (htmlFor / aria-labelledby), hint e error (aria-describedby) e aria-invalid chegam automaticamente ao controle filho.",
+        "Três padrões de erro: 1. Erro inline no campo (via prop error, anunciado ao focar o campo); 2. Resumo consolidado no topo via ErrorSummary (com foco automático e links âncora para os campos); 3. Erro de submissão do servidor (Alert destructive no topo ou campos específicos).",
+        "role=\"alert\": por padrão a mensagem inline não usa role=\"alert\" para não poluir ou interromper leitores de tela quando há múltiplos campos inválidos (o resumo assume o anúncio imediato, AUD-22). Em campos avulsos, pode ser ativado com errorRole=\"alert\".",
+        "Contraste da mensagem de erro: utiliza var(--feedback-danger) / --pv-red-700 (#b91c1c), garantindo 5,98:1 sobre fundo branco (superando o critério WCAG AA de 4.5:1).",
+        "Legenda auxiliar de ação / download: botões de envio que geram efeitos secundários (ex.: download de PDF ou envio assíncrono) devem conter legenda explicativa complementar abaixo do botão (ex.: text-xs text-muted-foreground) associada ao botão ou visualmente orientada.",
+      ]}
+    >
+      <h3>Padrão Canônico com React Hook Form e Zod</h3>
+      <p className="text-sm text-muted-foreground">
+        O <code>FormField</code> integra-se de forma transparente com <code>react-hook-form</code> tanto via <code>register</code> quanto via <code>Controller</code>, recebendo a mensagem de erro direto de <code>errors[field]?.message</code>:
+      </p>
+    </Prose>
+  );
+}
+
 export function ErrorSummaryExtras() {
   return (
     <Prose
@@ -223,10 +244,76 @@ export function ErrorSummaryExtras() {
       ]}
     >
       <p className="text-sm text-muted-foreground">
-        <code>id</code> é o do campo. <code>focusKey</code> muda a cada envio,
-        para que o resumo refoque quando a pessoa tenta de novo e a lista de
-        erros é a mesma.
+        <code>id</code> é o do campo. <code>focusKey</code> muda a cada envio
+        inválido e é o único gatilho de foco: o resumo refoca quando a pessoa
+        tenta de novo, mas não quando some e volta enquanto ela digita.
       </p>
     </Prose>
   );
 }
+
+export function ErrorStateExtras() {
+  return (
+    <Prose
+      quandoUsar="Quando uma seção ou página inteira falhar ao carregar dados remotos (erro 500, timeout 504, erro de rede ou falha de sincronização) e existir uma possibilidade de recuperação pelo próprio usuário (ex.: tentar novamente)."
+      quandoNaoUsar="Para validação de campos de formulário (use FormField e ErrorSummary). Para avisos flutuantes temporários (use Toast). Para estados normais em que a busca simplesmente não retornou registros (use EmptyState)."
+      a11y={[
+        "Usa role=\"alert\" e aria-live=\"assertive\" para anunciar imediatamente a falha aos leitores de tela.",
+        "O ícone decorativo possui aria-hidden=\"true\" para não poluir a leitura.",
+        "Não depende apenas de cor: conta com título explícito, ícone de alerta e mensagem textual clara com instrução de como proceder.",
+        "Ação de recuperação (onRetry ou action) é sempre um botão ou elemento focável e acionável por teclado (Enter/Espaço).",
+      ]}
+    >
+      <h3>Props</h3>
+      <div className="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Prop</th>
+              <th>Tipo</th>
+              <th>Descrição</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>title</code></td>
+              <td><code>string</code></td>
+              <td>Título principal descrevendo a falha de forma clara e direta.</td>
+            </tr>
+            <tr>
+              <td><code>description</code></td>
+              <td><code>string</code></td>
+              <td>Explicação complementar da causa e orientação de ação para o usuário.</td>
+            </tr>
+            <tr>
+              <td><code>onRetry</code></td>
+              <td><code>() =&gt; void</code></td>
+              <td>Callback disparado ao clicar no botão de tentar novamente.</td>
+            </tr>
+            <tr>
+              <td><code>retryLabel</code></td>
+              <td><code>string</code></td>
+              <td>Texto do botão de tentar novamente (padrão: &quot;Tentar novamente&quot;).</td>
+            </tr>
+            <tr>
+              <td><code>variant</code></td>
+              <td><code>&quot;default&quot; | &quot;inline&quot;</code></td>
+              <td><code>default</code> para páginas ou blocos principais; <code>inline</code> para cards e tabelas.</td>
+            </tr>
+            <tr>
+              <td><code>icon</code></td>
+              <td><code>ReactNode</code></td>
+              <td>Ícone customizado opcional. Por padrão exibe AlertCircle.</td>
+            </tr>
+            <tr>
+              <td><code>action</code></td>
+              <td><code>ReactNode</code></td>
+              <td>Elemento ou botão de ação customizado em substituição ao botão padrão de retry.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </Prose>
+  );
+}
+

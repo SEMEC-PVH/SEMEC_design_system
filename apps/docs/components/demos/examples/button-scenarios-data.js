@@ -25,10 +25,11 @@ export const buttonDestructiveUsage = `import { Button, Dialog, DialogClose, Dia
 </Dialog>`;
 
 export const buttonLoadingUsage = `import { Button } from "semec-ds/react";
-import { Loader2, Send } from "lucide-react";
+import { Send } from "lucide-react";
 
-<Button disabled={loading}>
-  {loading ? (<><Loader2 className="animate-spin" /> Enviando…</>) : (<><Send /> Enviar requerimento</>)}
+// loading: Spinner decorativo, aria-busy e aria-disabled; o foco fica no botão
+<Button type="submit" loading={loading} loadingText="Enviando…">
+  <Send /> Enviar requerimento
 </Button>`;
 
 export const buttonAsLinkUsage = `import { Button } from "semec-ds/react";
@@ -49,7 +50,7 @@ export const iconToolbarUsage = `import { IconButton, Tooltip, TooltipContent, T
 import { Download, Pencil, Trash2 } from "lucide-react";
 
 <TooltipProvider>
-  <div className="flex gap-2">
+  <div className="flex items-center justify-center gap-2">
     <Tooltip>
       <TooltipTrigger asChild>
         <IconButton label="Editar requerimento"><Pencil /></IconButton>

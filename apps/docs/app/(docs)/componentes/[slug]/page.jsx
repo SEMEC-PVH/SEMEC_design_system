@@ -8,8 +8,10 @@ import {
   DataTableExtras,
   DrawerExtras,
   DropdownMenuExtras,
+  ErrorStateExtras,
   ErrorSummaryExtras,
   FileUploadExtras,
+  FormFieldExtras,
   SheetExtras,
   SidebarTriggerExtras,
 } from "@/components/demos/kit-extras";
@@ -31,6 +33,8 @@ const EXTRAS = {
   "gatilho-da-barra-lateral": <SidebarTriggerExtras />,
   "menu-suspenso": <DropdownMenuExtras />,
   "error-summary": <ErrorSummaryExtras />,
+  "estado-de-erro": <ErrorStateExtras />,
+  "campo-de-formulario": <FormFieldExtras />,
 };
 
 export async function generateMetadata({ params }) {

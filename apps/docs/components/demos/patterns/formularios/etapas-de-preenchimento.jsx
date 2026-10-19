@@ -9,6 +9,7 @@ import {
   FormField,
   Input,
   Progress,
+  Stepper,
   Textarea,
 } from "semec-ds/react";
 
@@ -117,22 +118,11 @@ export function EtapasDemo() {
           Etapa {passo + 1} de {PASSOS.length} — {PASSOS[passo]}
         </p>
         <Progress value={progresso} aria-label="Progresso do formulário" />
-        <ol className="flex flex-wrap gap-2">
-          {PASSOS.map((titulo, i) => (
-            <li
-              key={titulo}
-              aria-current={i === passo ? "step" : undefined}
-              className={
-                i === passo
-                  ? "rounded-full border border-border bg-surface px-3 py-1 text-xs font-semibold text-foreground"
-                  : "rounded-full border border-border px-3 py-1 text-xs text-muted-foreground"
-              }
-            >
-              {i + 1}. {titulo}
-              {i < passo ? " — concluída" : i === passo ? " — etapa atual" : ""}
-            </li>
-          ))}
-        </ol>
+        <Stepper
+          steps={PASSOS.map((label) => ({ label }))}
+          currentStep={passo}
+          labels={{ list: "Etapas do formulário" }}
+        />
       </div>
 
       <form onSubmit={aoSubmeter} noValidate className="space-y-5">

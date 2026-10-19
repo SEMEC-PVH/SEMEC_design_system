@@ -11,7 +11,7 @@ variants: "composição: Popover · PopoverTrigger · PopoverContent · PopoverA
 
 > Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.
 
-**Arquivo:** `src/components/popover.tsx` | **Categoria:** Feedback e estados | **Rota:** `/componentes/popover`
+**Arquivo:** `src/components/popover.tsx` | **Categoria:** Feedback e estados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/popover/
 
 ## Variantes
 
@@ -21,14 +21,19 @@ variants: "composição: Popover · PopoverTrigger · PopoverContent · PopoverA
 ## Instalação (@semec/ds)
 
 ```bash
-npm install @semec/ds
+npm install @semec/ds lucide-react
 ```
+
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
 ## Uso
 
@@ -39,7 +44,8 @@ import { Popover, PopoverTrigger, PopoverContent, Button } from "@semec/ds/react
   <PopoverTrigger asChild>
     <Button variant="outline">Filtros</Button>
   </PopoverTrigger>
-  <PopoverContent>
+  {/* PopoverContent é role=dialog: dê um nome com aria-label ou aria-labelledby */}
+  <PopoverContent aria-label="Filtros">
     <p>Opções de filtro aqui.</p>
   </PopoverContent>
 </Popover>
@@ -48,12 +54,14 @@ import { Popover, PopoverTrigger, PopoverContent, Button } from "@semec/ds/react
 ## Prompt para IA
 
 ```text
-Crie um popover (Popover) usando @semec/ds/react (`src/components/popover.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Popover · PopoverTrigger · PopoverContent · PopoverAnchor · props: sideOffset · align · side (top/right/bottom/left). Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.
+Use o componente `Popover` (Popover) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus. API e variantes: composição: Popover · PopoverTrigger · PopoverContent · PopoverAnchor · props: sideOffset · align · side (top/right/bottom/left). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 

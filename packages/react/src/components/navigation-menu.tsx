@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { cva } from "class-variance-authority";
@@ -8,9 +10,12 @@ import { cn } from "../lib/utils";
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, "aria-label": ariaLabel = "Menu principal", ...props }, ref) => (
+  // AUD-31: o Radix rotula o <nav> como "Main" (inglês). O padrão aqui é
+  // "Menu principal"; passe `aria-label` para sobrescrever (ex.: "Menu do servidor").
   <NavigationMenuPrimitive.Root
     ref={ref}
+    aria-label={ariaLabel}
     className={cn(
       "relative z-10 flex max-w-max flex-1 items-center justify-center",
       className
@@ -41,7 +46,7 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+  "group inline-flex h-11 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
 );
 
 const NavigationMenuTrigger = React.forwardRef<
@@ -77,7 +82,29 @@ const NavigationMenuContent = React.forwardRef<
 ));
 NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName;
 
-const NavigationMenuLink = NavigationMenuPrimitive.Link;
+// TST-08: o Link vinha cru (`NavigationMenuPrimitive.Link`) e media 23px de
+// altura no painel. Agora tem alvo de 44px (`min-h-11`), respiro lateral
+// (`px-4`), hover/foco em `tint` e anel de foco por dentro (o viewport tem
+// overflow-hidden e cortaria um anel com offset). `active` (Radix) marca a
+// página atual com `aria-current="page"` e ganha peso semibold.
+// Quem passa `className={navigationMenuTriggerStyle()}` continua com o visual
+// do gatilho: o tailwind-merge resolve display, padding e fundo a favor da
+// classe recebida.
+const navigationMenuLinkStyle = cva(
+  "flex min-h-11 select-none items-center rounded-md px-4 py-2 text-sm font-medium leading-snug text-foreground no-underline outline-none transition-colors duration-fast ease-standard hover:bg-tint hover:text-foreground focus:bg-tint focus:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[active]:font-semibold"
+);
+
+const NavigationMenuLink = React.forwardRef<
+  React.ElementRef<typeof NavigationMenuPrimitive.Link>,
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Link>
+>(({ className, ...props }, ref) => (
+  <NavigationMenuPrimitive.Link
+    ref={ref}
+    className={cn(navigationMenuLinkStyle(), className)}
+    {...props}
+  />
+));
+NavigationMenuLink.displayName = NavigationMenuPrimitive.Link.displayName;
 
 const NavigationMenuViewport = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Viewport>,
@@ -109,7 +136,7 @@ const NavigationMenuIndicator = React.forwardRef<
     )}
     {...props}
   >
-    <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md" />
+    <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-elevation-1" />
   </NavigationMenuPrimitive.Indicator>
 ));
 NavigationMenuIndicator.displayName =
@@ -117,6 +144,7 @@ NavigationMenuIndicator.displayName =
 
 export {
   navigationMenuTriggerStyle,
+  navigationMenuLinkStyle,
   NavigationMenu,
   NavigationMenuList,
   NavigationMenuItem,

@@ -1,0 +1,9 @@
+/* CSS da bancada de regressão visual: as mesmas linhas que o README do kit
+   manda o consumidor usar (Tailwind v4 + tokens + @source do dist). A fonte
+   (fonts.css) entra por <link> separado em index.html, para os woff2 serem
+   servidos com as URLs relativas originais. */
+@import "tailwindcss" source(none);
+@import "../../../packages/react/dist/react/tokens.css";
+@source "../../../packages/react/dist/react";
+@source "../../../scripts/gate";
+@source "../visual.fixtures.mjs";

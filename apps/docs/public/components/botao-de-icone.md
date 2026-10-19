@@ -4,30 +4,36 @@ code: "icon-button"
 slug: "botao-de-icone"
 file: "src/components/icon-button.tsx"
 category: "acoes"
-variants: "variant: primary · secondary · outline · ghost · destructive · link"
+variants: "variant: primary · secondary · outline · ghost · destructive · link · loading: false (padrão) · true (Spinner no lugar do ícone, aria-busy, aria-disabled, clique bloqueado)"
 ---
 
 # Botão de ícone — `icon-button`
 
-> Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).
+> Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome.
 
-**Arquivo:** `src/components/icon-button.tsx` | **Categoria:** Ações e links | **Rota:** `/componentes/botao-de-icone`
+**Arquivo:** `src/components/icon-button.tsx` | **Categoria:** Ações e links | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/botao-de-icone/
 
 ## Variantes
 
 - **variant**: primary · secondary · outline · ghost · destructive · link
+- **loading**: false (padrão) · true (Spinner no lugar do ícone, aria-busy, aria-disabled, clique bloqueado)
 
 ## Instalação (@semec/ds)
 
 ```bash
-npm install @semec/ds
+npm install @semec/ds lucide-react
 ```
+
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
 ## Uso
 
@@ -38,12 +44,13 @@ import { Download, Search, Trash2 } from "lucide-react";
 <IconButton label="Buscar requerimento"><Search /></IconButton>
 <IconButton label="Baixar carnê"><Download /></IconButton>
 <IconButton label="Excluir requerimento" variant="destructive"><Trash2 /></IconButton>
+<IconButton label="Baixar carnê" loading={baixando}><Download /></IconButton>
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um icon-button (Botão de ícone) usando @semec/ds/react (`src/components/icon-button.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: variant: primary · secondary · outline · ghost · destructive · link. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`).
+Use o componente `IconButton` (Botão de ícone) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome. API e variantes: variant: primary · secondary · outline · ghost · destructive · link · loading: false (padrão) · true (Spinner no lugar do ícone, aria-busy, aria-disabled, clique bloqueado). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -72,6 +79,12 @@ export interface IconButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof iconButtonVariants> {
   label: string;
+  /**
+   * Ação em andamento: troca o ícone por um Spinner decorativo e repassa
+   * `loading` ao `Button` (`aria-busy`, `aria-disabled`, clique bloqueado,
+   * foco mantido). O nome acessível continua sendo `label`.
+   */
+  loading?: boolean;
 }
 
 /**
@@ -79,7 +92,10 @@ export interface IconButtonProps
  * (`label`) — sem ele, leitores de tela anunciam um botão vazio.
  */
 const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ className, label, variant = "outline", type = "button", ...props }, ref) => (
+  (
+    { className, label, variant = "outline", type = "button", loading = false, children, ...props },
+    ref
+  ) => (
     <Button
       ref={ref}
       type={type}
@@ -88,8 +104,11 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       aria-label={label}
       title={label}
       className={className}
+      loading={loading}
       {...props}
-    />
+    >
+      {loading ? null : children}
+    </Button>
   )
 );
 IconButton.displayName = "IconButton";

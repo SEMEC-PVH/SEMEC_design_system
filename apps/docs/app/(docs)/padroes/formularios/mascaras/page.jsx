@@ -1,8 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
-import PreviewFrame from "@/components/docs/PreviewFrame";
-import CodeBlock from "@/components/docs/CodeBlock";
+import PatternDemo from "@/components/docs/PatternDemo";
 import { FormAdvanced } from "@/components/demos/examples/form-advanced";
-import { formAdvancedUsage } from "@/components/demos/examples/form-advanced-data";
 
 export const metadata = { title: "Máscaras" };
 
@@ -41,14 +39,9 @@ export default function MascarasPage() {
         ]}
         note="Máscara facilita a entrada, mas nunca deve esconder o valor real digitado."
       />
-      <h2>Exemplo — máscaras CPF/CNPJ/CEP/moeda</h2>
-      <p>Mesmo formulário da página Validação — altere tipo PF/PJ para ver CPF↔CNPJ, CEP e moeda em tempo real.</p>
-      <PreviewFrame>
-        <div style={{ padding: "1rem" }}>
-          <FormAdvanced />
-        </div>
-      </PreviewFrame>
-      <CodeBlock code={formAdvancedUsage} filename="FormAdvanced.jsx" prompt="Crie campos com máscara CPF CNPJ CEP moeda usando semec-ds-react — Input com inputMode numeric e formatação ao digitar" />
+      <PatternDemo id="formularios/mascaras">
+        <FormAdvanced />
+      </PatternDemo>
     </>
   );
 }

@@ -1,9 +1,56 @@
+"use client";
+
 import * as React from "react";
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { cn } from "../lib/utils";
 
 type SortDirection = "asc" | "desc" | null;
+
+/** Controles que tratam o próprio clique e não devem ativar a linha (TST-11). */
+const INTERACTIVE_SELECTOR = [
+  "a[href]",
+  "button",
+  "input",
+  "select",
+  "textarea",
+  "label",
+  "summary",
+  "[contenteditable]:not([contenteditable=false])",
+  "[role=button]",
+  "[role=link]",
+  "[role=checkbox]",
+  "[role=radio]",
+  "[role=switch]",
+  "[role=menuitem]",
+  "[role=option]",
+  "[role=combobox]",
+  "[role=tab]",
+  "[tabindex]:not([tabindex='-1'])",
+].join(",");
+
+export interface DataTableLabels {
+  /**
+   * Instrução do botão de ordenação, exposta como **descrição**
+   * (`aria-describedby`). Padrão: `Ordenar por ${header}`. O nome do botão e do
+   * cabeçalho é só o texto da coluna (TST-27): antes este texto virava o nome
+   * do `columnheader` e era repetido a cada célula pelo leitor de tela.
+   */
+  sortBy: (header: string) => string;
+  /** Texto da paginação. Padrão: `Página ${page} de ${pageCount}`. */
+  pageOf: (page: number, pageCount: number) => string;
+  /** Padrão: "Anterior". */
+  previous: string;
+  /** Padrão: "Próximo". */
+  next: string;
+}
+
+const defaultDataTableLabels: DataTableLabels = {
+  sortBy: (header) => `Ordenar por ${header}`,
+  pageOf: (page, pageCount) => `Página ${page} de ${pageCount}`,
+  previous: "Anterior",
+  next: "Próximo",
+};
 
 interface Column<T> {
   key: string;
@@ -24,8 +71,22 @@ interface DataTableProps<T> extends React.HTMLAttributes<HTMLDivElement> {
   onPageChange?: (page: number) => void;
   emptyMessage?: string;
   rowKey?: (row: T, index: number) => string | number;
+  /**
+   * Ativação da linha inteira. A linha fica focável (Tab) e responde a
+   * Enter/Espaço, além do clique. Para várias ações por linha, prefira uma
+   * coluna de ações com botões (`render`) — ver manifest/usage.
+   */
   onRowClick?: (row: T, index: number) => void;
+  /**
+   * Nome acessível da linha (`aria-label` na `<tr>`), por exemplo
+   * `(row) => "Abrir protocolo " + row.numero`. Recomendado junto com
+   * `onRowClick`: a linha focável não tem nome próprio e o leitor de tela não
+   * diz o que o Enter faz (TST-28).
+   */
+  rowLabel?: (row: T, index: number) => string;
   caption?: string;
+  /** Textos embutidos (PT-BR por padrão), sobrescrevíveis um a um. */
+  labels?: Partial<DataTableLabels>;
 }
 
 function DataTableInner<T extends Record<string, unknown>>(
@@ -41,20 +102,58 @@ function DataTableInner<T extends Record<string, unknown>>(
     emptyMessage = "Nenhum registro encontrado.",
     rowKey,
     onRowClick,
+    rowLabel,
     caption,
+    labels: labelsProp,
     className,
     ...props
   }: DataTableProps<T>,
   _ref: React.Ref<HTMLDivElement>
 ) {
+  const labels = { ...defaultDataTableLabels, ...labelsProp };
+  const idBase = React.useId();
+
   const handleSort = (key: string) => {
     onSort?.(key);
   };
 
   const getSortIcon = (key: string) => {
-    if (sortKey !== key) return <ArrowUpDown className="h-3 w-3 opacity-50" />;
-    if (sortDir === "asc") return <ArrowUp className="h-3 w-3" />;
-    return <ArrowDown className="h-3 w-3" />;
+    if (sortKey !== key || !sortDir)
+      return <ArrowUpDown className="h-3 w-3 opacity-50" aria-hidden="true" />;
+    if (sortDir === "asc") return <ArrowUp className="h-3 w-3" aria-hidden="true" />;
+    return <ArrowDown className="h-3 w-3" aria-hidden="true" />;
+  };
+
+  // Enter/Espaço ativam a linha só quando o foco está nela mesma, para não
+  // sequestrar teclas de botões/links dentro das células.
+  const handleRowKeyDown = (
+    event: React.KeyboardEvent<HTMLTableRowElement>,
+    row: T,
+    index: number
+  ) => {
+    if (!onRowClick || event.target !== event.currentTarget) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onRowClick(row, index);
+    }
+  };
+
+  // O clique (do mouse, ou o sintético que o Enter/Espaço gera num botão) sobe
+  // até a <tr>. Ignora o que vem de um controle dentro da célula e o que vem
+  // de um portal (menu/diálogo aberto por uma célula), que sobe pela árvore do
+  // React sem estar dentro da linha no DOM (TST-11).
+  const handleRowClick = (
+    event: React.MouseEvent<HTMLTableRowElement>,
+    row: T,
+    index: number
+  ) => {
+    if (!onRowClick) return;
+    const rowEl = event.currentTarget;
+    const target = event.target as Element | null;
+    if (!target || !rowEl.contains(target)) return;
+    const interactive = target.closest(INTERACTIVE_SELECTOR);
+    if (interactive && interactive !== rowEl && rowEl.contains(interactive)) return;
+    onRowClick(row, index);
   };
 
   return (
@@ -68,13 +167,13 @@ function DataTableInner<T extends Record<string, unknown>>(
           )}
           <thead className="border-b border-border bg-muted/50">
             <tr>
-              {columns.map((col) => (
+              {columns.map((col, colIndex) => (
                 <th
                   key={col.key}
                   scope="col"
                   aria-sort={
                     col.sortable
-                      ? sortKey === col.key
+                      ? sortKey === col.key && sortDir
                         ? sortDir === "asc"
                           ? "ascending"
                           : "descending"
@@ -88,15 +187,24 @@ function DataTableInner<T extends Record<string, unknown>>(
                   )}
                 >
                   {col.sortable ? (
-                    <button
-                      type="button"
-                      onClick={() => handleSort(col.key)}
-                      aria-label={`Ordenar por ${col.header}`}
-                      className="inline-flex items-center gap-2 rounded-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    >
-                      {col.header}
-                      {getSortIcon(col.key)}
-                    </button>
+                    <>
+                      {/* min-h-11/min-w-11: alvo de 44 px (TST-10) sem
+                          crescer o cabeçalho, que já tem h-11. */}
+                      <button
+                        type="button"
+                        onClick={() => handleSort(col.key)}
+                        aria-describedby={`${idBase}-sort-${colIndex}`}
+                        className="inline-flex min-h-11 min-w-11 items-center gap-2 rounded-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      >
+                        {col.header}
+                        {getSortIcon(col.key)}
+                      </button>
+                      {/* `hidden`: fora do nome do columnheader (calculado
+                          pelo conteúdo), mas referenciável como descrição. */}
+                      <span id={`${idBase}-sort-${colIndex}`} hidden>
+                        {labels.sortBy(col.header)}
+                      </span>
+                    </>
                   ) : (
                     <div className="flex items-center gap-2">{col.header}</div>
                   )}
@@ -120,9 +228,21 @@ function DataTableInner<T extends Record<string, unknown>>(
                   key={rowKey ? rowKey(row, index) : index}
                   className={cn(
                     "border-b border-border transition-colors duration-fast ease-standard hover:bg-muted/50 data-[state=selected]:bg-muted",
-                    onRowClick && "cursor-pointer"
+                    onRowClick &&
+                      "cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
                   )}
-                  onClick={onRowClick ? () => onRowClick(row, index) : undefined}
+                  tabIndex={onRowClick ? 0 : undefined}
+                  aria-label={rowLabel ? rowLabel(row, index) : undefined}
+                  onClick={
+                    onRowClick
+                      ? (event) => handleRowClick(event, row, index)
+                      : undefined
+                  }
+                  onKeyDown={
+                    onRowClick
+                      ? (event) => handleRowKeyDown(event, row, index)
+                      : undefined
+                  }
                 >
                   {columns.map((col) => (
                     <td
@@ -145,28 +265,30 @@ function DataTableInner<T extends Record<string, unknown>>(
       </div>
 
       {page !== undefined && pageCount !== undefined && pageCount > 1 && (
-        <div className="flex items-center justify-between px-2 py-4">
+        // Abaixo de `sm` o rodapé vira coluna e os botões podem quebrar de
+        // linha, em vez de o texto quebrar dentro do botão (TST-23).
+        <div className="flex flex-col gap-2 px-2 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-sm text-muted-foreground">
-            Página {page} de {pageCount}
+            {labels.pageOf(page, pageCount)}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => onPageChange?.(page - 1)}
               disabled={page <= 1}
-              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              <ChevronLeft className="h-4 w-4" />
-              Anterior
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+              {labels.previous}
             </button>
             <button
               type="button"
               onClick={() => onPageChange?.(page + 1)}
               disabled={page >= pageCount}
-              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              Próximo
-              <ChevronRight className="h-4 w-4" />
+              {labels.next}
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>

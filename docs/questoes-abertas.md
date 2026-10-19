@@ -12,19 +12,21 @@ Este documento reúne, em um lugar só, as decisões que ainda não foram tomada
 
 | Identificador | Questão | Quem decide | Status |
 |---|---|---|---|
-| **QA-01** · `Q1` `D1` `F5` | Qual azul é o azul institucional, e a paleta parte da marca ou de um sistema neutro? | Responsável pela marca institucional, com os mantenedores | Aberta |
+| **QA-01** · `Q1` `D1` `F5` | Qual azul é o azul institucional, e a paleta parte da marca ou de um sistema neutro? | Responsável pela marca institucional, com os mantenedores | Aberta — dono: @VgavaBR123, prazo 14/11/2026 |
 | **QA-02** · `Q2` `D5` | O design system é da SEMEC ou nasce como padrão da PMPV? | Direção da SEMEC com a prefeitura | Aberta |
-| **QA-03** · `Q6` `D2` | Qual família tipográfica: Rawline/Raleway do gov.br, Poppins ou fonte de sistema? | Responsável pela marca institucional, com os mantenedores | Aberta |
+| **QA-03** · `Q6` `D2` | Qual família tipográfica: Rawline/Raleway do gov.br, Poppins ou fonte de sistema? | Responsável pela marca institucional, com os mantenedores | Aberta — dono: @VgavaBR123, prazo 14/11/2026 |
 | **QA-04** · `Q3` | O SIGO nasce sobre o design system ou o design system é extraído dele depois? | Mantenedores com a gestão do SIGO | Aberta |
 | **QA-05** · `Q4` | Existe capacidade de manter um UIKit no Figma, ou a documentação em código é a única fonte? | Mantenedores com quem desenha | Aberta |
 | **QA-06** · `Q5` | ~~O registry npm do Gitea da prefeitura está habilitado, e sob qual owner?~~ | ~~Administração do Gitea institucional, com os mantenedores~~ | **Respondida** — [ADR-022](adr/0022-publicacao-npm-publico.md) |
 | **QA-07** · `D3` | Qual vermelho vira o token de perigo, que hoje não existe na paleta? | Responsável pela marca institucional, com os mantenedores | **Respondida** — [ADR-024](adr/0024-vermelho-de-perigo-pv-red-700.md) |
 | **QA-08** · `D4` | A Calculadora de Taxas migra para os tokens institucionais ou fica como exceção documentada? | Mantenedores com o time da Calculadora | Aberta |
-| **QA-09** · `F10` | O design system assina como DEVSEMEC ou como SEMEC/PMPV? | Responsável pela marca institucional | Aberta |
+| **QA-09** · `F10` | O design system assina como DEVSEMEC ou como SEMEC/PMPV? | Responsável pela marca institucional | Aberta — dono: @VgavaBR123, prazo 14/11/2026 |
 
 ---
 
 ## QA-01 — O azul institucional · `Q1` `D1` `F5`
+
+**Dono: Vinicius Gava de Oliveira (@VgavaBR123) · prazo: 14/11/2026** (definidos em 15/10/2026, AUD-48). O dono conduz a decisão com quem a tabela indica e registra a resposta como ADR; não decide sozinho.
 
 **A pergunta.** A escala primária de azul é derivada de qual cor? E, na formulação mais ampla da Q1: paleta e tipografia partem da marca da Prefeitura, da marca da SEMEC ou de um sistema neutro criado para o design system?
 
@@ -42,6 +44,8 @@ A parte tipográfica da Q1 está desdobrada em **QA-03**; a parte de qual marca 
 
 **A pergunta.** O design system é da SEMEC, ou nasce já como padrão da Prefeitura de Porto Velho? A Q2 observa que isso muda a governança e o nome do escopo npm. A D5 faz a mesma pergunta pelo lado do tema: `semec` é um tema dentro de um sistema `pmpv`, ou o contrário?
 
+> **Nota (15/10/2026, AUD-47).** O ADR-012 citado abaixo foi substituído pelo [ADR-025](adr/0025-tema-unico-claro.md): o pacote tem tema único claro e o mecanismo multi-órgão nunca foi implementado. Mais de um tema volta a ser decisão nova, se esta questão pedir.
+
 **O que já se sabe.** O [ADR-012](adr/0012-tema-por-atributo-de-dados.md) já decidiu que o tema é aplicado por atributo de dados e que o sistema é multi-órgão, o que torna a resposta possível em qualquer ordem — mas não a dispensa, porque ela define qual órgão é o padrão e qual é a exceção. O [ADR-007](adr/0007-distribuicao-registry-npm-gitea.md) já fixou o escopo `@semec` para publicação. O roadmap da [arquitetura](arquitetura.md) prevê "adoção fora da SEMEC" apenas na fase F4, e a D5 argumenta que vale definir agora, não na F4. O papel de "aprovação de identidade" descrito na governança é de quem detém a identidade institucional — que órgão é esse depende desta resposta.
 
 **Nota de facto (30/09/2026, registro sem ADR).** A parte prática desta questão já está respondida no código e nos ADRs: o pacote é publicado sob o escopo **`@semec`** ([ADR-007](adr/0007-distribuicao-registry-npm-gitea.md), mantido pelo [ADR-022](adr/0022-publicacao-npm-publico.md)) e o projeto se chama **Design System da SEMEC**. O que permanece em aberto é a parte de governança: se o sistema nasce como padrão da SEMEC ou já como padrão da PMPV — decisão da direção, não do código.
@@ -53,6 +57,8 @@ A parte tipográfica da Q1 está desdobrada em **QA-03**; a parte de qual marca 
 ---
 
 ## QA-03 — Tipografia · `Q6` `D2`
+
+**Dono: Vinicius Gava de Oliveira (@VgavaBR123) · prazo: 14/11/2026** (definidos em 15/10/2026, AUD-48). Estado de fato até lá: o pacote publica Poppins 400–700 auto-hospedada (`@semec/ds/react/fonts.css`, licença SIL OFL).
 
 **A pergunta.** Usar Rawline/Raleway, o padrão do gov.br, ou uma fonte de sistema — considerando licenciamento e desempenho (Q6)? Ou consolidar em Poppins, ou ainda aproveitar o design system para escolher uma família com melhor leitura em tabela densa (D2)?
 
@@ -96,7 +102,7 @@ A parte tipográfica da Q1 está desdobrada em **QA-03**; a parte de qual marca 
 
 **Resposta (ADR-022, 17/09/2026).** Esta questão foi **encerrada** pelo [ADR-022](adr/0022-publicacao-npm-publico.md): o ADR-007 (registry npm do Gitea) foi **substituído**, e a publicação passou a ser no **npm público**, sob o pacote unificado `@semec/ds`. O caminho Gitea foi abandonado de forma registrada — o registry institucional não foi confirmado, o repositório remoto é o GitHub e a adoção externa esbarra na impossibilidade de instalar de um registry inacessível. O owner do Gitea, se o registry um dia for retomado, segue dependendo de **QA-02**.
 
-**O que a resposta destrava.** ~~A fase F0 inteira~~ — destravada: o pacote `@semec/ds` está publicado (v2.1.0) e consumível via `npm install @semec/ds`. O token de publicação do CI e a seção de instalação da documentação seguem o npm público.
+**O que a resposta destrava.** ~~A fase F0 inteira~~ — destravada: o pacote `@semec/ds` está publicado (v2.1.0 na data da resposta; 3.1.0 em 15/10/2026) e consumível via `npm install @semec/ds`. O token de publicação do CI e a seção de instalação da documentação seguem o npm público.
 
 **O que fica desatualizado quando ela for respondida.** [`adr/0007-distribuicao-registry-npm-gitea.md`](adr/0007-distribuicao-registry-npm-gitea.md) — status `Substituído por 022`; [`adr/README.md`](adr/README.md), na coluna de status; [`arquitetura.md`](arquitetura.md), seções 8, 12 e 13 (nota de estado atual adicionada); [`especificacao-alvo.md`](especificacao-alvo.md), seção "Instalação" (nota de ADR-022 adicionada); [`CONTRIBUTING.md`](../CONTRIBUTING.md), na parte de processo futuro.
 
@@ -106,7 +112,7 @@ A parte tipográfica da Q1 está desdobrada em **QA-03**; a parte de qual marca 
 
 **A pergunta.** Qual vermelho vira o token de perigo? Ele não existe na paleta institucional e precisa ser criado e validado para contraste.
 
-**Resposta (ADR-024, 07/10/2026).** A escala **`--pv-red-*` com centro em `--pv-red-700: #b91c1c`** é o token de perigo, com `--pv-red-50: #fef2f2` como superfície. Contraste medido: 5,98:1 sobre o fundo de página e 6,47:1 com texto branco. O tema escuro troca só o L1 (`--pv-red-400`). A escolha é por contraste e por já estar em uso no portal, não por identidade — se a QA-01 ou a QA-09 mudarem a paleta de marca, a escala `pv-red-*` é a única que precisa ser trocada, sem tocar em componente.
+**Resposta (ADR-024, 07/10/2026).** A escala **`--pv-red-*` com centro em `--pv-red-700: #b91c1c`** é o token de perigo, com `--pv-red-50: #fef2f2` como superfície. Contraste medido: 5,98:1 sobre o fundo de página e 6,47:1 com texto branco. No tema escuro **do site de documentação**, só o L1 troca (`--pv-red-400`); o pacote não tem tema escuro desde a 2.0.0 (errata do ADR-024 e [ADR-025](adr/0025-tema-unico-claro.md)). A escolha é por contraste e por já estar em uso no portal, não por identidade — se a QA-01 ou a QA-09 mudarem a paleta de marca, a escala `pv-red-*` é a única que precisa ser trocada, sem tocar em componente.
 
 **O que já se sabe.** A paleta institucional declarada tem azul, verde, amarelo e neutros — não tem vermelho, como registra o [inventário](inventario-identidade.md), que também cataloga as cores em uso fora de qualquer sistema. A [especificação-alvo](especificacao-alvo.md) já prevê a existência de tokens semânticos e regras de contraste, e o [ADR-014](adr/0014-wcag-21-aa-criterio-bloqueante.md) torna WCAG 2.1 AA critério bloqueante — ou seja, o vermelho escolhido precisa passar no cálculo antes de ser adotado, não depois.
 
@@ -120,6 +126,8 @@ A parte tipográfica da Q1 está desdobrada em **QA-03**; a parte de qual marca 
 
 **A pergunta.** A Calculadora de Taxas migra para os tokens institucionais na fase F1, ou fica com o tema próprio como exceção documentada?
 
+> **Nota (15/10/2026, AUD-47).** O ADR-012 citado abaixo foi substituído pelo [ADR-025](adr/0025-tema-unico-claro.md) (tema único claro no pacote). Manter a Calculadora com tema próprio continua possível, sobrescrevendo os L1 no próprio app, mas não é mais um mecanismo do pacote.
+
 **O que já se sabe.** O [inventário](inventario-identidade.md) registra que existe uma segunda paleta em circulação, em tokens no formato shadcn escopados a essa aplicação — ou seja, o tema próprio é fato consumado, não hipótese. O [ADR-012](adr/0012-tema-por-atributo-de-dados.md) dá o mecanismo para manter a exceção de forma formal, por atributo de dados, em vez de por divergência. O [caminho de adoção](adocao.md) prevê a substituição mecânica dos hex institucionais por tokens, e o alcance dessa substituição depende desta resposta.
 
 **O que a resposta destrava.** O escopo do passo 3 do caminho de adoção e quantos temas o sistema precisa carregar já na F1 — o que, por sua vez, é o primeiro teste real da arquitetura multi-tema.
@@ -130,6 +138,8 @@ A parte tipográfica da Q1 está desdobrada em **QA-03**; a parte de qual marca 
 
 ## QA-09 — A assinatura de marca do site · `F10`
 
+**Dono: Vinicius Gava de Oliveira (@VgavaBR123) · prazo: 14/11/2026** (definidos em 15/10/2026, AUD-48).
+
 **A pergunta.** O design system assina como DEVSEMEC, a marca do time de tecnologia, ou como SEMEC/PMPV, a marca institucional?
 
 **O que já se sabe.** A [auditoria](auditoria/2026-08-21-repositorio.md) levantou a questão a partir de fatos medidos: o logotipo do cabeçalho é a palavra DEVSEMEC em Press Start 2P, uma fonte pixel de videogame; a página de anti-padrões do próprio site proíbe `font-press-start` "fora do logotipo", isto é, a regra foi escrita para acomodar a exceção; há um MIV oficial da PMPV de 20 MB dentro do repositório; e o `app/icon.svg` é um "S" em Arial. A auditoria classificou o achado como MÉDIO, mas observou que ele **é a Q1 do documento de arquitetura** e que trava a definição dos tokens primitivos.
@@ -139,6 +149,18 @@ Esta questão ficou separada de **QA-01** e **QA-02** de propósito: ela decide 
 **O que a resposta destrava.** A substituição do logotipo e do favicon, o uso (ou a remoção) do MIV oficial que já está versionado aqui, e o destino da regra de exceção de fonte na página de anti-padrões.
 
 **O que fica desatualizado quando ela for respondida.** [`auditoria/2026-08-21-repositorio.md`](auditoria/2026-08-21-repositorio.md), achado F10 e os itens menores ligados a ícone e marca; [`inventario-identidade.md`](inventario-identidade.md), seção 1, sobre assets e duplicação de marca; [`especificacao-alvo.md`](especificacao-alvo.md), seção "Marca e ilustração".
+
+---
+
+## Decisões avulsas da auditoria de 14/10/2026
+
+A [auditoria de 14/10/2026](auditoria/2026-10-14-auditoria-prototipos-antes-depois.md) deixou pontos ambíguos (`AMB-*`) que não são questões de identidade e não pedem ADR. As respostas do mantenedor ficam registradas aqui, com data.
+
+| Ponto | Decisão (15/10/2026) | Onde está aplicada |
+|---|---|---|
+| **AMB-09** · crédito (AUD-69) | **Respondida.** O crédito à SEMEC em projetos que usam o kit é **recomendado, não obrigatório**: a licença MIT só exige manter o aviso de copyright e a licença nas cópias do código. A SKILL deixa de dizer "obrigatório" e passa a sugerir o texto de crédito. | `packages/react/README.md` § Licença e crédito; skills `semec-ds` e `semec-ds-lite` § Crédito; `manifest.json` do lite (`credit.required: false`) |
+| Raio (AUD-57) | Fica a escala do código: `sm` 2px · `md` 8px · `lg` 12px · `full`. A especificação-alvo foi corrigida; o aviso "a escala pode mudar na 4.0" deixa de valer. | `packages/react/tokens.css`; [especificacao-alvo.md](especificacao-alvo.md) § Forma |
+| Button desabilitado e carregando (AUD-63) | O `Button` mantém `disabled` nativo e ganha `loading`: `aria-busy="true"` e `aria-disabled="true"` (continua focalizável) só durante o carregamento. | [especificacao-alvo.md](especificacao-alvo.md) § Button; implementação no componente em PR próprio |
 
 ---
 

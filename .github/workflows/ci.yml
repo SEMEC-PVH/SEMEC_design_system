@@ -1,13 +1,58 @@
 name: CI
 
+# Cobre o checklist de PR do AGENTS.md/CONTRIBUTING.md:
+# build:ds, typecheck, lint, build do site, deriva dos artefatos de agentes,
+# changeset obrigatório para mudança publicada do @semec/ds, testes do kit, o gate de qualidade
+# e a regressão visual (contêiner do Playwright).
+# O workflow "Release" só roda depois que este termina verde no main.
+
 on:
   pull_request:
     branches: [main]
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  changeset:
+    name: changeset
+    # O PR "Version Packages" (changeset-release/main) consome os changesets;
+    # ele mexe em package.json/CHANGELOG sem changeset, por definição.
+    if: github.event_name == 'pull_request' && !startsWith(github.head_ref, 'changeset-release/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Verificar changeset
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          # Falha se o PR muda arquivos publicados do @semec/ds
+          # ("changedFilePatterns" em .changeset/config.json: src/**, manifest.js,
+          # tokens.css, skills/** etc.) sem um changeset correspondente.
+          if ! npx changeset status --since="origin/${BASE_REF}"; then
+            echo "::error title=Changeset ausente::Este PR altera arquivos publicados do @semec/ds sem changeset. Rode 'npm run changeset' e commite o arquivo em .changeset/. Se a mudança realmente não precisa de release, use 'npx changeset add --empty'."
+            exit 1
+          fi
+
   lint:
+    name: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +69,7 @@ jobs:
         run: npm run lint
 
   typecheck:
+    name: typecheck
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +85,25 @@ jobs:
       - name: Typecheck package
         run: npm run typecheck
 
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Testes do @semec/ds (Vitest + Testing Library + axe, zod 3 e 4)
+        run: npm test
+
   build:
+    name: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,3 +121,86 @@ jobs:
 
       - name: Verify dist exists
         run: test -f packages/react/dist/react/index.js
+
+      - name: Testes do dist (fronteira RSC + poda por módulo)
+        # check-rsc: importa @semec/ds/react na camada react-server, com os módulos
+        # "use client" trocados por client references. check-treeshake: falha se
+        # `import { Button } from "@semec/ds/react"` passar do limite de bundle.
+        run: npm run test:dist --workspace @semec/ds
+
+      - name: Build docs (export estático)
+        # Chama o workspace direto: o "build" da raiz repetiria o build:ds no prebuild.
+        run: npm run build --workspace @semec/docs
+
+      - name: Aviso "Não publicado" nas páginas do site (TST-15)
+        # Com changesets pendentes, toda página exportada mostra o aviso; sem eles, nenhuma.
+        run: npm run check:release-banner --workspace @semec/docs
+
+      - name: Verificar deriva dos artefatos de agentes
+        run: |
+          # build:ds e o prebuild do site regeneram llms.txt, llms-full.txt,
+          # manifest.json, components/*.md e skills/ em apps/docs/public a partir de
+          # packages/react/manifest.js. Se algo mudou, o commit esqueceu de regenerar.
+          # O carimbo de data ("generatedAt" e "> Gerado <data>") é determinístico
+          # (último commit em packages/react), mas o commit que muda o pacote recebe
+          # data nova depois que os artefatos foram gerados, e o checkout raso da CI
+          # vê outra data; por isso essas duas linhas ficam fora da comparação.
+          untracked=$(git ls-files --others --exclude-standard -- apps/docs/public)
+          if ! git --no-pager diff --exit-code --stat \
+               -I '"generatedAt":' -I '^> Gerado ' -- apps/docs/public || [ -n "$untracked" ]; then
+            git --no-pager diff -I '"generatedAt":' -I '^> Gerado ' -- apps/docs/public | head -200
+            [ -n "$untracked" ] && printf 'Arquivos novos não commitados:\n%s\n' "$untracked"
+            echo "::error title=Artefatos desatualizados::apps/docs/public está desatualizado em relação a packages/react/manifest.js. Rode 'npm run build:ds' (ou 'npm run generate:llms') e commite apps/docs/public."
+            exit 1
+          fi
+
+  visual:
+    name: test:visual
+    # Regressão visual (TST-B1): as baselines são do Linux, geradas nesta mesma
+    # imagem. A tag acompanha a versão EXATA do @playwright/test no package.json;
+    # o tests/visual/docker.mjs confere a revisão do Chromium e falha se divergir.
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
+    env:
+      CI: "1"
+      HOME: /root
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install
+        run: npm ci
+
+      - name: Regressão visual (build:ds + Playwright no contêiner)
+        # O pretest:visual roda build:ds; dentro da imagem o docker.mjs chama o Playwright direto.
+        run: npm run test:visual
+
+      - name: Enviar diffs e relatório
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regressao-visual
+          path: |
+            tests/visual/.results
+            tests/visual/.report
+          retention-days: 14
+
+  gate:
+    name: gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Instalar Chromium (estados abertos do gate)
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Quality and Regression Gate
+        run: npm run gate

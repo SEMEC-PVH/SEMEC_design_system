@@ -3,7 +3,7 @@
 import * as React from "react";
 import { setNonce } from "get-nonce";
 
-interface SemecProviderProps {
+export interface SemecProviderProps {
   /** CSP nonce aplicado a todos os <style> injetados pelo React (Radix, remove-scroll). */
   nonce?: string;
   children: React.ReactNode;
@@ -38,4 +38,4 @@ function SemecProvider({ nonce, children }: SemecProviderProps) {
 
 SemecProvider.displayName = "SemecProvider";
 
-export { SemecProvider, type SemecProviderProps };
+export { SemecProvider };

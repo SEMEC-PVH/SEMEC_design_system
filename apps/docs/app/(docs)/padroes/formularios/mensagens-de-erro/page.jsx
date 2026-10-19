@@ -1,8 +1,6 @@
 import PatternPage from "@/components/ui/PatternPage";
-import PreviewFrame from "@/components/docs/PreviewFrame";
-import CodeBlock from "@/components/docs/CodeBlock";
+import PatternDemo from "@/components/docs/PatternDemo";
 import { FormAdvanced } from "@/components/demos/examples/form-advanced";
-import { formAdvancedUsage } from "@/components/demos/examples/form-advanced-data";
 
 export const metadata = { title: "Mensagens de erro" };
 
@@ -42,14 +40,18 @@ export default function MensagensDeErroPage() {
         ]}
         note="Uma boa mensagem de erro diz o que aconteceu, por quê e como resolver."
       />
-      <h2>Exemplo — ErrorSummary + FormField a11y</h2>
-      <p>ErrorSummary no topo com links âncora para cada campo + <code>FormField</code> com <code>aria-invalid</code> e <code>role=&quot;alert&quot;</code>. Deixe campos vazios e envie.</p>
-      <PreviewFrame>
-        <div style={{ padding: "1rem" }}>
-          <FormAdvanced />
-        </div>
-      </PreviewFrame>
-      <CodeBlock code={formAdvancedUsage} filename="FormAdvanced.jsx" prompt="Crie mensagens de erro acessíveis com ErrorSummary e FormField aria-invalid usando semec-ds-react" />
+      <PatternDemo
+        id="formularios/mensagens-de-erro"
+        desc={
+          <>
+            ErrorSummary no topo com links âncora para cada campo +{" "}
+            <code>FormField</code> com <code>aria-invalid</code> e{" "}
+            <code>role=&quot;alert&quot;</code>. Deixe campos vazios e envie.
+          </>
+        }
+      >
+        <FormAdvanced />
+      </PatternDemo>
     </>
   );
 }

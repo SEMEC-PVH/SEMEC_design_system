@@ -11,7 +11,7 @@ variants: "composição: TooltipProvider · Tooltip · TooltipTrigger · Tooltip
 
 > Dica curta ao passar o ponteiro ou focar o elemento.
 
-**Arquivo:** `src/components/tooltip.tsx` | **Categoria:** Feedback e estados | **Rota:** `/componentes/dica`
+**Arquivo:** `src/components/tooltip.tsx` | **Categoria:** Feedback e estados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/dica/
 
 ## Variantes
 
@@ -20,23 +20,29 @@ variants: "composição: TooltipProvider · Tooltip · TooltipTrigger · Tooltip
 ## Instalação (@semec/ds)
 
 ```bash
-npm install @semec/ds
+npm install @semec/ds lucide-react
 ```
+
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
 ## Uso
 
 ```tsx
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } from "@semec/ds/react";
+import { HelpCircle } from "lucide-react";
 
 <TooltipProvider>
   <Tooltip>
-    <TooltipTrigger asChild><IconButton aria-label="Ajuda"><HelpCircle /></IconButton></TooltipTrigger>
+    <TooltipTrigger asChild><IconButton label="Ajuda"><HelpCircle /></IconButton></TooltipTrigger>
     <TooltipContent>Explica o campo ao lado</TooltipContent>
   </Tooltip>
 </TooltipProvider>
@@ -45,12 +51,14 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, IconButton } 
 ## Prompt para IA
 
 ```text
-Crie um tooltip (Dica) usando @semec/ds/react (`src/components/tooltip.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: TooltipProvider · Tooltip · TooltipTrigger · TooltipContent. Dica curta ao passar o ponteiro ou focar o elemento.
+Use o componente `Tooltip` (Dica) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Dica curta ao passar o ponteiro ou focar o elemento. API e variantes: composição: TooltipProvider · Tooltip · TooltipTrigger · TooltipContent. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 

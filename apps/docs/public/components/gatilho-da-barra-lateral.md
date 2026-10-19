@@ -9,9 +9,9 @@ variants: "props: open · onToggle · labelOpen · labelClosed · a11y: aria-exp
 
 # Gatilho da barra lateral — `sidebar-trigger`
 
-> Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
+> `SidebarToggleButton`: botão controlado (`open` + `onToggle`) para colapsar/expandir uma sidebar cujo estado vive no seu layout (ex.: Header). Alterna entre ícones PanelLeftOpen e PanelLeftClose. Dentro de `SidebarProvider`, use `SidebarTrigger` (ver Barra lateral), que não recebe `open`/`onToggle`.
 
-**Arquivo:** `src/components/sidebar-trigger.tsx` | **Categoria:** Navegação | **Rota:** `/componentes/gatilho-da-barra-lateral`
+**Arquivo:** `src/components/sidebar-trigger.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/gatilho-da-barra-lateral/
 
 ## Variantes
 
@@ -21,32 +21,42 @@ variants: "props: open · onToggle · labelOpen · labelClosed · a11y: aria-exp
 ## Instalação (@semec/ds)
 
 ```bash
-npm install @semec/ds
+npm install @semec/ds lucide-react
 ```
+
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
+
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
 ## Uso
 
 ```tsx
 import { SidebarToggleButton } from "@semec/ds/react";
 
-<SidebarToggleButton open={sidebarOpen} onToggle={() => setSidebarOpen(v => !v)} />
+// Estado no seu layout; o rótulo acessível vem de labelOpen/labelClosed
+<SidebarToggleButton open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+
+// Com SidebarProvider (componente Barra lateral), use <SidebarTrigger /> — sem open/onToggle
 ```
 
 ## Prompt para IA
 
 ```text
-Crie um sidebar-trigger (Gatilho da barra lateral) usando @semec/ds/react (`src/components/sidebar-trigger.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). Botão para colapsar/expandir a sidebar. Alterna entre ícones PanelLeftOpen e PanelLeftClose.
+Use o componente `SidebarToggleButton` (Gatilho da barra lateral) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. `SidebarToggleButton`: botão controlado (`open` + `onToggle`) para colapsar/expandir uma sidebar cujo estado vive no seu layout (ex.: Header). Alterna entre ícones PanelLeftOpen e PanelLeftClose. Dentro de `SidebarProvider`, use `SidebarTrigger` (ver Barra lateral), que não recebe `open`/`onToggle`. API e variantes: props: open · onToggle · labelOpen · labelClosed · a11y: aria-expanded · aria-label dinâmico (Abrir/Fechar menu). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
 
 ```tsx
+"use client";
+
 import * as React from "react";
 
 import { IconButton, type IconButtonProps } from "./icon-button";
@@ -57,11 +67,14 @@ import { IconButton, type IconButtonProps } from "./icon-button";
  *
  * **Props herdadas de IconButton:** `open` controla qual ícone exibir
  * (PanelLeftClose quando aberto, PanelLeftOpen quando fechado). `onToggle`
- * é chamado ao clicar. `label` pode ser sobrescrito para rótulos
- * específicos.
+ * é chamado ao clicar. `label` é opcional: sem ele, o nome acessível
+ * alterna entre `labelOpen` e `labelClosed`; com ele, vira um rótulo fixo
+ * (o estado continua anunciado por `aria-expanded`).
  */
 export interface SidebarToggleButtonProps
-  extends Omit<IconButtonProps, "icon"> {
+  extends Omit<IconButtonProps, "icon" | "label"> {
+  /** Rótulo acessível fixo. Opcional; padrão: `labelOpen`/`labelClosed` conforme o estado. */
+  label?: string;
   /** Estado atual da sidebar (aberta = true). */
   open?: boolean;
   /** Callback chamado ao clicar no gatilho. */
@@ -119,7 +132,7 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
       labelOpen = "Fechar menu",
       labelClosed = "Abrir menu",
       variant = "ghost",
-      label: _label,
+      label,
       ...props
     },
     ref
@@ -127,7 +140,7 @@ const SidebarToggleButton = React.forwardRef<HTMLButtonElement, SidebarToggleBut
     <IconButton
       ref={ref}
       variant={variant}
-      label={open ? labelOpen : labelClosed}
+      label={label ?? (open ? labelOpen : labelClosed)}
       aria-expanded={open}
       onClick={onToggle}
       {...props}

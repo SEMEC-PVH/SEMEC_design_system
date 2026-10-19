@@ -6,14 +6,21 @@
  * estão em dist/lite/ e acessíveis via subpath exports.
  */
 
-export { dsCategories, dsPortal } from "../../manifest.js";
+import * as manifest from "../../manifest.js";
+import type { DsCategory, DsPortal } from "../skills/types";
+
+export type { DsCategory, DsPortal, DsPortalItem } from "../skills/types";
+
+/** Categorias do catálogo. */
+export const dsCategories: DsCategory[] = manifest.dsCategories;
+/** Estrutura de página do portal. */
+export const dsPortal: DsPortal = manifest.dsPortal;
 
 export const dsTokens = {
   colors: [
-    "--pv-blue-900",
+    "--pv-blue-*",
     "--pv-blue-hero",
-    "--pv-green-600",
-    "--pv-green-500",
+    "--pv-green-*",
     "--pv-yellow-*",
     "--pv-red-*",
     "--pv-gray-*",
@@ -29,6 +36,7 @@ export const dsTokens = {
     "--text-muted",
     "--text-secondary",
     "--text-strong",
+    "--text-on-brand",
     "--action-primary",
     "--action-primary-hover",
     "--action-primary-active",
@@ -39,8 +47,6 @@ export const dsTokens = {
   ],
   typography: [
     "--font-family-sans",
-    "--font-poppins",
-    "--font-mono",
     "--text-xs",
     "--text-sm",
     "--text-base",
@@ -48,6 +54,8 @@ export const dsTokens = {
     "--text-xl",
     "--text-2xl",
     "--font-regular",
+    "--font-medium",
+    "--font-semibold",
     "--font-bold",
   ],
   spacing: [

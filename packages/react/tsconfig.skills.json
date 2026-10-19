@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "sourceMap": false,
+    "rootDir": ".",
+    "outDir": "dist/.types-skills",
+    "types": []
+  },
+  "include": ["src/skills/index.ts", "src/lite/skills.ts"],
+  "exclude": ["node_modules", "dist"]
+}

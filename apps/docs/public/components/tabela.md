@@ -4,39 +4,45 @@ code: "table"
 slug: "tabela"
 file: "src/components/table.tsx"
 category: "conteudo-dados"
-variants: "composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount"
+variants: "composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome"
 ---
 
 # Tabela — `table`
 
 > Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
 
-**Arquivo:** `src/components/table.tsx` | **Categoria:** Conteúdo e dados | **Rota:** `/componentes/tabela`
+**Arquivo:** `src/components/table.tsx` | **Categoria:** Conteúdo e dados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/tabela/
 
 ## Variantes
 
 - **composição**: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption
-- **a11y**: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount
+- **a11y**: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome
 
 ## Instalação (@semec/ds)
 
 ```bash
-npm install @semec/ds
+npm install @semec/ds lucide-react
 ```
+
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
 
 ```css
 @import "tailwindcss";
+@import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
 @source "../node_modules/@semec/ds/dist/react";
 ```
 
+No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
+
 ## Uso
 
 ```tsx
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/ds/react";
+import { Table, TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@semec/ds/react";
 
 // Básico
 <Table>
+  <TableCaption>Serviços solicitados</TableCaption>
   <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
   <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>
 </Table>
@@ -48,7 +54,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 ## Prompt para IA
 
 ```text
-Crie um table (Tabela) usando @semec/ds/react (`src/components/table.tsx`), estilo shadcn (Radix + CVA + clsx + tailwind-merge) em React + Tailwind CSS v4. Variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: role=table · scope=col (TableHead) · aria-sort · aria-rowcount · aria-colcount. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.
+Use o componente `Table` (Tabela) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas. API e variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte

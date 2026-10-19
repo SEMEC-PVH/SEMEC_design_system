@@ -8,6 +8,7 @@ import Sidebar from "./Sidebar";
 import CookieBanner from "./CookieBanner";
 import Footer from "./Footer";
 import TableOfContents from "./TableOfContents";
+import PrevNextNav from "./PrevNextNav";
 import { breadcrumbsFor } from "@/lib/navigation";
 import { safeGet, safeSet } from "@/lib/storage";
 
@@ -30,7 +31,7 @@ const readCollapsed = () => {
 };
 const serverCollapsed = () => false;
 
-export default function DocsShell({ children }) {
+export default function DocsShell({ children, banner = null }) {
   const [open, setOpen] = useState(false);
   const collapsed = useSyncExternalStore(
     subscribeCollapsed,
@@ -109,6 +110,7 @@ export default function DocsShell({ children }) {
           <div className="content-main">
             <div className="content-inner">
               <div className="container">
+                {banner}
                 {crumbs.length > 1 && (
                   <nav className="breadcrumbs" aria-label="Trilha de navegação">
                     {crumbs.map((c, i) => (
@@ -130,6 +132,7 @@ export default function DocsShell({ children }) {
                   </nav>
                 )}
                 {children}
+                <PrevNextNav />
               </div>
             </div>
             <TableOfContents />
