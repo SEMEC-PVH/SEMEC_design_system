@@ -258,11 +258,11 @@ Para consumo exclusivo de CSS/lite com npm 7+:
 npm install @semec/ds --omit=peer
 ```
 
-Isso evita instalar os peers ausentes (`react`, `react-dom`, `lucide-react` e
-`tailwindcss`) nesse comando. As dependências diretas, incluindo Radix, continuam
+Isso evita instalar os peers ausentes (`react`, `react-dom` e `lucide-react`;
+`tailwindcss` já é peer opcional) nesse comando. As dependências diretas, incluindo Radix, continuam
 no pacote; `--omit=peer` não transforma a lite em um pacote separado. Repita a
 opção no `npm ci`/`npm install` seguinte se quiser manter essa instalação. Se usar
-Tailwind na lite, instale-o explicitamente com o plugin do bundler. Os peers do
+Tailwind na lite, instale-o explicitamente com o plugin do bundler. Os peers React do
 kit permanecem obrigatórios para preservar a instalação automática em apps React;
 use a instalação normal do passo 1 quando consumir componentes.
 
@@ -414,6 +414,8 @@ import { cn } from "@semec/ds/react";
 | `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS config) |
 | `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 (arquivo TS original) |
 | `@semec/ds/react/server` | **Depreciado na 4.1, sai na 5.0** (TST-34b). Uso interno do monorepo: só tem `dsPackageRootResolve()`, que procura `packages/react` a partir do `cwd` e lança erro fora do repositório. Em desenvolvimento, avisa no console. Não use em apps consumidores |
+| `@semec/ds/tokens` | Tokens como dados em JS (`tokens`, valores CSS resolvidos), com tipos |
+| `@semec/ds/tokens.json` | Tokens no formato DTCG 2025.10 (grupos `L0`/`L1`) |
 | `@semec/ds/skills` | Metadados dos componentes para agentes IA (`dsComponents`, `dsBySlug`, `dsCategories`…) |
 | `@semec/ds/skills/llms.txt` | Índice para IA |
 | `@semec/ds/skills/llms-full.txt` | Dump completo |
