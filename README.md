@@ -5,6 +5,8 @@ Monorepo do **Design System da SEMEC** — Secretaria Municipal de Economia da P
 Ele reúne três coisas:
 
 - **`packages/react/`** — o pacote npm **`@semec/ds`** (componentes React + Tailwind CSS v4 + shadcn/Radix/CVA, tokens `pv-*`, tema claro).
+- **`packages/tokens/`** — o pacote npm **`@semec/ds-tokens`** (só tokens: variáveis CSS, base, fonte, `tokens.json` DTCG e saídas para Android, iOS e Figma; gerado de `packages/react/tokens.css`).
+- **`packages/css/`** — o pacote npm **`@semec/ds-css`** (classes `.semec-*` com o visual dos componentes, para HTML, PHP, Django, Vue, Angular e outros sem React).
 - **`apps/docs/`** — o **site de documentação** (Next.js 16, export estático), que publica fundamentos, componentes e padrões.
 - **`packages/react/manifest.js`** — a **fonte única** para artefatos de IA (`llms.txt`, `manifest.json`, `components/*.md`), gerados automaticamente no build.
 
@@ -15,6 +17,8 @@ Ele reúne três coisas:
 ```
 apps/docs/        Site de documentação (Next.js) + artefatos gerados para IA
 packages/react/   Kit @semec/ds (tokens + componentes) + manifest.js
+packages/tokens/  @semec/ds-tokens (tokens para CSS, JS, Android, iOS e Figma)
+packages/css/     @semec/ds-css (classes .semec-* sem React)
 docs/             Decisões: objetivo, arquitetura, ADRs, auditorias, questões abertas
 legacy/           Somente README (conteúdo removido em 15/09/2026)
 ```
@@ -28,6 +32,9 @@ npm install
 npm run dev          # site em http://localhost:3000
 npm run build        # artefatos de IA (prebuild) + export estático em apps/docs/out
 npm run build:ds     # build do pacote @semec/ds (tsup + build-artifacts)
+npm run build:pacotes  # build do @semec/ds-tokens e do @semec/ds-css
+npm run test:pacotes   # testes do @semec/ds-tokens e do @semec/ds-css
+npm run test:release   # teste do plano de release (scripts/release)
 npm run typecheck    # verifica tipos do pacote
 npm run lint         # ESLint (flat config + jsx-a11y)
 npm run proto:css    # CSS isolado dos componentes
@@ -69,14 +76,22 @@ import { Button, Card, CardHeader, CardTitle, CardContent } from "@semec/ds/reac
 | `@semec/ds/skills/semec-ds` | Skill full do agente (React + tokens + a11y) |
 | `@semec/ds/lite/skills/semec-ds-lite` | Skill lite (tokens + a11y + responsive) |
 
+## Sem React
+
+HTML, PHP, Django, Flask, Vue, Angular, Android, iOS ou Figma: use o `@semec/ds-css` (classes prontas) ou o `@semec/ds-tokens` (só tokens). Guia: [Usar sem React](https://semec-pvh.github.io/SEMEC_design_system/usar-sem-react/).
+
+```bash
+npm install @semec/ds-css
+```
+
 ## Publicação
 
-O `@semec/ds` vai para o npm público via Changesets + GitHub Actions. Nenhuma versão sai por bump manual, e o workflow de release só roda depois da CI verde no `main`. O versionamento é feito por um mantenedor, num PR; o workflow só publica.
+Os pacotes públicos (`@semec/ds`, `@semec/ds-tokens` e `@semec/ds-css`) vão para o npm pelo mesmo fluxo. O `@semec/ds` vai para o npm público via Changesets + GitHub Actions. Nenhuma versão sai por bump manual, e o workflow de release só roda depois da CI verde no `main`. O versionamento é feito por um mantenedor, num PR; o workflow só publica.
 
 1. Todo PR que muda arquivo publicado do pacote traz um changeset (`npm run changeset`: patch/minor/major + descrição). A CI falha sem ele. Depois do merge, os changesets se acumulam no `main` e o workflow de release só resume o plano.
 2. Para lançar, um mantenedor roda `npm run version-packages` (bump + CHANGELOG + lockfile + artefatos de IA) numa branch `changeset-release/<versão>` e abre o PR de versão.
 3. Outro mantenedor revisa e mergeia o PR de versão.
-4. Com a CI verde nesse merge, o workflow publica (`changeset publish`), confere `npm view @semec/ds@x.y.z`, envia a tag `@semec/ds@x.y.z` e cria a GitHub Release.
+4. Com a CI verde nesse merge, o workflow publica (`changeset publish`) cada pacote cuja versão ainda não está no npm e, para cada um, confere `npm view <nome>@x.y.z`, envia a tag `<nome>@x.y.z` e cria a GitHub Release.
 
 A CI depende do secret **`NPM_TOKEN`** no repo (token npm com publish em `@semec`). Passo a passo, conferência no registry e fallback local: [CONTRIBUTING.md](CONTRIBUTING.md#publicação-e-versionamento).
 

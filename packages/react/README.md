@@ -10,6 +10,8 @@ São 5 passos para o caminho Tailwind v4. Para usar o CSS pronto, siga [Sem Tail
 
 ### Sem React (Vue, Angular, Svelte, HTML)
 
+**Pacotes próprios para quem não usa React.** O [`@semec/ds-tokens`](https://www.npmjs.com/package/@semec/ds-tokens) traz só os tokens (variáveis CSS, base, fonte Poppins, `tokens.json` DTCG e saídas para Android, iOS e Figma), sem dependências. O [`@semec/ds-css`](https://www.npmjs.com/package/@semec/ds-css) traz as classes `.semec-*` (botão, campos, cartão, alerta, cabeçalho, tabela…) com o visual dos componentes React, em `index.css` para bundler ou num arquivo único para `<link>`/CDN. Nenhum dos dois instala React nem Radix. Guia completo: [Usar sem React](https://semec-pvh.github.io/SEMEC_design_system/usar-sem-react/). A variante lite deste pacote, descrita abaixo, continua valendo para quem já usa Tailwind v4.
+
 Sem Tailwind, use `@semec/ds/lite/variables.css` (e, se quiser os estilos globais, `@semec/ds/lite/base.css`) com `@semec/ds/lite/fonts.css`; com Tailwind v4, `@semec/ds/lite/tokens.css`. Veja [CSS sem Tailwind / lite](#css-sem-tailwind--lite). A orientação para esses projetos está na skill lite: `node_modules/@semec/ds/dist/lite/semec-ds-lite/SKILL.md` (export `@semec/ds/lite/skills/semec-ds-lite`). Os componentes React não rodam nesses frameworks. A lite traz tokens, orientações de acessibilidade e receitas de componentes (Button, Input, Select, Card, Alert, Header, Toast e outros) com HTML acessível e CSS puro gerado das classes reais do kit, na seção "Anatomia dos componentes (sem React)" e no campo `classes` do manifest lite. O comportamento interativo (foco do resumo de erros, fechar o Toast) fica com o JavaScript do app. Sem bundler, veja [Via CDN](#via-cdn).
 
 ### 1. Instalar
