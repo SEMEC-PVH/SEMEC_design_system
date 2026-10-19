@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Transferência escolar · SEMEC</title>
+    <!-- Fontes (Poppins) do @semec/ds-tokens e o CSS único do @semec/ds-css. -->
+    <link rel="stylesheet" href="vendor/fonts.css" />
+    <link rel="stylesheet" href="vendor/semec-ds.css" />
+    <link rel="stylesheet" href="exemplo.css" />
+  </head>
+  <body>
+    <a href="#conteudo" class="semec-skip-link">Pular para o conteúdo principal</a>
+
+    <header class="semec-header">
+      <a href="#conteudo" class="semec-header__brand">
+        <img src="marca.svg" alt="Prefeitura de Porto Velho" width="90" height="36" />
+        <span aria-hidden="true" class="semec-header__divider"></span>
+        <span class="semec-header__org">SEMEC <span aria-hidden="true" class="semec-header__separator">|</span> <span class="semec-header__service">Matrícula e transferência</span></span>
+        <span class="semec-sr-only">— ir para o início</span>
+      </a>
+      <nav aria-label="Menu principal" class="semec-header__nav">
+        <a href="#matricula" class="semec-header__link">Matrícula</a>
+        <a href="#conteudo" class="semec-header__link" aria-current="page">Transferência</a>
+        <a href="#ajuda" class="semec-header__link">Ajuda</a>
+      </nav>
+    </header>
+
+    <main id="conteudo" tabindex="-1" class="pagina">
+      <h1 class="semec-heading semec-heading--1">Solicitação de transferência escolar</h1>
+      <p class="semec-card__description">Peça a transferência do estudante para outra escola da rede municipal. A análise leva até 5 dias úteis.</p>
+
+      <div role="status" class="semec-alert semec-alert--info">
+        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+        <div class="semec-alert__title">Prazo de transferência</div>
+        <div class="semec-alert__description"><p>As solicitações deste semestre vão até 30 de novembro.</p></div>
+      </div>
+
+      <section class="semec-card" aria-labelledby="titulo-form">
+        <div class="semec-card__header">
+          <h2 id="titulo-form" class="semec-card__title">Dados da solicitação</h2>
+          <p class="semec-card__description">Campos com * são obrigatórios.</p>
+        </div>
+        <div class="semec-card__content">
+          <form id="form" class="formulario" novalidate>
+            <div id="resumo" class="semec-error-summary" role="alert" tabindex="-1" aria-labelledby="resumo-titulo" hidden>
+              <h2 id="resumo-titulo" class="semec-error-summary__title">Há pendências a corrigir antes de enviar</h2>
+              <ul id="resumo-lista" class="semec-error-summary__list"></ul>
+            </div>
+
+            <div class="semec-form-field" data-campo="nome">
+              <label for="nome" class="semec-label">Nome completo do estudante<span class="semec-label__required" aria-hidden="true"> *</span></label>
+              <input id="nome" name="nome" type="text" class="semec-field" autocomplete="off" required aria-describedby="nome-hint" />
+              <p id="nome-hint" class="semec-hint">Como consta na certidão de nascimento.</p>
+            </div>
+
+            <div class="grade">
+              <div class="semec-form-field" data-campo="nascimento">
+                <label for="nascimento" class="semec-label">Data de nascimento<span class="semec-label__required" aria-hidden="true"> *</span></label>
+                <input id="nascimento" name="nascimento" type="date" class="semec-field" required />
+              </div>
+              <div class="semec-form-field" data-campo="cpf">
+                <label for="cpf" class="semec-label">CPF do responsável<span class="semec-label__required" aria-hidden="true"> *</span></label>
+                <input id="cpf" name="cpf" type="text" inputmode="numeric" class="semec-field" required aria-describedby="cpf-hint" />
+                <p id="cpf-hint" class="semec-hint">Somente números.</p>
+              </div>
+            </div>
+
+            <div class="grade">
+              <div class="semec-form-field" data-campo="telefone">
+                <label for="telefone" class="semec-label">Telefone do responsável<span class="semec-label__required" aria-hidden="true"> *</span></label>
+                <input id="telefone" name="telefone" type="tel" inputmode="tel" autocomplete="tel-national" class="semec-field" required aria-describedby="telefone-hint" />
+                <p id="telefone-hint" class="semec-hint">Com DDD.</p>
+              </div>
+              <div class="semec-form-field" data-campo="escola">
+                <label for="escola" class="semec-label">Escola de destino<span class="semec-label__required" aria-hidden="true"> *</span></label>
+                <select id="escola" name="escola" class="semec-field" required>
+                  <option value="">Selecione a escola</option>
+                  <option value="emef-joao-paulo">EMEF João Paulo II</option>
+                  <option value="emef-santa-marcelina">EMEF Santa Marcelina</option>
+                  <option value="emef-rio-madeira">EMEF Rio Madeira</option>
+                </select>
+              </div>
+            </div>
+
+            <fieldset class="semec-form-field" data-campo="turno" id="turno">
+              <legend class="semec-label">Turno desejado<span class="semec-label__required" aria-hidden="true"> *</span></legend>
+              <label class="semec-choice"><input type="radio" name="turno" value="manha" class="semec-radio" required /> Manhã</label>
+              <label class="semec-choice"><input type="radio" name="turno" value="tarde" class="semec-radio" /> Tarde</label>
+              <label class="semec-choice"><input type="radio" name="turno" value="integral" class="semec-radio" /> Integral</label>
+            </fieldset>
+
+            <div class="semec-form-field" data-campo="motivo">
+              <label for="motivo" class="semec-label">Motivo da transferência<span class="semec-label__required" aria-hidden="true"> *</span></label>
+              <textarea id="motivo" name="motivo" rows="4" class="semec-field" required aria-describedby="motivo-hint"></textarea>
+              <p id="motivo-hint" class="semec-hint">Até 500 caracteres.</p>
+            </div>
+
+            <div class="semec-form-field" data-campo="declaracao">
+              <label class="semec-choice"><input id="declaracao" name="declaracao" type="checkbox" class="semec-checkbox" required /> Declaro que as informações são verdadeiras</label>
+            </div>
+
+            <div class="acoes">
+              <button type="submit" id="enviar" class="semec-btn semec-btn--primary">Revisar e enviar</button>
+              <button type="reset" class="semec-btn semec-btn--outline">Limpar formulário</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section aria-labelledby="titulo-solicitacoes" class="secao">
+        <h2 id="titulo-solicitacoes" class="semec-heading semec-heading--2">Minhas solicitações</h2>
+        <div class="semec-table__wrapper" role="region" aria-label="Tabela de solicitações" tabindex="0">
+          <table class="semec-table">
+            <caption class="semec-table__caption">Solicitações de transferência enviadas</caption>
+            <thead>
+              <tr><th scope="col">Protocolo</th><th scope="col">Estudante</th><th scope="col">Escola de destino</th><th scope="col">Turno</th><th scope="col">Situação</th></tr>
+            </thead>
+            <tbody id="linhas"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <div id="avisos" class="avisos" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <footer class="semec-footer">
+      <div class="semec-footer__content">
+        <div class="semec-footer__section">
+          <h2 class="semec-footer__title">Atendimento</h2>
+          <p>Rua Exemplo, 100 · Centro · Porto Velho/RO</p>
+        </div>
+        <div class="semec-footer__section">
+          <h2 class="semec-footer__title">Serviços</h2>
+          <ul class="semec-footer__links">
+            <li><a href="#matricula" class="semec-footer__link">Matrícula</a></li>
+            <li><a href="#transporte" class="semec-footer__link">Transporte escolar</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="semec-footer__bottom">© 2026 Prefeitura de Porto Velho · SEMEC</div>
+    </footer>
+
+    <script src="exemplo.js"></script>
+  </body>
+</html>
