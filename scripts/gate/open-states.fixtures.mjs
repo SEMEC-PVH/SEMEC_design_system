@@ -177,7 +177,7 @@ export function openStateCases(ds) {
       disableRules: EXC_01_RULES,
       element: h(
         ds.NavigationMenu,
-        { "aria-label": "Principal" },
+        { "aria-label": "Menu principal" },
         h(
           ds.NavigationMenuList,
           null,
