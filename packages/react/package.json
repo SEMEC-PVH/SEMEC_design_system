@@ -10,37 +10,46 @@
   "exports": {
     "./react": {
       "types": "./dist/react/index.d.ts",
-      "import": "./dist/react/index.js"
+      "import": "./dist/react/index.js",
+      "default": "./dist/react/index.js"
     },
     "./react/validacao": {
       "types": "./dist/react/validacao.d.ts",
-      "import": "./dist/react/validacao.js"
+      "import": "./dist/react/validacao.js",
+      "default": "./dist/react/validacao.js"
     },
     "./react/tokens.css": "./dist/react/tokens.css",
     "./react/fonts.css": "./dist/react/fonts.css",
     "./react/fonts/*": "./dist/react/fonts/*",
     "./react/pv-preset": {
       "types": "./dist/react/pv-preset.d.ts",
-      "import": "./dist/react/pv-preset.js"
+      "import": "./dist/react/pv-preset.js",
+      "default": "./dist/react/pv-preset.js"
     },
     "./react/pv-preset.ts": "./pv-preset.ts",
     "./react/server": {
       "types": "./dist/react/server.d.ts",
-      "import": "./dist/react/server.js"
+      "import": "./dist/react/server.js",
+      "default": "./dist/react/server.js"
     },
     "./react/button-loading": null,
     "./react/*": {
       "types": "./dist/react/components/*.d.ts",
-      "import": "./dist/react/components/*.js"
+      "import": "./dist/react/components/*.js",
+      "default": "./dist/react/components/*.js"
     },
     "./skills": {
       "types": "./dist/skills/index.d.ts",
-      "import": "./dist/skills/index.js"
+      "import": "./dist/skills/index.js",
+      "default": "./dist/skills/index.js"
     },
     "./skills/llms.txt": "./dist/skills/llms.txt",
     "./skills/llms-full.txt": "./dist/skills/llms-full.txt",
     "./skills/manifest.json": "./dist/skills/manifest.json",
-    "./skills/manifest.js": "./dist/skills/manifest.js",
+    "./skills/manifest.js": {
+      "import": "./dist/skills/manifest.js",
+      "default": "./dist/skills/manifest.js"
+    },
     "./skills/components/*": "./dist/skills/components/*",
     "./skills/semec-ds": "./dist/skills/semec-ds/SKILL.md",
     "./skills/ds-semec-skill": "./dist/skills/semec-ds/SKILL.md",
@@ -48,18 +57,26 @@
     "./lite/fonts.css": "./dist/react/fonts.css",
     "./lite/pv-preset": {
       "types": "./dist/react/pv-preset.d.ts",
-      "import": "./dist/react/pv-preset.js"
+      "import": "./dist/react/pv-preset.js",
+      "default": "./dist/react/pv-preset.js"
     },
     "./lite/pv-preset.ts": "./pv-preset.ts",
     "./lite/skills": {
       "types": "./dist/lite/skills.d.ts",
-      "import": "./dist/lite/skills.js"
+      "import": "./dist/lite/skills.js",
+      "default": "./dist/lite/skills.js"
     },
     "./lite/skills/llms.txt": "./dist/lite/llms.txt",
     "./lite/skills/manifest.json": "./dist/lite/manifest.json",
     "./lite/skills/semec-ds-lite": "./dist/lite/semec-ds-lite/SKILL.md",
     "./lite/skills/ds-semec-skill": "./dist/lite/semec-ds-lite/SKILL.md",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./react/variables.css": "./dist/react/variables.css",
+    "./react/base.css": "./dist/react/base.css",
+    "./react/source.css": "./dist/react/source.css",
+    "./lite/variables.css": "./dist/react/variables.css",
+    "./lite/base.css": "./dist/react/base.css",
+    "./lite/source.css": "./dist/react/source.css"
   },
   "files": [
     "dist",
@@ -86,7 +103,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:csp": "node scripts/check-integracao-csp.mjs --browser",
-    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-barrel.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs && node scripts/check-integracao-csp.mjs && node scripts/check-artifact-examples.mjs"
+    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-barrel.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs && node scripts/check-css.mjs && node scripts/check-fonts.mjs && node scripts/check-integracao-csp.mjs && node scripts/check-artifact-examples.mjs"
   },
   "peerDependencies": {
     "lucide-react": ">=0.468.0 <2",
@@ -148,7 +165,8 @@
     "typescript-eslint": "^8.67.0",
     "vitest": "^5.0.4",
     "zod": "^4.6.2",
-    "zod3": "npm:zod@^3.25.76"
+    "zod3": "npm:zod@^3.25.76",
+    "postcss": "^8.5.23"
   },
   "engines": {
     "node": ">=22"
@@ -174,5 +192,6 @@
     "shadcn",
     "semec",
     "portovelho"
-  ]
+  ],
+  "preferUnplugged": true
 }
