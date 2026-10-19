@@ -669,6 +669,12 @@
     --focus-ring: var(--focus-ring-inverse);
   }
 
+  /* INT-A-01: o anel inverso precisa da superfície de marca mesmo sem Tailwind. */
+  .bg-brand-hero {
+    background-color: var(--brand-hero);
+    color: var(--text-on-brand);
+  }
+
   /* O próprio elemento bg-brand-hero focado desenha o anel por fora, sobre
      o fundo da página: mantém o anel padrão (9,38:1 sobre --surface). */
   .bg-brand-hero:focus-visible,
