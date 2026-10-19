@@ -700,20 +700,15 @@ function writeLlmsFullForTarget(outDir, { lite = false } = {}) {
 }
 
 // --- dist (npm) ---
-function buildDist() {
+async function buildDist() {
   console.log("→ dist (npm)");
   syncPackageReadme();
   syncObjetivo();
 
   // CSS + preset em dist/react
-  const cssFiles = ["tokens.css"];
-  for (const file of cssFiles) {
-    const src = path.join(pkgRoot, file);
-    if (fs.existsSync(src)) {
-      copyFile(src, path.join(distDir, "react", file));
-      console.log(`  copied ${file}`);
-    }
-  }
+  const { buildCss } = await import("./build-css.mjs");
+  buildCss(pkgRoot, path.join(distDir, "react"));
+  console.log("  generated tokens.css, variables.css, base.css, source.css");
   const pvSrc = path.join(pkgRoot, "pv-preset.ts");
   if (fs.existsSync(pvSrc)) {
     copyFile(pvSrc, path.join(distDir, "react", "pv-preset.ts"));
@@ -875,7 +870,7 @@ function buildAgentDirs() {
 }
 
 // --- run ---
-if (targets.has("dist")) buildDist();
+if (targets.has("dist")) await buildDist();
 if (targets.has("docs-public")) buildDocsPublic();
 if (targets.has("agent-dirs")) buildAgentDirs();
 

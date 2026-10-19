@@ -74,18 +74,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```css
 @import "tailwindcss";
 @import "@semec/ds/react/tokens.css";
-@source "../node_modules/@semec/ds/dist/react";
+@import "@semec/ds/react/source.css";
 ```
 
-- O `@source` é **obrigatório**: sem ele o Tailwind não gera as classes usadas dentro do pacote (`bg-card`, `shadow-elevation-*`, `animate-in`…) e os componentes saem sem estilo.
-- O caminho do `@source` é **relativo ao arquivo CSS**, não à raiz do projeto. Ajuste a quantidade de `../` até chegar em `node_modules`:
+- O `source.css` é **obrigatório**: contém `@source "./components/**/*.js"` relativo ao próprio pacote. Assim o Tailwind gera as classes dos componentes (`bg-card`, `shadow-elevation-*`, `animate-in`…) sem depender da posição do CSS do app. Varre somente JS, sem incluir mapas ou declarações de tipos.
+- Use o mesmo import com npm, workspaces/monorepo, Astro e Yarn 4 PnP. O pacote declara `preferUnplugged: true`, para o Yarn extrair os arquivos que o scanner precisa ler. Não é necessário calcular um caminho com hash nem executar `yarn unplug` manualmente.
+- **Alternativa manual**, substituindo o import de `source.css`: o caminho do `@source` é relativo ao arquivo CSS, não à raiz do projeto:
 
 | Onde está o CSS | `@source` |
 |---|---|
-| `src/index.css` (Vite) | `"../node_modules/@semec/ds/dist/react"` |
-| `app/globals.css` (Next) | `"../node_modules/@semec/ds/dist/react"` |
-| `src/app/globals.css` (Next com `src/`) | `"../../node_modules/@semec/ds/dist/react"` |
-| monorepo com `node_modules` na raiz | suba até a pasta que contém o `node_modules` com `@semec/ds` |
+| `src/index.css` (Vite) | `"../node_modules/@semec/ds/dist/react/components/**/*.js"` |
+| `app/globals.css` (Next) | `"../node_modules/@semec/ds/dist/react/components/**/*.js"` |
+| `src/app/globals.css` (Next com `src/`) | `"../../node_modules/@semec/ds/dist/react/components/**/*.js"` |
+| `apps/web/src/index.css`, `node_modules` na raiz do monorepo | `"../../../node_modules/@semec/ds/dist/react/components/**/*.js"` |
+| `src/styles/global.css` (Astro) | `"../../node_modules/@semec/ds/dist/react/components/**/*.js"` |
+| Yarn 4 PnP | prefira o import de `source.css`; o caminho físico fica em `.yarn/unplugged` e contém um hash variável |
+
+Se o CSS minificado de um app mínimo tiver **~14 kB em vez de ~70 kB**, confira se o `source.css` foi importado ou se o `@source` manual encontra o pacote: um caminho inexistente pode falhar sem aviso. O tamanho exato depende das versões e das classes do app.
 
 - Se o Tailwind estiver varrendo pastas demais (build lento, recarga cruzada em monorepo), limite a detecção automática ao código do app com `source()`, também relativo ao CSS: `@import "tailwindcss" source("../src");`. O `@source` do pacote continua necessário.
 
@@ -99,7 +104,7 @@ O pacote traz a Poppins auto-hospedada (pesos 400, 500, 600 e 700, `font-display
 @import "tailwindcss";
 @import "@semec/ds/react/fonts.css";
 @import "@semec/ds/react/tokens.css";
-@source "../node_modules/@semec/ds/dist/react";
+@import "@semec/ds/react/source.css";
 ```
 
 O `@font-face` usa a família `"Poppins"`, que é o nome que `--font-family-sans` já espera; não é preciso ajustar token. As URLs são relativas (`./fonts/Poppins-*.woff2`): `@tailwindcss/postcss` (Next.js) e `@tailwindcss/vite` reescrevem o caminho e o bundler copia os arquivos para o build. Com o `@tailwindcss/cli`, que não reescreve URL de CSS importado, importe `fonts.css` pelo JS (`import "@semec/ds/react/fonts.css";`) ou copie `dist/react/fonts/` para junto do CSS gerado.
@@ -142,6 +147,41 @@ A partir da 3.2 o `dist` sai **um arquivo por módulo**, e cada componente inter
 Na 3.0 e na 3.1 o `dist` era um bundle único sem `"use client"` e importar o kit num Server Component quebrava; se estiver preso a essas versões, use o kit só em arquivos `"use client"`.
 
 Em Vite/SPA nada disso se aplica.
+
+## CSS sem Tailwind / lite
+
+Para adotar apenas as variáveis em um sistema existente, use
+`@semec/ds/lite/variables.css` (ou `@semec/ds/react/variables.css`). Esse arquivo
+contém somente `:root`: não altera margens, links, fontes ou o fundo da página,
+nem contém diretivas do Tailwind. Em um bundler sem Tailwind, pode importar pelo JS:
+
+```js
+import "@semec/ds/lite/variables.css";
+// Opcionais: Poppins e estilos globais do kit.
+import "@semec/ds/lite/fonts.css";
+import "@semec/ds/lite/base.css";
+```
+
+`base.css` contém reset, tipografia, links, foco visível e reduced motion; depende
+das variáveis e sua adoção deve ser explícita. Em HTML sem bundler, copie
+`dist/react/variables.css` e, se desejado, `dist/react/base.css` para a pasta
+estática e carregue-os via `<link>` nessa ordem. Para as fontes, use `copiar-fontes`.
+O `tokens.css` existente continua agregando variáveis, Tailwind e estilos globais;
+quem já o importa não precisa adicionar `variables.css` nem `base.css`.
+
+Para consumo exclusivo de CSS/lite com npm 7+:
+
+```bash
+npm install @semec/ds --omit=peer
+```
+
+Isso evita instalar os peers ausentes (`react`, `react-dom`, `lucide-react` e
+`tailwindcss`) nesse comando. As dependências diretas, incluindo Radix, continuam
+no pacote; `--omit=peer` não transforma a lite em um pacote separado. Repita a
+opção no `npm ci`/`npm install` seguinte se quiser manter essa instalação. Se usar
+Tailwind na lite, instale-o explicitamente com o plugin do bundler. Os peers do
+kit permanecem obrigatórios para preservar a instalação automática em apps React;
+use a instalação normal do passo 1 quando consumir componentes.
 
 ## CommonJS / Node
 
@@ -284,6 +324,9 @@ import { cn } from "@semec/ds/react";
 | `@semec/ds/react/<componente>` | Um componente só, pelo nome do arquivo em `src/components` (ex.: `@semec/ds/react/button`, `@semec/ds/react/dialog`, `@semec/ds/react/form-field`). Desde a 3.2 |
 | `@semec/ds/react/validacao` | Schemas Zod (exige o peer `zod`) |
 | `@semec/ds/react/tokens.css` | Tokens `pv-*` (primitivos + semânticos) + utilitários de animação |
+| `@semec/ds/react/source.css` / `@semec/ds/lite/source.css` | Fontes de classes dos componentes para o scanner Tailwind v4 |
+| `@semec/ds/react/variables.css` / `@semec/ds/lite/variables.css` | Somente variáveis `:root`, sem reset nem Tailwind |
+| `@semec/ds/react/base.css` / `@semec/ds/lite/base.css` | Estilos globais opcionais, dependem das variáveis |
 | `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS config) |
 | `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 (arquivo TS original) |
 | `@semec/ds/react/server` | **Depreciado na 4.1, sai na 5.0** (TST-34b). Uso interno do monorepo: só tem `dsPackageRootResolve()`, que procura `packages/react` a partir do `cwd` e lança erro fora do repositório. Em desenvolvimento, avisa no console. Não use em apps consumidores |
@@ -297,7 +340,7 @@ import { cn } from "@semec/ds/react";
 
 **Poda (tree-shaking).** Desde a 3.2 cada componente é um módulo ESM próprio em `dist/react/components/` e o pacote declara `"sideEffects": ["**/*.css"]`, então o bundler do app descarta o que não é importado: `import { Button } from "@semec/ds/react"` custa cerca de 35 kB minificado com as dependências (quase tudo `tailwind-merge`); o código do kit fica em ~3 kB, em vez do kit inteiro (~340 kB na 3.1). Importar pela raiz ou pelo subpath dá o mesmo resultado num bundler com poda (esbuild, Vite, Turbopack); o subpath ajuda ferramentas sem poda e testes. Exceção: Server Component do Next com webpack (`next build --webpack`), em que a raiz leva ao cliente todos os componentes interativos; ali use o subpath ou `experimental.optimizePackageImports: ["@semec/ds/react"]` (ver o passo 5). A CI mede a poda e confere que o barrel reexporta por nome (`npm run test:dist`).
 
-**O CSS não sofre poda.** A poda vale para o JS. O `@source "…/node_modules/@semec/ds/dist/react"` faz o Tailwind varrer o `dist` inteiro, então o CSS gera as classes de todos os componentes, use o app um ou todos: cerca de 68 kB de CSS do kit (~12 kB com gzip), um custo fixo medido num app novo com a 4.0.0. O JS, sim, cai para o que é importado (os ~35 kB do `Button` acima).
+**O CSS não sofre poda por import JS.** O `source.css` faz o Tailwind varrer o JS de todos os componentes, então o CSS gera suas classes, use o app um ou todos: cerca de 70 kB de CSS minificado (~12 kB com gzip). O JS cai para o que é importado (os ~35 kB do `Button` acima).
 
 Metadados de componente (o que versões anteriores deste README chamavam de `getComponentMetadata()`, função que nunca existiu) vêm de `@semec/ds/skills`: `dsBySlug["botoes"]`, `dsComponents`.
 

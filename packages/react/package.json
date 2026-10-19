@@ -70,7 +70,13 @@
     "./lite/skills/manifest.json": "./dist/lite/manifest.json",
     "./lite/skills/semec-ds-lite": "./dist/lite/semec-ds-lite/SKILL.md",
     "./lite/skills/ds-semec-skill": "./dist/lite/semec-ds-lite/SKILL.md",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./react/variables.css": "./dist/react/variables.css",
+    "./react/base.css": "./dist/react/base.css",
+    "./react/source.css": "./dist/react/source.css",
+    "./lite/variables.css": "./dist/react/variables.css",
+    "./lite/base.css": "./dist/react/base.css",
+    "./lite/source.css": "./dist/react/source.css"
   },
   "files": [
     "dist",
@@ -96,7 +102,7 @@
     "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-barrel.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs"
+    "test:dist": "node scripts/check-rsc.mjs && node scripts/check-treeshake.mjs && node scripts/check-barrel.mjs && node scripts/check-dts.mjs && node scripts/check-exports.mjs && node scripts/check-css.mjs"
   },
   "peerDependencies": {
     "lucide-react": ">=0.468.0 <2",
@@ -158,7 +164,8 @@
     "typescript-eslint": "^8.67.0",
     "vitest": "^5.0.4",
     "zod": "^4.6.2",
-    "zod3": "npm:zod@^3.25.76"
+    "zod3": "npm:zod@^3.25.76",
+    "postcss": "^8.5.23"
   },
   "engines": {
     "node": ">=22"
@@ -184,5 +191,6 @@
     "shadcn",
     "semec",
     "portovelho"
-  ]
+  ],
+  "preferUnplugged": true
 }
