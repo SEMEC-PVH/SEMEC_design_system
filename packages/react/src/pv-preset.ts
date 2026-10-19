@@ -21,14 +21,21 @@ import type { Config } from "tailwindcss";
 export default {
   theme: {
     extend: {
+      // INT-A-14: `muted`/`secondary` são só fundo (bg-muted, bg-secondary),
+      // como no @theme; `text-muted`/`text-secondary` não são gerados.
+      backgroundColor: {
+        muted: "var(--surface-alt)",
+        secondary: "var(--surface-alt)",
+      },
       colors: {
         background: "var(--bg)",
         foreground: "var(--fg)",
+        bg: "var(--bg)",
+        fg: "var(--fg)",
         card: "var(--surface)",
         "card-foreground": "var(--fg)",
         popover: "var(--surface)",
         "popover-foreground": "var(--fg)",
-        secondary: "var(--surface-alt)",
         "secondary-foreground": "var(--fg)",
         accent: "var(--surface-alt)",
         "accent-foreground": "var(--fg)",
@@ -45,7 +52,6 @@ export default {
           DEFAULT: "var(--focus-ring)",
           inverse: "var(--focus-ring-inverse)",
         },
-        muted: "var(--surface-alt)",
         "muted-foreground": "var(--text-muted)",
         // AUD-30: cor de TEXTO. `text-muted`/`text-secondary` são fundo.
         "text-muted": "var(--text-muted)",
