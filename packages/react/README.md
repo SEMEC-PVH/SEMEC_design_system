@@ -156,6 +156,24 @@ import "@semec/ds/react/styles.css";
 
 As classes de layout do **app** ficam por conta do app: use CSS próprio ou seu compilador de estilos. Classes passadas em `className` que não aparecem no kit não são incluídas nesse arquivo. Escolha entre este CSS pronto e a compilação Tailwind v4 para evitar duplicar reset e utilitários. O CSS pronto mantém os [requisitos de navegador do Tailwind v4](https://tailwindcss.com/docs/compatibility) (Safari 16.4+, Chrome 111+, Firefox 128+); não é um modo de compatibilidade com navegadores antigos.
 
+## Tailwind v3
+
+**Tailwind v3 não é suportado oficialmente.** Para projetos que permanecem na v3, prefira [o CSS pronto](#sem-tailwind) para os componentes e mantenha o CSS do app separado. Evite aplicar outro reset global sobre o kit.
+
+O preset `@semec/ds/react/pv-preset` existe para quem quiser adaptar a integração. Ele inclui as 45 cores semânticas e as seis animações/keyframes do `@theme`, inclusive fundos de Select/Dialog e cores de Sidebar. Exemplo de configuração ESM:
+
+```js
+// tailwind.config.mjs — caminho relativo à raiz deste app
+import pvPreset from "@semec/ds/react/pv-preset";
+
+export default {
+  presets: [pvPreset],
+  content: ["./src/**/*.{js,jsx,ts,tsx}", "./node_modules/@semec/ds/dist/react/components/*.js"],
+};
+```
+
+Esse caminho ainda precisa de `fonts.css` e das variáveis de `tokens.css`. A v3 não processa `@theme`/`@utility`: pode emitir avisos e não gera todos os modificadores de animação (`fade-*`, `zoom-*`, `slide-*`) nem todas as classes v4 do kit. Completar o preset não garante paridade visual ou suporte a navegadores antigos. O peer opcional `tailwindcss` continua na faixa `^4`: uma instalação com v3 pode exigir a política de resolução de peers do seu gerenciador (no npm, `--legacy-peer-deps`, que ignora a validação de todos os peers). Não use essa opção no caminho oficial v4 ou sem Tailwind.
+
 ## Uso rápido
 
 ```tsx
