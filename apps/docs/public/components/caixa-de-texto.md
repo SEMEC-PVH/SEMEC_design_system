@@ -9,7 +9,7 @@ variants: "estados: padrão · inválido (invalid / aria-invalid) · disabled ·
 
 # Caixa de texto — `input`
 
-> Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string.
+> Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` e `aria-invalid` automaticamente: sem erro, `aria-describedby` aponta para a dica; com erro, a dica sai e ele aponta só para a mensagem de erro. `onChange` é o evento nativo; `onValueChange` recebe só a string.
 
 **Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/input.tsx) | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/caixa-de-texto/
 
@@ -63,7 +63,7 @@ import { FormField, Input } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `Input` (Caixa de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string. API e variantes: estados: padrão · inválido (invalid / aria-invalid) · disabled · contrato: value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Input` (Caixa de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` e `aria-invalid` automaticamente: sem erro, `aria-describedby` aponta para a dica; com erro, a dica sai e ele aponta só para a mensagem de erro. `onChange` é o evento nativo; `onValueChange` recebe só a string. API e variantes: estados: padrão · inválido (invalid / aria-invalid) · disabled · contrato: value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
