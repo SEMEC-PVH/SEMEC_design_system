@@ -64,6 +64,7 @@ import {
   BANCADA,
   BOX,
   CHEGADA,
+  CORREDOR_FOLGA,
   GARAGEM,
   LARGADA,
   LARGURA_ZEBRA,
@@ -993,13 +994,13 @@ export function createPista({ pal, lite = false, reducedMotion = false }) {
   };
   const infoPorTile = new Map(INFO_REGRAS.tiles.map(([x, y]) => [chave(x, y), INFO_REGRAS]));
   const cpPorTile = new Map();
-  checkpoints.forEach((cp, i) => cp.tiles.forEach(([x, y]) => cpPorTile.set(chave(x, y), i)));
+  checkpoints.forEach((cp, i) => cp.corte.forEach(([x, y]) => cpPorTile.set(chave(x, y), i)));
   const tilesPorVolta = medirVolta(c, [LARGADA.x, LARGADA.y], VOLTAS);
 
   const corrida = {
     largada: { ...LARGADA },
     voltas: VOLTAS,
-    checkpoints: checkpoints.map((cp) => ({ id: cp.id, tiles: cp.tiles.map((t) => [...t]) })),
+    checkpoints: checkpoints.map((cp) => ({ id: cp.id, tiles: cp.corte.map((t) => [...t]) })),
     saidaVila: PORTAO.map((t) => [...t]),
     // Caminho mais curto por volta (tiles) da largada, na ordem (medirVolta).
     tilesPorVolta,
@@ -1020,6 +1021,17 @@ export function createPista({ pal, lite = false, reducedMotion = false }) {
     zoom: ZOOM,
     piso: "asfalto",
     passable: (x, y) => c.passable(x, y),
+    // Bicicleta: corredor contínuo do asfalto (ver vila-engine, colidir).
+    // Coordenadas de tile do motor: o tile (x, y) cobre [x, x + 1), daí o
+    // −0,5 (aqui o centro do tile é o ponto inteiro).
+    corredor: {
+      raio: RAIO_ASFALTO + CORREDOR_FOLGA,
+      perto: (px, py) => c.corredor(px - 0.5, py - 0.5),
+      // Tiles que o círculo da bicicleta (raio < 0,3) pode tocar sem o
+      // centro sair do corredor: esses a grade não bloqueia.
+      cobre: (x, y) => y < MURO_Y && c.distancia(x, y) <= RAIO_ASFALTO + CORREDOR_FOLGA + 0.3 + Math.SQRT1_2,
+      box: (x, y) => c.box.has(chave(x, y)),
+    },
     inBounds: (x, y) => x >= 0 && y >= 0 && x < MW && y < MH,
     saidaEm,
     ehPorta: (x, y) => saidaEm(x, y) !== null,

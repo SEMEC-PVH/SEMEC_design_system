@@ -76,7 +76,8 @@
 // Comprimento: ~220 tiles de linha central por volta. Na grade (4 vizinhos,
 // os trechos diagonais viram "escadinha") o caminho mais curto da largada
 // passando pelos checkpoints na ordem dá 254 tiles na 1ª volta e 256 na 2ª
-// (medirVolta): de bicicleta (0,11 s/tile) ~28 s por volta, ~56 s nas 2.
+// (medirVolta). De bicicleta em direção livre (máx. ~9,1 tiles/s, curvas
+// pelo corredor contínuo) dá ~23,5 s por volta, ~47 s nas 2.
 
 export const MW = 86;
 export const MH = 56;
@@ -87,6 +88,9 @@ export const RAIO_PISTA = 1.25;
 export const RAIO_ASFALTO = 1.7;
 // Zebra (meio-fio vermelho e branco) logo depois do asfalto desenhado.
 export const LARGURA_ZEBRA = 0.38;
+// De bicicleta, o centro do ciclista vai até RAIO_ASFALTO + isto da linha
+// central (as rodas pegam um pouco da zebra).
+export const CORREDOR_FOLGA = 0.1;
 
 // Pontos de controle da linha central (ordem = sentido da corrida).
 export const CONTROLE = [
@@ -234,6 +238,43 @@ export function montarCircuito() {
   const andavel = new Set([...pista, ...box]);
   const passable = (x, y) => andavel.has(chave(x, y));
 
+  // Ponto contínuo (px, py) → distância à linha central e normal unitária
+  // (da linha para o ponto), ou null longe da pista. A bicicleta colide com
+  // este corredor (o asfalto desenhado), não com a escadinha dos tiles.
+  const n = pts.length;
+  const corredor = (px, py) => {
+    const rx = Math.round(px);
+    const ry = Math.round(py);
+    if (rx < 0 || ry < 0 || rx >= MW || ry >= MH) return null;
+    const k0 = idx[ry * MW + rx];
+    if (k0 < 0) return null;
+    let d2 = Infinity;
+    let cx = 0;
+    let cy = 0;
+    for (let d = -20; d < 20; d++) {
+      const a = pts[(k0 + d + n) % n];
+      const b = pts[(k0 + d + 1 + n) % n];
+      const ex = b.x - a.x;
+      const ey = b.y - a.y;
+      const u = Math.max(0, Math.min(1, ((px - a.x) * ex + (py - a.y) * ey) / (ex * ex + ey * ey || 1)));
+      const qx = a.x + ex * u;
+      const qy = a.y + ey * u;
+      const e2 = (px - qx) ** 2 + (py - qy) ** 2;
+      if (e2 < d2) {
+        d2 = e2;
+        cx = qx;
+        cy = qy;
+      }
+    }
+    const dist = Math.sqrt(d2);
+    return { d: dist, nx: dist > 1e-9 ? (px - cx) / dist : 0, ny: dist > 1e-9 ? (py - cy) / dist : 0 };
+  };
+  // Tiles fora da grade andável em que o centro da bicicleta pode entrar
+  // pelo corredor (até RAIO_ASFALTO + CORREDOR_FOLGA da linha): os cortes dos
+  // checkpoints passam por eles também, para ninguém "pular" um arco pela borda.
+  const alcanceCorredor = RAIO_ASFALTO + CORREDOR_FOLGA + Math.SQRT1_2;
+  const noCorredor = (x, y) => y < MURO_Y && x >= 0 && y >= 0 && x < MW && y < MH && dist[y * MW + x] <= alcanceCorredor;
+
   // Checkpoints: corte de uma coluna (ou linha) inteira de asfalto que passa
   // pelo ponto da linha central mais perto de `perto`.
   const checkpoints = CHECKPOINTS.map((c) => {
@@ -259,6 +300,20 @@ export function montarCircuito() {
       while (pista.has(chave(x - 1, y))) x--;
       for (; pista.has(chave(x, y)); x++) tiles.push([x, y]);
     }
+    // Corte lógico: os tiles do asfalto andável mais as bordas do corredor
+    // (fora da grade) por onde a bicicleta também passa.
+    const [dx, dy] = c.eixo === "col" ? [0, 1] : [1, 0];
+    const corte = [...tiles];
+    for (let [x, y] = tiles[0]; noCorredor(x - dx, y - dy) && !pista.has(chave(x - dx, y - dy)); ) {
+      x -= dx;
+      y -= dy;
+      corte.unshift([x, y]);
+    }
+    for (let [x, y] = tiles[tiles.length - 1]; noCorredor(x + dx, y + dy) && !pista.has(chave(x + dx, y + dy)); ) {
+      x += dx;
+      y += dy;
+      corte.push([x, y]);
+    }
     // Onde a linha central cruza a reta do corte (x = X ou y = Y) e a meia-
     // largura do asfalto medida nessa reta: é onde se pinta a faixa no chão,
     // alinhada com o arco (que também segue a grade).
@@ -277,7 +332,7 @@ export function montarCircuito() {
     const q = pts[kc];
     const meia = RAIO_ASFALTO / Math.max(0.5, Math.abs(col ? q.tx : q.ty));
     const faixa = col ? { x: reta, y: q.y, meia } : { x: q.x, y: reta, meia };
-    return { id: c.id, tiles, eixo: c.eixo, s: q.s, centro: [q.x, q.y], tangente: [q.tx, q.ty], faixa };
+    return { id: c.id, tiles, corte, eixo: c.eixo, s: q.s, centro: [q.x, q.y], tangente: [q.tx, q.ty], faixa };
   });
 
   return {
@@ -290,6 +345,8 @@ export function montarCircuito() {
     // Distância do centro do tile (x, y) à linha central (Infinity longe).
     distancia: (x, y) => (x >= 0 && y >= 0 && x < MW && y < MH ? dist[y * MW + x] : Infinity),
     checkpoints,
+    corredor,
+    noCorredor,
   };
 }
 

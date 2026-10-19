@@ -9,9 +9,10 @@ export const CHAVE_CORRIDA = "vila-semec-corrida-v1";
 
 // Metas das medalhas (ms, tempo total das 2 voltas). Provisórias: ajustar
 // depois de cronometrar a pista de verdade.
-// Calibradas com a volta automática perfeita (caminho mais curto, sem errar):
-// 56,2 s nas 2 voltas. Ouro exige pilotar bem; bronze é para quem completa.
-export const METAS = Object.freeze({ ouro: 62000, prata: 72000, bronze: 90000 });
+// Calibradas com a bicicleta em direção livre: um piloto automático só com as
+// setas (8 direções, mirando 3 tiles à frente) fez 47,1 s nas 2 voltas. Ouro
+// exige pilotar bem (~10% acima); bronze é para quem completa.
+export const METAS = Object.freeze({ ouro: 52000, prata: 60000, bronze: 75000 });
 
 export const MEDALHAS = ["ouro", "prata", "bronze"];
 export const ROTULO_MEDALHA = { ouro: "Ouro", prata: "Prata", bronze: "Bronze" };

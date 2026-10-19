@@ -76,29 +76,57 @@ const BICICLETARIO = { x: 18, y: 15 };
 const BIKE_TILES_POR_VOLTA = 3;
 const RODA_SINAL = 1;
 const PEDIVELA_SINAL = 1;
-// Pilotagem (só visual: a grade, a colisão e o "de frente para" não mudam).
-// Giro: o yaw visual persegue o lógico (player.dir) por amortecimento
-// exponencial; 16/s fecha ~95% de 90° em 0,2 s (vale também a pé).
+// Giro a pé: o yaw visual persegue o lógico (player.dir) por amortecimento
+// exponencial; 16/s fecha ~95% de 90° em 0,2 s. Também é ele que alinha o
+// jogador ao cardinal depois de descer da bicicleta.
 const GIRO_TAXA = 16;
 // Teto da velocidade angular do giro amortecido (rad/s): sem ele o 1º quadro
 // de uma meia-volta já cobriria metade dela (num PC lento, um estalo). Com
 // 11 rad/s, 90° levam ~0,2 s e 180° ~0,32 s.
 const GIRO_MAX = 11;
-// Inclinação (roll) para dentro da curva: proporcional à velocidade angular do
-// yaw visual × embalo da bicicleta (parado não inclina); ~17° no máximo. Na
-// esquina em arco o yaw gira ~14 rad/s, o que já satura.
+// Montado, a bicicleta anda em direção livre (ver "Direção livre"): posição
+// contínua e um rumo (yaw) contínuo; a grade só é consultada para colisão e
+// para dizer em que tile o jogador está.
+// Inclinação (roll) para dentro da curva: tan(roll) ≈ v·ω/g, aqui linear
+// em velocidade (tiles/s) × velocidade angular do rumo (rad/s); ~17° no
+// máximo. Na velocidade máxima, virando a 2,6 rad/s, dá ~0,3 (satura).
 const INCLINA_MAX = 0.3;
-const INCLINA_K = 0.026;
+const INCLINA_K = 0.0125;
 const INCLINA_TAXA = 10;
 // Guidão (nó `Garfo`, Y local, + = esquerda do ciclista) e o peso das clips
-// `pedalando_esq`/`pedalando_dir`: pela mesma velocidade angular.
+// `pedalando_esq`/`pedalando_dir`: pela velocidade angular do rumo (o
+// esterço). Devagar o rumo gira mais rápido, então o guidão vira mais.
 const GUIDAO_MAX = 0.35;
-const GUIDAO_K = 0.035;
+const GUIDAO_K = 0.09;
 const GUIDAO_TAXA = 12;
-// Embalo: de parado à cadência e ao passo cheios (e de volta) em ~0,3 s; na
-// largada o passo anda a 45% (o 1º tile leva ~0,24 s em vez de 0,11 s).
+// Embalo: de parado à velocidade máxima em ~0,3 s (aceleração constante);
+// sem setas, roda livre e freio: da máxima a parado em ~0,4 s.
 const BIKE_EMBALO = 0.3;
-const BIKE_RITMO_MIN = 0.45;
+const BIKE_FREIO = 0.4;
+// Velocidade máxima: a mesma da bicicleta na grade (1 tile a cada STEP_BIKE,
+// ~9,1 tiles/s), para a pista e as medalhas continuarem na mesma escala.
+const BIKE_VMAX = 1 / STEP_BIKE;
+// Taxa de giro do rumo (rad/s): parado/devagar vira rápido, na máxima vira
+// devagar (raio ~3,5 tiles: curvas abertas; para fechar mais, solte a seta
+// e deixe a bicicleta perder embalo).
+const BIKE_GIRO_LENTO = 4.5;
+const BIKE_GIRO_RAPIDO = 2.6;
+// Alvo mais de ~120° fora do rumo (seta contrária): não gira no lugar, freia
+// até 35% da máxima e faz um U largo.
+const BIKE_U = 2.1;
+const BIKE_U_VEL = 0.35;
+// Colisão: círculo contra os tiles não andáveis, com subpassos de no máximo
+// 0,2 tile (nenhum tile atravessado fica sem ser visto). Batendo na parede a
+// bicicleta perde embalo (de frente; raspando de lado, pouco) e desliza junto.
+const BIKE_RAIO = 0.28;
+const BIKE_SUBPASSO = 0.2;
+const BIKE_ATRITO_PAREDE = 20;
+const BIKE_RASPA = 0.4;
+// Toque curto numa seta (api.press e solta antes do quadro seguinte): vale
+// como segurada por esse tempo (vira ~40° ou anda ~0,7 tile).
+const BIKE_TOQUE = 0.15;
+// Descendo: o jogador assenta no centro do tile a essa velocidade (tiles/s).
+const BIKE_ASSENTA_VEL = 3;
 // Crossfade para `bike_parado` (pé no chão) ao parar, e de volta ao sair.
 const BIKE_PARADO_ENTRA = 6;
 const BIKE_PARADO_SAI = 14;
@@ -320,7 +348,7 @@ const CORRIDA_CONTAGEM = 3;
 // adiantada na direção do movimento (a bicicleta anda ~9 tiles/s: sem isso
 // a curva chega antes de aparecer). PISTA_FRENTE_S: quantos segundos de velocidade ela adianta,
 // até PISTA_FRENTE_MAX tiles; PISTA_FRENTE_TAXA amortece a direção (1/s),
-// devagar o bastante para não sacudir nas esquinas em arco.
+// devagar o bastante para não sacudir nas curvas.
 const PISTA_ZOOM = 1.3;
 const PISTA_FRENTE_S = 0.28;
 const PISTA_FRENTE_MAX = 2.2;
@@ -1124,7 +1152,8 @@ export function createVila(host, options) {
         baseUrl: modelUrl.replace(/gava\.glb$/, ""),
         lite,
         tileToWorld,
-        isFree: (x, y) => passable(x, y) && !(player.x === x && player.y === y),
+        // Montado, também não entra num tile em que a bicicleta encosta.
+        isFree: (x, y) => passable(x, y) && !(player.x === x && player.y === y) && !bikeEncosta(x, y),
         occupied,
         shadowColor: pal.black,
         slashColor: pal.white,
@@ -1169,8 +1198,13 @@ export function createVila(host, options) {
       .then((gltf) => {
         if (disposed || pedido !== jogadorPedido) return;
         if (coding) stopCoding();
-        if (bike.on) onBicicleta(false);
-        bike.on = false;
+        // Perdeu a bicicleta montado (o boneco novo chega sem ela montada):
+        // volta à grade, como ao descer.
+        if (bike.on) {
+          onBicicleta(false);
+          bike.on = false;
+          voltarAGrade();
+        }
         if (sentados.has(player.body)) sentados.delete(player.body);
         mixer?.stopAllAction();
         mixer = null;
@@ -1274,10 +1308,14 @@ export function createVila(host, options) {
   // pedais com origem no eixo, girando em X local) e o clipe `pedalando` (uma
   // volta do pedivela). Rodas giram pela distância andada; o pedivela segue o
   // tempo do clipe; os pedais contra-giram para ficarem nivelados.
-  // Pilotagem: `vel` é o embalo (0 parado … 1 cadência cheia), `guidao` o
-  // esterço atual (rad), `paradoPeso` o peso da `bike_parado`. `desvio` é o
-  // resto de uma curva planejada que não aconteceu (ver planejarCurva), que
-  // some amortecido em vez de saltar para o centro do tile.
+  // Pilotagem (ver "Direção livre"): `rumo` é o yaw contínuo (o do root),
+  // `spd` a velocidade (tiles/s), `omega` a velocidade angular do rumo no
+  // quadro (rad/s), `vel` o embalo (spd / BIKE_VMAX: 0 parado … 1 cadência
+  // cheia), `guidao` o esterço atual (rad), `paradoPeso` o peso da
+  // `bike_parado`. `toque`: setas de um toque curto (direção → segundos que
+  // ainda valem). `pneu`: distância desde o último som de pneu. `rota`: os
+  // tiles do caminho do clique (player.path) e `virar`: a direção para onde
+  // virar parado no fim dele (alvo do clique).
   const bike = {
     on: false,
     node: null,
@@ -1292,7 +1330,17 @@ export function createVila(host, options) {
     vel: 0,
     guidao: 0,
     paradoPeso: 0,
-    desvio: new THREE.Vector3(),
+    rumo: 0,
+    spd: 0,
+    omega: 0,
+    pedalando: false,
+    toque: new Map(),
+    pneu: 0,
+    rota: null,
+    rotaDe: null,
+    rotaI: 0,
+    rotaPreso: 0,
+    virar: null,
   };
   function prepararBike(model, bicicleta) {
     bike.node = bicicleta ?? null;
@@ -1311,6 +1359,20 @@ export function createVila(host, options) {
   }
   let bikeLiberada = bicicletaLiberada;
   const temBike = () => Boolean(bikeLiberada && bike.node && actions?.pedalando);
+  // Zera a pilotagem (montar, teleportes da pista): parado, sem setas de
+  // toque, sem caminho de clique.
+  function zerarPilotagem() {
+    bike.spd = 0;
+    bike.vel = 0;
+    bike.omega = 0;
+    bike.pedalando = false;
+    bike.toque.clear();
+    bike.pneu = 0.7;
+    bike.rota = null;
+    bike.rotaDe = null;
+    bike.virar = null;
+    tilesNoQuadro.length = 0;
+  }
   // `forcar`: a entrada na pista monta no escuro da íris (com a transição
   // ainda ativa); na pista vale montar, nos prédios não.
   function montar(forcar = false) {
@@ -1322,13 +1384,30 @@ export function createVila(host, options) {
     walking = false;
     actions.andando?.stop();
     actions.pose.stop();
+    // Passo a pé pela metade: a bicicleta parte de onde o jogador está (a
+    // posição agora é contínua) e o tile passa a ser o que está sob ele.
+    if (player.move) {
+      player.move = null;
+      const o = origemDaGrade();
+      player.x = Math.floor(player.root.position.x - o.x);
+      player.y = Math.floor(player.root.position.z - o.z);
+      if (player.body) {
+        player.body.position.y = 0;
+        player.body.rotation.z = 0;
+      }
+    }
+    assento = null;
+    // Rumo inicial = o yaw que está na tela (o giro a pé pode estar no meio).
+    bike.rumo = player.root.rotation.y + player.giro.rotation.y;
+    player.root.rotation.y = bike.rumo;
+    player.giro.rotation.y = 0;
+    yawVisual = bike.rumo;
+    zerarPilotagem();
     // Todas as clips da bicicleta tocam juntas e o peso de cada uma sai de
     // pesarBike (sem crossFade: ele brigaria com os pesos manuais). Parado na
     // largada: a cadência começa em 0 (timeScale 0 congela o pedivela).
-    bike.vel = 0;
     bike.guidao = 0;
     bike.paradoPeso = actions.bikeParado ? 1 : 0;
-    bike.desvio.set(0, 0, 0);
     for (const a of clipsBike()) {
       a.reset().play();
       a.timeScale = 0;
@@ -1346,16 +1425,51 @@ export function createVila(host, options) {
     bike.node.visible = false;
     for (const a of clipsBike()) a.stop();
     walking = false;
-    // Sobra de curva desfeita: volta ao centro do tile (numa transição, quem
-    // move o jogador é ela).
-    if (bike.desvio.lengthSq() && !player.move && !transicao) player.root.position.copy(paraMundo(player.x, player.y));
-    bike.desvio.set(0, 0, 0);
+    voltarAGrade();
     bike.guidao = 0;
-    player.inclina.rotation.z = 0;
     if (bike.garfo && !bike.garfoNaClip) bike.garfo.rotation.y = bike.garfoY0;
     playPose();
     mixer.update(0);
     onBicicleta(false);
+  }
+  // Descendo (ou perdendo a bicicleta): de volta à grade. O yaw lógico vira
+  // o cardinal de player.dir e o visual parte do rumo (giroVisual alinha);
+  // a posição assenta no centro do tile (numa transição, quem move o jogador
+  // é ela; numa cena, vai direto).
+  function voltarAGrade() {
+    player.root.rotation.y = DIRS[player.dir].rot;
+    yawVisual = bike.rumo;
+    player.giro.rotation.y = difAngulo(yawVisual, player.root.rotation.y);
+    player.inclina.rotation.z = 0;
+    zerarPilotagem();
+    if (transicao) return;
+    // O tile sob o jogador (ou, se ocupado, o vizinho andável mais perto).
+    const pos = player.root.position;
+    let melhor = null;
+    let dMelhor = Infinity;
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const x = player.x + dx;
+        const y = player.y + dy;
+        if (!dentro(x, y) || !podeAndar(x, y)) continue;
+        const d = paraMundo(x, y).distanceTo(pos) - (dx || dy ? 0 : 1);
+        if (d < dMelhor) {
+          dMelhor = d;
+          melhor = { x, y };
+        }
+      }
+    }
+    if (melhor) {
+      player.x = melhor.x;
+      player.y = melhor.y;
+    }
+    const ate = paraMundo(player.x, player.y);
+    const d = ate.distanceTo(pos);
+    if (reducedMotion || cutscene.active || d < 1e-3) {
+      pos.copy(ate);
+      assento = null;
+    } else assento = { de: pos.clone(), ate, t: 0, dur: THREE.MathUtils.clamp(d / BIKE_ASSENTA_VEL, 0.08, 0.25) };
+    reportFacing();
   }
   const clipsBike = () => [actions.pedalando, actions.pedalandoEsq, actions.pedalandoDir, actions.bikeParado].filter(Boolean);
 
@@ -1379,23 +1493,25 @@ export function createVila(host, options) {
     }
   }
 
-  // Antes do mixer, a cada quadro montado: embalo (cadência e passo), guidão
-  // (pela velocidade angular do yaw visual, em giroVisual) e pesos das clips.
-  function pilotarBike(dt, omega) {
-    const continua = held.length || player.tap || player.path.length;
-    // Andando com mais passos pela frente: embala; no último passo (nada
-    // segurado), já vai freando, e parado o pedivela perde o giro devagar.
-    const alvo = player.move && continua ? 1 : 0;
-    if (reducedMotion) bike.vel = player.move ? 1 : 0;
-    else bike.vel += THREE.MathUtils.clamp(alvo - bike.vel, -dt / BIKE_EMBALO, dt / BIKE_EMBALO);
+  // Antes do mixer, a cada quadro montado (depois de pedalarLivre): cadência
+  // pela velocidade, pé no chão parado, guidão e inclinação pela velocidade
+  // angular do rumo, pesos das clips.
+  function pilotarBike(dt) {
+    const andando = bike.spd > 0.05;
+    bike.vel = Math.min(bike.spd / BIKE_VMAX, 1);
     // Pé no chão só depois de parar; ao sair, larga rápido.
-    const paradoAlvo = player.move ? 0 : 1;
+    const paradoAlvo = andando ? 0 : 1;
     const taxaParado = paradoAlvo ? BIKE_PARADO_ENTRA : BIKE_PARADO_SAI;
     bike.paradoPeso = reducedMotion
       ? paradoAlvo
       : bike.paradoPeso + (paradoAlvo - bike.paradoPeso) * (1 - Math.exp(-dt * taxaParado));
-    const guidaoAlvo = reducedMotion ? 0 : THREE.MathUtils.clamp(omega * GUIDAO_K, -GUIDAO_MAX, GUIDAO_MAX);
+    const guidaoAlvo = reducedMotion ? 0 : THREE.MathUtils.clamp(bike.omega * GUIDAO_K, -GUIDAO_MAX, GUIDAO_MAX);
     bike.guidao += (guidaoAlvo - bike.guidao) * (1 - Math.exp(-dt * GUIDAO_TAXA));
+    // Roll para dentro da curva; em Z local (frente = +Z), negativo inclina
+    // para a esquerda do ciclista, que é o lado de um yaw crescente. Parado
+    // não inclina; movimento reduzido, nunca.
+    const rollAlvo = reducedMotion ? 0 : THREE.MathUtils.clamp(-bike.omega * bike.spd * INCLINA_K, -INCLINA_MAX, INCLINA_MAX);
+    player.inclina.rotation.z += (rollAlvo - player.inclina.rotation.z) * (reducedMotion ? 1 : 1 - Math.exp(-dt * INCLINA_TAXA));
     // Uma volta do pedivela a cada BIKE_TILES_POR_VOLTA tiles na cadência cheia.
     const p = actions.pedalando;
     const dur = p.getClip().duration;
@@ -1407,7 +1523,7 @@ export function createVila(host, options) {
     // o pedal) e estaciona em t = 0, senão o pé direito sai do pedal. Voltando
     // a pedalar, a fase recomeça daí e pedal e pé casam. Sem `bike_parado`,
     // só congela onde parou.
-    if (actions.bikeParado && !player.move) {
+    if (actions.bikeParado && !andando) {
       const fase = ((p.time % dur) + dur) % dur;
       const frente = fase > dur / 2;
       const falta = frente ? dur - fase : fase;
@@ -1419,8 +1535,6 @@ export function createVila(host, options) {
     }
     pesarBike();
   }
-  // Fração do passo cheio que o passo de agora anda (o embalo da largada).
-  const ritmoBike = () => (reducedMotion ? 1 : BIKE_RITMO_MIN + (1 - BIKE_RITMO_MIN) * bike.vel);
 
   // Depois do mixer, a cada quadro: rodas pela distância, pedivela pelo clipe
   // (com a cadência a 0 ele congela no ângulo em que parou), guidão.
@@ -1436,69 +1550,342 @@ export function createVila(host, options) {
     for (const pedal of bike.pedais) pedal.rotation.x = -a;
   }
 
-  // ---- Curva em arco nas esquinas (bicicleta) ---------------------------------
-  // No meio de um passo, se já há outra direção pedida (não a oposta) e o tile
-  // dela está livre, a segunda metade deste passo e a primeira do próximo viram
-  // uma Bézier quadrática: do meio do tile anterior, pela esquina (controle),
-  // ao meio do seguinte. A grade não muda: player.x/y e a colisão continuam
-  // tile a tile; só o root (que a câmera segue, amortecida) corta a quina.
-  // A curva fica combinada (player.tap): o próximo passo sai mesmo se a seta
-  // subir antes do fim; se ainda assim não sair (tile ocupado de repente,
-  // outra seta), o resto vira `desvio` e some amortecido.
-  const vCurva = new THREE.Vector3();
-  function planejarCurva(m) {
-    // Na pista as esquinas também viram arco (nos prédios, não).
-    if (!bike.on || reducedMotion || (noPredio() && !naPista())) return null;
-    const want = held[held.length - 1] ?? player.tap;
-    if (!want || want === m.dir || want === OPPOSITE[m.dir]) return null;
-    const nx = player.x + DIRS[want].dx;
-    const ny = player.y + DIRS[want].dy;
-    if (!noPredio() && nx === SEMEC_PORTA.x && ny === SEMEC_PORTA.y) return null;
-    if ((noPredio() && interior.saidaEm(nx, ny)) || !podeAndar(nx, ny)) return null;
-    if (!held.length) player.tap = want;
-    const seguinte = paraMundo(nx, ny);
-    return {
-      dir: want,
-      p0: new THREE.Vector3().lerpVectors(m.from, m.to, 0.5),
-      p1: m.to.clone(),
-      p2: new THREE.Vector3().lerpVectors(m.to, seguinte, 0.5),
-    };
+  // ---- Direção livre (bicicleta) ------------------------------------------------
+  // Montado, o jogador sai da grade: a posição do root é contínua e o rumo
+  // (root.rotation.y) também. A cada quadro (pedalarLivre):
+  //   1. alvo de rumo = soma dos vetores das setas seguradas (duas setas =
+  //      diagonal; opostas se anulam) ou o próximo tile do caminho do clique;
+  //   2. o rumo gira até o alvo a no máximo BIKE_GIRO_LENTO…_RAPIDO rad/s
+  //      (mais lento quanto mais rápido); alvo quase atrás: freia e faz um U;
+  //   3. a velocidade acelera até BIKE_VMAX em BIKE_EMBALO s e, sem setas,
+  //      freia sozinha em BIKE_FREIO s;
+  //   4. anda em subpassos de BIKE_SUBPASSO, cada um resolvendo a colisão de
+  //      um círculo (BIKE_RAIO) contra os tiles não andáveis (desliza na
+  //      parede); cada tile novo sob o centro passa por pisouTile.
+  // A grade continua valendo para o resto do jogo: player.x/y = tile sob o
+  // centro, player.dir = cardinal mais perto do rumo (com histerese), e
+  // reportFacing/interact (Espaço) usam os dois como sempre. Coordenadas
+  // contínuas de tile: o tile (x, y) cobre [x, x + 1) × [y, y + 1).
+  const gradeO = new THREE.Vector3();
+  function origemDaGrade() {
+    gradeO.copy(paraMundo(0, 0));
+    gradeO.x -= 0.5;
+    gradeO.z -= 0.5;
+    return gradeO;
   }
-  // Ponto (em `out`) e yaw da tangente da curva em u ∈ [0, 1].
-  function pontoDaCurva(c, u, out) {
-    const w = 1 - u;
-    out.set(0, 0, 0).addScaledVector(c.p0, w * w).addScaledVector(c.p1, 2 * w * u).addScaledVector(c.p2, u * u);
-    vCurva.subVectors(c.p1, c.p0).multiplyScalar(w);
-    vCurva.addScaledVector(vAux2.subVectors(c.p2, c.p1), u);
-    return Math.atan2(vCurva.x, vCurva.z);
-  }
-  const vAux2 = new THREE.Vector3();
-  // Posição do passo de agora; devolve o yaw da tangente quando está na curva
-  // (o giro visual segue a curva em vez de amortecer) ou null na reta.
-  function posicionarPasso(m) {
-    const k = Math.min(m.t, 1);
-    let yaw = null;
-    if (m.entrada && k <= 0.5) yaw = pontoDaCurva(m.entrada, 0.5 + k, player.root.position);
-    else if (m.saida && k >= 0.5) yaw = pontoDaCurva(m.saida, k - 0.5, player.root.position);
-    else player.root.position.lerpVectors(m.from, m.to, k);
-    player.root.position.add(bike.desvio);
-    return yaw;
+  const bloqueado = (x, y) => !dentro(x, y) || !podeAndar(x, y);
+  // Tiles atravessados neste quadro (a corrida confere cada um: num quadro
+  // lento a bicicleta não "pula" um checkpoint).
+  const tilesNoQuadro = [];
+  // Círculo do jogador montado tocando o tile (x, y)? (Os walkers não entram
+  // num tile em que a bicicleta já está encostada.)
+  function bikeEncosta(x, y) {
+    if (!bike.on) return false;
+    const o = origemDaGrade();
+    const px = player.root.position.x - o.x;
+    const py = player.root.position.z - o.z;
+    const dx = px - THREE.MathUtils.clamp(px, x, x + 1);
+    const dy = py - THREE.MathUtils.clamp(py, y, y + 1);
+    return dx * dx + dy * dy < (BIKE_RAIO + 0.05) ** 2;
   }
 
-  // ---- Giro visual e inclinação -------------------------------------------------
+  // Empurra o círculo (p em coordenadas de tile) para fora dos tiles
+  // bloqueados em volta; devolve a normal média do contato (ou null).
+  // Na pista, perto do asfalto, quem limita é o corredor contínuo
+  // (interior.corredor: distância à linha central até `raio`), não a
+  // escadinha dos tiles: os tiles que ele cobre não bloqueiam e o centro é
+  // puxado de volta para dentro do raio. Encostando no box (a abertura do
+  // muro), vale só a grade, para dar para entrar e sair.
+  const nContato = { x: 0, y: 0 };
+  function colidir(p) {
+    const cor = naPista() ? interior?.corredor : null;
+    let nx = 0;
+    let ny = 0;
+    let tocou = false;
+    for (let it = 0; it < 3; it++) {
+      let mexeu = false;
+      const x0 = Math.floor(p.x - BIKE_RAIO);
+      const x1 = Math.floor(p.x + BIKE_RAIO);
+      const y0 = Math.floor(p.y - BIKE_RAIO);
+      const y1 = Math.floor(p.y + BIKE_RAIO);
+      let noBox = false;
+      for (let ty = y0; ty <= y1; ty++) {
+        for (let tx = x0; tx <= x1; tx++) {
+          if (cor?.box(tx, ty)) noBox = true;
+          if (!bloqueado(tx, ty) || cor?.cobre(tx, ty)) continue;
+          const dx = p.x - THREE.MathUtils.clamp(p.x, tx, tx + 1);
+          const dy = p.y - THREE.MathUtils.clamp(p.y, ty, ty + 1);
+          const d2 = dx * dx + dy * dy;
+          if (d2 >= BIKE_RAIO * BIKE_RAIO) continue;
+          let ux;
+          let uy;
+          let empurra;
+          if (d2 > 1e-12) {
+            const d = Math.sqrt(d2);
+            ux = dx / d;
+            uy = dy / d;
+            empurra = BIKE_RAIO - d;
+          } else {
+            // Centro dentro do tile (alguém entrou nele): sai pelo lado mais perto.
+            const lados = [
+              [p.x - tx, -1, 0],
+              [tx + 1 - p.x, 1, 0],
+              [p.y - ty, 0, -1],
+              [ty + 1 - p.y, 0, 1],
+            ].sort((a, b) => a[0] - b[0]);
+            [empurra, ux, uy] = lados[0];
+            empurra += BIKE_RAIO;
+          }
+          p.x += ux * empurra;
+          p.y += uy * empurra;
+          nx += ux;
+          ny += uy;
+          tocou = mexeu = true;
+        }
+      }
+      const q = cor && !noBox ? cor.perto(p.x, p.y) : null;
+      if (q && q.d > cor.raio) {
+        const empurra = q.d - cor.raio;
+        p.x -= q.nx * empurra;
+        p.y -= q.ny * empurra;
+        nx -= q.nx;
+        ny -= q.ny;
+        tocou = mexeu = true;
+      }
+      if (!mexeu) break;
+    }
+    if (!tocou) return null;
+    const l = Math.hypot(nx, ny) || 1;
+    nContato.x = nx / l;
+    nContato.y = ny / l;
+    return nContato;
+  }
+
+  // Cardinal mais perto de um yaw.
+  function cardinalDe(yaw) {
+    let melhor = "down";
+    let dMelhor = Infinity;
+    for (const [k, d] of Object.entries(DIRS)) {
+      const e = Math.abs(difAngulo(yaw, d.rot));
+      if (e < dMelhor) {
+        dMelhor = e;
+        melhor = k;
+      }
+    }
+    return melhor;
+  }
+
+  // O centro entrou no tile (x, y): tudo o que o passo na grade fazia ao
+  // pisar num tile. Devolve true se começou uma transição (para de andar).
+  function pisouTile(x, y) {
+    player.x = x;
+    player.y = y;
+    player.idle = 0;
+    if (coding) stopCoding();
+    if (noPredio() && interior.saidaEm(x, y)) {
+      usarSaida(interior.saidaEm(x, y));
+      return Boolean(transicao);
+    }
+    if (!noPredio()) {
+      veg.rustle(x, y);
+      if (!tryFindOcarina(x, y)) tryColeta(x, y);
+    } else tryColeta(x, y);
+    if (corrida && naPista()) tilesNoQuadro.push(`${x},${y}`);
+    return false;
+  }
+
+  // Encostado num tile de saída (porta da SEMEC, portão do box, saída de um
+  // interior) e empurrando para ele: usa a saída, como o passo na grade.
+  function saidaAFrente(x, y) {
+    if (!noPredio() && x === SEMEC_PORTA.x && y === SEMEC_PORTA.y) entrarOuSair("terreo");
+    else if (naPista() && naSaidaDaPista(x, y)) sairDaPista();
+    else if (noPredio() && interior.saidaEm(x, y)) usarSaida(interior.saidaEm(x, y));
+    return Boolean(transicao);
+  }
+
+  // Caminho do clique (player.path, direções na grade) montado: os centros
+  // dos tiles viram waypoints; passa a ~0,8 tile de cada um (corta a quina) e
+  // freia para parar no último. Devolve { rumo, vel } ou null (chegou/desistiu).
+  function seguirRota(p, dt) {
+    if (bike.rotaDe !== player.path) {
+      bike.rotaDe = player.path;
+      bike.rota = [];
+      bike.rotaI = 0;
+      bike.rotaPreso = 0;
+      let x = player.x;
+      let y = player.y;
+      for (const dir of player.path) {
+        x += DIRS[dir].dx;
+        y += DIRS[dir].dy;
+        bike.rota.push([x + 0.5, y + 0.5]);
+      }
+    }
+    const r = bike.rota;
+    const ultimo = r.length - 1;
+    while (bike.rotaI < ultimo && Math.hypot(r[bike.rotaI][0] - p.x, r[bike.rotaI][1] - p.y) < 0.8) bike.rotaI++;
+    const [tx, ty] = r[bike.rotaI];
+    const d = Math.hypot(tx - p.x, ty - p.y);
+    // Preso (parede, alguém no caminho) por mais de 1,2 s: desiste.
+    bike.rotaPreso = bike.spd < 0.5 ? bike.rotaPreso + dt : 0;
+    if ((bike.rotaI === ultimo && d < 0.3) || bike.rotaPreso > 1.2) {
+      player.path = [];
+      bike.rota = null;
+      bike.rotaDe = null;
+      // Alvo do clique (alguém, uma placa): vira para ele parado e conversa.
+      const pend = player.pending;
+      player.pending = null;
+      if (pend) bike.virar = Object.keys(DIRS).find((k) => DIRS[k].dx === pend.x - player.x && DIRS[k].dy === pend.y - player.y) ?? null;
+      return null;
+    }
+    const resto = d + (ultimo - bike.rotaI);
+    const rumo = Math.atan2(tx - p.x, ty - p.y);
+    let vel = Math.min(BIKE_VMAX, Math.sqrt((2 * BIKE_VMAX * resto) / BIKE_FREIO) * 0.8);
+    // Esquina fechada pela frente: entra mais devagar.
+    if (Math.abs(difAngulo(rumo, bike.rumo)) > 0.8) vel = Math.min(vel, BIKE_VMAX * 0.45);
+    return { rumo, vel };
+  }
+
+  const pLivre = { x: 0, y: 0 };
+  function pedalarLivre(dt) {
+    // Setas de toque perdem a validade (mesmo travado: um toque na contagem
+    // não fica guardado para o verde).
+    for (const [k, s] of bike.toque) {
+      if (s - dt <= 0) bike.toque.delete(k);
+      else bike.toque.set(k, s - dt);
+    }
+    // Pausa: congela tudo (posição, velocidade, rumo).
+    if (paused || foco || cutscene.active || dt <= 0) {
+      bike.omega = 0;
+      return;
+    }
+    // Travado (íris, contagem, depois da chegada): sem entrada, só freia.
+    const travado = Boolean(transicao) || corridaTrava();
+    let ix = 0;
+    let iy = 0;
+    if (!travado) {
+      for (const dir of held) {
+        ix += DIRS[dir].dx;
+        iy += DIRS[dir].dy;
+      }
+      for (const dir of bike.toque.keys()) {
+        if (held.includes(dir)) continue;
+        ix += DIRS[dir].dx;
+        iy += DIRS[dir].dy;
+      }
+    }
+    const temSeta = ix !== 0 || iy !== 0;
+    const o = origemDaGrade();
+    const pos = player.root.position;
+    pLivre.x = pos.x - o.x;
+    pLivre.y = pos.z - o.z;
+    let alvoRumo = null;
+    let vAlvo = 0;
+    if (temSeta) {
+      alvoRumo = Math.atan2(ix, iy);
+      vAlvo = BIKE_VMAX;
+      bike.virar = null;
+    } else if (!travado && player.path.length) {
+      const r = seguirRota(pLivre, dt);
+      if (r) {
+        alvoRumo = r.rumo;
+        vAlvo = r.vel;
+      }
+    } else if (!travado && bike.virar && bike.spd < 0.3) {
+      // Fim do caminho do clique: vira parado para o alvo e conversa.
+      alvoRumo = DIRS[bike.virar].rot;
+      if (Math.abs(difAngulo(alvoRumo, bike.rumo)) < 0.03) {
+        player.dir = bike.virar;
+        bike.virar = null;
+        reportFacing();
+        interact();
+        alvoRumo = null;
+      }
+    }
+    // Giro do rumo, limitado (mais lento quanto mais rápido).
+    const taxa = BIKE_GIRO_LENTO + (BIKE_GIRO_RAPIDO - BIKE_GIRO_LENTO) * Math.min(bike.spd / BIKE_VMAX, 1);
+    let dRumo = 0;
+    if (alvoRumo !== null) {
+      let dif = difAngulo(alvoRumo, bike.rumo);
+      // Bem atrás: continua virando para o lado em que já virava (sem
+      // trocar de lado a cada quadro perto dos 180°) e freia para o U.
+      if (Math.abs(dif) > Math.PI - 0.2 && bike.omega) dif = Math.sign(bike.omega) * Math.abs(dif);
+      if (Math.abs(dif) > BIKE_U && bike.spd > 0.5) vAlvo = Math.min(vAlvo, BIKE_VMAX * BIKE_U_VEL);
+      dRumo = THREE.MathUtils.clamp(dif, -taxa * dt, taxa * dt);
+    }
+    bike.pedalando = alvoRumo !== null && vAlvo > 0.5;
+    if (bike.spd < vAlvo) bike.spd = Math.min(vAlvo, bike.spd + (BIKE_VMAX / BIKE_EMBALO) * dt);
+    else bike.spd = Math.max(vAlvo, bike.spd - (BIKE_VMAX / BIKE_FREIO) * dt);
+    bike.rumo = difAngulo(bike.rumo + dRumo, 0);
+    bike.omega = dRumo / dt;
+    // Anda em subpassos, colidindo e conferindo cada tile novo.
+    const fx = Math.sin(bike.rumo);
+    const fy = Math.cos(bike.rumo);
+    const dist = bike.spd * dt;
+    const n = Math.max(1, Math.ceil(dist / BIKE_SUBPASSO));
+    let contra = 0;
+    let andou = 0;
+    let mudou = false;
+    for (let i = 0; i < n && dist > 0; i++) {
+      const ax = pLivre.x;
+      const ay = pLivre.y;
+      pLivre.x += (fx * dist) / n;
+      pLivre.y += (fy * dist) / n;
+      const nrm = colidir(pLivre);
+      if (nrm) contra = Math.max(contra, -(fx * nrm.x + fy * nrm.y));
+      andou += Math.hypot(pLivre.x - ax, pLivre.y - ay);
+      const tx = Math.floor(pLivre.x);
+      const ty = Math.floor(pLivre.y);
+      if (tx === player.x && ty === player.y) continue;
+      mudou = true;
+      pos.x = pLivre.x + o.x;
+      pos.z = pLivre.y + o.z;
+      if (pisouTile(tx, ty)) return;
+    }
+    pos.x = pLivre.x + o.x;
+    pos.z = pLivre.y + o.z;
+    // Batendo na parede: perde embalo só pelo que passa de BIKE_RASPA no
+    // ângulo contra ela (ao quadrado). Raspando a 45° desliza a ~5,8 tiles/s;
+    // de frente quase para (~1,5 tile/s de pedalada contra a parede).
+    const contraEfetivo = Math.max(0, (contra - BIKE_RASPA) / (1 - BIKE_RASPA));
+    if (contraEfetivo > 0) bike.spd = Math.max(0, bike.spd - bike.spd * contraEfetivo ** 2 * BIKE_ATRITO_PAREDE * dt);
+    // Pneu no chão a cada ~1 tile rodado.
+    bike.pneu += andou;
+    if (bike.pneu >= 1) {
+      bike.pneu %= 1;
+      onSom("pneu");
+    }
+    // Empurrando contra uma saída (porta, portão): sai, como o passo na grade.
+    if (temSeta && !transicao) {
+      const alc = BIKE_RAIO + 0.15;
+      const sx = Math.floor(pLivre.x + fx * alc);
+      const sy = Math.floor(pLivre.y + fy * alc);
+      if ((sx !== player.x || sy !== player.y) && saidaAFrente(sx, sy)) return;
+    }
+    // Cardinal de frente: o mais perto do rumo, trocando só depois de passar
+    // ~5° da diagonal (sem piscar a dica "Espaço: …" na diagonal exata).
+    let virou = false;
+    if (Math.abs(difAngulo(bike.rumo, DIRS[player.dir].rot)) > Math.PI / 4 + 0.08) {
+      player.dir = cardinalDe(bike.rumo);
+      virou = true;
+    }
+    if (mudou || virou) reportFacing();
+  }
+
+  // ---- Giro visual (a pé) -------------------------------------------------------
   // O yaw lógico (player.dir → root.rotation.y) muda na hora, como sempre;
-  // o visual (player.giro) persegue-o pelo lado mais curto, ou segue a tangente
-  // da curva. Travado (= lógico) com movimento reduzido, em transições, cenas
-  // e sentado, onde quem gira o root é o código daquele trecho.
+  // o visual persegue-o pelo lado mais curto (player.giro guarda a diferença).
+  // Travado (= lógico) com movimento reduzido, em transições, cenas e
+  // sentado, onde quem gira o root é o código daquele trecho. Montado não
+  // roda: o rumo contínuo já é o yaw do root (pedalarLivre).
   let yawVisual = player.root.rotation.y;
+  let assento = null; // { de, ate, t, dur }: assentando no centro do tile ao descer
   const VOLTA = Math.PI * 2;
   const difAngulo = (a, b) => {
     const d = (a - b) % VOLTA;
     return d > Math.PI ? d - VOLTA : d < -Math.PI ? d + VOLTA : d;
   };
-  function giroVisual(dt, yawCurva) {
+  function giroVisual(dt) {
     const logico = player.root.rotation.y;
-    let omega = 0;
     if (reducedMotion || transicao || cutscene.active || sentados.has(player.body) || dt <= 0) yawVisual = logico;
     else {
       const passo = THREE.MathUtils.clamp(
@@ -1506,17 +1893,9 @@ export function createVila(host, options) {
         -GIRO_MAX * dt,
         GIRO_MAX * dt
       );
-      const novo = yawCurva ?? yawVisual + passo;
-      omega = difAngulo(novo, yawVisual) / dt;
-      yawVisual = novo;
+      yawVisual += passo;
     }
     player.giro.rotation.y = difAngulo(yawVisual, logico);
-    // Roll só montado e com embalo; em Z local (frente = +Z), negativo inclina
-    // para a esquerda do ciclista, que é o lado de um yaw crescente.
-    const rollAlvo =
-      bike.on && !reducedMotion ? THREE.MathUtils.clamp(-omega * INCLINA_K * bike.vel, -INCLINA_MAX, INCLINA_MAX) : 0;
-    player.inclina.rotation.z += (rollAlvo - player.inclina.rotation.z) * (reducedMotion ? 1 : 1 - Math.exp(-dt * INCLINA_TAXA));
-    return omega;
   }
 
   // Caminhada: crossfade entre a pose parada (1º quadro da `entrada`, ou a
@@ -1690,11 +2069,12 @@ export function createVila(host, options) {
   function face(dir) {
     player.dir = dir;
     player.root.rotation.y = DIRS[dir].rot;
+    // Montado (teleportes da pista, cenas): o rumo contínuo vai junto.
+    if (bike.on) bike.rumo = DIRS[dir].rot;
     reportFacing();
   }
 
-  // Passo que terminou neste quadro, montado: { sobra (s), saida (curva) }.
-  let passoAcabou = null;
+  // Passo na grade (a pé; montado, quem anda é pedalarLivre).
   function tryStep(dir) {
     const d = DIRS[dir];
     const nx = player.x + d.dx;
@@ -1715,25 +2095,11 @@ export function createVila(host, options) {
       return false;
     }
     if (!podeAndar(nx, ny)) return false;
-    // Emendando no passo que acabou neste quadro (bicicleta): herda o tempo que
-    // sobrou dele (sem o soluço de um quadro parado no centro do tile) e, se
-    // era a curva combinada, a 1ª metade deste passo segue o arco.
-    const emenda = bike.on ? passoAcabou : null;
-    const dur = bike.on ? STEP_BIKE : player.run ? STEP_RUN : STEP_WALK;
-    player.move = {
-      from: paraMundo(player.x, player.y),
-      to: paraMundo(nx, ny),
-      t: emenda ? Math.min(emenda.sobra / dur, 0.5) : 0,
-      dur,
-      dir,
-      entrada: emenda?.saida?.dir === dir ? emenda.saida : null,
-      saida: undefined, // decidida no meio do passo (planejarCurva)
-    };
-    // Montado e fora de um arco: o que o root estiver fora do centro do tile
-    // (resto de uma curva combinada que saiu para outro lado) vira desvio,
-    // que some amortecido.
-    if (bike.on && !player.move.entrada) bike.desvio.subVectors(player.root.position, player.move.from);
-    passoAcabou = null;
+    const dur = player.run ? STEP_RUN : STEP_WALK;
+    // Ainda assentando depois de descer da bicicleta: parte de onde está.
+    const from = assento ? player.root.position.clone() : paraMundo(player.x, player.y);
+    assento = null;
+    player.move = { from, to: paraMundo(nx, ny), t: 0, dur, dir };
     player.x = nx;
     player.y = ny;
     if (!noPredio()) veg.rustle(nx, ny);
@@ -1744,7 +2110,6 @@ export function createVila(host, options) {
   }
   // Som do passo pelo chão: grama/mato, calçada, madeira (Galeria), carpete.
   function somDoPasso(x, y) {
-    if (bike.on) return "pneu";
     if (interior?.piso === "asfalto") return "passo-pedra";
     if (noPredio()) return interior?.galeria || local === "galeria" ? "passo-madeira" : "passo-carpete";
     return map[y]?.[x] === PATH ? "passo-pedra" : "passo-grama";
@@ -2609,8 +2974,8 @@ export function createVila(host, options) {
   // preparo), mas se entra a partir da Vila, já montado: api.entrarPista()
   // fecha a íris parado (modo "pista": ninguém anda até porta nenhuma),
   // troca de cena no escuro e abre com o jogador na largada. Lá dentro a
-  // bicicleta não desce (nem pelo B, nem sozinha) e as esquinas viram arco
-  // como na Vila. O portão do box (corrida.saidaVila) ou api.sairDaPista()
+  // bicicleta não desce (nem pelo B, nem sozinha) e anda em direção livre
+  // como na Vila (pedalarLivre). O portão do box (corrida.saidaVila) ou api.sairDaPista()
   // levam de volta para o lado do bicicletário.
   //
   // Máquina da corrida (no motor, para o tempo ser justo):
@@ -2618,12 +2983,14 @@ export function createVila(host, options) {
   //   "contagem"  3 bipes, 1 s cada (onCorrida "contagem" n = 3, 2, 1; o
   //               semáforo da pista no vermelho), jogador travado;
   //   "correndo"  verde ("largada"); conta o tempo e os checkpoints na ordem
-  //               (o último é a linha de chegada; fora de ordem não conta);
+  //               (o último é a linha de chegada; fora de ordem não conta;
+  //               valem todos os tiles que o centro da bicicleta cruzou no
+  //               quadro, em ordem: tilesNoQuadro);
   //   "fim"       cruzou a chegada na última volta: festa, jogador freia e
   //               fica parado até correrDeNovo() ou sairDaPista().
   // Tempo: soma do dt do próprio tick (já limitado a 0,05 s por quadro), só
-  // em "correndo" e sem pausa. É o mesmo relógio que move a bicicleta (o
-  // passo anda dt/STEP_BIKE): num PC lento, em que o quadro passa de 50 ms,
+  // em "correndo" e sem pausa. É o mesmo relógio que move a bicicleta
+  // (pedalarLivre anda spd·dt): num PC lento, em que o quadro passa de 50 ms,
   // o jogo inteiro anda mais devagar e o cronômetro também, então a mesma
   // pilotagem dá o mesmo tempo em qualquer máquina, e um engasgo (GC, aba em
   // segundo plano) não vira segundos perdidos. Com performance.now() o PC
@@ -2692,15 +3059,14 @@ export function createVila(host, options) {
   // ou pista → Vila (ao lado do bicicletário, de frente para ele).
   function trocarDePista(tr) {
     const de = local;
-    // Passo pela metade, curva combinada, setas: tudo zerado (é um teleporte).
+    // Passo pela metade, velocidade, setas, caminho: tudo zerado (é um teleporte).
     player.move = null;
     player.path = [];
     player.pending = null;
     player.tap = null;
     held.length = 0;
-    passoAcabou = null;
-    bike.desvio.set(0, 0, 0);
-    bike.vel = 0;
+    assento = null;
+    zerarPilotagem();
     if (tr.para === "vila") {
       interior?.setJogador?.(null);
       local = "vila";
@@ -2728,6 +3094,9 @@ export function createVila(host, options) {
       player.y = L.y;
       face(L.dir);
       montar(true);
+      // (montar parte do yaw na tela, que ainda é o do outro lado.)
+      bike.rumo = DIRS[L.dir].rot;
+      player.root.rotation.y = bike.rumo;
     }
     const pos = paraMundo(player.x, player.y);
     player.root.position.copy(pos);
@@ -2773,10 +3142,11 @@ export function createVila(host, options) {
     interior.largada?.(null);
   }
 
-  // A cada quadro, depois do movimento (o tile novo vale já no quadro em que
-  // o passo começa: player.x/y mudam no início do passo).
+  // A cada quadro, depois do movimento: cada tile em que o centro da
+  // bicicleta entrou neste quadro (tilesNoQuadro, na ordem) e o atual.
   function atualizarCorrida(dt) {
     const c = corrida;
+    const atravessados = tilesNoQuadro.splice(0);
     if (!c || !naPista() || paused) return;
     if (c.fase === "espera") {
       if (transicao) return;
@@ -2803,7 +3173,13 @@ export function createVila(host, options) {
     }
     if (c.fase !== "correndo") return;
     c.tempo += dt;
-    const tile = `${player.x},${player.y}`;
+    atravessados.push(`${player.x},${player.y}`);
+    for (const tile of atravessados) {
+      if (c.fase !== "correndo") break;
+      corridaPisou(c, tile);
+    }
+  }
+  function corridaPisou(c, tile) {
     if (tile === c.tile) return;
     c.tile = tile;
     const i = c.proximo;
@@ -2825,8 +3201,8 @@ export function createVila(host, options) {
       somCorrida("volta");
       return;
     }
-    // Última volta: festa, freia (o passo de agora termina e o embalo cai)
-    // e fica parado (corridaTrava).
+    // Última volta: festa, freia sozinha (sem entrada: corridaTrava) e fica
+    // parado.
     c.fase = "fim";
     c.proximo = -1;
     interior.setProximo?.(-1);
@@ -3186,6 +3562,12 @@ export function createVila(host, options) {
       player.path = [];
       player.pending = null;
       if (!held.includes(dir)) held.push(dir);
+      // Montado: a seta entra no alvo do rumo (pedalarLivre); um toque curto
+      // vale como segurada por BIKE_TOQUE (vira ou anda um pouco).
+      if (bike.on) {
+        bike.toque.set(dir, BIKE_TOQUE);
+        return;
+      }
       // Na contagem a seta fica segurada (sai no verde), mas não vira.
       if (!player.move && !paused && !transicao && !foco && !corridaTrava()) {
         if (player.dir !== dir) {
@@ -3205,6 +3587,7 @@ export function createVila(host, options) {
     },
     releaseAll() {
       held.length = 0;
+      bike.toque.clear();
       player.tap = null;
       player.run = false;
     },
@@ -3234,6 +3617,7 @@ export function createVila(host, options) {
       paused = p;
       if (p) {
         held.length = 0;
+        bike.toque.clear();
         player.tap = null;
       }
     },
@@ -3521,22 +3905,30 @@ export function createVila(host, options) {
     lastTs = ts;
     t += dt;
 
-    // Movimento em grade.
-    if (player.turnLock > 0) player.turnLock -= dt;
-    let yawCurva = null;
-    // Resto de curva desfeita (bicicleta): some em ~0,15 s.
-    if (bike.desvio.lengthSq()) {
-      bike.desvio.multiplyScalar(Math.exp(-dt * 20));
-      if (bike.desvio.lengthSq() < 1e-7) bike.desvio.set(0, 0, 0);
-      if (!player.move && !transicao) player.root.position.copy(paraMundo(player.x, player.y)).add(bike.desvio);
+    // Montado: direção livre (posição e rumo contínuos; a grade só segue).
+    if (bike.on) {
+      pedalarLivre(dt);
+      player.root.rotation.y = bike.rumo;
+      player.giro.rotation.y = 0;
+      yawVisual = bike.rumo;
     }
+    // Descendo da bicicleta: assenta no centro do tile.
+    if (assento) {
+      if (bike.on || transicao || cutscene.active) assento = null;
+      else {
+        assento.t += dt;
+        const k = Math.min(assento.t / assento.dur, 1);
+        player.root.position.lerpVectors(assento.de, assento.ate, k * k * (3 - 2 * k));
+        if (k >= 1) assento = null;
+      }
+    }
+    // Movimento em grade (a pé).
+    if (player.turnLock > 0) player.turnLock -= dt;
     if (player.move) {
       const m = player.move;
-      // Montado, o passo segue o embalo (mais lento na largada).
-      m.t += (dt * (bike.on ? ritmoBike() : 1)) / m.dur;
-      if (m.saida === undefined && m.t >= 0.5) m.saida = planejarCurva(m);
+      m.t += dt / m.dur;
       const k = Math.min(m.t, 1);
-      yawCurva = posicionarPasso(m);
+      player.root.position.lerpVectors(m.from, m.to, k);
       // Sem a clip `andando` (bonequinho provisório), balanço procedural.
       if (player.body && !reducedMotion && !actions?.andando) {
         player.body.position.y = Math.abs(Math.sin(k * Math.PI)) * 0.06;
@@ -3544,7 +3936,6 @@ export function createVila(host, options) {
       }
       if (m.t >= 1) {
         player.move = null;
-        if (bike.on) passoAcabou = { sobra: (m.t - 1) * m.dur, saida: m.saida };
         if (noPredio() || !tryFindOcarina(player.x, player.y)) tryColeta(player.x, player.y);
         if (player.body) {
           player.body.position.y = 0;
@@ -3553,9 +3944,8 @@ export function createVila(host, options) {
         reportFacing();
       }
     }
-    const passoAntes = player.move;
     // (Na pista, travado na espera, na contagem e depois da chegada.)
-    if (!player.move && !paused && !cutscene.active && !transicao && !foco && !corridaTrava()) {
+    if (!bike.on && !assento && !player.move && !paused && !cutscene.active && !transicao && !foco && !corridaTrava()) {
       const want = held[held.length - 1] ?? player.tap;
       if (want && player.turnLock <= 0) {
         player.tap = null;
@@ -3576,11 +3966,6 @@ export function createVila(host, options) {
         }
       }
     }
-    // Passo emendado neste quadro: já anda o tempo herdado (e o arco).
-    if (player.move && player.move !== passoAntes) yawCurva = posicionarPasso(player.move);
-    // Não emendou: se vinha numa curva combinada, o resto dela vira desvio.
-    if (passoAcabou?.saida) bike.desvio.subVectors(player.root.position, paraMundo(player.x, player.y));
-    passoAcabou = null;
     atualizarCorrida(dt);
     if (!player.move && !held.length && !player.path.length) {
       player.idle += dt;
@@ -3613,16 +3998,20 @@ export function createVila(host, options) {
     const emPasso = Boolean(player.move) || andandoSozinho;
     if (emPasso && !walking) startWalk();
     else if (!emPasso && walking) stopWalk();
-    // Yaw visual, roll e (montado) embalo, guidão e pesos das clips.
-    const omega = giroVisual(dt, bike.on ? yawCurva : null);
-    if (bike.on) pilotarBike(dt, omega);
-    else if (walking && actions?.andando) actions.andando.timeScale = walkTimeScale();
-    if (mixer) mixer.update(dt);
+    // A pé: yaw visual. Montado: cadência, guidão, roll e pesos das clips
+    // (pausado, a bicicleta congela: o mixer do jogador não anda).
+    if (bike.on) {
+      if (!paused) pilotarBike(dt);
+    } else {
+      giroVisual(dt);
+      if (walking && actions?.andando) actions.andando.timeScale = walkTimeScale();
+    }
+    if (mixer) mixer.update(bike.on && paused ? 0 : dt);
     if (bike.on) {
       girarBike();
       // Roda livre: freando ou embalado sem pedalar, a catraca "tica" mais
       // rápido quanto maior o embalo.
-      if (bike.vel > 0.08 && !held.length) {
+      if (bike.vel > 0.08 && !bike.pedalando && !paused) {
         catracaT -= dt;
         if (catracaT <= 0) {
           onSom("catraca");
