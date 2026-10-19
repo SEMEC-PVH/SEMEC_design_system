@@ -802,7 +802,7 @@ async function buildDist() {
             "npm 7+: não instala os peers React (react, react-dom, lucide-react). Repita --omit=peer no npm ci/npm install seguinte.",
           fonts:
             "npx semec-ds copiar-fontes <pasta> copia fonts.css e fonts/ para a pasta estática (Tailwind CLI, HTML sem bundler).",
-          cdn: "https://cdn.jsdelivr.net/npm/@semec/ds@<versão>/dist/react/{fonts,variables,base}.css — caminho físico dist/react/, versão fixa e SRI calculado dos arquivos publicados (variables.css e base.css a partir da 4.3.0).",
+          cdn: "https://cdn.jsdelivr.net/npm/@semec/ds@<versão>/dist/react/{fonts,variables,base}.css — caminho físico dist/react/, versão fixa e SRI calculado dos arquivos publicados (variables.css e base.css a partir da 4.4.0).",
           tokensData:
             "@semec/ds/tokens.json (DTCG 2025.10, grupos L0/L1) e @semec/ds/tokens (JS tipado com valores CSS resolvidos), para Figma, mobile, back-end, PDF e e-mail.",
         },

@@ -1,6 +1,12 @@
 import * as z from "zod";
 
-import { validateCPF, validateCNPJ } from "./validators";
+import {
+  validateCPF,
+  validateCNPJ,
+  validateDateBR,
+  validateDateMonthYear,
+  validateTime,
+} from "./validators";
 
 /** Remove tudo que não é dígito. */
 function digits(v: string): string {
@@ -51,3 +57,33 @@ export const cepSchema = textoValidado("Informe o CEP.", (v) =>
       ? null
       : "CEP inválido. Use o formato 00000-000."
 );
+
+/** Data em formato brasileiro DD/MM/AAAA. */
+export const dateBRSchema = textoValidado("Informe a data.", (v) =>
+  validateDateBR(v) ? null : "Data inválida. Use o formato DD/MM/AAAA."
+);
+
+/** Competência em formato MM/AAAA. */
+export const dateMonthYearSchema = textoValidado("Informe o mês e o ano.", (v) =>
+  validateDateMonthYear(v) ? null : "Mês/ano inválido. Use o formato MM/AAAA."
+);
+
+/** Horário em formato HH:MM. */
+export const timeSchema = textoValidado("Informe o horário.", (v) =>
+  validateTime(v) ? null : "Horário inválido. Use o formato HH:MM."
+);
+
+/**
+ * Valida data tanto em formato brasileiro (DD/MM/AAAA) quanto ISO (AAAA-MM-DD).
+ * Útil para campos que aceitam digitação mascarada ou valor de DatePicker nativo.
+ */
+export const dateSchema = textoValidado("Informe a data.", (v) => {
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(v)) return validateDateBR(v) ? null : "Data inválida. Use o formato DD/MM/AAAA.";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
+    const [year, month, day] = v.split("-").map(Number);
+    if (!year || !month || !day || month < 1 || month > 12) return "Data inválida.";
+    const daysInMonth = new Date(year, month, 0).getDate();
+    return day >= 1 && day <= daysInMonth ? null : "Data inválida.";
+  }
+  return "Data inválida. Use o formato DD/MM/AAAA.";
+});

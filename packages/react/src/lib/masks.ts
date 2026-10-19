@@ -40,3 +40,35 @@ export const maskCurrency: MaskFn = (v) => {
   if (!v) return "";
   return (Number(v) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 };
+
+/** DD/MM/AAAA */
+export const maskDate: MaskFn = (v) => {
+  v = v.replace(/\D/g, "").slice(0, 8);
+  v = v.replace(/^(\d{2})(\d)/, "$1/$2");
+  v = v.replace(/^(\d{2})\/(\d{2})(\d)/, "$1/$2/$3");
+  return v;
+};
+
+/** MM/AAAA */
+export const maskDateMonthYear: MaskFn = (v) => {
+  v = v.replace(/\D/g, "").slice(0, 6);
+  v = v.replace(/^(\d{2})(\d)/, "$1/$2");
+  return v;
+};
+
+/** HH:MM */
+export const maskTime: MaskFn = (v) => {
+  v = v.replace(/\D/g, "").slice(0, 4);
+  v = v.replace(/^(\d{2})(\d)/, "$1:$2");
+  return v;
+};
+
+/** DD/MM/AAAA HH:MM */
+export const maskDateTime: MaskFn = (v) => {
+  v = v.replace(/\D/g, "").slice(0, 12);
+  v = v.replace(/^(\d{2})(\d)/, "$1/$2");
+  v = v.replace(/^(\d{2})\/(\d{2})(\d)/, "$1/$2/$3");
+  v = v.replace(/^(\d{2})\/(\d{2})\/(\d{4})(\d)/, "$1/$2/$3 $4");
+  v = v.replace(/^(\d{2})\/(\d{2})\/(\d{4}) (\d{2})(\d)/, "$1/$2/$3 $4:$5");
+  return v;
+};

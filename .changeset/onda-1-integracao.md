@@ -2,7 +2,7 @@
 "@semec/ds": minor
 ---
 
-Novidades da 4.3.0: integração da onda 1 dos testes de integração de 19/10/2026 (#65, #66, #67, #68, #69, #70, #71 e #73). Nenhuma mudança quebra o uso atual; as entradas e os comportamentos abaixo são acréscimos.
+Novidades da 4.4.0: integração da onda 1 dos testes de integração de 19/10/2026 (#65, #66, #67, #68, #69, #70, #71 e #73). Nenhuma mudança quebra o uso atual; as entradas e os comportamentos abaixo são acréscimos.
 
 - **React 18.3 suportado (#70).** Os peers `react` e `react-dom` passam a `^18.3.0 || ^19.0.0` (use a mesma versão nos dois). A Sidebar recolhida aplica `inert` direto no DOM, então o conteúdo oculto não recebe foco também no React 18, nos modos fixo e mobile. O aviso de desenvolvimento do NavigationMenu com React 18 vem do Radix e está documentado.
 - **CSS pronto, sem Tailwind no app (#68).** Novo `@semec/ds/react/styles.css`: CSS minificado com tokens, reset e as classes dos componentes publicados. Importe-o junto de `@semec/ds/react/fonts.css`; não precisa de plugin Tailwind nem de `@source`. O peer `tailwindcss` ^4 passa a ser opcional, necessário só para quem compila o CSS no app.

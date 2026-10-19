@@ -8,7 +8,7 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 > Gerado para `@semec/ds@4.2.0` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
 
-> **Não publicado: este conteúdo vem do repositório e inclui 2 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.**
+> **Não publicado: este conteúdo vem do repositório e inclui 3 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.**
 
 Tokens, acessibilidade, responsive e padrões visuais para interfaces da Prefeitura de Porto Velho. **Sem componentes React.**
 
@@ -79,7 +79,7 @@ O caminho em `dist/` não é contrato público (o `exports` não o expõe) e pod
 <link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@semec/ds@4.2.0/dist/react/base.css" integrity="sha384-…" />
 ```
 
-Calcule o SRI a partir dos arquivos publicados dessa versão (`variables.css` e `base.css` existem a partir da 4.3.0) e teste o carregamento. As fontes vêm de `dist/react/fonts/`, relativas ao `fonts.css`. Com CSP, autorize `https://cdn.jsdelivr.net` em `style-src` e `font-src`.
+Calcule o SRI a partir dos arquivos publicados dessa versão (`variables.css` e `base.css` existem a partir da 4.4.0) e teste o carregamento. As fontes vêm de `dist/react/fonts/`, relativas ao `fonts.css`. Com CSP, autorize `https://cdn.jsdelivr.net` em `style-src` e `font-src`.
 
 ### Tokens como dados (sem CSS)
 
@@ -226,7 +226,7 @@ Use os degraus de espaçamento no layout do app. Preserve as exceções do kit: 
 | `rounded-sm/md/lg/full` | `--radius-*` |
 | `shadow-elevation-1/2/3` | `--elevation-*` |
 
-**Armadilha:** `text-muted` e `text-secondary` **não geram CSS** desde a 4.3.0 (até a 4.2 compilavam para a cor de fundo `--surface-alt`, 1,09:1). A classe não dá erro: o texto só herda a cor do pai, e a intenção de texto de apoio se perde sem aviso. Use `text-text-muted` e `text-text-secondary`. Os fundos `bg-muted` e `bg-secondary` continuam.
+**Armadilha:** `text-muted` e `text-secondary` **não geram CSS** desde a 4.4.0 (até a 4.3 compilavam para a cor de fundo `--surface-alt`, 1,09:1). A classe não dá erro: o texto só herda a cor do pai, e a intenção de texto de apoio se perde sem aviso. Use `text-text-muted` e `text-text-secondary`. Os fundos `bg-muted` e `bg-secondary` continuam.
 
 ## Tema
 

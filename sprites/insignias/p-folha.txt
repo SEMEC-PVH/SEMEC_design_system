@@ -1,0 +1,13 @@
+Use your image generation tool. Do NOT read files, run shell commands or open skills: just generate the image and reply only with the path of the generated image.
+
+A imagem anexada mostra o estilo visual do jogo (bonecos de vinil 3D fofos, render limpo). Gere UMA imagem 1536x1024 com uma FOLHA de 8 INSÍGNIAS de conquista de um jogo (como insígnias de ginásio de RPG / broches esmaltados), no estilo vinil 3D fofo com contorno de metal dourado polido e esmalte colorido brilhante, vistas de frente, todas no mesmo tamanho, organizadas numa grade de 4 colunas por 2 linhas com bastante espaço vazio entre elas, sobre FUNDO BRANCO PURO LISO (sem sombra no fundo, sem textura, sem moldura de grade). Cada insígnia tem uma silhueta diferente e um símbolo grande e simples no centro, legível mesmo bem pequeno. SEM texto, SEM letras, SEM números.
+Linha de cima, da esquerda para a direita:
+1) Front-End: escudo azul com uma janelinha de navegador e um pincel;
+2) Back-End: engrenagem verde com um pequeno servidor (rack) no centro;
+3) Dados: hexágono amarelo-mostarda com um cilindro de banco de dados;
+4) Inteligência Artificial: círculo azul-marinho com um chip/cérebro de circuitos brilhando em ciano.
+Linha de baixo:
+5) Full Stack: estrela vermelha de cinco pontas com três camadas empilhadas no centro;
+6) Ocarina: gota/lágrima azul-celeste com uma ocarina e uma notinha musical;
+7) Sabedoria: brasão marrom e dourado com um livro aberto;
+8) Comunicação: losango arredondado roxo com um microfone roxo e ondas sonoras.

@@ -199,7 +199,7 @@ A partir da 3.2 o `dist` sai **um arquivo por módulo**, e cada componente inter
 - props de função (`onClick`, `onValueChange`, `onOpenChange`…) continuam exigindo um arquivo `"use client"` seu, como em qualquer componente de cliente;
 - os providers do passo 4 já são de cliente e podem ir direto no `layout`;
 - não use `export *` para reexportar o kit num arquivo `"use client"` (o Next não aceita); reexporte por nome ou importe direto.
-- **peso no cliente:** desde a 4.2.1 o barrel `@semec/ds/react` reexporta por nome, e no Turbopack (padrão do Next 16) importar pela raiz num Server Component leva ao cliente só os componentes interativos usados, como o subpath. No 4.2.0 e anteriores, a raiz num Server Component levava o kit inteiro (~77 kB gzip a mais): importe por subpath (`@semec/ds/react/navigation-menu`). Com `next build --webpack`, ligue `experimental.optimizePackageImports: ["@semec/ds/react"]` no `next.config` ou use o subpath.
+- **peso no cliente:** desde a 4.3.0 o barrel `@semec/ds/react` reexporta por nome, e no Turbopack (padrão do Next 16) importar pela raiz num Server Component leva ao cliente só os componentes interativos usados, como o subpath. Na 4.2.0 e anteriores, a raiz num Server Component levava o kit inteiro (~77 kB gzip a mais): importe por subpath (`@semec/ds/react/navigation-menu`). Com `next build --webpack`, ligue `experimental.optimizePackageImports: ["@semec/ds/react"]` no `next.config` ou use o subpath.
 
 Na 3.0 e na 3.1 o `dist` era um bundle único sem `"use client"` e importar o kit num Server Component quebrava; se estiver preso a essas versões, use o kit só em arquivos `"use client"`.
 
@@ -648,7 +648,7 @@ Os IDs do resumo são os controles: `city` fica no **SelectTrigger**, `shift` no
 
 O nonce autoriza elementos `<script>`/`<style>` que carregam o mesmo valor da política. **Não autoriza atributos `style`**: no HTML gerado por SSR, eles são controlados por `style-src-attr` (ou por `style-src` quando aquela diretiva está ausente). Portanto, passar `nonce` ao `SemecProvider` não garante ausência de violações nem corrige atributos bloqueados antes da hidratação.
 
-Com as correções CSP da 4.2.1 (onda 0 da integração de 19/10/2026):
+Com as correções CSP da 4.3.0 (onda 0 da integração de 19/10/2026):
 
 | Componente | Resultado com SSR e política estrita |
 |---|---|

@@ -8,7 +8,7 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 > Gerado para `@semec/ds@4.2.0` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
 
-> **Não publicado: este conteúdo vem do repositório e inclui 2 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.**
+> **Não publicado: este conteúdo vem do repositório e inclui 3 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.**
 
 Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
@@ -62,7 +62,7 @@ Sem a fonte, o texto cai em `system-ui` (fallback do token `--font-family-sans`)
 
 **Providers no root (quando usar):** `<Toaster />` se usar `useToast()`; `<TooltipProvider>` em volta do app se usar `Tooltip`; `<SemecProvider nonce>` só para CSP estrita. O `SemecProvider` não inclui os outros dois.
 
-**Next.js App Router:** desde a 3.2 o `dist` sai por módulo e cada componente interativo já traz `"use client"`; importar `@semec/ds/react` num Server Component funciona (apresentacionais como `Heading`, `Card`, `Badge`, `Button`, `Link`, `Table` renderizam no servidor). Passar handler (`onClick`, `onValueChange`…) ou usar hook continua exigindo um arquivo `"use client"` seu. Não use `export *` do kit num arquivo `"use client"`. Um componente só: `@semec/ds/react/<arquivo>` (ex.: `@semec/ds/react/button`). Peso no cliente: com Turbopack (padrão do Next 16) e kit 4.2.1+, a raiz num Server Component custa o mesmo que o subpath; com `next build --webpack` ou kit 4.2.0, prefira o subpath nos Server Components (ou `experimental.optimizePackageImports: ["@semec/ds/react"]`), senão o kit inteiro vai para o cliente. Na 3.0/3.1 (bundle único, sem `"use client"`) o kit só funcionava em arquivos `"use client"`.
+**Next.js App Router:** desde a 3.2 o `dist` sai por módulo e cada componente interativo já traz `"use client"`; importar `@semec/ds/react` num Server Component funciona (apresentacionais como `Heading`, `Card`, `Badge`, `Button`, `Link`, `Table` renderizam no servidor). Passar handler (`onClick`, `onValueChange`…) ou usar hook continua exigindo um arquivo `"use client"` seu. Não use `export *` do kit num arquivo `"use client"`. Um componente só: `@semec/ds/react/<arquivo>` (ex.: `@semec/ds/react/button`). Peso no cliente: com Turbopack (padrão do Next 16) e kit 4.3.0+, a raiz num Server Component custa o mesmo que o subpath; com `next build --webpack` ou kit 4.2.0, prefira o subpath nos Server Components (ou `experimental.optimizePackageImports: ["@semec/ds/react"]`), senão o kit inteiro vai para o cliente. Na 3.0/3.1 (bundle único, sem `"use client"`) o kit só funcionava em arquivos `"use client"`.
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0). Use só `tokens.css` (+ `@source`). Preset JS opcional: `@config "@semec/ds/react/pv-preset"`.
 
@@ -146,7 +146,7 @@ O `@theme inline` do `tokens.css` gera utilitários para cor, espaçamento (`p-s
 | Sucesso em destaque (fundo cheio, texto 5,85:1) | `--feedback-success-emphasis` / `--text-on-success-emphasis` | `bg-success-emphasis text-success-emphasis-foreground` (nunca o verde cheio como texto: 2,13:1) |
 | Superfície colorida leve | `--tint` | `bg-tint` |
 
-**Armadilha (AUD-30):** **não** use `text-muted` nem `text-secondary` para texto. Desde a 4.3.0 essas classes **não geram CSS** (o texto herda a cor do pai, sem aviso); até a 4.2 compilavam para a cor de fundo `--surface-alt` (1,09:1, texto invisível), porque `--color-muted` e `--color-secondary` são cores de superfície no estilo shadcn. Use `text-text-muted`, `text-text-secondary` e `text-text-strong`; `bg-muted` e `bg-secondary` continuam como fundos.
+**Armadilha (AUD-30):** **não** use `text-muted` nem `text-secondary` para texto. Desde a 4.4.0 essas classes **não geram CSS** (o texto herda a cor do pai, sem aviso); até a 4.3 compilavam para a cor de fundo `--surface-alt` (1,09:1, texto invisível), porque `--color-muted` e `--color-secondary` são cores de superfície no estilo shadcn. Use `text-text-muted`, `text-text-secondary` e `text-text-strong`; `bg-muted` e `bg-secondary` continuam como fundos.
 
 **Espaçamento:** `--space-N` → `p-space-N`, `gap-space-N`, `mt-space-N` etc. (degraus 0, 1, 2, 3, 4, 6, 8, 12, 16). A escala do Tailwind continua valendo e tem os mesmos valores (`p-4` = `p-space-4` = 16px); use esses degraus no layout do app. Exceções do kit que devem ser preservadas: botão médio `px-5` (20px), botão pequeno `py-1.5` (6px) e `FormField` `gap-1.5` (6px).
 
@@ -212,7 +212,7 @@ Lista gerada do manifest (export principal, `code`, arquivo `.md` e descrição)
 
 - `Input` (`input`, `components/caixa-de-texto.md`) — Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` e `aria-invalid` automaticamente: sem erro, `aria-describedby` aponta para a dica; com erro, a dica sai e ele aponta só para a mensagem de erro. `onChange` é o evento nativo; `onValueChange` recebe só a string.
 - `PasswordInput` (`password-input`, `components/campo-de-senha.md`) — Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo ("Mostrar senha") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Desliga corretor e maiúscula automática (`spellCheck={false}`, `autoCapitalize="none"`, `autoCorrect="off"`, sobrescrevíveis), que alterariam a senha visível. Repassa todas as props do `Input`, inclusive `autoComplete`.
-- `InputMask` (`input-mask`, `components/campo-com-mascara.md`) — Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
+- `InputMask` (`input-mask`, `components/campo-com-mascara.md`) — Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data (DD/MM/AAAA, MM/AAAA, DD/MM/AAAA HH:MM ou HH:MM), telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
 - `Textarea` (`textarea`, `components/area-de-texto.md`) — Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`).
 - `Select` (`select`, `components/menu-de-selecao.md`) — Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`).
 - `Combobox` (`combobox`, `components/combobox.md`) — Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.
@@ -762,7 +762,9 @@ import { FormField, Combobox, InputOTP, InputOTPGroup, InputOTPSlot } from "@sem
   </InputOTP>
 </FormField>
 ```
-- Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`, `cpfCnpjSchema`
+- Máscaras prontas (`InputMask`): `mask="cpf"`, `mask="cnpj"`, `mask="cep"`, `mask="data"` (DD/MM/AAAA), `mask="data-mes-ano"` (MM/AAAA), `mask="data-hora"` (DD/MM/AAAA HH:MM), `mask="hora"` (HH:MM), `mask="telefone"`
+- Funções utilitárias de máscara (`@semec/ds/react`): `maskCPF`, `maskCNPJ`, `maskCEP`, `maskDate`, `maskDateMonthYear`, `maskDateTime`, `maskTime`, `maskCurrency`, `applyInputMask`
+- Zod (entry `@semec/ds/react/validacao`): `cpfSchema`, `cnpjSchema`, `emailSchema`, `cepSchema`, `cpfCnpjSchema`, `dateBRSchema`, `dateMonthYearSchema`, `timeSchema`, `dateSchema`
 
 ## Responsive / Mobile
 
@@ -789,7 +791,7 @@ import { FormField, Combobox, InputOTP, InputOTPGroup, InputOTPSlot } from "@sem
 - Tooltip: exige `<TooltipProvider>` acima na árvore
 - DatePicker: nativo `type="date"` (ISO YYYY-MM-DD); período = 2 campos
 - Sem hex solto, sem `rgba()`, sem `style` inline — use tokens L1
-- CSP: Dialog/Drawer/Sheet/DropdownMenu usam `SemecProvider` com nonce. Na 4.2.1, o provider também repassa o nonce aos elementos `<style>` dos viewports de Select e ScrollArea, inclusive no SSR. `SelectContent nonce` explícito prevalece; em ScrollArea, a ordem é `viewportProps.nonce` → `nonce` → provider. O nonce não autoriza atributos `style` do Radix: ainda podem ocorrer violações de `style-src-attr`. Valide SSR e interações com a política de produção.
+- CSP: Dialog/Drawer/Sheet/DropdownMenu usam `SemecProvider` com nonce. Na 4.3.0, o provider também repassa o nonce aos elementos `<style>` dos viewports de Select e ScrollArea, inclusive no SSR. `SelectContent nonce` explícito prevalece; em ScrollArea, a ordem é `viewportProps.nonce` → `nonce` → provider. O nonce não autoriza atributos `style` do Radix: ainda podem ocorrer violações de `style-src-attr`. Valide SSR e interações com a política de produção.
 
 ## Removido na 4.0 e depreciações anunciadas
 
