@@ -36,10 +36,13 @@ const Progress = React.forwardRef<
       aria-valuenow={value ?? undefined}
       {...props}
     >
-      <ProgressPrimitive.Indicator
-        className="h-full w-full flex-1 rounded-full bg-primary transition-all duration-base ease-standard"
-        style={{ transform: `translateX(-${100 - percentual}%)` }}
-      />
+      <ProgressPrimitive.Indicator asChild>
+        {/* Atributos SVG funcionam no SSR com style-src-attr 'none'. O rx/ry
+            (metade da altura útil da trilha h-3) mantém a ponta arredondada. */}
+        <svg className="block h-full w-full" aria-hidden="true" focusable="false">
+          <rect width={`${percentual}%`} height="100%" rx={5} ry={5} className="fill-primary" />
+        </svg>
+      </ProgressPrimitive.Indicator>
     </ProgressPrimitive.Root>
   );
 });

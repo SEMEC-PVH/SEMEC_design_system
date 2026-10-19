@@ -104,7 +104,7 @@ const AlertTitle = React.forwardRef<HTMLHeadingElement, AlertTitleProps>(
   ({ className, as: Tag = "div", ...props }, ref) => (
     <Tag
       ref={ref}
-      className={cn("mb-1 font-semibold leading-none tracking-tight", className)}
+      className={cn("mb-1 font-semibold leading-tight tracking-tight", className)}
       {...props}
     />
   )

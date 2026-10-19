@@ -27,7 +27,12 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "../..");
-const args = process.argv.slice(2);
+// `--browsers=webkit,firefox` vira VISUAL_BROWSERS (projetos opcionais, ver playwright.visual.config.mjs).
+const args = process.argv.slice(2).filter((a) => {
+  const m = /^--browsers=(.+)$/.exec(a);
+  if (m) process.env.VISUAL_BROWSERS = m[1];
+  return !m;
+});
 const config = "playwright.visual.config.mjs";
 
 const installed = JSON.parse(readFileSync(path.join(root, "node_modules/@playwright/test/package.json"), "utf8")).version;
@@ -94,7 +99,7 @@ const script = [
   `node tests/visual/docker.mjs ${quoted}`,
 ].join("\n");
 
-const env = ["CI", "VISUAL_PORT"].flatMap((k) => (process.env[k] ? ["-e", `${k}=${process.env[k]}`] : []));
+const env = ["CI", "VISUAL_PORT", "VISUAL_BROWSERS"].flatMap((k) => (process.env[k] ? ["-e", `${k}=${process.env[k]}`] : []));
 
 process.exit(
   run("docker", [

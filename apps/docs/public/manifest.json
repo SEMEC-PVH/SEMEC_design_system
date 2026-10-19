@@ -1,7 +1,7 @@
 {
   "name": "SEMEC Design System",
   "version": "4.2.0",
-  "generatedAt": "2026-10-15T19:35:20.000Z",
+  "generatedAt": "2026-10-19T16:23:13.000Z",
   "componentCount": 55,
   "categories": [
     {
@@ -41,7 +41,7 @@
       "slug": "botoes",
       "label": "Botões",
       "exportName": "Button",
-      "file": "src/components/button.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/button.tsx",
       "category": "acoes",
       "desc": "Ação principal. Sete variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. A altura é mínima (`min-h-*`), não fixa: rótulo longo quebra em linhas balanceadas em vez de criar rolagem horizontal; para reduzir a altura com `className`, sobrescreva o `min-h-*` junto com o `h-*`. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível.",
       "variants": [
@@ -58,7 +58,7 @@
           "values": "false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento) · com asChild, o spinner entra no link e o onClick do filho não dispara · o clique ainda sobe aos ancestrais (só envio e navegação são cancelados)"
         }
       ],
-      "usage": "import { Button } from \"@semec/ds/react\";\nimport Link from \"next/link\";\nimport { Plus } from \"lucide-react\";\n\n<Button variant=\"primary\">Emitir boleto</Button>\n<Button variant=\"outline\">Salvar rascunho</Button>\n<Button variant=\"ghost\">Cancelar</Button>\n\n<Button variant=\"destructive\">Excluir requerimento</Button>\n\n<Button><Plus /> Adicionar serviço</Button>\n\n<Button asChild>\n  <Link href=\"/iptu\">Ver meu IPTU</Link>\n</Button>\n\n// Envio em andamento: o foco fica no botão e o clique é ignorado\n<Button type=\"submit\" loading={enviando} loadingText=\"Enviando…\">\n  Enviar requerimento\n</Button>",
+      "usage": "import { Button } from \"@semec/ds/react\";\n// No Next.js, substitua <a> por <Link> e habilite: import Link from \"next/link\";\nimport { Plus } from \"lucide-react\";\n\n<Button variant=\"primary\">Emitir boleto</Button>\n<Button variant=\"outline\">Salvar rascunho</Button>\n<Button variant=\"ghost\">Cancelar</Button>\n\n<Button variant=\"destructive\">Excluir requerimento</Button>\n\n<Button><Plus /> Adicionar serviço</Button>\n\n<Button asChild>\n  <a href=\"/iptu\">Ver meu IPTU</a>\n</Button>\n\n// Envio em andamento: o foco fica no botão e o clique é ignorado\n<Button type=\"submit\" loading={enviando} loadingText=\"Enviando…\">\n  Enviar requerimento\n</Button>",
       "prompt": "Use o componente `Button` (Botões) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Ação principal. Sete variantes e quatro tamanhos; `asChild` transforma o botão num link. Todos os tamanhos têm alvo de toque de 44px: `sm` mantém o visual de 36px com a área clicável estendida. A altura é mínima (`min-h-*`), não fixa: rótulo longo quebra em linhas balanceadas em vez de criar rolagem horizontal; para reduzir a altura com `className`, sobrescreva o `min-h-*` junto com o `h-*`. `loading` mostra um Spinner decorativo, aplica `aria-busy` e `aria-disabled` e bloqueia o clique sem tirar o foco do botão; o nome acessível continua sendo o texto visível. API e variantes: variant: primary · secondary · outline · ghost · destructive · success · link · size: sm (36px visual, alvo 44px) · md (44px) · lg (48px) · icon (44×44px) · loading: false (padrão) · true (Spinner decorativo, aria-busy, aria-disabled, clique bloqueado, continua focalizável) · loadingText (texto visível durante o carregamento) · com asChild, o spinner entra no link e o onClick do filho não dispara · o clique ainda sobe aos ancestrais (só envio e navegação são cancelados). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "https://semec-pvh.github.io/SEMEC_design_system/componentes/botoes/",
       "md": "https://semec-pvh.github.io/SEMEC_design_system/components/botoes.md"
@@ -68,7 +68,7 @@
       "slug": "botao-de-icone",
       "label": "Botão de ícone",
       "exportName": "IconButton",
-      "file": "src/components/icon-button.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/icon-button.tsx",
       "category": "acoes",
       "desc": "Botão quadrado só com ícone. Exige `label` (vira `aria-label` e `title`). `loading` troca o ícone por um Spinner decorativo e mantém o `label` como nome.",
       "variants": [
@@ -91,7 +91,7 @@
       "slug": "link",
       "label": "Link",
       "exportName": "Link",
-      "file": "src/components/link.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/link.tsx",
       "category": "acoes",
       "desc": "Link tipográfico com variantes de cor, sublinhado por padrão (a cor sozinha não distingue o link do texto: 2,91:1, WCAG 1.4.1). `onSurface` para links sobre superfícies elevadas.",
       "variants": [
@@ -118,9 +118,9 @@
       "slug": "caixa-de-texto",
       "label": "Caixa de texto",
       "exportName": "Input",
-      "file": "src/components/input.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/input.tsx",
       "category": "formularios",
-      "desc": "Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string.",
+      "desc": "Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` e `aria-invalid` automaticamente: sem erro, `aria-describedby` aponta para a dica; com erro, a dica sai e ele aponta só para a mensagem de erro. `onChange` é o evento nativo; `onValueChange` recebe só a string.",
       "variants": [
         {
           "prop": "estados",
@@ -132,7 +132,7 @@
         }
       ],
       "usage": "import { FormField, Input } from \"@semec/ds/react\";\n\n// Todo campo precisa de rótulo visível (placeholder não substitui o rótulo).\n// Dentro do FormField, id, aria-describedby e aria-invalid são ligados sozinhos.\n<FormField label=\"Nome completo\" hint=\"Como no documento\">\n  <Input autoComplete=\"name\" />\n</FormField>\n\n// Com id próprio (ex.: alvo do ErrorSummary): o rótulo e a mensagem seguem o id\n<FormField label=\"CPF\" error=\"Informe os 11 dígitos do CPF.\">\n  <Input id=\"cpf\" inputMode=\"numeric\" />\n</FormField>\n// → <label for=\"cpf\">, aria-invalid=\"true\", aria-describedby=\"cpf-error\"\n\n// Controlado: onValueChange recebe a string (onChange continua recebendo o evento)\n<FormField label=\"E-mail\">\n  <Input type=\"email\" name=\"email\" value={email} onValueChange={setEmail} invalid={emailInvalido} />\n</FormField>",
-      "prompt": "Use o componente `Input` (Caixa de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` (dica + erro) e `aria-invalid` automaticamente. `onChange` é o evento nativo; `onValueChange` recebe só a string. API e variantes: estados: padrão · inválido (invalid / aria-invalid) · disabled · contrato: value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "prompt": "Use o componente `Input` (Caixa de texto) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo de texto. Estado de erro via `invalid` (vira `aria-invalid`). Dentro de um FormField, recebe `id`, `aria-describedby` e `aria-invalid` automaticamente: sem erro, `aria-describedby` aponta para a dica; com erro, a dica sai e ele aponta só para a mensagem de erro. `onChange` é o evento nativo; `onValueChange` recebe só a string. API e variantes: estados: padrão · inválido (invalid / aria-invalid) · disabled · contrato: value · defaultValue · onValueChange(value) · onChange(evento nativo) · name · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "https://semec-pvh.github.io/SEMEC_design_system/componentes/caixa-de-texto/",
       "md": "https://semec-pvh.github.io/SEMEC_design_system/components/caixa-de-texto.md"
     },
@@ -141,7 +141,7 @@
       "slug": "campo-de-senha",
       "label": "Campo de senha",
       "exportName": "PasswordInput",
-      "file": "src/components/password-input.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/password-input.tsx",
       "category": "formularios",
       "desc": "Campo de senha sobre o `Input`, com botão de 44px para mostrar ou ocultar o texto. O botão tem nome fixo (\"Mostrar senha\") e `aria-pressed` (pressionado = senha visível), além de `aria-controls` para o campo. Desliga corretor e maiúscula automática (`spellCheck={false}`, `autoCapitalize=\"none\"`, `autoCorrect=\"off\"`, sobrescrevíveis), que alterariam a senha visível. Repassa todas as props do `Input`, inclusive `autoComplete`.",
       "variants": [
@@ -168,7 +168,7 @@
       "slug": "campo-com-mascara",
       "label": "Campo com máscara",
       "exportName": "InputMask",
-      "file": "src/components/input-mask.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/input-mask.tsx",
       "category": "formularios",
       "desc": "Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data (DD/MM/AAAA, MM/AAAA, DD/MM/AAAA HH:MM ou HH:MM), telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.",
       "variants": [
@@ -195,7 +195,7 @@
       "slug": "area-de-texto",
       "label": "Área de texto",
       "exportName": "Textarea",
-      "file": "src/components/textarea.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/textarea.tsx",
       "category": "formularios",
       "desc": "Campo multilinha com as mesmas variantes visuais e o mesmo contrato do campo de texto (`onValueChange`, `invalid`).",
       "variants": [
@@ -218,7 +218,7 @@
       "slug": "menu-de-selecao",
       "label": "Menu de seleção",
       "exportName": "Select",
-      "file": "src/components/select.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/select.tsx",
       "category": "formularios",
       "desc": "Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`).",
       "variants": [
@@ -231,7 +231,7 @@
           "values": "Select: value · defaultValue · onValueChange · name · required · disabled — SelectTrigger: id · invalid"
         }
       ],
-      "usage": "import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from \"@semec/ds/react\";\n\n<Select defaultValue=\"pbh\">\n  <SelectTrigger aria-label=\"Município\"><SelectValue placeholder=\"Município\" /></SelectTrigger>\n  <SelectContent>\n    <SelectItem value=\"pbh\">Porto Velho</SelectItem>\n    <SelectItem value=\"riob\">Rio Branco</SelectItem>\n  </SelectContent>\n</Select>\n\n// Dentro de FormField, o SelectTrigger recebe id, aria-describedby e aria-invalid\n<FormField label=\"Município\" error={erro}>\n  <Select name=\"municipio\" value={municipio} onValueChange={setMunicipio}>\n    <SelectTrigger><SelectValue placeholder=\"Selecione\" /></SelectTrigger>\n    <SelectContent>\n      <SelectItem value=\"pbh\">Porto Velho</SelectItem>\n    </SelectContent>\n  </Select>\n</FormField>",
+      "usage": "import { FormField, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from \"@semec/ds/react\";\n\n<Select defaultValue=\"porto-velho\">\n  <SelectTrigger aria-label=\"Município\"><SelectValue placeholder=\"Município\" /></SelectTrigger>\n  <SelectContent>\n    <SelectItem value=\"porto-velho\">Porto Velho</SelectItem>\n    <SelectItem value=\"rio-branco\">Rio Branco</SelectItem>\n  </SelectContent>\n</Select>\n\n// Dentro de FormField, o SelectTrigger recebe id, aria-describedby e aria-invalid\n<FormField label=\"Município\" error={erro}>\n  <Select name=\"municipio\" value={municipio} onValueChange={setMunicipio}>\n    <SelectTrigger><SelectValue placeholder=\"Selecione\" /></SelectTrigger>\n    <SelectContent>\n      <SelectItem value=\"porto-velho\">Porto Velho</SelectItem>\n    </SelectContent>\n  </Select>\n</FormField>",
       "prompt": "Use o componente `Select` (Menu de seleção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Seleção fechada com gatilho, conteúdo e itens compostos. O contrato de formulário fica na raiz (`value`, `defaultValue`, `onValueChange`, `name`, `required`, `disabled`, API Radix) e no gatilho (`id`, `invalid`). API e variantes: composição: Select · SelectTrigger · SelectValue · SelectContent · SelectItem · contrato: Select: value · defaultValue · onValueChange · name · required · disabled — SelectTrigger: id · invalid. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "https://semec-pvh.github.io/SEMEC_design_system/componentes/menu-de-selecao/",
       "md": "https://semec-pvh.github.io/SEMEC_design_system/components/menu-de-selecao.md"
@@ -241,7 +241,7 @@
       "slug": "combobox",
       "label": "Combobox",
       "exportName": "Combobox",
-      "file": "src/components/combobox.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/combobox.tsx",
       "category": "formularios",
       "desc": "Seleção com busca, no padrão APG combobox + listbox: uma parada de Tab, setas ↑/↓, Home/End, Enter seleciona, Esc fecha e devolve o foco. Opções via `options`; aceita `id`, `name`, `aria-*` e integra com FormField.",
       "variants": [
@@ -268,9 +268,9 @@
       "slug": "seletor-de-data",
       "label": "Seletor de data",
       "exportName": "DatePicker",
-      "file": "src/components/date-picker.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/date-picker.tsx",
       "category": "formularios",
-      "desc": "Data com `<input type=\"date\">` nativo — sem biblioteca de calendário. Um só indicador: botão \"Abrir calendário\" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).",
+      "desc": "Data com `<input type=\"date\">` nativo — sem biblioteca de calendário. Um só indicador: botão \"Abrir calendário\" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). O formato mostrado (dd/mm/aaaa ou mm/dd/aaaa) vem do idioma do navegador, não do `lang` da página: nos PCs da prefeitura, deixe o navegador em português. Num navegador sem `type=\"date\"` o campo vira texto e `onValueChange` recebe o que foi digitado, então valide o ISO no schema (ex.: `z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/)`). Em teste automatizado, preencha com `fill(\"2026-10-16\")`, não digitando a data.",
       "variants": [
         {
           "prop": "props",
@@ -282,7 +282,7 @@
         }
       ],
       "usage": "import { DatePicker, FormField } from \"@semec/ds/react\";\n\n<FormField label=\"Data de vencimento\" hint=\"dd/mm/aaaa\">\n  <DatePicker id=\"vencimento\" name=\"vencimento\" defaultValue=\"2026-08-31\" />\n</FormField>\n\n// Controlado: onValueChange recebe o ISO (AAAA-MM-DD)\n<FormField label=\"Data de início\" error={erroData}>\n  <DatePicker value={inicio} onValueChange={setInicio} />\n</FormField>",
-      "prompt": "Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type=\"date\">` nativo — sem biblioteca de calendário. Um só indicador: botão \"Abrir calendário\" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). API e variantes: props: nativo HTML (min · max · disabled · name · required · onChange(evento)) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · mudou na 4.0: onChange é o evento nativo do <input> (até a 3.x recebia a string); para o valor, use onValueChange. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "prompt": "Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type=\"date\">` nativo — sem biblioteca de calendário. Um só indicador: botão \"Abrir calendário\" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). O formato mostrado (dd/mm/aaaa ou mm/dd/aaaa) vem do idioma do navegador, não do `lang` da página: nos PCs da prefeitura, deixe o navegador em português. Num navegador sem `type=\"date\"` o campo vira texto e `onValueChange` recebe o que foi digitado, então valide o ISO no schema (ex.: `z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/)`). Em teste automatizado, preencha com `fill(\"2026-10-16\")`, não digitando a data. API e variantes: props: nativo HTML (min · max · disabled · name · required · onChange(evento)) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · mudou na 4.0: onChange é o evento nativo do <input> (até a 3.x recebia a string); para o valor, use onValueChange. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "https://semec-pvh.github.io/SEMEC_design_system/componentes/seletor-de-data/",
       "md": "https://semec-pvh.github.io/SEMEC_design_system/components/seletor-de-data.md"
     },
@@ -291,7 +291,7 @@
       "slug": "envio-de-arquivos",
       "label": "Envio de arquivos",
       "exportName": "FileUpload",
-      "file": "src/components/file-upload.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/file-upload.tsx",
       "category": "formularios",
       "desc": "Área de arrastar-e-soltar com lista de arquivos, limite por tamanho e erro. `error` (mensagem) equivale a `invalid` + mensagem; `invalid` sozinho marca o campo sem texto próprio. Com `name`/`required`, funciona em `<form>` nativo: o `input.files` acompanha a lista mostrada (escolha, soltar e `value` do pai). Cada escolha substitui a seleção anterior, como no input nativo; para juntar arquivos de várias escolhas, controle `value` no pai. No Safari anterior à 16.4 (sem o evento `cancel`), cancelar o seletor depois de já haver arquivo esvazia o `input.files`, embora a lista continue mostrando o arquivo, e ele não vai no envio.",
       "variants": [
@@ -314,7 +314,7 @@
       "slug": "caixa-de-marcacao",
       "label": "Caixa de marcação",
       "exportName": "Checkbox",
-      "file": "src/components/checkbox.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/checkbox.tsx",
       "category": "formularios",
       "desc": "Caixa de marcação com estado indeterminado. Mantém a API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.",
       "variants": [
@@ -327,7 +327,7 @@
           "values": "checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required"
         }
       ],
-      "usage": "import { Checkbox, Label } from \"@semec/ds/react\";\n\n<div className=\"flex items-center gap-2\">\n  <Checkbox id=\"termos\" />\n  <Label htmlFor=\"termos\">Aceito os termos</Label>\n</div>\n\n// Controlado, com envio em <form> e erro (checked/onCheckedChange = value/onValueChange)\n<div className=\"flex items-center gap-2\">\n  <Checkbox id=\"aceite\" name=\"aceite\" checked={aceito} onCheckedChange={(v) => setAceito(v === true)} invalid={!aceito && enviado} />\n  <Label htmlFor=\"aceite\">Li e aceito o regulamento</Label>\n</div>",
+      "usage": "import { Checkbox, Label } from \"@semec/ds/react\";\n\n<div className=\"flex min-h-11 items-center gap-2\">\n  <Checkbox id=\"termos\" />\n  <Label htmlFor=\"termos\">Aceito os termos</Label>\n</div>\n\n// Controlado, com envio em <form> e erro (checked/onCheckedChange = value/onValueChange)\n<div className=\"flex min-h-11 items-center gap-2\">\n  <Checkbox id=\"aceite\" name=\"aceite\" checked={aceito} onCheckedChange={(v) => setAceito(v === true)} invalid={!aceito && enviado} />\n  <Label htmlFor=\"aceite\">Li e aceito o regulamento</Label>\n</div>",
       "prompt": "Use o componente `Checkbox` (Caixa de marcação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Caixa de marcação com estado indeterminado. Mantém a API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`. API e variantes: estados: desmarcado · marcado (checked) · indeterminado · disabled · inválido (invalid) · contrato: checked · defaultChecked · onCheckedChange · name · value (valor enviado) · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "https://semec-pvh.github.io/SEMEC_design_system/componentes/caixa-de-marcacao/",
       "md": "https://semec-pvh.github.io/SEMEC_design_system/components/caixa-de-marcacao.md"
@@ -337,7 +337,7 @@
       "slug": "botao-de-opcao",
       "label": "Botão de opção",
       "exportName": "RadioGroup",
-      "file": "src/components/radio-group.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/radio-group.tsx",
       "category": "formularios",
       "desc": "Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`.",
       "variants": [
@@ -350,7 +350,7 @@
           "values": "value · defaultValue · onValueChange · name · id · invalid · disabled · required"
         }
       ],
-      "usage": "import { RadioGroup, RadioGroupItem, Label } from \"@semec/ds/react\";\n\n<RadioGroup name=\"tipoPessoa\" defaultValue=\"pessoa-fisica\" onValueChange={setTipoPessoa}>\n  <div className=\"flex items-center gap-2\">\n    <RadioGroupItem value=\"pessoa-fisica\" id=\"pf\" />\n    <Label htmlFor=\"pf\">Pessoa física</Label>\n  </div>\n</RadioGroup>",
+      "usage": "import { RadioGroup, RadioGroupItem, Label } from \"@semec/ds/react\";\n\n<RadioGroup name=\"tipoPessoa\" defaultValue=\"pessoa-fisica\" onValueChange={setTipoPessoa}>\n  <div className=\"flex min-h-11 items-center gap-2\">\n    <RadioGroupItem value=\"pessoa-fisica\" id=\"pf\" />\n    <Label htmlFor=\"pf\">Pessoa física</Label>\n  </div>\n</RadioGroup>",
       "prompt": "Use o componente `RadioGroup` (Botão de opção) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Escolha única entre duas ou mais opções. Já segue o contrato de formulário (`value`/`defaultValue`/`onValueChange`/`name`, API Radix) e aceita `invalid`. API e variantes: composição: RadioGroup · RadioGroupItem + Label · contrato: value · defaultValue · onValueChange · name · id · invalid · disabled · required. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "https://semec-pvh.github.io/SEMEC_design_system/componentes/botao-de-opcao/",
       "md": "https://semec-pvh.github.io/SEMEC_design_system/components/botao-de-opcao.md"
@@ -360,7 +360,7 @@
       "slug": "interruptor",
       "label": "Interruptor",
       "exportName": "Switch",
-      "file": "src/components/switch.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/switch.tsx",
       "category": "formularios",
       "desc": "Interruptor on/off para ativação imediata. API Radix (`checked`/`onCheckedChange`), equivalente a `value`/`onValueChange` no contrato de formulário; `invalid` vira `aria-invalid`.",
       "variants": [
@@ -383,7 +383,7 @@
       "slug": "rotulo",
       "label": "Rótulo",
       "exportName": "Label",
-      "file": "src/components/label.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/label.tsx",
       "category": "formularios",
       "desc": "Rótulo acessível vinculado ao campo.",
       "variants": [],
@@ -397,9 +397,9 @@
       "slug": "campo-de-formulario",
       "label": "Campo de formulário",
       "exportName": "FormField",
-      "file": "src/components/form-field.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/form-field.tsx",
       "category": "formularios",
-      "desc": "Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio.",
+      "desc": "Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (sem erro, a dica; com erro, a dica sai e ele aponta só para a mensagem de erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio.",
       "variants": [
         {
           "prop": "props",
@@ -414,8 +414,8 @@
           "values": "1. Inline (FormField error) · 2. Resumo topo (ErrorSummary) · 3. Servidor (Alert destructive) · Legenda de ação no botão"
         }
       ],
-      "usage": "import { FormField, Input, ErrorSummary, Button, useToast, maskCurrency } from \"@semec/ds/react\";\nimport { cpfSchema, emailSchema } from \"@semec/ds/react/validacao\";\nimport { useForm, Controller } from \"react-hook-form\";\nimport { zodResolver } from \"@hookform/resolvers/zod\";\nimport { z } from \"zod\";\nimport { useState } from \"react\";\n\n// npm install react-hook-form @hookform/resolvers zod (opcionais, só para esta receita)\nconst formSchema = z.object({\n  nome: z.string().min(3, \"Nome deve ter ao menos 3 caracteres\"),\n  email: emailSchema,\n  cpf: cpfSchema,\n  valor: z.string().min(1, \"Informe o valor\"),\n});\n\ntype FormValues = z.infer<typeof formSchema>;\n\n// Ordem dos campos na tela: o ErrorSummary segue esta lista (não a ordem do objeto errors)\nconst ORDEM_CAMPOS = [\"nome\", \"email\", \"cpf\", \"valor\"] as const satisfies readonly (keyof FormValues)[];\n\nexport function FormularioExemplo() {\n  const { toast } = useToast();\n  const [tentativa, setTentativa] = useState(0);\n  const { register, control, handleSubmit, formState: { errors } } = useForm<FormValues>({\n    resolver: zodResolver(formSchema),\n    defaultValues: { nome: \"\", email: \"\", cpf: \"\", valor: \"\" },\n    // Sem isto o RHF foca o 1º campo inválido e o ErrorSummary nunca recebe o foco\n    shouldFocusError: false,\n  });\n\n  // Padrão 2: Resumo consolidado no topo, na ordem da tela\n  const errorSummaryItems = ORDEM_CAMPOS.flatMap((id) => {\n    const message = errors[id]?.message;\n    return message ? [{ id, message }] : [];\n  });\n\n  const onSubmit = (data: FormValues) => {\n    void data;\n    // Padrão de sucesso via Toast:\n    toast({ variant: \"success\", title: \"Sucesso!\", description: \"Dados gravados com sucesso.\" });\n  };\n\n  return (\n    <form\n      onSubmit={handleSubmit(onSubmit, () => setTentativa((t) => t + 1))}\n      noValidate\n      className=\"max-w-xl space-y-4\"\n    >\n      {errorSummaryItems.length > 0 && (\n        <ErrorSummary title=\"Corrija os erros destacados\" errors={errorSummaryItems} focusKey={tentativa} />\n      )}\n\n      {/* Padrão 1: Erro inline ligado via aria-describedby e aria-invalid */}\n      <FormField label=\"Nome completo\" htmlFor=\"nome\" required error={errors.nome?.message}>\n        <Input id=\"nome\" {...register(\"nome\")} />\n      </FormField>\n\n      <FormField label=\"E-mail\" htmlFor=\"email\" required error={errors.email?.message}>\n        <Input id=\"email\" type=\"email\" {...register(\"email\")} />\n      </FormField>\n\n      {/* Uso canônico com Controller para componentes controlados ou máscaras */}\n      <Controller\n        name=\"cpf\"\n        control={control}\n        render={({ field }) => (\n          <FormField label=\"CPF\" htmlFor=\"cpf\" required error={errors.cpf?.message}>\n            <Input id=\"cpf\" inputMode=\"numeric\" {...field} />\n          </FormField>\n        )}\n      />\n\n      {/* Campo R$: maskCurrency(\"\") devolve \"\", então min(1) barra o vazio */}\n      <Controller\n        name=\"valor\"\n        control={control}\n        render={({ field }) => (\n          <FormField label=\"Valor da taxa\" htmlFor=\"valor\" required error={errors.valor?.message}>\n            <Input\n              id=\"valor\"\n              inputMode=\"numeric\"\n              name={field.name}\n              ref={field.ref}\n              onBlur={field.onBlur}\n              value={field.value}\n              onValueChange={(v) => field.onChange(maskCurrency(v))}\n            />\n          </FormField>\n        )}\n      />\n\n      {/* Padrão de Ação com Legenda Auxiliar de Ação / Download */}\n      <div className=\"pt-2 space-y-2\">\n        <Button type=\"submit\" variant=\"primary\">Gerar requerimento</Button>\n        <p className=\"text-xs text-text-muted\">\n          Ao clicar, o arquivo PDF do requerimento será gerado e baixado automaticamente.\n        </p>\n      </div>\n    </form>\n  );\n}",
-      "prompt": "Use o componente `FormField` (Campo de formulário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (dica + erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio. API e variantes: props: label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · errorRole (\"alert\" | undefined) · id · hooks: useFormField · useFormFieldControl (para campos próprios) · padrões: 1. Inline (FormField error) · 2. Resumo topo (ErrorSummary) · 3. Servidor (Alert destructive) · Legenda de ação no botão. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { FormField, Input, ErrorSummary, Button, useToast, maskCurrency } from \"@semec/ds/react\";\nimport { cpfSchema, emailSchema } from \"@semec/ds/react/validacao\";\nimport { useForm, Controller } from \"react-hook-form\";\nimport { zodResolver } from \"@hookform/resolvers/zod\";\nimport * as z from \"zod\";\nimport { useState } from \"react\";\n\n// npm install react-hook-form @hookform/resolvers@^5 zod@^4 (opcionais, só para esta receita)\nconst formSchema = z.object({\n  nome: z.string().min(3, \"Nome deve ter ao menos 3 caracteres\"),\n  email: emailSchema,\n  cpf: cpfSchema,\n  valor: z.string().min(1, \"Informe o valor\"),\n});\n\ntype FormValues = z.infer<typeof formSchema>;\n\n// Ordem dos campos na tela: o ErrorSummary segue esta lista (não a ordem do objeto errors)\nconst ORDEM_CAMPOS = [\"nome\", \"email\", \"cpf\", \"valor\"] as const satisfies readonly (keyof FormValues)[];\n\nexport function FormularioExemplo() {\n  const { toast } = useToast();\n  const [tentativa, setTentativa] = useState(0);\n  const { register, control, handleSubmit, formState: { errors } } = useForm<FormValues>({\n    resolver: zodResolver(formSchema),\n    defaultValues: { nome: \"\", email: \"\", cpf: \"\", valor: \"\" },\n    // Sem isto o RHF foca o 1º campo inválido e o ErrorSummary nunca recebe o foco\n    shouldFocusError: false,\n  });\n\n  // Padrão 2: Resumo consolidado no topo, na ordem da tela\n  const errorSummaryItems = ORDEM_CAMPOS.flatMap((id) => {\n    const message = errors[id]?.message;\n    return message ? [{ id, message }] : [];\n  });\n\n  const onSubmit = (data: FormValues) => {\n    void data;\n    // Padrão de sucesso via Toast:\n    toast({ variant: \"success\", title: \"Sucesso!\", description: \"Dados gravados com sucesso.\" });\n  };\n\n  return (\n    <form\n      onSubmit={handleSubmit(onSubmit, () => setTentativa((t) => t + 1))}\n      noValidate\n      className=\"max-w-xl space-y-4\"\n    >\n      {errorSummaryItems.length > 0 && (\n        <ErrorSummary title=\"Corrija os erros destacados\" errors={errorSummaryItems} focusKey={tentativa} />\n      )}\n\n      {/* Padrão 1: Erro inline ligado via aria-describedby e aria-invalid */}\n      <FormField label=\"Nome completo\" htmlFor=\"nome\" required error={errors.nome?.message}>\n        <Input id=\"nome\" {...register(\"nome\")} />\n      </FormField>\n\n      <FormField label=\"E-mail\" htmlFor=\"email\" required error={errors.email?.message}>\n        <Input id=\"email\" type=\"email\" {...register(\"email\")} />\n      </FormField>\n\n      {/* Uso canônico com Controller para componentes controlados ou máscaras */}\n      <Controller\n        name=\"cpf\"\n        control={control}\n        render={({ field }) => (\n          <FormField label=\"CPF\" htmlFor=\"cpf\" required error={errors.cpf?.message}>\n            <Input id=\"cpf\" inputMode=\"numeric\" {...field} />\n          </FormField>\n        )}\n      />\n\n      {/* Campo R$: maskCurrency(\"\") devolve \"\", então min(1) barra o vazio */}\n      <Controller\n        name=\"valor\"\n        control={control}\n        render={({ field }) => (\n          <FormField label=\"Valor da taxa\" htmlFor=\"valor\" required error={errors.valor?.message}>\n            <Input\n              id=\"valor\"\n              inputMode=\"numeric\"\n              name={field.name}\n              ref={field.ref}\n              onBlur={field.onBlur}\n              value={field.value}\n              onValueChange={(v) => field.onChange(maskCurrency(v))}\n            />\n          </FormField>\n        )}\n      />\n\n      {/* Padrão de Ação com Legenda Auxiliar de Ação / Download */}\n      <div className=\"pt-2 space-y-2\">\n        <Button type=\"submit\" variant=\"primary\">Gerar requerimento</Button>\n        <p className=\"text-xs text-text-muted\">\n          Ao clicar, o arquivo PDF do requerimento será gerado e baixado automaticamente.\n        </p>\n      </div>\n    </form>\n  );\n}",
+      "prompt": "Use o componente `FormField` (Campo de formulário) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Estrutura do campo: label, obrigatório (*), dica e mensagem de erro na ordem a11y correta. Integra-se ao react-hook-form (via Controller ou register) e esquemas Zod (@semec/ds/react/validacao). Liga o campo filho pelo contexto (`FormFieldContext`): `id` (gerado com `useId` se faltar), `aria-describedby` (sem erro, a dica; com erro, a dica sai e ele aponta só para a mensagem de erro) e `aria-invalid`. Suporta três padrões de erro: inline, resumo no topo com ErrorSummary e falha de servidor com Alert. Inclui padrão para legenda auxiliar de ação/download em botões de envio. API e variantes: props: label · htmlFor · required · hint · error (mensagem; implica invalid) · invalid (sem mensagem) · errorRole (\"alert\" | undefined) · id · hooks: useFormField · useFormFieldControl (para campos próprios) · padrões: 1. Inline (FormField error) · 2. Resumo topo (ErrorSummary) · 3. Servidor (Alert destructive) · Legenda de ação no botão. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "https://semec-pvh.github.io/SEMEC_design_system/componentes/campo-de-formulario/",
       "md": "https://semec-pvh.github.io/SEMEC_design_system/components/campo-de-formulario.md"
     },
@@ -424,7 +424,7 @@
       "slug": "error-summary",
       "label": "ErrorSummary",
       "exportName": "ErrorSummary",
-      "file": "src/components/error-summary.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/error-summary.tsx",
       "category": "formularios",
       "desc": "Resumo de erros de validação no topo do formulário, com links para cada campo (`id` do campo, ou `name` como recuo). A11y: `role=\"alert\"`, foco automático só quando o `focusKey` muda (passe `focusKey={tentativa}`, somado a cada envio inválido; sem `focusKey`, foca ao passar de 0 para N erros). O resumo que some e volta enquanto a pessoa digita não rouba o foco. Título ligado por id gerado. Liste os itens na ordem dos campos na tela; com React Hook Form, use `shouldFocusError: false`. Sem margem externa: espace pelo layout (ex.: `className=\"mb-6\"`).",
       "variants": [
@@ -443,7 +443,7 @@
       "slug": "cartao",
       "label": "Cartão",
       "exportName": "Card",
-      "file": "src/components/card.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/card.tsx",
       "category": "conteudo-dados",
       "desc": "Superfície de conteúdo com header, corpo e footer. Sombra pelo token `shadow-elevation-1`.",
       "variants": [
@@ -466,7 +466,7 @@
       "slug": "titulo",
       "label": "Título",
       "exportName": "Heading",
-      "file": "src/components/heading.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/heading.tsx",
       "category": "conteudo-dados",
       "desc": "Título semântico h1–h6 com a escala tipográfica do kit. O nível (level) segue a estrutura da página; o tamanho (size) segue o visual. Escala: 1 = `text-3xl` (32px, título da página), 2 = `text-2xl` (24px), 3 = `text-xl` (20px), 4 = `text-base`, 5 = `text-sm`, 6 = `text-xs` em caixa alta.",
       "variants": [
@@ -489,7 +489,7 @@
       "slug": "etiqueta",
       "label": "Etiqueta",
       "exportName": "Badge",
-      "file": "src/components/badge.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/badge.tsx",
       "category": "conteudo-dados",
       "desc": "Etiqueta curta de status ou contagem.",
       "variants": [
@@ -508,9 +508,9 @@
       "slug": "tabela",
       "label": "Tabela",
       "exportName": "Table",
-      "file": "src/components/table.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/table.tsx",
       "category": "conteudo-dados",
-      "desc": "Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas.",
+      "desc": "Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver https://semec-pvh.github.io/SEMEC_design_system/padroes/dados-relatorios/tabelas/. Se houver rolagem horizontal, use uma região nomeada e focável, como no exemplo, e teste Tab e setas em tela estreita.",
       "variants": [
         {
           "prop": "composição",
@@ -521,8 +521,8 @@
           "values": "scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome"
         }
       ],
-      "usage": "import { Table, TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell } from \"@semec/ds/react\";\n\n// Básico\n<Table>\n  <TableCaption>Serviços solicitados</TableCaption>\n  <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>\n  <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>\n</Table>\n\n// Avançado: ordenação + filtro + paginação + seleção\n// Ver padroes/dados-relatorios/tabelas → demo com TableAdvanced",
-      "prompt": "Use o componente `Table` (Tabela) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver padrão avançado em /padroes/dados-relatorios/tabelas. API e variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "usage": "import { Table, TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell } from \"@semec/ds/react\";\n\n// A região recebe o foco e a rolagem; o wrapper interno da Table fica overflow-visible.\n<div role=\"region\" aria-label=\"Serviços solicitados\" tabIndex={0} className=\"overflow-x-auto [&>div]:overflow-visible\">\n  <Table className=\"min-w-[40rem]\">\n    <TableCaption>Serviços solicitados</TableCaption>\n    <TableHeader><TableRow><TableHead>Serviço</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>\n    <TableBody><TableRow><TableCell>IPTU</TableCell><TableCell>Aberto</TableCell></TableRow></TableBody>\n  </Table>\n</div>\n\n// Avançado: ordenação + filtro + paginação + seleção\n// Ver https://semec-pvh.github.io/SEMEC_design_system/padroes/dados-relatorios/tabelas/ → demo com TableAdvanced",
+      "prompt": "Use o componente `Table` (Tabela) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Tabela de dados semântica com caption, header, body e footer. Para ordenação, filtros e seleção, ver https://semec-pvh.github.io/SEMEC_design_system/padroes/dados-relatorios/tabelas/. Se houver rolagem horizontal, use uma região nomeada e focável, como no exemplo, e teste Tab e setas em tela estreita. API e variantes: composição: Table · TableHeader · TableRow · TableHead · TableBody · TableCell · TableFooter · TableCaption · a11y: scope=col (TableHead) · aria-sort repassado pelo consumidor em TableHead · TableCaption para nome. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "https://semec-pvh.github.io/SEMEC_design_system/componentes/tabela/",
       "md": "https://semec-pvh.github.io/SEMEC_design_system/components/tabela.md"
     },
@@ -531,7 +531,7 @@
       "slug": "esqueleto",
       "label": "Esqueleto",
       "exportName": "Skeleton",
-      "file": "src/components/skeleton.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/skeleton.tsx",
       "category": "feedback",
       "desc": "Placeholder pulsante de carregamento, decorativo (aria-hidden). Fundo `surface-sunken`. Anuncie o carregamento no contêiner com aria-busy e um texto ou Spinner.",
       "variants": [
@@ -550,7 +550,7 @@
       "slug": "estado-vazio",
       "label": "Estado vazio",
       "exportName": "EmptyState",
-      "file": "src/components/empty-state.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/empty-state.tsx",
       "category": "feedback",
       "desc": "Estado vazio com ícone, título, descrição e ação opcional.",
       "variants": [
@@ -569,7 +569,7 @@
       "slug": "estado-de-erro",
       "label": "Estado de erro",
       "exportName": "ErrorState",
-      "file": "src/components/error-state.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/error-state.tsx",
       "category": "feedback",
       "desc": "Estado de erro com anúncio acessível (role=alert), mensagem explicativa e ação de recuperação (onRetry ou ação personalizada).",
       "variants": [
@@ -596,7 +596,7 @@
       "slug": "trilha-de-navegacao",
       "label": "Trilha de navegação",
       "exportName": "Breadcrumb",
-      "file": "src/components/breadcrumb.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/breadcrumb.tsx",
       "category": "navegacao",
       "desc": "Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.",
       "variants": [
@@ -619,7 +619,7 @@
       "slug": "cabecalho",
       "label": "Cabeçalho",
       "exportName": "Header",
-      "file": "src/components/header.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/header.tsx",
       "category": "navegacao",
       "desc": "Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.",
       "variants": [
@@ -640,7 +640,7 @@
           "values": "Header dentro do SidebarInset (as=\"div\"), antes do <main id=\"conteudo\">; SkipLink antes do SidebarProvider. Antes do provider o Header fica sob a Sidebar fixa e a marca recebe foco sem aparecer"
         }
       ],
-      "usage": "import { Header, HeaderBrand, HeaderNav, HeaderNavLink } from \"@semec/ds/react\";\nimport { Button } from \"@semec/ds/react\";\n\n<Header>\n  <HeaderBrand\n    orgName=\"SEMEC\"\n    serviceName=\"Nome do serviço\"\n    logo={<img src=\"/logo-prefeitura.svg\" alt=\"Prefeitura de Porto Velho\" className=\"h-9 w-auto\" />}\n  />\n  <div className=\"flex items-center gap-2\">\n    <HeaderNav>\n      <HeaderNavLink href=\"/prefeitura\" current>Prefeitura</HeaderNavLink>\n      <HeaderNavLink href=\"/servicos\">Serviços</HeaderNavLink>\n    </HeaderNav>\n    <Button asChild>\n      <a href=\"/contato\">Fale Conosco</a>\n    </Button>\n  </div>\n</Header>",
+      "usage": "import { Header, HeaderBrand, HeaderNav, HeaderNavLink } from \"@semec/ds/react\";\nimport { Button } from \"@semec/ds/react\";\n\n<Header>\n  <HeaderBrand\n    orgName=\"SEMEC\"\n    serviceName=\"Nome do serviço\"\n    // A logo não vem no pacote: peça o SVG oficial à SEMEC e salve em public/marca.svg.\n    logo={<img src=\"/marca.svg\" alt=\"Prefeitura de Porto Velho\" className=\"h-9 w-auto\" />}\n  />\n  <div className=\"flex items-center gap-2\">\n    <HeaderNav>\n      <HeaderNavLink href=\"/prefeitura\" current>Prefeitura</HeaderNavLink>\n      <HeaderNavLink href=\"/servicos\">Serviços</HeaderNavLink>\n    </HeaderNav>\n    <Button asChild>\n      <a href=\"/contato\">Fale Conosco</a>\n    </Button>\n  </div>\n</Header>",
       "prompt": "Use o componente `Header` (Cabeçalho) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav. API e variantes: composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href (\"\" = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional) · com Sidebar: Header dentro do SidebarInset (as=\"div\"), antes do <main id=\"conteudo\">; SkipLink antes do SidebarProvider. Antes do provider o Header fica sob a Sidebar fixa e a marca recebe foco sem aparecer. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "https://semec-pvh.github.io/SEMEC_design_system/componentes/cabecalho/",
       "md": "https://semec-pvh.github.io/SEMEC_design_system/components/cabecalho.md"
@@ -650,7 +650,7 @@
       "slug": "etapas",
       "label": "Etapas",
       "exportName": "Stepper",
-      "file": "src/components/stepper.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/stepper.tsx",
       "category": "navegacao",
       "desc": "Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current=\"step\"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.",
       "variants": [
@@ -681,7 +681,7 @@
       "slug": "link-para-o-conteudo",
       "label": "Link para o conteúdo",
       "exportName": "SkipLink",
-      "file": "src/components/skip-link.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/skip-link.tsx",
       "category": "navegacao",
       "desc": "Link \"Pular para o conteúdo principal\" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo).",
       "variants": [
@@ -704,7 +704,7 @@
       "slug": "rodape",
       "label": "Rodapé",
       "exportName": "Footer",
-      "file": "src/components/footer.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/footer.tsx",
       "category": "navegacao",
       "desc": "Rodapé institucional (<footer>, landmark contentinfo) com seções de links e faixa final. Use um por página, fora do <main>.",
       "variants": [
@@ -731,7 +731,7 @@
       "slug": "abas",
       "label": "Abas",
       "exportName": "Tabs",
-      "file": "src/components/tabs.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/tabs.tsx",
       "category": "navegacao",
       "desc": "Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix. A aba ativa tem barra inferior de 3px em `primary` (≥4,97:1) e peso semibold, além do fundo: não depende só de cor. Alvo de 44px.",
       "variants": [
@@ -754,7 +754,7 @@
       "slug": "paginacao",
       "label": "Paginação",
       "exportName": "Pagination",
-      "file": "src/components/pagination.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/pagination.tsx",
       "category": "navegacao",
       "desc": "Controle de páginas com elipses (janela por `siblingCount`). Navegação por teclado completa. Botões de 44px que não encolhem. Abaixo de `sm` ficam só as setas e a página atual ± 1 (primeira, última e elipses ocultas). Textos em PT-BR, sobrescrevíveis por `labels`.",
       "variants": [
@@ -781,7 +781,7 @@
       "slug": "gatilho-da-barra-lateral",
       "label": "Gatilho da barra lateral",
       "exportName": "SidebarToggleButton",
-      "file": "src/components/sidebar-trigger.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/sidebar-trigger.tsx",
       "category": "navegacao",
       "desc": "`SidebarToggleButton`: botão controlado (`open` + `onToggle`) para colapsar/expandir uma sidebar cujo estado vive no seu layout (ex.: Header). Alterna entre ícones PanelLeftOpen e PanelLeftClose. Dentro de `SidebarProvider`, use `SidebarTrigger` (ver Barra lateral), que não recebe `open`/`onToggle`.",
       "variants": [
@@ -804,7 +804,7 @@
       "slug": "modal",
       "label": "Modal",
       "exportName": "Dialog",
-      "file": "src/components/dialog.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/dialog.tsx",
       "category": "feedback",
       "desc": "Diálogo modal acessível com overlay, header, título, descrição e footer.",
       "variants": [
@@ -827,13 +827,13 @@
       "slug": "notificacao",
       "label": "Notificação",
       "exportName": "Toaster",
-      "file": "src/components/toast.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/toast.tsx",
       "category": "feedback",
       "desc": "Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.",
       "variants": [
         {
           "prop": "variant",
-          "values": "default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive"
+          "values": "default · success (fundo bg-success-emphasis, texto text-success-emphasis-foreground, 5,85:1; título 16px (text-base font-bold), descrição 14px (text-sm), Poppins) · warning · destructive"
         },
         {
           "prop": "uso",
@@ -849,7 +849,7 @@
         }
       ],
       "usage": "import { Toaster, useToast, Button } from \"@semec/ds/react\";\n\n// Dispare de qualquer componente com useToast():\nfunction Acao() {\n  const { toast } = useToast();\n  return <Button onClick={() => toast({ variant: \"success\", title: \"Protocolo enviado\" })}>Enviar</Button>;\n}\n\n// Monte <Toaster /> UMA vez no root do app (ex.: app/layout.tsx).\n// Não use ToastProvider/ToastViewport soltos: sem o Toaster nenhum toast aparece.\n<Acao />\n<Toaster />",
-      "prompt": "Use o componente `Toaster` (Notificação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`. API e variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos · Toaster: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis) · alvos: X e ToastAction com 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
+      "prompt": "Use o componente `Toaster` (Notificação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`. API e variantes: variant: default · success (fundo bg-success-emphasis, texto text-success-emphasis-foreground, 5,85:1; título 16px (text-base font-bold), descrição 14px (text-sm), Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos · Toaster: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis) · alvos: X e ToastAction com 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "https://semec-pvh.github.io/SEMEC_design_system/componentes/notificacao/",
       "md": "https://semec-pvh.github.io/SEMEC_design_system/components/notificacao.md"
     },
@@ -858,7 +858,7 @@
       "slug": "dica",
       "label": "Dica",
       "exportName": "Tooltip",
-      "file": "src/components/tooltip.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/tooltip.tsx",
       "category": "feedback",
       "desc": "Dica curta ao passar o ponteiro ou focar o elemento.",
       "variants": [
@@ -877,7 +877,7 @@
       "slug": "aviso",
       "label": "Aviso",
       "exportName": "Alert",
-      "file": "src/components/alert.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/alert.tsx",
       "category": "feedback",
       "desc": "Mensagem de feedback em linha, com ícone automático por variante. Só destructive interrompe o leitor de tela (role=alert); as demais usam role=status.",
       "variants": [
@@ -904,7 +904,7 @@
       "slug": "acordeao",
       "label": "Acordeão",
       "exportName": "Accordion",
-      "file": "src/components/accordion.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/accordion.tsx",
       "category": "conteudo-dados",
       "desc": "Seções expansíveis. Um item abre por vez (`single`) ou vários (`multiple`).",
       "variants": [
@@ -927,7 +927,7 @@
       "slug": "dialogo-de-alerta",
       "label": "Diálogo de alerta",
       "exportName": "AlertDialog",
-      "file": "src/components/alert-dialog.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/alert-dialog.tsx",
       "category": "feedback",
       "desc": "Confirmação perigosa. Força decisão (ação/cancelar) antes de prosseguir: role=\"alertdialog\", sempre modal, não fecha por clique fora e abre com o foco no Cancelar.",
       "variants": [
@@ -958,7 +958,7 @@
       "slug": "popover",
       "label": "Popover",
       "exportName": "Popover",
-      "file": "src/components/popover.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/popover.tsx",
       "category": "feedback",
       "desc": "Camada flutuante ancorada a um elemento. Tooltips interativos, filtros, menus.",
       "variants": [
@@ -981,7 +981,7 @@
       "slug": "separador",
       "label": "Separador",
       "exportName": "Separator",
-      "file": "src/components/separator.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/separator.tsx",
       "category": "conteudo-dados",
       "desc": "Linha divisória visual. Horizontal ou vertical. Decorativo ou semântico.",
       "variants": [
@@ -1004,7 +1004,7 @@
       "slug": "avatar",
       "label": "Avatar",
       "exportName": "Avatar",
-      "file": "src/components/avatar.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/avatar.tsx",
       "category": "conteudo-dados",
       "desc": "Foto de perfil com fallback automático (iniciais). Com a foto quebrada, o `AvatarFallback` anuncia o `alt` da `AvatarImage` (as iniciais ficam só visuais); um `aria-label` no `AvatarFallback` continua aceito e tem prioridade.",
       "variants": [
@@ -1031,7 +1031,7 @@
       "slug": "toggle",
       "label": "Toggle",
       "exportName": "Toggle",
-      "file": "src/components/toggle.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/toggle.tsx",
       "category": "formularios",
       "desc": "Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. Ligado = fundo `tint` + contorno de 2px em `primary` (5,00:1 sobre `--bg`, 5,42:1 sobre branco) e texto `foreground`; o estado vai ao leitor de tela por `aria-pressed`.",
       "variants": [
@@ -1058,7 +1058,7 @@
       "slug": "spinner",
       "label": "Spinner",
       "exportName": "Spinner",
-      "file": "src/components/spinner.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/spinner.tsx",
       "category": "feedback",
       "desc": "Indicador de carregamento inline (role=status). Com `decorative`, é só visual (sem role, aria-label nem texto sr-only), para quando outro elemento já anuncia o carregamento; é o que o `Button` com `loading` usa.",
       "variants": [
@@ -1081,7 +1081,7 @@
       "slug": "progress",
       "label": "Progresso",
       "exportName": "Progress",
-      "file": "src/components/progress.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/progress.tsx",
       "category": "feedback",
       "desc": "Barra de progresso determinada. Trilha com contorno border-strong (3,77:1 sobre surface) e indicador primary.",
       "variants": [],
@@ -1095,7 +1095,7 @@
       "slug": "slider",
       "label": "Slider",
       "exportName": "Slider",
-      "file": "src/components/slider.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/slider.tsx",
       "category": "formularios",
       "desc": "Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares.",
       "variants": [
@@ -1114,7 +1114,7 @@
       "slug": "input-otp",
       "label": "Input OTP",
       "exportName": "InputOTP",
-      "file": "src/components/input-otp.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/input-otp.tsx",
       "category": "formularios",
       "desc": "Campo de código OTP com foco automático entre dígitos.",
       "variants": [
@@ -1141,7 +1141,7 @@
       "slug": "calendario",
       "label": "Calendário",
       "exportName": "Calendar",
-      "file": "src/components/calendar.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/calendar.tsx",
       "category": "formularios",
       "desc": "Calendário mensal no padrão APG de grade de datas: uma parada de Tab na grade, setas, Home/End, PageUp/PageDown e nomes completos em PT-BR. Células e botões de 44px.",
       "variants": [
@@ -1172,7 +1172,7 @@
       "slug": "scroll-area",
       "label": "Área de scroll",
       "exportName": "ScrollArea",
-      "file": "src/components/scroll-area.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/scroll-area.tsx",
       "category": "navegacao",
       "desc": "Scroll customizado e consistente entre navegadores. A região rolável é alcançável pelo teclado: sem nada focável dentro (ex.: texto puro), a viewport vira parada de Tab com anel de foco (`focusable=\"auto\"`, o padrão). Dê nome à região com `viewportProps={{ \"aria-label\": \"…\" }}`.",
       "variants": [
@@ -1203,7 +1203,7 @@
       "slug": "menu-suspenso",
       "label": "Menu suspenso",
       "exportName": "DropdownMenu",
-      "file": "src/components/dropdown-menu.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/dropdown-menu.tsx",
       "category": "navegacao",
       "desc": "Menu flutuante com itens, checkbox, radio, sub-menus e separadores.",
       "variants": [
@@ -1222,7 +1222,7 @@
       "slug": "drawer",
       "label": "Drawer",
       "exportName": "Drawer",
-      "file": "src/components/drawer.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/drawer.tsx",
       "category": "feedback",
       "desc": "Painel deslizante de qualquer lado da tela.",
       "variants": [
@@ -1253,7 +1253,7 @@
       "slug": "sheet",
       "label": "Sheet",
       "exportName": "Sheet",
-      "file": "src/components/sheet.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/sheet.tsx",
       "category": "feedback",
       "desc": "Painel lateral modal com overlay. Variantes left/right/top/bottom.",
       "variants": [
@@ -1284,7 +1284,7 @@
       "slug": "tabela-de-dados",
       "label": "Tabela de dados",
       "exportName": "DataTable",
-      "file": "src/components/data-table.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/data-table.tsx",
       "category": "conteudo-dados",
       "desc": "Tabela com ordenação, paginação e estados vazios. Com `onRowClick`, passe `rowLabel` para dar nome à linha clicável.",
       "variants": [
@@ -1307,7 +1307,7 @@
       "slug": "timeline",
       "label": "Linha do tempo",
       "exportName": "Timeline",
-      "file": "src/components/timeline.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/timeline.tsx",
       "category": "conteudo-dados",
       "desc": "Sequência temporal em lista ordenada (ol/li), com pontos, conectores visíveis e conteúdo. O status vai em texto (srLabel), não só na cor.",
       "variants": [
@@ -1338,7 +1338,7 @@
       "slug": "menu-de-navegacao",
       "label": "Menu de navegação",
       "exportName": "NavigationMenu",
-      "file": "src/components/navigation-menu.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/navigation-menu.tsx",
       "category": "navegacao",
       "desc": "Navegação principal com mega-menu e viewport animado. O `<nav>` se chama \"Menu principal\" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. O `NavigationMenuLink` já vem estilizado: alvo de 44px (`min-h-11`), `px-4`, hover/foco em `tint` e anel de foco por dentro; `active` marca a página atual com `aria-current=\"page\"`.",
       "variants": [
@@ -1365,7 +1365,7 @@
       "slug": "sidebar",
       "label": "Barra lateral",
       "exportName": "Sidebar",
-      "file": "src/components/sidebar.tsx",
+      "file": "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/sidebar.tsx",
       "category": "navegacao",
       "desc": "Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile. Abaixo de 768px (48rem, via `matchMedia`) a Sidebar vira gaveta modal (Radix Dialog): foco preso, Esc fecha, conteúdo de trás inerte, foco volta a quem abriu e botão visível \"Fechar menu\" (44×44). No desktop renderiza um landmark `<nav aria-label=\"Menu lateral\">`. `SidebarMenuButton isActive` gera `aria-current=\"page\"`; `tooltip` aparece só no modo recolhido (`collapsible=\"icon\"`). `SidebarTrigger` (44×44) expõe `aria-expanded` e `aria-controls`.",
       "variants": [
@@ -1410,22 +1410,22 @@
           "values": "SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail"
         }
       ],
-      "usage": "import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SkipLink, Header, HeaderBrand, Heading } from \"@semec/ds/react\";\nimport { LayoutDashboard } from \"lucide-react\";\n\n<SidebarProvider>\n  <Sidebar>\n    <SidebarHeader>Logo</SidebarHeader>\n    <SidebarContent>\n      <SidebarGroup>\n        <SidebarGroupLabel>Menu</SidebarGroupLabel>\n        <SidebarGroupContent>\n          <SidebarMenu>\n            <SidebarMenuItem>\n              <SidebarMenuButton isActive>Dashboard</SidebarMenuButton>\n            </SidebarMenuItem>\n            <SidebarMenuItem>\n              <SidebarMenuButton>Protocolos</SidebarMenuButton>\n            </SidebarMenuItem>\n          </SidebarMenu>\n        </SidebarGroupContent>\n      </SidebarGroup>\n    </SidebarContent>\n    <SidebarFooter>Footer</SidebarFooter>\n  </Sidebar>\n  {/* SidebarInset renderiza <main> por padrão: não aninhe outro <main> dentro dele.\n      Se o layout já tem o próprio <main>, use <SidebarInset as=\"div\">. */}\n  <SidebarInset>\n    <SidebarTrigger />\n    <div className=\"p-4\">Conteúdo</div>\n  </SidebarInset>\n</SidebarProvider>\n\n// Painel com Header (composição única, TST-04): SkipLink antes do SidebarProvider,\n// Header dentro do SidebarInset (as=\"div\") e o <main> depois do Header.\n// Header antes do provider fica sob a Sidebar fixa (marca focada sem aparecer).\n<>\n  <SkipLink />\n  <SidebarProvider>\n    <Sidebar>{/* … */}</Sidebar>\n    <SidebarInset as=\"div\">\n      <Header>\n        <SidebarTrigger />\n        <HeaderBrand href=\"/\" logo={<img src=\"/marca.svg\" alt=\"Prefeitura de Porto Velho\" />} serviceName=\"Gestão de protocolos\" />\n      </Header>\n      <main id=\"conteudo\" tabIndex={-1} className=\"mx-auto w-full max-w-[75rem] px-4 py-8\">\n        <Heading level={1}>Protocolos</Heading>\n      </main>\n    </SidebarInset>\n  </SidebarProvider>\n</>\n\n// Item ativo com link (aria-current=\"page\" vem de isActive) e tooltip no modo recolhido\n<Sidebar collapsible=\"icon\" labels={{ navigation: \"Menu do servidor\" }}>\n  <SidebarContent>\n    <SidebarMenu>\n      <SidebarMenuItem>\n        <SidebarMenuButton asChild isActive tooltip=\"Painel\">\n          <a href=\"/painel\"><LayoutDashboard aria-hidden=\"true\" /><span>Painel</span></a>\n        </SidebarMenuButton>\n      </SidebarMenuItem>\n    </SidebarMenu>\n  </SidebarContent>\n</Sidebar>",
+      "usage": "import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SkipLink, Header, HeaderBrand, Heading } from \"@semec/ds/react\";\nimport { LayoutDashboard } from \"lucide-react\";\n\n<SidebarProvider>\n  <Sidebar>\n    <SidebarHeader>Logo</SidebarHeader>\n    <SidebarContent>\n      <SidebarGroup>\n        <SidebarGroupLabel>Menu</SidebarGroupLabel>\n        <SidebarGroupContent>\n          <SidebarMenu>\n            <SidebarMenuItem>\n              <SidebarMenuButton isActive>Dashboard</SidebarMenuButton>\n            </SidebarMenuItem>\n            <SidebarMenuItem>\n              <SidebarMenuButton>Protocolos</SidebarMenuButton>\n            </SidebarMenuItem>\n          </SidebarMenu>\n        </SidebarGroupContent>\n      </SidebarGroup>\n    </SidebarContent>\n    <SidebarFooter>Footer</SidebarFooter>\n  </Sidebar>\n  {/* SidebarInset renderiza <main> por padrão: não aninhe outro <main> dentro dele.\n      Se o layout já tem o próprio <main>, use <SidebarInset as=\"div\">. */}\n  <SidebarInset>\n    <SidebarTrigger />\n    <div className=\"p-4\">Conteúdo</div>\n  </SidebarInset>\n</SidebarProvider>\n\n// Painel com Header (composição única, TST-04): SkipLink antes do SidebarProvider,\n// Header dentro do SidebarInset (as=\"div\") e o <main> depois do Header.\n// Header antes do provider fica sob a Sidebar fixa (marca focada sem aparecer).\n<>\n  <SkipLink />\n  <SidebarProvider>\n    <Sidebar>{/* … */}</Sidebar>\n    <SidebarInset as=\"div\">\n      <Header>\n        {/* Gatilho e marca num grupo à esquerda (o Header é justify-between) */}\n        <div className=\"flex min-w-0 items-center gap-2\">\n          <SidebarTrigger />\n          <HeaderBrand orgName=\"SEMEC\" href=\"/\" logo={<img src=\"/marca.svg\" alt=\"Prefeitura de Porto Velho\" />} serviceName=\"Gestão de protocolos\" />\n        </div>\n      </Header>\n      <main id=\"conteudo\" tabIndex={-1} className=\"mx-auto w-full max-w-[75rem] px-4 py-8\">\n        <Heading level={1}>Protocolos</Heading>\n      </main>\n    </SidebarInset>\n  </SidebarProvider>\n</>\n\n// Item ativo com link (aria-current=\"page\" vem de isActive) e tooltip no modo recolhido\n<Sidebar collapsible=\"icon\" labels={{ navigation: \"Menu do servidor\" }}>\n  <SidebarContent>\n    <SidebarMenu>\n      <SidebarMenuItem>\n        <SidebarMenuButton asChild isActive tooltip=\"Painel\">\n          <a href=\"/painel\"><LayoutDashboard aria-hidden=\"true\" /><span>Painel</span></a>\n        </SidebarMenuButton>\n      </SidebarMenuItem>\n    </SidebarMenu>\n  </SidebarContent>\n</Sidebar>",
       "prompt": "Use o componente `Sidebar` (Barra lateral) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile. Abaixo de 768px (48rem, via `matchMedia`) a Sidebar vira gaveta modal (Radix Dialog): foco preso, Esc fecha, conteúdo de trás inerte, foco volta a quem abriu e botão visível \"Fechar menu\" (44×44). No desktop renderiza um landmark `<nav aria-label=\"Menu lateral\">`. `SidebarMenuButton isActive` gera `aria-current=\"page\"`; `tooltip` aparece só no modo recolhido (`collapsible=\"icon\"`). `SidebarTrigger` (44×44) expõe `aria-expanded` e `aria-controls`. API e variantes: side: left · right · variant: sidebar · floating · inset · collapsible: offcanvas · icon · none · as (Sidebar): nav (padrão) · aside · div · labels (Sidebar): navigation (\"Menu lateral\") · mobileTitle (\"Menu de navegação\") · close (\"Fechar menu\") · as (SidebarInset): main (padrão) · div · section · label (SidebarTrigger): padrão \"Alternar barra lateral\" · SidebarMenuButton: isActive (aria-current=page) · tooltip (string ou props do TooltipContent) · asChild · a11y: landmark nav/aside com aria-label · gaveta mobile com focus trap, Esc e retorno de foco · aria-expanded/aria-controls no gatilho · aria-current=page no item ativo · alvos de 44px · barra offcanvas recolhida fica inert · composição: SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.",
       "url": "https://semec-pvh.github.io/SEMEC_design_system/componentes/sidebar/",
       "md": "https://semec-pvh.github.io/SEMEC_design_system/components/sidebar.md"
     }
   ],
   "unreleased": {
-    "pendingChangesets": 1,
+    "pendingChangesets": 2,
     "bump": "minor",
     "nextVersion": "4.3.0",
-    "note": "Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`."
+    "note": "Não publicado: este conteúdo vem do repositório e inclui 2 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`."
   },
   "install": {
     "packages": "npm install @semec/ds lucide-react",
-    "peers": "lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.",
-    "form": "npm install react-hook-form @hookform/resolvers zod",
+    "peers": "lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.",
+    "form": "npm install react-hook-form @hookform/resolvers@^5 zod@^4",
     "css": "@import \"tailwindcss\";\n@import \"@semec/ds/react/fonts.css\";\n@import \"@semec/ds/react/tokens.css\";\n@source \"../node_modules/@semec/ds/dist/react\";",
     "cssNote": "No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).",
     "fonts": "@import \"@semec/ds/react/fonts.css\";",

@@ -26,10 +26,11 @@ export interface HeaderBrandProps extends React.HTMLAttributes<HTMLElement> {
    * renderizar a marca sem link (ex.: já na página inicial).
    */
   href?: string | null;
+  /** Nome do órgão. @default "SEMEC" */
   orgName?: string;
   serviceName?: string;
   /**
-   * Logo do órgão (ex.: `<img src="/logo.svg" alt="Prefeitura de Porto Velho" />`).
+   * Logo do órgão (ex.: `<img src="/marca.svg" alt="Prefeitura de Porto Velho" />`).
    * Sem logo, aparece um placeholder decorativo e um aviso no console em
    * desenvolvimento.
    */
@@ -137,8 +138,8 @@ const HeaderNav = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement
   ({ className, children, ...props }, ref) => (
     <nav
       ref={ref}
-      aria-label="Principal"
-      className={cn("flex items-center gap-2", className)}
+      aria-label="Menu principal"
+      className={cn("flex flex-wrap items-center gap-2", className)}
       {...props}
     >
       {children}

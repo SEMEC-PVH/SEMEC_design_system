@@ -1,6 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { gateBrowserLabel, launchGateBrowser } from "./browser.mjs";
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 
 /**
@@ -14,7 +16,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
  * dois modos de uso (renderização condicional da SKILL e resumo sempre montado).
  */
 export async function checkErrorSummaryFocus() {
-  console.log("▶ Foco do ErrorSummary com digitação real (Chromium headless)...");
+  console.log(`▶ Foco do ErrorSummary com digitação real (${gateBrowserLabel()})...`);
 
   const { build } = await import("esbuild");
   const bundle = await build({
@@ -28,16 +30,7 @@ export async function checkErrorSummaryFocus() {
   });
   const script = bundle.outputFiles[0].text;
 
-  const { chromium } = await import("playwright");
-  let browser;
-  try {
-    browser = await chromium.launch();
-  } catch (err) {
-    throw new Error(
-      `Não foi possível abrir o Chromium do Playwright (${err.message.split("\n")[0]}). ` +
-        "Rode 'npx playwright install --with-deps chromium' (CI) ou defina PLAYWRIGHT_BROWSERS_PATH."
-    );
-  }
+  const browser = await launchGateBrowser();
 
   const errors = [];
   const expect = (label, actual, expected) => {
@@ -71,7 +64,7 @@ export async function checkErrorSummaryFocus() {
       expect(`${modo}: tudo corrigido, o resumo some`, await form.getByRole("alert").count(), 0);
 
       // Apaga o e-mail (0 → 1 erro) e redigita sem pausa.
-      await page.keyboard.press("Control+A");
+      await page.keyboard.press("ControlOrMeta+A");
       await page.keyboard.press("Backspace");
       await page.keyboard.type("jose@semec.gov.br");
       expect(

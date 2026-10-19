@@ -74,7 +74,7 @@ import { Button, Card, CardHeader, CardTitle, CardContent } from "@semec/ds/reac
 O `@semec/ds` vai para o npm público via Changesets + GitHub Actions. Nenhuma versão sai por bump manual, e o workflow de release só roda depois da CI verde no `main`. O versionamento é feito por um mantenedor, num PR; o workflow só publica.
 
 1. Todo PR que muda arquivo publicado do pacote traz um changeset (`npm run changeset`: patch/minor/major + descrição). A CI falha sem ele. Depois do merge, os changesets se acumulam no `main` e o workflow de release só resume o plano.
-2. Para lançar, um mantenedor roda `npm run version-packages` (bump + CHANGELOG + lockfile) numa branch `changeset-release/<versão>` e abre o PR de versão.
+2. Para lançar, um mantenedor roda `npm run version-packages` (bump + CHANGELOG + lockfile + artefatos de IA) numa branch `changeset-release/<versão>` e abre o PR de versão.
 3. Outro mantenedor revisa e mergeia o PR de versão.
 4. Com a CI verde nesse merge, o workflow publica (`changeset publish`), confere `npm view @semec/ds@x.y.z`, envia a tag `@semec/ds@x.y.z` e cria a GitHub Release.
 

@@ -12,6 +12,8 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
+App em Vue, Angular, Svelte ou HTML sem React: use a skill lite (`@semec/ds/lite/skills/semec-ds-lite`), que traz só tokens, acessibilidade e padrões visuais.
+
 **Regra número 1: use os componentes do kit, não os reimplemente.** Importe de `@semec/ds/react`. Não copie o código-fonte de um componente para o app, não recrie um componente existente com `div` + classes e não troque o estilo dele por outro. Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 
 <!-- ds:maintainer:start -->
@@ -31,13 +33,13 @@ Instale `lucide-react` **sempre** junto: é peer (os componentes importam os íc
 Formulários com a receita oficial (React Hook Form + Zod, seção "Padrão de formulários"): instale também os pacotes da receita, que são **opcionais** e não vêm com o kit:
 
 ```bash
-npm install react-hook-form @hookform/resolvers zod
+npm install react-hook-form @hookform/resolvers@^5 zod@^4
 ```
 
 **Tailwind v4 no bundler:**
 
-- **Vite:** `npm install -D tailwindcss @tailwindcss/vite`, `plugins: [react(), tailwindcss()]` no `vite.config.ts` (`import tailwindcss from "@tailwindcss/vite"`). O CSS global é o `src/index.css`: troque o conteúdo do template pelas linhas abaixo e apague o `import "./App.css"`.
-- **Next.js (`create-next-app`):** o Tailwind já vem (`@tailwindcss/postcss`, ou `@tailwindcss/turbopack` sem `postcss.config` no `create-next-app` 16.4; os dois funcionam igual). Em `app/globals.css`, **apague** o que o template gerou (`:root`, `@theme inline` com `--font-sans: var(--font-geist-sans)`, `@media (prefers-color-scheme: dark)`, `body { font-family: Arial… }`): fora de camada, eles vencem o `@layer base` do `tokens.css` e o app fica com Arial e as cores do template. Em `app/layout.tsx`, apague o `next/font/google` Geist e as classes `geist*.variable` do `<body>`, e use `<html lang="pt-BR">`.
+- **Vite:** `npm install -D tailwindcss @tailwindcss/vite`, `plugins: [react(), tailwindcss()]` no `vite.config.ts` (`import tailwindcss from "@tailwindcss/vite"`). O CSS global é o `src/index.css`: troque o conteúdo do template pelas linhas abaixo e apague o `import "./App.css"`. No `index.html`, troque `<html lang="en">` por `<html lang="pt-BR">`.
+- **Next.js (`create-next-app`):** o Tailwind já vem (`@tailwindcss/postcss`, ou `@tailwindcss/turbopack` sem `postcss.config` no `create-next-app` 16.4; os dois funcionam igual). Em `app/globals.css`, **apague** o que o template gerou (`:root`, `@theme inline` com `--font-sans: var(--font-geist-sans)`, `@media (prefers-color-scheme: dark)`, `body { font-family: Arial… }`): fora de camada, eles vencem o `@layer base` do `tokens.css` e o app fica com Arial e as cores do template. Em `app/layout.tsx`, apague o `next/font/google` Geist e as classes `geist*.variable` do `<body>`, e use `<html lang="pt-BR">`. No `logo` do `HeaderBrand`, o `<img>` dos exemplos gera o aviso de lint `@next/next/no-img-element`; troque por `<Image>` do `next/image` (com `alt`) ou ignore o aviso para SVG estático.
 
 No CSS global do app (não via `import` em JS):
 
@@ -64,7 +66,7 @@ Sem a fonte, o texto cai em `system-ui` (fallback do token `--font-family-sans`)
 
 **Providers no root (quando usar):** `<Toaster />` se usar `useToast()`; `<TooltipProvider>` em volta do app se usar `Tooltip`; `<SemecProvider nonce>` só para CSP estrita. O `SemecProvider` não inclui os outros dois.
 
-**Next.js App Router:** desde a 3.2 o `dist` sai por módulo e cada componente interativo já traz `"use client"`; importar `@semec/ds/react` num Server Component funciona (apresentacionais como `Heading`, `Card`, `Badge`, `Button`, `Link`, `Table` renderizam no servidor). Passar handler (`onClick`, `onValueChange`…) ou usar hook continua exigindo um arquivo `"use client"` seu. Não use `export *` do kit num arquivo `"use client"`. Um componente só: `@semec/ds/react/<arquivo>` (ex.: `@semec/ds/react/button`). Na 3.0/3.1 (bundle único, sem `"use client"`) o kit só funcionava em arquivos `"use client"`.
+**Next.js App Router:** desde a 3.2 o `dist` sai por módulo e cada componente interativo já traz `"use client"`; importar `@semec/ds/react` num Server Component funciona (apresentacionais como `Heading`, `Card`, `Badge`, `Button`, `Link`, `Table` renderizam no servidor). Passar handler (`onClick`, `onValueChange`…) ou usar hook continua exigindo um arquivo `"use client"` seu. Não use `export *` do kit num arquivo `"use client"`. Um componente só: `@semec/ds/react/<arquivo>` (ex.: `@semec/ds/react/button`). Peso no cliente: com Turbopack (padrão do Next 16) e kit 4.3.0+, a raiz num Server Component custa o mesmo que o subpath; com `next build --webpack` ou kit 4.2.0, prefira o subpath nos Server Components (ou `experimental.optimizePackageImports: ["@semec/ds/react"]`), senão o kit inteiro vai para o cliente. Na 3.0/3.1 (bundle único, sem `"use client"`) o kit só funcionava em arquivos `"use client"`.
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0). Use só `tokens.css` (+ `@source`). Preset JS opcional: `@config "@semec/ds/react/pv-preset"`.
 
@@ -150,7 +152,7 @@ O `@theme inline` do `tokens.css` gera utilitários para cor, espaçamento (`p-s
 
 **Armadilha (AUD-30):** **nunca** use `text-muted` nem `text-secondary` para texto: eles **compilam para a cor de fundo** `--surface-alt` (1,09:1, texto invisível), porque `--color-muted` e `--color-secondary` são cores de superfície no estilo shadcn. Use `text-text-muted`, `text-text-secondary` e `text-text-strong`.
 
-**Espaçamento:** `--space-N` → `p-space-N`, `gap-space-N`, `mt-space-N` etc. (degraus 0, 1, 2, 3, 4, 6, 8, 12, 16). A escala do Tailwind continua valendo e tem os mesmos valores (`p-4` = `p-space-4` = 16px); fique nos degraus do DS (nada de `px-5`, `py-1.5`).
+**Espaçamento:** `--space-N` → `p-space-N`, `gap-space-N`, `mt-space-N` etc. (degraus 0, 1, 2, 3, 4, 6, 8, 12, 16). A escala do Tailwind continua valendo e tem os mesmos valores (`p-4` = `p-space-4` = 16px); use esses degraus no layout do app. Exceções do kit que devem ser preservadas: botão médio `px-5` (20px), botão pequeno `py-1.5` (6px) e `FormField` `gap-1.5` (6px).
 
 **Texto:** cada degrau já inclui a altura de linha do DS. Papel de cada um:
 
@@ -163,11 +165,11 @@ O `@theme inline` do `tokens.css` gera utilitários para cor, espaçamento (`p-s
 | `text-lg` | 18px | Destaque |
 | `text-base` | 16px | Corpo |
 | `text-sm` | 14px | Apoio |
-| `text-xs` | 12px | Rótulo |
+| `text-xs` | 12px | Etiqueta, dica e mensagem de erro; rótulo de campo usa `text-sm font-medium` (14px) |
 
 Pesos: `font-regular` 400, `font-medium` 500, `font-semibold` 600, `font-bold` 700 (não existem 800/900).
 
-**Raio:** `rounded-sm` 2px · `rounded-md` 8px · `rounded-lg` 12px · `rounded-full`. Escolha pelo papel (controle `rounded-md`, cartão `rounded-lg`, pílula `rounded-full`). A escala é fixa (decisão de 15/10/2026); não use `rounded-xl` ou acima, que ficam fora dela.
+**Raio:** `rounded-sm` 2px · `rounded-md` 8px · `rounded-lg` 12px · `rounded-full`. Escolha pelo papel (controle de entrada (campo, select) `rounded-md`, botão `rounded-full` (pílula), cartão e diálogo `rounded-lg`). A escala é fixa (decisão de 15/10/2026); não use `rounded-xl` ou acima, que ficam fora dela.
 
 **Sombra:** `shadow-elevation-1/2/3` (nunca `shadow-md` e afins do Tailwind, que usam preto puro).
 
@@ -188,6 +190,9 @@ As máscaras têm a mesma assinatura, `(value: string) => string` (tipo `MaskFn`
 - `maskCurrency(value: string): string` → moeda BRL: guarda até 12 dígitos e lê os 2 últimos como centavos (`"123456"` → `"R$ 1.234,56"`). Entrada sem dígitos significativos (`""`, `"abc"`, só zeros como `"R$ 0,0"` ao apagar com Backspace) devolve `""` (desde a 4.1.0; até a 4.0.1 devolvia `"R$ 0,00"`), então o campo volta a vazio e `z.string().min(1)` barra o envio. A saída vem do `Intl` (`toLocaleString("pt-BR", { style: "currency", currency: "BRL" })`), com espaço não separável (U+00A0) depois de `R$`: compare com o mesmo `Intl` ou só com os dígitos, nunca com um literal digitado com espaço comum. O valor é texto: converta para número no envio (`Number(valor.replace(/\D/g, "")) / 100`).
 
 ```tsx
+import { useState } from "react";
+import { FormField, Input, maskCurrency } from "@semec/ds/react";
+
 const [valor, setValor] = useState("");
 
 <FormField label="Valor da taxa" htmlFor="valor" required hint="Somente números; os centavos entram sozinhos">
@@ -199,7 +204,7 @@ Com React Hook Form, o campo R$ está no exemplo canônico (seção "Padrão de 
 
 ## Componentes ({{ds:component-count}})
 
-Lista gerada do manifest (export principal, `code` e descrição). Detalhes, variantes e exemplo de uso de cada um: `components/<slug>.md` ou `manifest.json`.
+Lista gerada do manifest (export principal, `code`, arquivo `.md` e descrição). Detalhes, variantes e exemplo de uso de cada um: o `components/<slug>.md` indicado em cada linha (o slug é em português, ex.: `DataTable` → `components/tabela-de-dados.md`) ou `manifest.json`.
 
 <!-- ds:component-list -->
 
@@ -211,9 +216,9 @@ Coisas que o componente faz sozinho e que mudam como você monta a tela. Leve em
 - **Níveis de título:** os títulos internos (`AlertTitle`, `CardTitle`, `TimelineTitle`, `EmptyState`, `ErrorState`, `SectionHeader`, `FooterSection`) aceitam `as`/`titleAs` para escolher o nível. Ajuste o nível à hierarquia da página (ex.: `EmptyState titleAs="h2"` logo abaixo do `h1`) em vez de deixar o padrão pular nível.
 - **`SidebarInset` é `<main>` por padrão** (aceita `as`): não aninhe outro `<main>` dentro dele; se a página já tem `<main>`, use `as="div"`.
 - **`Sidebar`** é `<nav aria-label="Menu lateral">`; `SidebarMenuButton isActive` vira `aria-current="page"`.
-- **`HeaderBrand` sem `logo`** mostra um placeholder decorativo (`aria-hidden`) e avisa no console em desenvolvimento. Passe sempre `logo` com o asset real (`<img alt="Prefeitura de Porto Velho">`). O nome quebra linha no mobile (use `truncate` para cortar).
+- **`HeaderBrand` sem `logo`** mostra um placeholder decorativo (`aria-hidden`) e avisa no console em desenvolvimento. Passe sempre `logo` com o asset real (`<img alt="Prefeitura de Porto Velho">`). O nome quebra linha no mobile (use `truncate` para cortar). A logo oficial não vem no pacote: peça o SVG à SEMEC e salve como `public/marca.svg`. Informe `orgName` com o nome da secretaria do app; o padrão é `"SEMEC"`.
 - **`NavigationMenu`** é `<nav aria-label="Menu principal">` por padrão; passe outro `aria-label` se houver mais de um menu na página.
-- **`FormField`** liga dica e erro ao controle sozinho (contexto com `useId`): o controle filho recebe `id`, `aria-describedby`, `aria-invalid` e `aria-required`. Não monte `aria-describedby` à mão; o que você passar explicitamente vence.
+- **`FormField`** liga dica e erro ao controle sozinho (contexto com `useId`): o controle filho recebe `id`, `aria-describedby`, `aria-invalid` e `aria-required`. Com erro, a dica some e `aria-describedby` referencia só a mensagem de erro; sem erro, referencia a dica, quando houver. Não monte `aria-describedby` à mão; o que você passar explicitamente vence.
 - **`Toggle` ligado** (`pressed`) tem fundo `tint`, contorno de 2px em `primary` e texto `foreground`: o contorno tem 5,00:1 sobre `--bg` e 5,42:1 sobre branco, então ligado e solto se distinguem sem depender só do cinza. O estado vai para o leitor de tela por `aria-pressed`. Não troque o visual do ligado por `className` com `bg-accent` (1,01:1 contra o fundo).
 - **`Button` com rótulo longo** quebra em linhas balanceadas em vez de criar rolagem horizontal: os tamanhos usam altura **mínima** (`min-h-9`/`min-h-11`/`min-h-12`). Para reduzir a altura por `className`, sobrescreva o `min-h-*` junto com o `h-*`. Mesmo assim, prefira rótulos curtos (verbo + objeto).
 - **`ScrollArea`** vira parada de Tab sozinha quando não há nada focável dentro (`focusable="auto"`, o padrão): quem usa teclado consegue rolar texto puro. Dê nome à região com `viewportProps={{ "aria-label": "Termos de uso" }}`. `focusable` aceita `true` (sempre focável) e `false` (nunca; só se o conteúdo garantir outro caminho de teclado).
@@ -246,7 +251,7 @@ export function PaginaDeServico() {
       {/* padrão: "Pular para o conteúdo principal", href="#conteudo" */}
       <SkipLink />
       <Header>
-        <HeaderBrand logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Emissão de certidões" />
+        <HeaderBrand orgName="SEMEC" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Emissão de certidões" />
         <HeaderNav aria-label="Menu principal">
           <HeaderNavLink href="/certidoes" current>Certidões</HeaderNavLink>
         </HeaderNav>
@@ -311,8 +316,11 @@ export function PainelDeProtocolos() {
         {/* "div": o <main> é o de baixo, depois do Header (banner fora do main) */}
         <SidebarInset as="div">
           <Header>
-            <SidebarTrigger />
-            <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+            {/* Gatilho e marca num grupo: o Header é justify-between, e com 3 filhos soltos a marca ia para o meio */}
+            <div className="flex min-w-0 items-center gap-2">
+              <SidebarTrigger />
+              <HeaderBrand orgName="SEMEC" href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+            </div>
             <HeaderNav aria-label="Menu principal">
               <HeaderNavLink href="/ajuda">Ajuda</HeaderNavLink>
             </HeaderNav>
@@ -345,14 +353,15 @@ export function PainelDeProtocolos() {
 
 ### Marca e ação
 
-- **Marca = `brand-hero`.** Faixas institucionais, hero e selo usam `bg-brand-hero text-primary-foreground` (ou `text-brand-hero` sobre fundo claro). Não use `bg-primary` para marca.
+- **Cabeçalho do portal:** `bg-surface border-b border-border`, marca em `text-brand-hero font-bold` e link atual em `text-brand-hero font-semibold`.
+- **Marca = `brand-hero`.** Reserve `bg-brand-hero text-primary-foreground` para hero e faixas de destaque dentro da página. Não use `bg-primary` para marca.
 - **Ação = `primary`.** O botão principal de cada tela é `<Button variant="primary">` (`bg-primary`), **um** por grupo de ações; os demais são `outline` ou `ghost`. Não use `brand-hero` em botão.
-- **Foco sobre a marca:** o anel padrão (`--focus-ring` = `--pv-blue-hero`) some sobre a marca (1,00:1). Áreas com `bg-brand-hero` ou `data-surface="brand"` trocam o anel automaticamente para branco (9,38:1); fora disso, use `ring-ring-inverse` (`--focus-ring-inverse`) em controles sobre fundo de marca.
+- **Foco sobre a marca:** o anel padrão (`--focus-ring` = `--pv-blue-hero`) some sobre a marca (1,00:1). Áreas com `bg-brand-hero` ou `data-surface="brand"` trocam o anel automaticamente para branco (9,38:1). O `data-surface="brand"` não pinta o fundo: use-o junto de `bg-brand-hero` (ou `background: var(--brand-hero)`), senão o anel branco fica com 1,08:1 sobre o fundo claro; fora disso, use `ring-ring-inverse` (`--focus-ring-inverse`) em controles sobre fundo de marca.
 
 ### Tabelas
 
 - Use `Table` (ou `DataTable` para ordenar e paginar) com `TableCaption` ou `caption` descrevendo o conteúdo; cabeçalhos em `TableHead`.
-- A `Table` já rola na horizontal (wrapper `overflow-auto`), mas esse wrapper não recebe foco: se a tabela não tiver nenhum elemento focável, quem usa só teclado não consegue rolar. Em telas estreitas, prefira **menos colunas** (as secundárias vão para uma tela de detalhe) ou uma **lista de `Card`** abaixo de `md:`, mantendo a `Table` a partir de `md:`.
+- A `Table` já rola na horizontal (wrapper `overflow-auto`), mas esse wrapper não recebe foco: se a tabela não tiver nenhum elemento focável, quem usa só teclado não consegue rolar. Se precisar manter a rolagem, envolva a `Table` em `<div role="region" aria-label="Serviços solicitados" tabIndex={0} className="overflow-x-auto [&>div]:overflow-visible">`. A variante `[&>div]:overflow-visible` transfere a rolagem do wrapper interno para a região focável. Teste Tab e setas em 390px. Em telas estreitas, prefira **menos colunas** (as secundárias vão para uma tela de detalhe) ou uma **lista de `Card`** abaixo de `md:`, mantendo a `Table` a partir de `md:`.
 - Quando a linha tem várias ações, use uma coluna "Ações" com `Button`, não a linha inteira clicável.
 - **`DataTable` com `onRowClick`:** passe também `rowLabel` (ex.: `rowLabel={(p) => \`Abrir protocolo ${p.numero}\`}`). A linha clicável é focável, mas sem `rowLabel` não tem nome e o leitor de tela não diz o que o Enter faz. Cliques e teclas em controles da célula (botão, link, campo, menu aberto por ela) **não** ativam a linha.
 - **Ordenação do `DataTable`:** o `columnheader` e o botão de ordenar se chamam só pelo nome da coluna; a instrução "Ordenar por …" (`labels.sortBy`) é a **descrição** do botão (`aria-describedby`), e a ordem atual vem em `aria-sort`. Num cabeçalho ordenável feito à mão, faça igual: não ponha "Ordenar por X" no `aria-label` do botão (vira o nome do cabeçalho e se repete em cada célula).
@@ -366,7 +375,7 @@ export function PainelDeProtocolos() {
 ## Workflow IA
 
 1. Leia `llms.txt` → escolha o componente pelo `code` (lista em "Componentes", acima)
-2. Leia `components/<slug>.md` → parta do exemplo de `usage` e **importe** o componente; nunca o reimplemente
+2. Leia `components/<slug>.md` (o arquivo citado na lista de componentes, não o `code`) → parta do exemplo de `usage` e **importe** o componente; nunca o reimplemente
 3. Monte a tela pelo esqueleto de "Padrões de tela"
 4. Aplique tokens L1 pelos utilitários da tabela "Do token ao utilitário" — nunca hex solto
 5. Valide variantes em `manifest.json` e confira teclado e contraste (seção abaixo)
@@ -415,12 +424,14 @@ Nunca `outline: none` sem alternativa visível com 3:1.
 - Estados: `aria-invalid`, `aria-expanded`, `aria-selected`, `aria-current="page"`
 - Textos auxiliares: classe `sr-only`
 - Idioma: `<html lang="pt-BR">`
+- Teste de teclado no Safari: no padrão do macOS o `Tab` não para em links nem botões. Ligue "Navegação por teclado" no macOS e "Pressionar Tab para destacar cada item" no Safari (ou use `Option+Tab`) antes de concluir que algo saiu da ordem de Tab
 
 ### Áreas clicáveis
 
 - **Régua do DS: 44×44px** nos controles interativos (`min-h-11 min-w-11`, `h-11`, `size-11`). É **decisão do projeto**, mais exigente que o AA: o WCAG 2.1 AA não tem critério de tamanho de alvo; o critério de 44px (2.5.5 Target Size) é **AAA**. (No WCAG 2.2, o 2.5.8, AA, pede 24×24px.)
 - Os padrões do kit já seguem a régua: Pagination, Tabs, Toggle, NavigationMenuTrigger, `NavigationMenuLink`, os itens do `DropdownMenu` (inclusive Checkbox e Radio), o botão de ordenação do `DataTable`, o polegar do `Slider` e o X dos overlays têm 44px; o `Button size="sm"` mantém 36px visuais com área de toque de 44px
-- Abaixo de `sm`, o `Link` e os links do `Breadcrumb` ganham área de toque de no mínimo 44×44px sem mudar o visual (no `Link`, um `::after`, sem alterar a altura da linha; no `Breadcrumb`, `min-h-11` mais um `::after` de largura)
+- `Checkbox` e `RadioGroupItem` têm 20×20px de propósito e **não** ampliam o alvo: o alvo é o conjunto caixa + `<Label>`. Ponha o rótulo ao lado (`<Label htmlFor>`), e o clique nele marca o controle. Para chegar a 44px de altura na linha, use `<div className="flex min-h-11 items-center gap-2"><Checkbox id="aceite" /><Label htmlFor="aceite">Li e aceito</Label></div>` (decisão da auditoria de 14/10/2026)
+- Abaixo de `sm`, o `Link`, os links do `Breadcrumb` e o `FooterLink` ganham área de toque de no mínimo 44×44px sem mudar o visual (no `Link`, um `::after`, sem alterar a altura da linha; no `Breadcrumb`, `min-h-11` mais um `::after` de largura)
 - Espaçamento entre alvos: 8px (regra do DS)
 - O pacote não define `--control-height-*`; use os utilitários acima
 
@@ -455,6 +466,10 @@ Nos formulários do SEMEC DS, o ciclo de validação e feedback segue três padr
    - Falhas globais de comunicação (timeout, 500, indisponibilidade) não pertencem a um campo isolado.
    - Utilize `<Alert variant="destructive">` no topo do formulário com título e explicação clara de como proceder ou tentar novamente.
 
+### Limpar o formulário
+
+Com React Hook Form e controles Radix (`Select`, `RadioGroup`, `Checkbox`), o reset nativo pode disparar `onValueChange`/`onCheckedChange` e revalidar campos vazios. Depois de `reset()`, chame `setTimeout(() => clearErrors(), 0)` para limpar os erros no próximo ciclo. Obtenha `reset` e `clearErrors` do mesmo `useForm`; confira os valores e a ausência de erros após limpar. Esse contorno não deve apagar erros de um novo envio.
+
 ### Padrão de Legenda Auxiliar de Ação / Download
 
 Quando o botão de submissão do formulário disparar uma ação de efeito secundário (como download imediato de arquivo gerado, emissão de PDF ou protocolo assíncrono), é obrigatório fornecer uma **Legenda Auxiliar de Ação / Download**:
@@ -467,7 +482,7 @@ Quando o botão de submissão do formulário disparar uma ação de efeito secun
 A receita usa três pacotes que **não** vêm com o kit. Instale-os junto (são opcionais: só para esta receita de formulário):
 
 ```bash
-npm install react-hook-form @hookform/resolvers zod
+npm install react-hook-form @hookform/resolvers@^5 zod@^4
 ```
 
 Três regras da receita (TST-17):
@@ -492,7 +507,7 @@ import {
 import { cpfSchema, emailSchema } from "@semec/ds/react/validacao";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import * as z from "zod";
 import { useState } from "react";
 
 const requerimentoSchema = z.object({
@@ -673,6 +688,8 @@ Todo controle de formulário do kit fala a mesma língua: `value` / `defaultValu
 - `name` envia em `<form>` nativo, inclusive em `Combobox` e `InputOTP` (input oculto). No `Select`, `name`/`value`/`onValueChange` vão na raiz e `invalid` no `SelectTrigger`.
 
 ```tsx
+import { FormField, Combobox, InputOTP, InputOTPGroup, InputOTPSlot } from "@semec/ds/react";
+
 <FormField label="Município" error={erroMunicipio}>
   <Combobox name="municipio" options={municipios} value={municipio} onValueChange={setMunicipio} />
 </FormField>
@@ -713,7 +730,7 @@ Todo controle de formulário do kit fala a mesma língua: `value` / `defaultValu
 - Tooltip: exige `<TooltipProvider>` acima na árvore
 - DatePicker: nativo `type="date"` (ISO YYYY-MM-DD); período = 2 campos
 - Sem hex solto, sem `rgba()`, sem `style` inline — use tokens L1
-- CSP: Dialog/Drawer/Sheet/DropdownMenu usam `SemecProvider` com nonce. Medido (SEM-752/780): Popover 0 violações; ScrollArea e Select 1 cada, mesmo com nonce (CSS estático de scrollbar no `tokens.css`).
+- CSP: Dialog/Drawer/Sheet/DropdownMenu usam `SemecProvider` com nonce. Na 4.3.0, o provider também repassa o nonce aos elementos `<style>` dos viewports de Select e ScrollArea, inclusive no SSR. `SelectContent nonce` explícito prevalece; em ScrollArea, a ordem é `viewportProps.nonce` → `nonce` → provider. O nonce não autoriza atributos `style` do Radix: ainda podem ocorrer violações de `style-src-attr`. Valide SSR e interações com a política de produção.
 
 ## Removido na 4.0 e depreciações anunciadas
 

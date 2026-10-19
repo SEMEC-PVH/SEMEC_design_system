@@ -144,6 +144,44 @@ describe("codemod-4", () => {
     expect(none.error).toContain("precisa do pacote typescript");
   });
 
+  it("não relata o pv-* que o próprio app declara no @theme nem o que está em comentário (DIG-02, DIG-03, DIG-07)", async () => {
+    // Caso do semec-digital: o app declara --color-pv-blue-900 no @theme e usa
+    // text-pv-blue-900 em 295 lugares; isso continua gerando CSS na 4.0. Só o
+    // bg-pv-blue-hero (que vinha do kit 3.x) quebra.
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "semec-codemod-4-theme-"));
+    tmpDirs.push(dir);
+    fs.writeFileSync(
+      path.join(dir, "globals.css"),
+      [
+        '@import "tailwindcss";',
+        "@theme inline {",
+        "  --color-pv-blue-900: #1e3a5f;",
+        "  --color-pv-gray-50 : #ffffff;",
+        "  /* Degraus 500–200: classes como text-pv-blue-200 não geram CSS */",
+        "}",
+        ".topo { background: var(--color-pv-blue-hero); }",
+        "",
+      ].join("\n")
+    );
+    fs.writeFileSync(
+      path.join(dir, "pagina.tsx"),
+      'export const P = () => <div className="text-pv-blue-900/50 bg-pv-gray-50 bg-pv-blue-hero">x</div>;\n'
+    );
+    const lines: string[] = [];
+    const summary = await run([dir], { ts, log: (l: string) => lines.push(l) });
+    const out = lines.join("\n");
+    expect(out).toContain("bg-pv-blue-hero → bg-brand-hero");
+    expect(out).toContain("--color-pv-blue-hero não existe mais na 4.0");
+    expect(out).not.toContain("text-pv-blue-900");
+    expect(out).not.toContain("bg-pv-gray-50 →");
+    expect(out).not.toContain("--color-pv-blue-900 não existe");
+    expect(out).not.toContain("--color-pv-gray-50 não existe");
+    expect(out).not.toContain("text-pv-blue-200");
+    expect(summary.utilities).toBe(2);
+    expect(summary.declared).toBe(2);
+    expect(out).toMatch(/2 utilitário\(s\) pv-\* com cor declarada pelo próprio app/);
+  });
+
   it("não confunde variável --pv-* nem classe parecida com utilitário L0", () => {
     expect(scanText("color: var(--pv-blue-600); .x-bg-pv-blue-600 {} --pv-gray-900-rgb")).toEqual([]);
   });

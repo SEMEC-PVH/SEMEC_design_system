@@ -2,7 +2,7 @@
 title: "Área de scroll"
 code: "scroll-area"
 slug: "scroll-area"
-file: "src/components/scroll-area.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/scroll-area.tsx"
 category: "navegacao"
 variants: "composição: ScrollArea · ScrollBar · orientation: vertical · horizontal · focusable: 'auto' (padrão: focável só sem conteúdo focável dentro) · true (sempre) · false (nunca; só se o conteúdo garantir outro caminho de teclado) · viewportProps: props da viewport (ex.: aria-label da região focável, className)"
 ---
@@ -11,7 +11,7 @@ variants: "composição: ScrollArea · ScrollBar · orientation: vertical · hor
 
 > Scroll customizado e consistente entre navegadores. A região rolável é alcançável pelo teclado: sem nada focável dentro (ex.: texto puro), a viewport vira parada de Tab com anel de foco (`focusable="auto"`, o padrão). Dê nome à região com `viewportProps={{ "aria-label": "…" }}`.
 
-**Arquivo:** `src/components/scroll-area.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/scroll-area/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/scroll-area.tsx) | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/scroll-area/
 
 ## Variantes
 
@@ -26,7 +26,7 @@ variants: "composição: ScrollArea · ScrollBar · orientation: vertical · hor
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -37,7 +37,7 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 
 No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
-> Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.
+> Não publicado: este conteúdo vem do repositório e inclui 2 changesets pendentes (minor) que ainda não estão no npm. O @semec/ds@4.2.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.3.0. Confira a versão instalada com `npm ls @semec/ds`.
 
 ## Uso
 
@@ -65,6 +65,7 @@ import * as React from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
 import { cn } from "../lib/utils";
+import { useNonce } from "../lib/nonce-context";
 
 // Seletor de elementos que já entram no Tab. Se a viewport contém algum, quem
 // usa teclado rola a área focando esses elementos e a viewport não precisa
@@ -74,6 +75,8 @@ const FOCUSABLE_SELECTOR =
 
 export interface ScrollAreaProps
   extends React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> {
+  /** Nonce do estilo do Viewport; viewportProps.nonce prevalece sobre este e o SemecProvider. */
+  nonce?: string;
   /**
    * TST-05 (WCAG 2.1.1): a região rolável precisa ser alcançável pelo teclado.
    * - `"auto"` (padrão): a viewport recebe `tabIndex={0}` e anel de foco só
@@ -89,7 +92,8 @@ export interface ScrollAreaProps
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   ScrollAreaProps
->(({ className, children, focusable = "auto", viewportProps, ...props }, ref) => {
+>(({ className, children, focusable = "auto", viewportProps, nonce, ...props }, ref) => {
+  const viewportNonce = useNonce(viewportProps?.nonce ?? nonce);
   const viewportRef = React.useRef<HTMLDivElement>(null);
   // Começa focável (inclusive no HTML do servidor): sem JS, a área de texto
   // continua alcançável. O efeito retira a parada quando há conteúdo focável.
@@ -125,6 +129,7 @@ const ScrollArea = React.forwardRef<
         ref={viewportRef}
         tabIndex={isFocusable ? 0 : undefined}
         {...restViewportProps}
+        nonce={viewportNonce}
         className={cn(
           // Anel por dentro (`ring-inset`): a raiz tem overflow-hidden e
           // cortaria um anel com offset.

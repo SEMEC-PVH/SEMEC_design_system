@@ -245,6 +245,8 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
         {label ? (
           <label htmlFor={id} className="text-sm font-medium text-foreground">
             {label}
+            {/* NEXT42-06: o mesmo " *" do FormField; o required vai no input. */}
+            {(required ?? inputProps?.required) ? <span className="text-destructive"> *</span> : null}
           </label>
         ) : null}
         <div

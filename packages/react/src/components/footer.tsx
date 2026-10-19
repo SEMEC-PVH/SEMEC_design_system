@@ -79,10 +79,13 @@ const FooterLink = React.forwardRef<
   HTMLAnchorElement,
   React.AnchorHTMLAttributes<HTMLAnchorElement>
 >(({ className, ...props }, ref) => (
+  // NEXT42-05: link curto ("IPTU") media 29×44. O ::after de no mínimo 44 px
+  // de largura (só abaixo de sm, como no Breadcrumb) completa o alvo de toque
+  // sem mudar o layout da lista.
   <a
     ref={ref}
     className={cn(
-      "inline-flex min-h-11 items-center rounded-sm text-sm text-foreground underline underline-offset-4 transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+      "relative inline-flex min-h-11 items-center rounded-sm max-sm:after:absolute max-sm:after:inset-y-0 max-sm:after:left-1/2 max-sm:after:w-full max-sm:after:min-w-11 max-sm:after:-translate-x-1/2 text-sm text-foreground underline underline-offset-4 transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       className
     )}
     {...props}

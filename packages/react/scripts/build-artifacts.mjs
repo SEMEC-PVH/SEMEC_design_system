@@ -180,7 +180,7 @@ const componentCount = dsComponents.length;
 /** Instalação do kit React: `lucide-react` é peer e só o npm 7+ o instala sozinho. */
 const INSTALL_CMD = "npm install @semec/ds lucide-react";
 /** Pacotes opcionais da receita de formulário (TST-20): não são peers do kit. */
-const FORM_RECIPE_CMD = "npm install react-hook-form @hookform/resolvers zod";
+const FORM_RECIPE_CMD = "npm install react-hook-form @hookform/resolvers@^5 zod@^4";
 const PEERS_NOTE =
   "lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: " +
   FORM_RECIPE_CMD +
@@ -216,6 +216,9 @@ const homepage = (pkgJson.homepage || "https://semec-pvh.github.io/SEMEC_design_
 const siteUrl = (rel = "") => `${homepage}${rel.replace(/^\//, "")}`;
 const componentPageUrl = (c) => siteUrl(`componentes/${c.slug}/`);
 const componentMdUrl = (c) => siteUrl(`components/${c.slug}.md`);
+// O caminho local continua no manifest-fonte para a leitura via fs do site.
+// Nos artefatos distribuídos, src/ não existe: a referência aponta ao GitHub.
+const componentSourceUrl = (c) => `https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/${c.file}`;
 
 function componentsByCategory() {
   const known = new Set(dsCategories.map((cat) => cat.key));
@@ -238,7 +241,7 @@ function skillComponentList() {
   for (const { cat, items } of componentsByCategory()) {
     out.push(`### ${cat.label} (${items.length})`, "");
     for (const c of items) {
-      out.push(`- \`${dsExportName(c)}\` (\`${c.code}\`) — ${c.desc}`);
+      out.push(`- \`${dsExportName(c)}\` (\`${c.code}\`, \`components/${c.slug}.md\`) — ${c.desc}`);
     }
     out.push("");
   }
@@ -353,7 +356,7 @@ function syncObjetivo() {
   }
 }
 
-function buildManifest({ site = false } = {}) {
+function buildManifest() {
   return {
     name: "SEMEC Design System",
     version,
@@ -365,15 +368,14 @@ function buildManifest({ site = false } = {}) {
       slug: c.slug,
       label: c.label,
       exportName: dsExportName(c),
-      file: c.file,
+      file: componentSourceUrl(c),
       category: c.category,
       desc: c.desc,
       variants: c.variants,
       usage: c.usage,
       prompt: dsPrompt(c),
-      ...(site
-        ? { url: componentPageUrl(c), md: componentMdUrl(c) }
-        : {}),
+      url: componentPageUrl(c),
+      md: componentMdUrl(c),
     })),
     // TST-15: `null` quando o repositório não tem changesets pendentes.
     unreleased: pending
@@ -405,21 +407,19 @@ function buildManifest({ site = false } = {}) {
   };
 }
 
-function componentMd(c, { site = false } = {}) {
+function componentMd(c) {
   const source = componentSource(c);
   const variantsLine = c.variants?.length
     ? c.variants.map((v) => `${v.prop}: ${v.values}`).join(" · ")
     : "—";
   const catLabel = dsCategories.find((x) => x.key === c.category)?.label ?? c.category;
-  const routeLine = site
-    ? `**Arquivo:** \`${c.file}\` | **Categoria:** ${catLabel} | **Página:** ${componentPageUrl(c)}`
-    : `**Arquivo:** \`${c.file}\` | **Categoria:** ${catLabel}`;
+  const routeLine = `**Arquivo:** [fonte no GitHub](${componentSourceUrl(c)}) | **Categoria:** ${catLabel} | **Página:** ${componentPageUrl(c)}`;
 
   return `---
 title: "${c.label}"
 code: "${c.code}"
 slug: "${c.slug}"
-file: "${c.file}"
+file: "${componentSourceUrl(c)}"
 category: "${c.category}"
 variants: "${variantsLine.replace(/"/g, "'")}"
 ---
@@ -522,6 +522,7 @@ function llmsIndex({ site = false, lite = false } = {}) {
       "",
       "Versão sem componentes React. Fornece tokens CSS, regras de acessibilidade",
       "e padrões responsive para aplicações com a identidade visual da Prefeitura de Porto Velho.",
+      "Use em Vue, Angular, Svelte, HTML ou qualquer app sem React.",
       "",
       "## Instalação",
       "",
@@ -614,11 +615,11 @@ function llmsIndex({ site = false, lite = false } = {}) {
     const importName = dsExportName(c);
     if (site) {
       lines.push(
-        `- [${c.label} (\`${c.code}\`) — ${c.desc}](${componentPageUrl(c)}) — \`${c.file}\` — md: ${componentMdUrl(c)}`
+        `- [${c.label} (\`${c.code}\`) — ${c.desc}](${componentPageUrl(c)}) — [fonte](${componentSourceUrl(c)}) — md: ${componentMdUrl(c)}`
       );
     } else {
       lines.push(
-        `- [${c.label} (\`${c.code}\`) — ${c.desc}](components/${c.slug}.md) — \`${c.file}\``
+        `- [${c.label} (\`${c.code}\`) — ${c.desc}](components/${c.slug}.md) — [fonte](${componentSourceUrl(c)})`
       );
     }
     lines.push(`  Uso: \`import { ${importName} } from "@semec/ds/react";\``);
@@ -674,7 +675,7 @@ function llmsFullDump() {
 
   for (const c of dsComponents) {
     const src = componentSource(c);
-    full += `\n### ${c.label} (\`${c.code}\`) — \`${c.file}\` — slug: ${c.slug}\n\n`;
+    full += `\n### ${c.label} (\`${c.code}\`) — [fonte](${componentSourceUrl(c)}) — slug: ${c.slug}\n\n`;
     full += `Desc: ${c.desc}\n\n`;
     if (c.variants?.length) {
       full += `Variantes: ${c.variants.map((x) => `${x.prop}: ${x.values}`).join(" · ")}\n\n`;
@@ -770,7 +771,7 @@ function buildDist() {
         version,
         generatedAt,
         description:
-          "Tokens, acessibilidade, responsive e padrões visuais. Sem componentes React.",
+          "Tokens, acessibilidade, responsive e padrões visuais. Sem componentes React: use em Vue, Angular, Svelte, HTML ou qualquer app sem React.",
         categories: dsCategories,
         unreleased: pending
           ? {

@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import { setNonce } from "get-nonce";
+import { NonceContext } from "../lib/nonce-context";
 
 export interface SemecProviderProps {
-  /** CSP nonce aplicado a todos os <style> injetados pelo React (Radix, remove-scroll). */
+  /** Nonce dos estilos de Select/ScrollArea e do scroll lock; não libera atributos style do SSR. */
   nonce?: string;
   children: React.ReactNode;
 }
@@ -16,8 +17,10 @@ export interface SemecProviderProps {
  * - `get-nonce` (utilizado por `react-style-singleton`): aplica nonce em
  *   todos os `<style>` injetados por Dialog, Drawer, Sheet, DropdownMenu,
  *   Popover e AlertDialog (scroll-locking via `react-remove-scroll`).
- * - Componentes que aceitam `nonce` diretamente: Select e ScrollArea
- *   (esconder scrollbar nativa).
+ * - Contexto React (inclusive no SSR): SelectContent e ScrollArea repassam
+ *   o nonce ao Viewport Radix para esconder a scrollbar nativa.
+ *   O nonce explícito do componente tem precedência sobre o contexto.
+ * Atributos `style` no HTML do servidor não são autorizados por nonce.
  *
  * Uso:
  * ```tsx
@@ -33,7 +36,7 @@ function SemecProvider({ nonce, children }: SemecProviderProps) {
     }
   }, [nonce]);
 
-  return <>{children}</>;
+  return <NonceContext.Provider value={nonce}>{children}</NonceContext.Provider>;
 }
 
 SemecProvider.displayName = "SemecProvider";

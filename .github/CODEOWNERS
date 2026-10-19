@@ -1,16 +1,22 @@
 # Code owners do Design System SEMEC (Departamento de Tecnologia da SEMEC).
 #
 # A organização SEMEC-PVH não tem times (GET /orgs/SEMEC-PVH/teams == []), então
-# os donos são usuários nominais com permissão de push no repositório. Com a regra
-# "Require review from Code Owners" ligada no main, todo PR precisa de aprovação de
-# UM dos donos abaixo que não seja o autor (o GitHub não aceita autoaprovação).
+# os donos são usuários nominais com permissão de push no repositório:
+#   - @VgavaBR123 — mantenedor (conferido com `gh api user` em 16/10/2026);
+#   - @Rug-gieri  — autor do SEM-817 (PR #43, `gh pr view 43 --json author`).
+# Com "Require review from Code Owners" ligado no main (TST-06), todo PR precisa da
+# aprovação de UM dos donos abaixo que não seja o autor: o GitHub não aceita
+# autoaprovação, então o PR de um é aprovado pelo outro.
 # Quando existir um time (ex.: @SEMEC-PVH/design-system), troque as linhas por ele.
-# Ver CONTRIBUTING.md, "Proteção do main".
+# Ver CONTRIBUTING.md, "Proteção do main". A última regra que casa vence.
 
-*                       @Rug-gieri @VgavaBR123
+*                          @VgavaBR123 @Rug-gieri
 
-# Pacote publicado no npm, release e CI: mesma dupla, explícita para não sumir
-# se a regra geral mudar.
-/packages/react/        @Rug-gieri @VgavaBR123
-/.changeset/            @Rug-gieri @VgavaBR123
-/.github/               @Rug-gieri @VgavaBR123
+# Pacote publicado no npm (componentes, tokens, manifest, artefatos de IA), release,
+# CI, gate e regressão visual: explícitos para não sumir se a regra geral mudar.
+/packages/react/           @VgavaBR123 @Rug-gieri
+/packages/react/skills/    @VgavaBR123 @Rug-gieri
+/.changeset/               @VgavaBR123 @Rug-gieri
+/.github/                  @VgavaBR123 @Rug-gieri
+/scripts/gate/             @VgavaBR123 @Rug-gieri
+/tests/visual/             @VgavaBR123 @Rug-gieri

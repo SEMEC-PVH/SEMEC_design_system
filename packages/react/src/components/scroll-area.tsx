@@ -4,6 +4,7 @@ import * as React from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
 import { cn } from "../lib/utils";
+import { useNonce } from "../lib/nonce-context";
 
 // Seletor de elementos que já entram no Tab. Se a viewport contém algum, quem
 // usa teclado rola a área focando esses elementos e a viewport não precisa
@@ -13,6 +14,8 @@ const FOCUSABLE_SELECTOR =
 
 export interface ScrollAreaProps
   extends React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> {
+  /** Nonce do estilo do Viewport; viewportProps.nonce prevalece sobre este e o SemecProvider. */
+  nonce?: string;
   /**
    * TST-05 (WCAG 2.1.1): a região rolável precisa ser alcançável pelo teclado.
    * - `"auto"` (padrão): a viewport recebe `tabIndex={0}` e anel de foco só
@@ -28,7 +31,8 @@ export interface ScrollAreaProps
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   ScrollAreaProps
->(({ className, children, focusable = "auto", viewportProps, ...props }, ref) => {
+>(({ className, children, focusable = "auto", viewportProps, nonce, ...props }, ref) => {
+  const viewportNonce = useNonce(viewportProps?.nonce ?? nonce);
   const viewportRef = React.useRef<HTMLDivElement>(null);
   // Começa focável (inclusive no HTML do servidor): sem JS, a área de texto
   // continua alcançável. O efeito retira a parada quando há conteúdo focável.
@@ -64,6 +68,7 @@ const ScrollArea = React.forwardRef<
         ref={viewportRef}
         tabIndex={isFocusable ? 0 : undefined}
         {...restViewportProps}
+        nonce={viewportNonce}
         className={cn(
           // Anel por dentro (`ring-inset`): a raiz tem overflow-hidden e
           // cortaria um anel com offset.
