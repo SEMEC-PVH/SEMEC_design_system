@@ -10,7 +10,7 @@ São 5 passos para o caminho Tailwind v4. Para usar o CSS pronto, siga [Sem Tail
 
 ### Sem React (Vue, Angular, Svelte, HTML)
 
-Use os tokens e a fonte pelos subpaths `@semec/ds/lite/tokens.css` e `@semec/ds/lite/fonts.css`. A orientação para esses projetos está na skill lite: `node_modules/@semec/ds/dist/lite/semec-ds-lite/SKILL.md` (export `@semec/ds/lite/skills/semec-ds-lite`). Os componentes React não rodam nesses frameworks; a lite fornece tokens e orientações de acessibilidade, não componentes prontos nem CSS de componentes. Sem bundler, veja [Via CDN](#via-cdn).
+Sem Tailwind, use `@semec/ds/lite/variables.css` (e, se quiser os estilos globais, `@semec/ds/lite/base.css`) com `@semec/ds/lite/fonts.css`; com Tailwind v4, `@semec/ds/lite/tokens.css`. Veja [CSS sem Tailwind / lite](#css-sem-tailwind--lite). A orientação para esses projetos está na skill lite: `node_modules/@semec/ds/dist/lite/semec-ds-lite/SKILL.md` (export `@semec/ds/lite/skills/semec-ds-lite`). Os componentes React não rodam nesses frameworks. A lite traz tokens, orientações de acessibilidade e receitas de componentes (Button, Input, Select, Card, Alert, Header, Toast e outros) com HTML acessível e CSS puro gerado das classes reais do kit, na seção "Anatomia dos componentes (sem React)" e no campo `classes` do manifest lite. O comportamento interativo (foco do resumo de erros, fechar o Toast) fica com o JavaScript do app. Sem bundler, veja [Via CDN](#via-cdn).
 
 ### 1. Instalar
 
@@ -207,7 +207,7 @@ Em Vite/SPA nada disso se aplica.
 
 ## Sem Tailwind
 
-Instale `@semec/ds` e `lucide-react` no app React 19. Importe uma vez, no ponto de entrada do app (ou no layout raiz do Next):
+Instale `@semec/ds` e `lucide-react` no app React (18.3+ ou 19). Importe uma vez, no ponto de entrada do app (ou no layout raiz do Next):
 
 ```tsx
 import "@semec/ds/react/fonts.css";
@@ -234,7 +234,7 @@ export default {
 };
 ```
 
-Esse caminho ainda precisa de `fonts.css` e das variáveis de `tokens.css`. A v3 não processa `@theme`/`@utility`: pode emitir avisos e não gera todos os modificadores de animação (`fade-*`, `zoom-*`, `slide-*`) nem todas as classes v4 do kit. Completar o preset não garante paridade visual ou suporte a navegadores antigos. O peer opcional `tailwindcss` continua na faixa `^4`: uma instalação com v3 pode exigir a política de resolução de peers do seu gerenciador (no npm, `--legacy-peer-deps`, que ignora a validação de todos os peers). Não use essa opção no caminho oficial v4 ou sem Tailwind.
+Esse caminho ainda precisa de `fonts.css` e das variáveis: importe `@semec/ds/react/variables.css` (só `:root`), não o `tokens.css`, cujas diretivas `@theme`/`@utility` a v3 não entende (cerca de 30 avisos `Unknown at rule`). Mesmo assim, a v3 não gera todos os modificadores de animação (`fade-*`, `zoom-*`, `slide-*`) nem todas as classes v4 do kit. Completar o preset não garante paridade visual ou suporte a navegadores antigos. O peer opcional `tailwindcss` continua na faixa `^4`: uma instalação com v3 pode exigir a política de resolução de peers do seu gerenciador (no npm, `--legacy-peer-deps`, que ignora a validação de todos os peers). Não use essa opção no caminho oficial v4 ou sem Tailwind.
 
 ## CSS sem Tailwind / lite
 
@@ -270,6 +270,8 @@ opção no `npm ci`/`npm install` seguinte se quiser manter essa instalação. S
 Tailwind na lite, instale-o explicitamente com o plugin do bundler. Os peers React do
 kit permanecem obrigatórios para preservar a instalação automática em apps React;
 use a instalação normal do passo 1 quando consumir componentes.
+
+**Receitas de componentes sem React.** A skill lite traz, na seção "Anatomia dos componentes (sem React)", receitas de Button, Input, Select, Textarea, FormField, Card, Alert, Header, ErrorSummary, Badge e Toast: HTML acessível com classes `semec-*` (e a versão com classes Tailwind v4) e um bloco de CSS puro gerado das classes reais dos componentes. O mesmo conteúdo está no campo `classes` de `@semec/ds/lite/skills/manifest.json`. Copie esse CSS para o app depois de `variables.css` e `base.css`; ele já traz o reset necessário à paridade com o React. Comportamentos interativos (foco do resumo de erros, fechar o Toast, menus) ficam com o JavaScript do app.
 
 ## CommonJS / Node
 
@@ -416,8 +418,8 @@ import { cn } from "@semec/ds/react";
 | `@semec/ds/react/variables.css` / `@semec/ds/lite/variables.css` | Somente variáveis `:root`, sem reset nem Tailwind |
 | `@semec/ds/react/base.css` / `@semec/ds/lite/base.css` | Estilos globais opcionais, dependem das variáveis |
 | `@semec/ds/react/styles.css` | CSS pronto minificado: tokens, reset e classes dos componentes, sem compilador Tailwind no app |
-| `@semec/ds/react/pv-preset` | Preset Tailwind v4 (JS config) |
-| `@semec/ds/react/pv-preset.ts` | Preset Tailwind v4 (arquivo TS original) |
+| `@semec/ds/react/pv-preset` | Preset Tailwind em JS: `@config` na v4 (opcional) ou `presets` na v3 (sem suporte oficial) |
+| `@semec/ds/react/pv-preset.ts` | O mesmo preset (arquivo TS original) |
 | `@semec/ds/react/server` | **Depreciado na 4.1, sai na 5.0** (TST-34b). Uso interno do monorepo: só tem `dsPackageRootResolve()`, que procura `packages/react` a partir do `cwd` e lança erro fora do repositório. Em desenvolvimento, avisa no console. Não use em apps consumidores |
 | `@semec/ds/tokens` | Tokens como dados em JS (`tokens`, valores CSS resolvidos), com tipos |
 | `@semec/ds/tokens.json` | Tokens no formato DTCG 2025.10 (grupos `L0`/`L1`) |
@@ -876,7 +878,8 @@ O pacote é **somente ESM** e não há build CJS publicado. Para TypeScript, pre
 - **Peers obrigatórios**: `react` e `react-dom` `^18.3.0 || ^19.0.0` (use a mesma versão nos dois) e `lucide-react` `>=0.468.0 <2`. O npm 7+ instala peer ausente sozinho; o pnpm só com `auto-install-peers=true`; o Yarn (clássico e Berry) nunca. Por isso o passo 1 instala `lucide-react` explicitamente
 - **Peer opcional**: `tailwindcss` ^4 — só no caminho que compila o CSS no app (passo 2); quem usa o [CSS pronto](#sem-tailwind) não precisa dele
 - **Peer opcional**: `zod` `^3.23.0 || ^4.0.0` (testado com o 3 e o 4) — só se usar `@semec/ds/react/validacao`
-- **Plugin do Tailwind** (do seu build, não do kit): `@tailwindcss/vite` no Vite; `@tailwindcss/postcss` ou `@tailwindcss/turbopack` no Next. O `@source` aponta para `node_modules/@semec/ds/dist/react`, com caminho relativo ao CSS
+- **Plugin do Tailwind** (do seu build, não do kit): `@tailwindcss/vite` no Vite; `@tailwindcss/postcss` ou `@tailwindcss/turbopack` no Next. O `@import "@semec/ds/react/source.css"` aponta o scanner para os componentes (o `@source` manual é só a alternativa, veja o passo 2)
+- **Node 22.12+** (`engines`): é a versão mínima em que o `require()` carrega o ESM do kit; no 22.11 e anteriores dá `ERR_REQUIRE_ESM`. Com `import`, vale o mesmo mínimo
 - **Dependências (vêm automaticamente)**: todos os `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `get-nonce`
 
 **TypeScript:** os subpaths tipados resolvem com `moduleResolution: "bundler"`, `"nodenext"` e `"node"` (node10), preservando a validação de variantes mesmo com `skipLibCheck: false`. Ao usar Zod 4 em `@semec/ds/react/validacao` com node10, habilite `esModuleInterop: true`, exigido pelas declarações do Zod. O suporte ao resolver legado não muda o formato ESM do pacote; para `require()` no Node 22.12+, veja [CommonJS / Node](#commonjs--node).
