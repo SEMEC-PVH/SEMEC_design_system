@@ -114,6 +114,10 @@ jobs:
 
       - name: Testes do @semec/ds (Vitest + Testing Library + axe, zod 3 e 4) e do @semec/ds-tokens
         # O @semec/ds-css (paridade no Chromium) roda no job build, em test:pacotes.
+        # Os testes de plataforma do ds-tokens usam o swiftc e o aapt2 (Android SDK) do
+        # ubuntu-latest, ou Docker na falta deles; aqui não podem pular (ADR-026).
+        env:
+          SEMEC_PLATAFORMAS_EXIGIR: "1"
         run: npm test
 
       - name: Teste do plano de release e da checagem de changeset
