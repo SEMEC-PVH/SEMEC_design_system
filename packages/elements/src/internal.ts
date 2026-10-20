@@ -73,17 +73,97 @@ export function isRtl(el: Element): boolean {
 }
 
 /**
- * Posição vertical do popup (menu e listbox): o CSS (F1) põe o popup abaixo do
- * gatilho; aqui só marcamos `data-side="top"` quando ele não cabe embaixo e
- * cabe em cima. Mede com o popup já visível.
+ * Posição do popup (menu e listbox). O CSS (F1) põe o popup abaixo do gatilho,
+ * alinhado ao início do wrapper; aqui só marcamos as exceções, com os mesmos
+ * atributos do Radix, medindo com o popup já visível:
+ * - `data-side="top"` quando ele não cabe embaixo e cabe em cima;
+ * - `data-align="end"` quando ele passa da borda direita da janela e, alinhado
+ *   ao fim do wrapper, passa menos da borda esquerda (o CSS ancora em `right: 0`).
  */
 export function placePopup(anchor: Element, popup: HTMLElement): void {
   popup.removeAttribute("data-side");
+  popup.removeAttribute("data-align");
   const a = anchor.getBoundingClientRect();
-  const height = popup.getBoundingClientRect().height;
+  const p = popup.getBoundingClientRect();
   const below = window.innerHeight - a.bottom;
   const above = a.top;
-  if (height > below && above > below && height <= above) popup.setAttribute("data-side", "top");
+  if (p.height > below && above > below && p.height <= above) popup.setAttribute("data-side", "top");
+
+  const viewport = document.documentElement.clientWidth;
+  const overflowStart = p.right - viewport;
+  if (overflowStart > 0.5) {
+    const wrapper = (popup.offsetParent ?? anchor).getBoundingClientRect();
+    const overflowEnd = Math.max(0, p.width - wrapper.right);
+    if (overflowEnd < overflowStart) popup.setAttribute("data-align", "end");
+  }
+}
+
+/** Tira as marcas de posição do popup fechado. */
+export function clearPopupPlacement(popup: HTMLElement | null): void {
+  popup?.removeAttribute("data-side");
+  popup?.removeAttribute("data-align");
+}
+
+/** Elemento alvo de um fragmento (`#id`), ou `null`. */
+function fragmentTarget(hash: string): Element | null {
+  if (!hash || hash === "#") return null;
+  let id = hash.slice(1);
+  try {
+    id = decodeURIComponent(id);
+  } catch {
+    // fragmento malformado: usa como está
+  }
+  return document.getElementById(id);
+}
+
+/**
+ * Chama `reveal(alvo)` quando a página vai para um fragmento desta página: no
+ * clique de um link `#id` (fase de captura, antes da navegação e de qualquer
+ * script do link, como o resumo de erros que foca o campo) e no `hashchange`
+ * (voltar/avançar, `location.hash`). `reveal` mostra o painel que contém o alvo
+ * e devolve `true` se mudou algo; no `hashchange`, o alvo é rolado até a vista
+ * (a navegação já aconteceu com ele escondido).
+ */
+export function onFragmentNavigation(signal: AbortSignal, reveal: (target: Element) => boolean): void {
+  document.addEventListener(
+    "click",
+    (event) => {
+      if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      const link = (event.target as Element | null)?.closest?.<HTMLAnchorElement>("a[href]");
+      if (!link || !link.hash) return;
+      const url = new URL(link.href, location.href);
+      if (url.origin !== location.origin || url.pathname !== location.pathname || url.search !== location.search) return;
+      const target = fragmentTarget(url.hash);
+      if (target) reveal(target);
+    },
+    { signal, capture: true }
+  );
+  window.addEventListener(
+    "hashchange",
+    () => {
+      const target = fragmentTarget(location.hash);
+      if (target && reveal(target)) target.scrollIntoView?.({ block: "start" });
+    },
+    { signal }
+  );
+}
+
+/**
+ * Valor único para uma parte nova (aba ou item): `base`, ou `base-2`, `base-3`…
+ * quando já existe. Evita que uma parte acrescentada depois herde o valor de
+ * posição de outra.
+ */
+export function uniqueValue(base: string, taken: Set<string>): string {
+  let value = base;
+  for (let n = 2; taken.has(value); n += 1) value = `${base}-${n}`;
+  taken.add(value);
+  return value;
+}
+
+/** `true` se algum nó acrescentado ou removido é (ou contém) uma parte do seletor. */
+export function touchesParts(records: MutationRecord[], selector: string): boolean {
+  const hit = (node: Node) => node instanceof Element && (node.matches(selector) || node.querySelector(selector) !== null);
+  return records.some((r) => Array.from(r.addedNodes).some(hit) || Array.from(r.removedNodes).some(hit));
 }
 
 /**
