@@ -17,6 +17,7 @@
     "skills/**",
     "scripts/**",
     "fonts/**",
+    "templates/**",
     "manifest.js",
     "tokens.css",
     "*.css",

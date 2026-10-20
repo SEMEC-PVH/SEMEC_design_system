@@ -82,7 +82,7 @@ O template de PR (`.github/pull_request_template.md`) repete esta lista.
 - [ ] Aprovação de 1 code owner que não seja o autor — **obrigatória** desde 16/10/2026 (TST-06)
 - [ ] Mensagens de commit na convenção abaixo
 
-**Scripts que existem hoje** (na raiz, delegando para `apps/docs` e `packages/*`): `dev`, `build`, `build:ds`, `build:tokens`, `build:css`, `build:pacotes`, `start`, `lint`, `typecheck`, `test`, `test:pacotes`, `test:release`, `generate:llms`, `check:artifacts`, `proto:css`, `gate`, `cobertura:promessas`, `changeset`, `changeset:check`, `version-packages`, `release`, `test:visual`, `test:visual:update`.
+**Scripts que existem hoje** (na raiz, delegando para `apps/docs` e `packages/*`): `dev`, `build`, `build:ds`, `build:tokens`, `build:css`, `build:elements`, `build:pacotes`, `start`, `lint`, `typecheck`, `test`, `test:pacotes`, `test:modelos`, `test:release`, `sri`, `generate:llms`, `check:artifacts`, `proto:css`, `gate`, `cobertura:promessas`, `changeset`, `changeset:check`, `version-packages`, `release`, `test:visual`, `test:visual:update`.
 
 ## O que a CI verifica
 
@@ -90,11 +90,11 @@ O template de PR (`.github/pull_request_template.md`) repete esta lista.
 
 | Check | O que roda | Falha quando |
 |---|---|---|
-| `changeset` | `changeset status --since=origin/main` + `scripts/release/checar-changesets.mjs` (só em PR) | o PR muda arquivo publicado de um pacote (`@semec/ds`, `@semec/ds-tokens`, `@semec/ds-css`) sem changeset para esse pacote |
+| `changeset` | `changeset status --since=origin/main` + `scripts/release/checar-changesets.mjs` (só em PR) | o PR muda arquivo publicado de um pacote (`@semec/ds`, `@semec/ds-tokens`, `@semec/ds-css`, `@semec/ds-elements`) sem changeset para esse pacote |
 | `lint` | `npm run lint` | eslint (`eslint-config-next` + `jsx-a11y`) acusa erro em `apps/docs` |
 | `typecheck` | `npm run typecheck` | `tsc --noEmit` do kit falha |
-| `build` | `npm run build:ds`, `npm run build:pacotes` + `npm run test:pacotes` (`@semec/ds-tokens` e `@semec/ds-css`), build do site (`next build`, export estático) e conferência de `apps/docs/public` | um pacote ou o site não compilam, um teste dos pacotes sem React falha, ou os artefatos de agentes estão desatualizados |
-| `test` | `npm test` (Vitest + Testing Library + axe, com zod 3 e 4, e os testes do `@semec/ds-tokens`) e `npm run test:release` (plano de release) | um teste do `@semec/ds`, do `@semec/ds-tokens` ou do plano de release falha, inclusive violação do axe |
+| `build` | `npm run build:ds`, `npm run build:pacotes` + `npm run test:pacotes` (`@semec/ds-tokens`, `@semec/ds-css` e `@semec/ds-elements`), `npm run test:modelos` (modelos de servidor do `@semec/ds-css` com PHP, Twig, Blade e Jinja2), build do site (`next build`, export estático) e conferência de `apps/docs/public` | um pacote ou o site não compilam, um teste dos pacotes sem React falha, ou os artefatos de agentes estão desatualizados |
+| `test` | `npm test` (Vitest + Testing Library + axe, com zod 3 e 4, e os testes do `@semec/ds-tokens`) e `npm run test:release` (plano de release e SRI) | um teste do `@semec/ds`, do `@semec/ds-tokens` ou do plano de release falha, inclusive violação do axe |
 | `gate` | `npm run gate` | o gate de qualidade e regressão reprova, inclusive a cobertura por promessa do manifest abaixo do piso (`npm run cobertura:promessas`) |
 | `test:visual` | `npm run test:visual` (regressão visual com Playwright no contêiner `mcr.microsoft.com/playwright:v1.56.1-noble`) | um print diverge da baseline em `tests/visual/__screenshots__` |
 
@@ -104,7 +104,7 @@ Para rodar o mesmo localmente, na ordem: `npm run build:ds`, `npm run typecheck`
 
 ### Changeset obrigatório
 
-Um PR precisa de changeset quando muda algo que vai para o npm dentro de um pacote público (`packages/react/` = `@semec/ds`, `packages/tokens/` = `@semec/ds-tokens`, `packages/css/` = `@semec/ds-css`): `src/**`, `skills/**`, `scripts/**`, `fonts/**`, `manifest.js`, `tokens.css`, `*.css` na raiz do pacote, `pv-preset.ts`, `server.js`, `tsup.config.ts`, `tsconfig.json` ou `package.json` (lista em `changedFilePatterns`, `.changeset/config.json`, relativa à pasta de cada pacote). Mudança só no site (`apps/docs`) ou só no `README` do pacote não exige.
+Um PR precisa de changeset quando muda algo que vai para o npm dentro de um pacote público (`packages/react/` = `@semec/ds`, `packages/tokens/` = `@semec/ds-tokens`, `packages/css/` = `@semec/ds-css`, `packages/elements/` = `@semec/ds-elements`): `src/**`, `skills/**`, `scripts/**`, `fonts/**`, `templates/**`, `manifest.js`, `tokens.css`, `*.css` na raiz do pacote, `pv-preset.ts`, `server.js`, `tsup.config.ts`, `tsconfig.json` ou `package.json` (lista em `changedFilePatterns`, `.changeset/config.json`, relativa à pasta de cada pacote). Mudança só no site (`apps/docs`) ou só no `README` do pacote não exige.
 
 O changeset precisa citar **cada** pacote mudado: um changeset só do `@semec/ds` não cobre mudança no `@semec/ds-tokens` (a CI confere com `scripts/release/checar-changesets.mjs`). Mudança em `packages/react/tokens.css` ou `packages/react/fonts/` (e no parser de tokens do kit) conta também para o `@semec/ds-tokens`, que é gerado a partir deles; mudança no `tokens.css` ou nos componentes React que o `@semec/ds-css` espelha (botão, campos, cartão, alerta etc.: lista em `UPSTREAM`, no próprio script) conta também para o `@semec/ds-css`.
 
@@ -298,6 +298,8 @@ O `RELEASE_TOKEN` (PAT cadastrado em 29/09/2026 para abrir os PRs de versão) **
 3. **Revisão e merge do PR de versão.** Um mantenedor confere a versão e o CHANGELOG e mergeia, como qualquer PR, com a CI verde e a aprovação de um code owner que não seja quem rodou o `version-packages`. Ninguém roda `version-packages` direto no `main`.
 
 4. **Publicação.** Com a CI verde no commit do merge, o Release não encontra changesets pendentes, vê que a versão ainda não está no npm e publica (modo `publish`, tabela acima).
+
+5. **SRI das páginas do CDN.** As páginas `/usar-sem-react` e `/usar-sem-react/web-components` mostram o `<link>`/`<script>` do jsDelivr com versão fixa e `integrity`. A versão fica nas constantes `VERSAO_*` e o hash nas `SRI_*` do próprio `page.jsx`. Quando sair uma versão nova de `@semec/ds-tokens`, `@semec/ds-css` ou `@semec/ds-elements` que as páginas devam recomendar, troque a `VERSAO_*` e rode `npm run sri` (`scripts/release/sri.mjs`): ele baixa do jsDelivr o arquivo publicado daquela versão, calcula o sha384 e reescreve a `SRI_*`. `npm run sri -- --check` só confere e sai com 1 se algum hash estiver desatualizado. Pacote ainda não publicado (404) fica com o marcador `sha384-CALCULE-NA-RELEASE` e a página mostra o aviso de que o valor precisa ser calculado. Só rode depois da publicação (o hash é do arquivo no CDN, não do `dist/` local) e abra um PR com a mudança. A parte sem rede do script tem teste em `scripts/release/sri.test.mjs` (`npm run test:release`).
 
 Se a publicação falhar (token expirado, npm fora do ar), corrija a causa e use **Re-run jobs** na execução do Release em Actions; ele refaz o checkout do mesmo commit aprovado. Se o publish já tiver acontecido, a nova execução cai em `noop`; envie a tag à mão, se ela faltar.
 

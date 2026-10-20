@@ -12,12 +12,14 @@ const REPO = "https://github.com/SEMEC-PVH/SEMEC_design_system";
 
 // Versões e caminhos físicos dos arquivos no CDN. O jsDelivr serve os arquivos
 // do pacote, não os aliases do "exports": o caminho é o do tarball publicado.
-// Atualize a cada release (o SRI é calculado na hora, sobre o arquivo publicado).
+// Ao trocar a versão, recalcule o SRI sobre o arquivo publicado com
+// `npm run sri` (scripts/release/sri.mjs), que reescreve as constantes SRI_*.
 const VERSAO_TOKENS = "1.0.0";
 const VERSAO_CSS = "1.0.0";
+const SRI_FONTS = "sha384-JPaBLIHnh0Pteb6nPfiQvklhUDnfvln4jCKfD1ASorqT7xYuyugBAs5ZvE32NxXb";
+const SRI_CSS = "sha384-c9LADLVx9GwAjxLSo4gazOCiy9R695i1f+iVHnHDNjA/QYH8raDhyMhdeZCOkOC1";
 const CDN_FONTS = `https://cdn.jsdelivr.net/npm/@semec/ds-tokens@${VERSAO_TOKENS}/dist/fonts.css`;
 const CDN_CSS = `https://cdn.jsdelivr.net/npm/@semec/ds-css@${VERSAO_CSS}/dist/semec-ds.css`;
-const SRI_PLACEHOLDER = "sha384-CALCULE-NA-RELEASE";
 
 /** Bloco de código com botão de copiar. Linhas longas rolam: o bloco recebe foco. */
 function Code({ children }) {
@@ -219,14 +221,14 @@ import "@semec/ds-css/index.css";`}</Code>
       </p>
       <Code>{`<link rel="stylesheet" crossorigin="anonymous"
   href="${CDN_FONTS}"
-  integrity="${SRI_PLACEHOLDER}">
+  integrity="${SRI_FONTS}">
 <link rel="stylesheet" crossorigin="anonymous"
   href="${CDN_CSS}"
-  integrity="${SRI_PLACEHOLDER}">`}</Code>
+  integrity="${SRI_CSS}">`}</Code>
       <Note>
-        <code>{SRI_PLACEHOLDER}</code> não é um valor: troque pelo hash do
-        arquivo publicado daquela versão. Calcule na hora da release (ou ao
-        atualizar a versão) com{" "}
+        Os hashes acima valem só para o <code>@semec/ds-tokens</code>{" "}
+        {VERSAO_TOKENS} e o <code>@semec/ds-css</code> {VERSAO_CSS}. Ao usar
+        outra versão, calcule o hash do arquivo publicado com{" "}
         <code>curl -sL &lt;url&gt; | openssl dgst -sha384 -binary | openssl base64 -A</code>{" "}
         e prefixe com <code>sha384-</code>. Com Content-Security-Policy, libere{" "}
         <code>https://cdn.jsdelivr.net</code> em <code>style-src</code> e{" "}

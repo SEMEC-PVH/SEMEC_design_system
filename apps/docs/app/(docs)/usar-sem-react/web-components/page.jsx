@@ -11,10 +11,13 @@ export const metadata = {
 const REPO = "https://github.com/SEMEC-PVH/SEMEC_design_system";
 
 // Versão e caminho físico do arquivo no CDN (o jsDelivr serve o tarball, não o "exports").
-// Atualize a cada release; o SRI é calculado sobre o arquivo publicado.
+// Ao trocar a versão (e depois da primeira publicação), recalcule o SRI sobre o
+// arquivo publicado com `npm run sri` (scripts/release/sri.mjs). Enquanto a versão
+// não está no npm, SRI_ELEMENTS fica com o marcador SRI_PENDENTE.
 const VERSAO_ELEMENTS = "1.0.0";
+const SRI_PENDENTE = "sha384-CALCULE-NA-RELEASE";
+const SRI_ELEMENTS = "sha384-CALCULE-NA-RELEASE";
 const CDN_ELEMENTS = `https://cdn.jsdelivr.net/npm/@semec/ds-elements@${VERSAO_ELEMENTS}/dist/semec-elements.js`;
-const SRI_PLACEHOLDER = "sha384-CALCULE-NA-RELEASE";
 
 /** Bloco de código com botão de copiar. Linhas longas rolam: o bloco recebe foco. */
 function Code({ children }) {
@@ -142,10 +145,20 @@ import "@semec/ds-elements/auto";`}</Code>
       <h3>Com CDN ou arquivo copiado</h3>
       <Code>{`<script type="module" crossorigin="anonymous"
   src="${CDN_ELEMENTS}"
-  integrity="${SRI_PLACEHOLDER}"></script>`}</Code>
+  integrity="${SRI_ELEMENTS}"></script>`}</Code>
       <Note>
-        Troque <code>{SRI_PLACEHOLDER}</code> pelo hash do arquivo publicado
-        daquela versão, como no CSS. Sem CDN, copie{" "}
+        {SRI_ELEMENTS === SRI_PENDENTE ? (
+          <>
+            <code>{SRI_PENDENTE}</code> não é um valor: troque pelo hash do
+            arquivo publicado daquela versão, como no CSS.{" "}
+          </>
+        ) : (
+          <>
+            O hash acima vale só para a versão {VERSAO_ELEMENTS}; em outra
+            versão, calcule o do arquivo publicado, como no CSS.{" "}
+          </>
+        )}
+        Sem CDN, copie{" "}
         <code>dist/semec-elements.js</code> do pacote para a pasta pública e
         aponte o <code>src</code> para ele. O <code>type=&quot;module&quot;</code>{" "}
         já espera a página carregar: o script pode ficar no{" "}
