@@ -1,0 +1,49 @@
+{#- Parcial "campo" (Jinja2). Uso:
+    {% from "semec/campo.jinja" import campo %}
+    {{ campo(id="email", rotulo="E-mail", tipo="email", obrigatorio=true, dica="Usaremos para enviar o protocolo.") }} -#}
+{%- from "semec/_atributos.jinja" import atributos_extras -%}
+{%- macro campo(id=none, rotulo=none, nome=none, tipo=none, valor=none, obrigatorio=false, dica=none, erro=none, opcoes=none, opcao_vazia=none, autocomplete=none, desabilitado=false, atributos=none) -%}
+{%- autoescape true -%}
+{%- set tipo = tipo if tipo in ['text', 'email', 'tel', 'number', 'date', 'password', 'url', 'search', 'textarea', 'select'] else 'text' -%}
+{%- set id = id or '' -%}
+{#- Como no FormField do kit: com erro, a mensagem substitui a dica. -#}
+{%- set dica_id = (id ~ '-hint') if (dica and not erro) else '' -%}
+{%- set erro_id = (id ~ '-error') if erro else '' -%}
+{%- set descritores = [dica_id, erro_id] | select | join(' ') -%}
+{%- set valor_presente = valor is not none and valor != '' -%}
+{%- set controle %} id="{{ id }}" name="{{ nome or id }}"
+{%- if tipo not in ['textarea', 'select'] %} type="{{ tipo }}"{% endif %} class="semec-field"
+{%- if tipo not in ['textarea', 'select'] and valor_presente %} value="{{ valor }}"{% endif %}
+{%- if autocomplete %} autocomplete="{{ autocomplete }}"{% endif %}
+{%- if obrigatorio %} required{% endif %}
+{%- if desabilitado %} disabled{% endif %}
+{%- if erro %} aria-invalid="true"{% endif %}
+{%- if descritores %} aria-describedby="{{ descritores }}"{% endif %}
+{{- atributos_extras(atributos, ['aria-invalid', 'aria-describedby']) }}
+{%- endset %}
+<div class="semec-form-field">
+  <label for="{{ id }}" class="semec-label">{{ rotulo or '' }}{% if obrigatorio %}<span class="semec-label__required" aria-hidden="true"> *</span>{% endif %}</label>
+{%- if tipo == 'textarea' %}
+  <textarea{{ controle }}>{{ valor if valor_presente else '' }}</textarea>
+{%- elif tipo == 'select' %}
+  <select{{ controle }}>
+{%- if opcao_vazia %}
+    <option value="">{{ opcao_vazia }}</option>
+{%- endif %}
+{%- for opcao in opcoes or [] %}
+    {%- set opcao_valor = opcao.valor if (opcao.valor is defined and opcao.valor is not none) else '' %}
+    <option value="{{ opcao_valor }}"{% if valor_presente and (opcao_valor | string) == (valor | string) %} selected{% endif %}>{{ opcao.texto | default('') }}</option>
+{%- endfor %}
+  </select>
+{%- else %}
+  <input{{ controle }}>
+{%- endif %}
+{%- if dica_id %}
+  <p id="{{ dica_id }}" class="semec-hint">{{ dica }}</p>
+{%- endif %}
+{%- if erro_id %}
+  <p id="{{ erro_id }}" class="semec-error">{{ erro }}</p>
+{%- endif %}
+</div>
+{%- endautoescape -%}
+{%- endmacro -%}

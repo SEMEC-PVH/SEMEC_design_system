@@ -1,0 +1,31 @@
+{#- Parcial "resumo-de-erros" (Jinja2). Uso:
+    {% from "semec/resumo-de-erros.jinja" import resumo_de_erros %}
+    {{ resumo_de_erros(erros=[{"campo": "email", "mensagem": "Informe um e-mail válido."}]) }}
+    Sem erros, não imprime nada. -#}
+{%- macro resumo_de_erros(erros=none, titulo=none, id=none, focar=none) -%}
+{%- autoescape true -%}
+{#- Aceita a lista [{"campo": …, "mensagem": …}] ou o mapa {"cpf": "…"} (o mesmo que o
+    "erro" de cada campo). Item sem campo ou sem mensagem não vira link. -#}
+{%- set itens = namespace(lista=[]) -%}
+{%- if erros is mapping -%}
+{%- for chave, item in erros.items() -%}
+{%- if item is mapping -%}{%- set itens.lista = itens.lista + [[item.campo | default(none), item.mensagem | default(none)]] -%}
+{%- else -%}{%- set itens.lista = itens.lista + [[chave, item]] -%}{%- endif -%}
+{%- endfor -%}
+{%- elif erros is iterable and erros is not string -%}
+{%- for item in erros if item is mapping -%}{%- set itens.lista = itens.lista + [[item.campo | default(none), item.mensagem | default(none)]] -%}{%- endfor -%}
+{%- endif -%}
+{%- set itens = itens.lista | selectattr(0, 'ne', none) | selectattr(1, 'ne', none) | rejectattr(0, 'eq', '') | rejectattr(1, 'eq', '') | list -%}
+{%- if itens -%}
+{%- set id = id or 'resumo-de-erros' -%}
+<div id="{{ id }}" class="semec-error-summary" role="alert" tabindex="-1" aria-labelledby="{{ id }}-titulo"{% if focar is none or focar %} autofocus{% endif %}>
+  <h2 id="{{ id }}-titulo" class="semec-error-summary__title">{{ titulo or 'Há um problema' }}</h2>
+  <ul class="semec-error-summary__list">
+{%- for campo, mensagem in itens %}
+    <li><a href="#{{ campo }}">{{ mensagem }}</a></li>
+{%- endfor %}
+  </ul>
+</div>
+{%- endif -%}
+{%- endautoescape -%}
+{%- endmacro -%}

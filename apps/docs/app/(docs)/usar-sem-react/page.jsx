@@ -12,12 +12,14 @@ const REPO = "https://github.com/SEMEC-PVH/SEMEC_design_system";
 
 // Versões e caminhos físicos dos arquivos no CDN. O jsDelivr serve os arquivos
 // do pacote, não os aliases do "exports": o caminho é o do tarball publicado.
-// Atualize a cada release (o SRI é calculado na hora, sobre o arquivo publicado).
+// Ao trocar a versão, recalcule o SRI sobre o arquivo publicado com
+// `npm run sri` (scripts/release/sri.mjs), que reescreve as constantes SRI_*.
 const VERSAO_TOKENS = "1.0.0";
 const VERSAO_CSS = "1.0.0";
+const SRI_FONTS = "sha384-JPaBLIHnh0Pteb6nPfiQvklhUDnfvln4jCKfD1ASorqT7xYuyugBAs5ZvE32NxXb";
+const SRI_CSS = "sha384-c9LADLVx9GwAjxLSo4gazOCiy9R695i1f+iVHnHDNjA/QYH8raDhyMhdeZCOkOC1";
 const CDN_FONTS = `https://cdn.jsdelivr.net/npm/@semec/ds-tokens@${VERSAO_TOKENS}/dist/fonts.css`;
 const CDN_CSS = `https://cdn.jsdelivr.net/npm/@semec/ds-css@${VERSAO_CSS}/dist/semec-ds.css`;
-const SRI_PLACEHOLDER = "sha384-CALCULE-NA-RELEASE";
 
 /** Bloco de código com botão de copiar. Linhas longas rolam: o bloco recebe foco. */
 function Code({ children }) {
@@ -48,6 +50,11 @@ const pacotes = [
     vem: "Classes .semec-* prontas (botão, campos, cartão, alerta, cabeçalho, tabela…), com tokens e base incluídos.",
   },
   {
+    caso: "Diálogo, abas, combobox, menu ou acordeão nessas mesmas páginas",
+    pacote: "@semec/ds-elements",
+    vem: "Web Components acessíveis que dão o comportamento (teclado, foco, ARIA) ao HTML com as classes .semec-*. Veja Web Components.",
+  },
+  {
     caso: "App com CSS próprio (ou outro kit) que só quer as cores, fontes e medidas",
     pacote: "@semec/ds-tokens",
     vem: "Variáveis CSS (tokens.css), base opcional (base.css), fonte Poppins (fonts.css).",
@@ -72,8 +79,8 @@ const pacotes = [
 const classes = [
   {
     grupo: "Botão",
-    nomes: ".semec-btn + --primary, --secondary, --ghost, --destructive, --link; tamanhos --sm e --lg (md é o padrão)",
-    obs: "Estado desabilitado por [disabled] ou [aria-disabled=\"true\"].",
+    nomes: ".semec-btn + --primary, --secondary, --outline, --ghost, --destructive, --success, --link; tamanhos --sm, --md (padrão), --lg e --icon",
+    obs: "Estado desabilitado por [disabled] ou [aria-disabled=\"true\"]. --icon exige aria-label.",
   },
   {
     grupo: "Campos",
@@ -97,12 +104,12 @@ const classes = [
   },
   {
     grupo: "Cabeçalho",
-    nomes: ".semec-header, __brand, __org, __service, __nav, __link",
+    nomes: ".semec-header, __brand, __divider, __org, __separator, __service, __nav, __link",
     obs: "Link atual com [aria-current=\"page\"].",
   },
   {
     grupo: "Rodapé",
-    nomes: ".semec-footer, __link",
+    nomes: ".semec-footer, __content, __section, __title, __links, __link, __bottom",
     obs: "",
   },
   {
@@ -117,23 +124,53 @@ const classes = [
   },
   {
     grupo: "Resumo de erros",
-    nomes: ".semec-error-summary, __title, __list",
-    obs: "O foco ao enviar o formulário fica com o JavaScript do app.",
+    nomes: ".semec-error-summary, __title, __list, __link",
+    obs: "O foco ao enviar o formulário fica com o JavaScript do app (ou com o autofocus dos modelos de servidor).",
   },
   {
     grupo: "Badge",
-    nomes: ".semec-badge + as variantes do Badge",
+    nomes: ".semec-badge + --default, --secondary, --outline, --success, --warning, --danger, --info",
     obs: "",
   },
   {
     grupo: "Toast",
-    nomes: ".semec-toast + --success, --danger, --info; __title, __description",
+    nomes: ".semec-toast + --info, --success, --warning, --danger; __body, __title, __description, __action, __close",
     obs: "Só a aparência. Mostrar, anunciar (role=\"status\") e fechar ficam com o app.",
   },
   {
     grupo: "Títulos",
-    nomes: ".semec-heading--1 a .semec-heading--4",
+    nomes: ".semec-heading + --1 a --6",
     obs: "A escala do Heading. Mantenha a ordem h1 → h2 → h3 no HTML.",
+  },
+  {
+    grupo: "Diálogo",
+    nomes: ".semec-dialog + --alert; __header, __title, __description, __footer, __close",
+    obs: "No <dialog> nativo. Comportamento: <semec-dialog> do @semec/ds-elements.",
+  },
+  {
+    grupo: "Abas",
+    nomes: ".semec-tabs, __list, __trigger, __panel",
+    obs: "Comportamento: <semec-tabs>.",
+  },
+  {
+    grupo: "Combobox",
+    nomes: ".semec-combobox, __input, __listbox, __option, __empty, __check",
+    obs: "A partir de um <select> nativo. Comportamento: <semec-combobox>.",
+  },
+  {
+    grupo: "Menu",
+    nomes: ".semec-menu, __item, __separator, __label",
+    obs: "Sem JavaScript, os itens ficam visíveis no fluxo. Comportamento: <semec-menu>.",
+  },
+  {
+    grupo: "Acordeão",
+    nomes: ".semec-accordion, __item, __header, __trigger, __panel, __icon",
+    obs: "Sem JavaScript, os painéis ficam abertos. Comportamento: <semec-accordion>.",
+  },
+  {
+    grupo: "Utilitário",
+    nomes: ".semec-sr-only",
+    obs: "Texto só para leitor de tela.",
   },
 ];
 
@@ -178,8 +215,11 @@ export default function UsarSemReactPage() {
       <p>
         O <code>@semec/ds-css</code> já depende do <code>@semec/ds-tokens</code>:
         instale só ele quando quiser as classes. Os dois são somente CSS e dados,
-        sem JavaScript de comportamento. Foco do resumo de erros, abrir e fechar
-        menus e mostrar o toast ficam com o código do seu app.
+        sem JavaScript de comportamento. Diálogo, abas, combobox, menu e
+        acordeão ganham comportamento com os{" "}
+        <Link href="/usar-sem-react/web-components">Web Components</Link> do{" "}
+        <code>@semec/ds-elements</code>; foco do resumo de erros e mostrar o
+        toast continuam com o código do seu app.
       </p>
 
       <h2 id="html">HTML puro</h2>
@@ -211,14 +251,14 @@ import "@semec/ds-css/index.css";`}</Code>
       </p>
       <Code>{`<link rel="stylesheet" crossorigin="anonymous"
   href="${CDN_FONTS}"
-  integrity="${SRI_PLACEHOLDER}">
+  integrity="${SRI_FONTS}">
 <link rel="stylesheet" crossorigin="anonymous"
   href="${CDN_CSS}"
-  integrity="${SRI_PLACEHOLDER}">`}</Code>
+  integrity="${SRI_CSS}">`}</Code>
       <Note>
-        <code>{SRI_PLACEHOLDER}</code> não é um valor: troque pelo hash do
-        arquivo publicado daquela versão. Calcule na hora da release (ou ao
-        atualizar a versão) com{" "}
+        Os hashes acima valem só para o <code>@semec/ds-tokens</code>{" "}
+        {VERSAO_TOKENS} e o <code>@semec/ds-css</code> {VERSAO_CSS}. Ao usar
+        outra versão, calcule o hash do arquivo publicado com{" "}
         <code>curl -sL &lt;url&gt; | openssl dgst -sha384 -binary | openssl base64 -A</code>{" "}
         e prefixe com <code>sha384-</code>. Com Content-Security-Policy, libere{" "}
         <code>https://cdn.jsdelivr.net</code> em <code>style-src</code> e{" "}
@@ -251,6 +291,12 @@ import "@semec/ds-css/index.css";`}</Code>
       </p>
 
       <h2 id="servidor-e-frameworks">Servidor e frameworks</h2>
+      <p>
+        Em PHP, Laravel, Symfony, Django ou Flask, prefira os{" "}
+        <Link href="/usar-sem-react/modelos-de-servidor">modelos de servidor</Link>:
+        parciais prontas de página, cabeçalho, campo, resumo de erros, alerta e
+        botão, com o HTML e a acessibilidade do kit e o escape já feitos.
+      </p>
 
       <h3>PHP</h3>
       <p>

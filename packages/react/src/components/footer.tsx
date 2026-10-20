@@ -85,7 +85,7 @@ const FooterLink = React.forwardRef<
   <a
     ref={ref}
     className={cn(
-      "relative inline-flex min-h-11 items-center rounded-sm max-sm:after:absolute max-sm:after:inset-y-0 max-sm:after:left-1/2 max-sm:after:w-full max-sm:after:min-w-11 max-sm:after:-translate-x-1/2 text-sm text-foreground underline underline-offset-4 transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+      "relative inline-flex min-h-11 items-center rounded-sm max-sm:after:absolute max-sm:after:inset-y-0 max-sm:after:left-1/2 max-sm:after:w-full max-sm:after:min-w-11 max-sm:after:-translate-x-1/2 text-sm text-foreground underline underline-offset-4 transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       className
     )}
     {...props}

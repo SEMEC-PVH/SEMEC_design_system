@@ -19,8 +19,8 @@ import postcss from "postcss";
 import { compile, optimize } from "@tailwindcss/node";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { Check, Circle } from "lucide-react";
-import { buildRules, semecClasses, kitRootFrom } from "./rules.mjs";
+import * as Icons from "lucide-react";
+import { buildRules, semecClasses, kitRootFrom, ICON_MASKS } from "./rules.mjs";
 import { buildCss as buildKitCss } from "../../react/scripts/build-css.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -77,7 +77,7 @@ function resolveTokens() {
 export async function build() {
   const rules = buildRules(kitRoot);
   const classes = semecClasses(rules);
-  const applied = rules.map(({ selector, classes: list }) => `${selector} {\n  @apply ${list.join(" ")};\n}`).join("\n");
+  const applied = rules.filter(({ classes: list }) => list.length).map(({ selector, classes: list }) => `${selector} {\n  @apply ${list.join(" ")};\n}`).join("\n");
   // Indicadores dos controles nativos: o desenho é o ícone lucide que o React usa.
   const indicators = `
 .semec-checkbox::before, .semec-radio::before {
@@ -85,11 +85,31 @@ export async function build() {
   background-color: currentColor;
   visibility: hidden;
 }
-.semec-checkbox::before { mask: ${maskUrl(Check)} center / contain no-repeat; }
-.semec-radio::before { mask: ${maskUrl(Circle, { fill: "currentColor" })} center / contain no-repeat; }
+.semec-checkbox::before { mask: ${maskUrl(Icons.Check)} center / contain no-repeat; }
+.semec-radio::before { mask: ${maskUrl(Icons.Circle, { fill: "currentColor" })} center / contain no-repeat; }
 .semec-checkbox:checked::before, .semec-radio:checked::before { visibility: visible; }
 @media (forced-colors: active) {
   .semec-checkbox::before, .semec-radio::before { background-color: CanvasText; }
+}`;
+  // Ícones das partes interativas (X do fechar, chevron do accordion, check da opção):
+  // o mesmo lucide do React, como máscara pintada com currentColor.
+  const iconMasks = ICON_MASKS.map(({ selector, icon, pseudo }) => `
+${selector} {${pseudo ? '\n  content: "";' : ""}
+  background-color: currentColor;
+  mask: ${maskUrl(Icons[icon])} center / contain no-repeat;
+}`).join("") + `
+@media (forced-colors: active) {
+  ${ICON_MASKS.map(({ selector }) => selector).join(", ")} { background-color: CanvasText; }
+}`;
+  // Menos movimento: a regra da base (`*, ::before, ::after`) não alcança o
+  // ::backdrop do <dialog> nativo (A11Y-18).
+  const reducedMotion = `
+@media (prefers-reduced-motion: reduce) {
+  .semec-dialog::backdrop {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }`;
   const input = [
     '@import "tailwindcss/theme.css" theme(inline);',
@@ -98,6 +118,8 @@ export async function build() {
     `@layer base {\n${scopedPreflight()}\n}`,
     applied,
     indicators,
+    iconMasks,
+    reducedMotion,
   ].join("\n");
   const compiler = await compile(input, { base: kitRoot, onDependency() {} });
   let css = compiler.build([]);
@@ -105,6 +127,18 @@ export async function build() {
   // O fallback de @property do Tailwind (Safari/Firefox antigos) também fica escopado.
   const scope = SCOPE;
   const scoped = postcss.parse(css);
+  // Variáveis de tema que o Tailwind não inline (ex.: `--spacing` dos @utility
+  // slide-in-from-* do tokens.css): o valor compilado entra no lugar do var()
+  // e o `:root, :host` sai (o contrato não declara tokens).
+  const themeVars = new Map();
+  scoped.walkRules((rule) => {
+    if (rule.parent?.type !== "root" || !rule.selectors.every((s) => s === ":root" || s === ":host")) return;
+    rule.walkDecls((d) => { if (d.prop.startsWith("--") && !d.prop.startsWith("--tw-")) themeVars.set(d.prop, d.value); });
+    if (rule.nodes.every((n) => n.type === "decl" && themeVars.has(n.prop))) rule.remove();
+  });
+  if (themeVars.size) scoped.walkDecls((d) => {
+    d.value = d.value.replace(/var\((--[\w-]+)\)/g, (m, name) => themeVars.get(name) ?? m);
+  });
   scoped.walkRules((rule) => {
     if (rule.selectors.every((s) => /^(\*|::?(before|after|backdrop))$/.test(s))) {
       rule.selectors = rule.selectors.map((s) => (s === "*" ? scope : `${scope}${s}`));
@@ -116,6 +150,13 @@ export async function build() {
     const inProperty = d.parent?.type === "atrule" && d.parent.name === "property";
     d.value = d.value.replace(/#0000(?![0-9a-f])/gi, "transparent").replace(/#fff(?![0-9a-f])/gi, inProperty ? "white" : "var(--pv-white)");
   });
+  // @keyframes usados pelas animações (enter/exit do Dialog, do menu e do popup):
+  // o tokens.css do kit entra como `reference`, então vêm de lá, copiados pelo nome.
+  const kitKeyframes = new Map();
+  postcss.parse(fs.readFileSync(path.join(kitRoot, "tokens.css"), "utf8")).walkAtRules("keyframes", (at) => { kitKeyframes.set(at.params, at); });
+  const usedAnimations = new Set();
+  scoped.walkDecls(/^animation(-name)?$/, (d) => { const name = d.value.trim().split(/\s+/)[0]; if (kitKeyframes.has(name)) usedAnimations.add(name); });
+  for (const name of [...usedAnimations].sort()) scoped.append(kitKeyframes.get(name).clone());
   css = scoped.toString();
 
   // Sanidade do contrato: só .semec-*, nada de token, @theme/@apply ou :root.

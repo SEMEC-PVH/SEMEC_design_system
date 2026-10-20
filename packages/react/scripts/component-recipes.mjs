@@ -21,6 +21,9 @@ export function readComponentClasses(pkgRoot, file) {
   function evaluate(node, props) {
     if (!node) return undefined;
     if (ts.isStringLiteral(node) || ts.isNumericLiteral(node)) return node.text;
+    // Estado de runtime fixado pelo chamador pelo texto exato da expressão
+    // (ex.: { "filtered.length > 0": false }); sem isso, a expressão falha abaixo.
+    if (Object.hasOwn(props, node.getText(source))) return props[node.getText(source)];
     if (ts.isParenthesizedExpression(node) || ts.isJsxExpression(node)) return evaluate(node.expression, props);
     if (ts.isIdentifier(node)) {
       if (Object.hasOwn(props, node.text)) return props[node.text];

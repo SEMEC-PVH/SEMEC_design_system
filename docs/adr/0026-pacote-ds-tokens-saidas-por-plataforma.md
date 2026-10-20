@@ -30,7 +30,7 @@ Faltavam três coisas:
   - Android: `android/resources` do próprio Style Dictionary; nomes `semec_` + snake_case; cores `#RRGGBB` (ou `#AARRGGBB` com alfa); os semânticos referenciam os primitivos (`@color/semec_pv_gray_50`); dimensões com `1rem = 16px`, em `dp`, e tamanhos de texto em `sp`.
   - iOS: `enum SemecTokens` com `ColorValues` (sRGB), `Colors` (SwiftUI), `UIColors` (UIKit) e `Dimensions` (`CGFloat` em pontos). SwiftUI e UIKit ficam em `#if canImport`, então o arquivo compila em Swift 6 também fora da Apple.
   - Figma: formato do Tokens Studio, com os conjuntos `L0` e `L1` e as referências preservadas como `{pv-gray-50}`. Do Tokens Studio saem as variables do Figma.
-- **Testes do pacote** (`npm run test --workspace @semec/ds-tokens`, também no `npm test` da raiz) provam a paridade byte a byte com o `@semec/ds`, o `tokens.css` sem diretivas do Tailwind e com todos os L0 e L1, os valores resolvidos de Android, iOS e Tokens Studio contra o JSON, a resolução dos exports por `import` e `require` e o conteúdo do `npm pack`.
+- **Testes do pacote** (`npm run test --workspace @semec/ds-tokens`, também no `npm test` da raiz) provam a paridade byte a byte com o `@semec/ds`, o `tokens.css` sem diretivas do Tailwind e com todos os L0 e L1, os valores resolvidos de Android, iOS e Tokens Studio contra o JSON (lidos também por `swiftc`, `aapt2` e `sd-transforms`; ver Consequências), a resolução dos exports por `import` e `require` e o conteúdo do `npm pack`.
 
 **Alternativas descartadas.**
 
@@ -45,5 +45,11 @@ Faltavam três coisas:
 - Toda mudança em `packages/react/tokens.css` muda também o `@semec/ds-tokens`. O changeset precisa listar os dois pacotes quando um token muda; renomear ou remover token é *major* nos dois ([ADR-013](0013-politica-de-depreciacao-duas-minors.md)).
 - O parser `token-data.mjs` passa a ter dois consumidores. Um tipo de valor novo no `tokens.css` (por exemplo `color-mix()`) quebra o build dos dois de propósito: precisa de mapeamento no parser e, para as plataformas, nas transformações do `packages/tokens/scripts/platforms.mjs`.
 - Os comentários do `tokens.css` (que citam `@semec/ds/react/fonts.css` e o `@theme`) vão também para o `tokens.css` deste pacote, porque ele é igual ao `variables.css`. Se incomodar, a limpeza é no CSS fonte.
-- A validação do Swift neste ADR foi feita com `swiftc` 6.0.3 no Linux (Docker `swift:6.0`), que compila `ColorValues` e `Dimensions`; os blocos SwiftUI/UIKit só são compilados no Xcode. Falta conferir num projeto iOS real.
+- **Verificação nas plataformas (onda 3, 20/10/2026).** Os testes de `packages/tokens/test/plataformas.test.mjs` passaram a ler as saídas com as ferramentas reais e a conferir todos os valores contra o `tokens.json`:
+  - *iOS:* `swiftc` (Swift 6.0.3 na imagem oficial `swift:6.0`, ou o local) compila o `SemecTokens.swift` em Swift 5 e Swift 6 com warnings como erro e executa um programa que imprime cada `ColorValues` e `Dimensions`. Fora da Apple, os blocos SwiftUI/UIKit compilam contra *stubs* com as assinaturas da Apple; num Mac, contra o SwiftUI real.
+  - *Android:* o `aapt2` oficial (Android SDK local, ou o do Google Maven com sha256 fixo num contêiner `python:3.12-slim`) faz `compile` + `link` de `colors.xml` e `dimens.xml`; a tabela de recursos (`aapt2 dump resources`) é resolvida e conferida, com as unidades `dp`/`sp`.
+  - *Figma:* o `tokens-studio.json` é lido com `@tokens-studio/sd-transforms` + Style Dictionary (o caminho de exportação do Tokens Studio); todas as referências L1 → L0 resolvem e cada valor bate. Um teste negativo prova que uma referência quebrada derruba a verificação.
+  - Nenhum defeito de geração apareceu: o gerador não mudou.
+  - Sem ferramenta local nem Docker, os testes de Swift e Android pulam com aviso; com `SEMEC_PLATAFORMAS_EXIGIR=1` falham. A CI roda assim no job `test` (o `ubuntu-latest` traz Swift e o Android SDK).
+  - **Continua sem confirmação automática:** a compilação dos blocos SwiftUI e UIKit contra o SDK do iOS (só num Mac com Xcode), o uso dos recursos num app Android real e o import no plugin Tokens Studio com a exportação para as variables do Figma (só no Figma).
 - O `@semec/ds` não passa a depender do `@semec/ds-tokens` nesta onda; essa troca fica para uma decisão futura.

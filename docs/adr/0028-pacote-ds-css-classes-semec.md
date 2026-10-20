@@ -24,6 +24,8 @@ Restrições: o visual tem de ser igual ao do componente React (mesmo token, mes
 
 Fora do escopo: comportamento (abrir/fechar, foco, temporizador), componentes que dependem de Radix sem equivalente nativo (Dialog, Select customizado, Combobox, Tabs…), tema escuro e multi-órgão ([ADR-025](0025-tema-unico-claro.md)).
 
+**Atualização (onda 3, #81).** Dialog/AlertDialog, Tabs, Combobox, DropdownMenu e Accordion entraram no pacote pelo mesmo mecanismo (classes lidas do TSX, sem cópia). Os estados continuam por atributo: os do Radix (`data-state`, `data-highlighted`, `data-disabled`, `aria-selected`, `aria-expanded`, `hidden`), que o `@semec/ds-elements` põe no HTML. As adaptações seguem a regra do item 4: o overlay vira `::backdrop` do `<dialog>` nativo; o popup do combobox e do menu, que o popper do Radix posiciona por JavaScript, é `absolute` abaixo do gatilho (o `sideOffset` do TSX), com largura mínima do wrapper e `data-side="top"` para subir; `focus:` do item do menu ganha o par `data-highlighted:`; os ícones lucide viram máscara. O comportamento segue fora do CSS.
+
 **Alternativas descartadas.**
 
 - *Manter só as receitas do manifest.* Uma classe por combinação (`semec-button-outline-lg`) não forma uma API legível, e o preflight global reseta a página do consumidor.

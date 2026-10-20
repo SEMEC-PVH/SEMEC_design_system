@@ -35,9 +35,9 @@ import { readPublicPackages } from "./plano.mjs";
  *   ao acrescentar um componente lá, acrescente o .tsx aqui.
  */
 const KIT_COMPONENTS_IN_CSS = [
-  "alert", "badge", "button", "card", "checkbox", "error-summary", "footer", "form-field",
-  "header", "heading", "input", "label", "radio-group", "select", "skip-link", "table",
-  "textarea", "toast",
+  "accordion", "alert", "alert-dialog", "badge", "button", "card", "checkbox", "combobox",
+  "dialog", "dropdown-menu", "error-summary", "footer", "form-field", "header", "heading",
+  "input", "label", "radio-group", "select", "skip-link", "table", "tabs", "textarea", "toast",
 ];
 
 export const UPSTREAM = {

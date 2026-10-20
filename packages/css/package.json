@@ -22,6 +22,7 @@
   "style": "./dist/semec-ds.css",
   "files": [
     "dist",
+    "templates",
     "README.md",
     "LICENSE"
   ],
@@ -31,6 +32,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "node scripts/build.mjs && node --test --test-concurrency=1 test/*.test.mjs",
+    "test:modelos": "node --test --test-concurrency=1 test/modelos/*.test.mjs",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {

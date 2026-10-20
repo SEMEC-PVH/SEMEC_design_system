@@ -17,7 +17,9 @@ const read = (f) => fs.readFileSync(path.join(cssDist, f), "utf8");
 const kitRoot = path.join(repoRoot, "packages/react");
 
 /** Limites de tamanho (bytes). Subir exige justificar no PR. */
-const LIMITS = { components: 64 * 1024, componentsGzip: 10 * 1024, single: 64 * 1024, singleGzip: 12 * 1024 };
+// Onda 3 (F1): +6 componentes interativos (Dialog/AlertDialog, Tabs, Combobox, menu,
+// Accordion) levaram o components.css de ~53 KB para ~75 KB (gzip de ~6,1 KB para ~7,9 KB).
+const LIMITS = { components: 88 * 1024, componentsGzip: 10 * 1024, single: 80 * 1024, singleGzip: 12 * 1024 };
 
 /** Classes que o contrato da onda 2 fixa como API pública. */
 const CONTRACT = [
@@ -32,6 +34,12 @@ const CONTRACT = [
   "semec-badge", "semec-badge--secondary", "semec-badge--outline", "semec-badge--success", "semec-badge--warning", "semec-badge--danger", "semec-badge--info",
   "semec-toast", "semec-toast--success", "semec-toast--danger", "semec-toast--info", "semec-toast__title", "semec-toast__description",
   "semec-heading--1", "semec-heading--2", "semec-heading--3", "semec-heading--4",
+  // Onda 3 (F1): interativos; os estados são os atributos do Radix (sem classe de estado).
+  "semec-dialog", "semec-dialog--alert", "semec-dialog__header", "semec-dialog__title", "semec-dialog__description", "semec-dialog__footer", "semec-dialog__close",
+  "semec-tabs", "semec-tabs__list", "semec-tabs__trigger", "semec-tabs__panel",
+  "semec-combobox", "semec-combobox__input", "semec-combobox__listbox", "semec-combobox__option", "semec-combobox__empty", "semec-combobox__check",
+  "semec-menu", "semec-menu__item", "semec-menu__separator", "semec-menu__label",
+  "semec-accordion", "semec-accordion__item", "semec-accordion__header", "semec-accordion__trigger", "semec-accordion__panel", "semec-accordion__icon",
 ];
 
 test("package.json segue o contrato", () => {
@@ -97,6 +105,13 @@ test("estados obrigatórios estão no CSS", () => {
     ".semec-btn:focus-visible", ".semec-btn:disabled", '.semec-btn[aria-disabled="true"]',
     '.semec-field[aria-invalid="true"]', ".semec-field:disabled",
     '.semec-header__link:where([aria-current="page"])', ".semec-checkbox:checked", ".semec-radio:checked",
+    // Interativos: os mesmos atributos que o Radix põe (e o @semec/ds-elements também).
+    ".semec-dialog::backdrop", ".semec-dialog:not([open])", '.semec-dialog--alert[data-state="open"]', ".semec-dialog__close:focus-visible",
+    '.semec-tabs__trigger[data-state="active"]', ".semec-tabs__trigger[data-disabled]", ".semec-tabs__panel:focus-visible",
+    ".semec-combobox__option:where([data-highlighted])", '.semec-combobox__option:where([data-state="checked"])', '.semec-combobox__input[aria-invalid="true"]',
+    '.semec-combobox__listbox[data-side="top"]', '.semec-combobox__listbox[data-state="open"]',
+    ".semec-menu__item[data-highlighted]", ".semec-menu__item[data-disabled]", '.semec-menu[data-side="top"]',
+    '.semec-accordion__trigger[data-state="open"] > .semec-accordion__icon',
   ]) assert.ok(css.includes(needle), `falta ${needle}`);
   assert.match(css, /@media \(hover: hover\)\s*\{\s*:is\(\.semec-btn:where/);
 });
@@ -132,8 +147,66 @@ test("se o cva mudar, a regra gerada muda junto (nada copiado à mão)", () => {
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
+test("interativos: o mesmo cva/className do React (Dialog × AlertDialog, popup, item ativo)", () => {
+  const rules = buildRules(kitRoot);
+  // Um seletor pode ter mais de uma regra (painel, ::backdrop e ajuste do <dialog>).
+  const rule = (selector) => rules.filter((r) => r.selector === selector).flatMap((r) => r.classes);
+  // O AlertDialog só difere onde o TSX difere: o título do Dialog tem leading/tracking a mais.
+  assert.ok(rule(".semec-dialog:where(:not(.semec-dialog--alert)) .semec-dialog__title").includes("tracking-tight"));
+  assert.ok(!rule(".semec-dialog__title").includes("tracking-tight"));
+  assert.ok(rule(".semec-dialog").includes("backdrop:bg-black/50"), "overlay vira ::backdrop");
+  // O item ativo vale por foco ou por data-highlighted; o popup tem a largura mínima do TSX e a do wrapper.
+  assert.ok(rule(".semec-menu__item").includes("data-highlighted:bg-tint"));
+  assert.ok(rule(".semec-menu").includes("min-w-[max(8rem,100%)]"));
+  assert.ok(rule(".semec-combobox__listbox").includes("min-w-[max(12rem,100%)]"));
+  // Ganchos sem CSS (o Radix Root não tem classe) continuam na API.
+  const { classes } = JSON.parse(read("classes.json"));
+  for (const c of ["semec-tabs", "semec-accordion"]) assert.ok(classes.includes(c), c);
+});
+
+test("se o className de um interativo mudar, a regra muda junto", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "semec-ds-css-int-"));
+  fs.cpSync(path.join(kitRoot, "src/components"), path.join(tmp, "src/components"), { recursive: true });
+  const edit = (name, from, to) => {
+    const file = path.join(tmp, "src/components", `${name}.tsx`);
+    const source = fs.readFileSync(file, "utf8");
+    assert.ok(source.includes(from), `${name}.tsx contém ${from}`);
+    fs.writeFileSync(file, source.replace(from, to));
+  };
+  edit("dialog", "w-full max-w-lg overflow-y-auto", "w-full max-w-xl overflow-y-auto");
+  edit("tabs", "data-[state=active]:after:bg-primary", "data-[state=active]:after:bg-success");
+  edit("combobox", 'isActive && "bg-tint ring-2', 'isActive && "bg-muted ring-2');
+  edit("accordion", '"border-b border-border"', '"border-b-2 border-border"');
+  const changed = buildRules(tmp);
+  const rule = (selector) => changed.filter((r) => r.selector === selector).flatMap((r) => r.classes);
+  assert.ok(rule(".semec-dialog:where(:not(.semec-dialog--alert))").includes("max-w-xl"));
+  assert.ok(rule(".semec-dialog--alert").includes("max-w-lg"), "o AlertDialog segue o próprio TSX");
+  assert.ok(rule(".semec-tabs__trigger").includes("data-[state=active]:after:bg-success"));
+  assert.ok(rule(".semec-combobox__option:where([data-highlighted])").includes("bg-muted"));
+  assert.ok(rule(".semec-accordion__item").includes("border-b-2"));
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
 test("o README documenta todas as classes publicadas", () => {
   const readme = fs.readFileSync(path.join(pkgRoot, "README.md"), "utf8");
   const { classes } = JSON.parse(read("classes.json"));
   assert.deepEqual(classes.filter((c) => !readme.includes(`\`${c}\``) && !readme.includes(`class="${c}`) && !readme.includes(` ${c}"`)), []);
+});
+
+// CONS-14: a tabela de classes da página "Usar sem React" acompanha o classes.json.
+test("a tabela de classes da página Usar sem React cita toda classe do classes.json", () => {
+  const { classes } = JSON.parse(fs.readFileSync(path.join(cssDist, "classes.json"), "utf8"));
+  const pagina = fs.readFileSync(path.join(repoRoot, "apps/docs/app/(docs)/usar-sem-react/page.jsx"), "utf8");
+  const tabela = pagina.slice(pagina.indexOf("const classes = ["), pagina.indexOf("];", pagina.indexOf("const classes = [")));
+  const linhas = [...tabela.matchAll(/nomes: "([^"]*)"/g)].map((m) => m[1]);
+  const faltam = classes.filter((c) => {
+    const [bloco, resto] = c.split(/(?=__|--)/);
+    const linha = linhas.find((l) => new RegExp(`\\.${bloco}(?![\\w-])`).test(l));
+    if (!linha) return true;
+    if (!resto) return false;
+    const n = resto.match(/^--(\d)$/);
+    if (n) return !/--1 a --6/.test(linha);
+    return !new RegExp(`${resto}(?![\\w-])`).test(linha);
+  });
+  assert.deepEqual(faltam, [], "classes fora da tabela da página");
 });

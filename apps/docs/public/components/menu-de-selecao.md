@@ -35,6 +35,8 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 
 No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
+> Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (patch) que ainda não estão no npm. O @semec/ds@4.4.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.4.2. Confira a versão instalada com `npm ls @semec/ds`.
+
 ## Uso
 
 ```tsx
@@ -101,7 +103,7 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground shadow-elevation-1 placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left",
+      "flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground shadow-elevation-1 placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left",
       className
     )}
     {...props}
@@ -202,7 +204,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex min-h-11 w-full cursor-default select-none items-center rounded-lg py-2 pl-3 pr-8 text-sm outline-none whitespace-normal leading-relaxed focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex min-h-11 w-full cursor-default select-none items-center rounded-lg py-2 pl-3 pr-8 text-sm outline-none whitespace-normal leading-relaxed focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring forced-colors:focus:forced-color-adjust-none forced-colors:focus:bg-[Highlight] forced-colors:focus:text-[HighlightText] data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     {...props}

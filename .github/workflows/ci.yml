@@ -114,9 +114,13 @@ jobs:
 
       - name: Testes do @semec/ds (Vitest + Testing Library + axe, zod 3 e 4) e do @semec/ds-tokens
         # O @semec/ds-css (paridade no Chromium) roda no job build, em test:pacotes.
+        # Os testes de plataforma do ds-tokens usam o swiftc e o aapt2 (Android SDK) do
+        # ubuntu-latest, ou Docker na falta deles; aqui não podem pular (ADR-026).
+        env:
+          SEMEC_PLATAFORMAS_EXIGIR: "1"
         run: npm test
 
-      - name: Teste do plano de release e da checagem de changeset
+      - name: Teste do plano de release, da checagem de changeset e do SRI
         # scripts/release/plano.mjs decide o que o workflow Release publica.
         run: npm run test:release
 
@@ -161,6 +165,11 @@ jobs:
             echo "::error title=Pacote desatualizado::O build de @semec/ds-tokens ou @semec/ds-css alterou arquivos versionados. Rode 'npm run build:pacotes' e commite o resultado."
             exit 1
           fi
+
+      - name: Modelos de servidor (PHP, Jinja2, Twig, Blade)
+        # O ubuntu-latest já tem php, composer e python3: o teste instala twig/twig e
+        # illuminate/view (composer.lock) e o jinja2 só para renderizar, sem Docker.
+        run: npm run test:modelos
 
       - name: Testes do dist (fronteira RSC + poda por módulo)
         # check-rsc: importa @semec/ds/react na camada react-server, com os módulos

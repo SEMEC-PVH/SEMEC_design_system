@@ -6,35 +6,13 @@ import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import postcss from "postcss";
+import {
+  allTokens, camel, colorNames, dimensionNames, dist, dtcg, expectedHex, expectedPx, pkgRoot, read, snake,
+} from "./esperado.mjs";
 
-const pkgRoot = fileURLToPath(new URL("../", import.meta.url));
 const reactRoot = path.join(pkgRoot, "..", "react");
-const dist = path.join(pkgRoot, "dist");
 const require = createRequire(import.meta.url);
 const pkg = JSON.parse(fs.readFileSync(path.join(pkgRoot, "package.json"), "utf8"));
-const read = (file) => fs.readFileSync(path.join(dist, file), "utf8");
-const dtcg = JSON.parse(read("tokens.json"));
-const allTokens = Object.fromEntries(["L0", "L1"].flatMap((layer) => Object.entries(dtcg[layer])));
-const ext = (token) => token.$extensions["br.gov.portovelho.semec"];
-const colorNames = Object.keys(allTokens).filter((name) => allTokens[name].$type === "color");
-const dimensionNames = Object.keys(allTokens).filter((name) => allTokens[name].$type === "dimension");
-
-/** Valor esperado a partir do `resolved` do JSON (independente do código de build). */
-function expectedHex(name) {
-  const resolved = ext(allTokens[name]).resolved;
-  if (/^#[\da-f]{6}$/i.test(resolved)) return resolved.toUpperCase();
-  const channels = resolved.split(/\s+/).map(Number);
-  assert.equal(channels.length, 3, `${name}: valor de cor inesperado ${resolved}`);
-  return `#${channels.map((c) => c.toString(16).padStart(2, "0")).join("").toUpperCase()}`;
-}
-function expectedPx(name) {
-  const resolved = ext(allTokens[name]).resolved;
-  if (resolved === "0") return 0;
-  const [, n, unit] = resolved.match(/^(-?\d*\.?\d+)(px|rem)$/);
-  return unit === "rem" ? Number(n) * 16 : Number(n);
-}
-const snake = (name) => `semec_${name.replace(/-/g, "_")}`;
-const camel = (name) => name.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase());
 
 /** Gera os artefatos do @semec/ds/tokens com o próprio script do kit, se o dist dele faltar. */
 function reactTokensDir() {

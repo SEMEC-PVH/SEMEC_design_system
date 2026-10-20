@@ -150,7 +150,7 @@ Text("Emitir certidão")
 view.backgroundColor = SemecTokens.UIColors.surface
 ```
 
-`SemecTokens.ColorValues` traz os componentes sRGB (0–1) para outros usos. As dimensões estão em pontos (`1rem = 16pt`). Os blocos SwiftUI/UIKit ficam em `#if canImport(…)`, então o arquivo também compila fora do iOS (Swift 6, Linux), só com `ColorValues` e `Dimensions`. Para textos que respeitam o Dynamic Type, use `SemecTokens.Dimensions.textBase` com `@ScaledMetric` ou `UIFontMetrics`.
+`SemecTokens.ColorValues` traz os componentes sRGB (0–1) para outros usos. As dimensões estão em pontos (`1rem = 16pt`). Os blocos SwiftUI/UIKit ficam em `#if canImport(…)`, então o arquivo também compila fora do iOS (Swift 5 e 6 no Linux, testado no pacote), só com `ColorValues` e `Dimensions`. Para textos que respeitam o Dynamic Type, use `SemecTokens.Dimensions.textBase` com `@ScaledMetric` ou `UIFontMetrics`.
 
 ## Figma (Tokens Studio)
 
@@ -166,6 +166,18 @@ Passo a passo:
 6. Ao sair uma versão nova do pacote, repita o passo 3 e exporte de novo. Não edite os valores no Figma: a mudança tem de nascer no `tokens.css` do repositório, senão o próximo import a desfaz.
 
 Mapeamento de tipos: cores → `color`; espaçamento → `spacing`; raios → `borderRadius`; tamanhos de texto → `fontSizes` (px); entrelinha → `lineHeights` (%); pesos → `fontWeights`; família → `fontFamilies` (`Poppins`; a pilha completa está na descrição); sombras → `boxShadow`; duração e curva de animação → `other`. A descrição de cada token traz o nome da variável CSS correspondente.
+
+## O que é testado em cada plataforma
+
+Os testes do pacote (`npm run test --workspace @semec/ds-tokens`; só as plataformas: `npm run test:plataformas --workspace @semec/ds-tokens`) leem as saídas com as ferramentas de cada plataforma e conferem **todos** os valores contra o `tokens.json`:
+
+| Plataforma | O que o teste faz | O que só a plataforma real confirma |
+| --- | --- | --- |
+| iOS | Compila o `SemecTokens.swift` com `swiftc` em Swift 5 e Swift 6, com warnings como erro, e executa um programa que imprime cada `ColorValues` e cada `Dimensions`. Fora da Apple, compila também os blocos SwiftUI e UIKit contra *stubs* com as assinaturas da Apple (`Color(_:red:green:blue:opacity:)`, `UIColor(red:green:blue:alpha:)`). Num Mac, esses blocos usam o SwiftUI de verdade. | A compilação dos blocos `Colors` (SwiftUI) e `UIColors` (UIKit) contra o SDK real do iOS e a cor exibida num aparelho só aparecem num Mac com Xcode. |
+| Android | Compila `colors.xml` e `dimens.xml` com o `aapt2` oficial (`compile` + `link`), lê a tabela de recursos gerada (`aapt2 dump resources`), resolve as referências `@color/…` e `@dimen/…` e confere valores e unidades (`dp`/`sp`). Também valida o XML e os nomes de recurso (`[a-z0-9_]`) sem ferramenta externa. | O uso num app (tema, `R.color.*` no Kotlin, renderização) fica para um projeto Android real. |
+| Figma | Lê o `tokens-studio.json` com `@tokens-studio/sd-transforms` + Style Dictionary (o mesmo caminho de exportação do Tokens Studio), resolve todas as referências L1 → L0 e confere cada valor. Uma referência quebrada derruba o teste. | O import no plugin Tokens Studio e a exportação para as variables e os estilos do Figma só se confirmam no Figma. |
+
+Ferramentas: o teste usa `swiftc` e `aapt2` locais quando existem (o `aapt2` vem de `AAPT2`, ou do `build-tools` em `ANDROID_HOME`/`ANDROID_SDK_ROOT`). Sem eles, usa Docker: a imagem oficial `swift:6.0` e a `python:3.12-slim` com o `aapt2` baixado do Google Maven (versão e sha256 fixos no teste). Sem ferramenta local nem Docker, os testes de Swift e Android pulam com aviso; com `SEMEC_PLATAFORMAS_EXIGIR=1`, falham. A CI (`ubuntu-latest`, que traz Swift e o Android SDK) roda com `SEMEC_PLATAFORMAS_EXIGIR=1`.
 
 ## Versões e mudanças
 

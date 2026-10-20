@@ -178,7 +178,7 @@ describe("checkCoverage (changeset por pacote)", () => {
 
   it("componente React fora do ds-css não exige changeset do @semec/ds-css", () => {
     const r = checkCoverage({
-      changedFiles: ["packages/react/src/components/dialog.tsx"],
+      changedFiles: ["packages/react/src/components/calendar.tsx"],
       packages,
       patterns,
       changesets: [{ "@semec/ds": "patch" }],

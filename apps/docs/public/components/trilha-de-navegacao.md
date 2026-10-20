@@ -35,6 +35,8 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 
 No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
+> Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (patch) que ainda não estão no npm. O @semec/ds@4.4.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.4.2. Confira a versão instalada com `npm ls @semec/ds`.
+
 ## Uso
 
 ```tsx
@@ -93,7 +95,7 @@ const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
                 // do texto.
                 <a
                   href={item.href}
-                  className="relative inline-flex items-center transition-colors duration-fast ease-standard hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background max-sm:min-h-11 max-sm:after:absolute max-sm:after:inset-y-0 max-sm:after:left-1/2 max-sm:after:w-full max-sm:after:min-w-11 max-sm:after:-translate-x-1/2"
+                  className="relative inline-flex items-center transition-colors duration-fast ease-standard hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background max-sm:min-h-11 max-sm:after:absolute max-sm:after:inset-y-0 max-sm:after:left-1/2 max-sm:after:w-full max-sm:after:min-w-11 max-sm:after:-translate-x-1/2"
                 >
                   {item.label}
                 </a>

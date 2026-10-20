@@ -36,6 +36,8 @@ A regra deste repositório é simples: **decisão estrutural entra como ADR novo
 | [026](0026-pacote-ds-tokens-saidas-por-plataforma.md) | Pacote `@semec/ds-tokens` e saídas por plataforma (CSS como fonte, JSON derivado) | Aceito |
 | [027](0027-sem-build-commonjs.md) | Sem build CommonJS: `@semec/ds` somente ESM, `require(esm)` no Node 22.12+ | Aceito |
 | [028](0028-pacote-ds-css-classes-semec.md) | Pacote `@semec/ds-css` e contrato de classes `.semec-*` | Aceito |
+| [029](0029-web-components-light-dom-sem-dependencias.md) | Web Components em light DOM sem dependências (`@semec/ds-elements`) | Aceito |
+| [030](0030-modelos-de-servidor-no-ds-css.md) | Modelos oficiais de servidor no `@semec/ds-css` | Aceito |
 
 ---
 

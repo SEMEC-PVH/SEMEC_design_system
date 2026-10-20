@@ -1,0 +1,8 @@
+<div class="semec-form-field">
+  <label for="xss-escola" class="semec-label">Escola</label>
+  <select id="xss-escola" name="xss-escola" class="semec-field">
+    <option value="">&lt;option&gt;falsa&lt;/option&gt;</option>
+    <option value="a&quot;b" selected>&lt;/option&gt;&lt;script&gt;alert(1)&lt;/script&gt;</option>
+    <option value="x' onclick='alert(1)">Outra</option>
+  </select>
+</div>

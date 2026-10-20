@@ -1,0 +1,38 @@
+{#- Parcial "combobox" (Jinja2). Uso:
+    {% from "semec/combobox.jinja" import combobox %}
+    {{ combobox(id="escola", rotulo="Escola", opcao_vazia="Selecione a escola", opcoes=[{"valor": "emef-aponia", "texto": "EMEF Aponiã"}]) }}
+    Um <select> nativo dentro do <semec-combobox> (@semec/ds-elements); o
+    elemento envolve só o select e o campo de busca assume o id (#id no resumo). -#}
+{%- macro combobox(id=none, rotulo=none, nome=none, valor=none, obrigatorio=false, dica=none, erro=none, opcoes=none, opcao_vazia=none, desabilitado=false, texto_vazio=none) -%}
+{%- autoescape true -%}
+{%- set id = id or '' -%}
+{%- set dica_id = (id ~ '-hint') if (dica and not erro) else '' -%}
+{%- set erro_id = (id ~ '-error') if erro else '' -%}
+{%- set descritores = [dica_id, erro_id] | select | join(' ') -%}
+{%- set valor_presente = valor is not none and valor != '' -%}
+<div class="semec-form-field">
+  <label for="{{ id }}" class="semec-label">{{ rotulo or '' }}{% if obrigatorio %}<span class="semec-label__required" aria-hidden="true"> *</span>{% endif %}</label>
+  <semec-combobox class="semec-combobox"{% if texto_vazio %} empty-text="{{ texto_vazio }}"{% endif %}>
+    <select id="{{ id }}" name="{{ nome or id }}" class="semec-field"
+{%- if obrigatorio %} required{% endif %}
+{%- if desabilitado %} disabled{% endif %}
+{%- if erro %} aria-invalid="true"{% endif %}
+{%- if descritores %} aria-describedby="{{ descritores }}"{% endif %}>
+{%- if opcao_vazia %}
+      <option value="">{{ opcao_vazia }}</option>
+{%- endif %}
+{%- for opcao in opcoes or [] %}
+      {%- set opcao_valor = opcao.valor if (opcao.valor is defined and opcao.valor is not none) else '' %}
+      <option value="{{ opcao_valor }}"{% if valor_presente and (opcao_valor | string) == (valor | string) %} selected{% endif %}>{{ opcao.texto | default('') }}</option>
+{%- endfor %}
+    </select>
+  </semec-combobox>
+{%- if dica_id %}
+  <p id="{{ dica_id }}" class="semec-hint">{{ dica }}</p>
+{%- endif %}
+{%- if erro_id %}
+  <p id="{{ erro_id }}" class="semec-error">{{ erro }}</p>
+{%- endif %}
+</div>
+{%- endautoescape -%}
+{%- endmacro -%}

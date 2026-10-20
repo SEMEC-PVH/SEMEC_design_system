@@ -1,0 +1,21 @@
+{#- Parcial "rodape" (Twig). Uso:
+    {% include '@semec/rodape.html.twig' with {secoes: [{titulo: 'Serviços', links: [{href: '/matricula', texto: 'Matrícula'}]}]} only %} -#}
+{%- autoescape 'html' -%}
+<footer class="semec-footer">
+{% if secoes|default([]) is not empty %}
+  <div class="semec-footer__content">
+{% for secao in secoes %}
+    <div class="semec-footer__section">
+      <h2 class="semec-footer__title">{{ secao.titulo ?? '' }}</h2>
+      <ul class="semec-footer__links">
+{% for link in secao.links ?? [] %}
+        <li><a href="{{ link.href ?? '' }}" class="semec-footer__link">{{ link.texto ?? '' }}</a></li>
+{% endfor %}
+      </ul>
+    </div>
+{% endfor %}
+  </div>
+{% endif %}
+  <div class="semec-footer__bottom">{{ texto_final|default('Prefeitura de Porto Velho · SEMEC') }}</div>
+</footer>
+{% endautoescape -%}
