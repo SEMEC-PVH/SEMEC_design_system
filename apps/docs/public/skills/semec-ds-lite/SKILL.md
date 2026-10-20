@@ -6,9 +6,7 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 # SEMEC Design System — skill lite
 
-> Gerado para `@semec/ds@4.4.1` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
-
-> **Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (patch) que ainda não estão no npm. O @semec/ds@4.4.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.4.2. Confira a versão instalada com `npm ls @semec/ds`.**
+> Gerado para `@semec/ds@4.4.2` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
 
 Tokens, acessibilidade, responsive e padrões visuais para interfaces da Prefeitura de Porto Velho. **Sem componentes React.**
 
@@ -94,14 +92,14 @@ Os subpaths `@semec/ds/lite/*.css` só resolvem num bundler (ou num `@import` qu
 <link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/base.css" />
 ```
 
-O caminho em `dist/` não é contrato público (o `exports` não o expõe) e pode mudar numa versão futura: fixe a versão do pacote (`"@semec/ds": "4.4.1"`, sem `^`) ou copie os arquivos. Se o servidor não publica `node_modules`, copie `dist/react/variables.css` e `dist/react/base.css` para a pasta estática e use `npx semec-ds copiar-fontes <pasta>` para levar `fonts.css` e `fonts/` juntos (as URLs dos `.woff2` são relativas ao `fonts.css`).
+O caminho em `dist/` não é contrato público (o `exports` não o expõe) e pode mudar numa versão futura: fixe a versão do pacote (`"@semec/ds": "4.4.2"`, sem `^`) ou copie os arquivos. Se o servidor não publica `node_modules`, copie `dist/react/variables.css` e `dist/react/base.css` para a pasta estática e use `npx semec-ds copiar-fontes <pasta>` para levar `fonts.css` e `fonts/` juntos (as URLs dos `.woff2` são relativas ao `fonts.css`).
 
 **Via CDN** (sem `npm install`): o jsDelivr serve os arquivos físicos, não os aliases do `exports` (`/lite/variables.css` dá 404). Use o caminho `dist/react/`, versão fixa e SRI:
 
 ```html
-<link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@semec/ds@4.4.1/dist/react/fonts.css" integrity="sha384-…" />
-<link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@semec/ds@4.4.1/dist/react/variables.css" integrity="sha384-…" />
-<link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@semec/ds@4.4.1/dist/react/base.css" integrity="sha384-…" />
+<link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@semec/ds@4.4.2/dist/react/fonts.css" integrity="sha384-…" />
+<link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@semec/ds@4.4.2/dist/react/variables.css" integrity="sha384-…" />
+<link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@semec/ds@4.4.2/dist/react/base.css" integrity="sha384-…" />
 ```
 
 Calcule o SRI a partir dos arquivos publicados dessa versão (`variables.css` e `base.css` existem a partir da 4.4.0) e teste o carregamento. As fontes vêm de `dist/react/fonts/`, relativas ao `fonts.css`. Com CSP, autorize `https://cdn.jsdelivr.net` em `style-src` e `font-src`.
