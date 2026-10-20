@@ -31,7 +31,9 @@ const ANNOUNCE_DELAY = 400;
  *
  * Digitar filtra (sem diferença de acento e caixa) e anuncia "N resultados";
  * ↓/↑ abrem e movem, Home/End vão ao primeiro/último, Enter escolhe, Esc
- * fecha e, com a lista fechada, limpa; Tab sai. Evento `semec-change`, e o
+ * fecha e, com a lista fechada, limpa; Tab sai. A opção ativa tem
+ * `aria-selected="true"` + `data-highlighted`; a escolhida, `data-state="checked"`.
+ * Evento `semec-change`, e o
  * select dispara `change` como se o usuário tivesse escolhido nele.
  */
 export class SemecCombobox extends SemecElement {
@@ -258,7 +260,8 @@ export class SemecCombobox extends SemecElement {
     listbox.replaceChildren(
       ...this.#filtered.map((o) => {
         const isChosen = o.value === chosen;
-        o.el.setAttribute("aria-selected", String(isChosen));
+        // Escolhida = marcada (convenção do Radix); aria-selected fica com a opção ativa.
+        o.el.setAttribute("data-state", isChosen ? "checked" : "unchecked");
         o.el.textContent = o.label;
         if (isChosen) o.el.insertAdjacentHTML("beforeend", CHECK_SVG);
         return o.el;
@@ -320,7 +323,12 @@ export class SemecCombobox extends SemecElement {
   #setActive(index: number, scroll: boolean): void {
     this.#active = index;
     const input = this.#input;
-    this.#filtered.forEach((o, i) => toggleAttr(o.el, "data-highlighted", i === index));
+    // APG com aria-activedescendant (e o kit React): aria-selected="true" na opção ativa,
+    // que é a que o leitor de tela anuncia; a escolhida é marcada por data-state="checked".
+    this.#filtered.forEach((o, i) => {
+      toggleAttr(o.el, "data-highlighted", i === index);
+      o.el.setAttribute("aria-selected", String(i === index && this.#open));
+    });
     const option = this.#filtered[index];
     if (input) {
       if (option && this.#open) input.setAttribute("aria-activedescendant", option.el.id);

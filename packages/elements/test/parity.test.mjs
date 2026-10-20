@@ -60,6 +60,8 @@ function snapshot(kind) {
       expanded: combo?.getAttribute("aria-expanded") ?? "false",
       active: active ? text(document.getElementById(active)) : null,
       options: listbox ? listbox.querySelectorAll("[role=option]").length : 0,
+      // Nos dois: aria-selected="true" só na opção ativa (a do aria-activedescendant).
+      ariaSelected: listbox ? [...listbox.querySelectorAll("[role=option][aria-selected=true]")].map(text) : [],
       value: document.querySelector("[name=escola]").value,
     };
   }
@@ -195,6 +197,7 @@ test("combobox: ↓ abre na escolhida, ↓/↑ param nas pontas, Home/End, Enter
     (s) => ({ ...s, focus: s.state.expanded === "true" ? s.focus.split(":")[0] : "fora da lista" })
   );
   assert.equal(out[0].state.active, "EMEF Rio Madeira");
+  assert.deepEqual(out[0].state.ariaSelected, ["EMEF Rio Madeira"]);
   assert.equal(out[3].state.active, "EMEIEF Ulisses Guimarães");
   assert.equal(out[6].state.value, "rio-madeira");
   assert.equal(out[7].state.active, "EMEF Rio Madeira");

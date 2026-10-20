@@ -327,16 +327,28 @@ for (const name of browsers) {
         return {
           expanded: input.getAttribute("aria-expanded"),
           options: [...document.querySelectorAll("#combo [role=option]")].map((o) => o.textContent),
-          active: [active?.textContent, active?.hasAttribute("data-highlighted")],
+          active: [active?.textContent, active?.hasAttribute("data-highlighted"), active?.getAttribute("aria-selected")],
           status: document.querySelector("#combo [role=status]").textContent,
         };
       });
-      assert.deepEqual(st, { expanded: "true", options: ["EMEF São Sebastião"], active: ["EMEF São Sebastião", true], status: "1 resultado" });
+      assert.deepEqual(st, { expanded: "true", options: ["EMEF São Sebastião"], active: ["EMEF São Sebastião", true, "true"], status: "1 resultado" });
       await page.keyboard.press("Enter");
       assert.equal(await page.$eval("#escola", (i) => i.value), "EMEF São Sebastião");
       await page.keyboard.press("ArrowDown");
-      const sel = await page.$$eval("#combo [role=option]", (os) => os.map((o) => o.getAttribute("aria-selected")));
-      assert.deepEqual(sel, ["false", "false", "false", "true", "false"], "aria-selected marca a escolhida");
+      await page.keyboard.press("ArrowDown");
+      const sel = await page.$$eval("#combo [role=option]", (os) => os.map((o) => [o.getAttribute("aria-selected"), o.hasAttribute("data-highlighted"), o.getAttribute("data-state"), Boolean(o.querySelector(".semec-combobox__check"))]));
+      assert.deepEqual(
+        sel,
+        [
+          ["false", false, "unchecked", false],
+          ["false", false, "unchecked", false],
+          ["false", false, "unchecked", false],
+          ["false", false, "checked", true],
+          ["true", true, "unchecked", false],
+        ],
+        "aria-selected + data-highlighted na ativa; data-state=checked e o ícone na escolhida"
+      );
+      assert.equal(await page.$eval("#escola", (i) => document.getElementById(i.getAttribute("aria-activedescendant")).getAttribute("aria-selected")), "true");
       await page.keyboard.type("emef");
       await page.waitForFunction(() => document.querySelector("#combo [role=status]").textContent === "3 resultados");
       await page.keyboard.type("xyz");
