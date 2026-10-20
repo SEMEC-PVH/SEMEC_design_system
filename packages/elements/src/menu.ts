@@ -1,4 +1,4 @@
-import { SemecElement, emit, ensureId, fold, isDisabled, placePopup, toggleAttr } from "./internal";
+import { SemecElement, clearPopupPlacement, emit, ensureId, fold, isDisabled, placePopup, setDefaultAttr, toggleAttr } from "./internal";
 
 export interface SemecMenuSelectDetail {
   /** O item escolhido (`<button>` ou `<a>`). */
@@ -8,6 +8,7 @@ export interface SemecMenuSelectDetail {
 }
 
 const ITEM = ".semec-menu__item";
+const GROUP = "[role=group], .semec-menu__group";
 
 /**
  * `<semec-menu>`: padrão APG "Menu Button", como o DropdownMenu do Radix no kit
@@ -20,10 +21,15 @@ const ITEM = ".semec-menu__item";
  * gatilho; Tab fecha e segue. Evento `semec-select` (cancelável: com
  * `preventDefault()` o menu fica aberto). Sem JavaScript, os itens aparecem
  * como uma lista comum de links e botões.
+ *
+ * Um `.semec-menu__label` seguido de itens vira um `role="group"` rotulado por
+ * ele (os itens são envolvidos num `<div class="semec-menu__group">` quando o
+ * autor não escreveu o grupo). Itens acrescentados depois recebem o papel.
  */
 export class SemecMenu extends SemecElement {
   #typeahead = "";
   #typeaheadTimer: ReturnType<typeof setTimeout> | undefined;
+  #observer: MutationObserver | null = null;
 
   get trigger(): HTMLElement | null {
     return (
@@ -64,19 +70,7 @@ export class SemecMenu extends SemecElement {
     popup.setAttribute("aria-orientation", "vertical");
     popup.setAttribute("tabindex", "-1");
     if (!popup.hasAttribute("aria-label")) popup.setAttribute("aria-labelledby", triggerId);
-    for (const item of this.#items()) {
-      item.setAttribute("role", "menuitem");
-      item.setAttribute("tabindex", "-1");
-      toggleAttr(item, "data-disabled", isDisabled(item));
-      if (item.tagName === "BUTTON" && !item.hasAttribute("type")) (item as HTMLButtonElement).type = "button";
-    }
-    for (const sep of Array.from(popup.querySelectorAll(".semec-menu__separator"))) {
-      sep.setAttribute("role", "separator");
-    }
-    for (const label of Array.from(popup.querySelectorAll(".semec-menu__label"))) {
-      // Rótulo de seção, como o DropdownMenuLabel: texto, fora da navegação.
-      label.setAttribute("role", "presentation");
-    }
+    this.#setupItems(popup);
     this.#setOpen(false, popupId);
 
     trigger.addEventListener(
@@ -138,6 +132,9 @@ export class SemecMenu extends SemecElement {
       { signal }
     );
     popup.addEventListener("focusin", (event) => this.#highlight(event.target as Element), { signal });
+    // Itens acrescentados depois (HTMX, script): papel e tabindex antes de entrar na navegação.
+    this.#observer = new MutationObserver(() => this.#setupItems(popup));
+    this.#observer.observe(popup, { childList: true, subtree: true });
 
     // Fecha ao clicar fora ou quando o foco sai do componente.
     document.addEventListener(
@@ -161,6 +158,8 @@ export class SemecMenu extends SemecElement {
   }
 
   protected teardown(): void {
+    this.#observer?.disconnect();
+    this.#observer = null;
     clearTimeout(this.#typeaheadTimer);
     if (this.popup && this.isOpen) this.#setOpen(false);
   }
@@ -170,6 +169,7 @@ export class SemecMenu extends SemecElement {
     const popup = this.popup;
     const trigger = this.trigger;
     if (!popup || !trigger || isDisabled(trigger)) return;
+    this.#setupItems(popup);
     this.#setOpen(true);
     placePopup(trigger, popup);
     const items = this.#enabledItems();
@@ -196,8 +196,56 @@ export class SemecMenu extends SemecElement {
     if (open && popupId) trigger.setAttribute("aria-controls", popupId);
     else trigger.removeAttribute("aria-controls");
     if (!open) {
-      popup.removeAttribute("data-side");
+      clearPopupPlacement(popup);
       this.#highlight(null);
+    }
+  }
+
+  /** Papéis dos itens, separadores e grupos. Idempotente: roda de novo para partes novas. */
+  #setupItems(popup: HTMLElement): void {
+    this.#groupSections(popup);
+    for (const item of Array.from(popup.querySelectorAll<HTMLElement>(ITEM))) {
+      item.setAttribute("role", "menuitem");
+      item.setAttribute("tabindex", "-1");
+      toggleAttr(item, "data-disabled", isDisabled(item));
+      if (item.tagName === "BUTTON" && !item.hasAttribute("type")) (item as HTMLButtonElement).type = "button";
+    }
+    for (const sep of Array.from(popup.querySelectorAll(".semec-menu__separator"))) {
+      sep.setAttribute("role", "separator");
+    }
+    // As mudanças acima são nossas: não precisam voltar ao observador.
+    this.#observer?.takeRecords();
+  }
+
+  /**
+   * Rótulo de seção (DropdownMenuLabel): dentro de `role="menu"`, só
+   * `menuitem`, `group` e `separator` são filhos válidos, e o texto solto não é
+   * lido em modo menu. O rótulo passa a dar nome a um `role="group"` com os
+   * itens da seção (até o próximo separador ou rótulo) e sai da árvore de
+   * acessibilidade, para não ser lido duas vezes.
+   */
+  #groupSections(popup: HTMLElement): void {
+    for (const label of Array.from(popup.querySelectorAll<HTMLElement>(".semec-menu__label"))) {
+      let group: Element | null = label.parentElement?.closest(GROUP) ?? null;
+      if (!group || !popup.contains(group)) {
+        group = label.nextElementSibling?.matches(GROUP) ? label.nextElementSibling : null;
+      }
+      if (!group) {
+        const members: Element[] = [];
+        for (let next = label.nextElementSibling; next?.matches(ITEM); next = next.nextElementSibling) members.push(next);
+        if (!members.length) {
+          label.setAttribute("role", "presentation");
+          continue;
+        }
+        group = document.createElement("div");
+        group.className = "semec-menu__group";
+        label.after(group);
+        group.append(...members);
+      }
+      group.setAttribute("role", "group");
+      setDefaultAttr(group, "aria-labelledby", ensureId(label, "menu-label"));
+      label.removeAttribute("role");
+      label.setAttribute("aria-hidden", "true");
     }
   }
 

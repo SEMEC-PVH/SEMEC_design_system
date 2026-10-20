@@ -1,8 +1,11 @@
-import { SemecElement, emit, ensureId, isDisabled, isRtl, toggleAttr } from "./internal";
+import { SemecElement, emit, ensureId, isDisabled, isRtl, onFragmentNavigation, toggleAttr, touchesParts, uniqueValue } from "./internal";
 
 export interface SemecTabsChangeDetail {
   value: string;
 }
+
+const TRIGGER = ".semec-tabs__trigger, [role=tab]";
+const PANEL = ".semec-tabs__panel, [role=tabpanel]";
 
 interface Tab {
   trigger: HTMLElement;
@@ -19,12 +22,17 @@ interface Tab {
  * roving tabindex, ←/→ (↑/↓ com `orientation="vertical"`) com volta ao início,
  * Home/End, `aria-controls`/`aria-labelledby`, painel focável e os estados
  * `data-state="active|inactive"`. Atributo `value` e evento `semec-change`.
+ *
+ * Abas e painéis acrescentados ou removidos depois são montados de novo (se a
+ * aba ativa sai, a primeira habilitada assume). Um link `#id` para um painel
+ * inativo, ou para algo dentro dele, ativa a aba antes de navegar.
  */
 export class SemecTabs extends SemecElement {
   static observedAttributes = ["value"];
 
   #syncing = false;
   #ready = false;
+  #observer: MutationObserver | null = null;
 
   get orientation(): "horizontal" | "vertical" {
     return this.getAttribute("orientation") === "vertical" ? "vertical" : "horizontal";
@@ -50,32 +58,43 @@ export class SemecTabs extends SemecElement {
   #tabs(): Tab[] {
     const list = this.#list();
     if (!list) return [];
-    const triggers = Array.from(list.querySelectorAll<HTMLElement>(".semec-tabs__trigger, [role=tab]")).filter(
-      (el) => el.closest("semec-tabs") === this
-    );
-    const panels = Array.from(this.querySelectorAll<HTMLElement>(".semec-tabs__panel, [role=tabpanel]")).filter(
-      (el) => el.closest("semec-tabs") === this
-    );
-    return triggers.map((trigger, index) => {
+    const triggers = Array.from(list.querySelectorAll<HTMLElement>(TRIGGER)).filter((el) => el.closest("semec-tabs") === this);
+    const panels = Array.from(this.querySelectorAll<HTMLElement>(PANEL)).filter((el) => el.closest("semec-tabs") === this);
+    // Painel de cada aba: o do aria-controls/href; senão o da mesma posição, se
+    // nenhuma outra aba o reivindicou (abas acrescentadas depois); senão o próximo livre.
+    const explicit = triggers.map((trigger) => {
       const target = trigger.getAttribute("aria-controls") ?? trigger.getAttribute("href")?.replace(/^#/, "") ?? "";
-      const panel = (target && panels.find((p) => p.id === target)) || panels[index] || null;
-      const value = trigger.dataset.value ?? panel?.id ?? String(index);
+      return (target && panels.find((p) => p.id === target)) || null;
+    });
+    const used = new Set<HTMLElement>(explicit.filter((p): p is HTMLElement => p !== null));
+    return triggers.map((trigger, index) => {
+      let panel = explicit[index] ?? null;
+      if (!panel) {
+        const byIndex = panels[index];
+        panel = byIndex && !used.has(byIndex) ? byIndex : (panels.find((p) => !used.has(p)) ?? null);
+        if (panel) used.add(panel);
+      }
+      // `||`: painel sem id tem id "" (não undefined); aí vale a posição.
+      const value = trigger.dataset.value ?? (panel?.id || String(index));
       return { trigger, panel, value };
     });
   }
 
-  protected setup(): void {
+  /** Papéis, ids e valores das partes. Pode rodar de novo (partes acrescentadas). */
+  #setupParts(): Tab[] {
     const list = this.#list();
-    if (!list) return;
-    const signal = this.signal;
+    if (!list) return [];
     const orientation = this.orientation;
     list.setAttribute("role", "tablist");
     list.setAttribute("aria-orientation", orientation);
     list.setAttribute("data-orientation", orientation);
 
-    // Valor estável de cada aba: data-value, o id do painel escrito pelo autor ou a posição.
-    for (const { trigger, value } of this.#tabs()) {
-      if (trigger.dataset.value === undefined) trigger.dataset.value = value;
+    // Valor estável de cada aba: data-value, o id do painel escrito pelo autor ou a
+    // posição, sem repetir o de outra aba.
+    const initial = this.#tabs();
+    const taken = new Set(initial.filter((t) => t.trigger.dataset.value !== undefined).map((t) => t.value));
+    for (const { trigger, value } of initial) {
+      if (trigger.dataset.value === undefined) trigger.dataset.value = uniqueValue(value, taken);
     }
     const tabs = this.#tabs();
     for (const { trigger, panel } of tabs) {
@@ -91,9 +110,23 @@ export class SemecTabs extends SemecElement {
         trigger.setAttribute("aria-controls", ensureId(panel, "tabpanel"));
       }
     }
+    return tabs;
+  }
+
+  protected setup(): void {
+    const list = this.#list();
+    if (!list) return;
+    const signal = this.signal;
+    const tabs = this.#setupParts();
 
     const enabled = tabs.filter((t) => !isDisabled(t.trigger));
-    const fromHash = location.hash ? enabled.find((t) => t.panel && `#${t.panel.id}` === decodeURIComponent(location.hash)) : undefined;
+    let hash = "";
+    try {
+      hash = decodeURIComponent(location.hash);
+    } catch {
+      hash = location.hash;
+    }
+    const fromHash = hash ? enabled.find((t) => t.panel && `#${t.panel.id}` === hash) : undefined;
     const initial =
       enabled.find((t) => t.value === this.getAttribute("value")) ??
       enabled.find((t) => t.trigger.getAttribute("aria-selected") === "true") ??
@@ -114,6 +147,32 @@ export class SemecTabs extends SemecElement {
       { signal }
     );
     list.addEventListener("keydown", (event) => this.#onKeyDown(event), { signal });
+    onFragmentNavigation(signal, (target) => this.#reveal(target));
+
+    this.#observer = new MutationObserver((records) => {
+      if (touchesParts(records, `${TRIGGER}, ${PANEL}`)) this.#refresh();
+    });
+    this.#observer.observe(this, { childList: true, subtree: true });
+  }
+
+  protected teardown(): void {
+    this.#observer?.disconnect();
+    this.#observer = null;
+  }
+
+  /** Partes acrescentadas ou removidas: monta as novas e garante uma aba ativa. */
+  #refresh(): void {
+    const enabled = this.#setupParts().filter((t) => !isDisabled(t.trigger));
+    const current = enabled.find((t) => t.value === this.value) ?? enabled[0];
+    if (current) this.#select(current.value, false, false);
+  }
+
+  /** Alvo de um link `#id` dentro de um painel inativo: ativa a aba dele. */
+  #reveal(target: Element): boolean {
+    const tab = this.#tabs().find((t) => t.panel?.contains(target));
+    if (!tab || isDisabled(tab.trigger) || tab.value === this.value) return false;
+    this.#select(tab.value, true, false);
+    return true;
   }
 
   #tabFrom(target: EventTarget | null): Tab | undefined {

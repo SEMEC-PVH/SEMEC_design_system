@@ -14,10 +14,21 @@ const REPO = "https://github.com/SEMEC-PVH/SEMEC_design_system";
 // Ao trocar a versão (e depois da primeira publicação), recalcule o SRI sobre o
 // arquivo publicado com `npm run sri` (scripts/release/sri.mjs). Enquanto a versão
 // não está no npm, SRI_ELEMENTS fica com o marcador SRI_PENDENTE.
+// O bloco do CDN mostra as três peças: fontes, CSS (as classes interativas só
+// existem a partir do @semec/ds-css 1.1.0) e o script. VERSAO_CSS nunca abaixo
+// de VERSAO_CSS_MINIMA.
+const VERSAO_TOKENS = "1.0.0";
+const SRI_FONTS = "sha384-JPaBLIHnh0Pteb6nPfiQvklhUDnfvln4jCKfD1ASorqT7xYuyugBAs5ZvE32NxXb";
+const VERSAO_CSS_MINIMA = "1.1.0";
+const VERSAO_CSS = "1.1.0";
+const SRI_CSS = "sha384-CALCULE-NA-RELEASE";
 const VERSAO_ELEMENTS = "1.0.0";
 const SRI_PENDENTE = "sha384-CALCULE-NA-RELEASE";
 const SRI_ELEMENTS = "sha384-CALCULE-NA-RELEASE";
+const CDN_FONTS = `https://cdn.jsdelivr.net/npm/@semec/ds-tokens@${VERSAO_TOKENS}/dist/fonts.css`;
+const CDN_CSS = `https://cdn.jsdelivr.net/npm/@semec/ds-css@${VERSAO_CSS}/dist/semec-ds.css`;
 const CDN_ELEMENTS = `https://cdn.jsdelivr.net/npm/@semec/ds-elements@${VERSAO_ELEMENTS}/dist/semec-elements.js`;
+const PENDENTES = [SRI_CSS, SRI_ELEMENTS].some((v) => v === SRI_PENDENTE);
 
 /** Bloco de código com botão de copiar. Linhas longas rolam: o bloco recebe foco. */
 function Code({ children }) {
@@ -103,7 +114,7 @@ export default function WebComponentsPage() {
           mesmos cenários.
         </li>
         <li>
-          <strong>Sem dependências.</strong> Um arquivo de cerca de 23 kB,
+          <strong>Sem dependências.</strong> Um arquivo de cerca de 29 kB (9 kB com gzip),
           somente ESM.
         </li>
       </ul>
@@ -129,8 +140,14 @@ export default function WebComponentsPage() {
       </Tabela>
 
       <h2 id="instalar">Instalar</h2>
+      <Note>
+        Os elementos precisam do <code>@semec/ds-css</code>{" "}
+        {VERSAO_CSS_MINIMA} ou mais novo. As classes dos componentes
+        interativos não existem nas versões anteriores: os elementos
+        funcionam, mas ficam sem estilo.
+      </Note>
       <h3>Com npm</h3>
-      <Code>{`npm install @semec/ds-elements @semec/ds-css`}</Code>
+      <Code>{`npm install @semec/ds-elements "@semec/ds-css@^${VERSAO_CSS_MINIMA}"`}</Code>
       <Code>{`import "@semec/ds-tokens/fonts.css";
 import "@semec/ds-css/index.css";
 import "@semec/ds-elements/auto";`}</Code>
@@ -143,26 +160,38 @@ import "@semec/ds-elements/auto";`}</Code>
       </p>
 
       <h3>Com CDN ou arquivo copiado</h3>
-      <Code>{`<script type="module" crossorigin="anonymous"
+      <p>
+        O bloco completo, com versão fixa em cada arquivo: as fontes, o CSS
+        (a partir da {VERSAO_CSS_MINIMA}) e o script. Não use uma faixa como{" "}
+        <code>@1</code>: o <code>integrity</code> vale para um arquivo só.
+      </p>
+      <Code>{`<link rel="stylesheet" crossorigin="anonymous"
+  href="${CDN_FONTS}"
+  integrity="${SRI_FONTS}">
+<link rel="stylesheet" crossorigin="anonymous"
+  href="${CDN_CSS}"
+  integrity="${SRI_CSS}">
+<script type="module" crossorigin="anonymous"
   src="${CDN_ELEMENTS}"
   integrity="${SRI_ELEMENTS}"></script>`}</Code>
       <Note>
-        {SRI_ELEMENTS === SRI_PENDENTE ? (
+        {PENDENTES ? (
           <>
             <code>{SRI_PENDENTE}</code> não é um valor: troque pelo hash do
             arquivo publicado daquela versão, como no CSS.{" "}
           </>
         ) : (
           <>
-            O hash acima vale só para a versão {VERSAO_ELEMENTS}; em outra
-            versão, calcule o do arquivo publicado, como no CSS.{" "}
+            Os hashes acima valem só para estas versões; em outra versão,
+            calcule o do arquivo publicado, como no CSS.{" "}
           </>
         )}
-        Sem CDN, copie{" "}
-        <code>dist/semec-elements.js</code> do pacote para a pasta pública e
-        aponte o <code>src</code> para ele. O <code>type=&quot;module&quot;</code>{" "}
-        já espera a página carregar: o script pode ficar no{" "}
-        <code>&lt;head&gt;</code>.
+        Sem CDN, copie <code>dist/semec-elements.js</code> e{" "}
+        <code>dist/semec-elements.js.map</code> do pacote para a mesma pasta
+        pública e aponte o <code>src</code> para o <code>.js</code> (sem o{" "}
+        <code>.map</code>, o DevTools mostra um 404). O{" "}
+        <code>type=&quot;module&quot;</code> já espera a página carregar: o
+        script pode ficar no <code>&lt;head&gt;</code>.
       </Note>
 
       <h2 id="estados">Estados</h2>
@@ -194,8 +223,13 @@ import "@semec/ds-elements/auto";`}</Code>
       </ul>
 
       <h2 id="dialogo">Diálogo</h2>
-      <Code>{`<button type="button" class="semec-btn"
-  data-semec-dialog-open="editar-contato">Editar contato</button>
+      <p>
+        Sem JavaScript, o diálogo não abre. Por isso o gatilho padrão é um
+        link para uma página com o mesmo conteúdo: com JavaScript, ele abre o
+        diálogo e passa a se comportar como botão.
+      </p>
+      <Code>{`<a class="semec-btn" href="/contato/editar"
+  data-semec-dialog-open="editar-contato">Editar contato</a>
 
 <semec-dialog id="editar-contato">
   <dialog class="semec-dialog">
@@ -217,10 +251,37 @@ import "@semec/ds-elements/auto";`}</Code>
 </semec-dialog>`}</Code>
       <p>
         Para confirmar uma ação destrutiva, acrescente <code>alert</code> ao{" "}
-        <code>&lt;semec-dialog&gt;</code> e marque o botão de cancelar com{" "}
-        <code>data-semec-dialog-cancel</code>: ele recebe o foco ao abrir e o
-        clique no fundo não fecha.
+        <code>&lt;semec-dialog&gt;</code>, use{" "}
+        <code>class=&quot;semec-dialog semec-dialog--alert&quot;</code> no{" "}
+        <code>&lt;dialog&gt;</code> (o elemento põe o modificador se faltar) e
+        marque o botão de cancelar com <code>data-semec-dialog-cancel</code>:
+        ele recebe o foco ao abrir e o clique no fundo não fecha.
       </p>
+      <h3 id="confirmar-envio">Confirmar antes de enviar</h3>
+      <p>
+        O gatilho é o próprio botão de envio. Sem JavaScript, ele envia o
+        formulário direto; com JavaScript, abre o diálogo, e o
+        &quot;Confirmar&quot; dentro do formulário envia.
+      </p>
+      <Code>{`<form method="post" action="/rascunhos/12/excluir">
+  <button type="submit" class="semec-btn semec-btn--destructive"
+    data-semec-dialog-open="confirmar-exclusao">Excluir rascunho</button>
+
+  <semec-dialog id="confirmar-exclusao" alert>
+    <dialog class="semec-dialog semec-dialog--alert">
+      <div class="semec-dialog__header">
+        <h2 class="semec-dialog__title">Excluir o rascunho?</h2>
+        <p class="semec-dialog__description">Não pode ser desfeito.</p>
+      </div>
+      <div class="semec-dialog__footer">
+        <button type="button" class="semec-btn semec-btn--outline"
+          data-semec-dialog-cancel>Cancelar</button>
+        <button type="submit" class="semec-btn semec-btn--destructive"
+          >Confirmar</button>
+      </div>
+    </dialog>
+  </semec-dialog>
+</form>`}</Code>
       <Teclas
         label="Teclado do diálogo"
         linhas={[
@@ -257,7 +318,9 @@ import "@semec/ds-elements/auto";`}</Code>
       />
       <p>
         Use o atributo <code>value</code> para escolher a aba aberta e o evento{" "}
-        <code>semec-change</code> para saber quando ela muda.
+        <code>semec-change</code> para saber quando ela muda. Um link da página
+        para um painel inativo, ou para um campo dentro dele (como o resumo de
+        erros), ativa a aba antes de navegar.
       </p>
 
       <h2 id="combobox">Combobox</h2>
@@ -270,12 +333,18 @@ import "@semec/ds-elements/auto";`}</Code>
   </select>
 </semec-combobox>`}</Code>
       <p>
-        O <code>&lt;select&gt;</code> é a fonte das opções e continua sendo o
+        O <code>&lt;semec-combobox&gt;</code> envolve só o{" "}
+        <code>&lt;select&gt;</code>: rótulo, dica e erro ficam fora dele. O{" "}
+        <code>&lt;select&gt;</code> é a fonte das opções e continua sendo o
         valor enviado no formulário. Com JavaScript, ele fica escondido e
         aparece um campo de busca com o mesmo <code>id</code>, rótulo, dica e
         estado de erro. Digitar filtra sem diferença de acento (&quot;sao&quot;
         encontra &quot;São&quot;) e o leitor de tela ouve quantos resultados
-        sobraram.
+        sobraram. Um texto que não virou escolha deixa o campo inválido
+        (&quot;Escolha uma opção da lista.&quot;), e o formulário não é
+        enviado com ele. Mudanças no <code>&lt;select&gt;</code> depois de
+        carregar (opções novas, <code>disabled</code>,{" "}
+        <code>aria-invalid</code>) chegam ao campo.
       </p>
       <Teclas
         label="Teclado do combobox"
@@ -284,7 +353,7 @@ import "@semec/ds-elements/auto";`}</Code>
           ["↓ e ↑", "Abrem na opção escolhida e movem pela lista."],
           ["Home e End", "Primeira e última opção, com a lista aberta."],
           ["Enter", "Escolhe a opção ativa e fecha."],
-          ["Esc", "Fecha a lista. Com a lista fechada, limpa a escolha."],
+          ["Esc", "Fecha a lista. Com a lista fechada, limpa a escolha e avisa \"Escolha removida\"."],
           ["Tab", "Fecha e vai para o próximo campo."],
         ]}
       />

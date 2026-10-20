@@ -1,4 +1,4 @@
-import { SemecElement, emit, ensureId, isDisabled, toggleAttr } from "./internal";
+import { SemecElement, emit, ensureId, isDisabled, onFragmentNavigation, toggleAttr, touchesParts, uniqueValue } from "./internal";
 
 export interface SemecAccordionChangeDetail {
   /** `type="single"`: o valor aberto ("" = nenhum). `type="multiple"`: lista dos abertos. */
@@ -20,6 +20,9 @@ interface Item {
  * botão. `type="single"` (padrão) abre um por vez; `collapsible` deixa fechar o
  * aberto; `type="multiple"` abre vários. ↑/↓ (com volta), Home/End entre os
  * botões. Sem JavaScript, todos os painéis ficam visíveis.
+ *
+ * Itens acrescentados depois são montados; um link `#id` para algo dentro de
+ * um painel fechado abre o item antes de navegar.
  */
 export class SemecAccordion extends SemecElement {
   static observedAttributes = ["value"];
@@ -28,6 +31,7 @@ export class SemecAccordion extends SemecElement {
   #authorDisabled = new WeakSet<Element>();
   #syncing = false;
   #ready = false;
+  #observer: MutationObserver | null = null;
 
   get type(): "single" | "multiple" {
     return this.getAttribute("type") === "multiple" ? "multiple" : "single";
@@ -71,21 +75,16 @@ export class SemecAccordion extends SemecElement {
     return out;
   }
 
-  protected setup(): void {
-    const signal = this.signal;
-    // Valor estável de cada item: data-value, o id do painel escrito pelo autor ou a posição.
-    this.#rawItems().forEach((item, index) => {
-      if (item.dataset.value === undefined) item.dataset.value = item.querySelector(".semec-accordion__panel")?.id || String(index);
+  /** Papéis, ids, valores e travas dos itens. Pode rodar de novo (itens acrescentados). */
+  #setupItems(): Item[] {
+    // Valor estável de cada item: data-value, o id do painel escrito pelo autor ou a
+    // posição, sem repetir o de outro item.
+    const raw = this.#rawItems();
+    const taken = new Set(raw.filter((i) => i.dataset.value !== undefined).map((i) => i.dataset.value as string));
+    raw.forEach((item, index) => {
+      if (item.dataset.value === undefined) item.dataset.value = uniqueValue(item.querySelector(".semec-accordion__panel")?.id || String(index), taken);
     });
     const items = this.#items();
-    const attr = this.getAttribute("value");
-    if (attr !== null) {
-      this.#open = new Set(attr.split(/\s+/).filter(Boolean));
-    } else {
-      this.#open = new Set(items.filter((i) => i.item.getAttribute("data-state") === "open").map((i) => i.value));
-    }
-    if (this.type === "single") this.#open = new Set([...this.#open].slice(0, 1));
-
     for (const { item, header, trigger, panel } of items) {
       item.setAttribute("data-orientation", "vertical");
       header?.setAttribute("data-orientation", "vertical");
@@ -104,6 +103,19 @@ export class SemecAccordion extends SemecElement {
       toggleAttr(item, "data-disabled", disabled);
       toggleAttr(trigger, "data-disabled", disabled);
     }
+    return items;
+  }
+
+  protected setup(): void {
+    const signal = this.signal;
+    const items = this.#setupItems();
+    const attr = this.getAttribute("value");
+    if (attr !== null) {
+      this.#open = new Set(attr.split(/\s+/).filter(Boolean));
+    } else {
+      this.#open = new Set(items.filter((i) => i.item.getAttribute("data-state") === "open").map((i) => i.value));
+    }
+    if (this.type === "single") this.#open = new Set([...this.#open].slice(0, 1));
     this.#ready = true;
     this.#render(false);
 
@@ -117,6 +129,30 @@ export class SemecAccordion extends SemecElement {
       { signal }
     );
     this.addEventListener("keydown", (event) => this.#onKeyDown(event), { signal });
+    onFragmentNavigation(signal, (target) => this.#reveal(target));
+
+    this.#observer = new MutationObserver((records) => {
+      if (!touchesParts(records, ".semec-accordion__item, .semec-accordion__trigger, .semec-accordion__panel")) return;
+      // Itens novos entram fechados; o valor de cada um não repete o de outro.
+      this.#setupItems();
+      this.#render(false);
+    });
+    this.#observer.observe(this, { childList: true, subtree: true });
+  }
+
+  protected teardown(): void {
+    this.#observer?.disconnect();
+    this.#observer = null;
+  }
+
+  /** Alvo de um link `#id` dentro de um painel fechado: abre o item. */
+  #reveal(target: Element): boolean {
+    const entry = this.#items().find((i) => i.panel?.contains(target));
+    if (!entry || this.#open.has(entry.value) || this.#authorDisabled.has(entry.trigger)) return false;
+    if (this.type === "multiple") this.#open.add(entry.value);
+    else this.#open = new Set([entry.value]);
+    this.#render(true);
+    return true;
   }
 
   #itemFrom(target: EventTarget | null): Item | undefined {
