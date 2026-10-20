@@ -126,7 +126,7 @@ Confirmação destrutiva: atributo `alert` e o modificador `semec-dialog--alert`
 | Fechar | `[data-semec-dialog-close]`, `[data-semec-dialog-cancel]`, Esc, clique no fundo (não no `alert`), `elemento.close()` ou `<form method="dialog">` |
 | Foco | Inicial no `[autofocus]` ou no primeiro focável; no `alert`, no cancelar. Tab e Shift+Tab circulam dentro. Ao fechar, volta ao gatilho (ou ao elemento focado antes de `open()`). |
 | ARIA | `aria-labelledby`/`aria-describedby` a partir de `__title`/`__description`; `alert` vira `role="alertdialog"` + `aria-modal="true"`; o gatilho recebe `aria-haspopup="dialog"`, `aria-controls` e `aria-expanded` |
-| Estado | `data-state` no `<dialog>` e no gatilho; trava a rolagem da página enquanto aberto |
+| Estado | `data-state` no `<dialog>` e no gatilho; trava a rolagem da página enquanto aberto (`overflow: hidden` no `<html>` e no `<body>`; a largura da barra vira `padding-right` no `<body>` para o layout não pular, e o fundo escurecido cobre a tela inteira) |
 | Eventos | `semec-open`; `semec-close` com `detail.returnValue` |
 
 Sem JavaScript, o diálogo não abre. Não deixe nele algo que a pessoa precisa para concluir a tarefa sem alternativa: por isso o gatilho é um link para uma página com o mesmo conteúdo. Um `<button>` como gatilho só serve quando o diálogo é um atalho para algo que também existe fora dele. Se o `<semec-dialog>` for removido aberto (troca do HTMX ou do Turbo), o foco volta ao gatilho.

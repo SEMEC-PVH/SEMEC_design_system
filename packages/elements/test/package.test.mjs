@@ -33,7 +33,8 @@ test("dist: arquivos de cada export existem; o bundle do CDN não importa nada",
     assert.ok(fs.existsSync(path.join(dist, file)), `dist/${file}`);
   }
   const bundle = fs.readFileSync(path.join(dist, "semec-elements.js"), "utf8");
-  assert.doesNotMatch(bundle, /\bimport\s*[\w{*("']/, "um arquivo só, sem import");
+  // Exige a palavra inteira: o CSS !important não é uma importação JavaScript.
+  assert.doesNotMatch(bundle, /\bimport\b\s*[\w{*("']/, "um arquivo só, sem import");
   for (const tag of ["semec-dialog", "semec-tabs", "semec-combobox", "semec-menu", "semec-accordion"]) assert.match(bundle, new RegExp(tag));
   const size = Buffer.byteLength(bundle);
   assert.ok(size < 40_000, `bundle do CDN com ${size} bytes (limite 40 kB sem gzip)`);

@@ -349,6 +349,45 @@ for (const name of browsers) {
       assert.deepEqual(r, { foco: "abrir-dialogo", lock: false, expanded: "false" });
     });
 
+    for (const width of [1280, 320]) {
+      test(`CONS-13: trava sem faixa nem salto de layout em ${width}px`, async () => {
+        await fresh();
+        await page.setViewportSize({ width, height: 900 });
+        // Página alta (com barra de rolagem clássica, quando o navegador tem) e fundo liso no topo.
+        await page.addStyleTag({ content: "body { padding-right: 7px; } #alto { height: 300vh; }" });
+        await insert(page, `<div id="alto"></div>`);
+        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+        await tick(page);
+        const medir = () =>
+          page.evaluate(() => ({
+            gap: window.innerWidth - document.documentElement.clientWidth,
+            largura: document.getElementById("conteudo").getBoundingClientRect().width,
+            esquerda: document.getElementById("conteudo").getBoundingClientRect().left,
+            padding: getComputedStyle(document.body).paddingRight,
+            overflow: getComputedStyle(document.documentElement).overflowY,
+            bodyOverflow: getComputedStyle(document.body).overflowY,
+          }));
+        const antes = await medir();
+        await page.evaluate(() => document.getElementById("dialogo").open());
+        await tick(page, 300);
+        const aberto = await medir();
+        assert.equal(aberto.overflow, "hidden", "o <html> trava a rolagem");
+        assert.equal(aberto.bodyOverflow, "hidden", "o <body> trava a rolagem");
+        assert.equal(aberto.gap, 0, "sem barra nem calha reservada com o diálogo aberto");
+        assert.equal(aberto.largura, antes.largura, `o conteúdo não muda de largura (barra de ${antes.gap}px)`);
+        assert.equal(aberto.esquerda, antes.esquerda, "o conteúdo não anda para o lado");
+        assert.equal(aberto.padding, `${7 + antes.gap}px`, "a largura da barra soma ao padding do <body>");
+        // O ::backdrop cobre a borda direita (onde ficava a calha) igual à esquerda.
+        const vw = await page.evaluate(() => window.innerWidth);
+        const canto = (x) => page.screenshot({ clip: { x, y: 2, width: 2, height: 2 } });
+        assert.ok((await canto(vw - 2)).equals(await canto(0)), "a borda direita tem o mesmo fundo escurecido da esquerda");
+        await page.keyboard.press("Escape");
+        await tick(page, 300);
+        const fechado = await medir();
+        assert.deepEqual(fechado, antes, "ao fechar, a barra, o padding e o layout voltam");
+      });
+    }
+
     test("CONS-10: <semec-dialog alert> põe o modificador --alert do @semec/ds-css", async () => {
       await fresh();
       assert.equal(await page.$eval("#excluir dialog", (d) => d.classList.contains("semec-dialog--alert")), true);

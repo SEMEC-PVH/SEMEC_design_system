@@ -169,33 +169,71 @@ export function touchesParts(records: MutationRecord[], selector: string): boole
 /**
  * Trava de rolagem do documento para o diálogo modal, com contagem (diálogos
  * aninhados). Sem `style` inline: uma folha construída (`adoptedStyleSheets`)
- * com uma regra por atributo, que não depende do CSS do app nem esbarra em
+ * com regras por atributo, que não depende do CSS do app nem esbarra em
  * Content-Security-Policy sem `unsafe-inline`.
+ *
+ * `overflow: hidden` no `<html>` e no `<body>` tira a barra de rolagem; a
+ * largura dela (medida na hora, `innerWidth - clientWidth`) volta como
+ * `padding-right` no `<body>`, somada ao padding que ele já tinha, para o
+ * layout não pular. Não usa `scrollbar-gutter: stable`: a calha reservada fica
+ * fora da área que o `::backdrop` pinta e aparecia como uma faixa sem fundo
+ * (CONS-13). É o que o react-remove-scroll faz no React. Ao destravar, a regra
+ * sai e o padding original volta.
  */
 let lockCount = 0;
 let lockSheet: CSSStyleSheet | null = null;
 const LOCK_ATTR = "data-semec-scroll-lock";
 
-function ensureLockSheet(): void {
-  if (lockSheet || typeof CSSStyleSheet === "undefined" || !("adoptedStyleSheets" in Document.prototype)) return;
+function ensureLockSheet(): CSSStyleSheet | null {
+  if (lockSheet || typeof CSSStyleSheet === "undefined" || !("adoptedStyleSheets" in Document.prototype)) return lockSheet;
   try {
     lockSheet = new CSSStyleSheet();
-    lockSheet.replaceSync(`html[${LOCK_ATTR}] { overflow: hidden; scrollbar-gutter: stable; }`);
     document.adoptedStyleSheets = [...document.adoptedStyleSheets, lockSheet];
   } catch {
     lockSheet = null;
   }
+  return lockSheet;
+}
+
+/** Largura da barra de rolagem vertical do documento (0 com barra sobreposta ou sem rolagem). */
+function scrollbarWidth(): number {
+  const html = document.documentElement;
+  // Calha reservada pelo próprio app: ela continua lá com `overflow: hidden`, nada a compensar.
+  if ((getComputedStyle(html).getPropertyValue("scrollbar-gutter") || "").includes("stable")) return 0;
+  return Math.max(0, window.innerWidth - html.clientWidth);
+}
+
+function lockRule(): string {
+  const base = `html[${LOCK_ATTR}], html[${LOCK_ATTR}] body { overflow: hidden !important; }`;
+  const gap = scrollbarWidth();
+  if (!gap || !document.body) return base;
+  const padding = parseFloat(getComputedStyle(document.body).paddingRight) || 0;
+  return `${base} html[${LOCK_ATTR}] body { padding-right: ${padding + gap}px !important; }`;
 }
 
 export function lockScroll(): void {
-  ensureLockSheet();
+  const sheet = ensureLockSheet();
+  if (lockCount === 0) {
+    // Mede antes de travar: com a regra ativa, a barra já sumiu.
+    try {
+      sheet?.replaceSync(lockRule());
+    } catch {
+      /* folha indisponível: segue sem trava, como antes */
+    }
+  }
   lockCount += 1;
   document.documentElement.setAttribute(LOCK_ATTR, "");
 }
 
 export function unlockScroll(): void {
   lockCount = Math.max(0, lockCount - 1);
-  if (lockCount === 0) document.documentElement.removeAttribute(LOCK_ATTR);
+  if (lockCount > 0) return;
+  document.documentElement.removeAttribute(LOCK_ATTR);
+  try {
+    lockSheet?.replaceSync("");
+  } catch {
+    /* nada a restaurar */
+  }
 }
 
 /**
