@@ -33,9 +33,11 @@ Copie para o projeto as pastas publicadas (ou use um CDN de npm) e carregue as f
 Pelo CDN:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-tokens@1/fonts.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-tokens@1.0.0/dist/fonts.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1/dist/semec-ds.css">
 ```
+
+O jsDelivr serve o caminho físico do pacote publicado (`dist/fonts.css`), não os atalhos do `exports` (`@semec/ds-tokens/fonts.css` só vale com bundler). Em produção, fixe a versão e use `integrity` (SRI): os valores de cada versão estão na página [Usar sem React](https://semec-pvh.github.io/SEMEC_design_system/usar-sem-react/).
 
 Em PHP, o mesmo `<link>` vai no layout (`<head>`) da aplicação. O CSS não precisa de JavaScript.
 
@@ -291,7 +293,7 @@ Um rodapé por página, irmão do `<main>`.
 Diálogo, abas, combobox, menu e accordion têm as mesmas classes geradas do TSX do kit, mas precisam de JavaScript para abrir, fechar e navegar pelo teclado. Esse comportamento está nos Web Components do **`@semec/ds-elements`** (`<semec-dialog>`, `<semec-tabs>`, `<semec-combobox>`, `<semec-menu>` e `<semec-accordion>`): HTML semântico com as classes deste pacote, sem shadow DOM; o elemento só acrescenta comportamento e ARIA, no padrão WAI-ARIA APG, como o Radix faz no React.
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-tokens@1/fonts.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-tokens@1.0.0/dist/fonts.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1/dist/semec-ds.css">
 <script type="module" src="https://cdn.jsdelivr.net/npm/@semec/ds-elements@1/dist/semec-elements.js"></script>
 ```

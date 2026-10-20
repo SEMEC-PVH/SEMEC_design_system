@@ -35,11 +35,11 @@ defineSemecElements(); // pode ser chamada de novo sem erro
 
 ### Com CDN
 
-Use versão fixa e `integrity` (SRI), como no `@semec/ds-css`:
+Use versão fixa e `integrity` (SRI), como no `@semec/ds-css`. As classes interativas chegam no `@semec/ds-css` 1.1.0:
 
 ```html
 <link rel="stylesheet" crossorigin="anonymous"
-  href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1/dist/semec-ds.css"
+  href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1.1.0/dist/semec-ds.css"
   integrity="sha384-CALCULE-NA-RELEASE">
 <script type="module" crossorigin="anonymous"
   src="https://cdn.jsdelivr.net/npm/@semec/ds-elements@1.0.0/dist/semec-elements.js"
