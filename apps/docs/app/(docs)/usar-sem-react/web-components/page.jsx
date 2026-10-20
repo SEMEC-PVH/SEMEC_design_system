@@ -210,8 +210,9 @@ import "@semec/ds-elements/auto";`}</Code>
       <button type="button" class="semec-btn"
         data-semec-dialog-close>Salvar</button>
     </div>
+    <!-- O X vem do CSS: sem <svg> dentro do botão. -->
     <button type="button" class="semec-dialog__close"
-      data-semec-dialog-close aria-label="Fechar">…</button>
+      data-semec-dialog-close><span class="semec-sr-only">Fechar</span></button>
   </dialog>
 </semec-dialog>`}</Code>
       <p>

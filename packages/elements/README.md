@@ -87,8 +87,9 @@ Envolve um `<dialog>` nativo aberto com `showModal()`: o resto da página fica i
       <button type="button" class="semec-btn semec-btn--outline" data-semec-dialog-close>Cancelar</button>
       <button type="button" class="semec-btn" data-semec-dialog-close>Salvar</button>
     </div>
-    <button type="button" class="semec-dialog__close" data-semec-dialog-close aria-label="Fechar">
-      <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    <!-- O X é desenhado pelo CSS (::before): não ponha <svg> aqui, só o nome acessível. -->
+    <button type="button" class="semec-dialog__close" data-semec-dialog-close>
+      <span class="semec-sr-only">Fechar</span>
     </button>
   </dialog>
 </semec-dialog>
