@@ -12,9 +12,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Structure
 
-npm workspaces monorepo. Two main locations:
+npm workspaces monorepo. Main locations (three publishable packages under `packages/`, one site under `apps/`):
 
-- **`packages/react/`** — `@semec/ds` kit (React components listed in `manifest.js`, Tailwind v4, shadcn/Radix/CVA). This is the publishable package.
+- **`packages/react/`** — `@semec/ds` kit (React components listed in `manifest.js`, Tailwind v4, shadcn/Radix/CVA). Publishable.
+- **`packages/tokens/`** — `@semec/ds-tokens` (tokens only: CSS variables, base, fonts, DTCG `tokens.json`, Android/iOS/Figma outputs via Style Dictionary 5). Generated from `packages/react/tokens.css` and `packages/react/fonts/`; never edit its `dist/`.
+- **`packages/css/`** — `@semec/ds-css` (`.semec-*` classes with the same look as the React components, no React). Depends on `@semec/ds-tokens`.
 - **`apps/docs/`** — `@semec/docs` documentation site (Next.js 16, static export via `output: 'export'`).
 
 Other dirs: `docs/` (ADRs, architecture decisions), `legacy/` (old content, ignore).
@@ -26,17 +28,22 @@ All root scripts delegate to workspaces. Key commands:
 ```bash
 npm install             # install all workspaces
 npm run dev             # docs site at localhost:3000
-npm run build           # prebuild (build:ds → AI artifacts) + next build + static export
+npm run build           # prebuild (build:ds → AI artifacts, build:tokens) + next build + static export
 npm run build:ds        # tsup build of @semec/ds + AI artifacts (build-artifacts.mjs)
+npm run build:pacotes   # build @semec/ds-tokens then @semec/ds-css
+npm run test:pacotes    # tests of @semec/ds-tokens and @semec/ds-css
+npm run test:release    # unit test of the release plan (scripts/release)
 npm run typecheck       # tsc --noEmit on @semec/ds
 npm run lint            # eslint . on apps/docs (flat config, eslint-config-next + jsx-a11y)
-npm test                # Vitest + Testing Library + axe on @semec/ds (packages/react/test)
+npm test                # Vitest + Testing Library + axe on @semec/ds (packages/react/test) + @semec/ds-tokens tests
 npm run gate            # quality gate (conflict markers, tokens, exports, axe smoke, open states in Chromium), same as CI
 npm run generate:llms   # regenerate AI artifacts (alias of packages/react build:skills)
 npm run proto:css       # isolated CSS build for prototyping
 ```
 
-**Recommended verification order:** `build:ds` → `typecheck` → `test` → `build` → `lint`. CI (`.github/workflows/ci.yml`) runs `changeset`, `lint`, `typecheck`, `test`, `build` (with AI-artifact drift check) and `gate`.
+**Recommended verification order:** `build:ds` → `typecheck` → `test` → `build:pacotes` → `test:pacotes` → `build` → `lint`. CI (`.github/workflows/ci.yml`) runs `changeset` (one changeset per changed public package), `lint`, `typecheck`, `test` (+ `test:release`), `build` (with `build:pacotes`, `test:pacotes` and AI-artifact drift check) and `gate`.
+
+**Release:** `.github/workflows/release.yml` publishes every public workspace package whose version is not on npm yet (plan in `scripts/release/plano.mjs`), one tag `<name>@<version>` and one GitHub Release per package. A change in `packages/react/tokens.css` or `packages/react/fonts/` also needs a changeset for `@semec/ds-tokens` (`scripts/release/checar-changesets.mjs`).
 
 **Note:** `next lint` was removed in Next.js 16. Lint runs via `eslint .` directly (see `apps/docs/eslint.config.mjs`).
 

@@ -8,11 +8,38 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 > Gerado para `@semec/ds@4.4.0` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
 
+> **Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (patch) que ainda não estão no npm. O @semec/ds@4.4.0 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.4.1. Confira a versão instalada com `npm ls @semec/ds`.**
+
 Tokens, acessibilidade, responsive e padrões visuais para interfaces da Prefeitura de Porto Velho. **Sem componentes React.**
 
 Serve para Vue, Angular, Svelte, HTML puro ou páginas geradas no servidor (PHP, templates): qualquer app que não use React. Os componentes React do kit não rodam nesses frameworks; monte a marcação com os tokens e as regras de acessibilidade desta skill.
 
 Para UI com o kit React (`@semec/ds`), use a skill `semec-ds`.
+
+## Pacotes sem React: `@semec/ds-tokens` e `@semec/ds-css`
+
+Para app sem React, prefira os pacotes próprios, que não instalam React nem Radix. O `@semec/ds` (abaixo) continua valendo para quem já usa Tailwind v4.
+
+| Caso | Pacote | Arquivos |
+|------|--------|----------|
+| HTML, PHP, Django, Flask, Vue, Angular: classes prontas | `@semec/ds-css` | `@semec/ds-css/index.css` (tokens + base + classes, para bundler), `@semec/ds-css/components.css` (só as classes `.semec-*`), `dist/semec-ds.css` (arquivo único para `<link>`/CDN) |
+| Só tokens num CSS próprio | `@semec/ds-tokens` | `@semec/ds-tokens/tokens.css` (só `:root`), `base.css` (reset, foco, links, reduced motion), `fonts.css` + `fonts/` |
+| Android, iOS, Figma, back-end | `@semec/ds-tokens` | `tokens.json` (DTCG), `tokens` (JS + tipos), `android/colors.xml`, `android/dimens.xml`, `ios/SemecTokens.swift`, `figma/tokens-studio.json` |
+
+```bash
+npm install @semec/ds-css   # já traz o @semec/ds-tokens
+```
+
+```js
+import "@semec/ds-tokens/fonts.css";
+import "@semec/ds-css/index.css";
+```
+
+Sem bundler, o `<link>` aponta para os arquivos físicos: `fonts.css` (com `fonts/` ao lado) do `@semec/ds-tokens` e `dist/semec-ds.css` do `@semec/ds-css`, com versão fixa e SRI no CDN.
+
+Classes (BEM curto, mesma aparência do componente React): `.semec-btn` (`--primary`, `--secondary`, `--ghost`, `--destructive`, `--link`, `--sm`, `--lg`), `.semec-field` (`[aria-invalid="true"]`), `.semec-label` (`__required`), `.semec-hint`, `.semec-error`, `.semec-form-field`, `.semec-checkbox`, `.semec-radio`, `.semec-choice`, `.semec-card` (`__header`, `__title`, `__description`, `__content`, `__footer`), `.semec-alert` (`--info`, `--success`, `--warning`, `--danger`, `__title`, `__description`), `.semec-header` (`__brand`, `__org`, `__service`, `__nav`, `__link` com `aria-current="page"`), `.semec-footer` (`__link`), `.semec-skip-link`, `.semec-table` (`__wrapper` com `role="region" tabindex="0" aria-label`, `__caption`), `.semec-error-summary` (`__title`, `__list`), `.semec-badge`, `.semec-toast` (`--success`, `--danger`, `--info`, `__title`, `__description`; só aparência) e `.semec-heading--1` a `--4`. O comportamento (foco do resumo de erros, mostrar e fechar toast, menus) fica com o app.
+
+Guia: https://semec-pvh.github.io/SEMEC_design_system/usar-sem-react/
 
 ## Instalação
 

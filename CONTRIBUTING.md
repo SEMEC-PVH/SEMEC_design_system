@@ -82,7 +82,7 @@ O template de PR (`.github/pull_request_template.md`) repete esta lista.
 - [ ] Aprovação de 1 code owner que não seja o autor — **obrigatória** desde 16/10/2026 (TST-06)
 - [ ] Mensagens de commit na convenção abaixo
 
-**Scripts que existem hoje** (na raiz, delegando para `apps/docs` e `packages/react`): `dev`, `build`, `build:ds`, `start`, `lint`, `typecheck`, `test`, `generate:llms`, `check:artifacts`, `proto:css`, `gate`, `cobertura:promessas`, `changeset`, `changeset:check`, `version-packages`, `release`, `test:visual`, `test:visual:update`.
+**Scripts que existem hoje** (na raiz, delegando para `apps/docs` e `packages/*`): `dev`, `build`, `build:ds`, `build:tokens`, `build:css`, `build:pacotes`, `start`, `lint`, `typecheck`, `test`, `test:pacotes`, `test:release`, `generate:llms`, `check:artifacts`, `proto:css`, `gate`, `cobertura:promessas`, `changeset`, `changeset:check`, `version-packages`, `release`, `test:visual`, `test:visual:update`.
 
 ## O que a CI verifica
 
@@ -90,11 +90,11 @@ O template de PR (`.github/pull_request_template.md`) repete esta lista.
 
 | Check | O que roda | Falha quando |
 |---|---|---|
-| `changeset` | `changeset status --since=origin/main` (só em PR) | o PR muda arquivo publicado do `@semec/ds` sem changeset |
+| `changeset` | `changeset status --since=origin/main` + `scripts/release/checar-changesets.mjs` (só em PR) | o PR muda arquivo publicado de um pacote (`@semec/ds`, `@semec/ds-tokens`, `@semec/ds-css`) sem changeset para esse pacote |
 | `lint` | `npm run lint` | eslint (`eslint-config-next` + `jsx-a11y`) acusa erro em `apps/docs` |
 | `typecheck` | `npm run typecheck` | `tsc --noEmit` do kit falha |
-| `build` | `npm run build:ds`, build do site (`next build`, export estático) e conferência de `apps/docs/public` | o pacote ou o site não compilam, ou os artefatos de agentes estão desatualizados |
-| `test` | `npm test` (Vitest + Testing Library + axe, com zod 3 e 4) | um teste do `@semec/ds` falha, inclusive violação do axe |
+| `build` | `npm run build:ds`, `npm run build:pacotes` + `npm run test:pacotes` (`@semec/ds-tokens` e `@semec/ds-css`), build do site (`next build`, export estático) e conferência de `apps/docs/public` | um pacote ou o site não compilam, um teste dos pacotes sem React falha, ou os artefatos de agentes estão desatualizados |
+| `test` | `npm test` (Vitest + Testing Library + axe, com zod 3 e 4, e os testes do `@semec/ds-tokens`) e `npm run test:release` (plano de release) | um teste do `@semec/ds`, do `@semec/ds-tokens` ou do plano de release falha, inclusive violação do axe |
 | `gate` | `npm run gate` | o gate de qualidade e regressão reprova, inclusive a cobertura por promessa do manifest abaixo do piso (`npm run cobertura:promessas`) |
 | `test:visual` | `npm run test:visual` (regressão visual com Playwright no contêiner `mcr.microsoft.com/playwright:v1.56.1-noble`) | um print diverge da baseline em `tests/visual/__screenshots__` |
 
@@ -104,7 +104,9 @@ Para rodar o mesmo localmente, na ordem: `npm run build:ds`, `npm run typecheck`
 
 ### Changeset obrigatório
 
-Um PR precisa de changeset quando muda algo que vai para o npm dentro de `packages/react/`: `src/**`, `skills/**`, `scripts/**`, `manifest.js`, `tokens.css`, `pv-preset.ts`, `server.js`, `tsup.config.ts`, `tsconfig.json` ou `package.json` (lista em `changedFilePatterns`, `.changeset/config.json`). Mudança só no site (`apps/docs`) ou só no `README` do pacote não exige.
+Um PR precisa de changeset quando muda algo que vai para o npm dentro de um pacote público (`packages/react/` = `@semec/ds`, `packages/tokens/` = `@semec/ds-tokens`, `packages/css/` = `@semec/ds-css`): `src/**`, `skills/**`, `scripts/**`, `fonts/**`, `manifest.js`, `tokens.css`, `*.css` na raiz do pacote, `pv-preset.ts`, `server.js`, `tsup.config.ts`, `tsconfig.json` ou `package.json` (lista em `changedFilePatterns`, `.changeset/config.json`, relativa à pasta de cada pacote). Mudança só no site (`apps/docs`) ou só no `README` do pacote não exige.
+
+O changeset precisa citar **cada** pacote mudado: um changeset só do `@semec/ds` não cobre mudança no `@semec/ds-tokens` (a CI confere com `scripts/release/checar-changesets.mjs`). Mudança em `packages/react/tokens.css` ou `packages/react/fonts/` (e no parser de tokens do kit) conta também para o `@semec/ds-tokens`, que é gerado a partir deles; mudança no `tokens.css` ou nos componentes React que o `@semec/ds-css` espelha (botão, campos, cartão, alerta etc.: lista em `UPSTREAM`, no próprio script) conta também para o `@semec/ds-css`.
 
 ```bash
 npm run changeset            # escolhe @semec/ds, o tipo (patch/minor/major) e descreve em PT-BR
@@ -237,8 +239,10 @@ A cada push no `main` com CI verde, o job decide um de três modos (o resumo da 
 | Situação no commit | Modo | O que acontece |
 |---|---|---|
 | Há arquivos em `.changeset/` | `pending` | Resume o plano (`changeset status --verbose`) e termina **com sucesso**. Nada é publicado, nenhum push, nenhum PR. |
-| Nenhum changeset e a versão do `package.json` **não** está no npm | `publish` | Autentica no npm, roda `npm run release` (`build:ds` + `changeset publish`), confere `npm view @semec/ds@x.y.z`, envia a tag `@semec/ds@x.y.z` e cria a GitHub Release. |
-| Nenhum changeset e a versão já está no npm | `noop` | Nada a fazer. |
+| Nenhum changeset e a versão do `package.json` de ao menos um pacote público **não** está no npm | `publish` | Autentica no npm, roda `npm run release` (`build:ds` + `build:pacotes` + `changeset publish`) e, para cada pacote publicado, confere `npm view <nome>@x.y.z`, envia a tag `<nome>@x.y.z` e cria a GitHub Release. |
+| Nenhum changeset e todas as versões já estão no npm | `noop` | Nada a fazer. |
+
+O plano olha todos os pacotes públicos do workspace (`scripts/release/plano.mjs`, testado por `npm run test:release`). Pacote em `0.0.0` (novo, antes do primeiro PR de versão) nunca é publicado: o changeset `major` dele leva a `1.0.0` no PR de versão. Se a consulta ao npm falhar com qualquer erro que não seja `E404`, o job aborta sem publicar.
 
 A tag e a GitHub Release usam o `GITHUB_TOKEN` do próprio job (`contents: write`); tag não é bloqueada como PR. Se o push da tag ou a criação da Release falharem **depois** do publish, o job registra **aviso**, não erro: o pacote já está no npm e conferido. Para enviar a tag à mão, a partir do commit publicado:
 

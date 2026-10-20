@@ -1,4 +1,18 @@
 export const searchIndex = [
+  // /usar-sem-react
+  { term: "sem react", href: "/usar-sem-react" },
+  { term: "html", href: "/usar-sem-react" },
+  { term: "cdn", href: "/usar-sem-react" },
+  { term: "php", href: "/usar-sem-react" },
+  { term: "django", href: "/usar-sem-react" },
+  { term: "flask", href: "/usar-sem-react" },
+  { term: "vue", href: "/usar-sem-react" },
+  { term: "angular", href: "/usar-sem-react" },
+  { term: "android", href: "/usar-sem-react" },
+  { term: "ios", href: "/usar-sem-react" },
+  { term: "figma", href: "/usar-sem-react" },
+  { term: "ds-tokens", href: "/usar-sem-react" },
+  { term: "ds-css", href: "/usar-sem-react" },
   // /padroes/acessibilidade
   { term: "contraste", href: "/padroes/acessibilidade" },
   { term: "wcag", href: "/padroes/acessibilidade" },
