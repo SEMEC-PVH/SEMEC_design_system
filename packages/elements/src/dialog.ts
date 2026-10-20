@@ -49,6 +49,8 @@ export class SemecDialog extends SemecElement {
     const signal = this.signal;
 
     if (this.alert) {
+      // O AlertDialog do kit tem estilo próprio (`--alert` no @semec/ds-css): vem junto com o atributo.
+      dialog.classList.add("semec-dialog--alert");
       dialog.setAttribute("role", "alertdialog");
       // Sem aria-modal, leitores de tela e o axe não tratam o role sobrescrito como modal.
       dialog.setAttribute("aria-modal", "true");
@@ -118,6 +120,17 @@ export class SemecDialog extends SemecElement {
       },
       { signal }
     );
+    // Durante a animação de entrada do fundo, o Chromium e o WebKit entregam o clique
+    // ao <html> (fora de qualquer <dialog>), e o foco cairia no <body>: impede também.
+    document.addEventListener(
+      "mousedown",
+      (event) => {
+        if (!dialog.open) return;
+        const target = event.target as Element | null;
+        if (target && !target.closest?.("dialog[open]")) event.preventDefault();
+      },
+      { signal, capture: true }
+    );
     dialog.addEventListener("keydown", (event) => this.#onKeyDown(event), { signal });
     // Esc nativo dispara "cancel": fechamos nós mesmos, para o foco voltar já (o evento
     // "close" é assíncrono). <form method="dialog"> continua chegando pelo "close".
@@ -135,7 +148,11 @@ export class SemecDialog extends SemecElement {
   protected teardown(): void {
     const dialog = this.dialog;
     if (dialog?.open) dialog.close();
-    this.#afterClose(false);
+    // Removido aberto (troca de HTMX/Turbo): o foco, que estava dentro e caiu no
+    // <body>, volta ao gatilho se ele ainda está na página.
+    const active = document.activeElement;
+    const focusLost = !active || active === document.body || this.contains(active);
+    this.#afterClose(focusLost);
   }
 
   /** Abre o diálogo. `trigger` recebe o foco de volta ao fechar (padrão: o foco atual). */
