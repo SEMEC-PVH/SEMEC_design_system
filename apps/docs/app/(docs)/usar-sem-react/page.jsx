@@ -15,9 +15,9 @@ const REPO = "https://github.com/SEMEC-PVH/SEMEC_design_system";
 // Ao trocar a versão, recalcule o SRI sobre o arquivo publicado com
 // `npm run sri` (scripts/release/sri.mjs), que reescreve as constantes SRI_*.
 const VERSAO_TOKENS = "1.0.0";
-const VERSAO_CSS = "1.0.0";
+const VERSAO_CSS = "1.1.0";
 const SRI_FONTS = "sha384-JPaBLIHnh0Pteb6nPfiQvklhUDnfvln4jCKfD1ASorqT7xYuyugBAs5ZvE32NxXb";
-const SRI_CSS = "sha384-c9LADLVx9GwAjxLSo4gazOCiy9R695i1f+iVHnHDNjA/QYH8raDhyMhdeZCOkOC1";
+const SRI_CSS = "sha384-j3GopGmbfBDbmxOnmviq5aOKVv2aScbeW5TzndRUOYUB/OcrQrD++8POpif35M/W";
 const CDN_FONTS = `https://cdn.jsdelivr.net/npm/@semec/ds-tokens@${VERSAO_TOKENS}/dist/fonts.css`;
 const CDN_CSS = `https://cdn.jsdelivr.net/npm/@semec/ds-css@${VERSAO_CSS}/dist/semec-ds.css`;
 

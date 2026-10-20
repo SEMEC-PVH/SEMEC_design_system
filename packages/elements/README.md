@@ -45,13 +45,13 @@ Use versão fixa (nunca uma faixa como `@1`: o SRI vale para um arquivo só) e `
   integrity="sha384-JPaBLIHnh0Pteb6nPfiQvklhUDnfvln4jCKfD1ASorqT7xYuyugBAs5ZvE32NxXb">
 <link rel="stylesheet" crossorigin="anonymous"
   href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1.1.0/dist/semec-ds.css"
-  integrity="sha384-CALCULE-NA-RELEASE">
+  integrity="sha384-j3GopGmbfBDbmxOnmviq5aOKVv2aScbeW5TzndRUOYUB/OcrQrD++8POpif35M/W">
 <script type="module" crossorigin="anonymous"
   src="https://cdn.jsdelivr.net/npm/@semec/ds-elements@1.0.0/dist/semec-elements.js"
-  integrity="sha384-CALCULE-NA-RELEASE"></script>
+  integrity="sha384-X3yHwotBgX64Ja/D0NFwawT1nbyBHXFZKqk2K0M6IK0OLeMfY2fKRZP0eh0VWCco"></script>
 ```
 
-`sha384-CALCULE-NA-RELEASE` não é um valor: calcule o hash do arquivo publicado (`curl -sL <url> | openssl dgst -sha384 -binary | openssl base64 -A`). O `<script type="module">` já é adiado: pode ficar no `<head>`. Sem CDN, copie `dist/semec-elements.js` e `dist/semec-elements.js.map` para a mesma pasta pública e aponte o `src` para o `.js` (sem o `.map`, tudo funciona, mas o DevTools mostra um 404 ao abrir).
+Os hashes acima correspondem aos arquivos publicados nas versões indicadas. Ao trocar uma versão, recalcule o hash do arquivo publicado (`npm run sri` neste repositório ou `curl -sL <url> | openssl dgst -sha384 -binary | openssl base64 -A`). O `<script type="module">` já é adiado: pode ficar no `<head>`. Sem CDN, copie `dist/semec-elements.js` e `dist/semec-elements.js.map` para a mesma pasta pública e aponte o `src` para o `.js` (sem o `.map`, tudo funciona, mas o DevTools mostra um 404 ao abrir).
 
 ### Exports
 
