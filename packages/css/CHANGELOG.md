@@ -1,5 +1,11 @@
 # @semec/ds-css
 
+## 1.1.1
+
+### Patch Changes
+
+- 9fec62f: Dialog e AlertDialog deixam 1 rem de margem de cada lado em telas estreitas (320 px), em vez de encostar nas bordas. A largura passa de `w-full` para `w-[calc(100%-2rem)]`, mantendo o limite `max-w-lg`; quem sobrescreve `max-w-*` pelo `className` não é afetado. O `.semec-dialog` do @semec/ds-css acompanha o kit.
+
 ## 1.1.0
 
 ### Minor Changes
