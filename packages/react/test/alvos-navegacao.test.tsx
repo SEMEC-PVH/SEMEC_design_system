@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import * as React from "react";
 import { describe, expect, it } from "vitest";
 
-import { Breadcrumb, Link } from "../src/index";
+import { Breadcrumb, FooterLink, Link } from "../src/index";
 
 /**
  * TST-10 (#55): alvos de toque de 44 px no mobile para os links do Breadcrumb e
@@ -78,5 +78,14 @@ describe("Link: alvo de toque (TST-10)", () => {
     const ref = React.createRef<HTMLAnchorElement>();
     render(<Link ref={ref} href="/" />);
     expect(ref.current).toBeInstanceOf(HTMLAnchorElement);
+  });
+});
+
+describe("FooterLink: alvo de toque (NEXT42-05)", () => {
+  it("link curto ganha ::after de no mínimo 44 px de largura só abaixo de sm", () => {
+    render(<FooterLink href="/iptu">IPTU</FooterLink>);
+    const c = classes(screen.getByRole("link", { name: "IPTU" }));
+    expect(c).toEqual(expect.arrayContaining(["relative", "min-h-11", "max-sm:after:absolute", "max-sm:after:min-w-11"]));
+    expect(c.filter((x) => x.startsWith("after:"))).toEqual([]);
   });
 });

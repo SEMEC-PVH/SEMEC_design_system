@@ -3,9 +3,12 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { AlertCircle, AlertTriangle, CheckCircle2, Info } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 import type { HeadingTag } from "./heading";
 
-const alertVariants = cva(
+const alertVariants: VariantFunction<{
+  variant: "default" | "success" | "warning" | "destructive";
+}> = cva(
   "relative w-full rounded-lg border border-border px-4 py-3 text-sm [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:h-4 [&>svg]:w-4",
   {
     variants: {
@@ -104,7 +107,7 @@ const AlertTitle = React.forwardRef<HTMLHeadingElement, AlertTitleProps>(
   ({ className, as: Tag = "div", ...props }, ref) => (
     <Tag
       ref={ref}
-      className={cn("mb-1 font-semibold leading-none tracking-tight", className)}
+      className={cn("mb-1 font-semibold leading-tight tracking-tight", className)}
       {...props}
     />
   )

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bancada dos elementos SEMEC</title>
+  <link rel="stylesheet" href="/fonts.css">
+  <link rel="stylesheet" href="/semec-ds.css">
+  <!--SCRIPT-->
+</head>
+<body>
+  <a class="semec-skip-link" href="#conteudo">Pular para o conteúdo principal</a>
+  <main id="conteudo">
+    <h1 class="semec-heading--1">Bancada dos elementos</h1>
+    <p><button type="button" class="semec-btn semec-btn--outline" id="antes">Antes</button></p>
+
+    <section aria-labelledby="t-dialogo">
+      <h2 id="t-dialogo" class="semec-heading--2">Diálogo</h2>
+      <button type="button" class="semec-btn" id="abrir-dialogo" data-semec-dialog-open="dialogo">Editar contato</button>
+      <semec-dialog id="dialogo">
+        <dialog class="semec-dialog">
+          <div class="semec-dialog__header">
+            <h2 class="semec-dialog__title">Editar contato</h2>
+            <p class="semec-dialog__description">Altere o telefone do responsável.</p>
+          </div>
+          <div class="semec-form-field">
+            <label class="semec-label" for="telefone">Telefone</label>
+            <input class="semec-field" id="telefone" name="telefone">
+          </div>
+          <div class="semec-dialog__footer">
+            <button type="button" class="semec-btn semec-btn--outline" id="dialogo-cancelar" data-semec-dialog-close>Cancelar</button>
+            <button type="button" class="semec-btn" id="dialogo-salvar" data-semec-dialog-close>Salvar</button>
+          </div>
+          <button type="button" class="semec-dialog__close" data-semec-dialog-close aria-label="Fechar"></button>
+        </dialog>
+      </semec-dialog>
+
+      <a class="semec-btn semec-btn--destructive" id="abrir-alerta" href="#excluir-sem-js" data-semec-dialog-open="excluir">Excluir rascunho</a>
+      <semec-dialog id="excluir" alert>
+        <dialog class="semec-dialog">
+          <div class="semec-dialog__header">
+            <h2 class="semec-dialog__title">Excluir o rascunho?</h2>
+            <p class="semec-dialog__description">Esta ação não pode ser desfeita.</p>
+          </div>
+          <div class="semec-dialog__footer">
+            <button type="button" class="semec-btn semec-btn--outline" id="alerta-cancelar" data-semec-dialog-cancel>Cancelar</button>
+            <button type="button" class="semec-btn semec-btn--destructive" id="alerta-excluir" data-semec-dialog-close>Excluir</button>
+          </div>
+        </dialog>
+      </semec-dialog>
+    </section>
+
+    <section aria-labelledby="t-abas">
+      <h2 id="t-abas" class="semec-heading--2">Abas</h2>
+      <semec-tabs class="semec-tabs" id="abas">
+        <nav class="semec-tabs__list" aria-label="Seções da matrícula">
+          <a class="semec-tabs__trigger" id="aba-1" href="#painel-dados">Dados</a>
+          <a class="semec-tabs__trigger" id="aba-2" href="#painel-documentos">Documentos</a>
+          <a class="semec-tabs__trigger" id="aba-3" href="#painel-historico">Histórico</a>
+        </nav>
+        <section class="semec-tabs__panel" id="painel-dados"><p>Nome, data de nascimento e responsável.</p></section>
+        <section class="semec-tabs__panel" id="painel-documentos"><p>Certidão, comprovante de residência e cartão de vacina.</p></section>
+        <section class="semec-tabs__panel" id="painel-historico"><p>Matrículas e transferências anteriores.</p></section>
+      </semec-tabs>
+    </section>
+
+    <section aria-labelledby="t-combobox">
+      <h2 id="t-combobox" class="semec-heading--2">Combobox</h2>
+      <form id="formulario" action="/eco" method="get">
+        <div class="semec-form-field">
+          <label class="semec-label" for="escola">Escola</label>
+          <semec-combobox class="semec-combobox" id="combo">
+            <select class="semec-field" id="escola" name="escola" aria-describedby="escola-dica">
+              <option value="">Selecione a escola</option>
+              <option value="rio-madeira">EMEF Rio Madeira</option>
+              <option value="santa-marcelina">EMEF Santa Marcelina</option>
+              <option value="pequeno-principe">EMEI Pequeno Príncipe</option>
+              <option value="sao-sebastiao">EMEF São Sebastião</option>
+              <option value="ulisses">EMEIEF Ulisses Guimarães</option>
+            </select>
+          </semec-combobox>
+          <p class="semec-hint" id="escola-dica">Digite parte do nome para filtrar.</p>
+        </div>
+        <p><button type="submit" class="semec-btn" id="enviar">Enviar</button></p>
+      </form>
+    </section>
+
+    <section aria-labelledby="t-menu">
+      <h2 id="t-menu" class="semec-heading--2">Menu</h2>
+      <semec-menu id="menu">
+        <button type="button" class="semec-btn semec-btn--outline" id="menu-gatilho" data-semec-menu-trigger>Ações do rascunho</button>
+        <div class="semec-menu">
+          <button type="button" class="semec-menu__item">Editar</button>
+          <button type="button" class="semec-menu__item">Duplicar</button>
+          <hr class="semec-menu__separator">
+          <a class="semec-menu__item" href="#arquivado">Arquivar</a>
+          <button type="button" class="semec-menu__item">Dividir</button>
+          <button type="button" class="semec-menu__item" disabled>Excluir</button>
+        </div>
+      </semec-menu>
+    </section>
+
+    <section aria-labelledby="t-acordeao">
+      <h2 id="t-acordeao" class="semec-heading--2">Acordeão</h2>
+      <semec-accordion class="semec-accordion" id="acordeao" type="single" collapsible>
+        <div class="semec-accordion__item">
+          <h3 class="semec-accordion__header">
+            <button type="button" class="semec-accordion__trigger" id="ac-1">Quem pode pedir transferência?<svg class="semec-accordion__icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+          </h3>
+          <div class="semec-accordion__panel" id="ac-painel-1"><p>O responsável legal pelo estudante.</p></div>
+        </div>
+        <div class="semec-accordion__item">
+          <h3 class="semec-accordion__header">
+            <button type="button" class="semec-accordion__trigger" id="ac-2">Quais documentos levar?<svg class="semec-accordion__icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+          </h3>
+          <div class="semec-accordion__panel" id="ac-painel-2"><p>Certidão de nascimento e comprovante de residência.</p></div>
+        </div>
+        <div class="semec-accordion__item">
+          <h3 class="semec-accordion__header">
+            <button type="button" class="semec-accordion__trigger" id="ac-3">Qual é o prazo?<svg class="semec-accordion__icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+          </h3>
+          <div class="semec-accordion__panel" id="ac-painel-3"><p>Até 30 de novembro.</p></div>
+        </div>
+      </semec-accordion>
+    </section>
+
+    <p><button type="button" class="semec-btn semec-btn--outline" id="depois">Depois</button></p>
+  </main>
+</body>
+</html>

@@ -2,7 +2,7 @@
 title: "Barra lateral"
 code: "sidebar"
 slug: "sidebar"
-file: "src/components/sidebar.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/sidebar.tsx"
 category: "navegacao"
 variants: "side: left · right · variant: sidebar · floating · inset · collapsible: offcanvas · icon · none · as (Sidebar): nav (padrão) · aside · div · labels (Sidebar): navigation ('Menu lateral') · mobileTitle ('Menu de navegação') · close ('Fechar menu') · as (SidebarInset): main (padrão) · div · section · label (SidebarTrigger): padrão 'Alternar barra lateral' · SidebarMenuButton: isActive (aria-current=page) · tooltip (string ou props do TooltipContent) · asChild · a11y: landmark nav/aside com aria-label · gaveta mobile com focus trap, Esc e retorno de foco · aria-expanded/aria-controls no gatilho · aria-current=page no item ativo · alvos de 44px · barra offcanvas recolhida fica inert · composição: SidebarProvider · Sidebar · SidebarTrigger · SidebarInset · SidebarHeader · SidebarContent · SidebarFooter · SidebarGroup · SidebarGroupLabel · SidebarGroupContent · SidebarMenu · SidebarMenuItem · SidebarMenuButton · SidebarMenuSub · SidebarMenuSubItem · SidebarMenuSubButton · SidebarSeparator · SidebarRail"
 ---
@@ -11,7 +11,7 @@ variants: "side: left · right · variant: sidebar · floating · inset · colla
 
 > Shell completo: SidebarProvider + Sidebar + Header/Content/Footer + grupos, menus, colapso e mobile. Abaixo de 768px (48rem, via `matchMedia`) a Sidebar vira gaveta modal (Radix Dialog): foco preso, Esc fecha, conteúdo de trás inerte, foco volta a quem abriu e botão visível "Fechar menu" (44×44). No desktop renderiza um landmark `<nav aria-label="Menu lateral">`. `SidebarMenuButton isActive` gera `aria-current="page"`; `tooltip` aparece só no modo recolhido (`collapsible="icon"`). `SidebarTrigger` (44×44) expõe `aria-expanded` e `aria-controls`.
 
-**Arquivo:** `src/components/sidebar.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/sidebar/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/sidebar.tsx) | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/sidebar/
 
 ## Variantes
 
@@ -32,7 +32,7 @@ variants: "side: left · right · variant: sidebar · floating · inset · colla
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -86,8 +86,11 @@ import { LayoutDashboard } from "lucide-react";
     <Sidebar>{/* … */}</Sidebar>
     <SidebarInset as="div">
       <Header>
-        <SidebarTrigger />
-        <HeaderBrand href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+        {/* Gatilho e marca num grupo à esquerda (o Header é justify-between) */}
+        <div className="flex min-w-0 items-center gap-2">
+          <SidebarTrigger />
+          <HeaderBrand orgName="SEMEC" href="/" logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" />} serviceName="Gestão de protocolos" />
+        </div>
       </Header>
       <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-[75rem] px-4 py-8">
         <Heading level={1}>Protocolos</Heading>
@@ -376,6 +379,8 @@ const defaultSidebarLabels: SidebarLabels = {
 };
 
 export interface SidebarProps extends React.ComponentProps<"div"> {
+  /** Impede interação e foco no painel, também no React 18. */
+  inert?: boolean;
   side?: "left" | "right";
   variant?: "sidebar" | "floating" | "inset";
   collapsible?: "offcanvas" | "icon" | "none";
@@ -424,6 +429,25 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
     const landmarkLabel =
       Landmark === "div" ? undefined : ariaLabelProp ?? l.navigation;
     const restoreFocusRef = React.useRef<HTMLElement | null>(null);
+    const inertPanelRef = React.useRef<HTMLDivElement | null>(null);
+    const hiddenOffcanvas = !isMobile && state === "collapsed" && collapsible === "offcanvas";
+    // React 18 descarta `inert` booleano no JSX. O ref aplica a propriedade
+    // antes do foco e reaplica quando o estado muda ou o painel é remontado.
+    const panelRef = React.useCallback((node: HTMLDivElement | null) => {
+      inertPanelRef.current = node;
+      if (node) node.inert = Boolean(inertProp ?? hiddenOffcanvas);
+      if (isMobile) mobilePanelRef.current = node;
+      if (isMobile || collapsible === "none") {
+        if (typeof ref === "function") ref(node);
+        else if (ref) ref.current = node;
+      }
+    }, [inertProp, hiddenOffcanvas, isMobile, collapsible, mobilePanelRef, ref]);
+    // O Radix pode manter o ref composto estável quando a prop muda.
+    React.useEffect(() => {
+      if (inertPanelRef.current) {
+        inertPanelRef.current.inert = Boolean(inertProp ?? hiddenOffcanvas);
+      }
+    }, [inertProp, hiddenOffcanvas]);
 
     const id = idProp ?? (panelId || undefined);
 
@@ -437,11 +461,10 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
     if (collapsible === "none") {
       return (
         <Landmark
-          ref={ref as React.Ref<HTMLDivElement>}
+          ref={panelRef}
           id={id}
           aria-label={landmarkLabel}
           data-sidebar="sidebar"
-          inert={inertProp}
           className={cn(
             "flex h-full w-[var(--sidebar-width)] min-w-0 flex-col bg-sidebar text-sidebar-foreground",
             className
@@ -465,17 +488,12 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
               className="fixed inset-0 z-40 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
             />
             <DialogPrimitive.Content
-              ref={(node) => {
-                mobilePanelRef.current = node;
-                if (typeof ref === "function") ref(node);
-                else if (ref) ref.current = node;
-              }}
+              ref={panelRef}
               id={id}
               aria-describedby={undefined}
               data-sidebar="sidebar"
               data-mobile="true"
               data-side={side}
-              inert={inertProp}
               onOpenAutoFocus={(event) => {
                 const active = document.activeElement;
                 restoreFocusRef.current =
@@ -522,7 +540,7 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
               >
                 <DialogPrimitive.Close
                   data-sidebar="close"
-                  className="inline-flex size-11 items-center justify-center rounded-md text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  className="inline-flex size-11 items-center justify-center rounded-md text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                   <X className="size-5" aria-hidden="true" />
                   <span className="sr-only">{l.close}</span>
@@ -543,7 +561,6 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
 
     // Recolhida em `offcanvas`, a barra fica fora da tela: sai da ordem de
     // Tab e da árvore de acessibilidade até ser reaberta.
-    const hiddenOffcanvas = state === "collapsed" && collapsible === "offcanvas";
 
     return (
       <div
@@ -567,7 +584,7 @@ const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
         <Landmark
           id={id}
           aria-label={landmarkLabel}
-          inert={inertProp ?? (hiddenOffcanvas || undefined)}
+          ref={panelRef}
           className={cn(
             "duration-base ease-standard fixed inset-y-0 z-10 hidden h-svh w-[var(--sidebar-width)] transition-[left,right,width] ease-linear md:flex",
             side === "left"
@@ -622,7 +639,7 @@ const SidebarTrigger = React.forwardRef<HTMLButtonElement, SidebarTriggerProps>(
         aria-expanded={expanded}
         aria-controls={controls}
         className={cn(
-          "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&>svg]:size-5",
+          "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&>svg]:size-5",
           className
         )}
         onClick={(event) => {
@@ -773,7 +790,7 @@ const SidebarGroupLabel = React.forwardRef<
       ref={ref}
       data-sidebar="group-label"
       className={cn(
-        "duration-base ease-standard flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opacity] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        "duration-base ease-standard flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none focus-visible:outline-hidden ring-sidebar-ring transition-[margin,opacity] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
         "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
         className
       )}
@@ -866,7 +883,7 @@ const SidebarMenuButton = React.forwardRef<
         data-active={isActive}
         aria-current={isActive ? "page" : undefined}
         className={cn(
-          "peer/menu-button flex min-h-11 w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding] duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 active:bg-accent active:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-accent data-[active=true]:font-medium data-[active=true]:text-accent-foreground data-[state=open]:hover:bg-accent data-[state=open]:hover:text-accent-foreground",
+          "peer/menu-button flex min-h-11 w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none focus-visible:outline-hidden ring-sidebar-ring transition-[width,height,padding] duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 active:bg-accent active:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-accent data-[active=true]:font-medium data-[active=true]:text-accent-foreground data-[state=open]:hover:bg-accent data-[state=open]:hover:text-accent-foreground",
           "group-data-[collapsible=icon]:!size-11 group-data-[collapsible=icon]:!p-3.5 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
           className
         )}
@@ -940,7 +957,7 @@ const SidebarMenuSubButton = React.forwardRef<
       data-active={isActive}
       aria-current={isActive ? "page" : undefined}
       className={cn(
-        "flex min-h-11 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 active:bg-accent active:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+        "flex min-h-11 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none focus-visible:outline-hidden ring-sidebar-ring hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 active:bg-accent active:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
         "data-[active=true]:bg-accent data-[active=true]:text-accent-foreground",
         size === "sm" && "text-xs",
         size === "md" && "text-sm",

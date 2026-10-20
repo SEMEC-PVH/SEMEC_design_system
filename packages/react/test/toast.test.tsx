@@ -28,6 +28,7 @@ describe("Toast", () => {
   it("o Toaster monta a região rotulada em PT-BR com o atalho F8", () => {
     render(<Toaster />);
     expect(screen.getByRole("region", { name: "Notificações (F8)" })).toBeInTheDocument();
+    expect(screen.getByRole("list")).toHaveClass("pointer-events-none");
   });
 
   it("useToast() mostra título e descrição e o X se chama \"Fechar notificação\"", async () => {
@@ -40,6 +41,7 @@ describe("Toast", () => {
     );
     await user.click(screen.getByRole("button", { name: "Disparar" }));
     const aviso = avisoCom("Protocolo enviado");
+    expect(aviso).toHaveClass("pointer-events-auto");
     expect(within(aviso).getByText("Nº 2026/000123")).toBeInTheDocument();
     expect(within(aviso).getByRole("button", { name: "Fechar notificação" })).toBeInTheDocument();
   });

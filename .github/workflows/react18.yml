@@ -1,0 +1,34 @@
+name: Compatibilidade React 18
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  react18:
+    runs-on: ubuntu-latest
+    env:
+      SEMEC_REACT18_ROOT: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Instalar React 18 isoladamente e usar o runtime neste job
+        # Evita recalcular os peers do site Next. O job principal continua
+        # validando o site e o kit com React 19; manifests e lockfile não mudam.
+        run: |
+          npm install --prefix "$RUNNER_TEMP/react18" --ignore-scripts --no-package-lock --workspaces=false react@18.3.1 react-dom@18.3.1
+          for package in react react-dom scheduler; do
+            mv "node_modules/$package" "$RUNNER_TEMP/$package-original"
+            cp -R "$RUNNER_TEMP/react18/node_modules/$package" node_modules/
+          done
+      - name: Testar o kit com React 18.3.1 (Vitest, interações e axe)
+        run: npm test --workspace @semec/ds

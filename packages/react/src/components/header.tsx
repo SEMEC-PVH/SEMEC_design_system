@@ -26,10 +26,11 @@ export interface HeaderBrandProps extends React.HTMLAttributes<HTMLElement> {
    * renderizar a marca sem link (ex.: já na página inicial).
    */
   href?: string | null;
+  /** Nome do órgão. @default "SEMEC" */
   orgName?: string;
   serviceName?: string;
   /**
-   * Logo do órgão (ex.: `<img src="/logo.svg" alt="Prefeitura de Porto Velho" />`).
+   * Logo do órgão (ex.: `<img src="/marca.svg" alt="Prefeitura de Porto Velho" />`).
    * Sem logo, aparece um placeholder decorativo e um aviso no console em
    * desenvolvimento.
    */
@@ -111,7 +112,7 @@ const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
     );
 
     const rootClass = cn(
-      "flex min-h-11 min-w-0 items-center gap-3 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+      "flex min-h-11 min-w-0 items-center gap-3 no-underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       className
     );
 
@@ -137,8 +138,8 @@ const HeaderNav = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement
   ({ className, children, ...props }, ref) => (
     <nav
       ref={ref}
-      aria-label="Principal"
-      className={cn("flex items-center gap-2", className)}
+      aria-label="Menu principal"
+      className={cn("flex flex-wrap items-center gap-2", className)}
       {...props}
     >
       {children}
@@ -158,7 +159,7 @@ const HeaderNavLink = React.forwardRef<HTMLAnchorElement, HeaderNavLinkProps>(
       ref={ref}
       aria-current={current ? "page" : undefined}
       className={cn(
-        "inline-flex min-h-11 items-center rounded-md px-2 text-sm font-medium text-foreground no-underline transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "inline-flex min-h-11 items-center rounded-md px-2 text-sm font-medium text-foreground no-underline transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         current && "font-semibold text-brand-hero",
         className
       )}

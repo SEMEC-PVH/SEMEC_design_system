@@ -8,6 +8,7 @@ import { checkFormSubmit } from "./check-form-submit.mjs";
 import { checkErrorSummaryFocus } from "./check-error-summary-focus.mjs";
 import { checkConflictMarkers } from "./check-conflict-markers.mjs";
 import { checkLayoutA11y } from "./check-layout-a11y.mjs";
+import { checkCoberturaPromessas } from "./cobertura-promessas.mjs";
 
 console.log("=================================================");
 console.log("🛡️  SEMEC DS — Portão de Regressão e Qualidade (gate)");
@@ -17,6 +18,9 @@ const startTime = Date.now();
 
 try {
   await checkConflictMarkers();
+  console.log("");
+
+  await checkCoberturaPromessas();
   console.log("");
 
   await checkExportsContract();

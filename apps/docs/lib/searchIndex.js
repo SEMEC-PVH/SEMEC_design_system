@@ -1,4 +1,30 @@
 export const searchIndex = [
+  // /usar-sem-react
+  { term: "sem react", href: "/usar-sem-react" },
+  { term: "html", href: "/usar-sem-react" },
+  { term: "cdn", href: "/usar-sem-react" },
+  { term: "php", href: "/usar-sem-react" },
+  { term: "django", href: "/usar-sem-react" },
+  { term: "flask", href: "/usar-sem-react" },
+  { term: "vue", href: "/usar-sem-react" },
+  { term: "angular", href: "/usar-sem-react" },
+  { term: "android", href: "/usar-sem-react" },
+  { term: "ios", href: "/usar-sem-react" },
+  { term: "figma", href: "/usar-sem-react" },
+  { term: "ds-tokens", href: "/usar-sem-react" },
+  { term: "ds-css", href: "/usar-sem-react" },
+  // /usar-sem-react/web-components
+  { term: "web components", href: "/usar-sem-react/web-components" },
+  { term: "ds-elements", href: "/usar-sem-react/web-components" },
+  { term: "custom elements", href: "/usar-sem-react/web-components" },
+  // /usar-sem-react/modelos-de-servidor
+  { term: "modelos de servidor", href: "/usar-sem-react/modelos-de-servidor" },
+  { term: "templates", href: "/usar-sem-react/modelos-de-servidor" },
+  { term: "jinja", href: "/usar-sem-react/modelos-de-servidor" },
+  { term: "twig", href: "/usar-sem-react/modelos-de-servidor" },
+  { term: "symfony", href: "/usar-sem-react/modelos-de-servidor" },
+  { term: "blade", href: "/usar-sem-react/modelos-de-servidor" },
+  { term: "laravel", href: "/usar-sem-react/modelos-de-servidor" },
   // /padroes/acessibilidade
   { term: "contraste", href: "/padroes/acessibilidade" },
   { term: "wcag", href: "/padroes/acessibilidade" },

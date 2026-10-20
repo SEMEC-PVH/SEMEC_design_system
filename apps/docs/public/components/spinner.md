@@ -2,7 +2,7 @@
 title: "Spinner"
 code: "spinner"
 slug: "spinner"
-file: "src/components/spinner.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/spinner.tsx"
 category: "feedback"
 variants: "label: texto anunciado (padrão 'Carregando') · decorative: false (padrão, role=status) · true (aria-hidden, sem nome; raiz <span>)"
 ---
@@ -11,7 +11,7 @@ variants: "label: texto anunciado (padrão 'Carregando') · decorative: false (p
 
 > Indicador de carregamento inline (role=status). Com `decorative`, é só visual (sem role, aria-label nem texto sr-only), para quando outro elemento já anuncia o carregamento; é o que o `Button` com `loading` usa.
 
-**Arquivo:** `src/components/spinner.tsx` | **Categoria:** Feedback e estados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/spinner/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/spinner.tsx) | **Categoria:** Feedback e estados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/spinner/
 
 ## Variantes
 
@@ -24,7 +24,7 @@ variants: "label: texto anunciado (padrão 'Carregando') · decorative: false (p
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";

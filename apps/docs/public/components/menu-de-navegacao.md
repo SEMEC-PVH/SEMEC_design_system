@@ -2,7 +2,7 @@
 title: "Menu de navegação"
 code: "navigation-menu"
 slug: "menu-de-navegacao"
-file: "src/components/navigation-menu.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/navigation-menu.tsx"
 category: "navegacao"
 variants: "composição: NavigationMenu · List · Item · Trigger · Content · Link · Viewport · Indicator · estilos exportados: navigationMenuTriggerStyle() (visual de gatilho, ex.: link solto na lista) · navigationMenuLinkStyle() (estilo padrão do NavigationMenuLink, para links próprios) · a11y: aria-label padrão 'Menu principal' · Tab/ArrowDown entram no conteúdo aberto · Esc fecha e devolve o foco · aria-hidden-focus aberto é exceção EXC-01 (sentinela do Radix)"
 ---
@@ -11,7 +11,7 @@ variants: "composição: NavigationMenu · List · Item · Trigger · Content ·
 
 > Navegação principal com mega-menu e viewport animado. O `<nav>` se chama "Menu principal" por padrão (sobrescreva com `aria-label`). Gatilhos de 44px. O `NavigationMenuLink` já vem estilizado: alvo de 44px (`min-h-11`), `px-4`, hover/foco em `tint` e anel de foco por dentro; `active` marca a página atual com `aria-current="page"`.
 
-**Arquivo:** `src/components/navigation-menu.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/menu-de-navegacao/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/navigation-menu.tsx) | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/menu-de-navegacao/
 
 ## Variantes
 
@@ -25,7 +25,7 @@ variants: "composição: NavigationMenu · List · Item · Trigger · Content ·
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -72,6 +72,7 @@ import { cva } from "class-variance-authority";
 import { ChevronDown } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
@@ -111,8 +112,8 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
-const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-11 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+const navigationMenuTriggerStyle: VariantFunction = cva(
+  "group inline-flex h-11 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
 );
 
 const NavigationMenuTrigger = React.forwardRef<
@@ -137,10 +138,13 @@ const NavigationMenuContent = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Content>
 >(({ className, ...props }, ref) => (
+  // V42-VITE-03: com `w-full`/`md:w-auto` o painel encolhia até a palavra
+  // mais longa e cada link quebrava em 2 linhas ("Alvará de / funcionamento").
+  // `w-max` dá ao painel a largura do link mais longo, limitada à tela.
   <NavigationMenuPrimitive.Content
     ref={ref}
     className={cn(
-      "left-0 top-0 w-full data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52 data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52 md:absolute md:w-auto",
+      "left-0 top-0 w-max max-w-[calc(100vw-2rem)] data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52 data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52 md:absolute",
       className
     )}
     {...props}
@@ -156,8 +160,8 @@ NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName;
 // Quem passa `className={navigationMenuTriggerStyle()}` continua com o visual
 // do gatilho: o tailwind-merge resolve display, padding e fundo a favor da
 // classe recebida.
-const navigationMenuLinkStyle = cva(
-  "flex min-h-11 select-none items-center rounded-md px-4 py-2 text-sm font-medium leading-snug text-foreground no-underline outline-none transition-colors duration-fast ease-standard hover:bg-tint hover:text-foreground focus:bg-tint focus:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[active]:font-semibold"
+const navigationMenuLinkStyle: VariantFunction = cva(
+  "flex min-h-11 select-none items-center rounded-md px-4 py-2 text-sm font-medium leading-snug text-foreground no-underline outline-none focus-visible:outline-hidden transition-colors duration-fast ease-standard hover:bg-tint hover:text-foreground focus:bg-tint focus:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[active]:font-semibold"
 );
 
 const NavigationMenuLink = React.forwardRef<

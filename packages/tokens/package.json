@@ -1,0 +1,86 @@
+{
+  "name": "@semec/ds-tokens",
+  "version": "1.0.1",
+  "private": false,
+  "description": "Design tokens SEMEC sem React nem Tailwind: CSS, JSON DTCG, JS, Android, iOS e Figma (Tokens Studio).",
+  "type": "module",
+  "exports": {
+    "./tokens.css": {
+      "default": "./dist/tokens.css"
+    },
+    "./base.css": {
+      "default": "./dist/base.css"
+    },
+    "./fonts.css": {
+      "default": "./dist/fonts.css"
+    },
+    "./fonts/*": {
+      "default": "./dist/fonts/*"
+    },
+    "./tokens.json": {
+      "default": "./dist/tokens.json"
+    },
+    "./tokens": {
+      "types": "./dist/tokens.d.ts",
+      "default": "./dist/tokens.js"
+    },
+    "./android/colors.xml": {
+      "default": "./dist/android/colors.xml"
+    },
+    "./android/dimens.xml": {
+      "default": "./dist/android/dimens.xml"
+    },
+    "./ios/SemecTokens.swift": {
+      "default": "./dist/ios/SemecTokens.swift"
+    },
+    "./figma/tokens-studio.json": {
+      "default": "./dist/figma/tokens-studio.json"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/build.mjs && node --test test/tokens.test.mjs test/plataformas.test.mjs",
+    "test:plataformas": "node scripts/build.mjs && node --test test/plataformas.test.mjs",
+    "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\"",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@tokens-studio/sd-transforms": "^2.0.3",
+    "postcss": "^8.5.23",
+    "style-dictionary": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SEMEC-PVH/SEMEC_design_system.git",
+    "directory": "packages/tokens"
+  },
+  "homepage": "https://semec-pvh.github.io/SEMEC_design_system/",
+  "bugs": {
+    "url": "https://github.com/SEMEC-PVH/SEMEC_design_system/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "design-system",
+    "design-tokens",
+    "dtcg",
+    "style-dictionary",
+    "tokens-studio",
+    "semec",
+    "portovelho"
+  ]
+}

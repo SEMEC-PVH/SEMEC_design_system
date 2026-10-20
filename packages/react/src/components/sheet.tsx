@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 
 const Sheet = DialogPrimitive.Root;
 
@@ -30,7 +31,9 @@ const SheetOverlay = React.forwardRef<
 ));
 SheetOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
-const sheetVariants = cva(
+const sheetVariants: VariantFunction<{
+  side: "top" | "bottom" | "left" | "right";
+}> = cva(
   "fixed z-50 gap-4 overflow-y-auto bg-card p-6 shadow-elevation-3 duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
   {
     variants: {
@@ -68,7 +71,7 @@ const SheetContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-3 top-3 inline-flex size-11 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none">
+      <DialogPrimitive.Close className="absolute right-3 top-3 inline-flex size-11 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none">
         <X className="h-4 w-4" aria-hidden="true" />
         <span className="sr-only">{closeLabel}</span>
       </DialogPrimitive.Close>

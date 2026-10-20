@@ -2,7 +2,7 @@
 title: "Link para o conteúdo"
 code: "skip-link"
 slug: "link-para-o-conteudo"
-file: "src/components/skip-link.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/skip-link.tsx"
 category: "navegacao"
 variants: "props: href (padrão #conteudo) · children (padrão 'Pular para o conteúdo principal') · a11y: visível no foco · foco movido ao alvo (tabindex=-1 aplicado se preciso) · alvo de 44px"
 ---
@@ -11,7 +11,7 @@ variants: "props: href (padrão #conteudo) · children (padrão 'Pular para o co
 
 > Link "Pular para o conteúdo principal" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo).
 
-**Arquivo:** `src/components/skip-link.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/link-para-o-conteudo/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/skip-link.tsx) | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/link-para-o-conteudo/
 
 ## Variantes
 
@@ -24,7 +24,7 @@ variants: "props: href (padrão #conteudo) · children (padrão 'Pular para o co
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -95,7 +95,7 @@ const SkipLink = React.forwardRef<HTMLAnchorElement, SkipLinkProps>(
         href={href}
         onClick={handleClick}
         className={cn(
-          "sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:inline-flex focus:min-h-11 focus:items-center focus:rounded-md focus:bg-surface focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-brand-hero focus:underline focus:shadow-elevation-2 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
+          "sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:inline-flex focus:min-h-11 focus:items-center focus:rounded-md focus:bg-surface focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-brand-hero focus:underline focus:shadow-elevation-2 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
           className
         )}
         {...props}

@@ -2,7 +2,7 @@
 title: "Avatar"
 code: "avatar"
 slug: "avatar"
-file: "src/components/avatar.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/avatar.tsx"
 category: "conteudo-dados"
 variants: "composição: Avatar · AvatarImage · AvatarFallback · a11y: alt da AvatarImage = nome da pessoa (vale também para o fallback) · alt vazio para foto decorativa (o fallback não anuncia) · aria-label no AvatarFallback vence o alt · tamanhos: h-10 w-10 (padrão) — sobrescreva com className"
 ---
@@ -11,7 +11,7 @@ variants: "composição: Avatar · AvatarImage · AvatarFallback · a11y: alt da
 
 > Foto de perfil com fallback automático (iniciais). Com a foto quebrada, o `AvatarFallback` anuncia o `alt` da `AvatarImage` (as iniciais ficam só visuais); um `aria-label` no `AvatarFallback` continua aceito e tem prioridade.
 
-**Arquivo:** `src/components/avatar.tsx` | **Categoria:** Conteúdo e dados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/avatar/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/avatar.tsx) | **Categoria:** Conteúdo e dados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/avatar/
 
 ## Variantes
 
@@ -25,7 +25,7 @@ variants: "composição: Avatar · AvatarImage · AvatarFallback · a11y: alt da
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";

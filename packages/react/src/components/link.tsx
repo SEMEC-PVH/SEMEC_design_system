@@ -2,13 +2,17 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 
-const linkVariants = cva(
+const linkVariants: VariantFunction<{
+  variant: "primary" | "onSurface" | "muted";
+  underline: boolean;
+}> = cva(
   // TST-10: abaixo de `sm`, um ::after centralizado de no mínimo 44×44 amplia a
   // área de toque (mesmo recurso do Button sm) sem mudar a altura da linha do
   // texto: um link tel/mailto sozinho num parágrafo media 21 px. No desktop o
   // ::after não existe, para não roubar cliques do texto das linhas vizinhas.
-  "relative inline-flex items-center gap-1 text-sm font-medium underline-offset-4 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background max-sm:after:absolute max-sm:after:left-1/2 max-sm:after:top-1/2 max-sm:after:h-full max-sm:after:min-h-11 max-sm:after:w-full max-sm:after:min-w-11 max-sm:after:-translate-x-1/2 max-sm:after:-translate-y-1/2",
+  "relative inline-flex items-center gap-1 text-sm font-medium underline-offset-4 transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background max-sm:after:absolute max-sm:after:left-1/2 max-sm:after:top-1/2 max-sm:after:h-full max-sm:after:min-h-11 max-sm:after:w-full max-sm:after:min-w-11 max-sm:after:-translate-x-1/2 max-sm:after:-translate-y-1/2",
   {
     variants: {
       variant: {

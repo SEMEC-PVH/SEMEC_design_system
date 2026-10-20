@@ -2,16 +2,16 @@
 title: "Seletor de data"
 code: "date-picker"
 slug: "seletor-de-data"
-file: "src/components/date-picker.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/date-picker.tsx"
 category: "formularios"
 variants: "props: nativo HTML (min · max · disabled · name · required · onChange(evento)) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · mudou na 4.0: onChange é o evento nativo do <input> (até a 3.x recebia a string); para o valor, use onValueChange"
 ---
 
 # Seletor de data — `date-picker`
 
-> Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo).
+> Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). O formato mostrado (dd/mm/aaaa ou mm/dd/aaaa) vem do idioma do navegador, não do `lang` da página: nos PCs da prefeitura, deixe o navegador em português. Num navegador sem `type="date"` o campo vira texto e `onValueChange` recebe o que foi digitado, então valide o ISO no schema (ex.: `z.string().regex(/^\d{4}-\d{2}-\d{2}$/)`). Em teste automatizado, preencha com `fill("2026-10-16")`, não digitando a data.
 
-**Arquivo:** `src/components/date-picker.tsx` | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/seletor-de-data/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/date-picker.tsx) | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/seletor-de-data/
 
 ## Variantes
 
@@ -24,7 +24,7 @@ variants: "props: nativo HTML (min · max · disabled · name · required · onC
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -53,7 +53,7 @@ import { DatePicker, FormField } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). API e variantes: props: nativo HTML (min · max · disabled · name · required · onChange(evento)) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · mudou na 4.0: onChange é o evento nativo do <input> (até a 3.x recebia a string); para o valor, use onValueChange. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `DatePicker` (Seletor de data) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Data com `<input type="date">` nativo — sem biblioteca de calendário. Um só indicador: botão "Abrir calendário" de 44px que chama `showPicker()` (o indicador nativo fica oculto; no Firefox, fica só o nativo). O formato mostrado (dd/mm/aaaa ou mm/dd/aaaa) vem do idioma do navegador, não do `lang` da página: nos PCs da prefeitura, deixe o navegador em português. Num navegador sem `type="date"` o campo vira texto e `onValueChange` recebe o que foi digitado, então valide o ISO no schema (ex.: `z.string().regex(/^\d{4}-\d{2}-\d{2}$/)`). Em teste automatizado, preencha com `fill("2026-10-16")`, não digitando a data. API e variantes: props: nativo HTML (min · max · disabled · name · required · onChange(evento)) + value · defaultValue · onValueChange(ISO) · invalid · labels.openCalendar · mudou na 4.0: onChange é o evento nativo do <input> (até a 3.x recebia a string); para o valor, use onValueChange. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -146,7 +146,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
             onValueChange?.(e.target.value);
           }}
           className={cn(
-            "flex h-11 w-full appearance-none rounded-md border border-input bg-surface px-3 py-2 pr-12 text-sm text-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&::-webkit-calendar-picker-indicator]:hidden",
+            "flex h-11 w-full appearance-none rounded-md border border-input bg-surface px-3 py-2 pr-12 text-base sm:text-sm text-foreground transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&::-webkit-calendar-picker-indicator]:hidden",
             className
           )}
           {...props}
@@ -157,7 +157,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
           onClick={openPicker}
           disabled={disabled || readOnly}
           aria-label={text.openCalendar}
-          className="absolute right-0 top-0 inline-flex size-11 items-center justify-center rounded-md text-muted-foreground transition-colors duration-fast ease-standard hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 supports-[-moz-appearance:none]:hidden"
+          className="absolute right-0 top-0 inline-flex size-11 items-center justify-center rounded-md text-muted-foreground transition-colors duration-fast ease-standard hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 supports-[-moz-appearance:none]:hidden"
         >
           <CalendarIcon className="h-4 w-4" aria-hidden="true" />
         </button>

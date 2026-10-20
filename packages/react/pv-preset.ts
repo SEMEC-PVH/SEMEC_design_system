@@ -1,5 +1,5 @@
 /**
- * Preset Tailwind CSS v4 da SEMEC (caminho JS via `@config`).
+ * Preset JS da SEMEC (Tailwind v4 via `@config`; v3 sem suporte oficial).
  *
  * Mapeia os tokens de `tokens.css` para utilitários. O caminho CSS-first
  * (`@theme inline`, dentro do próprio `tokens.css`) é o recomendado — este
@@ -21,9 +21,27 @@ import type { Config } from "tailwindcss";
 export default {
   theme: {
     extend: {
+      // INT-A-14: `muted`/`secondary` são só fundo (bg-muted, bg-secondary),
+      // como no @theme; `text-muted`/`text-secondary` não são gerados.
+      backgroundColor: {
+        muted: "var(--surface-alt)",
+        secondary: "var(--surface-alt)",
+      },
       colors: {
         background: "var(--bg)",
         foreground: "var(--fg)",
+        bg: "var(--bg)",
+        fg: "var(--fg)",
+        card: "var(--surface)",
+        "card-foreground": "var(--fg)",
+        popover: "var(--surface)",
+        "popover-foreground": "var(--fg)",
+        "secondary-foreground": "var(--fg)",
+        accent: "var(--surface-alt)",
+        "accent-foreground": "var(--fg)",
+        sidebar: "var(--surface)",
+        "sidebar-foreground": "var(--fg)",
+        "sidebar-ring": "var(--focus-ring)",
         surface: "var(--surface)",
         "surface-alt": "var(--surface-alt)",
         "surface-sunken": "var(--surface-sunken)",
@@ -34,7 +52,6 @@ export default {
           DEFAULT: "var(--focus-ring)",
           inverse: "var(--focus-ring-inverse)",
         },
-        muted: "var(--surface-alt)",
         "muted-foreground": "var(--text-muted)",
         // AUD-30: cor de TEXTO. `text-muted`/`text-secondary` são fundo.
         "text-muted": "var(--text-muted)",
@@ -146,6 +163,53 @@ export default {
       },
       transitionTimingFunction: {
         standard: "var(--easing-standard)",
+      },
+      // Mesmos valores de --animate-* e @keyframes em tokens.css, com uma
+      // diferença em enter/exit (RT1-R-01): na v3, -translate-x-1/2 vive em
+      // `transform`, que o keyframe sobrescrevia, e o Dialog entrava fora do
+      // centro. O keyframe devolve a translação do elemento pela propriedade
+      // `translate` (var(--tw-translate-x/y)). Na v4, que já usa `translate`
+      // com essas variáveis, o valor é o mesmo do elemento e nada muda. Os
+      // modificadores @utility (fade/zoom/slide) continuam exigindo v4.
+      animation: {
+        in: "enter var(--tw-animation-duration, var(--tw-duration, 0.15s)) var(--tw-ease, ease) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none)",
+        out: "exit var(--tw-animation-duration, var(--tw-duration, 0.15s)) var(--tw-ease, ease) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none)",
+        "accordion-down": "accordion-down var(--tw-animation-duration, var(--tw-duration, 0.2s)) var(--tw-ease, ease-out) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none)",
+        "accordion-up": "accordion-up var(--tw-animation-duration, var(--tw-duration, 0.2s)) var(--tw-ease, ease-out) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none)",
+        "collapsible-down": "collapsible-down var(--tw-animation-duration, var(--tw-duration, 0.2s)) var(--tw-ease, ease-out) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none)",
+        "collapsible-up": "collapsible-up var(--tw-animation-duration, var(--tw-duration, 0.2s)) var(--tw-ease, ease-out) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal) var(--tw-animation-fill-mode, none)",
+      },
+      keyframes: {
+        enter: {
+          from: {
+            opacity: "var(--tw-enter-opacity, 1)",
+            translate: "var(--tw-translate-x, 0) var(--tw-translate-y, 0)",
+            transform: "translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0) scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), var(--tw-enter-scale, 1)) rotate(var(--tw-enter-rotate, 0))",
+          },
+        },
+        exit: {
+          to: {
+            opacity: "var(--tw-exit-opacity, 1)",
+            translate: "var(--tw-translate-x, 0) var(--tw-translate-y, 0)",
+            transform: "translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0) scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1)) rotate(var(--tw-exit-rotate, 0))",
+          },
+        },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height, auto)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height, auto)" },
+          to: { height: "0" },
+        },
+        "collapsible-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-collapsible-content-height, auto)" },
+        },
+        "collapsible-up": {
+          from: { height: "var(--radix-collapsible-content-height, auto)" },
+          to: { height: "0" },
+        },
       },
     },
   },

@@ -2,20 +2,20 @@
 title: "Notificação"
 code: "toast"
 slug: "notificacao"
-file: "src/components/toast.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/toast.tsx"
 category: "feedback"
-variants: "variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos · Toaster: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis) · alvos: X e ToastAction com 44px"
+variants: "variant: default · success (fundo bg-success-emphasis, texto text-success-emphasis-foreground, 5,85:1; título 16px (text-base font-bold), descrição 14px (text-sm), Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos · Toaster: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis) · alvos: X e ToastAction com 44px"
 ---
 
 # Notificação — `toast`
 
 > Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`.
 
-**Arquivo:** `src/components/toast.tsx` | **Categoria:** Feedback e estados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/notificacao/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/toast.tsx) | **Categoria:** Feedback e estados | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/notificacao/
 
 ## Variantes
 
-- **variant**: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive
+- **variant**: default · success (fundo bg-success-emphasis, texto text-success-emphasis-foreground, 5,85:1; título 16px (text-base font-bold), descrição 14px (text-sm), Poppins) · warning · destructive
 - **uso**: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos
 - **Toaster**: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis)
 - **alvos**: X e ToastAction com 44px
@@ -26,7 +26,7 @@ variants: "variant: default · success (verde SEMEC #82C353, texto #26325B, 12px
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -57,7 +57,7 @@ function Acao() {
 ## Prompt para IA
 
 ```text
-Use o componente `Toaster` (Notificação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`. API e variantes: variant: default · success (verde SEMEC #82C353, texto #26325B, 12px, Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos · Toaster: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis) · alvos: X e ToastAction com 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Toaster` (Notificação) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Notificação temporária flutuante disparada com `useToast()` e viewport empilhável. Padrão oficial para confirmação de envio de formulários e ações com a variante `success`. API e variantes: variant: default · success (fundo bg-success-emphasis, texto text-success-emphasis-foreground, 5,85:1; título 16px (text-base font-bold), descrição 14px (text-sm), Poppins) · warning · destructive · uso: <Toaster /> uma vez no root do app + useToast() em formulários, botões de ação e fluxos assíncronos · Toaster: label · viewportLabel · closeLabel (textos PT-BR sobrescrevíveis) · alvos: X e ToastAction com 44px. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -71,6 +71,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 
 // Rótulos PT-BR padrão (ADR-016). Os padrões do Radix são em inglês
 // ("Notification", "Notifications ({hotkey})") e seriam lidos pelo leitor de tela.
@@ -94,7 +95,7 @@ const ToastViewport = React.forwardRef<
     ref={ref}
     label={label}
     className={cn(
-      "fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col gap-2 p-4 sm:top-4 sm:right-4 md:max-w-[420px]",
+      "pointer-events-none fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col gap-2 p-4 sm:top-4 sm:right-4 md:max-w-[420px]",
       className
     )}
     {...props}
@@ -102,7 +103,9 @@ const ToastViewport = React.forwardRef<
 ));
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 
-const toastVariants = cva(
+const toastVariants: VariantFunction<{
+  variant: "default" | "success" | "warning" | "destructive";
+}> = cva(
   "group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-[12px] border border-border bg-card p-4 text-card-foreground shadow-elevation-2 font-sans transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out",
   {
     variants: {
@@ -140,7 +143,7 @@ const ToastAction = React.forwardRef<
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      "inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-border bg-transparent px-4 text-sm font-medium transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+      "inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-border bg-transparent px-4 text-sm font-medium transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
       className
     )}
     {...props}
@@ -155,7 +158,7 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      "-m-2 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      "-m-2 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
       className
     )}
     toast-close=""
@@ -365,6 +368,7 @@ export {
   Toaster,
   useToast,
 };
+
 ```
 
 ## Tokens relacionados

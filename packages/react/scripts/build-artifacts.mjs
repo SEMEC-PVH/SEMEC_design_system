@@ -27,7 +27,9 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { assertNoConflictMarkers, listFilesRecursive } from "./conflict-markers.mjs";
+import { buildTokens } from "./build-tokens.mjs";
 import { pendingRelease, unreleasedNote } from "./release-status.mjs";
+import { buildComponentRecipes, componentRecipesMarkdown } from "./component-recipes.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgRoot = path.resolve(__dirname, "..");
@@ -165,6 +167,7 @@ const tokensCss = readBase("packages/react/tokens.css") ?? readPkgRootBase("toke
 const pvPreset = readBase("packages/react/pv-preset.ts") ?? readPkgRootBase("pv-preset.ts");
 const baseReadme = readBase("packages/react/README.md") ?? readPkgRootBase("README.md");
 const baseIndex = readBase("packages/react/src/index.ts") ?? "";
+const componentClasses = await buildComponentRecipes(pkgRoot);
 
 const COMPONENT_SOURCE_PREFIX = "packages/react/";
 
@@ -180,7 +183,7 @@ const componentCount = dsComponents.length;
 /** Instalação do kit React: `lucide-react` é peer e só o npm 7+ o instala sozinho. */
 const INSTALL_CMD = "npm install @semec/ds lucide-react";
 /** Pacotes opcionais da receita de formulário (TST-20): não são peers do kit. */
-const FORM_RECIPE_CMD = "npm install react-hook-form @hookform/resolvers zod";
+const FORM_RECIPE_CMD = "npm install react-hook-form @hookform/resolvers@^5 zod@^4";
 const PEERS_NOTE =
   "lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: " +
   FORM_RECIPE_CMD +
@@ -216,6 +219,9 @@ const homepage = (pkgJson.homepage || "https://semec-pvh.github.io/SEMEC_design_
 const siteUrl = (rel = "") => `${homepage}${rel.replace(/^\//, "")}`;
 const componentPageUrl = (c) => siteUrl(`componentes/${c.slug}/`);
 const componentMdUrl = (c) => siteUrl(`components/${c.slug}.md`);
+// O caminho local continua no manifest-fonte para a leitura via fs do site.
+// Nos artefatos distribuídos, src/ não existe: a referência aponta ao GitHub.
+const componentSourceUrl = (c) => `https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/${c.file}`;
 
 function componentsByCategory() {
   const known = new Set(dsCategories.map((cat) => cat.key));
@@ -238,7 +244,7 @@ function skillComponentList() {
   for (const { cat, items } of componentsByCategory()) {
     out.push(`### ${cat.label} (${items.length})`, "");
     for (const c of items) {
-      out.push(`- \`${dsExportName(c)}\` (\`${c.code}\`) — ${c.desc}`);
+      out.push(`- \`${dsExportName(c)}\` (\`${c.code}\`, \`components/${c.slug}.md\`) — ${c.desc}`);
     }
     out.push("");
   }
@@ -281,6 +287,7 @@ function renderSkill(src, { maintainer = false } = {}) {
     .replaceAll("{{ds:component-count}}", String(componentCount))
     .replaceAll("{{ds:homepage}}", homepage)
     .replaceAll("{{ds:version}}", version)
+    .replace("<!-- ds:component-recipes -->", componentRecipesMarkdown(componentClasses))
     .replace("<!-- ds:component-list -->", skillComponentList())
     .replace("<!-- ds:release-status -->", unreleased ? `> **${unreleased}**` : "");
   out = maintainer
@@ -353,27 +360,27 @@ function syncObjetivo() {
   }
 }
 
-function buildManifest({ site = false } = {}) {
+function buildManifest() {
   return {
     name: "SEMEC Design System",
     version,
     generatedAt,
     componentCount,
+    classes: componentClasses,
     categories: dsCategories,
     components: dsComponents.map((c) => ({
       code: c.code,
       slug: c.slug,
       label: c.label,
       exportName: dsExportName(c),
-      file: c.file,
+      file: componentSourceUrl(c),
       category: c.category,
       desc: c.desc,
       variants: c.variants,
       usage: c.usage,
       prompt: dsPrompt(c),
-      ...(site
-        ? { url: componentPageUrl(c), md: componentMdUrl(c) }
-        : {}),
+      url: componentPageUrl(c),
+      md: componentMdUrl(c),
     })),
     // TST-15: `null` quando o repositório não tem changesets pendentes.
     unreleased: pending
@@ -401,25 +408,23 @@ function buildManifest({ site = false } = {}) {
         "Opcional, no CSS global depois dos imports. O tokens.css já gera os utilitários; o preset só serve a quem ainda configura o Tailwind por JS.",
       utils: 'import { cn } from "@semec/ds/react";',
     },
-    tokens: { files: ["tokens.css", "fonts.css", "pv-preset.ts"] },
+    tokens: { files: ["tokens.css", "fonts.css", "pv-preset.ts", "tokens/tokens.json", "tokens/tokens.js"] },
   };
 }
 
-function componentMd(c, { site = false } = {}) {
+function componentMd(c) {
   const source = componentSource(c);
   const variantsLine = c.variants?.length
     ? c.variants.map((v) => `${v.prop}: ${v.values}`).join(" · ")
     : "—";
   const catLabel = dsCategories.find((x) => x.key === c.category)?.label ?? c.category;
-  const routeLine = site
-    ? `**Arquivo:** \`${c.file}\` | **Categoria:** ${catLabel} | **Página:** ${componentPageUrl(c)}`
-    : `**Arquivo:** \`${c.file}\` | **Categoria:** ${catLabel}`;
+  const routeLine = `**Arquivo:** [fonte no GitHub](${componentSourceUrl(c)}) | **Categoria:** ${catLabel} | **Página:** ${componentPageUrl(c)}`;
 
   return `---
 title: "${c.label}"
 code: "${c.code}"
 slug: "${c.slug}"
-file: "${c.file}"
+file: "${componentSourceUrl(c)}"
 category: "${c.category}"
 variants: "${variantsLine.replace(/"/g, "'")}"
 ---
@@ -522,6 +527,7 @@ function llmsIndex({ site = false, lite = false } = {}) {
       "",
       "Versão sem componentes React. Fornece tokens CSS, regras de acessibilidade",
       "e padrões responsive para aplicações com a identidade visual da Prefeitura de Porto Velho.",
+      "Use em Vue, Angular, Svelte, HTML ou qualquer app sem React.",
       "",
       "## Instalação",
       "",
@@ -541,18 +547,24 @@ function llmsIndex({ site = false, lite = false } = {}) {
       "",
       `Preset JS opcional (TST-33), no CSS global depois dos imports: \`${LITE_PRESET_LINE}\`. O \`tokens.css\` já gera os utilitários; o preset só serve a quem ainda configura o Tailwind por JS.`,
       "",
-      "Sem Tailwind: as variáveis `--*` e a camada base funcionam em CSS puro. Os subpaths `@semec/ds/lite/*.css` só resolvem num bundler (`import` no JS ou `@import` processado por Vite/Next); num `<link>`, use os arquivos reais:",
+      "Só CSS, sem React (npm 7+): `npm install @semec/ds --omit=peer` não instala os peers React (`react`, `react-dom`, `lucide-react`).",
+      "",
+      "Sem Tailwind, não use o `tokens.css` (as diretivas `@theme`/`@utility` geram avisos no bundler). Use `variables.css` (só as variáveis `:root`) e, se quiser os estilos globais do kit, `base.css` (reset, links, foco e reduced motion). Num bundler: `import \"@semec/ds/lite/fonts.css\"; import \"@semec/ds/lite/variables.css\"; import \"@semec/ds/lite/base.css\";`. Num `<link>`, use os arquivos reais:",
       "",
       "```html",
       '<link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/fonts.css" />',
-      '<link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/tokens.css" />',
+      '<link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/variables.css" />',
+      '<link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/base.css" />',
       "```",
       "",
-      "Sem `node_modules` publicado, copie `dist/react/tokens.css`, `dist/react/fonts.css` e `dist/react/fonts/` para a pasta estática (`fonts/` ao lado do `fonts.css`).",
+      "Sem `node_modules` publicado, copie `dist/react/variables.css` e `dist/react/base.css` para a pasta estática e rode `npx semec-ds copiar-fontes <pasta>` (copia `fonts.css` e `fonts/`). Via CDN: `https://cdn.jsdelivr.net/npm/@semec/ds@<versão>/dist/react/variables.css` (caminho físico `dist/react/`, versão fixa e SRI).",
+      "",
+      "Tokens como dados: `@semec/ds/tokens.json` (DTCG 2025.10) e `@semec/ds/tokens` (JS tipado, valores resolvidos).",
       "",
       "## Inclui",
       "",
-      "- Tokens de identidade visual L0 + L1 (`tokens.css`)",
+      "- Tokens de identidade visual L0 + L1 (`tokens.css` com Tailwind; `variables.css` + `base.css` sem Tailwind)",
+      "- Tokens como dados (`tokens.json` DTCG e `@semec/ds/tokens`)",
       "- Fonte Poppins 400–700 auto-hospedada, SIL OFL 1.1 (`fonts.css`)",
       "- Padrões de acessibilidade (WCAG 2.1 AA)",
       "- Padrões responsive / mobile",
@@ -614,11 +626,11 @@ function llmsIndex({ site = false, lite = false } = {}) {
     const importName = dsExportName(c);
     if (site) {
       lines.push(
-        `- [${c.label} (\`${c.code}\`) — ${c.desc}](${componentPageUrl(c)}) — \`${c.file}\` — md: ${componentMdUrl(c)}`
+        `- [${c.label} (\`${c.code}\`) — ${c.desc}](${componentPageUrl(c)}) — [fonte](${componentSourceUrl(c)}) — md: ${componentMdUrl(c)}`
       );
     } else {
       lines.push(
-        `- [${c.label} (\`${c.code}\`) — ${c.desc}](components/${c.slug}.md) — \`${c.file}\``
+        `- [${c.label} (\`${c.code}\`) — ${c.desc}](components/${c.slug}.md) — [fonte](${componentSourceUrl(c)})`
       );
     }
     lines.push(`  Uso: \`import { ${importName} } from "@semec/ds/react";\``);
@@ -674,7 +686,7 @@ function llmsFullDump() {
 
   for (const c of dsComponents) {
     const src = componentSource(c);
-    full += `\n### ${c.label} (\`${c.code}\`) — \`${c.file}\` — slug: ${c.slug}\n\n`;
+    full += `\n### ${c.label} (\`${c.code}\`) — [fonte](${componentSourceUrl(c)}) — slug: ${c.slug}\n\n`;
     full += `Desc: ${c.desc}\n\n`;
     if (c.variants?.length) {
       full += `Variantes: ${c.variants.map((x) => `${x.prop}: ${x.values}`).join(" · ")}\n\n`;
@@ -700,20 +712,16 @@ function writeLlmsFullForTarget(outDir, { lite = false } = {}) {
 }
 
 // --- dist (npm) ---
-function buildDist() {
+async function buildDist() {
+  buildTokens();
   console.log("→ dist (npm)");
   syncPackageReadme();
   syncObjetivo();
 
   // CSS + preset em dist/react
-  const cssFiles = ["tokens.css"];
-  for (const file of cssFiles) {
-    const src = path.join(pkgRoot, file);
-    if (fs.existsSync(src)) {
-      copyFile(src, path.join(distDir, "react", file));
-      console.log(`  copied ${file}`);
-    }
-  }
+  const { buildCss } = await import("./build-css.mjs");
+  buildCss(pkgRoot, path.join(distDir, "react"));
+  console.log("  generated tokens.css, variables.css, base.css, source.css");
   const pvSrc = path.join(pkgRoot, "pv-preset.ts");
   if (fs.existsSync(pvSrc)) {
     copyFile(pvSrc, path.join(distDir, "react", "pv-preset.ts"));
@@ -770,8 +778,9 @@ function buildDist() {
         version,
         generatedAt,
         description:
-          "Tokens, acessibilidade, responsive e padrões visuais. Sem componentes React.",
+          "Tokens, acessibilidade, responsive e padrões visuais. Sem componentes React: use em Vue, Angular, Svelte, HTML ou qualquer app sem React.",
         categories: dsCategories,
+        classes: componentClasses,
         unreleased: pending
           ? {
               pendingChangesets: pending.count,
@@ -787,10 +796,18 @@ function buildDist() {
           presetNote:
             "Opcional, no CSS global depois dos imports. O tokens.css já gera os utilitários; o preset só serve a quem ainda configura o Tailwind por JS.",
           withoutTailwind:
-            "Os subpaths @semec/ds/lite/*.css só resolvem num bundler. Num <link>, use node_modules/@semec/ds/dist/react/fonts.css e node_modules/@semec/ds/dist/react/tokens.css (ou copie esses arquivos e a pasta fonts/ para a pasta estática).",
+            "Não use tokens.css sem Tailwind (as diretivas @theme/@utility geram avisos no bundler). Use @semec/ds/lite/variables.css (só :root) e, opcionalmente, @semec/ds/lite/base.css (reset, links, foco, reduced motion), depois de fonts.css. Os subpaths só resolvem num bundler; num <link>, use node_modules/@semec/ds/dist/react/fonts.css, variables.css e base.css.",
+          cssOnly: "npm install @semec/ds --omit=peer",
+          cssOnlyNote:
+            "npm 7+: não instala os peers React (react, react-dom, lucide-react). Repita --omit=peer no npm ci/npm install seguinte.",
+          fonts:
+            "npx semec-ds copiar-fontes <pasta> copia fonts.css e fonts/ para a pasta estática (Tailwind CLI, HTML sem bundler).",
+          cdn: "https://cdn.jsdelivr.net/npm/@semec/ds@<versão>/dist/react/{fonts,variables,base}.css — caminho físico dist/react/, versão fixa e SRI calculado dos arquivos publicados (variables.css e base.css a partir da 4.4.0).",
+          tokensData:
+            "@semec/ds/tokens.json (DTCG 2025.10, grupos L0/L1) e @semec/ds/tokens (JS tipado com valores CSS resolvidos), para Figma, mobile, back-end, PDF e e-mail.",
         },
         tokens: {
-          files: ["tokens.css", "fonts.css", "pv-preset.ts"],
+          files: ["tokens.css", "variables.css", "base.css", "fonts.css", "pv-preset.ts", "tokens/tokens.json", "tokens/tokens.js"],
           primitives: "pv-* prefixed (L0)",
           semantic: "L1 — --bg, --fg, --surface, --action-primary, --feedback-*, etc.",
         },
@@ -875,7 +892,7 @@ function buildAgentDirs() {
 }
 
 // --- run ---
-if (targets.has("dist")) buildDist();
+if (targets.has("dist")) await buildDist();
 if (targets.has("docs-public")) buildDocsPublic();
 if (targets.has("agent-dirs")) buildAgentDirs();
 

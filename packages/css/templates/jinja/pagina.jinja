@@ -1,0 +1,38 @@
+{#- Parcial "pagina" (Jinja2): layout base. Uso, num template filho:
+    {% extends "semec/pagina.jinja" %}
+    {% block conteudo %}<h1 class="semec-heading semec-heading--1">Título</h1>{% endblock %}
+    Parâmetros (titulo, css_href, cabecalho, rodape…) vêm do contexto do template.
+    Blocos: conteudo (dentro do <main>) e head (fim do <head>). -#}
+{%- from "semec/pular-para-o-conteudo.jinja" import pular_para_o_conteudo -%}
+{%- from "semec/cabecalho.jinja" import cabecalho as semec_cabecalho -%}
+{%- from "semec/rodape.jinja" import rodape as semec_rodape -%}
+{%- autoescape true -%}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ titulo | default('', true) }}</title>
+{%- if fontes_href is not sameas false %}
+  <link rel="stylesheet" href="{{ fontes_href | default('/css/fonts.css', true) }}">
+{%- endif %}
+  <link rel="stylesheet" href="{{ css_href | default('/css/semec-ds.css', true) }}">
+{%- if elements_src is not sameas false %}
+  <script type="module" src="{{ elements_src | default('/js/semec-elements.js', true) }}"></script>
+{%- endif %}
+{% block head %}{% endblock %}
+</head>
+<body>
+{{ pular_para_o_conteudo(texto=pular_texto | default(none, true)) }}
+{%- if cabecalho is defined and cabecalho %}
+{{ semec_cabecalho(**cabecalho) }}
+{%- endif %}
+<main id="conteudo" tabindex="-1">
+{% block conteudo %}{% endblock %}
+</main>
+{%- if rodape is defined and rodape %}
+{{ semec_rodape(**rodape) }}
+{%- endif %}
+</body>
+</html>
+{% endautoescape -%}

@@ -5,6 +5,7 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import { useNonce } from "../lib/nonce-context";
 import { useFormFieldControl } from "./form-field";
 
 const Select = SelectPrimitive.Root;
@@ -30,7 +31,7 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground shadow-elevation-1 placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left",
+      "flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground shadow-elevation-1 placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left",
       className
     )}
     {...props}
@@ -75,34 +76,41 @@ SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayNam
 
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
->(({ className, children, position = "popper", ...props }, ref) => (
-  <SelectPrimitive.Portal>
-    <SelectPrimitive.Content
-      ref={ref}
-      className={cn(
-        "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 data-[state=open]:animate-in data-[state=closed]:animate-out",
-        position === "popper" &&
-          "w-[var(--radix-select-trigger-width)] max-w-[var(--radix-select-trigger-width)] data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
-        className
-      )}
-      position={position}
-      {...props}
-    >
-      <SelectScrollUpButton />
-      <SelectPrimitive.Viewport
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> & {
+    /** Nonce do estilo do Viewport; prevalece sobre o SemecProvider. */
+    nonce?: string;
+  }
+>(({ className, children, position = "popper", nonce, ...props }, ref) => {
+  const viewportNonce = useNonce(nonce);
+  return (
+    <SelectPrimitive.Portal>
+      <SelectPrimitive.Content
+        ref={ref}
         className={cn(
-          "p-1.5",
+          "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-elevation-2 data-[state=open]:animate-in data-[state=closed]:animate-out",
           position === "popper" &&
-            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+            "w-[var(--radix-select-trigger-width)] max-w-[var(--radix-select-trigger-width)] data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
+          className
         )}
+        position={position}
+        {...props}
       >
-        {children}
-      </SelectPrimitive.Viewport>
-      <SelectScrollDownButton />
-    </SelectPrimitive.Content>
-  </SelectPrimitive.Portal>
-));
+        <SelectScrollUpButton />
+        <SelectPrimitive.Viewport
+          nonce={viewportNonce}
+          className={cn(
+            "p-1.5",
+            position === "popper" &&
+              "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+          )}
+        >
+          {children}
+        </SelectPrimitive.Viewport>
+        <SelectScrollDownButton />
+      </SelectPrimitive.Content>
+    </SelectPrimitive.Portal>
+  );
+});
 SelectContent.displayName = SelectPrimitive.Content.displayName;
 
 const SelectLabel = React.forwardRef<
@@ -124,7 +132,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex min-h-11 w-full cursor-default select-none items-center rounded-lg py-2 pl-3 pr-8 text-sm outline-none whitespace-normal leading-relaxed focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex min-h-11 w-full cursor-default select-none items-center rounded-lg py-2 pl-3 pr-8 text-sm outline-none whitespace-normal leading-relaxed focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring forced-colors:focus:forced-color-adjust-none forced-colors:focus:bg-[Highlight] forced-colors:focus:text-[HighlightText] data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     {...props}

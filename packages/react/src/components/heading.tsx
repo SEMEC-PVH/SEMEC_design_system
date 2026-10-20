@@ -2,6 +2,7 @@ import * as React from "react";
 import { cva } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 
 /** Nível semântico de título (h1–h6). */
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
@@ -13,7 +14,9 @@ export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
  */
 export type HeadingTag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "div" | "p";
 
-const headingVariants = cva("text-foreground", {
+const headingVariants: VariantFunction<{
+  size: 1 | 2 | 3 | 4 | 5 | 6;
+}> = cva("text-foreground", {
   variants: {
     size: {
       // TST-16: alinhado à escala do tokens.css e à SKILL (3xl = título de

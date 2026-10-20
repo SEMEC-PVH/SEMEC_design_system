@@ -7,3 +7,4 @@
 @source "../../../packages/react/dist/react";
 @source "../../../scripts/gate";
 @source "../visual.fixtures.mjs";
+@source "../layout.fixtures.mjs";

@@ -264,6 +264,17 @@ function soltar(alvo: Element, files: File[]) {
 }
 
 describe("FileUpload", () => {
+  it("com required, o rótulo mostra o * como o FormField (NEXT42-06)", () => {
+    const { rerender } = render(<FileUpload label="Documentos" required />);
+    expect(screen.getByText("Documentos").closest("label")).toHaveTextContent("Documentos *");
+    expect(screen.getByLabelText(/Documentos/)).toBeRequired();
+    // Também pelo atalho inputProps.required.
+    rerender(<FileUpload label="Documentos" inputProps={{ required: true }} />);
+    expect(screen.getByText("Documentos").closest("label")).toHaveTextContent("Documentos *");
+    rerender(<FileUpload label="Documentos" />);
+    expect(screen.getByText("Documentos").closest("label")).toHaveTextContent(/^Documentos$/);
+  });
+
   it("label nomeia o input de arquivo; textos PT-BR da zona; hint descreve", () => {
     render(<FileUpload label="Documento de identidade" hint="PDF ou imagem, até 5 MB" />);
     const input = screen.getByLabelText("Documento de identidade");

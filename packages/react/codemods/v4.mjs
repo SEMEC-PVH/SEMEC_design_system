@@ -98,6 +98,36 @@ const COLOR_VAR_RE = /--color-pv-((?:blue|green|yellow|red|gray)-(?:\d+|hero)|wh
 const DIST_RE =
   /(?:\bfrom\s*|\bimport\s*\(\s*|\brequire\s*\(\s*|\bimport\s+|@import\s+(?:url\(\s*)?)(["'])(@semec\/ds\/dist\/[^"'\s]*)\1/g;
 
+// Declaração da cor no CSS do próprio app (ex.: `@theme { --color-pv-blue-900: #1e3a5f; }`).
+const COLOR_DECL_RE = /--color-pv-((?:blue|green|yellow|red|gray)-(?:\d+|hero)|white|black)\s*:/g;
+const CSS_EXT = new Set([".css", ".scss", ".sass", ".less", ".pcss"]);
+
+/**
+ * Troca comentários por espaços (mantém índices e quebras de linha), para não
+ * relatar exemplo de classe escrito num comentário (DIG-07). Só em CSS e
+ * pré-processadores: comentário de bloco sempre e de linha no SCSS/Sass/Less.
+ */
+export function maskComments(text, ext) {
+  if (!CSS_EXT.has(ext)) return text;
+  const blank = (m) => m.replace(/[^\n]/g, " ");
+  let out = text.replace(/\/\*[\s\S]*?\*\//g, blank);
+  if (ext !== ".css" && ext !== ".pcss") {
+    out = out.replace(/(^|[^:"'])(\/\/[^\n]*)/gm, (m, pre, comment) => pre + blank(comment));
+  }
+  return out;
+}
+
+/**
+ * Cores pv-* que o próprio app declara (--color-pv-*: … no CSS dele). Os
+ * utilitários dessas cores continuam gerando CSS na 4.0 e não são regressão
+ * (DIG-02, DIG-03: no semec-digital eram 852 dos 884 relatos).
+ */
+export function declaredColors(text, ext = ".css") {
+  const names = new Set();
+  for (const m of maskComments(text, ext).matchAll(COLOR_DECL_RE)) names.add(m[1]);
+  return names;
+}
+
 /** Sugestão semântica para um utilitário `prefixo-pv-nome[/opacidade]`. */
 export function suggestUtility(prefix, name, opacity = "") {
   const row = L0_TABLE[name];
@@ -319,24 +349,36 @@ export function transformSource(ts, file, text) {
   return { output, findings, changed: edits.length > 0 };
 }
 
-/** Relata utilitários L0, `--color-pv-*` e imports de `dist/` (nunca reescreve). */
-export function scanText(text) {
+/**
+ * Relata utilitários L0, `--color-pv-*` e imports de `dist/` (nunca reescreve).
+ * `declared`: cores que o app declara (ver `declaredColors`); os utilitários
+ * delas e a própria declaração não são relatados, só contados em `skipped`.
+ * `ext`: extensão do arquivo, para ignorar comentários de CSS.
+ */
+export function scanText(text, { declared = new Set(), ext = "", skipped = { count: 0 } } = {}) {
   const findings = [];
-  for (const m of text.matchAll(UTIL_RE)) {
+  const scan = maskComments(text, ext);
+  for (const m of scan.matchAll(UTIL_RE)) {
     const [whole, prefix, name, opacity = ""] = m;
+    if (declared.has(name)) {
+      skipped.count++;
+      continue;
+    }
     const { replacement, note } = suggestUtility(prefix, name, opacity);
     findings.push({
       index: m.index, kind: "utilitário",
       message: replacement ? `${whole} → ${replacement} (${note})` : `${whole}: sem semântico direto (${note})`,
     });
   }
-  for (const m of text.matchAll(COLOR_VAR_RE)) {
+  for (const m of scan.matchAll(COLOR_VAR_RE)) {
+    // A declaração do próprio app (--color-pv-x: …) e o uso de uma cor que ele declara não quebram.
+    if (declared.has(m[1])) continue;
     findings.push({
       index: m.index, kind: "utilitário",
       message: `${m[0]} não existe mais na 4.0: use var(--pv-${m[1]}) só para criar um semântico, ou o --color-* semântico (${L0_TABLE[m[1]]?.note ?? "ver guia"})`,
     });
   }
-  for (const m of text.matchAll(DIST_RE)) {
+  for (const m of scan.matchAll(DIST_RE)) {
     findings.push({
       index: m.index + m[0].indexOf(m[2]), kind: "import",
       message: `${m[2]}: caminho de arquivo em dist/ não é contrato e o "exports" já bloqueia; use @semec/ds/react ou @semec/ds/react/<componente>`,
@@ -369,7 +411,17 @@ export async function run(targets, { write = false, log = console.log, ts: tsArg
     if (loaded.error) throw new Error(loaded.error);
     ts = loaded.ts;
   }
-  const summary = { files: 0, rewritten: 0, written: 0, review: 0, utilities: 0, imports: 0 };
+  const summary = { files: 0, rewritten: 0, written: 0, review: 0, utilities: 0, imports: 0, declared: 0 };
+  // 1ª passada: cores pv-* que o próprio app declara no CSS (@theme), em qualquer arquivo lido.
+  const declared = new Set();
+  for (const target of targets) {
+    for (const file of walk(target)) {
+      const ext = path.extname(file);
+      if (!CSS_EXT.has(ext)) continue;
+      for (const name of declaredColors(fs.readFileSync(file, "utf8"), ext)) declared.add(name);
+    }
+  }
+  const skipped = { count: 0 };
   const header = write
     ? "@semec/ds codemod-4 (--write: as reescritas foram gravadas)"
     : "@semec/ds codemod-4 (simulação: nada foi gravado; use --write para aplicar as reescritas)";
@@ -384,7 +436,7 @@ export async function run(targets, { write = false, log = console.log, ts: tsArg
       if (CODE_EXT.has(path.extname(file)) && text.includes("@semec/ds")) {
         ({ output, findings, changed } = transformSource(ts, file, text));
       }
-      findings = findings.concat(scanText(text)).sort((a, b) => a.index - b.index);
+      findings = findings.concat(scanText(text, { declared, ext: path.extname(file), skipped })).sort((a, b) => a.index - b.index);
       if (!findings.length) continue;
       const rel = path.relative(process.cwd(), file);
       log(`\n${!rel || rel.startsWith("..") || path.isAbsolute(rel) ? file : rel}`);
@@ -402,11 +454,16 @@ export async function run(targets, { write = false, log = console.log, ts: tsArg
       }
     }
   }
+  summary.declared = skipped.count;
   log(
     `\nResumo: ${summary.files} arquivo(s) lido(s) · ${summary.rewritten} onChange → onValueChange (${
       write ? `${summary.written} arquivo(s) gravado(s)` : "não gravado"
     }) · ${summary.review} para revisar · ${summary.utilities} utilitário(s) L0 · ${summary.imports} import(s) de dist/.`
   );
+  if (summary.declared) {
+    const nomes = [...declared].sort().map((n) => `--color-pv-${n}`).join(", ");
+    log(`${summary.declared} utilitário(s) pv-* com cor declarada pelo próprio app (${nomes}): continuam gerando CSS e não foram relatados.`);
+  }
   if (summary.utilities) log("Utilitários L0 não são reescritos: confira o papel de cada um (tabela em docs/migracao-4.0.md).");
   return summary;
 }

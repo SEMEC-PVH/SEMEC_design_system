@@ -184,7 +184,7 @@ const Stepper = React.forwardRef<HTMLOListElement, StepperProps>(
                   onClick={() => onStepClick?.(index)}
                   className={cn(
                     rowClasses,
-                    "-mx-2 rounded-md px-2 transition-colors duration-fast ease-standard hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    "-mx-2 rounded-md px-2 transition-colors duration-fast ease-standard hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   )}
                 >
                   {body}

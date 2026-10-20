@@ -15,6 +15,9 @@ describe("applyInputMask", () => {
     ["cnpj", "12345678000195", "12.345.678/0001-95", "12345678000195"],
     ["cep", "76801000", "76801-000", "76801000"],
     ["data", "15102026", "15/10/2026", "15102026"],
+    ["data-mes-ano", "102026", "10/2026", "102026"],
+    ["data-hora", "151020261430", "15/10/2026 14:30", "151020261430"],
+    ["hora", "1430", "14:30", "1430"],
     ["telefone", "6932160000", "(69) 3216-0000", "6932160000"],
     ["telefone", "69992160000", "(69) 99216-0000", "69992160000"],
     ["telefone", "(69) 3216-0000", "(69) 3216-0000", "6932160000"],
@@ -258,5 +261,32 @@ describe("InputMask (AUD-36)", () => {
   it("axe sem violações serious/critical", async () => {
     setup({ defaultValue: "12345678901" });
     expect(await severeViolations()).toEqual([]);
+  });
+});
+
+describe("funções utilitárias de máscara de data/hora (SEM-845)", () => {
+  it("maskDate formata DD/MM/AAAA", async () => {
+    const { maskDate } = await import("../src/lib/masks");
+    expect(maskDate("15102026")).toBe("15/10/2026");
+    expect(maskDate("15")).toBe("15");
+    expect(maskDate("1510")).toBe("15/10");
+    expect(maskDate("15102026999")).toBe("15/10/2026");
+  });
+
+  it("maskDateMonthYear formata MM/AAAA", async () => {
+    const { maskDateMonthYear } = await import("../src/lib/masks");
+    expect(maskDateMonthYear("102026")).toBe("10/2026");
+    expect(maskDateMonthYear("10")).toBe("10");
+  });
+
+  it("maskTime formata HH:MM", async () => {
+    const { maskTime } = await import("../src/lib/masks");
+    expect(maskTime("1430")).toBe("14:30");
+    expect(maskTime("14")).toBe("14");
+  });
+
+  it("maskDateTime formata DD/MM/AAAA HH:MM", async () => {
+    const { maskDateTime } = await import("../src/lib/masks");
+    expect(maskDateTime("151020261430")).toBe("15/10/2026 14:30");
   });
 });

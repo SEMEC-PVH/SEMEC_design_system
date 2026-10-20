@@ -2,22 +2,22 @@
 title: "Campo com máscara"
 code: "input-mask"
 slug: "campo-com-mascara"
-file: "src/components/input-mask.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/input-mask.tsx"
 category: "formularios"
-variants: "mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: 'AAA-9*99') · valor: defaultValue · value + onValueChange(masked, raw) · inputMode: numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível"
+variants: "mask: cpf · cnpj · cep · data (DD/MM/AAAA) · data-mes-ano (MM/AAAA) · data-hora (DD/MM/AAAA HH:MM) · hora (HH:MM) · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: 'AAA-9*99') · valor: defaultValue · value + onValueChange(masked, raw) · inputMode: numeric (CPF, CNPJ, CEP, data, data-mes-ano, data-hora, hora) · tel (telefones) · sobrescrevível"
 ---
 
 # Campo com máscara — `input-mask`
 
-> Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
+> Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data (DD/MM/AAAA, MM/AAAA, DD/MM/AAAA HH:MM ou HH:MM), telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara.
 
-**Arquivo:** `src/components/input-mask.tsx` | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/campo-com-mascara/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/input-mask.tsx) | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/campo-com-mascara/
 
 ## Variantes
 
-- **mask**: cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: "AAA-9*99")
+- **mask**: cpf · cnpj · cep · data (DD/MM/AAAA) · data-mes-ano (MM/AAAA) · data-hora (DD/MM/AAAA HH:MM) · hora (HH:MM) · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: "AAA-9*99")
 - **valor**: defaultValue · value + onValueChange(masked, raw)
-- **inputMode**: numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível
+- **inputMode**: numeric (CPF, CNPJ, CEP, data, data-mes-ano, data-hora, hora) · tel (telefones) · sobrescrevível
 
 ## Instalação (@semec/ds)
 
@@ -25,7 +25,7 @@ variants: "mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo n�
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -45,6 +45,14 @@ import { FormField, InputMask } from "@semec/ds/react";
   <InputMask mask="cpf" onValueChange={(masked, raw) => setCpf(raw)} />
 </FormField>
 
+<FormField label="Data de nascimento" hint="DD/MM/AAAA">
+  <InputMask mask="data" placeholder="DD/MM/AAAA" />
+</FormField>
+
+<FormField label="Competência" hint="MM/AAAA">
+  <InputMask mask="data-mes-ano" placeholder="MM/AAAA" />
+</FormField>
+
 <FormField label="Telefone">
   <InputMask mask="telefone" autoComplete="tel-national" />
 </FormField>
@@ -62,7 +70,7 @@ import { FormField, InputMask } from "@semec/ds/react";
 ## Prompt para IA
 
 ```text
-Use o componente `InputMask` (Campo com máscara) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data, telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara. API e variantes: mask: cpf · cnpj · cep · data · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: "AAA-9*99") · valor: defaultValue · value + onValueChange(masked, raw) · inputMode: numeric (CPF, CNPJ, CEP, data) · tel (telefones) · sobrescrevível. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `InputMask` (Campo com máscara) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Campo sobre o `Input` que formata enquanto a pessoa digita: CPF, CNPJ, CEP, data (DD/MM/AAAA, MM/AAAA, DD/MM/AAAA HH:MM ou HH:MM), telefone (fixo ou celular, automático) ou padrão próprio (`9` dígito, `A` letra, `*` letra ou dígito). O cursor não pula ao editar no meio; Backspace/Delete junto de um literal apagam o dígito vizinho (também no teclado virtual do Android, via `beforeinput`); colar valor com outra pontuação funciona (nos telefones, o `+55` de país é descartado; num padrão com prefixo fixo, como `0800-999-9999`, um valor colado que já começa com o prefixo não o repete) e o `inputMode` vem da máscara. `onValueChange(masked, raw)` entrega o valor formatado e o sem máscara. API e variantes: mask: cpf · cnpj · cep · data (DD/MM/AAAA) · data-mes-ano (MM/AAAA) · data-hora (DD/MM/AAAA HH:MM) · hora (HH:MM) · telefone (fixo ou celular pelo nº de dígitos) · telefone-fixo · celular · padrão próprio (ex.: "AAA-9*99") · valor: defaultValue · value + onValueChange(masked, raw) · inputMode: numeric (CPF, CNPJ, CEP, data, data-mes-ano, data-hora, hora) · tel (telefones) · sobrescrevível. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -80,6 +88,9 @@ export type InputMaskPreset =
   | "cnpj"
   | "cep"
   | "data"
+  | "data-mes-ano"
+  | "data-hora"
+  | "hora"
   | "telefone"
   | "telefone-fixo"
   | "celular";
@@ -90,6 +101,9 @@ export const inputMaskPatterns: Record<Exclude<InputMaskPreset, "telefone">, str
   cnpj: "99.999.999/9999-99",
   cep: "99999-999",
   data: "99/99/9999",
+  "data-mes-ano": "99/9999",
+  "data-hora": "99/99/9999 99:99",
+  hora: "99:99",
   "telefone-fixo": "(99) 9999-9999",
   celular: "(99) 99999-9999",
 };
@@ -260,6 +274,9 @@ const presetInputMode: Record<InputMaskPreset, React.HTMLAttributes<HTMLInputEle
   cnpj: "numeric",
   cep: "numeric",
   data: "numeric",
+  "data-mes-ano": "numeric",
+  "data-hora": "numeric",
+  hora: "numeric",
   telefone: "tel",
   "telefone-fixo": "tel",
   celular: "tel",

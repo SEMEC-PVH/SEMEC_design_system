@@ -2,7 +2,7 @@
 title: "Trilha de navegação"
 code: "breadcrumb"
 slug: "trilha-de-navegacao"
-file: "src/components/breadcrumb.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/breadcrumb.tsx"
 category: "navegacao"
 variants: "props: items: { label, href? }[] · a11y: aria-label=Trilha de navegação · aria-current=page no último item · aria-hidden nos separadores · abaixo de sm, links com alvo mínimo de 44×44px (min-h-11 + ::after de largura)"
 ---
@@ -11,7 +11,7 @@ variants: "props: items: { label, href? }[] · a11y: aria-label=Trilha de navega
 
 > Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
 
-**Arquivo:** `src/components/breadcrumb.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/trilha-de-navegacao/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/breadcrumb.tsx) | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/trilha-de-navegacao/
 
 ## Variantes
 
@@ -24,7 +24,7 @@ variants: "props: items: { label, href? }[] · a11y: aria-label=Trilha de navega
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -93,7 +93,7 @@ const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
                 // do texto.
                 <a
                   href={item.href}
-                  className="relative inline-flex items-center transition-colors duration-fast ease-standard hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background max-sm:min-h-11 max-sm:after:absolute max-sm:after:inset-y-0 max-sm:after:left-1/2 max-sm:after:w-full max-sm:after:min-w-11 max-sm:after:-translate-x-1/2"
+                  className="relative inline-flex items-center transition-colors duration-fast ease-standard hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background max-sm:min-h-11 max-sm:after:absolute max-sm:after:inset-y-0 max-sm:after:left-1/2 max-sm:after:w-full max-sm:after:min-w-11 max-sm:after:-translate-x-1/2"
                 >
                   {item.label}
                 </a>

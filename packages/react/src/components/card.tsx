@@ -43,7 +43,7 @@ const CardTitle = React.forwardRef<HTMLDivElement, CardTitleProps>(
   ({ className, as: Tag = "div", ...props }, ref) => (
     <Tag
       ref={ref}
-      className={cn("text-lg font-semibold leading-none tracking-tight", className)}
+      className={cn("text-lg font-semibold leading-tight tracking-tight", className)}
       {...props}
     />
   )

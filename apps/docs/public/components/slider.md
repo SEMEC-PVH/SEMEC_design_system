@@ -2,7 +2,7 @@
 title: "Slider"
 code: "slider"
 slug: "slider"
-file: "src/components/slider.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/slider.tsx"
 category: "formularios"
 variants: "contrato: value · defaultValue · onValueChange(number[]) · name · id · invalid · disabled"
 ---
@@ -11,7 +11,7 @@ variants: "contrato: value · defaultValue · onValueChange(number[]) · name ·
 
 > Controle deslizante para faixas de valor. Contrato de formulário pela API Radix (`value`/`defaultValue`/`onValueChange` com `number[]`, `name`); `invalid` vira `aria-invalid` nos polegares.
 
-**Arquivo:** `src/components/slider.tsx` | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/slider/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/slider.tsx) | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/slider/
 
 ## Variantes
 
@@ -23,7 +23,7 @@ variants: "contrato: value · defaultValue · onValueChange(number[]) · name ·
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -106,6 +106,16 @@ const Slider = React.forwardRef<
       { labelable: false }
     );
     const ariaLabelledBy = field["aria-labelledby"] ?? ariaLabelledByProp;
+    // O preenchimento SVG não depende dos atributos style bloqueados no SSR.
+    // O Radix continua responsável pelo estado, teclado e inputs do formulário.
+    const [uncontrolledValue, setUncontrolledValue] = React.useState(props.defaultValue ?? [0]);
+    const values = props.value ?? uncontrolledValue;
+    const min = props.min ?? 0;
+    const max = props.max ?? 100;
+    const percentages = values.map((value) => max > min ? Math.min(100, Math.max(0, (value - min) / (max - min) * 100)) : 0);
+    const start = percentages.length > 1 ? Math.min(...percentages) : 0;
+    const end = percentages.length ? Math.max(...percentages) : 0;
+    const vertical = props.orientation === "vertical";
     // Um polegar por valor (range com 2 valores = 2 polegares).
     const count = Math.max((props.value ?? props.defaultValue ?? [0]).length, 1);
 
@@ -123,10 +133,33 @@ const Slider = React.forwardRef<
           className
         )}
         {...props}
+        onValueChange={(value) => {
+          setUncontrolledValue(value);
+          props.onValueChange?.(value);
+        }}
+        data-semec-slider=""
         id={field.id ?? props.id}
       >
         <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
-          <SliderPrimitive.Range className="absolute h-full bg-primary" />
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            data-inverted={props.inverted || undefined}
+            className={cn(
+              "absolute inset-0 h-full w-full",
+              vertical
+                ? "data-[inverted=true]:-scale-y-100"
+                : "data-[inverted=true]:-scale-x-100 rtl:-scale-x-100 rtl:data-[inverted=true]:scale-x-100"
+            )}
+          >
+            <rect
+              x={vertical ? 0 : `${start}%`}
+              y={vertical ? `${100 - end}%` : 0}
+              width={vertical ? "100%" : `${end - start}%`}
+              height={vertical ? `${end - start}%` : "100%"}
+              className="fill-primary"
+            />
+          </svg>
         </SliderPrimitive.Track>
         {Array.from({ length: count }, (_, index) => (
           <SliderPrimitive.Thumb
@@ -137,7 +170,7 @@ const Slider = React.forwardRef<
             aria-invalid={field["aria-invalid"] ?? ariaInvalid}
             // TST-22: o ::after parte da caixa de padding (16px, dentro da borda
             // de 2px). `-inset-3` dava 40×40; `-inset-3.5` dá 16 + 2×14 = 44×44.
-            className="relative block h-5 w-5 rounded-full after:absolute after:-inset-3.5 after:content-[''] after:rounded-full border-2 border-primary bg-background shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 aria-[invalid=true]:border-destructive"
+            className="relative block h-5 w-5 rounded-full after:absolute after:-inset-3.5 after:content-[''] after:rounded-full border-2 border-primary bg-background shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 aria-[invalid=true]:border-destructive"
           />
         ))}
       </SliderPrimitive.Root>

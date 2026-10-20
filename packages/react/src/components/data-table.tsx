@@ -89,7 +89,10 @@ interface DataTableProps<T> extends React.HTMLAttributes<HTMLDivElement> {
   labels?: Partial<DataTableLabels>;
 }
 
-function DataTableInner<T extends Record<string, unknown>>(
+// NEXT42-03: `T extends object` (e não `Record<string, unknown>`) para aceitar
+// linhas tipadas com `interface`, que não têm assinatura de índice. Alargar a
+// restrição não quebra quem já passava `type`.
+function DataTableInner<T extends object>(
   {
     columns,
     data,
@@ -158,13 +161,15 @@ function DataTableInner<T extends Record<string, unknown>>(
 
   return (
     <div ref={_ref} className={cn("w-full", className)} {...props}>
+      {/* V42-VITE-05: a <caption> ficava dentro da área rolável, com a
+          largura da tabela, e saía cortada no mobile. O texto visível agora
+          fica fora do overflow (abaixo da tabela, como antes) e continua
+          nomeando a tabela, por aria-labelledby. */}
       <div className="relative w-full overflow-auto rounded-md border border-border">
-        <table className="w-full caption-bottom text-sm">
-          {caption && (
-            <caption className="mt-4 text-sm text-muted-foreground">
-              {caption}
-            </caption>
-          )}
+        <table
+          className="w-full text-sm"
+          aria-labelledby={caption ? `${idBase}-caption` : undefined}
+        >
           <thead className="border-b border-border bg-muted/50">
             <tr>
               {columns.map((col, colIndex) => (
@@ -194,7 +199,7 @@ function DataTableInner<T extends Record<string, unknown>>(
                         type="button"
                         onClick={() => handleSort(col.key)}
                         aria-describedby={`${idBase}-sort-${colIndex}`}
-                        className="inline-flex min-h-11 min-w-11 items-center gap-2 rounded-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        className="inline-flex min-h-11 min-w-11 items-center gap-2 rounded-sm cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                       >
                         {col.header}
                         {getSortIcon(col.key)}
@@ -254,7 +259,7 @@ function DataTableInner<T extends Record<string, unknown>>(
                     >
                       {col.render
                         ? col.render(row, index)
-                        : String(row[col.key] ?? "")}
+                        : String((row as Record<string, unknown>)[col.key] ?? "")}
                     </td>
                   ))}
                 </tr>
@@ -263,6 +268,11 @@ function DataTableInner<T extends Record<string, unknown>>(
           </tbody>
         </table>
       </div>
+      {caption && (
+        <p id={`${idBase}-caption`} className="mt-4 text-center text-sm text-muted-foreground">
+          {caption}
+        </p>
+      )}
 
       {page !== undefined && pageCount !== undefined && pageCount > 1 && (
         // Abaixo de `sm` o rodapé vira coluna e os botões podem quebrar de
@@ -276,7 +286,7 @@ function DataTableInner<T extends Record<string, unknown>>(
               type="button"
               onClick={() => onPageChange?.(page - 1)}
               disabled={page <= 1}
-              className="inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               {labels.previous}
@@ -285,7 +295,7 @@ function DataTableInner<T extends Record<string, unknown>>(
               type="button"
               onClick={() => onPageChange?.(page + 1)}
               disabled={page >= pageCount}
-              className="inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               {labels.next}
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
@@ -298,7 +308,7 @@ function DataTableInner<T extends Record<string, unknown>>(
 }
 
 const DataTable = React.forwardRef(DataTableInner) as <
-  T extends Record<string, unknown>
+  T extends object
 >(
   props: DataTableProps<T> & { ref?: React.Ref<HTMLDivElement> }
 ) => React.ReactElement;

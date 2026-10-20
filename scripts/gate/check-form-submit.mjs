@@ -1,6 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { gateBrowserLabel, launchGateBrowser } from "./browser.mjs";
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 
 /**
@@ -15,7 +17,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
  * Playwright (mesma instalação do gate de estados abertos).
  */
 export async function checkFormSubmit() {
-  console.log("▶ [7/7] Envio nativo de formulário com FileUpload (Chromium headless)...");
+  console.log(`▶ [7/7] Envio nativo de formulário com FileUpload (${gateBrowserLabel()})...`);
 
   const { build } = await import("esbuild");
   const bundle = await build({
@@ -29,16 +31,7 @@ export async function checkFormSubmit() {
   });
   const script = bundle.outputFiles[0].text;
 
-  const { chromium } = await import("playwright");
-  let browser;
-  try {
-    browser = await chromium.launch();
-  } catch (err) {
-    throw new Error(
-      `Não foi possível abrir o Chromium do Playwright (${err.message.split("\n")[0]}). ` +
-        "Rode 'npx playwright install --with-deps chromium' (CI) ou defina PLAYWRIGHT_BROWSERS_PATH."
-    );
-  }
+  const browser = await launchGateBrowser();
 
   const errors = [];
   const expect = (label, actual, expected) => {

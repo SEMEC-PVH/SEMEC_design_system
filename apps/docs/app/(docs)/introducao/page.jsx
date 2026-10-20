@@ -247,6 +247,10 @@ export default function IntroPage() {
         <li><strong>Tailwind CSS v4</strong> (CSS-first config)</li>
         <li><strong>shadcn</strong> — Radix + CVA + clsx + tailwind-merge</li>
       </ul>
+      <p>
+        Sem React (HTML, PHP, Django, Vue, Angular, Android, iOS ou Figma)? Veja{" "}
+        <Link href="/usar-sem-react">Usar sem React</Link>.
+      </p>
 
       <h2>Segurança (CSP)</h2>
       <p>

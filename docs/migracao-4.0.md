@@ -1,6 +1,6 @@
 # Migração para o @semec/ds 4.0
 
-A 4.0 só remove o que foi anunciado como depreciado na 3.1.0 e na 3.2.0, conforme a política de duas minors ([ADR-013](adr/0013-politica-de-depreciacao-duas-minors.md)). Nenhum componente saiu e nenhum valor de token mudou. Se o seu app já roda na 3.2.0 sem avisos `[@semec/ds]` no console de desenvolvimento e sem utilitários `bg-pv-*`, a atualização não exige mudança.
+A 4.0 só remove o que foi anunciado como depreciado na 3.1.0 e na 3.2.0, conforme a política de duas minors ([ADR-013](adr/0013-politica-de-depreciacao-duas-minors.md)). Nenhum componente saiu e nenhum valor de token mudou em relação à 3.2.0. Se o seu app já roda na 3.2.0 sem avisos `[@semec/ds]` no console de desenvolvimento e sem utilitários `bg-pv-*`, a atualização não exige mudança.
 
 | O que saiu | O que usar | Achado |
 |---|---|---|
@@ -16,6 +16,16 @@ Ordem sugerida:
    `npx -p @semec/ds@4 -p typescript@5 semec-ds codemod-4 src`
 3. Rode de novo com `--write`, revise o diff e resolva à mão as linhas marcadas como `revisar` e `utilitário`.
 4. Atualize para a 4.0 (`npm i @semec/ds@4`) e rode o typecheck. Com pnpm ou Yarn, confira que `lucide-react` está no `package.json` do app (`pnpm add lucide-react`, `yarn add lucide-react`): ele é peer do kit desde a 3.1.0, e esses gerenciadores não instalam peer sozinhos (o npm 7+ instala). O `zod`, se usar `@semec/ds/react/validacao`, pode ser o 3 (`^3.23.0`) ou o 4. Ele é a rede de segurança do que o codemod não vê: no TypeScript, todo `onChange` que sobrou em `Calendar`, `Combobox`, `InputOTP` e `FileUpload` vira erro de compilação. Em JavaScript, o componente mostra um `console.error` em desenvolvimento ("onChange foi removido na 4.0; use onValueChange").
+
+## Vindo direto da 3.0 ou da 3.1
+
+O guia acima parte da 3.2.0. Quem pula da 3.0 ou da 3.1 para a 4.x recebe também o que mudou na 3.1.0 e na 3.2.0, e duas coisas mudam **sem erro de compilação nem de build** (medido na migração do semec-digital, 3.0.0 → 4.2.0):
+
+1. **Cor da marca que some.** Os utilitários de primitivo que vinham do kit (`bg-pv-blue-hero`, `text-pv-gray-600`, `bg-pv-gray-50`, `text-pv-green-800`…) deixam de gerar CSS, e o Tailwind ignora classe desconhecida sem avisar. No semec-digital, a faixa do topo, o herói e o rodapé (`bg-pv-blue-hero`) ficaram brancos com texto branco: o axe subiu de 64 para 97 problemas na home, e `tsc`, testes e build passaram. Antes de publicar:
+   - rode o codemod em simulação e resolva cada linha `utilitário` (desde a 4.3.0 ele não relata as cores `pv-*` que o próprio app declara no `@theme`; elas continuam funcionando);
+   - procure à mão o caso mais comum: `grep -rnE "(bg|text|border|ring)-pv-(blue-hero|gray-(50|400|600)|green-800|red|white|black)" src`. A troca de `bg-pv-blue-hero` é `bg-brand-hero`;
+   - abra as superfícies de marca (topo, herói, rodapé, botões) e rode o axe nelas com a cor de fundo conferida.
+2. **Tipografia (3.1.0, AUD-28).** O `tokens.css` redefine a escala do Tailwind, então ela muda em todo o app, não só nos componentes do kit: `text-3xl` passa de 30px/36px para 32px/38,4px, e as entrelinhas mudam (`text-sm` 20 → 21px, `text-lg` 28 → 25,2px, `text-xl` 28 → 26px, `text-2xl` 32 → 30px). Desde a 4.1.0 o `<h1>` e o `Heading` de nível 1 também têm 32px (era 24px), o h2 24px e o h3 20px. Título longo pode ganhar uma linha no mobile (no semec-digital, um h1 foi de 2 para 3 linhas a 390 px). Confira as telas com títulos longos no celular.
 
 ## 1. `onChange(valor)` sai dos campos não nativos (AUD-35)
 

@@ -5,8 +5,12 @@ import * as TogglePrimitive from "@radix-ui/react-toggle";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 
-const toggleVariants = cva(
+const toggleVariants: VariantFunction<{
+  variant: "default" | "outline";
+  size: "sm" | "md" | "lg";
+}> = cva(
   // TST-03: o estado ligado não pode depender de um cinza quase igual ao fundo
   // (antes `bg-accent`, 1,01:1). Ligado = fundo `tint` + contorno de 2px em
   // `primary` (borda + inset-ring de 1px), texto `foreground`:
@@ -18,7 +22,7 @@ const toggleVariants = cva(
   // inset-ring: o pixel interno passa de superfície a primary (5,00:1 / 5,42:1).
   // Hover solto: borda `border-strong` (3,49:1 / 3,77:1) na `default` e
   // `foreground` na `outline`; hover ligado escurece para `primary-hover`.
-  "inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[state=on]:border-primary data-[state=on]:bg-tint data-[state=on]:text-foreground data-[state=on]:inset-ring data-[state=on]:inset-ring-primary data-[state=on]:hover:border-primary-hover data-[state=on]:hover:inset-ring-primary-hover",
+  "inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[state=on]:border-primary data-[state=on]:bg-tint data-[state=on]:text-foreground data-[state=on]:inset-ring data-[state=on]:inset-ring-primary data-[state=on]:hover:border-primary-hover data-[state=on]:hover:inset-ring-primary-hover",
   {
     variants: {
       variant: {

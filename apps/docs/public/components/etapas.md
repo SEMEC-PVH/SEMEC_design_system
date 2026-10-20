@@ -2,7 +2,7 @@
 title: "Etapas"
 code: "stepper"
 slug: "etapas"
-file: "src/components/stepper.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/stepper.tsx"
 category: "navegacao"
 variants: "orientation: horizontal (padrão; empilha abaixo de 768px) · vertical · estados: concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only · interação: onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual) · labels: list · position(n, total) · complete · current · upcoming"
 ---
@@ -11,7 +11,7 @@ variants: "orientation: horizontal (padrão; empilha abaixo de 768px) · vertica
 
 > Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.
 
-**Arquivo:** `src/components/stepper.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/etapas/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/stepper.tsx) | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/etapas/
 
 ## Variantes
 
@@ -26,7 +26,7 @@ variants: "orientation: horizontal (padrão; empilha abaixo de 768px) · vertica
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -249,7 +249,7 @@ const Stepper = React.forwardRef<HTMLOListElement, StepperProps>(
                   onClick={() => onStepClick?.(index)}
                   className={cn(
                     rowClasses,
-                    "-mx-2 rounded-md px-2 transition-colors duration-fast ease-standard hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    "-mx-2 rounded-md px-2 transition-colors duration-fast ease-standard hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   )}
                 >
                   {body}

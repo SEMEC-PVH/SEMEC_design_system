@@ -2,7 +2,7 @@
 title: "Rodapé"
 code: "footer"
 slug: "rodape"
-file: "src/components/footer.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/footer.tsx"
 category: "navegacao"
 variants: "composição: Footer · FooterContent · FooterSection · FooterLinks · FooterLink · FooterBottom · props: FooterSection: title · titleAs (padrão h2) · a11y: landmark contentinfo · FooterLinks envolve cada filho em <li> · links com alvo de 44px e sublinhado"
 ---
@@ -11,7 +11,7 @@ variants: "composição: Footer · FooterContent · FooterSection · FooterLinks
 
 > Rodapé institucional (<footer>, landmark contentinfo) com seções de links e faixa final. Use um por página, fora do <main>.
 
-**Arquivo:** `src/components/footer.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/rodape/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/footer.tsx) | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/rodape/
 
 ## Variantes
 
@@ -25,7 +25,7 @@ variants: "composição: Footer · FooterContent · FooterSection · FooterLinks
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -149,10 +149,13 @@ const FooterLink = React.forwardRef<
   HTMLAnchorElement,
   React.AnchorHTMLAttributes<HTMLAnchorElement>
 >(({ className, ...props }, ref) => (
+  // NEXT42-05: link curto ("IPTU") media 29×44. O ::after de no mínimo 44 px
+  // de largura (só abaixo de sm, como no Breadcrumb) completa o alvo de toque
+  // sem mudar o layout da lista.
   <a
     ref={ref}
     className={cn(
-      "inline-flex min-h-11 items-center rounded-sm text-sm text-foreground underline underline-offset-4 transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+      "relative inline-flex min-h-11 items-center rounded-sm max-sm:after:absolute max-sm:after:inset-y-0 max-sm:after:left-1/2 max-sm:after:w-full max-sm:after:min-w-11 max-sm:after:-translate-x-1/2 text-sm text-foreground underline underline-offset-4 transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       className
     )}
     {...props}

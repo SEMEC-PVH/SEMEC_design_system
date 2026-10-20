@@ -1,0 +1,63 @@
+{
+  "name": "@semec/ds-elements",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Web Components acessíveis do Design System SEMEC (dialog, abas, combobox, menu e acordeão) em light DOM, sem dependências, para HTML, PHP e qualquer stack sem React.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./auto": {
+      "types": "./dist/auto.d.ts",
+      "import": "./dist/auto.js",
+      "default": "./dist/auto.js"
+    },
+    "./dist/semec-elements.js": {
+      "default": "./dist/semec-elements.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "./dist/auto.js",
+    "./dist/semec-elements.js"
+  ],
+  "scripts": {
+    "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run typecheck && npm run build && node --test --test-concurrency=1 test/*.test.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SEMEC-PVH/SEMEC_design_system.git",
+    "directory": "packages/elements"
+  },
+  "homepage": "https://semec-pvh.github.io/SEMEC_design_system/usar-sem-react/web-components/",
+  "bugs": {
+    "url": "https://github.com/SEMEC-PVH/SEMEC_design_system/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "design-system",
+    "web-components",
+    "custom-elements",
+    "semec",
+    "portovelho",
+    "acessibilidade"
+  ]
+}

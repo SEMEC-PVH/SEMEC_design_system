@@ -1,0 +1,21 @@
+{#- Parcial "cabecalho" (Twig). Uso:
+    {% include '@semec/cabecalho.html.twig' with {marca_src: '/img/marca.svg', servico: 'Matrícula', nav: [{href: '/matricula', texto: 'Matrícula', atual: true}]} only %} -#}
+{%- autoescape 'html' -%}
+<header class="semec-header">
+  <a href="{{ inicio|default('/') }}" class="semec-header__brand">
+{% if marca_src|default('') %}
+    <img src="{{ marca_src }}" alt="{{ marca_alt|default('Prefeitura de Porto Velho') }}" width="{{ marca_largura|default(90) }}" height="{{ marca_altura|default(36) }}">
+    <span aria-hidden="true" class="semec-header__divider"></span>
+{% endif %}
+    <span class="semec-header__org">{{ orgao|default('SEMEC') }}{% if servico|default('') %} <span aria-hidden="true" class="semec-header__separator">|</span> <span class="semec-header__service">{{ servico }}</span>{% endif %}</span>
+    <span class="semec-sr-only">— {{ rotulo_inicio|default('ir para o início') }}</span>
+  </a>
+{% if nav|default([]) is not empty %}
+  <nav aria-label="{{ nav_rotulo|default('Menu principal') }}" class="semec-header__nav">
+{% for item in nav %}
+    <a href="{{ item.href ?? '' }}" class="semec-header__link"{% if item.atual ?? false %} aria-current="page"{% endif %}>{{ item.texto ?? '' }}</a>
+{% endfor %}
+  </nav>
+{% endif %}
+</header>
+{% endautoescape -%}

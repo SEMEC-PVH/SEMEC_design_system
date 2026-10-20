@@ -1,0 +1,17 @@
+{
+  "name": "semec/ds-css-modelos-teste",
+  "description": "Dependências só de teste: renderizar os modelos Twig e Blade do @semec/ds-css.",
+  "type": "project",
+  "license": "MIT",
+  "require": {
+    "php": ">=8.2",
+    "twig/twig": "^3.14",
+    "illuminate/view": "^11.0 || ^12.0"
+  },
+  "config": {
+    "platform": {
+      "php": "8.2.0"
+    },
+    "sort-packages": true
+  }
+}

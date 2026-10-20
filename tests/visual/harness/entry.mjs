@@ -16,6 +16,7 @@ import * as ds from "../../../packages/react/dist/react/index.js";
 import { getComponentElement } from "../../../scripts/gate/smoke.fixtures.mjs";
 import { openStateCases } from "../../../scripts/gate/open-states.fixtures.mjs";
 import { extraStates } from "../visual.fixtures.mjs";
+import { layoutCases } from "../layout.fixtures.mjs";
 
 const container = document.getElementById("root");
 
@@ -36,6 +37,11 @@ window.__visual = {
         await waitFor(() => {
           if (!testCase.findOpen({ screen })) throw new Error("camada não abriu");
         });
+      } else if (state === "layout") {
+        // Telas de consumidor do layout.spec.mjs (code = chave de layoutCases).
+        const make = layoutCases[code];
+        if (!make) throw new Error(`sem caso de layout '${code}'`);
+        render(make(ds), { container });
       } else {
         const make = extraStates[code]?.[state];
         if (!make) throw new Error(`sem estado '${state}' para '${code}'`);

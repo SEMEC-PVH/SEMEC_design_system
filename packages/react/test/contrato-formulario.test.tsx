@@ -411,7 +411,7 @@ describe("name no envio de <form> nativo (FormData)", () => {
 
   it("FileUpload repassa name e required ao input de arquivo", () => {
     render(<FileUpload label="Anexo" name="anexo" required />);
-    const input = screen.getByLabelText("Anexo");
+    const input = screen.getByLabelText("Anexo *");
     expect(input).toHaveAttribute("name", "anexo");
     expect(input).toBeRequired();
   });

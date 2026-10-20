@@ -2,7 +2,7 @@
 title: "Cabeçalho"
 code: "header"
 slug: "cabecalho"
-file: "src/components/header.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/header.tsx"
 category: "navegacao"
 variants: "composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · props: HeaderBrand: orgName · serviceName · logo · href ('' = sem link) · truncate · homeLabel · HeaderNavLink: current · a11y: sem logo: placeholder decorativo (aria-hidden) e aviso em dev · nome quebra linha no mobile (truncate opcional) · com Sidebar: Header dentro do SidebarInset (as='div'), antes do <main id='conteudo'>; SkipLink antes do SidebarProvider. Antes do provider o Header fica sob a Sidebar fixa e a marca recebe foco sem aparecer"
 ---
@@ -11,7 +11,7 @@ variants: "composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · 
 
 > Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.
 
-**Arquivo:** `src/components/header.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/cabecalho/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/header.tsx) | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/cabecalho/
 
 ## Variantes
 
@@ -26,7 +26,7 @@ variants: "composição: Header · HeaderBrand · HeaderNav · HeaderNavLink · 
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -47,7 +47,8 @@ import { Button } from "@semec/ds/react";
   <HeaderBrand
     orgName="SEMEC"
     serviceName="Nome do serviço"
-    logo={<img src="/logo-prefeitura.svg" alt="Prefeitura de Porto Velho" className="h-9 w-auto" />}
+    // A logo não vem no pacote: peça o SVG oficial à SEMEC e salve em public/marca.svg.
+    logo={<img src="/marca.svg" alt="Prefeitura de Porto Velho" className="h-9 w-auto" />}
   />
   <div className="flex items-center gap-2">
     <HeaderNav>
@@ -98,10 +99,11 @@ export interface HeaderBrandProps extends React.HTMLAttributes<HTMLElement> {
    * renderizar a marca sem link (ex.: já na página inicial).
    */
   href?: string | null;
+  /** Nome do órgão. @default "SEMEC" */
   orgName?: string;
   serviceName?: string;
   /**
-   * Logo do órgão (ex.: `<img src="/logo.svg" alt="Prefeitura de Porto Velho" />`).
+   * Logo do órgão (ex.: `<img src="/marca.svg" alt="Prefeitura de Porto Velho" />`).
    * Sem logo, aparece um placeholder decorativo e um aviso no console em
    * desenvolvimento.
    */
@@ -183,7 +185,7 @@ const HeaderBrand = React.forwardRef<HTMLElement, HeaderBrandProps>(
     );
 
     const rootClass = cn(
-      "flex min-h-11 min-w-0 items-center gap-3 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+      "flex min-h-11 min-w-0 items-center gap-3 no-underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       className
     );
 
@@ -209,8 +211,8 @@ const HeaderNav = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement
   ({ className, children, ...props }, ref) => (
     <nav
       ref={ref}
-      aria-label="Principal"
-      className={cn("flex items-center gap-2", className)}
+      aria-label="Menu principal"
+      className={cn("flex flex-wrap items-center gap-2", className)}
       {...props}
     >
       {children}
@@ -230,7 +232,7 @@ const HeaderNavLink = React.forwardRef<HTMLAnchorElement, HeaderNavLinkProps>(
       ref={ref}
       aria-current={current ? "page" : undefined}
       className={cn(
-        "inline-flex min-h-11 items-center rounded-md px-2 text-sm font-medium text-foreground no-underline transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "inline-flex min-h-11 items-center rounded-md px-2 text-sm font-medium text-foreground no-underline transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         current && "font-semibold text-brand-hero",
         className
       )}

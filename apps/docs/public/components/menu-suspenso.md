@@ -2,7 +2,7 @@
 title: "Menu suspenso"
 code: "dropdown-menu"
 slug: "menu-suspenso"
-file: "src/components/dropdown-menu.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/dropdown-menu.tsx"
 category: "navegacao"
 variants: "composição: DropdownMenu · Trigger · Content · Item · CheckboxItem · RadioItem · Label · Separator · Sub · SubTrigger · SubContent"
 ---
@@ -11,7 +11,7 @@ variants: "composição: DropdownMenu · Trigger · Content · Item · CheckboxI
 
 > Menu flutuante com itens, checkbox, radio, sub-menus e separadores.
 
-**Arquivo:** `src/components/dropdown-menu.tsx` | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/menu-suspenso/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/dropdown-menu.tsx) | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/menu-suspenso/
 
 ## Variantes
 
@@ -23,7 +23,7 @@ variants: "composição: DropdownMenu · Trigger · Content · Item · CheckboxI
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -113,7 +113,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      "flex min-h-11 cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-tint focus:ring-2 focus:ring-inset focus:ring-ring data-[state=open]:bg-accent",
+      "flex min-h-11 cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-tint focus:ring-2 focus:ring-inset focus:ring-ring forced-colors:focus:forced-color-adjust-none forced-colors:focus:bg-[Highlight] forced-colors:focus:text-[HighlightText] data-[state=open]:bg-accent",
       inset && "pl-8",
       className
     )}
@@ -169,7 +169,7 @@ const DropdownMenuItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex min-h-11 cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex min-h-11 cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring forced-colors:focus:forced-color-adjust-none forced-colors:focus:bg-[Highlight] forced-colors:focus:text-[HighlightText] data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       inset && "pl-8",
       className
     )}
@@ -185,7 +185,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
     className={cn(
-      "relative flex min-h-11 cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex min-h-11 cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring forced-colors:focus:forced-color-adjust-none forced-colors:focus:bg-[Highlight] forced-colors:focus:text-[HighlightText] data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     checked={checked}
@@ -209,7 +209,7 @@ const DropdownMenuRadioItem = React.forwardRef<
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
     className={cn(
-      "relative flex min-h-11 cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex min-h-11 cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors duration-fast ease-standard focus:bg-tint focus:text-foreground focus:ring-2 focus:ring-inset focus:ring-ring forced-colors:focus:forced-color-adjust-none forced-colors:focus:bg-[Highlight] forced-colors:focus:text-[HighlightText] data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className
     )}
     {...props}

@@ -1,0 +1,35 @@
+{#- Parcial "pagina" (Twig): layout base. Uso, num template filho:
+    {% extends '@semec/pagina.html.twig' %}
+    {% block conteudo %}<h1 class="semec-heading semec-heading--1">Título</h1>{% endblock %}
+    Parâmetros (titulo, css_href, cabecalho, rodape…) vêm do contexto do template.
+    Blocos: conteudo (dentro do <main>) e head (fim do <head>). -#}
+{%- autoescape 'html' -%}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ titulo|default('') }}</title>
+{% if (fontes_href ?? null) is not same as(false) %}
+  <link rel="stylesheet" href="{{ fontes_href|default('/css/fonts.css') }}">
+{% endif %}
+  <link rel="stylesheet" href="{{ css_href|default('/css/semec-ds.css') }}">
+{% if (elements_src ?? null) is not same as(false) %}
+  <script type="module" src="{{ elements_src|default('/js/semec-elements.js') }}"></script>
+{% endif %}
+{% block head %}{% endblock %}
+</head>
+<body>
+{% include '@semec/pular-para-o-conteudo.html.twig' with {texto: pular_texto|default(null)} only %}
+{% if cabecalho|default(null) %}
+{% include '@semec/cabecalho.html.twig' with cabecalho only %}
+{% endif %}
+<main id="conteudo" tabindex="-1">
+{% block conteudo %}{% endblock %}
+</main>
+{% if rodape|default(null) %}
+{% include '@semec/rodape.html.twig' with rodape only %}
+{% endif %}
+</body>
+</html>
+{% endautoescape -%}

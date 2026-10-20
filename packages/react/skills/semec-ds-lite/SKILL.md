@@ -1,6 +1,6 @@
 ---
 name: semec-ds-lite
-description: Identidade visual SEMEC Design System sem React — tokens pv-*, acessibilidade WCAG 2.1 AA, padrões de tela e responsive. Use em apps que consomem só os tokens CSS (@semec/ds/lite/tokens.css).
+description: Identidade visual SEMEC Design System sem React — tokens pv-*, acessibilidade WCAG 2.1 AA, padrões de tela e responsive. Use em Vue, Angular, HTML ou qualquer app sem React (Svelte, PHP, templates de servidor) que consuma os tokens CSS (@semec/ds/lite/tokens.css).
 author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 ---
 
@@ -12,7 +12,34 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 Tokens, acessibilidade, responsive e padrões visuais para interfaces da Prefeitura de Porto Velho. **Sem componentes React.**
 
+Serve para Vue, Angular, Svelte, HTML puro ou páginas geradas no servidor (PHP, templates): qualquer app que não use React. Os componentes React do kit não rodam nesses frameworks; monte a marcação com os tokens e as regras de acessibilidade desta skill.
+
 Para UI com o kit React (`@semec/ds`), use a skill `semec-ds`.
+
+## Pacotes sem React: `@semec/ds-tokens` e `@semec/ds-css`
+
+Para app sem React, prefira os pacotes próprios, que não instalam React nem Radix. O `@semec/ds` (abaixo) continua valendo para quem já usa Tailwind v4.
+
+| Caso | Pacote | Arquivos |
+|------|--------|----------|
+| HTML, PHP, Django, Flask, Vue, Angular: classes prontas | `@semec/ds-css` | `@semec/ds-css/index.css` (tokens + base + classes, para bundler), `@semec/ds-css/components.css` (só as classes `.semec-*`), `dist/semec-ds.css` (arquivo único para `<link>`/CDN) |
+| Só tokens num CSS próprio | `@semec/ds-tokens` | `@semec/ds-tokens/tokens.css` (só `:root`), `base.css` (reset, foco, links, reduced motion), `fonts.css` + `fonts/` |
+| Android, iOS, Figma, back-end | `@semec/ds-tokens` | `tokens.json` (DTCG), `tokens` (JS + tipos), `android/colors.xml`, `android/dimens.xml`, `ios/SemecTokens.swift`, `figma/tokens-studio.json` |
+
+```bash
+npm install @semec/ds-css   # já traz o @semec/ds-tokens
+```
+
+```js
+import "@semec/ds-tokens/fonts.css";
+import "@semec/ds-css/index.css";
+```
+
+Sem bundler, o `<link>` aponta para os arquivos físicos: `fonts.css` (com `fonts/` ao lado) do `@semec/ds-tokens` e `dist/semec-ds.css` do `@semec/ds-css`, com versão fixa e SRI no CDN.
+
+Classes (BEM curto, mesma aparência do componente React): `.semec-btn` (`--primary`, `--secondary`, `--ghost`, `--destructive`, `--link`, `--sm`, `--lg`), `.semec-field` (`[aria-invalid="true"]`), `.semec-label` (`__required`), `.semec-hint`, `.semec-error`, `.semec-form-field`, `.semec-checkbox`, `.semec-radio`, `.semec-choice`, `.semec-card` (`__header`, `__title`, `__description`, `__content`, `__footer`), `.semec-alert` (`--info`, `--success`, `--warning`, `--danger`, `__title`, `__description`), `.semec-header` (`__brand`, `__org`, `__service`, `__nav`, `__link` com `aria-current="page"`), `.semec-footer` (`__link`), `.semec-skip-link`, `.semec-table` (`__wrapper` com `role="region" tabindex="0" aria-label`, `__caption`), `.semec-error-summary` (`__title`, `__list`), `.semec-badge`, `.semec-toast` (`--success`, `--danger`, `--info`, `__title`, `__description`; só aparência) e `.semec-heading--1` a `--4`. O comportamento (foco do resumo de erros, mostrar e fechar toast, menus) fica com o app.
+
+Guia: https://semec-pvh.github.io/SEMEC_design_system/usar-sem-react/
 
 ## Instalação
 
@@ -34,22 +61,64 @@ O Tailwind v4 precisa estar ligado ao bundler (Vite: `npm install -D tailwindcss
 
 O `npm install` traz junto as dependências do kit React (o pacote é um só) e, no npm 7+, também os peers dele (`react`, `react-dom`, `lucide-react`); a variante lite não os importa, então nada disso entra no seu bundle. No pnpm e no Yarn, o aviso de peer ausente desses pacotes pode ser ignorado na lite.
 
+**Só CSS, sem React (npm 7+):** `npm install @semec/ds --omit=peer` não instala os peers React (`react`, `react-dom`, `lucide-react`). As dependências diretas (Radix etc.) continuam vindo, porque o pacote é um só. Repita `--omit=peer` no `npm ci`/`npm install` seguinte para manter essa instalação. Com Tailwind, instale-o à parte com o plugin do bundler.
+
 **Preset JS (opcional):** `@config "@semec/ds/lite/pv-preset";` no CSS global, depois dos imports. O `tokens.css` já gera os utilitários pelo `@theme inline`; o preset (o mesmo `pv-preset` da variante React) só serve a quem ainda configura o Tailwind por JS. Sem Tailwind, ignore.
+
+**Com `@tailwindcss/cli`:** a CLI não copia os arquivos de fonte. Depois de gerar o CSS final, rode `npx semec-ds copiar-fontes <pasta-do-css>` (por exemplo, `npx semec-ds copiar-fontes public/css` para `public/css/app.css`), que copia `fonts.css` e a pasta `fonts/` com a licença; ou copie `node_modules/@semec/ds/dist/react/fonts/` à mão para `fonts/` ao lado desse CSS. Preserve as URLs relativas `./fonts/…` e confira no navegador que os `.woff2` respondem 200.
 
 **Fonte:** `@semec/ds/lite/fonts.css` (o mesmo arquivo de `@semec/ds/react/fonts.css`) traz a Poppins 400/500/600/700 (SIL OFL) e vai **antes** do `tokens.css`. Sem ela, o texto cai em `system-ui`. Não existem pesos 800/900.
 
 ### Sem Tailwind
 
-As variáveis do `:root` (`--bg`, `--action-primary`…) e a camada base (foco visível, links, reduced motion) funcionam em CSS puro com `var()`; os blocos `@theme` e `@utility` são ignorados pelo navegador, e os utilitários da tabela abaixo só existem com o Tailwind v4 processando o `tokens.css`.
+**CSS legado e foco:** uma regra `:focus { outline: 0 }` fora de `@layer` vence o foco do kit, que está em `@layer base`, mesmo carregada antes dele. Remova essa regra ou substitua-a por um foco visível equivalente. Não basta passar no axe: percorra a tela com Tab e Shift+Tab e confira o anel em cada controle.
 
-Os subpaths `@semec/ds/lite/*.css` só resolvem **num bundler** (Vite, Next, webpack): `import "@semec/ds/lite/fonts.css"; import "@semec/ds/lite/tokens.css";` no JS de entrada, ou `@import` num CSS que o bundler processa. Num `<link>` (HTML estático, servidor sem bundler) o navegador não conhece o `exports` do pacote; aponte para os arquivos reais, `fonts.css` antes do `tokens.css`:
+Sem Tailwind, **não use o `tokens.css`**: ele traz `@theme` e `@utility`, que o navegador ignora e que o bundler acusa (Vite e PostCSS mostram uns 30 avisos `Unknown at rule`). Use os dois arquivos portáveis:
+
+- **`variables.css`**: só as variáveis `:root` (`--bg`, `--action-primary`, `--pv-*`…). Não mexe em margens, links, fonte ou fundo da página. Basta ele para usar os tokens com `var()` num sistema existente.
+- **`base.css`** (opcional, depende do `variables.css`): reset, tipografia, links, foco visível, anel inverso sobre a marca e reduced motion. Adote-o de forma explícita; é a camada base que o `tokens.css` aplicava.
+
+Num bundler (Vite, Next, webpack), importe no JS de entrada, nesta ordem:
+
+```js
+import "@semec/ds/lite/fonts.css";
+import "@semec/ds/lite/variables.css";
+import "@semec/ds/lite/base.css"; // opcional
+```
+
+Os subpaths `@semec/ds/lite/*.css` só resolvem num bundler (ou num `@import` que ele processa). Num `<link>` (HTML estático, PHP, servidor sem bundler) o navegador não conhece o `exports` do pacote; aponte para os arquivos reais, `fonts.css` primeiro:
 
 ```html
 <link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/fonts.css" />
-<link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/tokens.css" />
+<link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/variables.css" />
+<link rel="stylesheet" href="/node_modules/@semec/ds/dist/react/base.css" />
 ```
 
-O caminho em `dist/` não é contrato público (o `exports` não o expõe) e pode mudar numa versão futura: fixe a versão do pacote (`"@semec/ds": "{{ds:version}}"`, sem `^`) ou copie os arquivos. Se o servidor não publica `node_modules`, copie `dist/react/tokens.css`, `dist/react/fonts.css` e a pasta `dist/react/fonts/` para a pasta estática, mantendo `fonts/` ao lado do `fonts.css` (as URLs dos `.woff2` são relativas a ele).
+O caminho em `dist/` não é contrato público (o `exports` não o expõe) e pode mudar numa versão futura: fixe a versão do pacote (`"@semec/ds": "{{ds:version}}"`, sem `^`) ou copie os arquivos. Se o servidor não publica `node_modules`, copie `dist/react/variables.css` e `dist/react/base.css` para a pasta estática e use `npx semec-ds copiar-fontes <pasta>` para levar `fonts.css` e `fonts/` juntos (as URLs dos `.woff2` são relativas ao `fonts.css`).
+
+**Via CDN** (sem `npm install`): o jsDelivr serve os arquivos físicos, não os aliases do `exports` (`/lite/variables.css` dá 404). Use o caminho `dist/react/`, versão fixa e SRI:
+
+```html
+<link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@semec/ds@{{ds:version}}/dist/react/fonts.css" integrity="sha384-…" />
+<link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@semec/ds@{{ds:version}}/dist/react/variables.css" integrity="sha384-…" />
+<link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@semec/ds@{{ds:version}}/dist/react/base.css" integrity="sha384-…" />
+```
+
+Calcule o SRI a partir dos arquivos publicados dessa versão (`variables.css` e `base.css` existem a partir da 4.4.0) e teste o carregamento. As fontes vêm de `dist/react/fonts/`, relativas ao `fonts.css`. Com CSP, autorize `https://cdn.jsdelivr.net` em `style-src` e `font-src`.
+
+### Tokens como dados (sem CSS)
+
+Para Figma/Tokens Studio, apps mobile, back-end, PDF ou e-mail, use os tokens como dados:
+
+```js
+import dtcg from "@semec/ds/tokens.json" with { type: "json" }; // DTCG 2025.10, grupos L0/L1
+import { tokens } from "@semec/ds/tokens"; // valores CSS resolvidos, tipados
+
+const primary = tokens["action-primary"]; // sem var()
+const reference = dtcg.L1["action-primary"].$value; // {L0.pv-blue-600}
+```
+
+Os dois são gerados do `:root` do `tokens.css`, que continua sendo a fonte de verdade. O arquivo físico é `dist/tokens/tokens.json`. A conversão para Android/iOS fica com o app.
 
 O pacote **não** exporta `shadcn.css` (removido na 2.0.0).
 
@@ -95,7 +164,7 @@ Camada do dia a dia. Diz o papel, não a cor. Use estes, nunca os L0.
 | `--surface-alt` | Superfície alternativa |
 | `--surface-sunken` | Superfície rebaixada (skeleton, trilhas) |
 | `--border` | Bordas leves |
-| `--border-strong` | Bordas proeminentes |
+| `--border-strong` | Borda de campo (`border-input`), contraste mínimo de 3:1 sobre `--surface` |
 | `--focus-ring` | Anel de foco (a11y) |
 | `--focus-ring-inverse` | Anel de foco sobre a marca |
 | `--text-muted` | Texto de apoio |
@@ -142,11 +211,13 @@ Camada do dia a dia. Diz o papel, não a cor. Use estes, nunca os L0.
 | `--font-semibold` | `600` |
 | `--font-bold` | `700` |
 
-Cada degrau tem altura de linha própria (`--leading-*`), já embutida no utilitário `text-*`. Papéis: `display` 40px = página inicial/hero, `3xl` 32px = h1, `2xl` = h2, `xl` = subtítulo, `lg` = destaque, `base` = corpo, `sm` = apoio, `xs` = rótulo. Não existem pesos 800/900.
+Cada degrau tem altura de linha própria (`--leading-*`), já embutida no utilitário `text-*`. Papéis: `display` 40px = página inicial/hero, `3xl` 32px = h1, `2xl` = h2, `xl` = subtítulo, `lg` = destaque, `base` = corpo, `sm` = apoio, `xs` = etiqueta, dica e mensagem de erro. Rótulo de campo usa `text-sm font-medium` (14px/500), ou `font-size: var(--text-sm); line-height: var(--leading-sm); font-weight: var(--font-medium)` em CSS puro. Não existem pesos 800/900.
 
 **Espaçamento:** `--space-0` 0 · `--space-1` 4px · `--space-2` 8px · `--space-3` 12px · `--space-4` 16px · `--space-6` 24px · `--space-8` 32px · `--space-12` 48px · `--space-16` 64px
 
-**Bordas:** `--radius-sm` 2px · `--radius-md` 8px · `--radius-lg` 12px · `--radius-full` 9999px (escolha pelo papel: controle `md`, cartão `lg`, pílula `full`; escala fixa, não use `rounded-xl` ou acima)
+Use os degraus de espaçamento no layout do app. Preserve as exceções do kit: botão médio `px-5` (20px), botão pequeno `py-1.5` (6px) e `FormField` `gap-1.5` (6px).
+
+**Bordas:** `--radius-sm` 2px · `--radius-md` 8px · `--radius-lg` 12px · `--radius-full` 9999px (escolha pelo papel: controle de entrada (campo, select) `rounded-md` / `--radius-md`, botão `rounded-full` / `--radius-full` (pílula), cartão e diálogo `rounded-lg` / `--radius-lg`; escala fixa, não use `rounded-xl` ou acima)
 
 **Elevação:** `--elevation-0/1/2/3`
 
@@ -164,6 +235,7 @@ Cada degrau tem altura de linha própria (`--leading-*`), já embutida no utilit
 | `bg-surface-alt` | `--surface-alt` |
 | `bg-surface-sunken` | `--surface-sunken` |
 | `border-border` / `border-border-strong` | `--border` / `--border-strong` |
+| `border-input` | `--border-strong` — borda de campo |
 | `text-text-muted` (ou `text-muted-foreground`) | `--text-muted` |
 | `text-text-secondary` | `--text-secondary` |
 | `text-text-on-brand` (ou `text-primary-foreground`) | `--text-on-brand` |
@@ -179,7 +251,7 @@ Cada degrau tem altura de linha própria (`--leading-*`), já embutida no utilit
 | `rounded-sm/md/lg/full` | `--radius-*` |
 | `shadow-elevation-1/2/3` | `--elevation-*` |
 
-**Armadilha:** **nunca** use `text-muted` nem `text-secondary` para texto: compilam para a cor de fundo `--surface-alt` (1,09:1). Use `text-text-muted` e `text-text-secondary`.
+**Armadilha:** `text-muted` e `text-secondary` **não geram CSS** desde a 4.4.0 (até a 4.3 compilavam para a cor de fundo `--surface-alt`, 1,09:1). A classe não dá erro: o texto só herda a cor do pai, e a intenção de texto de apoio se perde sem aviso. Use `text-text-muted` e `text-text-secondary`. Os fundos `bg-muted` e `bg-secondary` continuam.
 
 ## Tema
 
@@ -193,6 +265,7 @@ Cada degrau tem altura de linha própria (`--leading-*`), já embutida no utilit
 - Texto grande: **3:1**. Texto grande é **≥ 24px (18pt) regular** ou **≥ 18,66px (14pt) bold**; 18px bold **não** é texto grande
 - UI (bordas, ícones): **3:1** (WCAG 1.4.11)
 - Anel de foco `--focus-ring` (`--pv-blue-hero`): **9,38:1** sobre branco; sobre a marca, `bg-brand-hero` ou `data-surface="brand"` trocam o anel para branco (9,38:1) automaticamente, e `ring-ring-inverse` faz o mesmo por classe
+- **`data-surface="brand"` não pinta o fundo.** Ele só troca o anel para branco. O elemento precisa do fundo de marca próprio (`background: var(--brand-hero)` ou `bg-brand-hero`); sem ele, o anel branco fica sobre o fundo claro da página com **1,08:1** e o foco some
 
 ### Navegação por teclado
 
@@ -233,16 +306,16 @@ O `tokens.css` já reduz animações e transições globalmente com `@media (pre
 
 Complementar com ícone, texto ou padrão. Link em texto corrido é sublinhado.
 
-## Padrões de tela (sem React)
+## Padrões de tela (Tailwind, sem React)
 
 - **Esqueleto:** link "Pular para o conteúdo" como primeiro foco (`<a href="#conteudo">`, visível ao receber foco) → `<header>` → `<nav aria-label="Menu principal">` → um único `<main id="conteudo" tabindex="-1">` → `<footer>` institucional. Cada `<nav>` com `aria-label` distinto.
 - **Container:** `mx-auto w-full max-w-[75rem] px-4` (1200px) em todas as telas; texto corrido `max-w-prose`; formulário `max-w-3xl`.
 - **Títulos:** um `h1` por página com o nome da tarefa (`text-3xl font-bold`, 32px), `h2` em `text-2xl`, `h3` em `text-xl`, sem pular nível; `text-display` só no hero da página inicial.
-- **Marca e ação:** marca = `bg-brand-hero text-text-on-brand`; ação principal = `bg-primary` (um botão principal por grupo). Não use a cor de marca em botão nem a de ação como faixa institucional.
+- **Marca e ação:** cabeçalho do portal em `bg-surface border-b border-border`, marca em `text-brand-hero font-bold` e link atual em `text-brand-hero font-semibold`. Reserve `bg-brand-hero text-text-on-brand` para hero e faixas de destaque dentro da página. Ação principal = `bg-primary` (um botão principal por grupo). Não use a cor de marca em botão nem a de ação como faixa institucional. A logo oficial não vem no pacote: peça o SVG à SEMEC e salve como `public/marca.svg`.
 - **Formulários e Validação:**
   - Label associado ao campo (`<label for="id">`; placeholder não é rótulo).
   - Três padrões de erro:
-    1. *Inline no campo:* mensagem em texto abaixo do campo (`text-xs text-destructive`, `--feedback-danger: #b91c1c`, 5,98:1), campo com `aria-invalid="true"` e `aria-describedby="[id]-hint [id]-error"`. Sem `role="alert"` em listas para não interromper leitores de tela.
+    1. *Inline no campo:* mensagem em texto abaixo do campo (`text-xs text-destructive`, token `--feedback-danger`, 5,98:1). Com erro, a dica sai da tela e o campo recebe `aria-invalid="true"` e `aria-describedby="[id]-error"`; sem erro, use `aria-describedby="[id]-hint"` apenas se houver dica. Sem `role="alert"` em listas para não interromper leitores de tela.
     2. *Resumo no topo:* contêiner com `role="alert"`, `tabindex="-1"`, foco automático ao submeter e links para cada campo com erro (`<a href="#id">`).
     3. *Erro de servidor:* caixa de aviso (`role="alert"`, fundo `--feedback-danger-surface`, texto e borda `--feedback-danger`; com Tailwind, `bg-destructive-surface text-destructive border-destructive`) com instruções claras de recuperação. Nunca os primitivos `--pv-red-*` direto.
   - *Legenda Auxiliar de Ação / Download:* botões que geram efeitos secundários (ex.: download de PDF gerado) devem conter legenda explicativa complementar abaixo (`text-xs text-text-muted`).
@@ -252,6 +325,22 @@ Complementar com ícone, texto ou padrão. Link em texto corrido é sublinhado.
 - **Estados vazios:** título, descrição e ação.
 
 Para os mesmos padrões com componentes prontos (`SkipLink`, `Header`, `Heading`, `Footer`, `Table`…), veja a skill `semec-ds`.
+
+### Equivalentes sem Tailwind
+
+Em CSS puro, aplique as declarações abaixo em classes do app, no arquivo CSS. Mantenha o HTML e os atributos acessíveis descritos acima; eles funcionam sem Tailwind. As dimensões de layout (75rem, 65ch, 48rem) não têm token no pacote.
+
+| Padrão | CSS puro e semântica |
+|--------|---------------------|
+| Esqueleto | Página com `background: var(--bg); color: var(--fg); font-family: var(--font-family-sans)`. Preserve link de pular, header, nav, main e footer; deixe o link de pular visível, inclusive ao focar. |
+| Container | `box-sizing: border-box; margin-inline: auto; width: 100%; max-width: 75rem; padding-inline: var(--space-4)`. Texto corrido: `max-width: 65ch`; formulário: `max-width: 48rem`. |
+| Títulos | h1: `font-size: var(--text-3xl); line-height: var(--leading-3xl); font-weight: var(--font-bold); color: var(--fg)`. h2: `--text-2xl` / `--leading-2xl`; h3: `--text-xl` / `--leading-xl`; hero: `--text-display` / `--leading-display`. |
+| Marca e ação | Header: `background: var(--surface); border-bottom: 1px solid var(--border)`; marca: `color: var(--brand-hero); font-weight: var(--font-bold)`. Hero/faixa: `background: var(--brand-hero); color: var(--text-on-brand)` e `data-surface="brand"`. Ação: `background: var(--action-primary); color: var(--text-on-brand)`; hover: `background: var(--action-primary-hover)`. |
+| Formulários e validação | Rótulo: `font-size: var(--text-sm); line-height: var(--leading-sm); font-weight: var(--font-medium)`. Borda de campo: `border: 1px solid var(--border-strong)`. Dica/legenda de ação: `font-size: var(--text-xs); line-height: var(--leading-xs); color: var(--text-muted)`. Erro inline: mesma tipografia, `color: var(--feedback-danger)`; esconda a dica e referencie só o erro. Resumo: foco programático, links para os campos e `color: var(--feedback-danger)`. Erro de servidor: `background: var(--feedback-danger-surface); color: var(--feedback-danger); border: 1px solid var(--feedback-danger)`. |
+| Navegação | Link atual: `color: var(--brand-hero); font-weight: var(--font-semibold)`, com `aria-current="page"`. Preserve `aria-label` distinto em cada nav e o comportamento de gaveta no mobile; CSS sozinho não controla foco nem `inert`. |
+| Feedback | Ícone, título e texto, com `color: var(--feedback-success)` e `background: var(--feedback-success-surface)` para sucesso; use os tokens de perigo para erro. Anuncie a confirmação com `role="status"`; cor sozinha não comunica o resultado. |
+| Tabelas | Região nomeada e focável: `overflow-x: auto; color: var(--fg); background: var(--surface)`; células: `padding: var(--space-4); border-bottom: 1px solid var(--border)`. Preserve caption e th com scope; teste a rolagem por setas. |
+| Estados vazios | Título em `color: var(--fg)`, descrição em `color: var(--text-muted)`, ação em `background: var(--action-primary); color: var(--text-on-brand)`. Mantenha a hierarquia de títulos e o nome acessível da ação. |
 
 ## Responsive / Mobile
 
@@ -269,12 +358,21 @@ Para os mesmos padrões com componentes prontos (`SkipLink`, `Header`, `Heading`
 - Container e largura de leitura: ver "Padrões de tela"
 - O pacote **não** tem `--container-max`, `--container-docs`, `--measure`, `--control-height-*` nem modo `data-density="compact"`: esses nomes existem só no CSS do site de documentação. `var()` com eles resolve para vazio, sem erro
 
+## Checklist de verificação
+
+- Percorra todos os controles com Tab e Shift+Tab; o anel deve permanecer visível, inclusive após aplicar o CSS legado. Axe sozinho não detecta foco apagado.
+- Em 320px e 390px, confirme reflow e use as setas para rolar a região focável da tabela.
+- Clique nos rótulos de Checkbox/Radio e confira a seleção; teste Space e setas pelo teclado.
+- Confira as fontes na aba de rede e os estados de dica/erro com leitor de tela.
+
 ## Regras
 
 - PT-BR rótulos, EN código (ADR-016)
 - Sem hex solto, sem `rgba()`, sem `style` inline — use tokens L1
 - Semântica > aparência
 - `className` escapatória sempre permitida
+
+<!-- ds:component-recipes -->
 
 ## Licença e crédito
 

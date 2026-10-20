@@ -6,6 +6,7 @@ import { cva } from "class-variance-authority";
 import { ChevronDown } from "lucide-react";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
@@ -45,8 +46,8 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
-const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-11 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+const navigationMenuTriggerStyle: VariantFunction = cva(
+  "group inline-flex h-11 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
 );
 
 const NavigationMenuTrigger = React.forwardRef<
@@ -71,10 +72,13 @@ const NavigationMenuContent = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Content>
 >(({ className, ...props }, ref) => (
+  // V42-VITE-03: com `w-full`/`md:w-auto` o painel encolhia até a palavra
+  // mais longa e cada link quebrava em 2 linhas ("Alvará de / funcionamento").
+  // `w-max` dá ao painel a largura do link mais longo, limitada à tela.
   <NavigationMenuPrimitive.Content
     ref={ref}
     className={cn(
-      "left-0 top-0 w-full data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52 data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52 md:absolute md:w-auto",
+      "left-0 top-0 w-max max-w-[calc(100vw-2rem)] data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52 data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52 md:absolute",
       className
     )}
     {...props}
@@ -90,8 +94,8 @@ NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName;
 // Quem passa `className={navigationMenuTriggerStyle()}` continua com o visual
 // do gatilho: o tailwind-merge resolve display, padding e fundo a favor da
 // classe recebida.
-const navigationMenuLinkStyle = cva(
-  "flex min-h-11 select-none items-center rounded-md px-4 py-2 text-sm font-medium leading-snug text-foreground no-underline outline-none transition-colors duration-fast ease-standard hover:bg-tint hover:text-foreground focus:bg-tint focus:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[active]:font-semibold"
+const navigationMenuLinkStyle: VariantFunction = cva(
+  "flex min-h-11 select-none items-center rounded-md px-4 py-2 text-sm font-medium leading-snug text-foreground no-underline outline-none focus-visible:outline-hidden transition-colors duration-fast ease-standard hover:bg-tint hover:text-foreground focus:bg-tint focus:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[active]:font-semibold"
 );
 
 const NavigationMenuLink = React.forwardRef<

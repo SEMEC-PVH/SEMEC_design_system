@@ -1,0 +1,37 @@
+{#- Parcial "combobox" (Twig). Uso:
+    {% include '@semec/combobox.html.twig' with {id: 'escola', rotulo: 'Escola', opcao_vazia: 'Selecione a escola', opcoes: [{valor: 'emef-aponia', texto: 'EMEF Aponiã'}]} only %}
+    Um <select> nativo dentro do <semec-combobox> (@semec/ds-elements); o
+    elemento envolve só o select e o campo de busca assume o id (#id no resumo). -#}
+{%- autoescape 'html' -%}
+{%- set id = id|default('') -%}
+{%- set dica = dica|default('') -%}
+{%- set erro = erro|default('') -%}
+{%- set obrigatorio = obrigatorio|default(false) -%}
+{%- set dica_id = dica and not erro ? id ~ '-hint' : '' -%}
+{%- set erro_id = erro ? id ~ '-error' : '' -%}
+{%- set descritores = [dica_id, erro_id]|filter(v => v)|join(' ') -%}
+{%- set valor_presente = valor is defined and valor is not null and valor is not same as('') -%}
+<div class="semec-form-field">
+  <label for="{{ id }}" class="semec-label">{{ rotulo|default('') }}{% if obrigatorio %}<span class="semec-label__required" aria-hidden="true"> *</span>{% endif %}</label>
+  <semec-combobox class="semec-combobox"{% if texto_vazio|default('') %} empty-text="{{ texto_vazio }}"{% endif %}>
+    <select id="{{ id }}" name="{{ nome|default(id) }}" class="semec-field"
+{%- if obrigatorio %} required{% endif %}
+{%- if desabilitado|default(false) %} disabled{% endif %}
+{%- if erro %} aria-invalid="true"{% endif %}
+{%- if descritores %} aria-describedby="{{ descritores }}"{% endif %}>
+{% if opcao_vazia|default('') %}
+      <option value="">{{ opcao_vazia }}</option>
+{% endif %}
+{% for opcao in opcoes|default([]) %}
+      <option value="{{ opcao.valor ?? '' }}"{% if valor_presente and (opcao.valor ?? '') ~ '' == valor ~ '' %} selected{% endif %}>{{ opcao.texto ?? '' }}</option>
+{% endfor %}
+    </select>
+  </semec-combobox>
+{% if dica_id %}
+  <p id="{{ dica_id }}" class="semec-hint">{{ dica }}</p>
+{% endif %}
+{% if erro_id %}
+  <p id="{{ erro_id }}" class="semec-error">{{ erro }}</p>
+{% endif %}
+</div>
+{% endautoescape -%}

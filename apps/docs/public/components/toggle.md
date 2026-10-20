@@ -2,7 +2,7 @@
 title: "Toggle"
 code: "toggle"
 slug: "toggle"
-file: "src/components/toggle.tsx"
+file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/toggle.tsx"
 category: "formularios"
 variants: "variant: default (solto sem borda) · outline (solto com borda input) · estado ligado: data-state=on · aria-pressed=true · fundo tint · contorno primary de 2px (borda + inset-ring) · hover escurece para primary-hover · size: sm (36px visual, alvo 44px) · md (44px, padrão) · lg (48px)"
 ---
@@ -11,7 +11,7 @@ variants: "variant: default (solto sem borda) · outline (solto com borda input)
 
 > Botão binário para estados on/off em toolbars (`pressed`/`onPressedChange`, API Radix). Não é controle de formulário: não envia valor em `<form>` nem tem `name`/`invalid`; para opção de formulário, use Checkbox ou Switch. Alvo de toque de 44px em todos os tamanhos. Ligado = fundo `tint` + contorno de 2px em `primary` (5,00:1 sobre `--bg`, 5,42:1 sobre branco) e texto `foreground`; o estado vai ao leitor de tela por `aria-pressed`.
 
-**Arquivo:** `src/components/toggle.tsx` | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/toggle/
+**Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/toggle.tsx) | **Categoria:** Formulários | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/toggle/
 
 ## Variantes
 
@@ -25,7 +25,7 @@ variants: "variant: default (solto sem borda) · outline (solto com borda input)
 npm install @semec/ds lucide-react
 ```
 
-lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers zod.
+lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer ausente sozinho, o pnpm só com auto-install-peers=true e o Yarn nunca, então instale-o junto. tailwindcss ^4 também é peer, com o plugin do bundler (@tailwindcss/vite ou @tailwindcss/postcss). zod (^3.23.0 || ^4.0.0) é peer opcional, só para @semec/ds/react/validacao. A receita de formulário (React Hook Form + Zod + FormField + ErrorSummary) usa ainda react-hook-form e @hookform/resolvers, opcionais e fora do kit: npm install react-hook-form @hookform/resolvers@^5 zod@^4.
 
 ```css
 @import "tailwindcss";
@@ -63,8 +63,12 @@ import * as TogglePrimitive from "@radix-ui/react-toggle";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 
-const toggleVariants = cva(
+const toggleVariants: VariantFunction<{
+  variant: "default" | "outline";
+  size: "sm" | "md" | "lg";
+}> = cva(
   // TST-03: o estado ligado não pode depender de um cinza quase igual ao fundo
   // (antes `bg-accent`, 1,01:1). Ligado = fundo `tint` + contorno de 2px em
   // `primary` (borda + inset-ring de 1px), texto `foreground`:
@@ -76,7 +80,7 @@ const toggleVariants = cva(
   // inset-ring: o pixel interno passa de superfície a primary (5,00:1 / 5,42:1).
   // Hover solto: borda `border-strong` (3,49:1 / 3,77:1) na `default` e
   // `foreground` na `outline`; hover ligado escurece para `primary-hover`.
-  "inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[state=on]:border-primary data-[state=on]:bg-tint data-[state=on]:text-foreground data-[state=on]:inset-ring data-[state=on]:inset-ring-primary data-[state=on]:hover:border-primary-hover data-[state=on]:hover:inset-ring-primary-hover",
+  "inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-[state=on]:border-primary data-[state=on]:bg-tint data-[state=on]:text-foreground data-[state=on]:inset-ring data-[state=on]:inset-ring-primary data-[state=on]:hover:border-primary-hover data-[state=on]:hover:inset-ring-primary-hover",
   {
     variants: {
       variant: {

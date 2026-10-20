@@ -60,3 +60,26 @@ Só quando a mudança visual for intencional. Rode `npm run test:visual`, abra o
 `npm run test:visual:update` e commite os PNGs de `tests/visual/__screenshots__/` junto com a mudança.
 
 Ao subir a versão do `@playwright/test`, regrave todas as baselines: a imagem muda junto.
+
+## Multi-navegador (opcional): WebKit e Firefox
+
+O `npm run gate` e o `npm run test:visual` continuam só no Chromium. Para conferir o **comportamento** nos
+outros motores do Playwright:
+
+```bash
+npm run gate:browsers          # estados abertos, FileUpload no <form>, layout real e foco do ErrorSummary
+                               # em chromium, webkit e firefox (scripts/gate/browsers.mjs)
+node scripts/gate/browsers.mjs webkit   # só um motor
+npm run test:visual:browsers   # suíte visual nos projetos *-webkit e *-firefox, no contêiner, sem comparar pixel
+```
+
+- `GATE_BROWSER=webkit|firefox` troca o motor de qualquer check do gate que abre navegador
+  (`scripts/gate/browser.mjs`); sem a variável, é Chromium.
+- `VISUAL_BROWSERS=chromium,webkit,firefox` acrescenta projetos à suíte visual (`desktop-1366-webkit`,
+  `mobile-390-firefox`…). Só o Chromium tem baselines; nos outros a suíte roda com `--ignore-snapshots` e
+  falha por comportamento (foco por Tab, camada que não abre, overflow, fonte não carregada, erro de página),
+  nunca por pixel: a fonte renderiza diferente em cada motor e isso não é achado.
+- Navegadores: `npx playwright install --with-deps chromium webkit firefox` (a imagem do contêiner já traz os três).
+- Limite: o WebKit do Playwright não é o Safari. No Safari com a configuração padrão do macOS, `Tab` não para em
+  links nem em botões (só `Opção+Tab`, ou com "Navegação por teclado" ligada no sistema e "Pressionar Tab para
+  destacar cada item" no Safari). Teste de teclado no Safari real precisa dessas opções ligadas.
