@@ -391,40 +391,40 @@ HTML sem Tailwind:
 HTML com Tailwind v4:
 
 ```html
-<button type="submit" class="inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active min-h-11 px-5 py-2 text-sm">Revisar solicitação</button>
+<button type="submit" class="inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active min-h-11 px-5 py-2 text-sm">Revisar solicitação</button>
 ```
 
 | Parte / variante | Classe no CSS puro | Classes do componente |
 |---|---|---|
-| root | `semec-button-root` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active min-h-11 px-5 py-2 text-sm` |
-| primary-sm | `semec-button-primary-sm` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2` |
-| primary-md | `semec-button-primary-md` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active min-h-11 px-5 py-2 text-sm` |
-| primary-lg | `semec-button-primary-lg` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active min-h-12 px-6 py-2 text-base` |
-| primary-icon | `semec-button-primary-icon` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active h-11 w-11` |
-| secondary-sm | `semec-button-secondary-sm` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-secondary text-secondary-foreground hover:bg-secondary/80 min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2` |
-| secondary-md | `semec-button-secondary-md` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-secondary text-secondary-foreground hover:bg-secondary/80 min-h-11 px-5 py-2 text-sm` |
-| secondary-lg | `semec-button-secondary-lg` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-secondary text-secondary-foreground hover:bg-secondary/80 min-h-12 px-6 py-2 text-base` |
-| secondary-icon | `semec-button-secondary-icon` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-11 w-11` |
-| outline-sm | `semec-button-outline-sm` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2` |
-| outline-md | `semec-button-outline-md` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground min-h-11 px-5 py-2 text-sm` |
-| outline-lg | `semec-button-outline-lg` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground min-h-12 px-6 py-2 text-base` |
-| outline-icon | `semec-button-outline-icon` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground h-11 w-11` |
-| ghost-sm | `semec-button-ghost-sm` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-foreground hover:bg-accent hover:text-accent-foreground min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2` |
-| ghost-md | `semec-button-ghost-md` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-foreground hover:bg-accent hover:text-accent-foreground min-h-11 px-5 py-2 text-sm` |
-| ghost-lg | `semec-button-ghost-lg` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-foreground hover:bg-accent hover:text-accent-foreground min-h-12 px-6 py-2 text-base` |
-| ghost-icon | `semec-button-ghost-icon` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-foreground hover:bg-accent hover:text-accent-foreground h-11 w-11` |
-| destructive-sm | `semec-button-destructive-sm` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2` |
-| destructive-md | `semec-button-destructive-md` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 min-h-11 px-5 py-2 text-sm` |
-| destructive-lg | `semec-button-destructive-lg` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 min-h-12 px-6 py-2 text-base` |
-| destructive-icon | `semec-button-destructive-icon` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-11 w-11` |
-| success-sm | `semec-button-success-sm` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-success text-white hover:bg-success/90 focus-visible:ring-success/30 min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2` |
-| success-md | `semec-button-success-md` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-success text-white hover:bg-success/90 focus-visible:ring-success/30 min-h-11 px-5 py-2 text-sm` |
-| success-lg | `semec-button-success-lg` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-success text-white hover:bg-success/90 focus-visible:ring-success/30 min-h-12 px-6 py-2 text-base` |
-| success-icon | `semec-button-success-icon` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-success text-white hover:bg-success/90 focus-visible:ring-success/30 h-11 w-11` |
-| link-sm | `semec-button-link-sm` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-primary underline-offset-4 hover:underline min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2` |
-| link-md | `semec-button-link-md` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-primary underline-offset-4 hover:underline min-h-11 px-5 py-2 text-sm` |
-| link-lg | `semec-button-link-lg` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-primary underline-offset-4 hover:underline min-h-12 px-6 py-2 text-base` |
-| link-icon | `semec-button-link-icon` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-primary underline-offset-4 hover:underline h-11 w-11` |
+| root | `semec-button-root` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active min-h-11 px-5 py-2 text-sm` |
+| primary-sm | `semec-button-primary-sm` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2` |
+| primary-md | `semec-button-primary-md` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active min-h-11 px-5 py-2 text-sm` |
+| primary-lg | `semec-button-primary-lg` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active min-h-12 px-6 py-2 text-base` |
+| primary-icon | `semec-button-primary-icon` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active h-11 w-11` |
+| secondary-sm | `semec-button-secondary-sm` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-secondary text-secondary-foreground hover:bg-secondary/80 min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2` |
+| secondary-md | `semec-button-secondary-md` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-secondary text-secondary-foreground hover:bg-secondary/80 min-h-11 px-5 py-2 text-sm` |
+| secondary-lg | `semec-button-secondary-lg` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-secondary text-secondary-foreground hover:bg-secondary/80 min-h-12 px-6 py-2 text-base` |
+| secondary-icon | `semec-button-secondary-icon` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-11 w-11` |
+| outline-sm | `semec-button-outline-sm` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2` |
+| outline-md | `semec-button-outline-md` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground min-h-11 px-5 py-2 text-sm` |
+| outline-lg | `semec-button-outline-lg` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground min-h-12 px-6 py-2 text-base` |
+| outline-icon | `semec-button-outline-icon` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground h-11 w-11` |
+| ghost-sm | `semec-button-ghost-sm` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-foreground hover:bg-accent hover:text-accent-foreground min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2` |
+| ghost-md | `semec-button-ghost-md` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-foreground hover:bg-accent hover:text-accent-foreground min-h-11 px-5 py-2 text-sm` |
+| ghost-lg | `semec-button-ghost-lg` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-foreground hover:bg-accent hover:text-accent-foreground min-h-12 px-6 py-2 text-base` |
+| ghost-icon | `semec-button-ghost-icon` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-foreground hover:bg-accent hover:text-accent-foreground h-11 w-11` |
+| destructive-sm | `semec-button-destructive-sm` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2` |
+| destructive-md | `semec-button-destructive-md` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 min-h-11 px-5 py-2 text-sm` |
+| destructive-lg | `semec-button-destructive-lg` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 min-h-12 px-6 py-2 text-base` |
+| destructive-icon | `semec-button-destructive-icon` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-11 w-11` |
+| success-sm | `semec-button-success-sm` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-success text-white hover:bg-success/90 focus-visible:ring-success/30 min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2` |
+| success-md | `semec-button-success-md` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-success text-white hover:bg-success/90 focus-visible:ring-success/30 min-h-11 px-5 py-2 text-sm` |
+| success-lg | `semec-button-success-lg` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-success text-white hover:bg-success/90 focus-visible:ring-success/30 min-h-12 px-6 py-2 text-base` |
+| success-icon | `semec-button-success-icon` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-success text-white hover:bg-success/90 focus-visible:ring-success/30 h-11 w-11` |
+| link-sm | `semec-button-link-sm` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-primary underline-offset-4 hover:underline min-h-9 px-4 py-1.5 text-sm relative after:absolute after:left-1/2 after:top-1/2 after:h-full after:min-h-11 after:w-full after:min-w-11 after:-translate-x-1/2 after:-translate-y-1/2` |
+| link-md | `semec-button-link-md` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-primary underline-offset-4 hover:underline min-h-11 px-5 py-2 text-sm` |
+| link-lg | `semec-button-link-lg` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-primary underline-offset-4 hover:underline min-h-12 px-6 py-2 text-base` |
+| link-icon | `semec-button-link-icon` | `inline-flex items-center justify-center gap-2 text-center text-balance rounded-full font-medium no-underline transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-primary underline-offset-4 hover:underline h-11 w-11` |
 
 ### Input
 
@@ -442,14 +442,14 @@ HTML com Tailwind v4:
 
 ```html
 <label for="nome" class="text-sm font-medium text-foreground">Nome completo</label>
-<input id="nome" name="nome" autocomplete="name" class="flex h-11 w-full rounded-md border border-input bg-surface px-4 py-2 text-base sm:text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive" aria-describedby="nome-hint">
+<input id="nome" name="nome" autocomplete="name" class="flex h-11 w-full rounded-md border border-input bg-surface px-4 py-2 text-base sm:text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive" aria-describedby="nome-hint">
 <p id="nome-hint" class="text-xs text-muted-foreground">Informe seu nome completo.</p>
 ```
 
 | Parte / variante | Classe no CSS puro | Classes do componente |
 |---|---|---|
-| root | `semec-input-root` | `flex h-11 w-full rounded-md border border-input bg-surface px-4 py-2 text-base sm:text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive` |
-| invalid | `semec-input-invalid` | `flex h-11 w-full rounded-md border border-input bg-surface px-4 py-2 text-base sm:text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive` |
+| root | `semec-input-root` | `flex h-11 w-full rounded-md border border-input bg-surface px-4 py-2 text-base sm:text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive` |
+| invalid | `semec-input-invalid` | `flex h-11 w-full rounded-md border border-input bg-surface px-4 py-2 text-base sm:text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive` |
 
 ### Select
 
@@ -466,13 +466,13 @@ HTML com Tailwind v4:
 
 ```html
 <label for="escola" class="text-sm font-medium text-foreground">Escola</label>
-<select id="escola" name="escola" class="flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground shadow-elevation-1 placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left"><option value="">Selecione</option><option value="centro">Escola Centro</option></select>
+<select id="escola" name="escola" class="flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground shadow-elevation-1 placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left"><option value="">Selecione</option><option value="centro">Escola Centro</option></select>
 ```
 
 | Parte / variante | Classe no CSS puro | Classes do componente |
 |---|---|---|
-| root | `semec-select-root` | `flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground shadow-elevation-1 placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left` |
-| invalid | `semec-select-invalid` | `flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground shadow-elevation-1 placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left` |
+| root | `semec-select-root` | `flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground shadow-elevation-1 placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left` |
+| invalid | `semec-select-invalid` | `flex h-11 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-surface px-4 py-2 text-sm text-foreground shadow-elevation-1 placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&>span]:line-clamp-1 [&>span]:truncate [&>span]:text-left` |
 
 ### Textarea
 
@@ -489,13 +489,13 @@ HTML com Tailwind v4:
 
 ```html
 <label for="observacoes" class="text-sm font-medium text-foreground">Observações</label>
-<textarea id="observacoes" name="observacoes" class="flex min-h-[80px] w-full rounded-md border border-input bg-surface px-4 py-3 text-base sm:text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"></textarea>
+<textarea id="observacoes" name="observacoes" class="flex min-h-[80px] w-full rounded-md border border-input bg-surface px-4 py-3 text-base sm:text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive"></textarea>
 ```
 
 | Parte / variante | Classe no CSS puro | Classes do componente |
 |---|---|---|
-| root | `semec-textarea-root` | `flex min-h-[80px] w-full rounded-md border border-input bg-surface px-4 py-3 text-base sm:text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive` |
-| invalid | `semec-textarea-invalid` | `flex min-h-[80px] w-full rounded-md border border-input bg-surface px-4 py-3 text-base sm:text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive` |
+| root | `semec-textarea-root` | `flex min-h-[80px] w-full rounded-md border border-input bg-surface px-4 py-3 text-base sm:text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive` |
+| invalid | `semec-textarea-invalid` | `flex min-h-[80px] w-full rounded-md border border-input bg-surface px-4 py-3 text-base sm:text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive` |
 
 ### FormField
 
@@ -516,7 +516,7 @@ HTML com Tailwind v4:
 ```html
 <div class="grid content-start gap-1.5">
   <label for="email" class="text-sm font-medium text-foreground">E-mail (obrigatório)</label>
-  <input id="email" name="email" type="email" autocomplete="email" required aria-invalid="true" aria-describedby="email-error" class="flex h-11 w-full rounded-md border border-input bg-surface px-4 py-2 text-base sm:text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive">
+  <input id="email" name="email" type="email" autocomplete="email" required aria-invalid="true" aria-describedby="email-error" class="flex h-11 w-full rounded-md border border-input bg-surface px-4 py-2 text-base sm:text-sm text-foreground placeholder:text-muted-foreground transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus-visible:ring-destructive">
   <p id="email-error" class="text-xs text-destructive">Informe um e-mail válido.</p>
 </div>
 ```
@@ -613,21 +613,21 @@ HTML com Tailwind v4:
 
 ```html
 <header class="flex w-full max-w-full flex-wrap items-center justify-between gap-4 border-b border-border bg-surface px-4 py-3 sm:px-6">
-  <a href="#conteudo" class="flex min-h-11 min-w-0 items-center gap-3 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background" aria-label="SEMEC — Atendimento — ir para o início"><span class="min-w-0 text-base font-bold leading-snug text-brand-hero break-words">SEMEC <span aria-hidden="true" class="font-normal text-muted-foreground">|</span> <span class="font-semibold text-foreground">Atendimento</span></span></a>
-  <nav aria-label="Principal" class="flex flex-wrap items-center gap-2"><a href="#conteudo" aria-current="page" class="inline-flex min-h-11 items-center rounded-md px-2 text-sm no-underline transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background font-semibold text-brand-hero">Solicitações</a><a href="#ajuda" class="inline-flex min-h-11 items-center rounded-md px-2 text-sm font-medium text-foreground no-underline transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">Ajuda</a></nav>
+  <a href="#conteudo" class="flex min-h-11 min-w-0 items-center gap-3 no-underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background" aria-label="SEMEC — Atendimento — ir para o início"><span class="min-w-0 text-base font-bold leading-snug text-brand-hero break-words">SEMEC <span aria-hidden="true" class="font-normal text-muted-foreground">|</span> <span class="font-semibold text-foreground">Atendimento</span></span></a>
+  <nav aria-label="Principal" class="flex flex-wrap items-center gap-2"><a href="#conteudo" aria-current="page" class="inline-flex min-h-11 items-center rounded-md px-2 text-sm no-underline transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background font-semibold text-brand-hero">Solicitações</a><a href="#ajuda" class="inline-flex min-h-11 items-center rounded-md px-2 text-sm font-medium text-foreground no-underline transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">Ajuda</a></nav>
 </header>
 ```
 
 | Parte / variante | Classe no CSS puro | Classes do componente |
 |---|---|---|
 | root | `semec-header-root` | `flex w-full max-w-full flex-wrap items-center justify-between gap-4 border-b border-border bg-surface px-4 py-3 sm:px-6` |
-| brand | `semec-header-brand` | `flex min-h-11 min-w-0 items-center gap-3 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background` |
+| brand | `semec-header-brand` | `flex min-h-11 min-w-0 items-center gap-3 no-underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background` |
 | brandText | `semec-header-brand-text` | `min-w-0 text-base font-bold leading-snug text-brand-hero break-words` |
 | separator | `semec-header-separator` | `font-normal text-muted-foreground` |
 | service | `semec-header-service` | `font-semibold text-foreground` |
 | nav | `semec-header-nav` | `flex flex-wrap items-center gap-2` |
-| link | `semec-header-link` | `inline-flex min-h-11 items-center rounded-md px-2 text-sm font-medium text-foreground no-underline transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background` |
-| current | `semec-header-current` | `inline-flex min-h-11 items-center rounded-md px-2 text-sm no-underline transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background font-semibold text-brand-hero` |
+| link | `semec-header-link` | `inline-flex min-h-11 items-center rounded-md px-2 text-sm font-medium text-foreground no-underline transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background` |
+| current | `semec-header-current` | `inline-flex min-h-11 items-center rounded-md px-2 text-sm no-underline transition-colors duration-fast ease-standard hover:text-brand-hero focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background font-semibold text-brand-hero` |
 
 ### ErrorSummary
 
@@ -671,19 +671,19 @@ HTML sem Tailwind:
 HTML com Tailwind v4:
 
 ```html
-<span class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-success-surface text-success">Aprovado</span>
+<span class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-success-surface text-success">Aprovado</span>
 ```
 
 | Parte / variante | Classe no CSS puro | Classes do componente |
 |---|---|---|
-| root | `semec-badge-root` | `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground` |
-| default | `semec-badge-default` | `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground` |
-| secondary | `semec-badge-secondary` | `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground` |
-| outline | `semec-badge-outline` | `inline-flex items-center rounded-full border border-border px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground` |
-| success | `semec-badge-success` | `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-success-surface text-success` |
-| warning | `semec-badge-warning` | `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-warning-surface text-warning` |
-| danger | `semec-badge-danger` | `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-destructive-surface text-destructive` |
-| info | `semec-badge-info` | `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-info-surface text-info` |
+| root | `semec-badge-root` | `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground` |
+| default | `semec-badge-default` | `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary text-primary-foreground` |
+| secondary | `semec-badge-secondary` | `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground` |
+| outline | `semec-badge-outline` | `inline-flex items-center rounded-full border border-border px-3 py-1 text-xs font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground` |
+| success | `semec-badge-success` | `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-success-surface text-success` |
+| warning | `semec-badge-warning` | `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-warning-surface text-warning` |
+| danger | `semec-badge-danger` | `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-destructive-surface text-destructive` |
+| info | `semec-badge-info` | `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-info-surface text-info` |
 
 ### Toast
 
@@ -706,7 +706,7 @@ HTML com Tailwind v4:
 <div role="status" aria-live="polite" aria-atomic="true">
   <div class="group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-[12px] border border-border p-4 shadow-elevation-2 font-sans transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out border-none bg-success-emphasis text-success-emphasis-foreground px-5 py-4 [&_[toast-close]]:text-success-emphasis-foreground [&_[toast-close]]:hover:bg-success-emphasis-foreground/10">
     <div><p class="text-base font-bold leading-tight">Solicitação salva</p><p class="text-sm font-normal leading-[1.4] opacity-95">Seu protocolo está disponível.</p></div>
-    <button type="button" toast-close="" aria-label="Fechar notificação" class="-m-2 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">×</button>
+    <button type="button" toast-close="" aria-label="Fechar notificação" class="-m-2 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring">×</button>
   </div>
 </div>
 ```
@@ -717,8 +717,8 @@ HTML com Tailwind v4:
 | viewport | `semec-toast-viewport` | `pointer-events-none fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col gap-2 p-4 sm:top-4 sm:right-4 md:max-w-[420px]` |
 | title | `semec-toast-title` | `text-base font-bold leading-tight` |
 | description | `semec-toast-description` | `text-sm font-normal leading-[1.4] opacity-95` |
-| close | `semec-toast-close` | `-m-2 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring` |
-| action | `semec-toast-action` | `inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-border bg-transparent px-4 text-sm font-medium transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50` |
+| close | `semec-toast-close` | `-m-2 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring` |
+| action | `semec-toast-action` | `inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-border bg-transparent px-4 text-sm font-medium transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50` |
 | default | `semec-toast-default` | `group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-[12px] border p-4 shadow-elevation-2 font-sans transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out border-border bg-card text-card-foreground` |
 | success | `semec-toast-success` | `group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-[12px] border border-border p-4 shadow-elevation-2 font-sans transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out border-none bg-success-emphasis text-success-emphasis-foreground px-5 py-4 [&_[toast-close]]:text-success-emphasis-foreground [&_[toast-close]]:hover:bg-success-emphasis-foreground/10` |
 | warning | `semec-toast-warning` | `group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-[12px] border p-4 shadow-elevation-2 font-sans transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out border-warning/40 bg-warning-surface text-foreground` |
@@ -1142,6 +1142,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:active {
     background-color: var(--action-primary-active);
@@ -1244,6 +1248,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:active {
     background-color: var(--action-primary-active);
@@ -1307,6 +1315,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:active {
     background-color: var(--action-primary-active);
@@ -1370,6 +1382,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:active {
     background-color: var(--action-primary-active);
@@ -1430,6 +1446,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:active {
     background-color: var(--action-primary-active);
@@ -1536,6 +1556,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -1600,6 +1624,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -1664,6 +1692,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -1725,6 +1757,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -1832,6 +1868,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -1900,6 +1940,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -1968,6 +2012,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -2033,6 +2081,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -2136,6 +2188,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -2200,6 +2256,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -2264,6 +2324,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -2325,6 +2389,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -2427,6 +2495,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -2490,6 +2562,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -2553,6 +2629,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -2613,6 +2693,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -2718,6 +2802,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -2784,6 +2872,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -2850,6 +2942,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -2913,6 +3009,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -3012,6 +3112,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -3072,6 +3176,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -3132,6 +3240,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -3189,6 +3301,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;
@@ -3243,6 +3359,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     cursor: not-allowed;
@@ -3303,6 +3423,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     cursor: not-allowed;
@@ -3368,6 +3492,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     cursor: not-allowed;
@@ -3438,6 +3566,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     cursor: not-allowed;
@@ -3503,6 +3635,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     cursor: not-allowed;
@@ -3563,6 +3699,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     cursor: not-allowed;
@@ -3929,6 +4069,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
 }
 .semec-header-brand-text {
@@ -3998,6 +4142,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
 }
 .semec-header-current {
@@ -4040,6 +4188,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
 }
 .semec-error-summary-root {
@@ -4140,6 +4292,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
 }
 .semec-badge-default {
@@ -4174,6 +4330,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
 }
 .semec-badge-secondary {
@@ -4208,6 +4368,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
 }
 .semec-badge-outline {
@@ -4241,6 +4405,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
 }
 .semec-badge-success {
@@ -4275,6 +4443,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
 }
 .semec-badge-warning {
@@ -4309,6 +4481,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
 }
 .semec-badge-danger {
@@ -4343,6 +4519,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
 }
 .semec-badge-info {
@@ -4377,6 +4557,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
 }
 .semec-toast-root {
@@ -4501,6 +4685,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
 }
 .semec-toast-action {
@@ -4545,6 +4733,10 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   &:focus-visible {
     --tw-outline-style: none;
     outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
   }
   &:disabled {
     pointer-events: none;

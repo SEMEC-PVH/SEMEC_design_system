@@ -111,7 +111,7 @@ const MOBILE_SIBLINGS = 1;
 // `shrink-0`: sem ele, numa linha apertada (390/320 px) o flex encolhe as
 // setas para 18–23 px de largura (TST-07).
 const arrowClass =
-  "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-input text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
 
 const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
   ({ className, page, pageCount, onPageChange, siblingCount = 1, labels, ...props }, ref) => {
@@ -180,7 +180,7 @@ const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
               aria-current={p === page ? "page" : undefined}
               aria-label={text.page(p)}
               className={cn(
-                "inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-md border border-input px-2 text-sm text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                "inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-md border border-input px-2 text-sm text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 p === page && "border-transparent bg-primary text-primary-foreground hover:bg-primary",
                 Math.abs(p - page) > mobileSiblings && "max-sm:hidden"
               )}

@@ -374,7 +374,11 @@ export function buildRules(kitRoot) {
   // linha dentro de um gatilho estreito); aqui o popup absoluto faria shrink-to-fit no wrapper.
   add(".semec-menu", [...placement("dropdown-menu"), "w-max", ...adaptClasses(tokens(menu.classes("DropdownMenuContent")), popup)], "dropdown-menu.tsx › DropdownMenuContent (popup posicionado pelo CSS)");
   // Item ativo: o Radix foca o item e marca data-highlighted; vale qualquer um dos dois.
-  const highlighted = (c) => (c.startsWith("focus:") ? [c, `data-highlighted:${c.slice("focus:".length)}`] : [c]);
+  // Vale também dentro de outras variantes (ex.: `forced-colors:focus:`).
+  const highlighted = (c) => {
+    const alt = c.replace(/(^|:)focus:/, "$1data-highlighted:");
+    return alt === c ? [c] : [c, alt];
+  };
   part(".semec-menu__item", "dropdown-menu", "DropdownMenuItem", 0, { inset: false }, highlighted);
   // O item do Radix é uma <div>; aqui pode ser <button>, que não estica nem alinha à esquerda sozinho.
   add(".semec-menu__item", ["w-full", "text-left"], "item como <button>/<a> nativo: ocupa a linha como a <div> do Radix");

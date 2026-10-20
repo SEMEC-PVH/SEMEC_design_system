@@ -199,7 +199,7 @@ function DataTableInner<T extends object>(
                         type="button"
                         onClick={() => handleSort(col.key)}
                         aria-describedby={`${idBase}-sort-${colIndex}`}
-                        className="inline-flex min-h-11 min-w-11 items-center gap-2 rounded-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        className="inline-flex min-h-11 min-w-11 items-center gap-2 rounded-sm cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                       >
                         {col.header}
                         {getSortIcon(col.key)}
@@ -286,7 +286,7 @@ function DataTableInner<T extends object>(
               type="button"
               onClick={() => onPageChange?.(page - 1)}
               disabled={page <= 1}
-              className="inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               {labels.previous}
@@ -295,7 +295,7 @@ function DataTableInner<T extends object>(
               type="button"
               onClick={() => onPageChange?.(page + 1)}
               disabled={page >= pageCount}
-              className="inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground transition-colors duration-fast ease-standard hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               {labels.next}
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
