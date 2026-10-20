@@ -15,7 +15,7 @@ const REPO = "https://github.com/SEMEC-PVH/SEMEC_design_system";
 // Atualize a cada release (o SRI é calculado na hora, sobre o arquivo publicado).
 const VERSAO_TOKENS = "1.0.0";
 const VERSAO_CSS = "1.0.0";
-const CDN_FONTS = `https://cdn.jsdelivr.net/npm/@semec/ds-tokens@${VERSAO_TOKENS}/fonts.css`;
+const CDN_FONTS = `https://cdn.jsdelivr.net/npm/@semec/ds-tokens@${VERSAO_TOKENS}/dist/fonts.css`;
 const CDN_CSS = `https://cdn.jsdelivr.net/npm/@semec/ds-css@${VERSAO_CSS}/dist/semec-ds.css`;
 const SRI_PLACEHOLDER = "sha384-CALCULE-NA-RELEASE";
 
@@ -195,7 +195,7 @@ import "@semec/ds-css/index.css";`}</Code>
         Sem bundler, o navegador não entende os nomes do pacote: aponte o{" "}
         <code>&lt;link&gt;</code> para os arquivos reais. Copie{" "}
         <code>dist/semec-ds.css</code> do <code>@semec/ds-css</code>, e o{" "}
-        <code>fonts.css</code> com a pasta <code>fonts/</code> do{" "}
+        <code>dist/fonts.css</code> com a pasta <code>dist/fonts/</code> do{" "}
         <code>@semec/ds-tokens</code>, para a pasta pública do site. Mantenha{" "}
         <code>fonts/</code> ao lado do <code>fonts.css</code>, porque os
         endereços das fontes são relativos.
@@ -339,25 +339,33 @@ import "@semec/ds-css/index.css";`}</Code>
       <h3>Android</h3>
       <p>
         Copie <code>android/colors.xml</code> e <code>android/dimens.xml</code>{" "}
-        de <code>node_modules/@semec/ds-tokens/</code> para{" "}
-        <code>app/src/main/res/values/</code>. Use os recursos pelo nome que está
-        no arquivo, como qualquer <code>@color</code> e <code>@dimen</code>:
+        de <code>node_modules/@semec/ds-tokens/dist/</code> para{" "}
+        <code>app/src/main/res/values/</code>. Cada recurso é o token com o
+        prefixo <code>semec_</code>, em snake_case (<code>--action-primary</code>{" "}
+        vira <code>semec_action_primary</code>). Texto sai em <code>sp</code>, o
+        resto em <code>dp</code>:
       </p>
       <Code>{`<Button
-  android:background="@color/<nome-do-token>"
-  android:minHeight="@dimen/<nome-do-token>" />`}</Code>
+  android:background="@color/semec_action_primary"
+  android:padding="@dimen/semec_space_4" />`}</Code>
 
       <h3>iOS</h3>
       <p>
-        Adicione <code>ios/SemecTokens.swift</code> ao alvo do app no Xcode. Ele
-        traz as cores (UIColor e Color do SwiftUI) e as medidas. Os nomes seguem
-        os tokens do <code>tokens.json</code>, em camelCase.
+        Adicione <code>dist/ios/SemecTokens.swift</code> ao alvo do app no
+        Xcode. Ele traz as cores (<code>SemecTokens.Colors</code> para SwiftUI,{" "}
+        <code>SemecTokens.UIColors</code> para UIKit) e as medidas (
+        <code>SemecTokens.Dimensions</code>, em pontos). Os nomes seguem os
+        tokens em camelCase: <code>--action-primary</code> vira{" "}
+        <code>actionPrimary</code>.
       </p>
+      <Code>{`Text("Enviar")
+  .padding(SemecTokens.Dimensions.space4)
+  .background(SemecTokens.Colors.actionPrimary)`}</Code>
 
       <h3>Figma</h3>
       <p>
         No plugin Tokens Studio, importe{" "}
-        <code>figma/tokens-studio.json</code> (Tools → Load from file). Para
+        <code>dist/figma/tokens-studio.json</code> (Tools → Load from file). Para
         variáveis nativas do Figma, use a exportação do plugin para variables. Os
         valores são os mesmos do código, então o design e o sistema não divergem.
       </p>
