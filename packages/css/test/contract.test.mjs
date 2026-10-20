@@ -173,7 +173,7 @@ test("se o className de um interativo mudar, a regra muda junto", () => {
     assert.ok(source.includes(from), `${name}.tsx contém ${from}`);
     fs.writeFileSync(file, source.replace(from, to));
   };
-  edit("dialog", "w-full max-w-lg overflow-y-auto", "w-full max-w-xl overflow-y-auto");
+  edit("dialog", "w-[calc(100%-2rem)] max-w-lg overflow-y-auto", "w-[calc(100%-2rem)] max-w-xl overflow-y-auto");
   edit("tabs", "data-[state=active]:after:bg-primary", "data-[state=active]:after:bg-success");
   edit("combobox", 'isActive && "bg-tint ring-2', 'isActive && "bg-muted ring-2');
   edit("accordion", '"border-b border-border"', '"border-b-2 border-border"');
