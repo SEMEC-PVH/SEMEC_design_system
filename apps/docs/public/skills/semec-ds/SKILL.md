@@ -8,6 +8,8 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 > Gerado para `@semec/ds@4.4.2` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
 
+> **Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (patch) que ainda não estão no npm. O @semec/ds@4.4.2 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.4.3. Confira a versão instalada com `npm ls @semec/ds`.**
+
 Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
 App em Vue, Angular, Svelte ou HTML sem React: use a skill lite (`@semec/ds/lite/skills/semec-ds-lite`), que traz só tokens, acessibilidade e padrões visuais.
