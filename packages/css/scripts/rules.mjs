@@ -286,7 +286,9 @@ export function buildRules(kitRoot) {
   };
   const placement = (file) => {
     const offset = `${sideOffset(file)}px`;
-    return ["absolute", "top-full", "left-0", `mt-[${offset}]`, "data-[side=top]:top-auto", "data-[side=top]:bottom-full", "data-[side=top]:mt-0", `data-[side=top]:mb-[${offset}]`];
+    // `data-align="end"` (posto pelo elemento quando o popup não cabe à direita) ancora
+    // pela direita; a largura nunca passa da tela (A11Y-04, reflow em 320 px).
+    return ["absolute", "top-full", "left-0", `mt-[${offset}]`, "data-[side=top]:top-auto", "data-[side=top]:bottom-full", "data-[side=top]:mt-0", `data-[side=top]:mb-[${offset}]`, "data-[align=end]:left-auto", "data-[align=end]:right-0", "max-w-[calc(100vw-2rem)]"];
   };
   /** `disabled:` também por `data-disabled` (o Radix marca os dois; o elemento pode marcar só o atributo). */
   const dataDisabled = (c) => (c.startsWith("disabled:") ? [c, `data-disabled:${c.slice("disabled:".length)}`] : [c]);
