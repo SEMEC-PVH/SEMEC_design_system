@@ -120,7 +120,7 @@ jobs:
           SEMEC_PLATAFORMAS_EXIGIR: "1"
         run: npm test
 
-      - name: Teste do plano de release e da checagem de changeset
+      - name: Teste do plano de release, da checagem de changeset e do SRI
         # scripts/release/plano.mjs decide o que o workflow Release publica.
         run: npm run test:release
 
