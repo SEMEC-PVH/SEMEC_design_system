@@ -4,7 +4,7 @@
 //   1. "Pressione Start" — logo sobre a vila em modo vitrine (o motor
 //      sobrevoa o mapa ao fundo);
 //   2. menu em caixa de RPG (moldura dupla, cursor ▶) — Novo jogo, Como
-//      jogar, Gráficos, Ver equipe em lista. Setas movem o cursor, Enter
+//      jogar, Gráficos, Voltar para a equipe. Setas movem o cursor, Enter
 //      escolhe (em Gráficos, troca o nível; ←/→ também), Esc volta;
 //   3. "Novo jogo" abre a escolha de personagem (EscolhaPersonagem).
 // O VilaSemec controla `started`; aqui só chamamos onStart(jogador).
@@ -192,7 +192,7 @@ export default function TitleScreen({
                 </li>
                 <li>
                   <a className={styles.item} href="#equipe">
-                    Ver equipe em lista
+                    Voltar para a equipe
                   </a>
                 </li>
               </ul>

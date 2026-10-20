@@ -1689,7 +1689,7 @@ export default function VilaSemec({ members }) {
           <div className="vila-hud-direita">
             <div className="vila-hud-actions">
               <a className="vila-panel vila-skip" href="#equipe">
-                Ver equipe em lista
+                Voltar para a equipe
               </a>
               <SomButton />
               <FullscreenButton />
