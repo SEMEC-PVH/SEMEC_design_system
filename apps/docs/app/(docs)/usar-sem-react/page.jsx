@@ -251,6 +251,12 @@ import "@semec/ds-css/index.css";`}</Code>
       </p>
 
       <h2 id="servidor-e-frameworks">Servidor e frameworks</h2>
+      <p>
+        Em PHP, Laravel, Symfony, Django ou Flask, prefira os{" "}
+        <Link href="/usar-sem-react/modelos-de-servidor">modelos de servidor</Link>:
+        parciais prontas de página, cabeçalho, campo, resumo de erros, alerta e
+        botão, com o HTML e a acessibilidade do kit e o escape já feitos.
+      </p>
 
       <h3>PHP</h3>
       <p>

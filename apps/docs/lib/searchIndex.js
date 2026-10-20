@@ -13,6 +13,14 @@ export const searchIndex = [
   { term: "figma", href: "/usar-sem-react" },
   { term: "ds-tokens", href: "/usar-sem-react" },
   { term: "ds-css", href: "/usar-sem-react" },
+  // /usar-sem-react/modelos-de-servidor
+  { term: "modelos de servidor", href: "/usar-sem-react/modelos-de-servidor" },
+  { term: "templates", href: "/usar-sem-react/modelos-de-servidor" },
+  { term: "jinja", href: "/usar-sem-react/modelos-de-servidor" },
+  { term: "twig", href: "/usar-sem-react/modelos-de-servidor" },
+  { term: "symfony", href: "/usar-sem-react/modelos-de-servidor" },
+  { term: "blade", href: "/usar-sem-react/modelos-de-servidor" },
+  { term: "laravel", href: "/usar-sem-react/modelos-de-servidor" },
   // /padroes/acessibilidade
   { term: "contraste", href: "/padroes/acessibilidade" },
   { term: "wcag", href: "/padroes/acessibilidade" },

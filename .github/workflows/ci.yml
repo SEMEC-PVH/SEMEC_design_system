@@ -166,6 +166,11 @@ jobs:
             exit 1
           fi
 
+      - name: Modelos de servidor (PHP, Jinja2, Twig, Blade)
+        # O ubuntu-latest já tem php, composer e python3: o teste instala twig/twig e
+        # illuminate/view (composer.lock) e o jinja2 só para renderizar, sem Docker.
+        run: npm run test:modelos
+
       - name: Testes do dist (fronteira RSC + poda por módulo)
         # check-rsc: importa @semec/ds/react na camada react-server, com os módulos
         # "use client" trocados por client references. check-treeshake: falha se

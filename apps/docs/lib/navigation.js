@@ -60,6 +60,7 @@ export const navigation = [
     items: [
       { href: "/introducao", label: "Introdução" },
       { href: "/usar-sem-react", label: "Usar sem React" },
+      { href: "/usar-sem-react/modelos-de-servidor", label: "Modelos de servidor", sub: true },
       { href: "/fundamentos", label: "Fundamentos" },
       { href: "/fundamentos/cores", label: "Cores", sub: true },
       { href: "/fundamentos/tipografia", label: "Tipografia", sub: true },
