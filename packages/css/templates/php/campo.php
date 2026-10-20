@@ -18,7 +18,8 @@ $atributos = semec_attr('id', $id)
     . semec_attr('required', !empty($p['obrigatorio']))
     . semec_attr('disabled', !empty($p['desabilitado']))
     . semec_attr('aria-invalid', $erro !== null ? 'true' : null)
-    . semec_attr('aria-describedby', $descritores);
+    . semec_attr('aria-describedby', $descritores)
+    . semec_atributos($p['atributos'] ?? null, ['aria-invalid', 'aria-describedby']);
 ?>
 <div class="semec-form-field">
   <label for="<?= semec_e($id) ?>" class="semec-label"><?= semec_e(semec_param($p, 'rotulo')) ?><?php if (!empty($p['obrigatorio'])): ?><span class="semec-label__required" aria-hidden="true"> *</span><?php endif ?></label>

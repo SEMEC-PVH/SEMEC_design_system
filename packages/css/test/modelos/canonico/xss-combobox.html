@@ -1,0 +1,10 @@
+<div class="semec-form-field">
+  <label for="xss-cb&quot; onfocus=&quot;alert(1)" class="semec-label">&lt;script&gt;alert(1)&lt;/script&gt;Escola</label>
+  <semec-combobox class="semec-combobox" empty-text="&quot; onmouseover=&quot;alert(1)">
+    <select id="xss-cb&quot; onfocus=&quot;alert(1)" name="xss-cb&quot; onfocus=&quot;alert(1)" class="semec-field" aria-describedby="xss-cb&quot; onfocus=&quot;alert(1)-hint">
+      <option value="">&lt;option&gt;falsa&lt;/option&gt;</option>
+      <option value="a&quot;b" selected>&lt;/option&gt;&lt;script&gt;alert(1)&lt;/script&gt;</option>
+    </select>
+  </semec-combobox>
+  <p id="xss-cb&quot; onfocus=&quot;alert(1)-hint" class="semec-hint">&lt;img src=x onerror=alert(1)&gt;</p>
+</div>

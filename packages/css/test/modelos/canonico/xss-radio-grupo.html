@@ -1,0 +1,6 @@
+<fieldset class="semec-form-field" aria-describedby="xss-r-error">
+  <legend class="semec-label">&lt;i&gt;Turno&lt;/i&gt;</legend>
+  <label class="semec-choice"><input type="radio" id="xss-r" name="n&quot; onclick=&quot;alert(1)" value="x&#039; onclick=&#039;alert(1)" class="semec-radio" checked aria-invalid="true"> &lt;script&gt;alert(1)&lt;/script&gt;</label>
+  <label class="semec-choice"><input type="radio" id="xss-r-2" name="n&quot; onclick=&quot;alert(1)" value="&quot;&gt;&lt;img src=x onerror=alert(1)&gt;" class="semec-radio" aria-invalid="true"> Outra</label>
+  <p id="xss-r-error" class="semec-error">&lt;b&gt;erro&lt;/b&gt;</p>
+</fieldset>

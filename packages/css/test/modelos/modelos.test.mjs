@@ -12,6 +12,10 @@
  *   5. parâmetros: a tabela do templates/README.md bate com as 4 linguagens;
  *   6. pagina com o bundle real do @semec/ds-elements: os elementos registram,
  *      sobem dentro do layout e o axe continua zero (fechados e abertos).
+ *   7. exemplos do templates/README.md: iguais aos da página do site e rodando
+ *      como estão (GET sem erro; POST com o erro no resumo e no campo; axe zero);
+ *   8. Flask de verdade: a configuração de autoescape documentada escapa a tela;
+ *   9. combobox com o bundle: a lista abre colada ao campo.
  *
  * Rode com `npm run test:modelos` (raiz) depois de `npm run build:pacotes`.
  * Motores: binários locais (php 8.2+, composer, python 3) ou Docker
@@ -24,7 +28,7 @@ import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
-import { renderizarTodos } from "./motores.mjs";
+import { renderizarTodos, renderizarExemplos, renderizarFlask } from "./motores.mjs";
 import { normalizar, parse } from "./normalizar.mjs";
 
 const require = createRequire(import.meta.url);
@@ -38,7 +42,7 @@ const tokensDist = path.join(repoRoot, "packages/tokens/dist");
 const casos = JSON.parse(fs.readFileSync(path.join(here, "fixtures.json"), "utf8"));
 const canonico = (id) => fs.readFileSync(path.join(here, "canonico", `${id}.html`), "utf8");
 const LINGUAGENS = ["php", "jinja", "twig", "blade"];
-const PARCIAIS = ["alerta", "botao", "cabecalho", "campo", "pagina", "pular-para-o-conteudo", "resumo-de-erros", "rodape"];
+const PARCIAIS = ["alerta", "botao", "cabecalho", "campo", "checkbox", "combobox", "pagina", "pular-para-o-conteudo", "radio-grupo", "resumo-de-erros", "rodape"];
 const ARQUIVO = {
   php: (p) => `php/${p}.php`,
   jinja: (p) => `jinja/${p}.jinja`,
@@ -298,4 +302,135 @@ test("pagina com o bundle real do @semec/ds-elements: registra, sobe e axe zero 
   } finally {
     await b.close();
   }
+});
+
+// --- exemplos da documentação, como estão (CONS-01 a CONS-04) ------------------
+// Os trechos marcados com <!-- exemplo:<linguagem> --> no templates/README.md
+// rodam nas 4 linguagens, num primeiro acesso (GET) e num envio com o CPF vazio
+// (POST). A página "Modelos de servidor" do site mostra os mesmos trechos.
+const PAGINA_SITE = path.join(repoRoot, "apps/docs/app/(docs)/usar-sem-react/modelos-de-servidor/page.jsx");
+const EXT_EXEMPLO = { php: "exemplo.php", jinja: "exemplo.jinja", twig: "exemplo.html.twig", blade: "exemplo.blade.php" };
+
+function exemplosDoReadme() {
+  const readme = fs.readFileSync(path.join(templatesDir, "README.md"), "utf8");
+  const out = {};
+  for (const [, lang, codigo] of readme.matchAll(/<!-- exemplo:(\w+)[^>]*-->\n```\w+\n([\s\S]*?)\n```/g)) out[lang] = codigo;
+  return out;
+}
+
+test("os exemplos do README são os mesmos da página Modelos de servidor", () => {
+  const doReadme = exemplosDoReadme();
+  assert.deepEqual(Object.keys(doReadme).sort(), ["blade", "flask", "jinja", "php", "twig"]);
+  const pagina = fs.readFileSync(PAGINA_SITE, "utf8");
+  const blocos = [...pagina.matchAll(/<Code>\{`([\s\S]*?)`\}<\/Code>/g)].map((m) => m[1]);
+  for (const [lang, codigo] of Object.entries(doReadme)) {
+    assert.ok(blocos.includes(codigo), `a página do site mostra o exemplo ${lang} do README (igual, caractere por caractere)`);
+  }
+});
+
+test("os exemplos do README rodam como estão: sem erro no GET e com o erro ligado ao campo no POST", async () => {
+  const dir = path.join(here, ".cache", "exemplos");
+  fs.rmSync(dir, { recursive: true, force: true });
+  fs.mkdirSync(dir, { recursive: true });
+  fs.cpSync(path.join(templatesDir, "php"), path.join(dir, "semec"), { recursive: true });
+  const exemplos = exemplosDoReadme();
+  for (const [lang, arquivo] of Object.entries(EXT_EXEMPLO)) fs.writeFileSync(path.join(dir, arquivo), exemplos[lang]);
+  const { saidas: porLinguagem, motores } = renderizarExemplos();
+  console.log(`# exemplos: ${Object.entries(motores).map(([k, v]) => `${k} = ${v}`).join("; ")}`);
+
+  const falhas = [];
+  const b = await chromium.launch();
+  try {
+    const page = await b.newPage({ viewport: { width: 1280, height: 900 } });
+    let atual = "";
+    await page.route(`${BASE}/**`, (route) => {
+      const { pathname } = new URL(route.request().url());
+      if (pathname === "/teste") return route.fulfill({ body: atual, contentType: "text/html; charset=utf-8" });
+      const f = arquivoEstatico(pathname);
+      return f ? route.fulfill(f) : route.fulfill({ status: 404, body: "" });
+    });
+    for (const lang of Object.keys(EXT_EXEMPLO)) {
+      for (const cenario of ["get", "post"]) {
+        const onde = `${lang} · ${cenario}`;
+        const html = porLinguagem[lang]?.[cenario];
+        if (!html) { falhas.push(`${onde}: sem saída`); continue; }
+        const doc = parse(html);
+        const cpf = doc.getElementById("cpf");
+        const resumo = doc.querySelector(".semec-error-summary");
+        if (!doc.querySelector("h1")) falhas.push(`${onde}: sem <h1>`);
+        if (cpf?.getAttribute("inputmode") !== "numeric" || cpf?.getAttribute("maxlength") !== "11") falhas.push(`${onde}: atributos extras do CPF ausentes`);
+        if (cenario === "get") {
+          if (resumo) falhas.push(`${onde}: resumo de erros no primeiro acesso`);
+          if (cpf?.hasAttribute("aria-invalid")) falhas.push(`${onde}: CPF inválido no primeiro acesso`);
+        } else {
+          const links = [...(resumo?.querySelectorAll("a") ?? [])].map((a) => `${a.getAttribute("href")} ${a.textContent.trim()}`);
+          if (links.join("|") !== "#cpf Informe o CPF.") falhas.push(`${onde}: links do resumo = ${JSON.stringify(links)}`);
+          if (resumo?.querySelector("h2")?.textContent !== "Há um problema") falhas.push(`${onde}: título do resumo = ${resumo?.querySelector("h2")?.textContent}`);
+          if (cpf?.getAttribute("aria-invalid") !== "true") falhas.push(`${onde}: CPF sem aria-invalid`);
+          if (doc.getElementById("cpf-error")?.textContent !== "Informe o CPF.") falhas.push(`${onde}: sem a mensagem #cpf-error`);
+          if (!(cpf?.getAttribute("aria-describedby") ?? "").split(" ").includes("cpf-error")) falhas.push(`${onde}: erro fora do aria-describedby`);
+        }
+        atual = html;
+        await page.goto(`${BASE}/teste`);
+        await page.addScriptTag({ path: require.resolve("axe-core/axe.min.js") });
+        const v = await page.evaluate(async () => (await window.axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"] } })).violations.map((x) => x.id));
+        if (v.length) falhas.push(`${onde}: axe ${v.join(", ")}`);
+      }
+    }
+  } finally {
+    await b.close();
+  }
+  assert.deepEqual(falhas, []);
+});
+
+test("Flask (CONS-03): com a configuração documentada, a tela .jinja do app escapa", () => {
+  const { saida } = renderizarFlask();
+  const nome = (html) => html.match(/Protocolo gerado para (.*?)\.<\/p>/)?.[1];
+  // Sem configurar, o Flask não escapa .jinja: é o risco que a documentação avisa.
+  assert.equal(nome(saida["padrao-jinja"]), '<img src=x onerror="alert(1)">', "Flask padrão deixa a tela .jinja crua (o aviso do README continua necessário)");
+  for (const caso of ["documentado-jinja", "padrao-html"]) {
+    assert.ok(!/<img src=x/.test(saida[caso]), `${caso}: nada cru`);
+    assert.match(nome(saida[caso]) ?? "", /^&lt;img src=x onerror=/, `${caso}: o nome sai escapado`);
+  }
+  // A linha do README é a que o render_flask.py executa.
+  const linha = exemplosDoReadme().flask.split("\n").find((l) => l.startsWith("app.jinja_env.autoescape"));
+  const script = fs.readFileSync(path.join(here, "render_flask.py"), "utf8");
+  assert.ok(script.includes(linha.replace(/^app\./, "aplicacao.")), "render_flask.py usa a mesma configuração do README");
+});
+
+// --- combobox dentro do layout, com o bundle real (CONS-06) ------------------------
+test("combobox: com o @semec/ds-elements, a lista abre colada ao campo mesmo com dica e erro (4 linguagens)", { skip: !fs.existsSync(bundleElements) && "sem packages/elements/dist (npm run build:pacotes)" }, async () => {
+  const b = await chromium.launch();
+  const falhas = [];
+  try {
+    const page = await b.newPage({ viewport: { width: 1280, height: 900 } });
+    let atual = "";
+    await page.route(`${BASE}/**`, (route) => {
+      const { pathname } = new URL(route.request().url());
+      if (pathname === "/teste") return route.fulfill({ body: atual, contentType: "text/html; charset=utf-8" });
+      const f = arquivoEstatico(pathname);
+      return f ? route.fulfill(f) : route.fulfill({ status: 404, body: "" });
+    });
+    for (const lang of LINGUAGENS) {
+      for (const id of ["combobox", "combobox-erro"]) {
+        atual = envolver(MAIN(saidas[lang][id])).replace("</head>", '<script type="module" src="/js/semec-elements.js"></script></head>');
+        await page.goto(`${BASE}/teste`);
+        await page.waitForSelector("input[role=combobox]");
+        await page.focus("input[role=combobox]");
+        await page.keyboard.press("ArrowDown");
+        await page.waitForSelector("[role=listbox]:not([hidden])");
+        await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {}))));
+        const r = await page.evaluate(() => {
+          const campo = document.querySelector("input[role=combobox]");
+          const lista = document.querySelector("[role=listbox]").getBoundingClientRect();
+          return { gap: Math.round(lista.top - campo.getBoundingClientRect().bottom), idCampo: campo.id, rotulo: document.querySelector("label").getAttribute("for") };
+        });
+        if (r.gap !== 4) falhas.push(`${lang} · ${id}: lista a ${r.gap}px do campo (esperado 4)`);
+        if (r.idCampo !== r.rotulo) falhas.push(`${lang} · ${id}: o campo não assumiu o id do rótulo`);
+      }
+    }
+  } finally {
+    await b.close();
+  }
+  assert.deepEqual(falhas, []);
 });

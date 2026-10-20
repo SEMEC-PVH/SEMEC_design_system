@@ -6,9 +6,10 @@
 {%- set classe = 'semec-btn semec-btn--' ~ variante ~ (tamanho == 'md' ? '' : ' semec-btn--' ~ tamanho) -%}
 {%- set desabilitado = desabilitado|default(false) -%}
 {%- set valor_presente = valor is defined and valor is not null and valor is not same as('') -%}
+{%- set extras = include('@semec/_atributos.html.twig', {mapa: atributos|default(null), reservados: ['aria-label', 'aria-disabled']}, with_context = false) -%}
 {% if href|default('') -%}
-<a{% if not desabilitado %} href="{{ href }}"{% endif %} class="{{ classe }}"{% if id|default('') %} id="{{ id }}"{% endif %}{% if desabilitado %} aria-disabled="true"{% endif %}{% if rotulo|default('') %} aria-label="{{ rotulo }}"{% endif %}>{{ texto|default('') }}</a>
+<a{% if not desabilitado %} href="{{ href }}"{% endif %} class="{{ classe }}"{% if id|default('') %} id="{{ id }}"{% endif %}{% if desabilitado %} aria-disabled="true"{% endif %}{% if rotulo|default('') %} aria-label="{{ rotulo }}"{% endif %}{{ extras }}>{{ texto|default('') }}</a>
 {% else -%}
-<button type="{{ tipo|default('') in ['button', 'submit', 'reset'] ? tipo : 'button' }}" class="{{ classe }}"{% if id|default('') %} id="{{ id }}"{% endif %}{% if nome|default('') %} name="{{ nome }}"{% endif %}{% if valor_presente %} value="{{ valor }}"{% endif %}{% if desabilitado %} disabled{% endif %}{% if rotulo|default('') %} aria-label="{{ rotulo }}"{% endif %}>{{ texto|default('') }}</button>
+<button type="{{ tipo|default('') in ['button', 'submit', 'reset'] ? tipo : 'button' }}" class="{{ classe }}"{% if id|default('') %} id="{{ id }}"{% endif %}{% if nome|default('') %} name="{{ nome }}"{% endif %}{% if valor_presente %} value="{{ valor }}"{% endif %}{% if desabilitado %} disabled{% endif %}{% if rotulo|default('') %} aria-label="{{ rotulo }}"{% endif %}{{ extras }}>{{ texto|default('') }}</button>
 {% endif %}
 {% endautoescape -%}
