@@ -192,3 +192,21 @@ test("o README documenta todas as classes publicadas", () => {
   const { classes } = JSON.parse(read("classes.json"));
   assert.deepEqual(classes.filter((c) => !readme.includes(`\`${c}\``) && !readme.includes(`class="${c}`) && !readme.includes(` ${c}"`)), []);
 });
+
+// CONS-14: a tabela de classes da página "Usar sem React" acompanha o classes.json.
+test("a tabela de classes da página Usar sem React cita toda classe do classes.json", () => {
+  const { classes } = JSON.parse(fs.readFileSync(path.join(cssDist, "classes.json"), "utf8"));
+  const pagina = fs.readFileSync(path.join(repoRoot, "apps/docs/app/(docs)/usar-sem-react/page.jsx"), "utf8");
+  const tabela = pagina.slice(pagina.indexOf("const classes = ["), pagina.indexOf("];", pagina.indexOf("const classes = [")));
+  const linhas = [...tabela.matchAll(/nomes: "([^"]*)"/g)].map((m) => m[1]);
+  const faltam = classes.filter((c) => {
+    const [bloco, resto] = c.split(/(?=__|--)/);
+    const linha = linhas.find((l) => new RegExp(`\\.${bloco}(?![\\w-])`).test(l));
+    if (!linha) return true;
+    if (!resto) return false;
+    const n = resto.match(/^--(\d)$/);
+    if (n) return !/--1 a --6/.test(linha);
+    return !new RegExp(`${resto}(?![\\w-])`).test(linha);
+  });
+  assert.deepEqual(faltam, [], "classes fora da tabela da página");
+});

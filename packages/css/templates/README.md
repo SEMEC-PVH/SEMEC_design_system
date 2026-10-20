@@ -267,6 +267,20 @@ Os mesmos nas quatro linguagens. Parâmetro ausente, `null` ou texto vazio usa o
 | `botao` | `valor` | texto | — | `value` do `<button>`. |
 | `botao` | `atributos` | mapa | — | Atributos extras (veja Atributos extras): gatilhos do `@semec/ds-elements`, `aria-describedby`, `form`… |
 
+## Largura da página
+
+O `@semec/ds-css` não tem classe de contêiner (as classes saem dos componentes do kit, e o kit não tem um): a largura do conteúdo é do app. Um ponto de partida, com os tokens, no CSS do app (passe-o no bloco `head` do layout):
+
+```css
+#conteudo {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding: var(--space-6) var(--space-4);
+}
+/* Grade de colunas: minmax(0, 1fr), senão uma tabela larga estoura a tela em 320 px. */
+.minha-grade { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
+```
+
 ## Segurança
 
 - Escape em tudo: PHP com `htmlspecialchars(…, ENT_QUOTES)`; Jinja, Twig e Blade com o autoescape de HTML, ligado dentro de cada parcial do Jinja e do Twig mesmo que o ambiente o desligue. Nenhum parâmetro é impresso como HTML.
