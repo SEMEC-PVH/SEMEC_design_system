@@ -42,7 +42,11 @@ test("package.json segue o contrato", () => {
   assert.equal(pkg.engines.node, ">=22.12");
   assert.equal(pkg.publishConfig.access, "public");
   assert.deepEqual(pkg.sideEffects, ["**/*.css"]);
-  assert.deepEqual(pkg.dependencies, { "@semec/ds-tokens": "^1.0.0" });
+  // A faixa acompanha a versão do ds-tokens no workspace: "^0.0.0" no fonte (com
+  // "^1.0.0" o npm não liga o workspace 0.0.0 e vai ao registry: E404) e "^1.0.0"
+  // depois do `changeset version`, que reescreve as duas juntas.
+  const tokensPkg = JSON.parse(fs.readFileSync(path.join(pkgRoot, "..", "tokens", "package.json"), "utf8"));
+  assert.deepEqual(pkg.dependencies, { "@semec/ds-tokens": `^${tokensPkg.version}` });
   assert.equal(pkg.peerDependencies, undefined);
   assert.ok(!JSON.stringify(pkg).includes('"react'), "nada de React no pacote CSS");
   for (const key of ["./components.css", "./index.css", "./dist/semec-ds.css"]) {

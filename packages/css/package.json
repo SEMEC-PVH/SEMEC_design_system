@@ -34,7 +34,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@semec/ds-tokens": "^1.0.0"
+    "@semec/ds-tokens": "^0.0.0"
   },
   "engines": {
     "node": ">=22.12"
