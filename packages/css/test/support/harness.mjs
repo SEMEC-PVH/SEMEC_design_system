@@ -13,6 +13,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import * as Icons from "lucide-react";
 import { build } from "esbuild";
 import { cases } from "./cases.mjs";
+import { interactiveCases } from "./interactive-cases.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const pkgRoot = path.resolve(here, "../..");
@@ -48,18 +49,41 @@ export function htmlCases(list = cases) {
   return list.map((c) => `<div class="${caseClass(c)}" data-case="${c.id}">${c.html(icon)}</div>`).join("\n");
 }
 
-async function reactBundle() {
+/**
+ * Bundle React dos casos. `?caso=<id>` monta só aquele caso (os interativos abertos
+ * ficam um por página: o Dialog e o menu modais tornam o resto inerte). `c.actions`
+ * roda depois da montagem (clique ou tecla), para abrir o que o Radix só abre por interação.
+ */
+async function reactBundle(file = "cases.mjs", exportName = "cases") {
   const entry = `
 import React from "react";
 import { createRoot } from "react-dom/client";
 import * as DS from "semec-kit";
 import * as I from "lucide-react";
-import { cases } from ${JSON.stringify(path.join(here, "cases.mjs").replaceAll("\\", "/"))};
+import { ${exportName} as all } from ${JSON.stringify(path.join(here, file).replaceAll("\\", "/"))};
 const h = React.createElement;
+const only = new URLSearchParams(location.search).get("caso");
+const cases = only ? all.filter((c) => c.id === only) : all;
 createRoot(document.getElementById("root")).render(
   h(React.Fragment, null, cases.map((c) => h("div", { key: c.id, className: ["case", c.narrow && "case--narrow", c.flex && "case--flex"].filter(Boolean).join(" "), "data-case": c.id }, c.react(h, DS, I))))
 );
-window.__ready = true;`;
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+(async () => {
+  await wait(50);
+  for (const c of cases) {
+    for (const a of c.actions ?? []) {
+      const el = a.target.startsWith("doc:") ? document.querySelector(a.target.slice(4)) : document.querySelector('[data-case="' + c.id + '"] ' + a.target);
+      if (a.click) el.click();
+      if (a.key) el.dispatchEvent(new KeyboardEvent("keydown", { key: a.key, bubbles: true, cancelable: true }));
+      if (a.type !== undefined) {
+        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(el, a.type);
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      await wait(150);
+    }
+  }
+  window.__ready = true;
+})();`;
   const result = await build({
     stdin: { contents: entry, resolveDir: pkgRoot, loader: "js" },
     bundle: true,
@@ -77,10 +101,15 @@ window.__ready = true;`;
 export async function startServer(extra = {}) {
   requireKitDist();
   const bundle = await reactBundle();
+  const bundleI = await reactBundle("interactive-cases.mjs", "interactiveCases");
   const routes = {
     "/react": { type: "text/html; charset=utf-8", body: page({ title: "Paridade · React", head: '<link rel="stylesheet" href="/styles.css">', body: '<div id="root"></div><script src="/react.js"></script>' }) },
     "/html": { type: "text/html; charset=utf-8", body: page({ title: "Paridade · CSS", head: '<link rel="stylesheet" href="/semec-ds.css">', body: `<main id="conteudo">${htmlCases()}</main>` }) },
     "/react.js": { type: "text/javascript", body: bundle },
+    // Interativos abertos: um caso por página (?caso=<id>).
+    "/react-i": { type: "text/html; charset=utf-8", body: page({ title: "Paridade · React (interativos)", head: '<link rel="stylesheet" href="/styles.css">', body: '<div id="root"></div><script src="/react-i.js"></script>' }) },
+    "/react-i.js": { type: "text/javascript", body: bundleI },
+    "/html-i": { type: "text/html; charset=utf-8", body: (url) => page({ title: "Paridade · CSS (interativos)", head: '<link rel="stylesheet" href="/semec-ds.css">', body: `<main id="conteudo">${htmlCases(interactiveCases.filter((c) => c.id === url.searchParams.get("caso")))}</main>` }) },
     "/logo.svg": { type: "image/svg+xml", body: LOGO },
     ...extra,
   };
@@ -90,11 +119,12 @@ export async function startServer(extra = {}) {
     "/semec-ds.css": path.join(cssDist, "semec-ds.css"),
   };
   const server = http.createServer((req, res) => {
-    const url = new URL(req.url, "http://localhost").pathname;
+    const full = new URL(req.url, "http://localhost");
+    const url = full.pathname;
     const route = routes[url];
     if (route) {
       res.setHeader("Content-Type", route.type);
-      res.end(typeof route.body === "function" ? route.body() : route.body);
+      res.end(typeof route.body === "function" ? route.body(full) : route.body);
       return;
     }
     let file = files[url];
@@ -124,7 +154,7 @@ export const PROPS = [
 ];
 
 /** Abre a página, marca as partes de cada caso e devolve a medição por estado. */
-export async function measure(browser, url) {
+export async function measure(browser, url, list = cases) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await page.emulateMedia({ reducedMotion: "reduce" });
   const errors = [];
@@ -133,46 +163,52 @@ export async function measure(browser, url) {
   await page.waitForFunction(() => document.querySelectorAll("[data-case]").length > 0 && (!document.getElementById("root") || window.__ready));
   await page.waitForTimeout(200);
   await page.evaluate(() => document.fonts.ready);
-  const isReact = url.endsWith("/react");
+  const isReact = /\/react(-i)?(\?|$)/.test(url);
   const keys = await page.evaluate(({ list, isReact }) => {
     const out = [];
     for (const c of list) {
       const box = document.querySelector(`[data-case="${c.id}"]`);
+      if (!box) continue;
       for (const [name, reactSel, htmlSel] of c.parts) {
-        const sel = isReact ? reactSel : htmlSel;
-        const el = sel ? box.querySelector(sel) : box.firstElementChild;
+        // `doc:` = no documento (portal do Radix); sufixo `::backdrop` = pseudo do <dialog>.
+        const raw = isReact ? reactSel : htmlSel;
+        const pseudo = raw?.endsWith("::backdrop") ? "::backdrop" : null;
+        const sel = pseudo ? raw.slice(0, -pseudo.length) : raw;
+        const el = sel ? (sel.startsWith("doc:") ? document.querySelector(sel.slice(4)) : box.querySelector(sel)) : box.firstElementChild;
         const key = `${c.id}/${name}`;
         if (!el) { out.push({ key, missing: true }); continue; }
-        el.setAttribute("data-measure", key);
-        out.push({ key, states: c.states[name] ?? [] });
+        // Lista: o mesmo elemento pode ser duas partes (o <dialog> e o seu ::backdrop).
+        el.setAttribute("data-measure", `${el.getAttribute("data-measure") ?? ""} ${key}`.trim());
+        out.push({ key, pseudo, states: c.states[name] ?? [] });
       }
     }
     return out;
-  }, { list: cases.map(({ id, parts, states }) => ({ id, parts, states })), isReact });
+  }, { list: list.map(({ id, parts, states }) => ({ id, parts, states })), isReact });
 
   const client = await page.context().newCDPSession(page);
   await client.send("DOM.enable");
   await client.send("CSS.enable");
   const { root } = await client.send("DOM.getDocument", { depth: -1 });
-  const read = (key) => page.evaluate(({ key, props }) => {
-    const el = document.querySelector(`[data-measure="${CSS.escape(key)}"]`);
-    const s = getComputedStyle(el);
+  const read = (key, pseudo) => page.evaluate(({ key, pseudo, props }) => {
+    const el = document.querySelector(`[data-measure~="${CSS.escape(key)}"]`);
+    const s = getComputedStyle(el, pseudo);
     const out = {};
     for (const p of props) out[p] = s[p];
-    out.height = `${Math.round(el.getBoundingClientRect().height * 2) / 2}px`;
+    // ::backdrop não tem caixa no DOM: vale a altura computada (fixed, inset 0).
+    out.height = pseudo ? s.height : `${Math.round(el.getBoundingClientRect().height * 2) / 2}px`;
     return out;
-  }, { key, props: PROPS });
+  }, { key, pseudo, props: PROPS });
 
   const result = {};
-  for (const { key, missing, states } of keys) {
+  for (const { key, missing, states, pseudo } of keys) {
     if (missing) { result[key] = { missing: true }; continue; }
-    result[key] = { default: await read(key) };
+    result[key] = { default: await read(key, pseudo) };
     if (!states.length) continue;
-    const { nodeId } = await client.send("DOM.querySelector", { nodeId: root.nodeId, selector: `[data-measure="${key}"]` });
+    const { nodeId } = await client.send("DOM.querySelector", { nodeId: root.nodeId, selector: `[data-measure~="${key}"]` });
     for (const state of states) {
       const forced = state === "focus" ? ["focus", "focus-visible"] : [state];
       await client.send("CSS.forcePseudoState", { nodeId, forcedPseudoClasses: forced });
-      result[key][state] = await read(key);
+      result[key][state] = await read(key, pseudo);
       await client.send("CSS.forcePseudoState", { nodeId, forcedPseudoClasses: [] });
     }
   }

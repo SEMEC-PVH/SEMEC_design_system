@@ -10,6 +10,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { chromium } from "playwright";
 import { cases } from "./support/cases.mjs";
+import { interactiveCases } from "./support/interactive-cases.mjs";
 import { startServer, measure, diff, compareImages, htmlCases, cssDist } from "./support/harness.mjs";
 
 /**
@@ -79,7 +80,8 @@ test("o estado de foco é visível em todo interativo medido", () => {
 
 test("todas as classes publicadas aparecem nos casos de paridade", () => {
   const { classes } = JSON.parse(fs.readFileSync(path.join(cssDist, "classes.json"), "utf8"));
-  const markup = htmlCases();
+  // Os interativos abertos são medidos em interactive.test.mjs (uma página por caso).
+  const markup = htmlCases() + htmlCases(interactiveCases);
   // Aliases do contrato com a mesma regra de outra classe já medida.
   const aliases = new Set(["semec-error-summary__link", "semec-table__caption"]);
   const absent = classes.filter((c) => !aliases.has(c) && !new RegExp(`["\\s]${c}["\\s]`).test(markup.replaceAll("class=\"", "class=\" ")));
@@ -98,7 +100,7 @@ test("screenshot lado a lado dos principais (tolerância pequena)", async () => 
   const failures = [];
   const report = [];
   for (const c of shots) {
-    const target = c.shot === true ? `[data-case="${c.id}"]` : `[data-measure="${c.id}/${c.shot}"]`;
+    const target = c.shot === true ? `[data-case="${c.id}"]` : `[data-measure~="${c.id}/${c.shot}"]`;
     const a = await pageReact.locator(target).screenshot({ animations: "disabled" });
     const b = await pageHtml.locator(target).screenshot({ animations: "disabled" });
     const r = await compareImages(pageHtml, a, b);
