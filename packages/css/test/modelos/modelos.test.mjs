@@ -9,7 +9,9 @@
  *   2. classes: toda classe usada existe no dist/classes.json;
  *   3. XSS: <script>, aspas e atributos on* dos dados saem escapados;
  *   4. axe-core: zero violações no Chromium com o dist/semec-ds.css;
- *   5. parâmetros: a tabela do templates/README.md bate com as 4 linguagens.
+ *   5. parâmetros: a tabela do templates/README.md bate com as 4 linguagens;
+ *   6. pagina com o bundle real do @semec/ds-elements: os elementos registram,
+ *      sobem dentro do layout e o axe continua zero (fechados e abertos).
  *
  * Rode com `npm run test:modelos` (raiz) depois de `npm run build:pacotes`.
  * Motores: binários locais (php 8.2+, composer, python 3) ou Docker
@@ -218,4 +220,82 @@ test("axe-core: zero violações em cada parcial renderizada, nas 4 linguagens",
   }
   assert.ok(auditadas >= 90, `páginas auditadas: ${auditadas}`);
   assert.deepEqual(falhas, []);
+});
+
+// --- pagina + bundle real do @semec/ds-elements ------------------------------
+// O layout `pagina` carrega /js/semec-elements.js. Com o bundle do monorepo
+// (packages/elements/dist), os elementos têm de registrar e subir dentro do
+// <main> do layout, e o axe continua zero com eles fechados e abertos.
+const bundleElements = path.join(repoRoot, "packages/elements/dist/semec-elements.js");
+const bancada = path.join(repoRoot, "packages/elements/test/fixtures/bancada.html");
+
+test("pagina com o bundle real do @semec/ds-elements: registra, sobe e axe zero (fechado e aberto)", { skip: !fs.existsSync(bundleElements) && "sem packages/elements/dist (npm run build:pacotes)" }, async () => {
+  const fonte = fs.readFileSync(bancada, "utf8");
+  const ini = fonte.indexOf('<section aria-labelledby="t-dialogo">');
+  const fim = fonte.lastIndexOf("</section>") + "</section>".length;
+  assert.ok(ini > 0 && fim > ini, "seções da bancada do ds-elements encontradas");
+  const interativos = fonte.slice(ini, fim);
+
+  const b = await chromium.launch();
+  try {
+    const page = await b.newPage({ viewport: { width: 1280, height: 900 } });
+    let atual = "";
+    const erros = [];
+    page.on("pageerror", (e) => erros.push(String(e)));
+    page.on("response", (r) => { if (r.status() >= 400) erros.push(`${r.status()} ${r.url()}`); });
+    await page.route(`${BASE}/**`, (route) => {
+      const { pathname } = new URL(route.request().url());
+      if (pathname === "/teste") return route.fulfill({ body: atual, contentType: "text/html; charset=utf-8" });
+      const f = arquivoEstatico(pathname);
+      return f ? route.fulfill(f) : route.fulfill({ status: 404, body: "" });
+    });
+    const axe = async () => {
+      // Medir no fim da animação de entrada (fade/zoom do kit): no meio dela a
+      // opacidade parcial derruba o contraste e o axe acusa um estado transitório.
+      await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {}))));
+      await page.addScriptTag({ path: require.resolve("axe-core/axe.min.js") });
+      return page.evaluate(async () => {
+        const r = await window.axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"] } });
+        return r.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`);
+      });
+    };
+
+    const falhas = [];
+    for (const lang of LINGUAGENS) {
+      const html = saidas[lang].pagina;
+      assert.match(html, /<script type="module" src="\/js\/semec-elements\.js"><\/script>/, `${lang}: pagina carrega o bundle`);
+      atual = html;
+      erros.length = 0;
+      await page.goto(`${BASE}/teste`);
+      await page.evaluate(() => document.fonts.ready);
+      const definidos = await page.evaluate(async () => {
+        const nomes = ["semec-dialog", "semec-tabs", "semec-combobox", "semec-menu", "semec-accordion"];
+        await Promise.race([Promise.all(nomes.map((n) => customElements.whenDefined(n))), new Promise((r) => setTimeout(r, 5000))]);
+        return nomes.filter((n) => customElements.get(n));
+      });
+      assert.equal(definidos.length, 5, `${lang}: elementos registrados pelo bundle (${definidos.join(", ")})`);
+      await page.evaluate((h) => document.getElementById("conteudo").insertAdjacentHTML("beforeend", h), interativos);
+      // Subiram: o combobox criou o campo, as abas o tablist, o menu o role=menu.
+      await page.waitForSelector("#combo input[role=combobox]");
+      await page.waitForSelector("#abas [role=tablist]");
+      await page.waitForSelector("#menu [role=menu]", { state: "attached" });
+
+      const cenarios = [
+        ["fechado", async () => {}],
+        ["diálogo aberto", async () => { await page.click("#abrir-dialogo"); await page.waitForSelector("#dialogo dialog[open]"); }],
+        ["alerta aberto", async () => { await page.keyboard.press("Escape"); await page.click("#abrir-alerta"); await page.waitForSelector("#excluir dialog[open]"); }],
+        ["menu aberto", async () => { await page.keyboard.press("Escape"); await page.click("#menu-gatilho"); await page.waitForSelector("#menu [role=menu]:not([hidden])"); }],
+        ["listbox aberto", async () => { await page.keyboard.press("Escape"); await page.click("#combo input[role=combobox]"); await page.keyboard.press("ArrowDown"); await page.waitForSelector("#combo [role=listbox]:not([hidden])"); }],
+        ["aba 2 e item aberto", async () => { await page.keyboard.press("Escape"); await page.click("#aba-2"); await page.click("#ac-2"); await page.waitForSelector("#ac-painel-2:not([hidden])"); }],
+      ];
+      for (const [nome, passo] of cenarios) {
+        await passo();
+        const v = await axe();
+        if (v.length || erros.length) falhas.push(`${lang} · ${nome}: ${[...v, ...erros].join(" | ")}`);
+      }
+    }
+    assert.deepEqual(falhas, []);
+  } finally {
+    await b.close();
+  }
 });
