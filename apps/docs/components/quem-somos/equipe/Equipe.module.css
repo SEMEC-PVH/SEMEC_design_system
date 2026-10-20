@@ -1,0 +1,525 @@
+/* Página da equipe (Quem Somos). Cores só por tokens: semânticos do site
+   (--surface, --fg, --text-*, --color-*) para o que segue o tema e
+   primitivos --pv-* para a faixa de marca do topo, que é igual nos dois
+   temas. Tons por área com color-mix sobre a superfície (sem hex/rgba). */
+
+.pagina {
+  --equipe-gutter: var(--space-4);
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-6) var(--equipe-gutter) var(--space-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  /* A grade de cards responde à largura da coluna de conteúdo (a sidebar
+     come ~500px em telas largas), não à da janela. */
+  container-type: inline-size;
+}
+
+/* globals.css aplica a `.content p/ul/ol` uma medida de leitura (65ch) e
+   margem inferior; aqui o layout é de cards, então zeramos as duas. */
+.pagina.pagina :is(p, ul) {
+  margin-bottom: 0;
+}
+.pagina.pagina ul {
+  max-width: none;
+  padding-left: 0;
+}
+.pagina.pagina li {
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .pagina {
+    --equipe-gutter: var(--space-8);
+    padding-top: var(--space-8);
+  }
+}
+
+/* ---- Hero --------------------------------------------------------------- */
+
+.hero {
+  position: relative;
+  display: grid;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-6);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  color: var(--pv-white);
+  background:
+    radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--pv-blue-500) 45%, transparent), transparent 55%),
+    radial-gradient(circle at 10% 110%, color-mix(in srgb, var(--pv-green-600) 35%, transparent), transparent 50%),
+    linear-gradient(135deg, var(--pv-blue-hero), var(--pv-blue-900));
+  box-shadow: var(--elevation-2);
+}
+
+@media (min-width: 960px) {
+  .hero {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    align-items: center;
+    padding: var(--space-12);
+  }
+}
+
+.heroTexto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.sobretitulo {
+  align-self: flex-start;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--pv-blue-950) 55%, transparent);
+  color: var(--pv-yellow-400);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.titulo {
+  margin: 0;
+  font-size: clamp(2.25rem, 6vw, 3.5rem);
+  line-height: 1.05;
+  font-weight: var(--font-bold);
+  letter-spacing: -0.02em;
+  color: var(--pv-white);
+}
+
+.hero .subtitulo {
+  max-width: 34rem;
+  font-size: var(--font-size-base);
+  line-height: 1.65;
+  color: var(--pv-blue-50);
+}
+
+.numeros {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.numeros li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--pv-white) 35%, transparent);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  color: var(--pv-white);
+}
+
+.numeros strong {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-bold);
+  color: var(--pv-yellow-400);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-height-lg);
+  padding: 0 var(--space-6);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--pv-yellow-500);
+  color: var(--pv-blue-950);
+  font: inherit;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-bold);
+  cursor: pointer;
+  box-shadow: var(--elevation-2);
+  transition:
+    transform var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) var(--easing-standard),
+    background-color var(--duration-fast) var(--easing-standard);
+}
+
+.cta:hover {
+  background: var(--pv-yellow-400);
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-3);
+}
+
+.cta:active {
+  transform: translateY(0);
+}
+
+/* Na faixa azul, o anel de foco padrão (azul) some: anel branco. */
+.cta:focus-visible {
+  outline: 3px solid var(--pv-white);
+  outline-offset: 3px;
+}
+
+.hero .ctaDica {
+  font-size: var(--font-size-sm);
+  color: var(--pv-blue-100);
+  max-width: 22rem;
+}
+
+/* Mosaico dos bonecos (decorativo). */
+.mosaico {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+@media (min-width: 600px) {
+  .mosaico {
+    gap: var(--space-3);
+  }
+}
+
+.mosaicoItem {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--pv-gray-200);
+  box-shadow: var(--elevation-2);
+  border: 2px solid color-mix(in srgb, var(--pv-white) 55%, transparent);
+  transition: transform var(--duration-base) var(--easing-standard);
+}
+
+.mosaicoItem[data-pos="baixo"] {
+  transform: translateY(var(--space-4));
+}
+
+.mosaicoItem img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+}
+
+@media (hover: hover) {
+  .hero:hover .mosaicoItem[data-pos="cima"] {
+    transform: translateY(calc(-1 * var(--space-1)));
+  }
+  .hero:hover .mosaicoItem[data-pos="baixo"] {
+    transform: translateY(var(--space-6));
+  }
+}
+
+/* ---- Seções ------------------------------------------------------------- */
+
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.secaoCabeca {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.secaoTitulo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  font-size: var(--font-size-xl);
+  line-height: 1.25;
+  font-weight: var(--font-bold);
+  color: var(--text-strong);
+}
+
+/* Marcador de cor da área (decorativo; o nome da área está no texto). */
+.secaoTitulo::before {
+  content: "";
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--equipe-acento);
+}
+
+.secaoConta {
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--surface-alt);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-semibold);
+}
+
+/* Cor de cada área. */
+.secao[data-grupo="diretoria"] {
+  --equipe-acento: var(--pv-blue-600);
+}
+.secao[data-grupo="desenvolvimento"] {
+  --equipe-acento: var(--pv-green-600);
+}
+.secao[data-grupo="comunicacao"] {
+  --equipe-acento: var(--pv-yellow-500);
+}
+
+.grade {
+  list-style: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+}
+
+@container (min-width: 34rem) {
+  .grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 56rem) {
+  .grade {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ---- Cartão ------------------------------------------------------------- */
+
+.cartao {
+  display: flex;
+  min-width: 0;
+}
+
+.cartaoCorpo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: var(--space-8) var(--space-6) var(--space-6);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--elevation-1);
+  text-align: center;
+  overflow: hidden;
+  transition:
+    transform var(--duration-base) var(--easing-standard),
+    box-shadow var(--duration-base) var(--easing-standard),
+    border-color var(--duration-base) var(--easing-standard);
+}
+
+/* Faixa de cor da área no topo do cartão. */
+.cartaoCorpo::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--space-1);
+  background: var(--equipe-acento);
+}
+
+.cartaoCorpo:hover,
+.cartaoCorpo:focus-within {
+  transform: translateY(-4px);
+  box-shadow: var(--elevation-3);
+  border-color: color-mix(in srgb, var(--equipe-acento) 50%, var(--border));
+}
+
+.retratoMoldura {
+  position: relative;
+  width: 8.5rem;
+  height: 8.5rem;
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-full);
+  background:
+    radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--equipe-acento) 10%, var(--surface)), color-mix(in srgb, var(--equipe-acento) 30%, var(--surface)));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--equipe-acento) 25%, var(--surface));
+}
+
+.retrato {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  transition: transform var(--duration-base) var(--easing-standard);
+}
+
+.cartaoCorpo:hover .retrato {
+  transform: scale(1.04);
+}
+
+.mascoteSelo {
+  position: absolute;
+  right: calc(-1 * var(--space-2));
+  bottom: calc(-1 * var(--space-1));
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background: var(--pv-gray-200);
+  border: 3px solid var(--surface);
+  box-shadow: var(--elevation-2);
+  transition: transform var(--duration-base) var(--easing-standard);
+}
+
+.mascoteSelo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 45%;
+  transform: scale(1.35);
+}
+
+.cartaoCorpo:hover .mascoteSelo {
+  transform: rotate(-8deg) scale(1.08);
+}
+
+.nome {
+  margin: 0;
+  font-size: var(--font-size-md);
+  line-height: 1.3;
+  font-weight: var(--font-bold);
+  color: var(--text-strong);
+}
+
+.cargo {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-action-primary);
+}
+
+.bio {
+  margin-top: var(--space-3);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.mascoteTexto {
+  margin-top: var(--space-3);
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.mascoteTexto strong {
+  font-weight: var(--font-semibold);
+  color: var(--fg);
+}
+
+.rodape {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  margin-top: auto;
+  padding-top: var(--space-6);
+}
+
+.links {
+  list-style: none;
+  display: flex;
+  gap: var(--space-2);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  color: var(--fg);
+  transition:
+    color var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard),
+    transform var(--duration-fast) var(--easing-standard);
+}
+
+:global([data-theme="dark"]) .link {
+  /* --color-border-strong fica em 1,86:1 no escuro; esta mistura passa de 3:1. */
+  border-color: color-mix(in srgb, var(--fg) 45%, var(--surface));
+}
+
+.link:hover {
+  color: var(--color-action-primary);
+  border-color: var(--color-action-primary);
+  transform: translateY(-2px);
+}
+
+.verFicha {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-action-primary);
+  color: var(--color-text-on-brand);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--easing-standard);
+}
+
+.verFicha svg {
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.verFicha:hover {
+  background: var(--color-action-primary-hover);
+}
+
+.verFicha:hover svg {
+  transform: translateX(3px);
+}
+
+.link:focus-visible,
+.verFicha:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ---- Movimento reduzido ------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .cta,
+  .mosaicoItem,
+  .cartaoCorpo,
+  .retrato,
+  .mascoteSelo,
+  .link,
+  .verFicha,
+  .verFicha svg {
+    transition: none;
+  }
+  .cta:hover,
+  .cartaoCorpo:hover,
+  .cartaoCorpo:focus-within,
+  .cartaoCorpo:hover .retrato,
+  .cartaoCorpo:hover .mascoteSelo,
+  .link:hover,
+  .verFicha:hover svg,
+  .hero:hover .mosaicoItem[data-pos="cima"] {
+    transform: none;
+  }
+  .hero:hover .mosaicoItem[data-pos="baixo"] {
+    transform: translateY(var(--space-4));
+  }
+}

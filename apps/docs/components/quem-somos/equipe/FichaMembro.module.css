@@ -1,0 +1,301 @@
+/* Ficha de uma pessoa da equipe: <dialog> modal (camada do topo), no mesmo
+   estilo das fichas da Vila SEMEC. Cores dos tokens do site: seguem o tema. */
+
+.dialogo {
+  box-sizing: border-box;
+  width: min(52rem, calc(100% - 1.5rem));
+  max-width: none;
+  max-height: calc(100dvh - 1.5rem);
+  margin: auto;
+  padding: 0;
+  overflow: visible;
+  border: none;
+  background: transparent;
+  color: var(--text-strong);
+}
+.dialogo::backdrop {
+  background: color-mix(in srgb, var(--pv-gray-900) 60%, transparent);
+}
+
+.painel {
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(10rem, 17rem) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+  max-height: calc(100dvh - 1.5rem);
+  overflow-y: auto;
+  padding: 1.5rem;
+  border: 4px solid var(--text-strong);
+  border-radius: 1rem;
+  background: var(--surface);
+  box-shadow:
+    inset 0 0 0 5px var(--surface),
+    inset 0 0 0 8px var(--color-action-primary),
+    0 6px 0 var(--text-strong);
+}
+
+/* Zera margens do .content (mesma especificidade das regras abaixo, que
+   vêm depois e ganham pela ordem). */
+.dialogo .painel :where(p, h2, h3, ul) {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+/* Boneco grande, 2:3 vertical. */
+.figura {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border: 3px solid var(--text-strong);
+  border-radius: 0.75rem;
+  background: var(--surface-alt);
+}
+.boneco {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Selo com a inicial quando a imagem não carrega. */
+.semImagem {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  border: 4px solid var(--text-strong);
+  border-radius: 50%;
+  background: var(--pv-blue-100);
+  color: var(--pv-blue-900);
+  font-weight: 700;
+}
+.figura .semImagem {
+  width: 55%;
+  height: auto;
+  aspect-ratio: 1;
+  font-size: var(--font-size-2xl);
+}
+
+.corpo {
+  min-width: 0;
+  padding-top: 0.25rem;
+}
+
+.dialogo .nome {
+  padding-right: 2.5rem;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-strong);
+}
+/* Recebe o foco só por programa (tabIndex -1), para o leitor de tela. */
+.nome:focus {
+  outline: none;
+}
+.dialogo .cargo {
+  margin-top: 0.25rem;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.dialogo .bio {
+  margin-top: 0.85rem;
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--text-strong);
+}
+.dialogo .secao {
+  margin-top: 1rem;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.dialogo .descricao {
+  margin-top: 0.35rem;
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  color: var(--text-strong);
+}
+
+/* Card do mascote. */
+.mascote {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: start;
+  margin-top: 1.1rem;
+  padding: 0.75rem;
+  border: 2px solid var(--text-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-alt);
+}
+.mascoteImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border: 2px solid var(--text-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+.mascote .semImagem {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  font-size: var(--font-size-lg);
+}
+.mascoteTexto {
+  min-width: 0;
+}
+.dialogo .mascoteEtiqueta {
+  display: inline-block;
+  padding: 0.1rem 0.55rem;
+  border: 2px solid var(--text-strong);
+  border-radius: 999px;
+  background: var(--pv-blue-600);
+  color: var(--pv-white);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.dialogo .mascoteNome {
+  margin-top: 0.35rem;
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--text-strong);
+}
+.dialogo .mascoteDescricao {
+  margin-top: 0.2rem;
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--text-strong);
+}
+
+/* Perfis e ações. */
+.dialogo .links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin-top: 1.1rem;
+  list-style: none;
+}
+.link,
+.fechar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--text-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-strong);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.link:hover,
+.fechar:hover {
+  color: var(--color-action-primary);
+  border-color: var(--color-action-primary);
+}
+.acoes {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.25rem;
+}
+.fechar {
+  background: var(--color-action-primary);
+  border-color: var(--color-action-primary);
+  /* Claro no tema claro, escuro no escuro (a ação clareia no escuro). */
+  color: var(--color-text-on-brand);
+}
+.fechar:hover {
+  background: var(--surface);
+}
+
+.fecharX {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 2px solid var(--text-strong);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-strong);
+  cursor: pointer;
+}
+.fecharX:hover {
+  color: var(--color-action-primary);
+  border-color: var(--color-action-primary);
+}
+
+.link:focus-visible,
+.fechar:focus-visible,
+.fecharX:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Telas estreitas: uma coluna, boneco menor e centralizado. */
+@media (max-width: 40rem) {
+  .painel {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1.1rem;
+  }
+  .figura {
+    width: min(10rem, 50%);
+    justify-self: center;
+  }
+  .dialogo .nome {
+    padding-right: 0;
+    font-size: var(--font-size-lg);
+    text-align: center;
+  }
+  .dialogo .cargo {
+    text-align: center;
+  }
+  .acoes {
+    justify-content: stretch;
+  }
+  .fechar {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* Entrada animada só para quem não pediu menos movimento. */
+@media (prefers-reduced-motion: no-preference) {
+  .dialogo[open] {
+    animation: ficha-entra 0.25s ease-out both;
+  }
+  .dialogo[open]::backdrop {
+    animation: fundo-entra 0.2s ease-out both;
+  }
+}
+@keyframes ficha-entra {
+  from {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.97);
+  }
+}
+@keyframes fundo-entra {
+  from {
+    opacity: 0;
+  }
+}
