@@ -321,10 +321,11 @@ Os ícones (X do fechar, seta do accordion, check da opção escolhida) são o m
 
 ### Diálogo
 
-`.semec-dialog` vai no `<dialog>` nativo (aberto com `showModal()`); o fundo escurecido é o `::backdrop`. Para confirmação destrutiva, use o modificador `--alert` (o AlertDialog do React) e o atributo `alert` no elemento: não fecha no clique fora e o foco começa no botão de cancelar, marcado com `data-semec-dialog-cancel`. O HTML é o mesmo do README do `@semec/ds-elements`.
+`.semec-dialog` vai no `<dialog>` nativo (aberto com `showModal()`); o fundo escurecido é o `::backdrop`. Para confirmação destrutiva, use o modificador `--alert` (o AlertDialog do React) e o atributo `alert` no elemento: não fecha no clique fora e o foco começa no botão de cancelar, marcado com `data-semec-dialog-cancel` (o elemento põe o `--alert` se ele faltar). O HTML é o mesmo do README do `@semec/ds-elements`, que também mostra o padrão "confirmar antes de enviar" dentro de um `<form>`.
 
 ```html
-<button type="button" class="semec-btn semec-btn--destructive" data-semec-dialog-open="cancelar">Cancelar solicitação</button>
+<!-- O gatilho é um link para uma página com o mesmo conteúdo: sem JavaScript, o diálogo não abre. -->
+<a class="semec-btn semec-btn--destructive" href="/solicitacoes/318/cancelar" data-semec-dialog-open="cancelar">Cancelar solicitação</a>
 
 <semec-dialog id="cancelar">
   <dialog class="semec-dialog">
@@ -358,7 +359,7 @@ Os ícones (X do fechar, seta do accordion, check da opção escolhida) são o m
 </semec-dialog>
 ```
 
-O elemento põe `data-state`, `aria-labelledby`/`aria-describedby` (de `__title`/`__description`), `role="alertdialog"` e `aria-modal` no `alert`, trava a rolagem e devolve o foco ao gatilho ao fechar. O botão de fechar fica por último no `<dialog>` (como no React) e tem nome acessível pelo texto oculto. O `<dialog>` fechado continua oculto mesmo com o `display: grid` do painel.
+O elemento põe `data-state`, `aria-labelledby`/`aria-describedby` (de `__title`/`__description`), `role="alertdialog"` e `aria-modal` no `alert`, trava a rolagem e devolve o foco ao gatilho ao fechar (e também quando o `<semec-dialog>` aberto é removido da página). O botão de fechar fica por último no `<dialog>` (como no React) e tem nome acessível pelo texto oculto. O `<dialog>` fechado continua oculto mesmo com o `display: grid` do painel.
 
 ### Abas
 
@@ -427,7 +428,7 @@ Opção ativa (a do Enter, com `aria-activedescendant` no campo) = `data-highlig
 </semec-menu>
 ```
 
-É o mesmo HTML do README do `@semec/ds-elements`: o elemento põe `aria-haspopup`, `aria-expanded`, `aria-controls`, `role="menu"`/`menuitem` e o `hidden` do popup fechado. Sem JavaScript, os itens ficam visíveis no fluxo da página, como uma lista de botões e links (o CSS só posiciona o popup depois que o elemento põe `role="menu"`), e o item `disabled` aparece apagado. Itens são `<button>` ou `<a>` (ocupam a linha como o item do React). O item ativo é o focado ou o com `data-highlighted`: fundo `tint` e anel interno de 2 px. O popup tem `w-max` (não quebra linha dentro de um gatilho estreito, como o popper do Radix) e no mínimo a largura do gatilho.
+É o mesmo HTML do README do `@semec/ds-elements`: o elemento põe `aria-haspopup`, `aria-expanded`, `aria-controls`, `role="menu"`/`menuitem` e o `hidden` do popup fechado. Os itens depois de um `.semec-menu__label` (até o próximo separador ou rótulo) são envolvidos num `<div class="semec-menu__group" role="group">` rotulado por ele; essa classe é só gancho, sem estilo. Sem JavaScript, os itens ficam visíveis no fluxo da página, como uma lista de botões e links (o CSS só posiciona o popup depois que o elemento põe `role="menu"`), e o item `disabled` aparece apagado. Itens são `<button>` ou `<a>` (ocupam a linha como o item do React). O item ativo é o focado ou o com `data-highlighted`: fundo `tint` e anel interno de 2 px. O popup tem `w-max` (não quebra linha dentro de um gatilho estreito, como o popper do Radix) e no mínimo a largura do gatilho.
 
 ### Accordion
 
