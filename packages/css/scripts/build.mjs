@@ -101,6 +101,16 @@ ${selector} {${pseudo ? '\n  content: "";' : ""}
 @media (forced-colors: active) {
   ${ICON_MASKS.map(({ selector }) => selector).join(", ")} { background-color: CanvasText; }
 }`;
+  // Menos movimento: a regra da base (`*, ::before, ::after`) não alcança o
+  // ::backdrop do <dialog> nativo (A11Y-18).
+  const reducedMotion = `
+@media (prefers-reduced-motion: reduce) {
+  .semec-dialog::backdrop {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}`;
   const input = [
     '@import "tailwindcss/theme.css" theme(inline);',
     '@import "tailwindcss/utilities.css";',
@@ -109,6 +119,7 @@ ${selector} {${pseudo ? '\n  content: "";' : ""}
     applied,
     indicators,
     iconMasks,
+    reducedMotion,
   ].join("\n");
   const compiler = await compile(input, { base: kitRoot, onDependency() {} });
   let css = compiler.build([]);

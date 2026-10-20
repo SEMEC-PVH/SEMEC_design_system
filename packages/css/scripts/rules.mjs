@@ -123,6 +123,9 @@ export function buildRules(kitRoot) {
   part(".semec-label__required", "form-field", "FormField", 2);
   part(".semec-hint", "form-field", "FormField", 3);
   part(".semec-error", "form-field", "FormField", 4);
+  // Link do resumo de erros (#id) rola o campo para o topo: a margem mantém o rótulo
+  // (ou a legenda do grupo) visível acima dele (CONS-11).
+  add(".semec-field, .semec-checkbox, .semec-radio, .semec-combobox__input", ["scroll-mt-12"], "alvo do link do resumo de erros: rótulo continua visível");
 
   // Checkbox/rádio nativos: raiz e indicador do Radix aplicados ao <input>.
   const indicator = (file, component) => tokens(read(file).classes(component, 2));
@@ -379,11 +382,25 @@ export function buildRules(kitRoot) {
     const alt = c.replace(/(^|:)focus:/, "$1data-highlighted:");
     return alt === c ? [c] : [c, alt];
   };
-  part(".semec-menu__item", "dropdown-menu", "DropdownMenuItem", 0, { inset: false }, highlighted);
+  // Item desabilitado: o Radix marca data-disabled; sem JS, o <button disabled> do HTML
+  // (ou aria-disabled no <a>) recebe a mesma aparência (A11Y-17).
+  const nativeDisabled = (c) => (c.startsWith("data-[disabled]:") ? [c, `disabled:${c.slice("data-[disabled]:".length)}`, `aria-disabled:${c.slice("data-[disabled]:".length)}`] : [c]);
+  part(".semec-menu__item", "dropdown-menu", "DropdownMenuItem", 0, { inset: false }, (c) => highlighted(c).flatMap(nativeDisabled));
   // O item do Radix é uma <div>; aqui pode ser <button>, que não estica nem alinha à esquerda sozinho.
   add(".semec-menu__item", ["w-full", "text-left"], "item como <button>/<a> nativo: ocupa a linha como a <div> do Radix");
   part(".semec-menu__separator", "dropdown-menu", "DropdownMenuSeparator");
   part(".semec-menu__label", "dropdown-menu", "DropdownMenuLabel", 0, { inset: false });
+  // Sem JavaScript (o <semec-menu> não foi definido), o popup é uma lista comum no
+  // fluxo da página: posicionado, ele cobriria o conteúdo seguinte (A11Y-05). O
+  // `role="menu"` é posto pelo elemento; quem o escreve à mão já promete o comportamento.
+  add(":where(semec-menu:not(:defined)) .semec-menu:not([role=\"menu\"])", ["static", "shadow-none"], "aprimoramento progressivo: sem JS (sem o role=menu que o elemento põe), os itens ficam no fluxo");
+
+  // ---- Popups dentro do diálogo -------------------------------------------------
+  // O painel do diálogo rola (overflow-y-auto do DialogContent): um popup absoluto
+  // seria cortado pela borda dele. Dentro do diálogo, o popup entra no fluxo e empurra
+  // o conteúdo, e a rolagem do diálogo alcança a última opção (A11Y-06). O Radix
+  // resolve isso com portal, que o HTML sem React não tem.
+  add(".semec-dialog .semec-menu, .semec-dialog .semec-combobox__listbox, .semec-dialog .semec-combobox__empty", ["relative", "inset-auto"], "popup dentro do <dialog> rolável: no fluxo, nunca cortado (sem portal)");
 
   // ---- Accordion ------------------------------------------------------------------
   const accordion = read("accordion");
