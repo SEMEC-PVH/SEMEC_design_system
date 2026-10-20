@@ -1,6 +1,6 @@
 {
   "name": "@semec/ds-elements",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": false,
   "description": "Web Components acessíveis do Design System SEMEC (dialog, abas, combobox, menu e acordeão) em light DOM, sem dependências, para HTML, PHP e qualquer stack sem React.",
   "type": "module",

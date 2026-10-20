@@ -1,6 +1,6 @@
 {
   "name": "@semec/ds-tokens",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "description": "Design tokens SEMEC sem React nem Tailwind: CSS, JSON DTCG, JS, Android, iOS e Figma (Tokens Studio).",
   "type": "module",
