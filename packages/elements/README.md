@@ -44,8 +44,8 @@ Use versão fixa (nunca uma faixa como `@1`: o SRI vale para um arquivo só) e `
   href="https://cdn.jsdelivr.net/npm/@semec/ds-tokens@1.0.0/dist/fonts.css"
   integrity="sha384-JPaBLIHnh0Pteb6nPfiQvklhUDnfvln4jCKfD1ASorqT7xYuyugBAs5ZvE32NxXb">
 <link rel="stylesheet" crossorigin="anonymous"
-  href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1.1.0/dist/semec-ds.css"
-  integrity="sha384-j3GopGmbfBDbmxOnmviq5aOKVv2aScbeW5TzndRUOYUB/OcrQrD++8POpif35M/W">
+  href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1.1.1/dist/semec-ds.css"
+  integrity="sha384-fidW0owPdsWVRx89cAJc3pdox6KepexJueUrreuoNW1MNXGhmRfddyuPv/zT6v/G">
 <script type="module" crossorigin="anonymous"
   src="https://cdn.jsdelivr.net/npm/@semec/ds-elements@1.0.0/dist/semec-elements.js"
   integrity="sha384-X3yHwotBgX64Ja/D0NFwawT1nbyBHXFZKqk2K0M6IK0OLeMfY2fKRZP0eh0VWCco"></script>
