@@ -153,15 +153,38 @@ describe("checkCoverage (changeset por pacote)", () => {
     assert.deepEqual(r.missing.map((m) => m.name), ["@semec/ds-tokens"]);
   });
 
-  it("tokens.css do kit muda: exige changeset do @semec/ds e do @semec/ds-tokens", () => {
+  it("tokens.css do kit muda: exige changeset do @semec/ds, do @semec/ds-tokens e do @semec/ds-css", () => {
+    // O ds-tokens é gerado do tokens.css; o semec-ds.css do ds-css embute os tokens.
     const r = checkCoverage({
       changedFiles: ["packages/react/tokens.css"],
       packages,
       patterns,
       changesets: [{ "@semec/ds": "minor" }],
     });
-    assert.deepEqual(r.changed.map((c) => c.name).sort(), ["@semec/ds", "@semec/ds-tokens"]);
-    assert.deepEqual(r.missing.map((m) => m.name), ["@semec/ds-tokens"]);
+    assert.deepEqual(r.changed.map((c) => c.name).sort(), ["@semec/ds", "@semec/ds-css", "@semec/ds-tokens"]);
+    assert.deepEqual(r.missing.map((m) => m.name).sort(), ["@semec/ds-css", "@semec/ds-tokens"]);
+  });
+
+  it("componente React espelhado pelo ds-css muda: exige changeset do @semec/ds-css", () => {
+    const r = checkCoverage({
+      changedFiles: ["packages/react/src/components/button.tsx"],
+      packages,
+      patterns,
+      changesets: [{ "@semec/ds": "patch" }],
+    });
+    assert.deepEqual(r.changed.map((c) => c.name).sort(), ["@semec/ds", "@semec/ds-css"]);
+    assert.deepEqual(r.missing.map((m) => m.name), ["@semec/ds-css"]);
+  });
+
+  it("componente React fora do ds-css não exige changeset do @semec/ds-css", () => {
+    const r = checkCoverage({
+      changedFiles: ["packages/react/src/components/dialog.tsx"],
+      packages,
+      patterns,
+      changesets: [{ "@semec/ds": "patch" }],
+    });
+    assert.deepEqual(r.changed.map((c) => c.name), ["@semec/ds"]);
+    assert.deepEqual(r.missing, []);
   });
 
   it("cada pacote mudado com seu changeset passa", () => {

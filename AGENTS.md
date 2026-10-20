@@ -28,14 +28,14 @@ All root scripts delegate to workspaces. Key commands:
 ```bash
 npm install             # install all workspaces
 npm run dev             # docs site at localhost:3000
-npm run build           # prebuild (build:ds → AI artifacts) + next build + static export
+npm run build           # prebuild (build:ds → AI artifacts, build:tokens) + next build + static export
 npm run build:ds        # tsup build of @semec/ds + AI artifacts (build-artifacts.mjs)
 npm run build:pacotes   # build @semec/ds-tokens then @semec/ds-css
 npm run test:pacotes    # tests of @semec/ds-tokens and @semec/ds-css
 npm run test:release    # unit test of the release plan (scripts/release)
 npm run typecheck       # tsc --noEmit on @semec/ds
 npm run lint            # eslint . on apps/docs (flat config, eslint-config-next + jsx-a11y)
-npm test                # Vitest + Testing Library + axe on @semec/ds (packages/react/test)
+npm test                # Vitest + Testing Library + axe on @semec/ds (packages/react/test) + @semec/ds-tokens tests
 npm run gate            # quality gate (conflict markers, tokens, exports, axe smoke, open states in Chromium), same as CI
 npm run generate:llms   # regenerate AI artifacts (alias of packages/react build:skills)
 npm run proto:css       # isolated CSS build for prototyping

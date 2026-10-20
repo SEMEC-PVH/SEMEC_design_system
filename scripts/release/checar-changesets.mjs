@@ -10,7 +10,8 @@
  * "Mudado" = arquivo dentro da pasta do pacote que casa com `changedFilePatterns`
  * (.changeset/config.json, relativo à pasta do pacote) OU arquivo de uma fonte
  * externa que o build do pacote lê (UPSTREAM abaixo: o @semec/ds-tokens gera
- * tudo a partir de packages/react/tokens.css e packages/react/fonts/).
+ * tudo a partir de packages/react/tokens.css e packages/react/fonts/; o
+ * @semec/ds-css, das classes dos componentes React que ele espelha).
  *
  * Um changeset vazio (`npx changeset add --empty`) continua sendo a saída
  * explícita para "mudou, mas não precisa de versão".
@@ -24,9 +25,34 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import picomatch from "picomatch";
 import { readPublicPackages } from "./plano.mjs";
 
-/** Fontes fora da pasta do pacote que entram no build dele (caminhos da raiz). */
+/**
+ * Fontes fora da pasta do pacote que entram no build dele (caminhos da raiz).
+ * - ds-tokens: packages/tokens/scripts/build.mjs lê o tokens.css e as fontes do kit
+ *   e importa o parser (token-data.mjs) e o gerador de CSS (build-css.mjs) dele.
+ * - ds-css: packages/css/scripts/build.mjs compila as classes dos componentes React
+ *   (rules.mjs → component-recipes.mjs) com o tokens.css do kit; o semec-ds.css
+ *   concatenado embute os tokens. A lista de componentes é a que rules.mjs lê:
+ *   ao acrescentar um componente lá, acrescente o .tsx aqui.
+ */
+const KIT_COMPONENTS_IN_CSS = [
+  "alert", "badge", "button", "card", "checkbox", "error-summary", "footer", "form-field",
+  "header", "heading", "input", "label", "radio-group", "select", "skip-link", "table",
+  "textarea", "toast",
+];
+
 export const UPSTREAM = {
-  "@semec/ds-tokens": ["packages/react/tokens.css", "packages/react/fonts/**"],
+  "@semec/ds-tokens": [
+    "packages/react/tokens.css",
+    "packages/react/fonts/**",
+    "packages/react/scripts/token-data.mjs",
+    "packages/react/scripts/build-css.mjs",
+  ],
+  "@semec/ds-css": [
+    "packages/react/tokens.css",
+    "packages/react/scripts/build-css.mjs",
+    "packages/react/scripts/component-recipes.mjs",
+    ...KIT_COMPONENTS_IN_CSS.map((name) => `packages/react/src/components/${name}.tsx`),
+  ],
 };
 
 /** Lê o frontmatter de um changeset: { "@semec/ds": "patch", ... }. */

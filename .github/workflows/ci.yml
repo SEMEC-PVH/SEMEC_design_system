@@ -60,7 +60,8 @@ jobs:
           # passo exige um changeset para CADA pacote público mudado: um changeset do
           # @semec/ds não cobre mudança no @semec/ds-tokens ou no @semec/ds-css. Mudança
           # em packages/react/tokens.css ou packages/react/fonts/ conta também para o
-          # @semec/ds-tokens, que é gerado a partir deles (scripts/release/checar-changesets.mjs).
+          # @semec/ds-tokens, e mudança nos componentes React que o @semec/ds-css espelha
+          # conta para ele (UPSTREAM em scripts/release/checar-changesets.mjs).
           node scripts/release/checar-changesets.mjs --since="origin/${BASE_REF}"
 
   lint:
@@ -111,7 +112,8 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Testes do @semec/ds (Vitest + Testing Library + axe, zod 3 e 4)
+      - name: Testes do @semec/ds (Vitest + Testing Library + axe, zod 3 e 4) e do @semec/ds-tokens
+        # O @semec/ds-css (paridade no Chromium) roda no job build, em test:pacotes.
         run: npm test
 
       - name: Teste do plano de release e da checagem de changeset

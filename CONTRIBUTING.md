@@ -82,7 +82,7 @@ O template de PR (`.github/pull_request_template.md`) repete esta lista.
 - [ ] Aprovação de 1 code owner que não seja o autor — **obrigatória** desde 16/10/2026 (TST-06)
 - [ ] Mensagens de commit na convenção abaixo
 
-**Scripts que existem hoje** (na raiz, delegando para `apps/docs` e `packages/*`): `dev`, `build`, `build:ds`, `build:pacotes`, `start`, `lint`, `typecheck`, `test`, `test:pacotes`, `test:release`, `generate:llms`, `check:artifacts`, `proto:css`, `gate`, `cobertura:promessas`, `changeset`, `changeset:check`, `version-packages`, `release`, `test:visual`, `test:visual:update`.
+**Scripts que existem hoje** (na raiz, delegando para `apps/docs` e `packages/*`): `dev`, `build`, `build:ds`, `build:tokens`, `build:css`, `build:pacotes`, `start`, `lint`, `typecheck`, `test`, `test:pacotes`, `test:release`, `generate:llms`, `check:artifacts`, `proto:css`, `gate`, `cobertura:promessas`, `changeset`, `changeset:check`, `version-packages`, `release`, `test:visual`, `test:visual:update`.
 
 ## O que a CI verifica
 
@@ -94,7 +94,7 @@ O template de PR (`.github/pull_request_template.md`) repete esta lista.
 | `lint` | `npm run lint` | eslint (`eslint-config-next` + `jsx-a11y`) acusa erro em `apps/docs` |
 | `typecheck` | `npm run typecheck` | `tsc --noEmit` do kit falha |
 | `build` | `npm run build:ds`, `npm run build:pacotes` + `npm run test:pacotes` (`@semec/ds-tokens` e `@semec/ds-css`), build do site (`next build`, export estático) e conferência de `apps/docs/public` | um pacote ou o site não compilam, um teste dos pacotes sem React falha, ou os artefatos de agentes estão desatualizados |
-| `test` | `npm test` (Vitest + Testing Library + axe, com zod 3 e 4) e `npm run test:release` (plano de release) | um teste do `@semec/ds` ou do plano de release falha, inclusive violação do axe |
+| `test` | `npm test` (Vitest + Testing Library + axe, com zod 3 e 4, e os testes do `@semec/ds-tokens`) e `npm run test:release` (plano de release) | um teste do `@semec/ds`, do `@semec/ds-tokens` ou do plano de release falha, inclusive violação do axe |
 | `gate` | `npm run gate` | o gate de qualidade e regressão reprova, inclusive a cobertura por promessa do manifest abaixo do piso (`npm run cobertura:promessas`) |
 | `test:visual` | `npm run test:visual` (regressão visual com Playwright no contêiner `mcr.microsoft.com/playwright:v1.56.1-noble`) | um print diverge da baseline em `tests/visual/__screenshots__` |
 
@@ -104,9 +104,9 @@ Para rodar o mesmo localmente, na ordem: `npm run build:ds`, `npm run typecheck`
 
 ### Changeset obrigatório
 
-Um PR precisa de changeset quando muda algo que vai para o npm dentro de um pacote público (`packages/react/` = `@semec/ds`, `packages/tokens/` = `@semec/ds-tokens`, `packages/css/` = `@semec/ds-css`): `src/**`, `skills/**`, `scripts/**`, `fonts/**`, `templates/**`, `manifest.js`, `tokens.css`, `*.css` na raiz do pacote, `build.mjs`, `style-dictionary.config.*`, `pv-preset.ts`, `server.js`, `tsup.config.ts`, `tsconfig.json` ou `package.json` (lista em `changedFilePatterns`, `.changeset/config.json`, relativa à pasta de cada pacote). Mudança só no site (`apps/docs`) ou só no `README` do pacote não exige.
+Um PR precisa de changeset quando muda algo que vai para o npm dentro de um pacote público (`packages/react/` = `@semec/ds`, `packages/tokens/` = `@semec/ds-tokens`, `packages/css/` = `@semec/ds-css`): `src/**`, `skills/**`, `scripts/**`, `fonts/**`, `manifest.js`, `tokens.css`, `*.css` na raiz do pacote, `pv-preset.ts`, `server.js`, `tsup.config.ts`, `tsconfig.json` ou `package.json` (lista em `changedFilePatterns`, `.changeset/config.json`, relativa à pasta de cada pacote). Mudança só no site (`apps/docs`) ou só no `README` do pacote não exige.
 
-O changeset precisa citar **cada** pacote mudado: um changeset só do `@semec/ds` não cobre mudança no `@semec/ds-tokens` (a CI confere com `scripts/release/checar-changesets.mjs`). Mudança em `packages/react/tokens.css` ou `packages/react/fonts/` conta também para o `@semec/ds-tokens`, que é gerado a partir deles.
+O changeset precisa citar **cada** pacote mudado: um changeset só do `@semec/ds` não cobre mudança no `@semec/ds-tokens` (a CI confere com `scripts/release/checar-changesets.mjs`). Mudança em `packages/react/tokens.css` ou `packages/react/fonts/` (e no parser de tokens do kit) conta também para o `@semec/ds-tokens`, que é gerado a partir deles; mudança no `tokens.css` ou nos componentes React que o `@semec/ds-css` espelha (botão, campos, cartão, alerta etc.: lista em `UPSTREAM`, no próprio script) conta também para o `@semec/ds-css`.
 
 ```bash
 npm run changeset            # escolhe @semec/ds, o tipo (patch/minor/major) e descreve em PT-BR
