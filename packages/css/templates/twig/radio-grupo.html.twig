@@ -1,0 +1,28 @@
+{#- Parcial "radio-grupo" (Twig). Uso:
+    {% include '@semec/radio-grupo.html.twig' with {id: 'turno', rotulo: 'Turno', obrigatorio: true, opcoes: [{valor: 'manha', texto: 'Manhã'}, {valor: 'tarde', texto: 'Tarde'}]} only %}
+    <fieldset> com <legend>; o primeiro rádio leva o id (#id no resumo), os outros id-2, id-3… -#}
+{%- autoescape 'html' -%}
+{%- set id = id|default('') -%}
+{%- set dica = dica|default('') -%}
+{%- set erro = erro|default('') -%}
+{%- set obrigatorio = obrigatorio|default(false) -%}
+{%- set dica_id = dica and not erro ? id ~ '-hint' : '' -%}
+{%- set erro_id = erro ? id ~ '-error' : '' -%}
+{%- set descritores = [dica_id, erro_id]|filter(v => v)|join(' ') -%}
+{%- set valor_presente = valor is defined and valor is not null and valor is not same as('') -%}
+<fieldset class="semec-form-field"{% if desabilitado|default(false) %} disabled{% endif %}{% if descritores %} aria-describedby="{{ descritores }}"{% endif %}>
+  <legend class="semec-label">{{ rotulo|default('') }}{% if obrigatorio %}<span class="semec-label__required" aria-hidden="true"> *</span>{% endif %}</legend>
+{% for opcao in opcoes|default([]) %}
+  <label class="semec-choice"><input type="radio" id="{{ loop.first ? id : id ~ '-' ~ loop.index }}" name="{{ nome|default(id) }}" value="{{ opcao.valor ?? '' }}" class="semec-radio"
+{%- if valor_presente and (opcao.valor ?? '') ~ '' == valor ~ '' %} checked{% endif %}
+{%- if obrigatorio %} required{% endif %}
+{%- if erro %} aria-invalid="true"{% endif %}> {{ opcao.texto ?? '' }}</label>
+{% endfor %}
+{% if dica_id %}
+  <p id="{{ dica_id }}" class="semec-hint">{{ dica }}</p>
+{% endif %}
+{% if erro_id %}
+  <p id="{{ erro_id }}" class="semec-error">{{ erro }}</p>
+{% endif %}
+</fieldset>
+{% endautoescape -%}

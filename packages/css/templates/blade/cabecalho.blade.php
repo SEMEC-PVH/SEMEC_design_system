@@ -1,8 +1,10 @@
 {{-- Parcial "cabecalho" (Blade). Uso: @include('semec::cabecalho', ['marca_src' => '/img/marca.svg', 'servico' => 'Matrícula', 'nav' => [['href' => '/matricula', 'texto' => 'Matrícula', 'atual' => true]]]) --}}
 <header class="semec-header">
   <a href="{{ ($inicio ?? null) ?: '/' }}" class="semec-header__brand">
-    <img src="{{ $marca_src ?? '' }}" alt="{{ ($marca_alt ?? null) ?: 'Prefeitura de Porto Velho' }}" width="{{ ($marca_largura ?? null) ?: 90 }}" height="{{ ($marca_altura ?? null) ?: 36 }}">
+@if (($marca_src ?? null) ?: false)
+    <img src="{{ $marca_src }}" alt="{{ ($marca_alt ?? null) ?: 'Prefeitura de Porto Velho' }}" width="{{ ($marca_largura ?? null) ?: 90 }}" height="{{ ($marca_altura ?? null) ?: 36 }}">
     <span aria-hidden="true" class="semec-header__divider"></span>
+@endif
     <span class="semec-header__org">{{ ($orgao ?? null) ?: 'SEMEC' }}@if (($servico ?? null) ?: false) <span aria-hidden="true" class="semec-header__separator">|</span> <span class="semec-header__service">{{ $servico }}</span>@endif</span>
     <span class="semec-sr-only">— {{ ($rotulo_inicio ?? null) ?: 'ir para o início' }}</span>
   </a>

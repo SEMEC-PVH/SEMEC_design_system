@@ -79,8 +79,8 @@ const pacotes = [
 const classes = [
   {
     grupo: "Botão",
-    nomes: ".semec-btn + --primary, --secondary, --ghost, --destructive, --link; tamanhos --sm e --lg (md é o padrão)",
-    obs: "Estado desabilitado por [disabled] ou [aria-disabled=\"true\"].",
+    nomes: ".semec-btn + --primary, --secondary, --outline, --ghost, --destructive, --success, --link; tamanhos --sm, --md (padrão), --lg e --icon",
+    obs: "Estado desabilitado por [disabled] ou [aria-disabled=\"true\"]. --icon exige aria-label.",
   },
   {
     grupo: "Campos",
@@ -104,12 +104,12 @@ const classes = [
   },
   {
     grupo: "Cabeçalho",
-    nomes: ".semec-header, __brand, __org, __service, __nav, __link",
+    nomes: ".semec-header, __brand, __divider, __org, __separator, __service, __nav, __link",
     obs: "Link atual com [aria-current=\"page\"].",
   },
   {
     grupo: "Rodapé",
-    nomes: ".semec-footer, __link",
+    nomes: ".semec-footer, __content, __section, __title, __links, __link, __bottom",
     obs: "",
   },
   {
@@ -124,23 +124,53 @@ const classes = [
   },
   {
     grupo: "Resumo de erros",
-    nomes: ".semec-error-summary, __title, __list",
-    obs: "O foco ao enviar o formulário fica com o JavaScript do app.",
+    nomes: ".semec-error-summary, __title, __list, __link",
+    obs: "O foco ao enviar o formulário fica com o JavaScript do app (ou com o autofocus dos modelos de servidor).",
   },
   {
     grupo: "Badge",
-    nomes: ".semec-badge + as variantes do Badge",
+    nomes: ".semec-badge + --default, --secondary, --outline, --success, --warning, --danger, --info",
     obs: "",
   },
   {
     grupo: "Toast",
-    nomes: ".semec-toast + --success, --danger, --info; __title, __description",
+    nomes: ".semec-toast + --info, --success, --warning, --danger; __body, __title, __description, __action, __close",
     obs: "Só a aparência. Mostrar, anunciar (role=\"status\") e fechar ficam com o app.",
   },
   {
     grupo: "Títulos",
-    nomes: ".semec-heading--1 a .semec-heading--4",
+    nomes: ".semec-heading + --1 a --6",
     obs: "A escala do Heading. Mantenha a ordem h1 → h2 → h3 no HTML.",
+  },
+  {
+    grupo: "Diálogo",
+    nomes: ".semec-dialog + --alert; __header, __title, __description, __footer, __close",
+    obs: "No <dialog> nativo. Comportamento: <semec-dialog> do @semec/ds-elements.",
+  },
+  {
+    grupo: "Abas",
+    nomes: ".semec-tabs, __list, __trigger, __panel",
+    obs: "Comportamento: <semec-tabs>.",
+  },
+  {
+    grupo: "Combobox",
+    nomes: ".semec-combobox, __input, __listbox, __option, __empty, __check",
+    obs: "A partir de um <select> nativo. Comportamento: <semec-combobox>.",
+  },
+  {
+    grupo: "Menu",
+    nomes: ".semec-menu, __item, __separator, __label",
+    obs: "Sem JavaScript, os itens ficam visíveis no fluxo. Comportamento: <semec-menu>.",
+  },
+  {
+    grupo: "Acordeão",
+    nomes: ".semec-accordion, __item, __header, __trigger, __panel, __icon",
+    obs: "Sem JavaScript, os painéis ficam abertos. Comportamento: <semec-accordion>.",
+  },
+  {
+    grupo: "Utilitário",
+    nomes: ".semec-sr-only",
+    obs: "Texto só para leitor de tela.",
   },
 ];
 

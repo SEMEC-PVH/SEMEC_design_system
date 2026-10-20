@@ -1,0 +1,29 @@
+{#- Parcial "radio-grupo" (Jinja2). Uso:
+    {% from "semec/radio-grupo.jinja" import radio_grupo %}
+    {{ radio_grupo(id="turno", rotulo="Turno", obrigatorio=true, opcoes=[{"valor": "manha", "texto": "Manhã"}, {"valor": "tarde", "texto": "Tarde"}]) }}
+    <fieldset> com <legend>; o primeiro rádio leva o id (#id no resumo), os outros id-2, id-3… -#}
+{%- macro radio_grupo(id=none, rotulo=none, nome=none, valor=none, opcoes=none, obrigatorio=false, dica=none, erro=none, desabilitado=false) -%}
+{%- autoescape true -%}
+{%- set id = id or '' -%}
+{%- set dica_id = (id ~ '-hint') if (dica and not erro) else '' -%}
+{%- set erro_id = (id ~ '-error') if erro else '' -%}
+{%- set descritores = [dica_id, erro_id] | select | join(' ') -%}
+{%- set valor_presente = valor is not none and valor != '' -%}
+<fieldset class="semec-form-field"{% if desabilitado %} disabled{% endif %}{% if descritores %} aria-describedby="{{ descritores }}"{% endif %}>
+  <legend class="semec-label">{{ rotulo or '' }}{% if obrigatorio %}<span class="semec-label__required" aria-hidden="true"> *</span>{% endif %}</legend>
+{%- for opcao in opcoes or [] %}
+  {%- set opcao_valor = opcao.valor if (opcao.valor is defined and opcao.valor is not none) else '' %}
+  <label class="semec-choice"><input type="radio" id="{{ id if loop.first else id ~ '-' ~ loop.index }}" name="{{ nome or id }}" value="{{ opcao_valor }}" class="semec-radio"
+{%- if valor_presente and (opcao_valor | string) == (valor | string) %} checked{% endif %}
+{%- if obrigatorio %} required{% endif %}
+{%- if erro %} aria-invalid="true"{% endif %}> {{ opcao.texto | default('') }}</label>
+{%- endfor %}
+{%- if dica_id %}
+  <p id="{{ dica_id }}" class="semec-hint">{{ dica }}</p>
+{%- endif %}
+{%- if erro_id %}
+  <p id="{{ erro_id }}" class="semec-error">{{ erro }}</p>
+{%- endif %}
+</fieldset>
+{%- endautoescape -%}
+{%- endmacro -%}

@@ -1,0 +1,25 @@
+{#- Uso interno das parciais "campo" e "botao": o parâmetro "atributos" (mapa
+    nome → valor). Só data-*, aria-* e alguns atributos de formulário, com nome
+    minúsculo ([a-z0-9-]); outro nome (on*, style, class, href…) e os que a
+    parcial já gera (reservados) são ignorados. O valor sai escapado; true gera
+    o atributo booleano; false, none e vazio omitem. -#}
+{%- macro atributos_extras(mapa, reservados) -%}
+{%- autoescape true -%}
+{%- set permitidos = ['inputmode', 'enterkeyhint', 'maxlength', 'minlength', 'pattern', 'min', 'max', 'step', 'rows', 'cols', 'placeholder', 'readonly', 'spellcheck', 'autocapitalize', 'size', 'multiple', 'accept', 'form', 'formnovalidate', 'title', 'lang', 'dir'] -%}
+{%- set letras = 'abcdefghijklmnopqrstuvwxyz' -%}
+{%- if mapa is mapping -%}
+{%- for chave, valor in mapa.items() -%}
+{%- set nome = chave | string -%}
+{%- set valido = namespace(ok=(nome | length) > 0 and nome[0] in letras) -%}
+{%- for c in nome -%}{%- if c not in letras ~ '0123456789-' -%}{%- set valido.ok = false -%}{%- endif -%}{%- endfor -%}
+{%- set prefixado = (nome | length) > 5 and nome[:5] in ['data-', 'aria-'] and nome[5] in letras ~ '0123456789' -%}
+{%- if valido.ok and nome not in reservados and (nome in permitidos or prefixado) -%}
+{%- if valor is sameas true %} {{ nome }}
+{%- elif valor is sameas false or valor is none or valor is mapping or (valor is iterable and valor is not string) -%}
+{%- elif (valor | string) != '' %} {{ nome }}="{{ valor }}"
+{%- endif -%}
+{%- endif -%}
+{%- endfor -%}
+{%- endif -%}
+{%- endautoescape -%}
+{%- endmacro -%}

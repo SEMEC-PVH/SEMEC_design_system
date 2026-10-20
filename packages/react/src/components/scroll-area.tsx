@@ -72,7 +72,7 @@ const ScrollArea = React.forwardRef<
         className={cn(
           // Anel por dentro (`ring-inset`): a raiz tem overflow-hidden e
           // cortaria um anel com offset.
-          "h-full w-full rounded-[inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+          "h-full w-full rounded-[inherit] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
           viewportClassName
         )}
       >

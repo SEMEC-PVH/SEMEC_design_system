@@ -35,6 +35,8 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 
 No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
+> Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (patch) que ainda não estão no npm. O @semec/ds@4.4.1 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.4.2. Confira a versão instalada com `npm ls @semec/ds`.
+
 ## Uso
 
 ```tsx
@@ -146,7 +148,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
             onValueChange?.(e.target.value);
           }}
           className={cn(
-            "flex h-11 w-full appearance-none rounded-md border border-input bg-surface px-3 py-2 pr-12 text-base sm:text-sm text-foreground transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&::-webkit-calendar-picker-indicator]:hidden",
+            "flex h-11 w-full appearance-none rounded-md border border-input bg-surface px-3 py-2 pr-12 text-base sm:text-sm text-foreground transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive [&::-webkit-calendar-picker-indicator]:hidden",
             className
           )}
           {...props}
@@ -157,7 +159,7 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
           onClick={openPicker}
           disabled={disabled || readOnly}
           aria-label={text.openCalendar}
-          className="absolute right-0 top-0 inline-flex size-11 items-center justify-center rounded-md text-muted-foreground transition-colors duration-fast ease-standard hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 supports-[-moz-appearance:none]:hidden"
+          className="absolute right-0 top-0 inline-flex size-11 items-center justify-center rounded-md text-muted-foreground transition-colors duration-fast ease-standard hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 supports-[-moz-appearance:none]:hidden"
         >
           <CalendarIcon className="h-4 w-4" aria-hidden="true" />
         </button>

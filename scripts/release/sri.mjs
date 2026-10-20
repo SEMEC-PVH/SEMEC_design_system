@@ -13,6 +13,10 @@
  *   2. `npm run sri`          → baixa, calcula e grava os hashes;
  *      `npm run sri -- --check` → só confere (sai com 1 se algum estiver errado).
  *
+ * Alvos `kind: "markdown"` (README de pacote): não há constante; a versão é a da
+ * própria URL do jsDelivr no texto e o hash fica no atributo `integrity` da
+ * mesma tag (todas as ocorrências da URL, que precisam ter a mesma versão).
+ *
  * Alvo `optional`: pacote que ainda pode não estar no npm (ex.: o
  * `@semec/ds-elements` antes da 1.0.0). Se o jsDelivr der 404, a constante fica
  * com o marcador `SRI_PENDENTE` e o script só avisa.
@@ -30,12 +34,17 @@ export const SRI_PENDENTE = "sha384-CALCULE-NA-RELEASE";
 
 const PAGE = "apps/docs/app/(docs)/usar-sem-react/page.jsx";
 const PAGE_ELEMENTS = "apps/docs/app/(docs)/usar-sem-react/web-components/page.jsx";
+const README_CSS = "packages/css/README.md";
 
 /** Arquivos do CDN citados no site (caminho físico do tarball, não o alias do "exports"). */
 export const TARGETS = [
   { file: PAGE, pkg: "@semec/ds-tokens", versionConst: "VERSAO_TOKENS", path: "dist/fonts.css", sriConst: "SRI_FONTS" },
   { file: PAGE, pkg: "@semec/ds-css", versionConst: "VERSAO_CSS", path: "dist/semec-ds.css", sriConst: "SRI_CSS" },
   { file: PAGE_ELEMENTS, pkg: "@semec/ds-elements", versionConst: "VERSAO_ELEMENTS", path: "dist/semec-elements.js", sriConst: "SRI_ELEMENTS", optional: true },
+  // README do @semec/ds-css (CONS-08): versão fixa e integrity nos trechos de CDN.
+  { file: README_CSS, kind: "markdown", pkg: "@semec/ds-tokens", path: "dist/fonts.css" },
+  { file: README_CSS, kind: "markdown", pkg: "@semec/ds-css", path: "dist/semec-ds.css", optional: true },
+  { file: README_CSS, kind: "markdown", pkg: "@semec/ds-elements", path: "dist/semec-elements.js", optional: true },
 ];
 
 /** `sha384-<base64>` do conteúdo, no formato do atributo `integrity`. */
@@ -64,6 +73,37 @@ export function setConst(source, name, value) {
   return source.replace(constRe(name), (_, head) => `${head}"${value}";`);
 }
 
+const escapeRe = (t) => t.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
+const mdTagRe = (pkg, file) => new RegExp(`(https://cdn\\.jsdelivr\\.net/npm/${escapeRe(pkg)}@([^/"\\s]+)/${escapeRe(file)}"[^>]*?integrity=")([^"]*)(")`, "g");
+
+/**
+ * Num markdown, a versão e o integrity de cada tag com a URL do arquivo. Erro se
+ * a URL não aparece, se alguma ocorrência não tem integrity ou se as versões
+ * diferem (um hash só por arquivo).
+ */
+export function readMarkdownSri(source, pkg, file) {
+  const url = new RegExp(`cdn\\.jsdelivr\\.net/npm/${escapeRe(pkg)}@[^/"\\s]+/${escapeRe(file)}`, "g");
+  const total = (source.match(url) ?? []).length;
+  const tags = [...source.matchAll(mdTagRe(pkg, file))].map((m) => ({ version: m[2], value: m[3] }));
+  if (!total) throw new Error(`${pkg}/${file}: URL do CDN não encontrada`);
+  if (tags.length !== total) throw new Error(`${pkg}/${file}: ${total - tags.length} tag(s) sem integrity`);
+  const versions = [...new Set(tags.map((t) => t.version))];
+  if (versions.length !== 1) throw new Error(`${pkg}/${file}: versões diferentes (${versions.join(", ")})`);
+  const values = [...new Set(tags.map((t) => t.value))];
+  return { version: versions[0], value: values.length === 1 ? values[0] : null };
+}
+
+/** Troca o integrity de todas as tags com a URL do arquivo. */
+export function setMarkdownSri(source, pkg, file, value) {
+  readMarkdownSri(source, pkg, file);
+  return source.replace(mdTagRe(pkg, file), (_, head, version, old, tail) => `${head}${value}${tail}`);
+}
+
+const current = (target, source) => (target.kind === "markdown" ? readMarkdownSri(source, target.pkg, target.path) : { version: readConst(source, target.versionConst), value: readConst(source, target.sriConst) });
+
+/** Nome do alvo nas mensagens. */
+export const targetLabel = (t) => (t.kind === "markdown" ? `${t.file} (${t.pkg})` : t.sriConst);
+
 /**
  * Calcula o SRI de cada alvo. Não grava nada.
  * @param {{ targets?: typeof TARGETS, readFile: (file: string) => string,
@@ -74,13 +114,13 @@ export async function computeSri({ targets = TARGETS, readFile, fetch }) {
   const results = [];
   for (const target of targets) {
     const source = readFile(target.file);
-    const url = cdnUrl(target.pkg, readConst(source, target.versionConst), target.path);
-    const current = readConst(source, target.sriConst);
+    const { version, value: atual } = current(target, source);
+    const url = cdnUrl(target.pkg, version, target.path);
     const res = await fetch(url);
     if (res.ok) {
-      results.push({ target, url, current, value: sriOf(Buffer.from(await res.arrayBuffer())), status: res.status });
+      results.push({ target, url, current: atual, value: sriOf(Buffer.from(await res.arrayBuffer())), status: res.status });
     } else if (res.status === 404 && target.optional) {
-      results.push({ target, url, current, value: null, status: 404 });
+      results.push({ target, url, current: atual, value: null, status: 404 });
     } else {
       throw new Error(`${url}: HTTP ${res.status}`);
     }
@@ -93,7 +133,8 @@ export function applySri(results, readFile) {
   const files = new Map();
   for (const r of results) {
     const source = files.get(r.target.file) ?? readFile(r.target.file);
-    files.set(r.target.file, setConst(source, r.target.sriConst, r.value ?? SRI_PENDENTE));
+    const value = r.value ?? SRI_PENDENTE;
+    files.set(r.target.file, r.target.kind === "markdown" ? setMarkdownSri(source, r.target.pkg, r.target.path, value) : setConst(source, r.target.sriConst, value));
   }
   return files;
 }
@@ -107,13 +148,13 @@ if (isMain) {
   let wrong = 0;
   for (const r of results) {
     if (r.value === null) {
-      console.warn(`AVISO ${r.url}: ainda não publicado (404); ${r.target.sriConst} fica "${SRI_PENDENTE}".`);
+      console.warn(`AVISO ${r.url}: ainda não publicado (404); ${targetLabel(r.target)} fica "${SRI_PENDENTE}".`);
       if (r.current !== SRI_PENDENTE) wrong++;
       continue;
     }
     const same = r.current === r.value;
     if (!same) wrong++;
-    console.log(`${same ? "ok  " : "novo"} ${r.target.sriConst} ${r.value}  ${r.url}`);
+    console.log(`${same ? "ok  " : "novo"} ${targetLabel(r.target)} ${r.value}  ${r.url}`);
   }
   if (check) {
     if (wrong) {

@@ -5,7 +5,7 @@ import Note from "@/components/ui/Note";
 export const metadata = {
   title: "Modelos de servidor",
   description:
-    "Parciais oficiais do SEMEC Design System para PHP, Laravel (Blade), Symfony (Twig), Django e Flask (Jinja2): página, cabeçalho, rodapé, campo, resumo de erros, alerta e botão, com escape e acessibilidade.",
+    "Parciais oficiais do SEMEC Design System para PHP, Laravel (Blade), Symfony (Twig), Django e Flask (Jinja2): página, cabeçalho, rodapé, campo, combobox, rádios, checkbox, resumo de erros, alerta e botão, com escape e acessibilidade.",
 };
 
 const REPO = "https://github.com/SEMEC-PVH/SEMEC_design_system";
@@ -39,9 +39,12 @@ const parciais = [
   { nome: "cabecalho", gera: "Marca, órgão, serviço e menu, com aria-current=\"page\" no item atual." },
   { nome: "rodape", gera: "Seções de links e a linha final." },
   { nome: "campo", gera: "input, textarea ou select com rótulo, obrigatório, dica, erro, aria-describedby e aria-invalid." },
+  { nome: "combobox", gera: "Campo de escolha com filtro: um <select> dentro do <semec-combobox>, com rótulo, dica e erro." },
+  { nome: "radio-grupo", gera: "Grupo de rádios em <fieldset> com <legend>, dica e erro." },
+  { nome: "checkbox", gera: "Uma caixa de marcação (declaração, aceite) ou um grupo delas em <fieldset>." },
   { nome: "resumo-de-erros", gera: "Lista de links para os campos com erro, focada quando a página volta do envio." },
   { nome: "alerta", gera: "Aviso info, success, warning ou danger, com o ícone e o role do Alert do kit." },
-  { nome: "botao", gera: "<button> ou link com aparência de botão, nas variantes e tamanhos do Button." },
+  { nome: "botao", gera: "<button> ou link com aparência de botão, nas variantes e tamanhos do Button; aceita os gatilhos do @semec/ds-elements em atributos." },
 ];
 
 const linguagens = [
@@ -61,6 +64,7 @@ const camposParametros = [
   { nome: "erro", desc: "Mensagem de erro: marca aria-invalid=\"true\" e entra no aria-describedby." },
   { nome: "opcoes, opcao_vazia", desc: "Opções do select ({valor, texto}) e a primeira opção vazia (\"Selecione\")." },
   { nome: "nome, autocomplete, desabilitado", desc: "name (padrão: o id), autocomplete e disabled." },
+  { nome: "atributos", desc: "Mapa de atributos extras: inputmode, maxlength, pattern, rows, placeholder, data-* e aria-*. Outros nomes (on*, style, class, href) são ignorados; o valor sai escapado." },
 ];
 
 export default function ModelosDeServidorPage() {
@@ -75,7 +79,7 @@ export default function ModelosDeServidorPage() {
 
       <p>
         O <code>@semec/ds-css</code> traz, além das classes, a pasta{" "}
-        <code>templates/</code> com oito parciais em quatro linguagens: PHP puro,
+        <code>templates/</code> com onze parciais em quatro linguagens: PHP puro,
         Jinja2, Twig e Blade. Os nomes e os parâmetros são os mesmos nas quatro,
         e todas geram o HTML recomendado nas{" "}
         <Link href="/usar-sem-react">instruções para usar sem React</Link>, com
@@ -148,71 +152,105 @@ export default function ModelosDeServidorPage() {
       <p>
         Inclua o <code>semec.php</code> uma vez. <code>semec_render()</code>{" "}
         devolve o HTML da parcial; o conteúdo da página é uma função que imprime
-        o HTML do seu app.
+        o HTML do seu app. Os exemplos desta página usam{" "}
+        <strong>um único mapa campo → mensagem</strong> (<code>$erros</code>)
+        para o resumo e para cada campo: vazio, nada aparece. Os quatro exemplos
+        rodam como estão no teste dos modelos.
       </p>
       <Code>{`<?php
-require __DIR__ . '/semec/semec.php';
+require __DIR__ . '/semec/semec.php'; // templates/php copiado para ./semec
+
+// Um só mapa campo => mensagem serve ao resumo e a cada campo.
+$dados = $_POST;
+$erros = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && trim($dados['cpf'] ?? '') === '') {
+    $erros['cpf'] = 'Informe o CPF.';
+}
 
 echo semec_render('pagina', [
     'titulo' => 'Transferência escolar — SEMEC',
     'cabecalho' => [
-        'marca_src' => '/img/marca.svg',
+        'marca_src' => '/img/marca.svg', // a marca oficial, servida pelo seu app
         'servico' => 'Matrícula e transferência',
-        'nav' => [
-            ['href' => '/transferencia', 'texto' => 'Transferência', 'atual' => true],
-        ],
+        'nav' => [['href' => '/transferencia', 'texto' => 'Transferência', 'atual' => true]],
     ],
     'conteudo' => function () use ($erros, $dados) {
+        echo '<h1 class="semec-heading semec-heading--1">Solicitar transferência</h1>';
         echo semec_render('resumo-de-erros', ['erros' => $erros]);
         echo '<form method="post" novalidate>';
         echo semec_render('campo', [
-            'id' => 'cpf',
-            'rotulo' => 'CPF',
-            'obrigatorio' => true,
-            'valor' => $dados['cpf'] ?? '',
+            'id' => 'cpf', 'rotulo' => 'CPF', 'obrigatorio' => true,
+            'valor' => $dados['cpf'] ?? '', 'erro' => $erros['cpf'] ?? null,
             'dica' => 'Somente números.',
-            'erro' => $errosPorCampo['cpf'] ?? null,
+            'atributos' => ['inputmode' => 'numeric', 'maxlength' => 11],
         ]);
         echo semec_render('botao', ['texto' => 'Enviar', 'tipo' => 'submit']);
         echo '</form>';
     },
 ]);`}</Code>
       <p>
-        <code>$erros</code> é a lista do resumo, no formato{" "}
-        <code>{"[['campo' => 'cpf', 'mensagem' => 'Informe o CPF.']]"}</code>.
-        Lista vazia não imprime nada.
+        A função do <code>conteudo</code> só enxerga as variáveis do{" "}
+        <code>use (...)</code>; se faltar uma, o PHP não avisa por causa do{" "}
+        <code>??</code>. O resumo também aceita a lista{" "}
+        <code>{"[['campo' => 'cpf', 'mensagem' => '…']]"}</code>; item sem campo
+        ou sem mensagem não vira link.
       </p>
+      <Note>
+        A marca da Prefeitura não vem no pacote: use o arquivo oficial do órgão,
+        servido pelo seu app, em <code>marca_src</code>. Sem ele, o cabeçalho sai
+        só com o nome do órgão e do serviço.
+      </Note>
 
       <h2 id="jinja">Django e Flask (Jinja2)</h2>
       <p>
         Copie <code>templates/jinja</code> para uma pasta <code>semec/</code>{" "}
         dentro do diretório de templates. No Django, use o{" "}
         <a href="https://niwi.nz/django-jinja/latest/">django-jinja</a> (os
-        arquivos <code>.jinja</code> vão para o motor Jinja2); no Flask, basta a
-        pasta <code>templates/</code>.
+        arquivos <code>.jinja</code> vão para o motor Jinja2); no Flask, a
+        pasta <code>templates/</code>, com o autoescape configurado (abaixo).
       </p>
       <Code>{`{% extends "semec/pagina.jinja" %}
 {% from "semec/campo.jinja" import campo %}
 {% from "semec/botao.jinja" import botao %}
 {% from "semec/resumo-de-erros.jinja" import resumo_de_erros %}
-
 {% block conteudo %}
+  <h1 class="semec-heading semec-heading--1">Solicitar transferência</h1>
   {{ resumo_de_erros(erros=erros) }}
   <form method="post" novalidate>
-    {{ campo(id="cpf", rotulo="CPF", obrigatorio=true,
-             valor=dados.cpf, dica="Somente números.",
-             erro=erros_por_campo.cpf) }}
+    {{ campo(id="cpf", rotulo="CPF", obrigatorio=true, valor=dados.get("cpf"), erro=erros.get("cpf"), dica="Somente números.", atributos={"inputmode": "numeric", "maxlength": 11}) }}
     {{ botao(texto="Enviar", tipo="submit") }}
   </form>
 {% endblock %}`}</Code>
       <p>
-        Os parâmetros do layout vêm do contexto da view, por exemplo{" "}
+        A view passa <code>erros</code> (o mapa, vazio quando não há erro),{" "}
+        <code>dados</code> (<code>{"{}"}</code> no primeiro acesso) e os
+        parâmetros do layout, por exemplo{" "}
         <code>
           render(request, &quot;transferencia.jinja&quot;, &#123;&quot;titulo&quot;: …,
-          &quot;cabecalho&quot;: &#123;…&#125;&#125;)
+          &quot;cabecalho&quot;: &#123;…&#125;, &quot;erros&quot;: erros, &quot;dados&quot;: dados&#125;)
         </code>
-        . As macros têm o nome da parcial com <code>_</code> no lugar de{" "}
-        <code>-</code>.
+        . No Django, ponha <code>{"{{ csrf_input }}"}</code> dentro do{" "}
+        <code>&lt;form&gt;</code>. As macros têm o nome da parcial com{" "}
+        <code>_</code> no lugar de <code>-</code>. Funciona com{" "}
+        <code>StrictUndefined</code> (use <code>.get()</code> para chave que pode
+        faltar).
+      </p>
+      <Note>
+        <strong>Flask: ligue o autoescape para .jinja.</strong> O Flask só escapa
+        templates <code>.html</code>, <code>.htm</code>, <code>.xml</code>,{" "}
+        <code>.xhtml</code> e <code>.svg</code>. As parciais do DS ligam o
+        próprio autoescape, mas a sua tela (o template filho) não: com o nome{" "}
+        <code>transferencia.jinja</code>, um <code>{"{{ dados.nome }}"}</code>{" "}
+        sai cru, e isso é XSS. Configure ao criar o app, ou dê às suas telas a
+        extensão <code>.html</code>:
+      </Note>
+      <Code>{`from jinja2 import select_autoescape
+
+app.jinja_env.autoescape = select_autoescape(["html", "htm", "xml", "xhtml", "jinja"])`}</Code>
+      <p>
+        No Django com django-jinja, a extensão <code>.jinja</code> precisa estar no{" "}
+        <code>match_extension</code> e o motor com{" "}
+        <code>&quot;autoescape&quot;: True</code> (o padrão do django-jinja).
       </p>
       <Note>
         O motor padrão do Django (DTL) não lê Jinja2. Num projeto só com DTL, use
@@ -227,15 +265,11 @@ echo semec_render('pagina', [
         Twig puro, <code>$loader-&gt;addPath($pasta, &apos;semec&apos;)</code>.
       </p>
       <Code>{`{% extends '@semec/pagina.html.twig' %}
-
 {% block conteudo %}
+  <h1 class="semec-heading semec-heading--1">Solicitar transferência</h1>
   {% include '@semec/resumo-de-erros.html.twig' with {erros: erros} only %}
   <form method="post" novalidate>
-    {% include '@semec/campo.html.twig' with {
-      id: 'cpf', rotulo: 'CPF', obrigatorio: true,
-      valor: dados.cpf, dica: 'Somente números.',
-      erro: erros_por_campo.cpf|default(null)
-    } only %}
+    {% include '@semec/campo.html.twig' with {id: 'cpf', rotulo: 'CPF', obrigatorio: true, valor: dados.cpf|default(null), erro: erros.cpf|default(null), dica: 'Somente números.', atributos: {inputmode: 'numeric', maxlength: 11}} only %}
     {% include '@semec/botao.html.twig' with {texto: 'Enviar', tipo: 'submit'} only %}
   </form>
 {% endblock %}`}</Code>
@@ -255,26 +289,60 @@ echo semec_render('pagina', [
         .
       </p>
       <Code>{`@extends('semec::pagina')
-
 @section('conteudo')
-  @include('semec::resumo-de-erros', ['erros' => $resumo])
+  <h1 class="semec-heading semec-heading--1">Solicitar transferência</h1>
+  {!! view('semec::resumo-de-erros', ['erros' => array_map(fn ($m) => $m[0], $errors->getMessages())])->render() !!}
   <form method="post" novalidate>
     @csrf
-    @include('semec::campo', [
-      'id' => 'cpf', 'rotulo' => 'CPF', 'obrigatorio' => true,
-      'valor' => old('cpf'), 'dica' => 'Somente números.',
-      'erro' => $errors->first('cpf') ?: null,
-    ])
-    @include('semec::botao', ['texto' => 'Enviar', 'tipo' => 'submit'])
+    {!! view('semec::campo', ['id' => 'cpf', 'rotulo' => 'CPF', 'obrigatorio' => true, 'valor' => old('cpf'), 'erro' => $errors->first('cpf') ?: null, 'dica' => 'Somente números.', 'atributos' => ['inputmode' => 'numeric', 'maxlength' => 11]])->render() !!}
+    {!! view('semec::botao', ['texto' => 'Enviar', 'tipo' => 'submit'])->render() !!}
   </form>
 @endsection`}</Code>
       <p>
-        <strong>Atenção:</strong> o <code>@include</code> do Blade passa para a parcial todas as variáveis
-        da view. Se a página tem <code>$titulo</code>, <code>$id</code> ou{" "}
-        <code>$erro</code>, passe esses parâmetros na chamada ou renderize
-        isolado com{" "}
-        <code>&#123;!! view(&apos;semec::alerta&apos;, [...])-&gt;render() !!&#125;</code>{" "}
-        (a parcial já escapou o HTML).
+        <code>&#123;!! view(&apos;semec::…&apos;, [...])-&gt;render() !!&#125;</code>{" "}
+        renderiza a parcial isolada; o <code>&#123;!! !!&#125;</code> só imprime
+        o HTML que a parcial já escapou. <strong>Não use <code>@include</code>{" "}
+        com as parciais:</strong> ele passa todas as variáveis da view, e o{" "}
+        <code>$titulo</code> do layout viraria o título do resumo de erros; um{" "}
+        <code>$id</code>, <code>$tipo</code> ou <code>$erro</code> mudaria o
+        campo.
+      </p>
+
+      <h2 id="escolhas">Combobox, rádios e checkbox</h2>
+      <ul>
+        <li>
+          <code>combobox</code>: o <code>&lt;semec-combobox&gt;</code> envolve só
+          o <code>&lt;select&gt;</code>, então a lista abre colada ao campo, não
+          depois da dica ou do erro. Sem JavaScript, o select funciona sozinho;
+          com o <code>@semec/ds-elements</code>, vira campo com filtro e o campo
+          de busca assume o <code>id</code> (o link do resumo é{" "}
+          <code>#id</code>).
+        </li>
+        <li>
+          <code>radio-grupo</code> e <code>checkbox</code> com{" "}
+          <code>opcoes</code>: <code>&lt;fieldset&gt;</code> com{" "}
+          <code>&lt;legend&gt;</code>, dica e erro ligados ao grupo. O primeiro
+          controle leva o <code>id</code> (o link do resumo é <code>#id</code>);
+          os outros, <code>id-2</code>, <code>id-3</code>…
+        </li>
+        <li>
+          <code>checkbox</code> sem <code>opcoes</code>: uma caixa só, com o
+          rótulo ao lado (declaração, aceite dos termos).
+        </li>
+      </ul>
+
+      <h2 id="atributos">Atributos extras</h2>
+      <p>
+        <code>campo</code> e <code>botao</code> aceitam <code>atributos</code>,
+        um mapa nome → valor: os gatilhos do <code>@semec/ds-elements</code>{" "}
+        (<code>data-semec-dialog-open</code>, <code>data-semec-menu-trigger</code>
+        …), <code>aria-describedby</code> e <code>form</code> num botão,{" "}
+        <code>inputmode</code>, <code>maxlength</code>, <code>pattern</code> e{" "}
+        <code>rows</code> num campo. Só valem nomes <code>data-*</code>,{" "}
+        <code>aria-*</code> e uma lista de atributos de formulário; outros
+        (<code>on*</code>, <code>style</code>, <code>class</code>,{" "}
+        <code>href</code>) são ignorados, e o valor sai escapado.{" "}
+        <code>true</code> gera o atributo sem valor.
       </p>
 
       <h2 id="parametros">Parâmetros</h2>
@@ -313,8 +381,8 @@ echo semec_render('pagina', [
           Toda saída é escapada: <code>htmlspecialchars</code> com{" "}
           <code>ENT_QUOTES</code> no PHP, autoescape de HTML no Jinja, no Twig e no
           Blade. O Jinja e o Twig ligam o autoescape dentro de cada parcial, mesmo
-          que o projeto o tenha desligado (o Flask não liga para{" "}
-          <code>.jinja</code>).
+          que o projeto o tenha desligado. Isso não protege a sua tela: no
+          Flask, configure o autoescape para <code>.jinja</code> (veja acima).
         </li>
         <li>
           Nenhum parâmetro aceita HTML. O conteúdo da página entra pelo bloco do
@@ -355,8 +423,9 @@ echo semec_render('pagina', [
         comparada com um único HTML de referência. O mesmo teste roda o axe-core
         no Chromium (zero violações), confere cada classe contra a lista oficial
         do <code>@semec/ds-css</code>, injeta <code>&lt;script&gt;</code> e aspas
-        em todos os textos e confere a tabela de parâmetros. Para rodar no
-        monorepo:
+        em todos os textos e confere a tabela de parâmetros. Os exemplos desta
+        página rodam como estão (com e sem erro), e um app Flask de verdade
+        confirma a configuração de autoescape. Para rodar no monorepo:
       </p>
       <Code>{`npm run build:pacotes
 npm run test:modelos`}</Code>

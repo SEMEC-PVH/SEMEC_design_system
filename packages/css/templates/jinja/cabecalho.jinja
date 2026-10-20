@@ -5,8 +5,11 @@
 {%- autoescape true -%}
 <header class="semec-header">
   <a href="{{ inicio or '/' }}" class="semec-header__brand">
-    <img src="{{ marca_src or '' }}" alt="{{ marca_alt or 'Prefeitura de Porto Velho' }}" width="{{ marca_largura or 90 }}" height="{{ marca_altura or 36 }}">
+
+{%- if marca_src %}
+    <img src="{{ marca_src }}" alt="{{ marca_alt or 'Prefeitura de Porto Velho' }}" width="{{ marca_largura or 90 }}" height="{{ marca_altura or 36 }}">
     <span aria-hidden="true" class="semec-header__divider"></span>
+{%- endif %}
     <span class="semec-header__org">{{ orgao or 'SEMEC' }}{% if servico %} <span aria-hidden="true" class="semec-header__separator">|</span> <span class="semec-header__service">{{ servico }}</span>{% endif %}</span>
     <span class="semec-sr-only">— {{ rotulo_inicio or 'ir para o início' }}</span>
   </a>

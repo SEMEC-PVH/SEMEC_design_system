@@ -1,0 +1,45 @@
+{#- Parcial "checkbox" (Twig). Uso:
+    {% include '@semec/checkbox.html.twig' with {id: 'declaracao', rotulo: 'Declaro que as informações são verdadeiras', obrigatorio: true} only %}
+    Com "opcoes", vira um grupo em <fieldset>; "valor" é a lista das marcadas e o
+    primeiro checkbox leva o id (#id no resumo). -#}
+{%- autoescape 'html' -%}
+{%- set id = id|default('') -%}
+{%- set dica = dica|default('') -%}
+{%- set erro = erro|default('') -%}
+{%- set obrigatorio = obrigatorio|default(false) -%}
+{%- set dica_id = dica and not erro ? id ~ '-hint' : '' -%}
+{%- set erro_id = erro ? id ~ '-error' : '' -%}
+{%- set descritores = [dica_id, erro_id]|filter(v => v)|join(' ') -%}
+{%- set valor = valor ?? null -%}
+{%- set opcoes = opcoes|default([]) -%}
+{%- set marcados = (valor is iterable ? valor : (valor is null ? [] : [valor]))|filter(v => v is not null and v is not iterable)|map(v => v ~ '') -%}
+{% if opcoes is empty %}
+<div class="semec-form-field">
+  <label class="semec-choice"><input type="checkbox" id="{{ id }}" name="{{ nome|default(id) }}"
+{%- if valor is not null and valor is not iterable and valor ~ '' is not same as('') %} value="{{ valor }}"{% endif %} class="semec-checkbox"
+{%- if marcado|default(false) %} checked{% endif %}
+{%- if obrigatorio %} required{% endif %}
+{%- if desabilitado|default(false) %} disabled{% endif %}
+{%- if erro %} aria-invalid="true"{% endif %}
+{%- if descritores %} aria-describedby="{{ descritores }}"{% endif %}> {{ rotulo|default('') }}{% if obrigatorio %}<span class="semec-label__required" aria-hidden="true"> *</span>{% endif %}</label>
+{% else %}
+<fieldset class="semec-form-field"{% if desabilitado|default(false) %} disabled{% endif %}{% if descritores %} aria-describedby="{{ descritores }}"{% endif %}>
+  <legend class="semec-label">{{ rotulo|default('') }}{% if obrigatorio %}<span class="semec-label__required" aria-hidden="true"> *</span>{% endif %}</legend>
+{% for opcao in opcoes %}
+  <label class="semec-choice"><input type="checkbox" id="{{ loop.first ? id : id ~ '-' ~ loop.index }}" name="{{ nome|default(id) }}" value="{{ opcao.valor ?? '' }}" class="semec-checkbox"
+{%- if (opcao.valor ?? '') ~ '' in marcados %} checked{% endif %}
+{%- if erro %} aria-invalid="true"{% endif %}> {{ opcao.texto ?? '' }}</label>
+{% endfor %}
+{% endif %}
+{% if dica_id %}
+  <p id="{{ dica_id }}" class="semec-hint">{{ dica }}</p>
+{% endif %}
+{% if erro_id %}
+  <p id="{{ erro_id }}" class="semec-error">{{ erro }}</p>
+{% endif %}
+{% if opcoes is empty %}
+</div>
+{% else %}
+</fieldset>
+{% endif %}
+{% endautoescape -%}

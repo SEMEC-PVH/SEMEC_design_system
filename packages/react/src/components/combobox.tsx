@@ -273,7 +273,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
             type="button"
             disabled={disabled}
             className={cn(
-              "flex h-11 w-full items-center justify-between rounded-md border border-input bg-surface px-3 py-2 text-sm text-foreground shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive",
+              "flex h-11 w-full items-center justify-between rounded-md border border-input bg-surface px-3 py-2 text-sm text-foreground shadow-elevation-1 transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive",
               className
             )}
             {...props}
@@ -335,7 +335,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
                 aria-required={required || ctx?.required ? true : undefined}
                 aria-labelledby={labelIds}
                 aria-label={labelIds ? undefined : hiddenLabel ?? text.search}
-                className="flex h-11 w-full rounded-md border border-input bg-surface px-3 py-1 text-base sm:text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="flex h-11 w-full rounded-md border border-input bg-surface px-3 py-1 text-base sm:text-sm placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               />
             </div>
             {filtered.length > 0 ? (
@@ -365,7 +365,7 @@ const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
                       onClick={() => choose(option)}
                       className={cn(
                         "flex min-h-11 w-full cursor-pointer select-none items-center justify-between rounded-sm px-2 py-2 text-sm text-foreground",
-                        isActive && "bg-tint ring-2 ring-inset ring-ring",
+                        isActive && "bg-tint ring-2 ring-inset ring-ring forced-colors:forced-color-adjust-none forced-colors:bg-[Highlight] forced-colors:text-[HighlightText]",
                         isChosen && "font-medium"
                       )}
                     >

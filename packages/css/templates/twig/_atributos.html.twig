@@ -1,0 +1,19 @@
+{#- Uso interno das parciais "campo" e "botao": o parâmetro "atributos" (mapa
+    nome → valor). Só data-*, aria-* e alguns atributos de formulário, com nome
+    minúsculo ([a-z0-9-]); outro nome (on*, style, class, href…) e os que a
+    parcial já gera (reservados) são ignorados. O valor sai escapado; true gera
+    o atributo booleano; false, null e vazio omitem. -#}
+{%- autoescape 'html' -%}
+{%- set permitidos = ['inputmode', 'enterkeyhint', 'maxlength', 'minlength', 'pattern', 'min', 'max', 'step', 'rows', 'cols', 'placeholder', 'readonly', 'spellcheck', 'autocapitalize', 'size', 'multiple', 'accept', 'form', 'formnovalidate', 'title', 'lang', 'dir'] -%}
+{%- if mapa is iterable -%}
+{%- for chave, valor in mapa -%}
+{%- set nome = chave ~ '' -%}
+{%- if nome matches '/^[a-z][a-z0-9-]*$/' and nome not in reservados and (nome in permitidos or nome matches '/^(data|aria)-[a-z0-9]/') -%}
+{%- if valor is same as(true) %} {{ nome }}
+{%- elseif valor is same as(false) or valor is null or valor is iterable -%}
+{%- elseif valor ~ '' is not same as('') %} {{ nome }}="{{ valor }}"
+{%- endif -%}
+{%- endif -%}
+{%- endfor -%}
+{%- endif -%}
+{%- endautoescape -%}

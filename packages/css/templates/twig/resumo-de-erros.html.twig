@@ -2,14 +2,23 @@
     {% include '@semec/resumo-de-erros.html.twig' with {erros: [{campo: 'email', mensagem: 'Informe um e-mail válido.'}]} only %}
     Sem erros, não imprime nada. -#}
 {%- autoescape 'html' -%}
-{% if erros|default([]) is not empty -%}
+{#- Aceita a lista [{campo: …, mensagem: …}] ou o mapa {cpf: '…'} (o mesmo que o "erro"
+    de cada campo). Item sem campo ou sem mensagem não vira link. -#}
+{%- set itens = [] -%}
+{%- for chave, item in (erros ?? null) is iterable ? erros : [] -%}
+{%- set par = item is iterable ? [item.campo ?? null, item.mensagem ?? null] : (chave is same as(loop.index0) ? [null, null] : [chave, item]) -%}
+{%- if par[0] is not null and par[0] ~ '' is not same as('') and par[1] is not null and par[1] ~ '' is not same as('') -%}
+{%- set itens = itens|merge([par]) -%}
+{%- endif -%}
+{%- endfor -%}
+{% if itens is not empty -%}
 {%- set id = id|default('resumo-de-erros') -%}
 {%- set focar = focar is not defined or focar is null or focar -%}
 <div id="{{ id }}" class="semec-error-summary" role="alert" tabindex="-1" aria-labelledby="{{ id }}-titulo"{% if focar %} autofocus{% endif %}>
   <h2 id="{{ id }}-titulo" class="semec-error-summary__title">{{ titulo|default('Há um problema') }}</h2>
   <ul class="semec-error-summary__list">
-{% for erro in erros %}
-    <li><a href="#{{ erro.campo ?? '' }}">{{ erro.mensagem ?? '' }}</a></li>
+{% for par in itens %}
+    <li><a href="#{{ par[0] }}">{{ par[1] }}</a></li>
 {% endfor %}
   </ul>
 </div>

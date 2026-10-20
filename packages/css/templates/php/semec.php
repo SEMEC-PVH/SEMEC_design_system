@@ -2,7 +2,7 @@
 /**
  * Modelos de servidor do @semec/ds-css para PHP puro (ADR-030).
  *
- *   require __DIR__ . '/vendor-semec/php/semec.php';
+ *   require __DIR__ . '/semec/semec.php'; // templates/php copiado para ./semec
  *   echo semec_render('campo', ['id' => 'email', 'rotulo' => 'E-mail', 'tipo' => 'email']);
  *
  * Toda saída passa por semec_e() (htmlspecialchars com ENT_QUOTES). Nenhum
@@ -50,10 +50,40 @@ if (!function_exists('semec_render')) {
         return in_array($valor, $permitidos, true) ? $valor : $padrao;
     }
 
+    /**
+     * Atributos extras do parâmetro "atributos" (mapa nome => valor), para
+     * data-*, aria-* e alguns atributos de formulário. O nome precisa ser
+     * minúsculo ([a-z0-9-]) e estar na lista; outro nome (on*, style, class,
+     * href…) e os já gerados pela parcial ($reservados) são ignorados. O valor
+     * sai escapado; true gera o atributo booleano; false, nulo e vazio omitem.
+     */
+    function semec_atributos($mapa, array $reservados = []): string
+    {
+        $permitidos = ['inputmode', 'enterkeyhint', 'maxlength', 'minlength', 'pattern', 'min', 'max', 'step', 'rows', 'cols', 'placeholder', 'readonly', 'spellcheck', 'autocapitalize', 'size', 'multiple', 'accept', 'form', 'formnovalidate', 'title', 'lang', 'dir'];
+        if (!is_array($mapa)) {
+            return '';
+        }
+        $html = '';
+        foreach ($mapa as $nome => $valor) {
+            $nome = (string) $nome;
+            if (preg_match('/^[a-z][a-z0-9-]*$/', $nome) !== 1 || in_array($nome, $reservados, true)) {
+                continue;
+            }
+            if (!in_array($nome, $permitidos, true) && preg_match('/^(data|aria)-[a-z0-9]/', $nome) !== 1) {
+                continue;
+            }
+            if (!is_scalar($valor) && $valor !== null) {
+                continue;
+            }
+            $html .= semec_attr($nome, $valor);
+        }
+        return $html;
+    }
+
     /** Renderiza uma parcial e devolve o HTML. */
     function semec_render(string $parcial, array $p = []): string
     {
-        $parciais = ['alerta', 'botao', 'cabecalho', 'campo', 'pagina', 'pular-para-o-conteudo', 'resumo-de-erros', 'rodape'];
+        $parciais = ['alerta', 'botao', 'cabecalho', 'campo', 'checkbox', 'combobox', 'pagina', 'pular-para-o-conteudo', 'radio-grupo', 'resumo-de-erros', 'rodape'];
         if (!in_array($parcial, $parciais, true)) {
             throw new InvalidArgumentException('Parcial desconhecida: ' . $parcial);
         }
