@@ -1,0 +1,9 @@
+{#- Parcial "pular-para-o-conteudo" (Jinja2). Uso:
+    {% from "semec/pular-para-o-conteudo.jinja" import pular_para_o_conteudo %}
+    {{ pular_para_o_conteudo(texto="Pular para o conteúdo principal") }}
+    O autoescape fica ligado dentro da macro, mesmo que o ambiente o desligue. -#}
+{%- macro pular_para_o_conteudo(alvo=none, texto=none) -%}
+{%- autoescape true -%}
+<a href="#{{ alvo or 'conteudo' }}" class="semec-skip-link">{{ texto or 'Pular para o conteúdo principal' }}</a>
+{%- endautoescape -%}
+{%- endmacro -%}

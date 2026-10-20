@@ -23,6 +23,7 @@
     "typecheck": "npm run typecheck --workspace @semec/ds",
     "test": "npm run test --workspace @semec/ds && npm run test --workspace @semec/ds-tokens",
     "test:pacotes": "npm run test --workspace @semec/ds-tokens && npm run test --workspace @semec/ds-css",
+    "test:modelos": "npm run test:modelos --workspace @semec/ds-css",
     "test:release": "node --test scripts/release/plano.test.mjs",
     "test:dist": "npm run test:dist --workspace @semec/ds",
     "generate:llms": "npm run build:skills --workspace @semec/ds",

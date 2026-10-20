@@ -1,0 +1,5 @@
+<div class="semec-form-field">
+  <label for="xss-nome" class="semec-label">&lt;script&gt;alert("rotulo")&lt;/script&gt;Nome</label>
+  <input id="xss-nome" name="xss-nome" type="text" class="semec-field" value="&quot; onfocus=&quot;alert(1)&quot; x=&quot;" autocomplete="name&quot; onmouseover=&quot;alert(1)" aria-describedby="xss-nome-hint">
+  <p id="xss-nome-hint" class="semec-hint">'&gt;&lt;img src=x onerror=alert(1)&gt;</p>
+</div>

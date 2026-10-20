@@ -1,0 +1,14 @@
+{#- Parcial "botao" (Twig). Uso:
+    {% include '@semec/botao.html.twig' with {texto: 'Enviar', tipo: 'submit'} only %} -#}
+{%- autoescape 'html' -%}
+{%- set variante = variante|default('') in ['primary', 'secondary', 'outline', 'ghost', 'destructive', 'success', 'link'] ? variante : 'primary' -%}
+{%- set tamanho = tamanho|default('') in ['sm', 'md', 'lg'] ? tamanho : 'md' -%}
+{%- set classe = 'semec-btn semec-btn--' ~ variante ~ (tamanho == 'md' ? '' : ' semec-btn--' ~ tamanho) -%}
+{%- set desabilitado = desabilitado|default(false) -%}
+{%- set valor_presente = valor is defined and valor is not null and valor is not same as('') -%}
+{% if href|default('') -%}
+<a{% if not desabilitado %} href="{{ href }}"{% endif %} class="{{ classe }}"{% if id|default('') %} id="{{ id }}"{% endif %}{% if desabilitado %} aria-disabled="true"{% endif %}{% if rotulo|default('') %} aria-label="{{ rotulo }}"{% endif %}>{{ texto|default('') }}</a>
+{% else -%}
+<button type="{{ tipo|default('') in ['button', 'submit', 'reset'] ? tipo : 'button' }}" class="{{ classe }}"{% if id|default('') %} id="{{ id }}"{% endif %}{% if nome|default('') %} name="{{ nome }}"{% endif %}{% if valor_presente %} value="{{ valor }}"{% endif %}{% if desabilitado %} disabled{% endif %}{% if rotulo|default('') %} aria-label="{{ rotulo }}"{% endif %}>{{ texto|default('') }}</button>
+{% endif %}
+{% endautoescape -%}

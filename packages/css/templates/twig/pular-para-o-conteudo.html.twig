@@ -1,0 +1,6 @@
+{#- Parcial "pular-para-o-conteudo" (Twig). Uso:
+    {% include '@semec/pular-para-o-conteudo.html.twig' with {texto: 'Pular para o conteúdo principal'} only %}
+    O autoescape fica ligado dentro da parcial, mesmo que o ambiente o desligue. -#}
+{%- autoescape 'html' -%}
+<a href="#{{ alvo|default('conteudo') }}" class="semec-skip-link">{{ texto|default('Pular para o conteúdo principal') }}</a>
+{% endautoescape -%}

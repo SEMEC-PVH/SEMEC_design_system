@@ -1,0 +1,22 @@
+{#- Parcial "cabecalho" (Jinja2). Uso:
+    {% from "semec/cabecalho.jinja" import cabecalho %}
+    {{ cabecalho(marca_src="/img/marca.svg", servico="Matrícula", nav=[{"href": "/matricula", "texto": "Matrícula", "atual": true}]) }} -#}
+{%- macro cabecalho(marca_src=none, marca_alt=none, marca_largura=none, marca_altura=none, inicio=none, orgao=none, servico=none, rotulo_inicio=none, nav=none, nav_rotulo=none) -%}
+{%- autoescape true -%}
+<header class="semec-header">
+  <a href="{{ inicio or '/' }}" class="semec-header__brand">
+    <img src="{{ marca_src or '' }}" alt="{{ marca_alt or 'Prefeitura de Porto Velho' }}" width="{{ marca_largura or 90 }}" height="{{ marca_altura or 36 }}">
+    <span aria-hidden="true" class="semec-header__divider"></span>
+    <span class="semec-header__org">{{ orgao or 'SEMEC' }}{% if servico %} <span aria-hidden="true" class="semec-header__separator">|</span> <span class="semec-header__service">{{ servico }}</span>{% endif %}</span>
+    <span class="semec-sr-only">— {{ rotulo_inicio or 'ir para o início' }}</span>
+  </a>
+{%- if nav %}
+  <nav aria-label="{{ nav_rotulo or 'Menu principal' }}" class="semec-header__nav">
+{%- for item in nav %}
+    <a href="{{ item.href | default('') }}" class="semec-header__link"{% if item.atual | default(false) %} aria-current="page"{% endif %}>{{ item.texto | default('') }}</a>
+{%- endfor %}
+  </nav>
+{%- endif %}
+</header>
+{%- endautoescape -%}
+{%- endmacro -%}

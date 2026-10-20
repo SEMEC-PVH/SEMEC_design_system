@@ -1,0 +1,19 @@
+{#- Parcial "resumo-de-erros" (Jinja2). Uso:
+    {% from "semec/resumo-de-erros.jinja" import resumo_de_erros %}
+    {{ resumo_de_erros(erros=[{"campo": "email", "mensagem": "Informe um e-mail válido."}]) }}
+    Sem erros, não imprime nada. -#}
+{%- macro resumo_de_erros(erros=none, titulo=none, id=none, focar=none) -%}
+{%- autoescape true -%}
+{%- if erros -%}
+{%- set id = id or 'resumo-de-erros' -%}
+<div id="{{ id }}" class="semec-error-summary" role="alert" tabindex="-1" aria-labelledby="{{ id }}-titulo"{% if focar is none or focar %} autofocus{% endif %}>
+  <h2 id="{{ id }}-titulo" class="semec-error-summary__title">{{ titulo or 'Há um problema' }}</h2>
+  <ul class="semec-error-summary__list">
+{%- for erro in erros %}
+    <li><a href="#{{ erro.campo | default('') }}">{{ erro.mensagem | default('') }}</a></li>
+{%- endfor %}
+  </ul>
+</div>
+{%- endif -%}
+{%- endautoescape -%}
+{%- endmacro -%}

@@ -1,0 +1,15 @@
+{#- Parcial "botao" (Jinja2). Uso:
+    {% from "semec/botao.jinja" import botao %}
+    {{ botao(texto="Enviar", tipo="submit") }} -#}
+{%- macro botao(texto=none, variante=none, tamanho=none, tipo=none, href=none, desabilitado=false, rotulo=none, id=none, nome=none, valor=none) -%}
+{%- autoescape true -%}
+{%- set variante = variante if variante in ['primary', 'secondary', 'outline', 'ghost', 'destructive', 'success', 'link'] else 'primary' -%}
+{%- set tamanho = tamanho if tamanho in ['sm', 'md', 'lg'] else 'md' -%}
+{%- set classe = 'semec-btn semec-btn--' ~ variante ~ ('' if tamanho == 'md' else ' semec-btn--' ~ tamanho) -%}
+{%- if href -%}
+<a{% if not desabilitado %} href="{{ href }}"{% endif %} class="{{ classe }}"{% if id %} id="{{ id }}"{% endif %}{% if desabilitado %} aria-disabled="true"{% endif %}{% if rotulo %} aria-label="{{ rotulo }}"{% endif %}>{{ texto or '' }}</a>
+{%- else -%}
+<button type="{{ tipo if tipo in ['button', 'submit', 'reset'] else 'button' }}" class="{{ classe }}"{% if id %} id="{{ id }}"{% endif %}{% if nome %} name="{{ nome }}"{% endif %}{% if valor is not none and valor != '' %} value="{{ valor }}"{% endif %}{% if desabilitado %} disabled{% endif %}{% if rotulo %} aria-label="{{ rotulo }}"{% endif %}>{{ texto or '' }}</button>
+{%- endif -%}
+{%- endautoescape -%}
+{%- endmacro -%}

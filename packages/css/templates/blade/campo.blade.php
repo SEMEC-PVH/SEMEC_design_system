@@ -1,0 +1,37 @@
+{{-- Parcial "campo" (Blade). Uso: @include('semec::campo', ['id' => 'email', 'rotulo' => 'E-mail', 'tipo' => 'email', 'obrigatorio' => true]) --}}
+@php
+  $semecTipo = in_array($tipo ?? null, ['text', 'email', 'tel', 'number', 'date', 'password', 'url', 'search', 'textarea', 'select'], true) ? $tipo : 'text';
+  $semecId = (string) (($id ?? null) ?: '');
+  $semecValor = $valor ?? null;
+  $semecValorPresente = $semecValor !== null && $semecValor !== '';
+  $semecDica = ($dica ?? null) ?: null;
+  $semecErro = ($erro ?? null) ?: null;
+  // Como no FormField do kit: com erro, a mensagem substitui a dica.
+  $semecDicaId = ($semecDica !== null && $semecErro === null) ? $semecId . '-hint' : null;
+  $semecErroId = $semecErro !== null ? $semecId . '-error' : null;
+  $semecDescritores = implode(' ', array_filter([$semecDicaId, $semecErroId]));
+  $semecObrigatorio = !empty($obrigatorio);
+  $semecDesabilitado = !empty($desabilitado);
+  $semecControle = $semecTipo === 'textarea' || $semecTipo === 'select' ? $semecTipo : 'input';
+@endphp
+<div class="semec-form-field">
+  <label for="{{ $semecId }}" class="semec-label">{{ $rotulo ?? '' }}@if ($semecObrigatorio)<span class="semec-label__required" aria-hidden="true"> *</span>@endif</label>
+  <{{ $semecControle }} id="{{ $semecId }}" name="{{ ($nome ?? null) ?: $semecId }}" @if ($semecControle === 'input') type="{{ $semecTipo }}" @endif class="semec-field" @if ($semecControle === 'input' && $semecValorPresente) value="{{ $semecValor }}" @endif @if (($autocomplete ?? null) ?: false) autocomplete="{{ $autocomplete }}" @endif @if ($semecObrigatorio) required @endif @if ($semecDesabilitado) disabled @endif @if ($semecErro !== null) aria-invalid="true" @endif @if ($semecDescritores !== '') aria-describedby="{{ $semecDescritores }}" @endif>
+@if ($semecControle === 'textarea')
+{{ $semecValorPresente ? $semecValor : '' }}</textarea>
+@elseif ($semecControle === 'select')
+@if (($opcao_vazia ?? null) ?: false)
+    <option value="">{{ $opcao_vazia }}</option>
+@endif
+@foreach (($opcoes ?? []) as $semecOpcao)
+    <option value="{{ $semecOpcao['valor'] ?? '' }}" @if ($semecValorPresente && (string) ($semecOpcao['valor'] ?? '') === (string) $semecValor) selected @endif>{{ $semecOpcao['texto'] ?? '' }}</option>
+@endforeach
+  </select>
+@endif
+@if ($semecDicaId !== null)
+  <p id="{{ $semecDicaId }}" class="semec-hint">{{ $semecDica }}</p>
+@endif
+@if ($semecErroId !== null)
+  <p id="{{ $semecErroId }}" class="semec-error">{{ $semecErro }}</p>
+@endif
+</div>

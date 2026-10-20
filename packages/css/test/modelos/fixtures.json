@@ -1,0 +1,45 @@
+[
+  { "id": "pular-padrao", "parcial": "pular-para-o-conteudo", "zona": "topo", "dados": {} },
+  { "id": "pular-texto", "parcial": "pular-para-o-conteudo", "zona": "topo", "dados": { "texto": "Ir para o formulário", "alvo": "conteudo" } },
+
+  { "id": "botao-enviar", "parcial": "botao", "zona": "main", "dados": { "texto": "Revisar e enviar", "tipo": "submit" } },
+  { "id": "botao-variantes", "parcial": "botao", "zona": "main", "dados": { "texto": "Cancelar", "variante": "ghost", "tamanho": "sm", "id": "cancelar", "nome": "acao", "valor": "cancelar" } },
+  { "id": "botao-link", "parcial": "botao", "zona": "main", "dados": { "texto": "Baixar comprovante", "href": "/comprovante.pdf", "variante": "secondary" } },
+  { "id": "botao-link-desabilitado", "parcial": "botao", "zona": "main", "dados": { "texto": "Baixar comprovante", "href": "/comprovante.pdf", "variante": "outline", "desabilitado": true } },
+  { "id": "botao-desabilitado", "parcial": "botao", "zona": "main", "dados": { "texto": "Enviar", "tipo": "submit", "tamanho": "lg", "variante": "destructive", "desabilitado": true, "rotulo": "Enviar solicitação" } },
+  { "id": "botao-valor-zero", "parcial": "botao", "zona": "main", "dados": { "texto": "Nenhum", "nome": "filhos", "valor": "0", "variante": "nao-existe", "tamanho": "xl", "tipo": "nao-existe" } },
+
+  { "id": "campo-dica", "parcial": "campo", "zona": "main", "dados": { "id": "email", "rotulo": "E-mail", "tipo": "email", "obrigatorio": true, "autocomplete": "email", "dica": "Usaremos para enviar o protocolo." } },
+  { "id": "campo-erro", "parcial": "campo", "zona": "main", "dados": { "id": "cpf", "rotulo": "CPF", "obrigatorio": true, "valor": "123", "dica": "Somente números.", "erro": "Informe os 11 números do CPF." } },
+  { "id": "campo-textarea", "parcial": "campo", "zona": "main", "dados": { "id": "motivo", "rotulo": "Motivo da transferência", "tipo": "textarea", "valor": "Mudança de endereço.", "dica": "Até 500 caracteres." } },
+  { "id": "campo-select", "parcial": "campo", "zona": "main", "dados": { "id": "turno", "nome": "turno_desejado", "rotulo": "Turno", "tipo": "select", "obrigatorio": true, "opcao_vazia": "Selecione", "valor": "tarde", "opcoes": [{ "valor": "manha", "texto": "Manhã" }, { "valor": "tarde", "texto": "Tarde" }] } },
+  { "id": "campo-desabilitado", "parcial": "campo", "zona": "main", "dados": { "id": "protocolo", "rotulo": "Protocolo", "valor": "2026-000318", "desabilitado": true, "tipo": "tipo-invalido" } },
+
+  { "id": "alerta-info", "parcial": "alerta", "zona": "main", "dados": { "titulo": "Prazo de transferência", "descricao": "As solicitações vão até 30 de novembro." } },
+  { "id": "alerta-sucesso", "parcial": "alerta", "zona": "main", "dados": { "variante": "success", "descricao": "Solicitação enviada.", "anuncio": "off" } },
+  { "id": "alerta-aviso", "parcial": "alerta", "zona": "main", "dados": { "variante": "warning", "id": "aviso-sistema", "titulo": "Sistema em manutenção", "descricao": "O envio de documentos volta às 18h." } },
+  { "id": "alerta-perigo", "parcial": "alerta", "zona": "main", "dados": { "variante": "danger", "titulo": "Não foi possível enviar", "descricao": "Tente de novo em alguns minutos." } },
+
+  { "id": "resumo-de-erros", "parcial": "resumo-de-erros", "zona": "main", "dados": { "erros": [{ "campo": "cpf", "mensagem": "Informe os 11 números do CPF." }, { "campo": "turno", "mensagem": "Escolha o turno." }] } },
+  { "id": "resumo-sem-foco", "parcial": "resumo-de-erros", "zona": "main", "dados": { "id": "erros-matricula", "titulo": "Corrija 1 campo", "focar": false, "erros": [{ "campo": "email", "mensagem": "Informe um e-mail válido." }] } },
+  { "id": "resumo-vazio", "parcial": "resumo-de-erros", "zona": "main", "dados": { "erros": [] } },
+
+  { "id": "cabecalho", "parcial": "cabecalho", "zona": "banner", "dados": { "marca_src": "/img/marca.svg", "servico": "Matrícula e transferência", "nav": [{ "href": "/matricula", "texto": "Matrícula" }, { "href": "/transferencia", "texto": "Transferência", "atual": true }] } },
+  { "id": "cabecalho-simples", "parcial": "cabecalho", "zona": "banner", "dados": { "marca_src": "/img/marca.svg", "inicio": "/sistema/", "marca_alt": "Prefeitura de Porto Velho", "marca_largura": 120, "marca_altura": 48 } },
+
+  { "id": "rodape", "parcial": "rodape", "zona": "contentinfo", "dados": { "texto_final": "© 2026 Prefeitura de Porto Velho · SEMEC", "secoes": [{ "titulo": "Serviços", "links": [{ "href": "/matricula", "texto": "Matrícula" }, { "href": "/transferencia", "texto": "Transferência" }] }, { "titulo": "Atendimento", "links": [{ "href": "/contato", "texto": "Fale com a SEMEC" }] }] } },
+  { "id": "rodape-simples", "parcial": "rodape", "zona": "contentinfo", "dados": {} },
+
+  { "id": "pagina", "parcial": "pagina", "zona": "documento", "dados": { "titulo": "Transferência escolar — SEMEC", "cabecalho": { "marca_src": "/img/marca.svg", "servico": "Matrícula e transferência", "nav": [{ "href": "/matricula", "texto": "Matrícula" }, { "href": "/transferencia", "texto": "Transferência", "atual": true }] }, "rodape": { "texto_final": "© 2026 Prefeitura de Porto Velho · SEMEC" } } },
+  { "id": "pagina-minima", "parcial": "pagina", "zona": "documento", "dados": { "titulo": "Página mínima", "fontes_href": false, "elements_src": false, "css_href": "/css/semec-ds.css", "pular_texto": "Pular para o conteúdo" } },
+
+  { "id": "xss-campo", "parcial": "campo", "zona": "main", "xss": true, "dados": { "id": "xss-nome", "rotulo": "<script>alert(\"rotulo\")</script>Nome", "valor": "\" onfocus=\"alert(1)\" x=\"", "dica": "'><img src=x onerror=alert(1)>", "autocomplete": "name\" onmouseover=\"alert(1)" } },
+  { "id": "xss-campo-erro", "parcial": "campo", "zona": "main", "xss": true, "dados": { "id": "xss-obs", "rotulo": "Observação", "tipo": "textarea", "valor": "</textarea><script>alert(1)</script>", "erro": "<b>Erro</b> & \"aspas\" 'simples'" } },
+  { "id": "xss-select", "parcial": "campo", "zona": "main", "xss": true, "dados": { "id": "xss-escola", "rotulo": "Escola", "tipo": "select", "valor": "a\"b", "opcao_vazia": "<option>falsa</option>", "opcoes": [{ "valor": "a\"b", "texto": "</option><script>alert(1)</script>" }, { "valor": "x' onclick='alert(1)", "texto": "Outra" }] } },
+  { "id": "xss-alerta", "parcial": "alerta", "zona": "main", "xss": true, "dados": { "variante": "info\" onclick=\"alert(1)", "anuncio": "polite\" x=\"", "id": "a\" onmouseover=\"alert(1)", "titulo": "<script>alert(1)</script>", "descricao": "<b>negrito</b> & \"aspas\" 'simples'" } },
+  { "id": "xss-botao", "parcial": "botao", "zona": "main", "xss": true, "dados": { "texto": "<script>alert(1)</script>", "href": "/x\" onclick=\"alert(1)", "rotulo": "\" autofocus onfocus=\"alert(1)", "variante": "primary semec-btn--danger" } },
+  { "id": "xss-resumo", "parcial": "resumo-de-erros", "zona": "main", "xss": true, "dados": { "titulo": "<i>Há</i> um problema", "id": "r\" onclick=\"alert(1)", "erros": [{ "campo": "x\" onclick=\"alert(1)", "mensagem": "<script>alert(1)</script>" }] } },
+  { "id": "xss-cabecalho", "parcial": "cabecalho", "zona": "banner", "xss": true, "dados": { "marca_src": "/img/marca.svg\" onerror=\"alert(1)", "marca_alt": "Prefeitura' onload='alert(1)", "servico": "<script>alert(1)</script>", "nav_rotulo": "\"><script>alert(1)</script>", "nav": [{ "href": "/a\" onclick=\"alert(1)", "texto": "<img src=x onerror=alert(1)>", "atual": true }] } },
+  { "id": "xss-rodape", "parcial": "rodape", "zona": "contentinfo", "xss": true, "dados": { "texto_final": "<script>alert(1)</script>", "secoes": [{ "titulo": "<img src=x onerror=alert(1)>", "links": [{ "href": "javascript-nao\" onclick=\"alert(1)", "texto": "</a><script>alert(1)</script>" }] }] } },
+  { "id": "xss-pagina", "parcial": "pagina", "zona": "documento", "xss": true, "dados": { "titulo": "</title><script>alert(1)</script>", "pular_texto": "<script>alert(1)</script>", "elements_src": "/js/semec-elements.js?v=\"></script><script>alert(1)</script>", "cabecalho": { "marca_src": "/img/marca.svg", "servico": "<script>alert(1)</script>" }, "rodape": { "texto_final": "\"><script>alert(1)</script>" } } }
+]

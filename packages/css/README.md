@@ -65,6 +65,10 @@ import "@semec/ds-css/index.css";
 
 Os mesmos do kit React (alvos do Tailwind v4): Chrome/Edge 111+, Safari 16.4+ e Firefox 128+. Em navegador mais antigo, `color-mix()` e `@property` caem em fallbacks (cor sólida, anel de foco ainda visível).
 
+## Modelos de servidor
+
+A pasta [`templates/`](templates/README.md) traz parciais prontas em PHP puro, Jinja2 (Django com django-jinja, Flask), Twig e Blade: `pagina`, `pular-para-o-conteudo`, `cabecalho`, `rodape`, `campo`, `resumo-de-erros`, `alerta` e `botao`. Mesmos nomes e parâmetros nas quatro linguagens, escape em toda saída e o HTML desta página, testado contra um HTML canônico único (ADR-030). A tabela de parâmetros está no [README dos modelos](templates/README.md).
+
 ## Componentes
 
 O CSS cuida da aparência. Comportamento (foco no resumo de erros, região viva do aviso, fechar) é do seu app, com HTML nativo e JavaScript. Os exemplos abaixo são o HTML recomendado, com os atributos ARIA necessários. Nos componentes interativos (diálogo, abas, combobox, menu e accordion), o comportamento vem pronto nos elementos `<semec-*>` do [`@semec/ds-elements`](#componentes-interativos).
