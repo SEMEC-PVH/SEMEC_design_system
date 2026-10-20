@@ -51,6 +51,8 @@ next-env.d.ts
 /referencias/
 # arquivos de trabalho do boneco 3D (Blender, ~500 MB; o jogo usa a cópia em apps/docs/public/quem-somos/gava.glb)
 /personagem-gava/
+# idem para os jogadores (Homem A e Mulher A, bike): o site usa apps/docs/public/quem-somos/jogador-*.glb
+/personagem-jogador/
 
 # Fontes 3D dos personagens (~1,8 GB de .blend/.fbx/.glb pesados): backup fora
 # do git. Os GLBs leves usados pelo site ficam em apps/docs/public/quem-somos.
