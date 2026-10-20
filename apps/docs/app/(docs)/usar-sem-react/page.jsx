@@ -48,6 +48,11 @@ const pacotes = [
     vem: "Classes .semec-* prontas (botão, campos, cartão, alerta, cabeçalho, tabela…), com tokens e base incluídos.",
   },
   {
+    caso: "Diálogo, abas, combobox, menu ou acordeão nessas mesmas páginas",
+    pacote: "@semec/ds-elements",
+    vem: "Web Components acessíveis que dão o comportamento (teclado, foco, ARIA) ao HTML com as classes .semec-*. Veja Web Components.",
+  },
+  {
     caso: "App com CSS próprio (ou outro kit) que só quer as cores, fontes e medidas",
     pacote: "@semec/ds-tokens",
     vem: "Variáveis CSS (tokens.css), base opcional (base.css), fonte Poppins (fonts.css).",
@@ -178,8 +183,11 @@ export default function UsarSemReactPage() {
       <p>
         O <code>@semec/ds-css</code> já depende do <code>@semec/ds-tokens</code>:
         instale só ele quando quiser as classes. Os dois são somente CSS e dados,
-        sem JavaScript de comportamento. Foco do resumo de erros, abrir e fechar
-        menus e mostrar o toast ficam com o código do seu app.
+        sem JavaScript de comportamento. Diálogo, abas, combobox, menu e
+        acordeão ganham comportamento com os{" "}
+        <Link href="/usar-sem-react/web-components">Web Components</Link> do{" "}
+        <code>@semec/ds-elements</code>; foco do resumo de erros e mostrar o
+        toast continuam com o código do seu app.
       </p>
 
       <h2 id="html">HTML puro</h2>
