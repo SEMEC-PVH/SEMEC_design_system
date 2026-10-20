@@ -304,7 +304,8 @@ Diálogo, abas, combobox, menu e accordion têm as mesmas classes geradas do TSX
 | `data-state="active"` / `"inactive"` | gatilho e painel das abas |
 | `data-highlighted` (presente) | item ativo do menu, opção ativa do combobox (a que o Enter escolhe) |
 | `data-disabled` (presente) | item, aba ou opção desabilitados (no `<button>`, use também `disabled`) |
-| `aria-selected="true"` | opção escolhida do combobox, aba ativa |
+| `aria-selected="true"` | aba ativa; no combobox, a opção ativa (junto com `data-highlighted`; sem efeito visual próprio) |
+| `data-state="checked"` / `"unchecked"` | opção escolhida do combobox (peso médio e o check) |
 | `aria-expanded` | gatilhos (botão do menu, campo do combobox, botão do accordion) |
 | `hidden` | painel ou popup fechado: quem esconde é o atributo, não o CSS |
 | `data-side="top"` | popup que não cabe embaixo do gatilho (o CSS o põe em cima) |
@@ -393,8 +394,8 @@ Depois que o elemento sobe (o `<select>` fica `hidden` e continua no formulário
   <input id="escola" type="text" role="combobox" class="semec-combobox__input" aria-autocomplete="list"
          aria-expanded="true" aria-controls="escola-lista" aria-activedescendant="escola-opcao-1" value="Escola Norte">
   <ul id="escola-lista" role="listbox" class="semec-combobox__listbox" data-state="open">
-    <li id="escola-opcao-0" role="option" class="semec-combobox__option" aria-selected="false">Escola Centro</li>
-    <li id="escola-opcao-1" role="option" class="semec-combobox__option" aria-selected="true" data-highlighted>
+    <li id="escola-opcao-0" role="option" class="semec-combobox__option" aria-selected="false" data-state="unchecked">Escola Centro</li>
+    <li id="escola-opcao-1" role="option" class="semec-combobox__option" aria-selected="true" data-state="checked" data-highlighted>
       Escola Norte <span class="semec-combobox__check" aria-hidden="true"></span>
     </li>
   </ul>
@@ -404,7 +405,7 @@ Depois que o elemento sobe (o `<select>` fica `hidden` e continua no formulário
 </semec-combobox>
 ```
 
-Opção ativa (a do Enter, com `aria-activedescendant` no campo) = `data-highlighted`: fundo `tint` e anel interno. Opção escolhida = `aria-selected="true"`: peso médio e o check. Inválido: `aria-invalid="true"` no campo, como no `.semec-field`.
+Opção ativa (a do Enter, com `aria-activedescendant` no campo) = `data-highlighted` + `aria-selected="true"`: fundo `tint` e anel interno. Opção escolhida = `data-state="checked"`: peso médio e o check. Inválido: `aria-invalid="true"` no campo, como no `.semec-field`.
 
 ### Menu
 

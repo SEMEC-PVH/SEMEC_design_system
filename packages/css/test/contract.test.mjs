@@ -108,7 +108,7 @@ test("estados obrigatórios estão no CSS", () => {
     // Interativos: os mesmos atributos que o Radix põe (e o @semec/ds-elements também).
     ".semec-dialog::backdrop", ".semec-dialog:not([open])", '.semec-dialog--alert[data-state="open"]', ".semec-dialog__close:focus-visible",
     '.semec-tabs__trigger[data-state="active"]', ".semec-tabs__trigger[data-disabled]", ".semec-tabs__panel:focus-visible",
-    ".semec-combobox__option:where([data-highlighted])", '.semec-combobox__option:where([aria-selected="true"])', '.semec-combobox__input[aria-invalid="true"]',
+    ".semec-combobox__option:where([data-highlighted])", '.semec-combobox__option:where([data-state="checked"])', '.semec-combobox__input[aria-invalid="true"]',
     '.semec-combobox__listbox[data-side="top"]', '.semec-combobox__listbox[data-state="open"]',
     ".semec-menu__item[data-highlighted]", ".semec-menu__item[data-disabled]", '.semec-menu[data-side="top"]',
     '.semec-accordion__trigger[data-state="open"] > .semec-accordion__icon',

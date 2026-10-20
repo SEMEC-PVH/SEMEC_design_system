@@ -240,7 +240,8 @@ export function buildRules(kitRoot) {
 
   // ==== Interativos (onda 3, F1) ==================================================
   // Os estados são os atributos que o Radix põe (data-state, data-highlighted,
-  // data-disabled, aria-selected, aria-expanded, hidden); os Web Components do
+  // data-disabled, aria-selected, aria-expanded, hidden; a opção escolhida do
+  // combobox leva data-state="checked", como o item marcado do Radix); os Web Components do
   // @semec/ds-elements põem os mesmos. Nenhuma classe de estado própria.
   //
   // Classe-gancho: parte da API (o elemento do @semec/ds-elements a procura),
@@ -342,7 +343,8 @@ export function buildRules(kitRoot) {
   add(".semec-combobox__input", adaptClasses(tokens(combobox.classes("Combobox", 6)).filter((c) => c.startsWith("placeholder:"))), "combobox.tsx › Combobox[6] (placeholder)");
   // Popup = PopoverContent (Combobox[4]) + <ul role=listbox> (Combobox[7]).
   add(".semec-combobox__listbox", [...placement("combobox"), ...adaptClasses(tokens(cn(combobox.classes("Combobox", 4), combobox.classes("Combobox", 7))), popup)], "combobox.tsx › Combobox[4] + Combobox[7] (popup posicionado pelo CSS)");
-  // Opção ativa (a do Enter) = data-highlighted; escolhida = aria-selected="true".
+  // Opção ativa (a do Enter) = data-highlighted (+ aria-selected="true", padrão APG com
+  // aria-activedescendant, sem efeito no CSS); escolhida = data-state="checked".
   decompose({
     block: "semec-combobox__option",
     file: "combobox",
@@ -352,15 +354,15 @@ export function buildRules(kitRoot) {
         { value: true, names: [], selector: ".semec-combobox__option:where([data-highlighted])" },
       ] },
       { prop: "isChosen", values: [
-        { value: false, names: [], selector: '.semec-combobox__option:where(:not([aria-selected="true"]))' },
-        { value: true, names: [], selector: '.semec-combobox__option:where([aria-selected="true"])' },
+        { value: false, names: [], selector: '.semec-combobox__option:where(:not([data-state="checked"]))' },
+        { value: true, names: [], selector: '.semec-combobox__option:where([data-state="checked"])' },
       ] },
     ],
     classesOf: (props) => combobox.classes("Combobox", 8, props),
   });
   add(".semec-combobox__check", tokens(combobox.classes("Combobox", 9)), "combobox.tsx › Combobox[9] (<Check>)");
   // O React só desenha o check na opção escolhida; aqui ele some nas outras.
-  add('.semec-combobox__option:not([aria-selected="true"]) .semec-combobox__check', ["invisible"], "combobox.tsx › <Check> só na opção escolhida");
+  add('.semec-combobox__option:not([data-state="checked"]) .semec-combobox__check', ["invisible"], "combobox.tsx › <Check> só na opção escolhida");
   // Sem resultado, a mensagem ocupa o lugar da lista: o popup (Combobox[4]) com o texto do <p> (Combobox[10]).
   add(".semec-combobox__empty", [...placement("combobox"), ...adaptClasses(tokens(cn(combobox.classes("Combobox", 4), combobox.classes("Combobox", 10, { "filtered.length > 0": false }))), popup)], "combobox.tsx › Combobox[4] + Combobox[10] (mensagem sem resultado, no lugar da lista)");
 
