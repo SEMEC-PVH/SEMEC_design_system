@@ -36,7 +36,8 @@ const CONTRACT = [
 
 test("package.json segue o contrato", () => {
   assert.equal(pkg.name, "@semec/ds-css");
-  assert.equal(pkg.version, "0.0.0");
+  // 0.0.0 até o primeiro release (o changeset major leva à 1.0.0); depois, semver comum.
+  assert.match(pkg.version, /^\d+\.\d+\.\d+$/);
   assert.equal(pkg.type, "module");
   assert.equal(pkg.license, "MIT");
   assert.equal(pkg.engines.node, ">=22.12");
@@ -55,7 +56,9 @@ test("package.json segue o contrato", () => {
   }
 });
 
-test("changeset major para o @semec/ds-css", () => {
+// Só vale antes do primeiro release: o `changeset version` consome o changeset e
+// leva o pacote à 1.0.0 (sem isto, o PR de versão quebraria a CI).
+test("changeset major para o @semec/ds-css", { skip: pkg.version !== "0.0.0" && "já publicado (versão > 0.0.0)" }, () => {
   const dir = path.join(repoRoot, ".changeset");
   const found = fs.readdirSync(dir).filter((f) => f.endsWith(".md")).map((f) => fs.readFileSync(path.join(dir, f), "utf8")).some((t) => /^"@semec\/ds-css": major$/m.test(t));
   assert.ok(found);
