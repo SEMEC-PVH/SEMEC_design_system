@@ -125,4 +125,21 @@ describe("páginas do site e READMEs", () => {
       }
     }
   });
+  it("o mesmo arquivo na mesma versão tem o mesmo hash em todos os alvos", () => {
+    const vistos = new Map();
+    for (const t of TARGETS) {
+      const src = fs.readFileSync(path.join(root, t.file), "utf8");
+      const atual = t.kind === "markdown" ? readMarkdownSri(src, t.pkg, t.path) : { version: readConst(src, t.versionConst), value: readConst(src, t.sriConst) };
+      const chave = `${t.pkg}@${atual.version}/${t.path}`;
+      if (vistos.has(chave)) assert.equal(atual.value, vistos.get(chave).value, `${chave}: hash diferente em ${t.file} e ${vistos.get(chave).file}`);
+      else vistos.set(chave, { value: atual.value, file: t.file });
+    }
+  });
+  it("a página Web Components não cita o ds-css abaixo da versão mínima", () => {
+    const src = fs.readFileSync(path.join(root, "apps/docs/app/(docs)/usar-sem-react/web-components/page.jsx"), "utf8");
+    const num = (v) => v.split(".").map(Number);
+    const [a, b] = [num(readConst(src, "VERSAO_CSS")), num(readConst(src, "VERSAO_CSS_MINIMA"))];
+    const cmp = a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+    assert.ok(cmp >= 0, "VERSAO_CSS abaixo de VERSAO_CSS_MINIMA");
+  });
 });

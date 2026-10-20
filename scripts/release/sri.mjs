@@ -17,9 +17,10 @@
  * própria URL do jsDelivr no texto e o hash fica no atributo `integrity` da
  * mesma tag (todas as ocorrências da URL, que precisam ter a mesma versão).
  *
- * Alvo `optional`: pacote que ainda pode não estar no npm (ex.: o
- * `@semec/ds-elements` antes da 1.0.0). Se o jsDelivr der 404, a constante fica
- * com o marcador `SRI_PENDENTE` e o script só avisa.
+ * Alvo `optional`: versão que ainda pode não estar no npm (ex.: o
+ * `@semec/ds-elements` 1.0.0 e o `@semec/ds-css` 1.1.0 antes da release). Se o
+ * jsDelivr der 404, a constante fica com o marcador `SRI_PENDENTE` e o script só
+ * avisa (o `--check` não falha por isso).
  *
  * A parte pura (`sriOf`, `readConst`, `setConst`, `cdnUrl`, `computeSri`) tem
  * teste em sri.test.mjs, sem rede (o `fetch` é injetado).
@@ -35,16 +36,24 @@ export const SRI_PENDENTE = "sha384-CALCULE-NA-RELEASE";
 const PAGE = "apps/docs/app/(docs)/usar-sem-react/page.jsx";
 const PAGE_ELEMENTS = "apps/docs/app/(docs)/usar-sem-react/web-components/page.jsx";
 const README_CSS = "packages/css/README.md";
+const README_ELEMENTS = "packages/elements/README.md";
 
 /** Arquivos do CDN citados no site (caminho físico do tarball, não o alias do "exports"). */
 export const TARGETS = [
   { file: PAGE, pkg: "@semec/ds-tokens", versionConst: "VERSAO_TOKENS", path: "dist/fonts.css", sriConst: "SRI_FONTS" },
   { file: PAGE, pkg: "@semec/ds-css", versionConst: "VERSAO_CSS", path: "dist/semec-ds.css", sriConst: "SRI_CSS" },
+  // Página Web Components: o bloco completo do CDN (fontes, CSS a partir da 1.1.0 e script).
+  { file: PAGE_ELEMENTS, pkg: "@semec/ds-tokens", versionConst: "VERSAO_TOKENS", path: "dist/fonts.css", sriConst: "SRI_FONTS" },
+  { file: PAGE_ELEMENTS, pkg: "@semec/ds-css", versionConst: "VERSAO_CSS", path: "dist/semec-ds.css", sriConst: "SRI_CSS", optional: true },
   { file: PAGE_ELEMENTS, pkg: "@semec/ds-elements", versionConst: "VERSAO_ELEMENTS", path: "dist/semec-elements.js", sriConst: "SRI_ELEMENTS", optional: true },
   // README do @semec/ds-css (CONS-08): versão fixa e integrity nos trechos de CDN.
   { file: README_CSS, kind: "markdown", pkg: "@semec/ds-tokens", path: "dist/fonts.css" },
   { file: README_CSS, kind: "markdown", pkg: "@semec/ds-css", path: "dist/semec-ds.css", optional: true },
   { file: README_CSS, kind: "markdown", pkg: "@semec/ds-elements", path: "dist/semec-elements.js", optional: true },
+  // README do @semec/ds-elements: o mesmo bloco da página Web Components.
+  { file: README_ELEMENTS, kind: "markdown", pkg: "@semec/ds-tokens", path: "dist/fonts.css" },
+  { file: README_ELEMENTS, kind: "markdown", pkg: "@semec/ds-css", path: "dist/semec-ds.css", optional: true },
+  { file: README_ELEMENTS, kind: "markdown", pkg: "@semec/ds-elements", path: "dist/semec-elements.js", optional: true },
 ];
 
 /** `sha384-<base64>` do conteúdo, no formato do atributo `integrity`. */
