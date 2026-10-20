@@ -34,10 +34,10 @@ Pelo CDN, com versão fixa e `integrity` (SRI):
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-tokens@1.0.0/dist/fonts.css" integrity="sha384-JPaBLIHnh0Pteb6nPfiQvklhUDnfvln4jCKfD1ASorqT7xYuyugBAs5ZvE32NxXb" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1.1.0/dist/semec-ds.css" integrity="sha384-j3GopGmbfBDbmxOnmviq5aOKVv2aScbeW5TzndRUOYUB/OcrQrD++8POpif35M/W" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1.1.1/dist/semec-ds.css" integrity="sha384-fidW0owPdsWVRx89cAJc3pdox6KepexJueUrreuoNW1MNXGhmRfddyuPv/zT6v/G" crossorigin="anonymous">
 ```
 
-O jsDelivr serve o caminho físico do pacote publicado (`dist/fonts.css`), não os atalhos do `exports` (`@semec/ds-tokens/fonts.css` só vale com bundler). Use sempre a versão exata (`@1.1.0`, nunca `@1`): o `integrity` vale para um arquivo só, e uma faixa muda de arquivo na próxima release. Os hashes deste README e da página [Usar sem React](https://semec-pvh.github.io/SEMEC_design_system/usar-sem-react/) são calculados pelo `npm run sri` a partir do arquivo publicado. Os hashes acima correspondem às versões publicadas indicadas nos links. Ao trocar uma versão, recalcule o hash a partir do arquivo publicado antes de atualizar o exemplo.
+O jsDelivr serve o caminho físico do pacote publicado (`dist/fonts.css`), não os atalhos do `exports` (`@semec/ds-tokens/fonts.css` só vale com bundler). Use sempre a versão exata (`@1.1.1`, nunca `@1`): o `integrity` vale para um arquivo só, e uma faixa muda de arquivo na próxima release. Os hashes deste README e da página [Usar sem React](https://semec-pvh.github.io/SEMEC_design_system/usar-sem-react/) são calculados pelo `npm run sri` a partir do arquivo publicado. Os hashes acima correspondem às versões publicadas indicadas nos links. Ao trocar uma versão, recalcule o hash a partir do arquivo publicado antes de atualizar o exemplo.
 
 Em PHP, o mesmo `<link>` vai no layout (`<head>`) da aplicação. O CSS não precisa de JavaScript.
 
@@ -294,7 +294,7 @@ Diálogo, abas, combobox, menu e accordion têm as mesmas classes geradas do TSX
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-tokens@1.0.0/dist/fonts.css" integrity="sha384-JPaBLIHnh0Pteb6nPfiQvklhUDnfvln4jCKfD1ASorqT7xYuyugBAs5ZvE32NxXb" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1.1.0/dist/semec-ds.css" integrity="sha384-j3GopGmbfBDbmxOnmviq5aOKVv2aScbeW5TzndRUOYUB/OcrQrD++8POpif35M/W" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1.1.1/dist/semec-ds.css" integrity="sha384-fidW0owPdsWVRx89cAJc3pdox6KepexJueUrreuoNW1MNXGhmRfddyuPv/zT6v/G" crossorigin="anonymous">
 <script type="module" src="https://cdn.jsdelivr.net/npm/@semec/ds-elements@1.0.0/dist/semec-elements.js" integrity="sha384-X3yHwotBgX64Ja/D0NFwawT1nbyBHXFZKqk2K0M6IK0OLeMfY2fKRZP0eh0VWCco" crossorigin="anonymous"></script>
 ```
 
