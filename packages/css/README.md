@@ -30,14 +30,14 @@ Copie para o projeto as pastas publicadas (ou use um CDN de npm) e carregue as f
 <link rel="stylesheet" href="vendor/semec-ds-css/semec-ds.css">
 ```
 
-Pelo CDN:
+Pelo CDN, com versão fixa e `integrity` (SRI):
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-tokens@1.0.0/dist/fonts.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1/dist/semec-ds.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-tokens@1.0.0/dist/fonts.css" integrity="sha384-JPaBLIHnh0Pteb6nPfiQvklhUDnfvln4jCKfD1ASorqT7xYuyugBAs5ZvE32NxXb" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1.1.0/dist/semec-ds.css" integrity="sha384-CALCULE-NA-RELEASE" crossorigin="anonymous">
 ```
 
-O jsDelivr serve o caminho físico do pacote publicado (`dist/fonts.css`), não os atalhos do `exports` (`@semec/ds-tokens/fonts.css` só vale com bundler). Em produção, fixe a versão e use `integrity` (SRI): os valores de cada versão estão na página [Usar sem React](https://semec-pvh.github.io/SEMEC_design_system/usar-sem-react/).
+O jsDelivr serve o caminho físico do pacote publicado (`dist/fonts.css`), não os atalhos do `exports` (`@semec/ds-tokens/fonts.css` só vale com bundler). Use sempre a versão exata (`@1.1.0`, nunca `@1`): o `integrity` vale para um arquivo só, e uma faixa muda de arquivo na próxima release. Os hashes deste README e da página [Usar sem React](https://semec-pvh.github.io/SEMEC_design_system/usar-sem-react/) são calculados pelo `npm run sri` a partir do arquivo publicado. Enquanto uma versão não sai no npm, o valor fica `sha384-CALCULE-NA-RELEASE`: esse marcador **não é um hash** e o navegador recusa o arquivo; troque pelo valor da página ou use a cópia local.
 
 Em PHP, o mesmo `<link>` vai no layout (`<head>`) da aplicação. O CSS não precisa de JavaScript.
 
@@ -69,13 +69,13 @@ Os mesmos do kit React (alvos do Tailwind v4): Chrome/Edge 111+, Safari 16.4+ e 
 
 ## Modelos de servidor
 
-A pasta [`templates/`](templates/README.md) traz parciais prontas em PHP puro, Jinja2 (Django com django-jinja, Flask), Twig e Blade: `pagina`, `pular-para-o-conteudo`, `cabecalho`, `rodape`, `campo`, `resumo-de-erros`, `alerta` e `botao`. Mesmos nomes e parâmetros nas quatro linguagens, escape em toda saída e o HTML desta página, testado contra um HTML canônico único (ADR-030). A tabela de parâmetros está no [README dos modelos](templates/README.md).
+A pasta [`templates/`](https://github.com/SEMEC-PVH/SEMEC_design_system/tree/main/packages/css/templates#readme) (em `node_modules/@semec/ds-css/templates/README.md`) traz parciais prontas em PHP puro, Jinja2 (Django com django-jinja, Flask), Twig e Blade: `pagina`, `pular-para-o-conteudo`, `cabecalho`, `rodape`, `campo`, `combobox`, `radio-grupo`, `checkbox`, `resumo-de-erros`, `alerta` e `botao`. Mesmos nomes e parâmetros nas quatro linguagens, escape em toda saída e o HTML desta página, testado contra um HTML canônico único (ADR-030). A tabela de parâmetros está no README dos modelos.
 
 ## Componentes
 
 O CSS cuida da aparência. Comportamento (foco no resumo de erros, região viva do aviso, fechar) é do seu app, com HTML nativo e JavaScript. Os exemplos abaixo são o HTML recomendado, com os atributos ARIA necessários. Nos componentes interativos (diálogo, abas, combobox, menu e accordion), o comportamento vem pronto nos elementos `<semec-*>` do [`@semec/ds-elements`](#componentes-interativos).
 
-Uma página completa (formulário de transferência escolar com validação, resumo de erros, tabela e aviso) está em [`examples/transferencia.html`](examples/transferencia.html).
+Uma página completa (formulário de transferência escolar com validação, resumo de erros, tabela e aviso) está no repositório, em [`packages/css/examples/transferencia.html`](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/css/examples/transferencia.html) (o exemplo não vai no pacote).
 
 ### Pular para o conteúdo
 
@@ -293,10 +293,12 @@ Um rodapé por página, irmão do `<main>`.
 Diálogo, abas, combobox, menu e accordion têm as mesmas classes geradas do TSX do kit, mas precisam de JavaScript para abrir, fechar e navegar pelo teclado. Esse comportamento está nos Web Components do **`@semec/ds-elements`** (`<semec-dialog>`, `<semec-tabs>`, `<semec-combobox>`, `<semec-menu>` e `<semec-accordion>`): HTML semântico com as classes deste pacote, sem shadow DOM; o elemento só acrescenta comportamento e ARIA, no padrão WAI-ARIA APG, como o Radix faz no React.
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-tokens@1.0.0/dist/fonts.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1/dist/semec-ds.css">
-<script type="module" src="https://cdn.jsdelivr.net/npm/@semec/ds-elements@1/dist/semec-elements.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-tokens@1.0.0/dist/fonts.css" integrity="sha384-JPaBLIHnh0Pteb6nPfiQvklhUDnfvln4jCKfD1ASorqT7xYuyugBAs5ZvE32NxXb" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@semec/ds-css@1.1.0/dist/semec-ds.css" integrity="sha384-CALCULE-NA-RELEASE" crossorigin="anonymous">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@semec/ds-elements@1.0.0/dist/semec-elements.js" integrity="sha384-CALCULE-NA-RELEASE" crossorigin="anonymous"></script>
 ```
+
+As classes interativas existem a partir do `@semec/ds-css` 1.1.0. Versão fixa e `integrity` como na seção [Uso sem bundler](#uso-sem-bundler-link-ou-cdn).
 
 **Estados pelos atributos do Radix, nunca por classe.** O CSS lê os mesmos atributos que o Radix põe no React e que os elementos `<semec-*>` põem no HTML. Se você escrever o seu próprio JavaScript, ponha estes:
 
@@ -311,14 +313,15 @@ Diálogo, abas, combobox, menu e accordion têm as mesmas classes geradas do TSX
 | `aria-expanded` | gatilhos (botão do menu, campo do combobox, botão do accordion) |
 | `hidden` | painel ou popup fechado: quem esconde é o atributo, não o CSS |
 | `data-side="top"` | popup que não cabe embaixo do gatilho (o CSS o põe em cima) |
+| `data-align="end"` | popup que não cabe à direita (o CSS o alinha pela direita do gatilho) |
 
-**Popup sem biblioteca de posicionamento.** O listbox do combobox e o popup do menu são `position: absolute` logo abaixo do gatilho (4 px, o `sideOffset` do React), dentro do wrapper relativo (`.semec-combobox` ou o próprio `<semec-combobox>`; no menu, o `<semec-menu>`), com largura mínima igual à do wrapper e `z-index` 50 (a camada de sobreposição do kit). Com `data-side="top"`, o popup sobe para cima do gatilho.
+**Popup sem biblioteca de posicionamento.** O listbox do combobox e o popup do menu são `position: absolute` logo abaixo do gatilho (4 px, o `sideOffset` do React), dentro do wrapper relativo (`.semec-combobox` ou o próprio `<semec-combobox>`; no menu, o `<semec-menu>`), com largura mínima igual à do wrapper, largura máxima `calc(100vw - 2rem)` e `z-index` 50 (a camada de sobreposição do kit). Com `data-side="top"`, o popup sobe para cima do gatilho; com `data-align="end"`, alinha pela direita (o elemento marca os dois quando o popup não cabe). Dentro de um `.semec-dialog`, que rola, o popup entra no fluxo do diálogo e empurra o conteúdo, para não ser cortado pela borda dele (o Radix resolve com portal, que o HTML não tem).
 
 Os ícones (X do fechar, seta do accordion, check da opção escolhida) são o mesmo ícone lucide do React, desenhados pelo CSS como máscara na cor do texto: não é preciso colar `<svg>` (se houver um `<svg>` com a classe, ele também funciona).
 
 ### Diálogo
 
-`.semec-dialog` vai no `<dialog>` nativo (aberto com `showModal()`); o fundo escurecido é o `::backdrop`. Para confirmação destrutiva, use o modificador `--alert` (o AlertDialog do React) e o atributo `alert` no elemento: não fecha no clique fora e o foco começa no botão de cancelar.
+`.semec-dialog` vai no `<dialog>` nativo (aberto com `showModal()`); o fundo escurecido é o `::backdrop`. Para confirmação destrutiva, use o modificador `--alert` (o AlertDialog do React) e o atributo `alert` no elemento: não fecha no clique fora e o foco começa no botão de cancelar, marcado com `data-semec-dialog-cancel`. O HTML é o mesmo do README do `@semec/ds-elements`.
 
 ```html
 <button type="button" class="semec-btn semec-btn--destructive" data-semec-dialog-open="cancelar">Cancelar solicitação</button>
@@ -348,8 +351,8 @@ Os ícones (X do fechar, seta do accordion, check da opção escolhida) são o m
       <p class="semec-dialog__description">Esta ação não pode ser desfeita.</p>
     </div>
     <div class="semec-dialog__footer">
-      <button type="button" class="semec-btn semec-btn--outline" data-semec-dialog-close>Cancelar</button>
-      <button type="button" class="semec-btn semec-btn--destructive">Excluir</button>
+      <button type="button" class="semec-btn semec-btn--outline" data-semec-dialog-cancel>Cancelar</button>
+      <button type="button" class="semec-btn semec-btn--destructive" data-semec-dialog-close>Excluir</button>
     </div>
   </dialog>
 </semec-dialog>
@@ -413,18 +416,18 @@ Opção ativa (a do Enter, com `aria-activedescendant` no campo) = `data-highlig
 
 ```html
 <semec-menu>
-  <button type="button" class="semec-btn semec-btn--outline" aria-haspopup="menu" aria-expanded="false" aria-controls="acoes">Ações</button>
-  <div id="acoes" role="menu" class="semec-menu" hidden>
-    <div class="semec-menu__label" role="presentation">Solicitação</div>
-    <button type="button" role="menuitem" class="semec-menu__item">Ver detalhes</button>
-    <a href="/comprovante.pdf" role="menuitem" class="semec-menu__item">Baixar comprovante</a>
-    <div role="separator" class="semec-menu__separator"></div>
-    <button type="button" role="menuitem" class="semec-menu__item" aria-disabled="true" data-disabled>Cancelar solicitação</button>
+  <button type="button" class="semec-btn semec-btn--outline" data-semec-menu-trigger>Ações</button>
+  <div class="semec-menu">
+    <div class="semec-menu__label">Solicitação</div>
+    <button type="button" class="semec-menu__item">Ver detalhes</button>
+    <a href="/comprovante.pdf" class="semec-menu__item">Baixar comprovante</a>
+    <hr class="semec-menu__separator">
+    <button type="button" class="semec-menu__item" disabled>Cancelar solicitação</button>
   </div>
 </semec-menu>
 ```
 
-Itens são `<button>` ou `<a>` (ocupam a linha como o item do React). O item ativo é o focado ou o com `data-highlighted`: fundo `tint` e anel interno de 2 px. O popup tem `w-max` (não quebra linha dentro de um gatilho estreito, como o popper do Radix) e no mínimo a largura do gatilho.
+É o mesmo HTML do README do `@semec/ds-elements`: o elemento põe `aria-haspopup`, `aria-expanded`, `aria-controls`, `role="menu"`/`menuitem` e o `hidden` do popup fechado. Sem JavaScript, os itens ficam visíveis no fluxo da página, como uma lista de botões e links (o CSS só posiciona o popup depois que o elemento põe `role="menu"`), e o item `disabled` aparece apagado. Itens são `<button>` ou `<a>` (ocupam a linha como o item do React). O item ativo é o focado ou o com `data-highlighted`: fundo `tint` e anel interno de 2 px. O popup tem `w-max` (não quebra linha dentro de um gatilho estreito, como o popper do Radix) e no mínimo a largura do gatilho.
 
 ### Accordion
 

@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
-import { SRI_PENDENTE, TARGETS, applySri, cdnUrl, computeSri, readConst, setConst, sriOf } from "./sri.mjs";
+import { SRI_PENDENTE, TARGETS, applySri, cdnUrl, computeSri, readConst, readMarkdownSri, setConst, setMarkdownSri, sriOf } from "./sri.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -80,15 +80,47 @@ describe("computeSri + applySri", () => {
   });
 });
 
-describe("páginas do site", () => {
+describe("readMarkdownSri / setMarkdownSri (README de pacote)", () => {
+  const md = [
+    '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@x/c@1.1.0/dist/c.css" integrity="sha384-velho" crossorigin="anonymous">',
+    "texto",
+    '<link rel="stylesheet"\n  href="https://cdn.jsdelivr.net/npm/@x/c@1.1.0/dist/c.css"\n  integrity="sha384-velho" crossorigin="anonymous">',
+    '<script type="module" src="https://cdn.jsdelivr.net/npm/@x/e@1.0.0/dist/e.js" integrity="sha384-e" crossorigin="anonymous"></script>',
+  ].join("\n");
+  it("lê a versão da URL e o integrity da mesma tag, em todas as ocorrências", () => {
+    assert.deepEqual(readMarkdownSri(md, "@x/c", "dist/c.css"), { version: "1.1.0", value: "sha384-velho" });
+    const out = setMarkdownSri(md, "@x/c", "dist/c.css", "sha384-novo");
+    assert.equal(out.match(/sha384-novo/g).length, 2);
+    assert.match(out, /integrity="sha384-e"/, "a outra URL não muda");
+  });
+  it("erro se uma tag com a URL não tem integrity, se as versões diferem ou se a URL falta", () => {
+    assert.throws(() => readMarkdownSri(md + '\n<link href="https://cdn.jsdelivr.net/npm/@x/c@1.1.0/dist/c.css">', "@x/c", "dist/c.css"), /sem integrity/);
+    assert.throws(() => readMarkdownSri(md.replace("@x/c@1.1.0", "@x/c@1.2.0"), "@x/c", "dist/c.css"), /versões diferentes/);
+    assert.throws(() => readMarkdownSri(md, "@x/z", "dist/z.css"), /não encontrada/);
+  });
+  it("computeSri + applySri gravam no markdown; 404 opcional fica pendente", async () => {
+    const targets = [
+      { file: "r.md", kind: "markdown", pkg: "@x/c", path: "dist/c.css" },
+      { file: "r.md", kind: "markdown", pkg: "@x/e", path: "dist/e.js", optional: true },
+    ];
+    const results = await computeSri({ targets, readFile: () => md, fetch: fakeFetch({ "https://cdn.jsdelivr.net/npm/@x/c@1.1.0/dist/c.css": "css" }) });
+    const out = applySri(results, () => md).get("r.md");
+    assert.equal(readMarkdownSri(out, "@x/c", "dist/c.css").value, sriOf("css"));
+    assert.equal(readMarkdownSri(out, "@x/e", "dist/e.js").value, SRI_PENDENTE);
+  });
+});
+
+describe("páginas do site e READMEs", () => {
   it("cada alvo existe, com versão fixa e hash no formato sha384", () => {
     for (const t of TARGETS) {
       const src = fs.readFileSync(path.join(root, t.file), "utf8");
-      cdnUrl(t.pkg, readConst(src, t.versionConst), t.path);
-      const value = readConst(src, t.sriConst);
-      if (!t.optional) assert.notEqual(value, SRI_PENDENTE, `${t.sriConst} ainda é o marcador: rode npm run sri`);
+      const atual = t.kind === "markdown" ? readMarkdownSri(src, t.pkg, t.path) : { version: readConst(src, t.versionConst), value: readConst(src, t.sriConst) };
+      cdnUrl(t.pkg, atual.version, t.path);
+      const value = atual.value;
+      assert.ok(value, `${t.file}: o mesmo arquivo com integrity diferentes`);
+      if (!t.optional) assert.notEqual(value, SRI_PENDENTE, `${t.sriConst ?? t.file} ainda é o marcador: rode npm run sri`);
       if (value !== SRI_PENDENTE) {
-        assert.match(value, /^sha384-[A-Za-z0-9+/]{64}$/, `${t.sriConst} não é um sha384 válido`);
+        assert.match(value, /^sha384-[A-Za-z0-9+/]{64}$/, `${t.sriConst ?? t.file} não é um sha384 válido`);
         assert.equal(Buffer.from(value.slice(7), "base64").length, crypto.createHash("sha384").digest().length);
       }
     }
