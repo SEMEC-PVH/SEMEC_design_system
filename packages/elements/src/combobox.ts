@@ -1,4 +1,4 @@
-import { SemecElement, emit, ensureId, fold, placePopup, toggleAttr } from "./internal";
+import { SemecElement, clearPopupPlacement, emit, ensureId, fold, placePopup, toggleAttr } from "./internal";
 
 export interface SemecComboboxChangeDetail {
   /** Valor escolhido ("" quando a escolha foi limpa). */
@@ -18,7 +18,11 @@ const CHECK_SVG =
   '<svg class="semec-combobox__check" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
 
 const DEFAULT_EMPTY = "Nenhum resultado";
+const DEFAULT_INVALID = "Escolha uma opção da lista.";
+const CLEARED = "Escolha removida";
 const ANNOUNCE_DELAY = 400;
+/** Atributos do `<select>` que valem para o campo; mudanças depois de montado também são copiadas. */
+const MIRRORED = ["aria-describedby", "aria-invalid", "aria-labelledby", "aria-label", "title"];
 
 /**
  * `<semec-combobox>`: padrão APG "Editable Combobox With List Autocomplete",
@@ -35,6 +39,13 @@ const ANNOUNCE_DELAY = 400;
  * `aria-selected="true"` + `data-highlighted`; a escolhida, `data-state="checked"`.
  * Evento `semec-change`, e o
  * select dispara `change` como se o usuário tivesse escolhido nele.
+ *
+ * O estado se muda no `<select>`, também depois de montado: `disabled`,
+ * `required`, `aria-invalid`, `aria-describedby`, `aria-label`,
+ * `aria-labelledby` e `title` passam para o campo; opções novas entram na lista
+ * sem apagar o que a pessoa digitou. Texto que não corresponde à escolha deixa o
+ * campo inválido ("Escolha uma opção da lista.", atributo `invalid-text`): o
+ * formulário não é enviado com um texto que não vai no envio.
  */
 export class SemecCombobox extends SemecElement {
   #input: HTMLInputElement | null = null;
@@ -47,6 +58,8 @@ export class SemecCombobox extends SemecElement {
   #open = false;
   #announceTimer: ReturnType<typeof setTimeout> | undefined;
   #observer: MutationObserver | null = null;
+  /** Valor do select na última vez que o texto do campo foi sincronizado com ele. */
+  #syncedValue = "";
 
   get select(): HTMLSelectElement | null {
     return this.querySelector("select");
@@ -91,15 +104,8 @@ export class SemecCombobox extends SemecElement {
         input.id = select.id;
         select.id = `${select.id}-nativo`;
       }
-      for (const attr of ["aria-describedby", "aria-invalid", "aria-labelledby", "aria-label", "title"]) {
-        const v = select.getAttribute(attr);
-        if (v !== null) input.setAttribute(attr, v);
-      }
-      if (select.required) {
-        input.required = true;
-        select.required = false; // um select escondido e obrigatório trava o envio sem mensagem
-      }
-      input.disabled = select.disabled;
+      for (const attr of MIRRORED) this.#mirror(select, input, attr);
+      this.#mirrorState(select, input);
       select.before(input);
     }
     this.#input = input;
@@ -199,10 +205,7 @@ export class SemecCombobox extends SemecElement {
       { signal }
     );
 
-    this.#observer = new MutationObserver(() => {
-      this.#readOptions();
-      this.#syncInputFromSelect();
-    });
+    this.#observer = new MutationObserver((records) => this.#onSelectMutation(records));
     this.#observer.observe(select, { childList: true, subtree: true, attributes: true, characterData: true });
   }
 
@@ -211,6 +214,64 @@ export class SemecCombobox extends SemecElement {
     this.#observer = null;
     clearTimeout(this.#announceTimer);
     if (this.#open) this.#setOpen(false);
+  }
+
+  /** Copia um atributo do select para o campo (ou tira, se o select não tem). */
+  #mirror(select: HTMLSelectElement, input: HTMLInputElement, attr: string): void {
+    const v = select.getAttribute(attr);
+    if (v === null) input.removeAttribute(attr);
+    else input.setAttribute(attr, v);
+    if (attr === "aria-labelledby" && this.#listbox && v !== null) this.#listbox.setAttribute("aria-labelledby", v);
+  }
+
+  /** `required` e `disabled` do select valem para o campo. */
+  #mirrorState(select: HTMLSelectElement, input: HTMLInputElement): void {
+    if (select.required) {
+      input.required = true;
+      select.required = false; // um select escondido e obrigatório trava o envio sem mensagem
+    }
+    input.disabled = select.disabled;
+    if (input.disabled && this.#open) this.#setOpen(false);
+  }
+
+  /**
+   * Mudança no select depois de montado. Atributos do próprio select passam
+   * para o campo; opções novas ou alteradas refazem a lista. O texto do campo só
+   * volta ao da escolha quando o valor mudou, ou quando a pessoa não está no
+   * campo: o que ela digitou não some porque as opções chegaram depois.
+   */
+  #onSelectMutation(records: MutationRecord[]): void {
+    const select = this.select;
+    const input = this.#input;
+    if (!select || !input) return;
+    let options = false;
+    for (const record of records) {
+      if (record.type === "attributes" && record.target === select) {
+        const attr = record.attributeName ?? "";
+        if (MIRRORED.includes(attr)) this.#mirror(select, input, attr);
+        else if (attr === "required" || attr === "disabled") this.#mirrorState(select, input);
+        continue;
+      }
+      options = true;
+    }
+    // Descarta os registros das nossas próprias mudanças no select (required).
+    this.#observer?.takeRecords();
+    if (options) this.#refreshOptions();
+  }
+
+  #refreshOptions(): void {
+    const input = this.#input;
+    if (!input) return;
+    const activeValue = this.#filtered[this.#active]?.value;
+    this.#readOptions(); // com a lista aberta, já filtra pelo texto digitado
+    if (this.#open) {
+      let index = activeValue === undefined ? -1 : this.#filtered.findIndex((o) => o.value === activeValue && !o.disabled);
+      if (index < 0 && input.value.trim()) index = this.#filtered.findIndex((o) => !o.disabled);
+      this.#setActive(index, false);
+      this.#announce();
+    }
+    if (this.value !== this.#syncedValue || (!this.#open && document.activeElement !== input)) this.#syncInputFromSelect();
+    else this.#validate();
   }
 
   #labelIds(input: HTMLInputElement): string {
@@ -294,7 +355,34 @@ export class SemecCombobox extends SemecElement {
     const input = this.#input;
     if (!input) return;
     input.value = this.#selectedOption()?.label ?? "";
-    input.setCustomValidity("");
+    this.#syncedValue = this.value;
+    this.#validate();
+  }
+
+  /**
+   * Texto que não é o da opção escolhida não vai no envio (o valor é o do
+   * select). O campo fica inválido até a pessoa escolher, apagar ou sair dele
+   * (aí o texto volta ao escolhido): com `required`, um texto solto não passa
+   * pela validação do formulário.
+   */
+  #validate(): void {
+    const input = this.#input;
+    if (!input) return;
+    const typed = fold(input.value);
+    const selected = this.#selectedOption();
+    const mismatch = typed !== "" && !(selected && fold(selected.label) === typed);
+    input.setCustomValidity(mismatch ? (this.getAttribute("invalid-text") ?? DEFAULT_INVALID) : "");
+  }
+
+  /** Texto igual ao de uma opção (sem escolher na lista): escolhe essa opção. */
+  #chooseTyped(): void {
+    const input = this.#input;
+    if (!input) return;
+    const typed = fold(input.value);
+    const selected = this.#selectedOption();
+    if (!typed || (selected && fold(selected.label) === typed)) return;
+    const exact = this.#options.find((o) => !o.disabled && fold(o.label) === typed);
+    if (exact) this.#choose(exact);
   }
 
   #setOpen(open: boolean): void {
@@ -304,8 +392,11 @@ export class SemecCombobox extends SemecElement {
     const popup = this.#filtered.length ? this.#listbox : this.#empty;
     if (open && this.#input && popup) placePopup(this.#input, popup);
     if (!open) {
-      this.#listbox?.removeAttribute("data-side");
-      this.#empty?.removeAttribute("data-side");
+      clearPopupPlacement(this.#listbox);
+      clearPopupPlacement(this.#empty);
+      // Lista fechada: a contagem antiga não fica na região viva.
+      clearTimeout(this.#announceTimer);
+      if (this.#status) this.#status.textContent = "";
     }
   }
 
@@ -378,16 +469,27 @@ export class SemecCombobox extends SemecElement {
     this.#filter(input.value);
     const first = this.#filtered.findIndex((o) => !o.disabled);
     this.#setActive(input.value.trim() ? first : -1, true);
+    this.#validate();
     this.#announce();
   }
 
   #announce(): void {
     clearTimeout(this.#announceTimer);
     this.#announceTimer = setTimeout(() => {
-      if (!this.#status || !this.#open) return;
+      if (!this.#open) return;
       const n = this.#filtered.length;
-      this.#status.textContent = n === 0 ? (this.#empty?.textContent ?? DEFAULT_EMPTY) : n === 1 ? "1 resultado" : `${n} resultados`;
+      this.#say(n === 0 ? (this.#empty?.textContent ?? DEFAULT_EMPTY) : n === 1 ? "1 resultado" : `${n} resultados`);
     }, ANNOUNCE_DELAY);
+  }
+
+  /**
+   * Escreve na região viva. Texto igual ao atual não seria lido de novo ("3
+   * resultados" → "3 resultados"): alterna um espaço não separável no fim.
+   */
+  #say(text: string): void {
+    const status = this.#status;
+    if (!status) return;
+    status.textContent = status.textContent === text ? `${text}\u00a0` : text;
   }
 
   #onBlur(): void {
@@ -436,7 +538,13 @@ export class SemecCombobox extends SemecElement {
         this.#move("last");
         return;
       case "Enter": {
-        if (!this.#open) return; // fechado: Enter envia o formulário, como num campo comum
+        if (!this.#open) {
+          // Fechado: Enter envia o formulário, como num campo comum. Antes, o texto
+          // igual ao de uma opção vira a escolha; um texto solto deixa o campo
+          // inválido e a validação do formulário avisa.
+          this.#chooseTyped();
+          return;
+        }
         event.preventDefault();
         const option = this.#filtered[this.#active];
         if (option && !option.disabled) this.#choose(option);
@@ -451,7 +559,11 @@ export class SemecCombobox extends SemecElement {
         } else if (this.#input?.value || this.value) {
           event.preventDefault();
           event.stopPropagation();
+          const had = this.value;
           this.#choose(null);
+          // Limpar uma escolha confirmada não pode ser silencioso (p.ex. Esc dentro
+          // de um diálogo, pensando em fechá-lo).
+          if (had) this.#say(CLEARED);
         }
         return;
       case "Tab":
