@@ -313,6 +313,7 @@ export default function Sidebar({ open, onClose, collapsed, onCollapse }) {
                       type="button"
                       className="side-title-caret"
                       onClick={() => toggleGroup(item.key)}
+                      aria-label={`Expandir ou recolher ${item.label}`}
                       aria-expanded={!collapsedGroup(item)}
                       aria-controls={"side-group-" + item.key}
                     >
