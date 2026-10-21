@@ -43,6 +43,11 @@ export const PROJETOS = {
     gh("MariMeng", "laboratorio-processamento-de-imagens", "Laboratório de processamento de imagens.", "Python"),
     gh("MariMeng", "advanced_algorithms", "Algoritmos avançados em C++.", "C++"),
   ],
+  tiago: [
+    gh("ThiagoACNascimento", "nestjs-clean-arch", "API em NestJS com arquitetura limpa.", "TypeScript"),
+    gh("ThiagoACNascimento", "movie-reservation-system", "Sistema de reserva de sessões de cinema.", "TypeScript"),
+    gh("ThiagoACNascimento", "clone_tabnews", "Clone do TabNews para praticar conceitos de programação.", "JavaScript"),
+  ],
   gava: [
     gh("VgavaBR123", "game-revisao-dataprev", "Jogo de revisão de conteúdo.", "HTML"),
     gh("VgavaBR123", "gava-skills", "Skills para agentes de IA.", "Python"),
@@ -50,7 +55,7 @@ export const PROJETOS = {
   ],
 };
 
-// TODO: LinkedIn e GitHub do Zé Carlos; GitHub da Emily; LinkedIn do Gava.
+// TODO: LinkedIn e GitHub do Zé Carlos; LinkedIn do Gava.
 const EXTRAS = {
   "ze-carlos": {
     name: "Zé Carlos",
@@ -59,8 +64,8 @@ const EXTRAS = {
   },
   emily: {
     name: "Emily Costa",
-    role: "Equipe SEMEC",
-    bio: "Cuida de como a SEMEC conversa com as pessoas: campanhas, posts e textos claros. Onde ela passa, o Microfone vai atrás.",
+    role: "Jornalista · Assessora de comunicação",
+    bio: "Jornalista formada pela UNIR, com passagem pelo g1 Rondônia. Cuida de como a SEMEC conversa com as pessoas: campanhas, posts e textos claros. Onde ela passa, o Microfone vai atrás.",
     linkedin: "https://www.linkedin.com/in/emily-costa-8b2706235/",
   },
   gava: {

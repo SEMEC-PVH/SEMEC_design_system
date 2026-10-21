@@ -37,7 +37,6 @@ export const FICHAS = {
     alt: "Boneco do Leo",
     mascote: "samurai",
   },
-  // TODO: confirmar a bio do Thiago (cargo igual ao de page.jsx)
   tiago: {
     tipo: "personagem",
     nome: "Thiago",
@@ -110,7 +109,7 @@ export const FICHAS = {
     alt: "Boneco da Ocarina azul do Pedro",
     dono: "pedro",
   },
-  // TODO: confirmar nome completo, cargo e bio do Zé Carlos; cargo e bio da Emily
+  // TODO: confirmar nome completo, cargo e bio do Zé Carlos
   "ze-carlos": {
     tipo: "personagem",
     nome: "Zé Carlos",
@@ -126,7 +125,7 @@ export const FICHAS = {
     tipo: "personagem",
     nome: "Emily",
     nomeCompleto: "Emily Costa",
-    subtitulo: "Equipe SEMEC",
+    subtitulo: "Jornalista · Assessora de comunicação",
     descricao:
       "Dos cachos castanhos e da blusa de bolinhas, anima a praça do Front-End. Onde ela passa, o microfone vai atrás, pronto para cantar.",
     imagem: "emily.webp",
