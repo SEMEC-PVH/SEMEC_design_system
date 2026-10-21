@@ -71,18 +71,19 @@ export const interns = [
     photo: "/quem-somos/retratos/mariana.webp",
   },
   {
-    // TODO: nome completo, bio, fala e LinkedIn do Tiago (sem link até lá).
-    name: "Tiago",
+    // TODO: bio e fala do Thiago.
+    name: "Thiago Nascimento",
     role: "DevOps / Infra",
     // Lidera o ginásio do Banco de Dados (no lugar do primeiro da área).
     chefe: "database",
+    linkedin: "https://www.linkedin.com/in/thiago-nascimento-916290328/",
     retrato: "tiago",
     photo: "/quem-somos/retratos/tiago.webp",
   },
 ];
 
-// TODO: nome completo, cargo, bio e links do Zé Carlos e da Emily (os textos
-// abaixo vêm das fichas da Vila, components/quem-somos/fichas.js).
+// TODO: nome completo, cargo, bio e links do Zé Carlos; cargo e bio da Emily
+// (os textos abaixo vêm das fichas da Vila, components/quem-somos/fichas.js).
 export const outros = [
   {
     name: "Zé Carlos",
@@ -92,9 +93,10 @@ export const outros = [
     photo: "/quem-somos/retratos/ze-carlos.webp",
   },
   {
-    name: "Emily",
+    name: "Emily Costa",
     role: "Equipe SEMEC",
     bio: "Cuida da comunicação: na Vila, desafia quem passa a montar campanhas acessíveis para a rede municipal.",
+    linkedin: "https://www.linkedin.com/in/emily-costa-8b2706235/",
     retrato: "emily",
     photo: "/quem-somos/retratos/emily.webp",
   },

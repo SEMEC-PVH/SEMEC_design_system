@@ -15,8 +15,8 @@ export const ALTS_HISTORIA = [
   "Telas de sistemas bagunçadas, com botões de toda cor e tamanho, e uma senhora e um aluno olhando confusos.",
   "Pedro no quadro branco explicando uma ideia para o time reunido em volta.",
   "Rafa e Mariana montando blocos de cores organizados, com uma grande letra A ao lado.",
-  "Leo e Tiago empilhando peças de interface, como botões e cartões, enquanto o Zé Carlos aprova com um sinal de positivo.",
-  "Pessoas usando o sistema de jeitos diferentes: um senhor com lupa, uma menina só com o teclado e o Tiago ouvindo o leitor de tela, ao lado da Emily.",
+  "Leo e Thiago empilhando peças de interface, como botões e cartões, enquanto o Zé Carlos aprova com um sinal de positivo.",
+  "Pessoas usando o sistema de jeitos diferentes: um senhor com lupa, uma menina só com o teclado e o Thiago ouvindo o leitor de tela, ao lado da Emily.",
   "O time acenando na frente de uma escola, com crianças em volta e um livro brilhando.",
 ];
 
