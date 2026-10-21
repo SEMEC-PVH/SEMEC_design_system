@@ -14,9 +14,9 @@ import { assinarBicicleta, lerBicicleta, salvarBicicleta } from "./bicicleta";
 import { arquivoDoJogador, lerJogadorSalvo, salvarJogador } from "./EscolhaPersonagem";
 import FullscreenButton from "./FullscreenButton";
 import SomButton from "./SomButton";
-import { assinarSom, desbloquear, lerSom } from "./som/som";
+import { assinarSom, desbloquear, encerrarSom, lerSom } from "./som/som";
 import { tocar } from "./som/sfx";
-import { tocarMusica } from "./som/musica";
+import { encerrarMusica, tocarMusica } from "./som/musica";
 import { areaOf, CHEFE_POR_AREA, mapaDeLideres } from "./areas";
 import { CHEFES, LINGUAGENS, TREINADORES } from "./batalha/dados";
 import { nomeTipo } from "./batalha/motor";
@@ -182,6 +182,7 @@ export default function VilaSemec({ members }) {
   const onCorridaRef = useRef(null);
   // Som (som/): preferência "tudo" | "efeitos" | "desligado". O áudio só
   // destrava no 1º clique/tecla (regra dos navegadores); aí a trilha entra.
+  // Ao sair da Vila (volta para a equipe), tudo silencia.
   const somPref = useSyncExternalStore(assinarSom, lerSom, () => "tudo");
   const faixaRef = useRef(null);
   useEffect(() => {
@@ -193,6 +194,8 @@ export default function VilaSemec({ members }) {
     return () => {
       window.removeEventListener("pointerdown", destravar, { capture: true });
       window.removeEventListener("keydown", destravar, { capture: true });
+      encerrarMusica();
+      encerrarSom();
     };
   }, []);
   // Preparo da Vila antes de jogar ({ fase, progresso }, avisado pelo motor) e

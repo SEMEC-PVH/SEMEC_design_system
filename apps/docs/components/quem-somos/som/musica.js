@@ -270,4 +270,12 @@ export function pararMusica() {
   atual = null;
 }
 
+// Saiu da Vila: nenhuma faixa pedida, nada agendado e o relógio parado.
+export function encerrarMusica() {
+  pedida = null;
+  pararMusica();
+  clearInterval(relogio);
+  relogio = 0;
+}
+
 export const FAIXAS_MUSICA = Object.keys(FAIXAS);
