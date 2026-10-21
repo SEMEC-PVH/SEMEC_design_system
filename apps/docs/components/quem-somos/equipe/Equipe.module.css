@@ -128,6 +128,14 @@
   margin-top: var(--space-2);
 }
 
+/* A Vila é jogo de computador (mouse e teclado): no celular e no tablet o
+   convite some. Mesma consulta de MIDIA_COMPUTADOR em QuemSomos.jsx. */
+@media not ((hover: hover) and (pointer: fine) and (min-width: 768px)) {
+  .acoes {
+    display: none;
+  }
+}
+
 .cta {
   display: inline-flex;
   align-items: center;

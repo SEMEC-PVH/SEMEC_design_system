@@ -8,6 +8,9 @@ import { membrosDaVila } from "./dados";
 import styles from "./QuemSomos.module.css";
 
 const HASH_VILA = "#vila";
+// A Vila só abre em computador (mouse e tela larga); no celular e no tablet,
+// #vila mostra a equipe. Mesma consulta do .acoes em Equipe.module.css.
+const MIDIA_COMPUTADOR = "(hover: hover) and (pointer: fine) and (min-width: 768px)";
 
 // Aviso enquanto o código do jogo (three.js) baixa. Ocupa o lugar do mapa.
 function CarregandoVila() {
@@ -25,19 +28,24 @@ const VilaSemec = dynamic(() => import("../VilaSemec"), { ssr: false, loading: C
 // Modo atual, derivado do hash da URL (#vila = jogo). O export estático não
 // tem servidor: tudo acontece no cliente, com history.pushState + popstate.
 // pushState não dispara evento, então quem muda o hash avisa os assinantes.
+// Sair do modo computador (ex.: janela estreitada) também troca o modo.
 const assinantes = new Set();
 const avisar = () => assinantes.forEach((fn) => fn());
 function assinarHash(fn) {
+  const midia = window.matchMedia(MIDIA_COMPUTADOR);
   assinantes.add(fn);
   window.addEventListener("popstate", fn);
   window.addEventListener("hashchange", fn);
+  midia.addEventListener("change", fn);
   return () => {
     assinantes.delete(fn);
     window.removeEventListener("popstate", fn);
     window.removeEventListener("hashchange", fn);
+    midia.removeEventListener("change", fn);
   };
 }
-const lerModo = () => (window.location.hash === HASH_VILA ? "vila" : "equipe");
+const lerModo = () =>
+  window.location.hash === HASH_VILA && window.matchMedia(MIDIA_COMPUTADOR).matches ? "vila" : "equipe";
 const modoServidor = () => "equipe";
 
 // Elemento que recebe foco por programa (título): tabIndex -1 se preciso.
