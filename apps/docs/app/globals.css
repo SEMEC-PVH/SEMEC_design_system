@@ -2310,6 +2310,18 @@ footer {
 .content-inner > .container:has(.quem-somos-wrapper) {
   width: 100%;
 }
+/* Vila aberta: o jogo ocupa a janela toda. Cabeçalho, menu lateral e rodapé
+   do site saem; a barra "Voltar para a equipe" (QuemSomos.module.css) fica. */
+body:has(.quem-somos-wrapper) :is(.site-header, .sidebar, .sidebar-backdrop, .site-footer, .doc-nav, .release-banner, .breadcrumbs) {
+  display: none;
+}
+body:has(.quem-somos-wrapper) .content {
+  min-height: 0;
+  padding: 0;
+}
+body:has(.quem-somos-wrapper) .quem-somos-wrapper {
+  margin: 0;
+}
 .quem-somos-wrapper {
   position: relative;
   overflow: hidden;

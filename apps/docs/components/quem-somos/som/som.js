@@ -49,9 +49,13 @@ export const proximaOpcaoSom = (v) => OPCOES_SOM[(OPCOES_SOM.indexOf(v) + 1) % O
 // ---- Contexto e barramentos --------------------------------------------------
 let ctx = null;
 let nos = null; // { mestre, efeitos, musica, eco }
+// A Vila está aberta: fora dela (página da equipe) o som fica suspenso, nem a
+// volta à aba o retoma.
+let emUso = false;
 
 export function desbloquear() {
   if (typeof window === "undefined") return null;
+  emUso = true;
   if (!ctx) {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
@@ -88,7 +92,7 @@ export function desbloquear() {
     document.addEventListener("visibilitychange", () => {
       if (!ctx) return;
       if (document.hidden) ctx.suspend();
-      else if (lerSom() !== "desligado") ctx.resume();
+      else if (emUso && lerSom() !== "desligado") ctx.resume();
     });
   }
   if (ctx.state === "suspended" && !document.hidden && lerSom() !== "desligado") ctx.resume();
@@ -115,6 +119,12 @@ export function contexto() {
   return ctx;
 }
 export const saidas = () => nos;
+
+// Saiu da Vila: silêncio até o próximo gesto dentro dela (desbloquear()).
+export function encerrarSom() {
+  emUso = false;
+  if (ctx && ctx.state === "running") ctx.suspend();
+}
 export const musicaLigada = () => lerSom() === "tudo";
 
 // Ruído branco reaproveitado (1 s), para passos, catraca, chiados.
