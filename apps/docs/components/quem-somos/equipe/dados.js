@@ -71,19 +71,21 @@ export const interns = [
     photo: "/quem-somos/retratos/mariana.webp",
   },
   {
-    // TODO: bio e fala do Thiago.
     name: "Thiago Nascimento",
     role: "DevOps / Infra",
     // Lidera o ginásio do Banco de Dados (no lugar do primeiro da área).
     chefe: "database",
+    bio: "Estudante de Ciência da Computação na UNIR, com foco em back-end: Node.js, TypeScript, Express e TDD, além de PostgreSQL e Docker. Leitor fiel de O Programador Pragmático.",
+    fala: "Estudo Ciência da Computação na UNIR e gosto de back-end bem testado: Node.js, TypeScript e TDD. Aqui no ginásio quem manda é o PostgreSQL... e o meu coelhinho.",
     linkedin: "https://www.linkedin.com/in/thiago-nascimento-916290328/",
+    github: "https://github.com/ThiagoACNascimento",
     retrato: "tiago",
     photo: "/quem-somos/retratos/tiago.webp",
   },
 ];
 
-// TODO: nome completo, cargo, bio e links do Zé Carlos; cargo e bio da Emily
-// (os textos abaixo vêm das fichas da Vila, components/quem-somos/fichas.js).
+// TODO: nome completo, cargo, bio e links do Zé Carlos (o texto abaixo vem
+// da ficha dele na Vila, components/quem-somos/fichas.js).
 export const outros = [
   {
     name: "Zé Carlos",
@@ -94,8 +96,8 @@ export const outros = [
   },
   {
     name: "Emily Costa",
-    role: "Equipe SEMEC",
-    bio: "Cuida da comunicação: na Vila, desafia quem passa a montar campanhas acessíveis para a rede municipal.",
+    role: "Jornalista · Assessora de comunicação",
+    bio: "Jornalista formada pela UNIR, com passagem pelo g1 Rondônia e experiência em rádio, TV, webjornalismo e produção multimídia. Premiada em webjornalismo pela OAB Rondônia.",
     linkedin: "https://www.linkedin.com/in/emily-costa-8b2706235/",
     retrato: "emily",
     photo: "/quem-somos/retratos/emily.webp",
