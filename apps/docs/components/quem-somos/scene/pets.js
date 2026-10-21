@@ -3,7 +3,7 @@
 // Cada mascote tem um jeito próprio de se mexer, diferente do dono:
 // - samurai (Leo): clipes do Hunyuan — trote, guarda, tai chi e ataque, em
 //   que ele saca a lâmina (nó `Espada`) e solta um arco de corte;
-// - coelho (Tiago): sem esqueleto (o Hunyuan não aceita rig nele), tudo
+// - coelho (Thiago): sem esqueleto (o Hunyuan não aceita rig nele), tudo
 //   procedural — anda aos pulinhos com achatamento ao tocar o chão, respira
 //   parado, dá pulinhos e mortal para trás;
 // - waffle (Rafa): também procedural — anda gingando de pé em pé, respira

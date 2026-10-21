@@ -37,16 +37,16 @@ export const FICHAS = {
     alt: "Boneco do Leo",
     mascote: "samurai",
   },
-  // TODO: confirmar a bio do Tiago (cargo igual ao de page.jsx)
+  // TODO: confirmar a bio do Thiago (cargo igual ao de page.jsx)
   tiago: {
     tipo: "personagem",
-    nome: "Tiago",
-    nomeCompleto: "Tiago",
+    nome: "Thiago",
+    nomeCompleto: "Thiago Nascimento",
     subtitulo: "DevOps / Infra",
     descricao:
       "De cabelo cacheado e óculos redondos, não larga o coelhinho de pelúcia, que pula ao lado dele na porta do ginásio. Se alguém pergunta qual é a boa, ele já responde: “É esse que é o negócio”.",
     imagem: "tiago.webp",
-    alt: "Boneco do Tiago",
+    alt: "Boneco do Thiago",
     mascote: "coelho",
   },
   samurai: {
@@ -62,11 +62,11 @@ export const FICHAS = {
   coelho: {
     tipo: "mascote",
     nome: "Coelhinho",
-    subtitulo: "Mascote do Tiago",
+    subtitulo: "Mascote do Thiago",
     descricao:
       "Coelhinho de pelúcia que não para quieto: dá pulinhos pelo jardim e, quando se empolga, solta um mortal.",
     imagem: "coelho.webp",
-    alt: "Boneco do Coelhinho de pelúcia do Tiago",
+    alt: "Boneco do Coelhinho de pelúcia do Thiago",
     dono: "tiago",
   },
   waffle: {
@@ -110,7 +110,7 @@ export const FICHAS = {
     alt: "Boneco da Ocarina azul do Pedro",
     dono: "pedro",
   },
-  // TODO: confirmar nome completo, cargo e bio do Zé Carlos e da Emily
+  // TODO: confirmar nome completo, cargo e bio do Zé Carlos; cargo e bio da Emily
   "ze-carlos": {
     tipo: "personagem",
     nome: "Zé Carlos",
@@ -125,7 +125,7 @@ export const FICHAS = {
   emily: {
     tipo: "personagem",
     nome: "Emily",
-    nomeCompleto: "Emily",
+    nomeCompleto: "Emily Costa",
     subtitulo: "Equipe SEMEC",
     descricao:
       "Dos cachos castanhos e da blusa de bolinhas, anima a praça do Front-End. Onde ela passa, o microfone vai atrás, pronto para cantar.",

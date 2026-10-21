@@ -50,7 +50,7 @@ export const PROJETOS = {
   ],
 };
 
-// TODO: LinkedIn e GitHub do Zé Carlos e da Emily; LinkedIn do Gava.
+// TODO: LinkedIn e GitHub do Zé Carlos; GitHub da Emily; LinkedIn do Gava.
 const EXTRAS = {
   "ze-carlos": {
     name: "Zé Carlos",
@@ -58,9 +58,10 @@ const EXTRAS = {
     bio: "Contador de histórias da equipe: foi ele quem guardou como nasceu o Design System. Anda sempre com o Livro Sábio.",
   },
   emily: {
-    name: "Emily",
+    name: "Emily Costa",
     role: "Equipe SEMEC",
     bio: "Cuida de como a SEMEC conversa com as pessoas: campanhas, posts e textos claros. Onde ela passa, o Microfone vai atrás.",
+    linkedin: "https://www.linkedin.com/in/emily-costa-8b2706235/",
   },
   gava: {
     name: "Vinicius Gava de Oliveira",

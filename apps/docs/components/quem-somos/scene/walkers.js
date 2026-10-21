@@ -32,7 +32,7 @@ const WALKERS = [
     pet: ({ slashColor }) => samuraiPet({ slashColor }),
   },
   {
-    // Tiago + coelhinho de pelúcia, dentro do jardim cercado a sudoeste
+    // Thiago + coelhinho de pelúcia, dentro do jardim cercado a sudoeste
     // (x 5–8, y 16–19; portão em (10,16)).
     id: "tiago",
     petId: "coelho",

@@ -17,7 +17,7 @@ const EQUIPE = [
   { id: "rafa", nome: "Rafa" },
   { id: "leo", nome: "Leo" },
   { id: "mariana", nome: "Mariana" },
-  { id: "tiago", nome: "Tiago" },
+  { id: "tiago", nome: "Thiago" },
   { id: "ze-carlos", nome: "Zé Carlos" },
   { id: "emily", nome: "Emily" },
 ];

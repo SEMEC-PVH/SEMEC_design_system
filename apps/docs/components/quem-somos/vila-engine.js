@@ -1155,7 +1155,7 @@ export function createVila(host, options) {
         reducedMotion,
       })
     : null;
-  // Duplas dono + mascote passeando (Leo + samurai, Tiago + coelho): scene/walkers.js.
+  // Duplas dono + mascote passeando (Leo + samurai, Thiago + coelho): scene/walkers.js.
   const walkers = modelUrl
     ? createWalkers({
         scene,

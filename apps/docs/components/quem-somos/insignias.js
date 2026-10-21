@@ -46,7 +46,7 @@ export const FICHAS_INSIGNIAS = {
     grupo: "ginasio",
     cor: "yellow-500",
     forma: "Hexágono amarelo com banco de dados",
-    comoGanhar: "Vença o Tiago no Ginásio de Dados, a torre do Banco de Dados, ao norte.",
+    comoGanhar: "Vença o Thiago no Ginásio de Dados, a torre do Banco de Dados, ao norte.",
     oQueE: "Os dados da rede municipal guardados com segurança, organizados e protegidos pela LGPD. Sem eles, a tela mais bonita fica vazia.",
   },
   ia: {
