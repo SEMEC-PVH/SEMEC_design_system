@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   react18:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       SEMEC_REACT18_ROOT: ${{ github.workspace }}
     steps:

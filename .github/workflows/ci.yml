@@ -26,7 +26,7 @@ jobs:
     # O PR "Version Packages" (changeset-release/main) consome os changesets;
     # ele mexe em package.json/CHANGELOG sem changeset, por definição.
     if: github.event_name == 'pull_request' && !startsWith(github.head_ref, 'changeset-release/')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -66,7 +66,7 @@ jobs:
 
   lint:
     name: lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -83,7 +83,7 @@ jobs:
 
   typecheck:
     name: typecheck
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -100,7 +100,7 @@ jobs:
 
   test:
     name: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -126,7 +126,7 @@ jobs:
 
   build:
     name: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -208,7 +208,7 @@ jobs:
     # Regressão visual (TST-B1): as baselines são do Linux, geradas nesta mesma
     # imagem. A tag acompanha a versão EXATA do @playwright/test no package.json;
     # o tests/visual/docker.mjs confere a revisão do Chromium e falha se divergir.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
       image: mcr.microsoft.com/playwright:v1.56.1-noble
     env:
@@ -240,7 +240,7 @@ jobs:
     # comportamento da suíte visual em WebKit e Firefox (sem baselines: pixel de
     # fonte muda por motor). Não obrigatório: não entra nos checks exigidos da
     # branch protection e não reprova o PR enquanto a cobertura amadurece.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     continue-on-error: true
     container:
       image: mcr.microsoft.com/playwright:v1.56.1-noble
@@ -261,7 +261,7 @@ jobs:
 
   gate:
     name: gate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
