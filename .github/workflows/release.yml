@@ -47,7 +47,7 @@ jobs:
       github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_branch == 'main' &&
       github.event.workflow_run.head_repository.full_name == github.repository
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       # Só para o push da tag e a GitHub Release (GITHUB_TOKEN). Nenhum PR é criado.
       contents: write
