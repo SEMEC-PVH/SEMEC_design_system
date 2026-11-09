@@ -63,11 +63,6 @@ export const navigation = [
       { href: "/usar-sem-react/web-components", label: "Web Components", sub: true },
       { href: "/usar-sem-react/modelos-de-servidor", label: "Modelos de servidor", sub: true },
       { href: "/fundamentos", label: "Fundamentos" },
-      { href: "/fundamentos/cores", label: "Cores", sub: true },
-      { href: "/fundamentos/tipografia", label: "Tipografia", sub: true },
-      { href: "/fundamentos/layout", label: "Layout", sub: true },
-      { href: "/fundamentos/raios-sombras", label: "Raios, bordas e sombras", sub: true },
-      { href: "/fundamentos/animacoes", label: "Animações", sub: true },
     ],
   },
   {
