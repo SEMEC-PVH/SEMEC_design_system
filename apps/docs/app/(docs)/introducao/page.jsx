@@ -3,7 +3,7 @@ import SectionCard from "@/components/ui/SectionCard";
 import SemequinhoAnimation from "@/components/SemequinhoAnimation";
 import AnimateOnScroll from "@/components/ui/AnimateOnScroll";
 import CopySkillButton from "@/components/ui/CopySkillButton";
-import MdxPre from "@/components/docs/MdxPre";
+import TerminalCard from "@/components/docs/TerminalCard";
 import {
   ArtTipografia,
   ArtCores,
@@ -70,31 +70,31 @@ const categorias = [
     desc: "As bases visuais que sustentam toda interface — tipografia, cores, layout e acabamentos.",
     items: [
       {
-        href: "/fundamentos/tipografia",
+        href: "/fundamentos#tipografia",
         art: <ArtTipografia />,
         title: "Tipografia",
         desc: "Famílias e escala renderizada dos títulos, corpo e microtexto.",
       },
       {
-        href: "/fundamentos/cores",
+        href: "/fundamentos#cores",
         art: <ArtCores />,
         title: "Cores",
         desc: "Paletas pv-blue, pv-green, pv-yellow, neutros e papéis semânticos.",
       },
       {
-        href: "/fundamentos/layout",
+        href: "/fundamentos#layout",
         art: <ArtLayout />,
         title: "Layout",
         desc: "Container, grid de cards e regras de espaçamento.",
       },
       {
-        href: "/fundamentos/raios-sombras",
+        href: "/fundamentos#raios-bordas-sombras",
         art: <ArtRaios />,
         title: "Raios, bordas e sombras",
         desc: "Escala de raios e família de sombras institucional.",
       },
       {
-        href: "/fundamentos/animacoes",
+        href: "/fundamentos#animacoes",
         art: <ArtAnimacoes />,
         title: "Animações",
         desc: "Easing padrão, movimento e prefers-reduced-motion.",
@@ -264,12 +264,15 @@ export default function IntroPage() {
       <h2>Instalação</h2>
       <p>
         Instale o pacote junto com o <code>lucide-react</code>, que é peer dependency do kit
-        (o npm 7+ instala peers sozinho; o pnpm com <code>auto-install-peers=false</code> e o
-        Yarn não):
+        (o npm 7+ instala peers sozinho; o Yarn não):
       </p>
-      <MdxPre><code>npm install @semec/ds lucide-react</code></MdxPre>
-      <p>Ou, se preferir yarn:</p>
-      <MdxPre><code>yarn add @semec/ds lucide-react</code></MdxPre>
+      <TerminalCard
+        title="zsh — terminal"
+        tabs={[
+          { label: "npm", code: "npm install @semec/ds lucide-react", lang: "bash" },
+          { label: "yarn", code: "yarn add @semec/ds lucide-react", lang: "bash" },
+        ]}
+      />
       <p>
         Tailwind CSS v4 no bundler (Vite ou Next.js), o CSS global e a fonte: veja o passo a
         passo no{" "}
