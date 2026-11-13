@@ -1524,14 +1524,13 @@ li {
   font-size: var(--font-size-sm);
 }
 
-/* Leitura e proporção: texto corrido ocupa 100% da largura do container de documentação,
-   alinhando-se aos cards, tabelas, terminal e demos. */
+/* Leitura confortável: o texto corrido não estica até a borda da coluna
+   em telas largas; cards, tabelas, código e demos continuam ocupando toda
+   a largura do container. */
 .content p,
 .content ul,
 .content ol {
-  max-width: 100%;
-  text-align: justify;
-  hyphens: auto;
+  max-width: var(--measure);
 }
 .demo-frame p,
 .demo-frame ul,
