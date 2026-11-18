@@ -1,5 +1,6 @@
 ---
 "@semec/ds": minor
+"@semec/ds-css": minor
 ---
 
 feat(stepper): adiciona variante compact com barra de progresso contínua e chips de navegação
