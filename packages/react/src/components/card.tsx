@@ -1,10 +1,13 @@
 import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 import type { HeadingTag } from "./heading";
 
-const cardVariants = cva(
+const cardVariants: VariantFunction<{
+  variant: "default" | "solid-brand" | "solid-success";
+}> = cva(
   "rounded-lg shadow-elevation-1 transition-colors duration-fast ease-standard",
   {
     variants: {
@@ -24,8 +27,7 @@ const cardVariants = cva(
 );
 
 export interface CardProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof cardVariants> {
+  extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Variação do cartão:
    * - `default` (padrão): fundo de superfície com borda sutil e sombra.

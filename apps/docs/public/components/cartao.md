@@ -36,6 +36,8 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 
 No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
+> Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (minor) que ainda não estão no npm. O @semec/ds@4.4.3 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.5.0. Confira a versão instalada com `npm ls @semec/ds`.
+
 ## Uso
 
 ```tsx
@@ -65,12 +67,15 @@ Use o componente `Card` (Cartão) importado de `@semec/ds/react`; não reimpleme
 
 ```tsx
 import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
+import type { VariantFunction } from "../lib/variant-function";
 import type { HeadingTag } from "./heading";
 
-const cardVariants = cva(
+const cardVariants: VariantFunction<{
+  variant: "default" | "solid-brand" | "solid-success";
+}> = cva(
   "rounded-lg shadow-elevation-1 transition-colors duration-fast ease-standard",
   {
     variants: {
@@ -90,8 +95,7 @@ const cardVariants = cva(
 );
 
 export interface CardProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof cardVariants> {
+  extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Variação do cartão:
    * - `default` (padrão): fundo de superfície com borda sutil e sombra.
