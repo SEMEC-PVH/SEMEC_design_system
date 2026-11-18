@@ -9,6 +9,10 @@ export default function IndicacaoLocalizacaoPage() {
     <PatternPage
       title="Indicação da localização atual"
       subtitle="Como o usuário sabe onde está dentro da estrutura da interface."
+      components={[
+        { label: "Etapas", href: "/componentes/etapas", code: "Stepper" },
+        { label: "Trilha de navegação", href: "/componentes/trilha-de-navegacao", code: "Breadcrumb" },
+      ]}
       sections={[
         {
           title: "Boas práticas",

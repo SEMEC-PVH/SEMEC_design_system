@@ -9,6 +9,9 @@ export default function PaginacaoPage() {
     <PatternPage
       title="Paginação"
       subtitle="Divisão de listas longas em páginas numeradas para facilitar a navegação."
+      components={[
+        { label: "Paginação", href: "/componentes/paginacao", code: "Pagination" },
+      ]}
       sections={[
         {
           title: "Boas práticas",

@@ -20,6 +20,20 @@ export default function ComponentDoc({ c, extra }) {
   const source = readFileSync(join(dsPackageRoot(), c.file), "utf8");
   const cat = dsCategories.find((k) => k.key === c.category);
 
+  // Mapeamento opcional de componente -> diretriz de padrão de UX
+  const PATTERN_MAP = {
+    stepper: { label: "Padrão: Indicação da localização atual", href: "/padroes/navegacao/indicacao-localizacao-atual" },
+    breadcrumb: { label: "Padrão: Breadcrumbs", href: "/padroes/navegacao/breadcrumbs" },
+    sidebar: { label: "Padrão: Navegação lateral", href: "/padroes/navegacao/navegacao-lateral" },
+    "navigation-menu": { label: "Padrão: Menu principal", href: "/padroes/navegacao/menu-principal" },
+    header: { label: "Padrão: Cabeçalho", href: "/padroes/navegacao/cabecalho" },
+    footer: { label: "Padrão: Rodapé", href: "/padroes/navegacao/rodape" },
+    pagination: { label: "Padrão: Paginação", href: "/padroes/navegacao/paginacao" },
+    tabs: { label: "Padrão: Abas", href: "/padroes/navegacao/abas" },
+  };
+
+  const pattern = PATTERN_MAP[c.code];
+
   return (
     <>
       <ProtoStyle />
@@ -29,6 +43,14 @@ export default function ComponentDoc({ c, extra }) {
         <span className="component-meta">
           No código: <code>{c.code}</code> — <code>{c.file}</code> ·{" "}
           <Link href={`/componentes/${cat.slug}`}>{cat.label}</Link>
+          {pattern ? (
+            <>
+              {" "}·{" "}
+              <Link href={pattern.href} className="text-primary underline">
+                {pattern.label}
+              </Link>
+            </>
+          ) : null}
         </span>
       </p>
 
