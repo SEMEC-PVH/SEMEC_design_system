@@ -4,17 +4,18 @@ code: "stepper"
 slug: "etapas"
 file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/stepper.tsx"
 category: "navegacao"
-variants: "orientation: horizontal (padrão; empilha abaixo de 768px) · vertical · estados: concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only · interação: onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual) · labels: list · position(n, total) · complete · current · upcoming"
+variants: "variant: connected (padrão; nós conectados com linha) · compact (barra de progresso compacta) · orientation: horizontal (padrão; empilha abaixo de 768px) · vertical · estados: concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only · interação: onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual) · labels: list · position(n, total) · complete · current · upcoming"
 ---
 
 # Etapas — `stepper`
 
-> Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.
+> Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px. Suporta variante compacta com barra de progresso para mobile ou cabeçalhos densos.
 
 **Arquivo:** [fonte no GitHub](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/stepper.tsx) | **Categoria:** Navegação | **Página:** https://semec-pvh.github.io/SEMEC_design_system/componentes/etapas/
 
 ## Variantes
 
+- **variant**: connected (padrão; nós conectados com linha) · compact (barra de progresso compacta)
 - **orientation**: horizontal (padrão; empilha abaixo de 768px) · vertical
 - **estados**: concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only
 - **interação**: onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual)
@@ -37,6 +38,8 @@ lucide-react é peer obrigatório (não dependência): o npm 7+ instala peer aus
 
 No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca via import em JS: o tokens.css tem @theme inline e @utility, que só o Tailwind processa. fonts.css antes do tokens.css. O caminho do @source é relativo ao arquivo CSS (src/app/globals.css usa ../../node_modules/...).
 
+> Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (minor) que ainda não estão no npm. O @semec/ds@4.4.3 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.5.0. Confira a versão instalada com `npm ls @semec/ds`.
+
 ## Uso
 
 ```tsx
@@ -50,6 +53,9 @@ const etapas = [
 
 <Stepper steps={etapas} currentStep={1} />
 
+// Barra compacta para mobile
+<Stepper variant="compact" steps={etapas} currentStep={1} />
+
 // Voltar a uma etapa já preenchida
 <Stepper steps={etapas} currentStep={2} onStepClick={(i) => setEtapa(i)} />
 ```
@@ -57,7 +63,7 @@ const etapas = [
 ## Prompt para IA
 
 ```text
-Use o componente `Stepper` (Etapas) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px. API e variantes: orientation: horizontal (padrão; empilha abaixo de 768px) · vertical · estados: concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only · interação: onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual) · labels: list · position(n, total) · complete · current · upcoming. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Stepper` (Etapas) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px. Suporta variante compacta com barra de progresso para mobile ou cabeçalhos densos. API e variantes: variant: connected (padrão; nós conectados com linha) · compact (barra de progresso compacta) · orientation: horizontal (padrão; empilha abaixo de 768px) · vertical · estados: concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only · interação: onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual) · labels: list · position(n, total) · complete · current · upcoming. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
@@ -116,6 +122,12 @@ export interface StepperProps
    */
   orientation?: "horizontal" | "vertical";
   /**
+   * Variação visual:
+   * - `connected` (padrão): nós conectados com linha contínua e rótulos.
+   * - `compact`: barra de progresso compacta (ideal para mobile ou cabeçalhos densos).
+   */
+  variant?: "connected" | "compact";
+  /**
    * Torna as etapas clicáveis (botões de 44px). Recebe o índice (base 0).
    * Por padrão só as concluídas e a atual são clicáveis; ajuste com
    * `isStepClickable`.
@@ -149,6 +161,7 @@ const Stepper = React.forwardRef<HTMLOListElement, StepperProps>(
       steps,
       currentStep,
       orientation = "horizontal",
+      variant = "connected",
       onStepClick,
       isStepClickable = defaultIsStepClickable,
       labels,
@@ -160,6 +173,76 @@ const Stepper = React.forwardRef<HTMLOListElement, StepperProps>(
     const text = { ...defaultLabels, ...labels };
     const horizontal = orientation === "horizontal";
     const total = steps.length;
+    const progressPercent = total > 0 ? Math.min(100, Math.max(0, ((Math.min(currentStep + 1, total)) / total) * 100)) : 0;
+    const activeStep = steps[Math.min(currentStep, total - 1)];
+
+    if (variant === "compact") {
+      return (
+        <div
+          ref={ref as unknown as React.Ref<HTMLDivElement>}
+          role="region"
+          aria-label={props["aria-labelledby"] ? ariaLabel : (ariaLabel ?? text.list)}
+          className={cn("flex w-full flex-col gap-2 rounded-md bg-surface p-4 shadow-elevation-1 ring-1 ring-foreground/5", className)}
+        >
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold uppercase tracking-wide text-primary">
+              {text.position(Math.min(currentStep + 1, total), total)}
+            </span>
+            {activeStep ? (
+              <span className="font-bold text-foreground">
+                {activeStep.label}
+              </span>
+            ) : null}
+          </div>
+
+          <div
+            className="h-2 w-full overflow-hidden rounded-full bg-surface-alt"
+            role="progressbar"
+            aria-label={text.position(Math.min(currentStep + 1, total), total)}
+            aria-valuenow={Math.min(currentStep + 1, total)}
+            aria-valuemin={1}
+            aria-valuemax={total}
+            aria-valuetext={`${text.position(Math.min(currentStep + 1, total), total)}: ${activeStep?.label ?? ""}`}
+          >
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-base ease-standard"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+
+          {onStepClick ? (
+            <ol className="flex items-center justify-between gap-1 pt-1" aria-label={text.list}>
+              {steps.map((step, index) => {
+                const status = statusOf(index, currentStep);
+                const clickable = isStepClickable(index, status);
+                const isCurrent = status === "current";
+                return (
+                  <li key={index} className="flex-1">
+                    <button
+                      type="button"
+                      disabled={!clickable}
+                      aria-current={isCurrent ? "step" : undefined}
+                      onClick={() => onStepClick(index)}
+                      className={cn(
+                        "w-full rounded-sm py-1 text-center text-xs font-semibold transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                        isCurrent
+                          ? "bg-primary text-primary-foreground"
+                          : status === "complete"
+                            ? "bg-accent text-accent-foreground hover:bg-accent/80"
+                            : "bg-surface-alt text-muted-foreground hover:bg-accent/50 disabled:pointer-events-none disabled:opacity-50"
+                      )}
+                    >
+                      <span className="sr-only">{text.position(index + 1, total)}: </span>
+                      {index + 1}
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          ) : null}
+        </div>
+      );
+    }
 
     return (
       <ol

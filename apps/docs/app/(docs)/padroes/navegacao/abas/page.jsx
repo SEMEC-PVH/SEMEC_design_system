@@ -9,6 +9,9 @@ export default function AbasPage() {
     <PatternPage
       title="Abas"
       subtitle="Alternância entre visões de um mesmo contexto sem trocar de página."
+      components={[
+        { label: "Abas", href: "/componentes/abas", code: "Tabs" },
+      ]}
       sections={[
         {
           title: "Boas práticas",

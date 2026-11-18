@@ -4,6 +4,8 @@
 
 Site: https://semec-pvh.github.io/SEMEC_design_system/
 
+> **Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (minor) que ainda não estão no npm. O @semec/ds@4.4.3 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.5.0. Confira a versão instalada com `npm ls @semec/ds`.**
+
 ## Instalar
 
 ```bash
@@ -83,7 +85,7 @@ No CSS global do app (src/index.css no Vite, app/globals.css no Next.js), nunca 
   Uso: `import { Breadcrumb } from "@semec/ds/react";`
 - [Cabeçalho (`header`) — Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.](https://semec-pvh.github.io/SEMEC_design_system/componentes/cabecalho/) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/header.tsx) — md: https://semec-pvh.github.io/SEMEC_design_system/components/cabecalho.md
   Uso: `import { Header } from "@semec/ds/react";`
-- [Etapas (`stepper`) — Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.](https://semec-pvh.github.io/SEMEC_design_system/componentes/etapas/) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/stepper.tsx) — md: https://semec-pvh.github.io/SEMEC_design_system/components/etapas.md
+- [Etapas (`stepper`) — Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px. Suporta variante compacta com barra de progresso para mobile ou cabeçalhos densos.](https://semec-pvh.github.io/SEMEC_design_system/componentes/etapas/) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/stepper.tsx) — md: https://semec-pvh.github.io/SEMEC_design_system/components/etapas.md
   Uso: `import { Stepper } from "@semec/ds/react";`
 - [Link para o conteúdo (`skip-link`) — Link "Pular para o conteúdo principal" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo).](https://semec-pvh.github.io/SEMEC_design_system/componentes/link-para-o-conteudo/) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/skip-link.tsx) — md: https://semec-pvh.github.io/SEMEC_design_system/components/link-para-o-conteudo.md
   Uso: `import { SkipLink } from "@semec/ds/react";`
@@ -168,4 +170,4 @@ Padrões de tela (navegação, formulários, dados e relatórios, feedback, aces
 3. Copie o snippet da seção "Uso" de `https://semec-pvh.github.io/SEMEC_design_system/components/<slug>.md` ou do `manifest.json`
 4. Aplique tokens L1 (`--action-primary` etc.), nunca hex solto
 
-> Gerado 2026-10-20T17:01:42.000Z a partir de packages/react/manifest.js. Versão 4.4.3.
+> Gerado 2026-11-18T13:31:34.000Z a partir de packages/react/manifest.js. Versão 4.4.3.

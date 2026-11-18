@@ -9,6 +9,10 @@ export default function MenuPrincipalPage() {
     <PatternPage
       title="Menu principal"
       subtitle="Navegação primária de topo que dá acesso às seções de maior nível da interface."
+      components={[
+        { label: "Menu de navegação", href: "/componentes/menu-de-navegacao", code: "NavigationMenu" },
+        { label: "Cabeçalho", href: "/componentes/cabecalho", code: "Header" },
+      ]}
       sections={[
         {
           title: "Boas práticas",

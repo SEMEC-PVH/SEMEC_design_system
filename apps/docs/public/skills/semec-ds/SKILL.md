@@ -8,6 +8,8 @@ author: "DevSemec — Secretaria Municipal de Economia de Porto Velho"
 
 > Gerado para `@semec/ds@4.4.3` (versão do `package.json` no build). Se o app tiver outra versão instalada (`npm ls @semec/ds`), o que vale é o README dela.
 
+> **Não publicado: este conteúdo vem do repositório e inclui 1 changeset pendente (minor) que ainda não estão no npm. O @semec/ds@4.4.3 do npm pode não ter o que está descrito aqui; a próxima versão prevista é a 4.5.0. Confira a versão instalada com `npm ls @semec/ds`.**
+
 Kit `@semec/ds` — React + Tailwind CSS v4 + shadcn (Radix + CVA + clsx + tailwind-merge). Conteúdo PT-BR, código EN (ADR-016).
 
 App em Vue, Angular, Svelte ou HTML sem React: use a skill lite (`@semec/ds/lite/skills/semec-ds-lite`), que traz só tokens, acessibilidade e padrões visuais.
@@ -243,7 +245,7 @@ Lista gerada do manifest (export principal, `code`, arquivo `.md` e descrição)
 
 - `Breadcrumb` (`breadcrumb`, `components/trilha-de-navegacao.md`) — Trilha com o item atual marcado (`current`). Separadores visuais ocultos de leitor de tela.
 - `Header` (`header`, `components/cabecalho.md`) — Topo do portal: marca, navegação e CTA. Composição Header + Brand + Nav.
-- `Stepper` (`stepper`, `components/etapas.md`) — Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.
+- `Stepper` (`stepper`, `components/etapas.md`) — Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px. Suporta variante compacta com barra de progresso para mobile ou cabeçalhos densos.
 - `SkipLink` (`skip-link`, `components/link-para-o-conteudo.md`) — Link "Pular para o conteúdo principal" (WCAG 2.4.1): oculto até receber foco pelo teclado. Primeiro elemento focável da página; leva o foco ao alvo (padrão #conteudo).
 - `Footer` (`footer`, `components/rodape.md`) — Rodapé institucional (<footer>, landmark contentinfo) com seções de links e faixa final. Use um por página, fora do <main>.
 - `Tabs` (`tabs`, `components/abas.md`) — Abas para alternar conteúdo na mesma tela. Gerenciamento de foco e roving tabindex via Radix. A aba ativa tem barra inferior de 3px em `primary` (≥4,97:1) e peso semibold, além do fundo: não depende só de cor. Alvo de 44px.

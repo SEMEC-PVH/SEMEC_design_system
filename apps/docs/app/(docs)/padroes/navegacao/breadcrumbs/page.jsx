@@ -10,6 +10,9 @@ export default function BreadcrumbsPage() {
       <PatternPage
         title="Breadcrumbs"
         subtitle="Trilha que mostra a posição do usuário na hierarquia e permite voltar a níveis superiores."
+        components={[
+          { label: "Trilha de navegação", href: "/componentes/trilha-de-navegacao", code: "Breadcrumb" },
+        ]}
         sections={[
           {
             title: "Boas práticas",

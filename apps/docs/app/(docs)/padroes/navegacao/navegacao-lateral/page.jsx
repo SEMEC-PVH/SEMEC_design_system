@@ -9,6 +9,10 @@ export default function NavegacaoLateralPage() {
     <PatternPage
       title="Navegação lateral"
       subtitle="Menu em coluna que organiza as seções de um contexto, típico de áreas administrativas e documentação."
+      components={[
+        { label: "Barra lateral", href: "/componentes/barra-lateral", code: "Sidebar" },
+        { label: "Gatilho da barra lateral", href: "/componentes/gatilho-da-barra-lateral", code: "SidebarTrigger" },
+      ]}
       sections={[
         {
           title: "Boas práticas",

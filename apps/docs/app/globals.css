@@ -1524,13 +1524,12 @@ li {
   font-size: var(--font-size-sm);
 }
 
-/* Leitura confortável: o texto corrido não estica até a borda da coluna
-   em telas largas; cards, tabelas, código e demos continuam ocupando toda
-   a largura do container. */
+/* Ocupação total da largura: texto corrido acompanha 100% da largura
+   do container, alinhando-se com cards, tabelas, código e demos. */
 .content p,
 .content ul,
 .content ol {
-  max-width: var(--measure);
+  max-width: 100%;
 }
 .demo-frame p,
 .demo-frame ul,
