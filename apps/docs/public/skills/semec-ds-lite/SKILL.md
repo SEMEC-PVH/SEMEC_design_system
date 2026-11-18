@@ -546,7 +546,7 @@ HTML sem Tailwind:
 HTML com Tailwind v4:
 
 ```html
-<section class="rounded-lg border border-border bg-card text-card-foreground shadow-elevation-1 ring-1 ring-foreground/5" aria-labelledby="card-title">
+<section class="rounded-lg shadow-elevation-1 transition-colors duration-fast ease-standard border border-border bg-card text-card-foreground ring-1 ring-foreground/5" aria-labelledby="card-title">
   <div class="flex flex-col space-y-1.5 p-6"><h2 id="card-title" class="text-lg font-semibold leading-tight tracking-tight">Solicitação</h2><p class="text-sm text-muted-foreground">Confira seus dados.</p></div>
   <div class="p-6 pt-0">Conteúdo do cartão.</div>
   <div class="flex items-center p-6 pt-0">Protocolo disponível após o envio.</div>
@@ -555,7 +555,7 @@ HTML com Tailwind v4:
 
 | Parte / variante | Classe no CSS puro | Classes do componente |
 |---|---|---|
-| root | `semec-card-root` | `rounded-lg border border-border bg-card text-card-foreground shadow-elevation-1 ring-1 ring-foreground/5` |
+| root | `semec-card-root` | `rounded-lg shadow-elevation-1 transition-colors duration-fast ease-standard border border-border bg-card text-card-foreground ring-1 ring-foreground/5` |
 | header | `semec-card-header` | `flex flex-col space-y-1.5 p-6` |
 | title | `semec-card-title` | `text-lg font-semibold leading-tight tracking-tight` |
 | description | `semec-card-description` | `text-sm text-muted-foreground` |
@@ -3762,6 +3762,12 @@ Gerado pelo Tailwind no build do kit. O consumidor copia CSS padrão com `var(--
   @supports (color: color-mix(in lab, red, red)) {
     --tw-ring-color: color-mix(in oklab, var(--fg) 5%, transparent);
   }
+  transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+  transition-duration: var(--tw-duration, var(--default-transition-duration));
+  transition-duration: var(--pv-duration-fast);
+  --tw-ease: var(--easing-standard);
+  transition-timing-function: var(--easing-standard);
 }
 .semec-card-header {
   display: flex;

@@ -1,6 +1,6 @@
 # SEMEC Design System — Dump completo para IA
 
-> Gerado 2026-10-20T17:01:42.000Z — packages/react/manifest.js + packages/react/* — versão 4.4.3
+> Gerado 2026-10-20T17:11:10.000Z — packages/react/manifest.js + packages/react/* — versão 4.4.3
 
 ## Instalação
 
@@ -4161,7 +4161,7 @@ export { ErrorSummary };
 
 Desc: Superfície de conteúdo com header, corpo e footer. Sombra pelo token `shadow-elevation-1`.
 
-Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader · títulos: CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2)
+Variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader · variante: default (padrão) · solid-brand (azul institucional de alto contraste) · solid-success (verde destaque) · títulos: CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2)
 
 Uso:
 ```tsx
@@ -4173,33 +4173,67 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@s
   <CardContent>Parcela em dia.</CardContent>
   <CardFooter><Button>Emitir boleto</Button></CardFooter>
 </Card>
+
+// Cartão sólido de alto contraste para seleção ou destaque
+<Card variant="solid-brand">
+  <CardHeader><CardTitle as="h3">Imóvel Urbano</CardTitle></CardHeader>
+  <CardContent>Classificação por perímetro urbano.</CardContent>
+</Card>
 ```
 
 Prompt:
 ```text
-Use o componente `Card` (Cartão) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Superfície de conteúdo com header, corpo e footer. Sombra pelo token `shadow-elevation-1`. API e variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader · títulos: CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Card` (Cartão) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Superfície de conteúdo com header, corpo e footer. Sombra pelo token `shadow-elevation-1`. API e variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader · variante: default (padrão) · solid-brand (azul institucional de alto contraste) · solid-success (verde destaque) · títulos: CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
 ```tsx
 import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
 import type { HeadingTag } from "./heading";
 
-const Card = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "rounded-lg border border-border bg-card text-card-foreground shadow-elevation-1 ring-1 ring-foreground/5",
-      className
-    )}
-    {...props}
-  />
-));
+const cardVariants = cva(
+  "rounded-lg shadow-elevation-1 transition-colors duration-fast ease-standard",
+  {
+    variants: {
+      variant: {
+        default:
+          "border border-border bg-card text-card-foreground ring-1 ring-foreground/5",
+        "solid-brand":
+          "border-transparent bg-primary text-primary-foreground ring-0",
+        "solid-success":
+          "border-transparent bg-feedback-success text-text-on-brand ring-0",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface CardProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {
+  /**
+   * Variação do cartão:
+   * - `default` (padrão): fundo de superfície com borda sutil e sombra.
+   * - `solid-brand`: fundo sólido azul institucional (--action-primary) com alto contraste (WCAG AA).
+   * - `solid-success`: fundo sólido verde sucesso (--feedback-success) com alto contraste (WCAG AA).
+   */
+  variant?: "default" | "solid-brand" | "solid-success";
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, variant, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(cardVariants({ variant }), className)}
+      {...props}
+    />
+  )
+);
 Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<
@@ -4313,6 +4347,7 @@ SectionHeader.displayName = "SectionHeader";
 
 export {
   Card,
+  cardVariants,
   CardHeader,
   CardFooter,
   CardTitle,
@@ -5249,9 +5284,9 @@ export { Header, HeaderBrand, HeaderNav, HeaderNavLink };
 
 ### Etapas (`stepper`) — [fonte](https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/stepper.tsx) — slug: etapas
 
-Desc: Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.
+Desc: Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px. Suporta variante compacta com barra de progresso para mobile ou cabeçalhos densos.
 
-Variantes: orientation: horizontal (padrão; empilha abaixo de 768px) · vertical · estados: concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only · interação: onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual) · labels: list · position(n, total) · complete · current · upcoming
+Variantes: variant: connected (padrão; nós conectados com linha) · compact (barra de progresso compacta) · orientation: horizontal (padrão; empilha abaixo de 768px) · vertical · estados: concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only · interação: onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual) · labels: list · position(n, total) · complete · current · upcoming
 
 Uso:
 ```tsx
@@ -5265,13 +5300,16 @@ const etapas = [
 
 <Stepper steps={etapas} currentStep={1} />
 
+// Barra compacta para mobile
+<Stepper variant="compact" steps={etapas} currentStep={1} />
+
 // Voltar a uma etapa já preenchida
 <Stepper steps={etapas} currentStep={2} onStepClick={(i) => setEtapa(i)} />
 ```
 
 Prompt:
 ```text
-Use o componente `Stepper` (Etapas) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px. API e variantes: orientation: horizontal (padrão; empilha abaixo de 768px) · vertical · estados: concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only · interação: onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual) · labels: list · position(n, total) · complete · current · upcoming. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Stepper` (Etapas) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current="step"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px. Suporta variante compacta com barra de progresso para mobile ou cabeçalhos densos. API e variantes: variant: connected (padrão; nós conectados com linha) · compact (barra de progresso compacta) · orientation: horizontal (padrão; empilha abaixo de 768px) · vertical · estados: concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only · interação: onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual) · labels: list · position(n, total) · complete · current · upcoming. Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 Fonte:
@@ -5329,6 +5367,12 @@ export interface StepperProps
    */
   orientation?: "horizontal" | "vertical";
   /**
+   * Variação visual:
+   * - `connected` (padrão): nós conectados com linha contínua e rótulos.
+   * - `compact`: barra de progresso compacta (ideal para mobile ou cabeçalhos densos).
+   */
+  variant?: "connected" | "compact";
+  /**
    * Torna as etapas clicáveis (botões de 44px). Recebe o índice (base 0).
    * Por padrão só as concluídas e a atual são clicáveis; ajuste com
    * `isStepClickable`.
@@ -5362,6 +5406,7 @@ const Stepper = React.forwardRef<HTMLOListElement, StepperProps>(
       steps,
       currentStep,
       orientation = "horizontal",
+      variant = "connected",
       onStepClick,
       isStepClickable = defaultIsStepClickable,
       labels,
@@ -5373,6 +5418,76 @@ const Stepper = React.forwardRef<HTMLOListElement, StepperProps>(
     const text = { ...defaultLabels, ...labels };
     const horizontal = orientation === "horizontal";
     const total = steps.length;
+    const progressPercent = total > 0 ? Math.min(100, Math.max(0, ((Math.min(currentStep + 1, total)) / total) * 100)) : 0;
+    const activeStep = steps[Math.min(currentStep, total - 1)];
+
+    if (variant === "compact") {
+      return (
+        <div
+          ref={ref as unknown as React.Ref<HTMLDivElement>}
+          role="region"
+          aria-label={props["aria-labelledby"] ? ariaLabel : (ariaLabel ?? text.list)}
+          className={cn("flex w-full flex-col gap-2 rounded-md bg-surface p-4 shadow-elevation-1 ring-1 ring-foreground/5", className)}
+        >
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold uppercase tracking-wide text-primary">
+              {text.position(Math.min(currentStep + 1, total), total)}
+            </span>
+            {activeStep ? (
+              <span className="font-bold text-foreground">
+                {activeStep.label}
+              </span>
+            ) : null}
+          </div>
+
+          <div
+            className="h-2 w-full overflow-hidden rounded-full bg-surface-alt"
+            role="progressbar"
+            aria-label={text.position(Math.min(currentStep + 1, total), total)}
+            aria-valuenow={Math.min(currentStep + 1, total)}
+            aria-valuemin={1}
+            aria-valuemax={total}
+            aria-valuetext={`${text.position(Math.min(currentStep + 1, total), total)}: ${activeStep?.label ?? ""}`}
+          >
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-base ease-standard"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+
+          {onStepClick ? (
+            <ol className="flex items-center justify-between gap-1 pt-1" aria-label={text.list}>
+              {steps.map((step, index) => {
+                const status = statusOf(index, currentStep);
+                const clickable = isStepClickable(index, status);
+                const isCurrent = status === "current";
+                return (
+                  <li key={index} className="flex-1">
+                    <button
+                      type="button"
+                      disabled={!clickable}
+                      aria-current={isCurrent ? "step" : undefined}
+                      onClick={() => onStepClick(index)}
+                      className={cn(
+                        "w-full rounded-sm py-1 text-center text-xs font-semibold transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                        isCurrent
+                          ? "bg-primary text-primary-foreground"
+                          : status === "complete"
+                            ? "bg-accent text-accent-foreground hover:bg-accent/80"
+                            : "bg-surface-alt text-muted-foreground hover:bg-accent/50 disabled:pointer-events-none disabled:opacity-50"
+                      )}
+                    >
+                      <span className="sr-only">{text.position(index + 1, total)}: </span>
+                      {index + 1}
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          ) : null}
+        </div>
+      );
+    }
 
     return (
       <ol

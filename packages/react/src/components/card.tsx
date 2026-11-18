@@ -1,21 +1,49 @@
 import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
 import type { HeadingTag } from "./heading";
 
-const Card = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "rounded-lg border border-border bg-card text-card-foreground shadow-elevation-1 ring-1 ring-foreground/5",
-      className
-    )}
-    {...props}
-  />
-));
+const cardVariants = cva(
+  "rounded-lg shadow-elevation-1 transition-colors duration-fast ease-standard",
+  {
+    variants: {
+      variant: {
+        default:
+          "border border-border bg-card text-card-foreground ring-1 ring-foreground/5",
+        "solid-brand":
+          "border-transparent bg-primary text-primary-foreground ring-0",
+        "solid-success":
+          "border-transparent bg-feedback-success text-text-on-brand ring-0",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface CardProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {
+  /**
+   * Variação do cartão:
+   * - `default` (padrão): fundo de superfície com borda sutil e sombra.
+   * - `solid-brand`: fundo sólido azul institucional (--action-primary) com alto contraste (WCAG AA).
+   * - `solid-success`: fundo sólido verde sucesso (--feedback-success) com alto contraste (WCAG AA).
+   */
+  variant?: "default" | "solid-brand" | "solid-success";
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, variant, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(cardVariants({ variant }), className)}
+      {...props}
+    />
+  )
+);
 Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<
@@ -129,6 +157,7 @@ SectionHeader.displayName = "SectionHeader";
 
 export {
   Card,
+  cardVariants,
   CardHeader,
   CardFooter,
   CardTitle,

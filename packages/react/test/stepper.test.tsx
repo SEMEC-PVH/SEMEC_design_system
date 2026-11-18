@@ -72,11 +72,34 @@ describe("Stepper (AUD-36)", () => {
     expect(screen.getAllByRole("listitem")[2]).toHaveTextContent("a fazer");
   });
 
+  it("renderiza a variante compact com barra de progresso e chips de etapa", async () => {
+    const onStepClick = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <Stepper
+        variant="compact"
+        steps={etapas}
+        currentStep={1}
+        onStepClick={onStepClick}
+      />
+    );
+
+    const progressbar = screen.getByRole("progressbar");
+    expect(progressbar).toHaveAttribute("aria-valuenow", "2");
+    expect(progressbar).toHaveAttribute("aria-valuemax", "3");
+
+    const buttons = screen.getAllByRole("button");
+    expect(buttons).toHaveLength(3);
+    await user.click(buttons[0]);
+    expect(onStepClick).toHaveBeenCalledWith(0);
+  });
+
   it("axe sem violações serious/critical", async () => {
     render(
       <main>
         <Stepper steps={etapas} currentStep={1} />
         <Stepper steps={etapas} currentStep={2} onStepClick={() => {}} aria-label="Etapas clicáveis" />
+        <Stepper variant="compact" steps={etapas} currentStep={1} onStepClick={() => {}} aria-label="Etapas compacto" />
       </main>
     );
     expect(await severeViolations()).toEqual([]);

@@ -460,6 +460,25 @@ describe("Card e SectionHeader", () => {
     expect(screen.getByRole("heading", { level: 2, name: "Dados pessoais" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 3, name: "Endereço" })).toBeInTheDocument();
   });
+
+  it("Card suporta variantes sólidas de alto contraste (solid-brand e solid-success)", () => {
+    render(
+      <>
+        <Card variant="solid-brand" data-testid="card-brand">
+          <CardHeader>
+            <CardTitle as="h3">Imóvel Urbano</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card variant="solid-success" data-testid="card-success">
+          <CardHeader>
+            <CardTitle as="h3">Imóvel Rural</CardTitle>
+          </CardHeader>
+        </Card>
+      </>
+    );
+    expect(screen.getByTestId("card-brand")).toHaveClass("bg-primary", "text-primary-foreground");
+    expect(screen.getByTestId("card-success")).toHaveClass("bg-feedback-success", "text-text-on-brand");
+  });
 });
 
 describe("Separator", () => {

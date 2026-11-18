@@ -51,6 +51,12 @@ export interface StepperProps
    */
   orientation?: "horizontal" | "vertical";
   /**
+   * Variação visual:
+   * - `connected` (padrão): nós conectados com linha contínua e rótulos.
+   * - `compact`: barra de progresso compacta (ideal para mobile ou cabeçalhos densos).
+   */
+  variant?: "connected" | "compact";
+  /**
    * Torna as etapas clicáveis (botões de 44px). Recebe o índice (base 0).
    * Por padrão só as concluídas e a atual são clicáveis; ajuste com
    * `isStepClickable`.
@@ -84,6 +90,7 @@ const Stepper = React.forwardRef<HTMLOListElement, StepperProps>(
       steps,
       currentStep,
       orientation = "horizontal",
+      variant = "connected",
       onStepClick,
       isStepClickable = defaultIsStepClickable,
       labels,
@@ -95,6 +102,76 @@ const Stepper = React.forwardRef<HTMLOListElement, StepperProps>(
     const text = { ...defaultLabels, ...labels };
     const horizontal = orientation === "horizontal";
     const total = steps.length;
+    const progressPercent = total > 0 ? Math.min(100, Math.max(0, ((Math.min(currentStep + 1, total)) / total) * 100)) : 0;
+    const activeStep = steps[Math.min(currentStep, total - 1)];
+
+    if (variant === "compact") {
+      return (
+        <div
+          ref={ref as unknown as React.Ref<HTMLDivElement>}
+          role="region"
+          aria-label={props["aria-labelledby"] ? ariaLabel : (ariaLabel ?? text.list)}
+          className={cn("flex w-full flex-col gap-2 rounded-md bg-surface p-4 shadow-elevation-1 ring-1 ring-foreground/5", className)}
+        >
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold uppercase tracking-wide text-primary">
+              {text.position(Math.min(currentStep + 1, total), total)}
+            </span>
+            {activeStep ? (
+              <span className="font-bold text-foreground">
+                {activeStep.label}
+              </span>
+            ) : null}
+          </div>
+
+          <div
+            className="h-2 w-full overflow-hidden rounded-full bg-surface-alt"
+            role="progressbar"
+            aria-label={text.position(Math.min(currentStep + 1, total), total)}
+            aria-valuenow={Math.min(currentStep + 1, total)}
+            aria-valuemin={1}
+            aria-valuemax={total}
+            aria-valuetext={`${text.position(Math.min(currentStep + 1, total), total)}: ${activeStep?.label ?? ""}`}
+          >
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-base ease-standard"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+
+          {onStepClick ? (
+            <ol className="flex items-center justify-between gap-1 pt-1" aria-label={text.list}>
+              {steps.map((step, index) => {
+                const status = statusOf(index, currentStep);
+                const clickable = isStepClickable(index, status);
+                const isCurrent = status === "current";
+                return (
+                  <li key={index} className="flex-1">
+                    <button
+                      type="button"
+                      disabled={!clickable}
+                      aria-current={isCurrent ? "step" : undefined}
+                      onClick={() => onStepClick(index)}
+                      className={cn(
+                        "w-full rounded-sm py-1 text-center text-xs font-semibold transition-colors duration-fast ease-standard focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                        isCurrent
+                          ? "bg-primary text-primary-foreground"
+                          : status === "complete"
+                            ? "bg-accent text-accent-foreground hover:bg-accent/80"
+                            : "bg-surface-alt text-muted-foreground hover:bg-accent/50 disabled:pointer-events-none disabled:opacity-50"
+                      )}
+                    >
+                      <span className="sr-only">{text.position(index + 1, total)}: </span>
+                      {index + 1}
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          ) : null}
+        </div>
+      );
+    }
 
     return (
       <ol

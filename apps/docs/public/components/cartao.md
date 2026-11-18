@@ -4,7 +4,7 @@ code: "card"
 slug: "cartao"
 file: "https://github.com/SEMEC-PVH/SEMEC_design_system/blob/main/packages/react/src/components/card.tsx"
 category: "conteudo-dados"
-variants: "composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader · títulos: CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2)"
+variants: "composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader · variante: default (padrão) · solid-brand (azul institucional de alto contraste) · solid-success (verde destaque) · títulos: CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2)"
 ---
 
 # Cartão — `card`
@@ -16,6 +16,7 @@ variants: "composição: Card · CardHeader · CardTitle · CardDescription · C
 ## Variantes
 
 - **composição**: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader
+- **variante**: default (padrão) · solid-brand (azul institucional de alto contraste) · solid-success (verde destaque)
 - **títulos**: CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2)
 
 ## Instalação (@semec/ds)
@@ -46,35 +47,69 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@s
   <CardContent>Parcela em dia.</CardContent>
   <CardFooter><Button>Emitir boleto</Button></CardFooter>
 </Card>
+
+// Cartão sólido de alto contraste para seleção ou destaque
+<Card variant="solid-brand">
+  <CardHeader><CardTitle as="h3">Imóvel Urbano</CardTitle></CardHeader>
+  <CardContent>Classificação por perímetro urbano.</CardContent>
+</Card>
 ```
 
 ## Prompt para IA
 
 ```text
-Use o componente `Card` (Cartão) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Superfície de conteúdo com header, corpo e footer. Sombra pelo token `shadow-elevation-1`. API e variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader · títulos: CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
+Use o componente `Card` (Cartão) importado de `@semec/ds/react`; não reimplemente, não copie o código-fonte e não recrie o estilo com outras classes. Superfície de conteúdo com header, corpo e footer. Sombra pelo token `shadow-elevation-1`. API e variantes: composição: Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader · variante: default (padrão) · solid-brand (azul institucional de alto contraste) · solid-success (verde destaque) · títulos: CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2). Parta do exemplo de uso do componente, com rótulos em PT-BR e tokens do tokens.css (sem hex). Se faltar alguma capacidade, componha com outros componentes do kit ou proponha a mudança por issue no repositório do design system.
 ```
 
 ## Fonte
 
 ```tsx
 import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../lib/utils";
 import type { HeadingTag } from "./heading";
 
-const Card = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "rounded-lg border border-border bg-card text-card-foreground shadow-elevation-1 ring-1 ring-foreground/5",
-      className
-    )}
-    {...props}
-  />
-));
+const cardVariants = cva(
+  "rounded-lg shadow-elevation-1 transition-colors duration-fast ease-standard",
+  {
+    variants: {
+      variant: {
+        default:
+          "border border-border bg-card text-card-foreground ring-1 ring-foreground/5",
+        "solid-brand":
+          "border-transparent bg-primary text-primary-foreground ring-0",
+        "solid-success":
+          "border-transparent bg-feedback-success text-text-on-brand ring-0",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface CardProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {
+  /**
+   * Variação do cartão:
+   * - `default` (padrão): fundo de superfície com borda sutil e sombra.
+   * - `solid-brand`: fundo sólido azul institucional (--action-primary) com alto contraste (WCAG AA).
+   * - `solid-success`: fundo sólido verde sucesso (--feedback-success) com alto contraste (WCAG AA).
+   */
+  variant?: "default" | "solid-brand" | "solid-success";
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, variant, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(cardVariants({ variant }), className)}
+      {...props}
+    />
+  )
+);
 Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<
@@ -188,6 +223,7 @@ SectionHeader.displayName = "SectionHeader";
 
 export {
   Card,
+  cardVariants,
   CardHeader,
   CardFooter,
   CardTitle,

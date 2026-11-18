@@ -570,6 +570,7 @@ export function FormularioExemplo() {
     desc: "Superfície de conteúdo com header, corpo e footer. Sombra pelo token `shadow-elevation-1`.",
     variants: [
       { prop: "composição", values: "Card · CardHeader · CardTitle · CardDescription · CardContent · CardFooter · FormHeader · SectionHeader" },
+      { prop: "variante", values: "default (padrão) · solid-brand (azul institucional de alto contraste) · solid-success (verde destaque)" },
       { prop: "títulos", values: "CardTitle as: h1–h6 · div (padrão) · p · SectionHeader titleAs (padrão h2)" },
     ],
     usage: `import { Card, CardHeader, CardTitle, CardContent, CardFooter, Button } from "@semec/ds/react";
@@ -579,6 +580,12 @@ export function FormularioExemplo() {
   <CardHeader><CardTitle as="h2">IPTU 2026</CardTitle></CardHeader>
   <CardContent>Parcela em dia.</CardContent>
   <CardFooter><Button>Emitir boleto</Button></CardFooter>
+</Card>
+
+// Cartão sólido de alto contraste para seleção ou destaque
+<Card variant="solid-brand">
+  <CardHeader><CardTitle as="h3">Imóvel Urbano</CardTitle></CardHeader>
+  <CardContent>Classificação por perímetro urbano.</CardContent>
 </Card>`,
   },
   {
@@ -762,8 +769,9 @@ import { Button } from "@semec/ds/react";
     label: "Etapas",
     file: "src/components/stepper.tsx",
     category: "navegacao",
-    desc: "Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current=\"step\"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px.",
+    desc: "Etapas de um processo (ex.: requerimento em 3 passos) numa lista ordenada. A etapa atual tem `aria-current=\"step\"` e cada etapa diz em texto (para leitor de tela) se está concluída, atual ou pendente, não só pela cor. Horizontal a partir de 768px e empilhado em telas estreitas. Com `onStepClick`, as etapas concluídas e a atual viram botões de 44px. Suporta variante compacta com barra de progresso para mobile ou cabeçalhos densos.",
     variants: [
+      { prop: "variant", values: "connected (padrão; nós conectados com linha) · compact (barra de progresso compacta)" },
       { prop: "orientation", values: "horizontal (padrão; empilha abaixo de 768px) · vertical" },
       { prop: "estados", values: "concluída (check) · atual (borda e texto em negrito) · pendente; sempre com texto sr-only" },
       { prop: "interação", values: "onStepClick(index) · isStepClickable(index, status) (padrão: concluídas e atual)" },
@@ -778,6 +786,9 @@ const etapas = [
 ];
 
 <Stepper steps={etapas} currentStep={1} />
+
+// Barra compacta para mobile
+<Stepper variant="compact" steps={etapas} currentStep={1} />
 
 // Voltar a uma etapa já preenchida
 <Stepper steps={etapas} currentStep={2} onStepClick={(i) => setEtapa(i)} />`,
