@@ -32,6 +32,7 @@ function comCodigo(texto) {
 }
 
 export default function ReleaseBanner() {
+  if (process.env.NODE_ENV === "production") return null;
   const unreleased = lerUnreleased();
   if (!unreleased?.note) return null;
   return (

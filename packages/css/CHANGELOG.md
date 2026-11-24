@@ -1,5 +1,12 @@
 # @semec/ds-css
 
+## 1.2.0
+
+### Minor Changes
+
+- fef6275: feat(stepper): adiciona variante compact com barra de progresso contínua e chips de navegação
+  feat(card): adiciona variantes sólidas de alto contraste (solid-brand e solid-success)
+
 ## 1.1.1
 
 ### Patch Changes

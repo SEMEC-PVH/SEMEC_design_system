@@ -34,6 +34,8 @@ const mono = localFont({
   display: "swap",
 });
 
+const basePath = process.env.NODE_ENV === "production" ? "/SEMEC_design_system" : "";
+
 export const metadata = {
   title: {
     default: "SEMEC Design System",
@@ -42,7 +44,10 @@ export const metadata = {
   description:
     "Guia visual de referência do design system SEMEC Digital — Prefeitura de Porto Velho.",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: `${basePath}/favicon.ico`, sizes: "any" },
+      { url: `${basePath}/icon.svg`, type: "image/svg+xml" },
+    ],
   },
 };
 
